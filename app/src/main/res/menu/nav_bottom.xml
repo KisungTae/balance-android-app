@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/swipeFragment"
+        android:icon="@drawable/ic_baseline_favorite"
+        android:title="" />
+
+    <item
+        android:id="@+id/likedFragment"
+        android:icon="@drawable/ic_baseline_thumb_up"
+        android:title="" />
+
+    <item
+        android:id="@+id/matchFragment"
+        android:icon="@drawable/ic_baseline_chat_bubble"
+        android:title="" />
+
+    <item
+        android:id="@+id/accountFragment"
+        android:icon="@drawable/ic_baseline_account_circle"
+        android:title="" />
+
+
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_baseline_settings"
+        android:title="" />
+
+
+
+</menu>

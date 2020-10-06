@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:id="@+id/llBalanceGame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvQuestionDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="this is question textview"
+            android:textColor="@color/textBlack" />
+
+        <Button
+            android:id="@+id/btnTopOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="this is top option textview" />
+
+        <Button
+            android:id="@+id/btnBottomOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="this is bottom option textview" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBalanceGameError"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvBalanceGameExceptionMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="this is Error page" />
+
+        <Button
+            android:id="@+id/btnBalanceGameReload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="load questions" />
+
+        <Button
+            android:id="@+id/btnBalanceGameErrorClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="close"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBalanceGameCompletion"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textBlack"
+            android:text="this is you passed or not pass questions page"/>
+
+        <Button
+            android:id="@+id/btnBalanceGameCompletionClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="close" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBalanceGameLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="this is loading page" />
+    </LinearLayout>
+
+</FrameLayout>
