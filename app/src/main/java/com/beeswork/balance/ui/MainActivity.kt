@@ -16,7 +16,12 @@ import com.beeswork.balance.internal.constant.PreferencesDefault
 import com.beeswork.balance.internal.constant.PreferencesKey
 import com.beeswork.balance.internal.constant.PermissionRequestCode
 import com.google.android.gms.location.*
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.activity_main.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -40,6 +45,24 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
         if (hasLocationPermission()) bindLocationManager()
         else requestLocationPermission()
+
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    return@OnCompleteListener
+                }
+
+                // Get new Instance ID token
+                val token = task.result?.token
+
+                // Log and toast
+//                val msg = getString(R.string.msg_token_fmt, token)
+//                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+
+                val bac = 123
+            })
+        // [END retrieve_current_token]
+
     }
 
     private fun hasLocationPermission(): Boolean {

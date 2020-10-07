@@ -1,11 +1,14 @@
-package com.beeswork.balance.data.network
+package com.beeswork.balance
 
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.FirebaseInstanceIdService
 import com.google.firebase.messaging.FirebaseMessagingService
+
 
 class BalanceFirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
-//         super.onNewToken(token)
-        println("firebas token: $token ")
+        println("new token: $token")
     }
+
 }
