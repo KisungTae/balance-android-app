@@ -30,4 +30,7 @@ interface BalanceRepository {
 
     // match
     fun click(swipedId: String, swipeId:Long)
+
+    // firebaseMessagingToken
+    fun insertFirebaseMessagingToken(token: String)
 }

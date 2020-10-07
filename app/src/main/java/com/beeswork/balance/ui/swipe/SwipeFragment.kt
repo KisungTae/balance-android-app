@@ -62,7 +62,8 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
 
         photoBtn.setOnClickListener {
-            balanceRepository.insertMatch()
+//            balanceRepository.insertMatch()
+            balanceRepository.insertFirebaseMessagingToken("test token")
         }
 
         cardStackAdapter = CardStackAdapter()

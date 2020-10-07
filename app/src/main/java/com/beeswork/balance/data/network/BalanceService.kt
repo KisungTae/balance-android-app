@@ -3,9 +3,10 @@ package com.beeswork.balance.data.network
 import com.beeswork.balance.data.entity.Click
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
-import com.beeswork.balance.data.network.request.Swipe
+import com.beeswork.balance.data.network.request.FirebaseMessagingTokenRequest
+import com.beeswork.balance.data.network.request.SwipeRequest
 import com.beeswork.balance.data.network.response.BalanceGame
-import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.data.network.response.EmptyJsonResponse
 import com.beeswork.balance.internal.constant.NetworkConstant
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
@@ -34,10 +35,13 @@ interface BalanceService {
     ): Response<MutableList<Card>>
 
     @POST("swipe")
-    suspend fun swipe(@Body swipe: Swipe): Response<BalanceGame>
+    suspend fun swipe(@Body swipeRequest: SwipeRequest): Response<BalanceGame>
 
     @POST("click")
-    suspend fun click(@Body swipe: Swipe): Response<Click>
+    suspend fun click(@Body swipeRequest: SwipeRequest): Response<Click>
+
+    @POST("account/message-token/save")
+    suspend fun postFirebaseMessagingToken(@Body firebaseMessagingTokenRequest: FirebaseMessagingTokenRequest): Response<EmptyJsonResponse>
 
     companion object {
         operator fun invoke(

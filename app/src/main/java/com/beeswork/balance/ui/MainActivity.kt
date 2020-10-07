@@ -46,21 +46,21 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         if (hasLocationPermission()) bindLocationManager()
         else requestLocationPermission()
 
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    return@OnCompleteListener
-                }
-
-                // Get new Instance ID token
-                val token = task.result?.token
-
-                // Log and toast
-//                val msg = getString(R.string.msg_token_fmt, token)
-//                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-
-                val bac = 123
-            })
+//        FirebaseInstanceId.getInstance().instanceId
+//            .addOnCompleteListener(OnCompleteListener { task ->
+//                if (!task.isSuccessful) {
+//                    return@OnCompleteListener
+//                }
+//
+//                // Get new Instance ID token
+//                val token = task.result?.token
+//
+//                // Log and toast
+////                val msg = getString(R.string.msg_token_fmt, token)
+////                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+//
+//                val bac = 123
+//            })
         // [END retrieve_current_token]
 
     }

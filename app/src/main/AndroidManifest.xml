@@ -24,7 +24,7 @@
         </activity>
 
         <service
-            android:name=".BalanceFirebaseMessagingService"
+            android:name=".service.BalanceFirebaseMessagingService"
             android:exported="false">
 
             <intent-filter>

@@ -3,8 +3,10 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.entity.Click
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.BalanceService
-import com.beeswork.balance.data.network.request.Swipe
+import com.beeswork.balance.data.network.request.FirebaseMessagingTokenRequest
+import com.beeswork.balance.data.network.request.SwipeRequest
 import com.beeswork.balance.data.network.response.BalanceGame
+import com.beeswork.balance.data.network.response.EmptyJsonResponse
 import com.beeswork.balance.internal.Resource
 
 class BalanceRDSImpl(
@@ -39,7 +41,7 @@ class BalanceRDSImpl(
         swipedId: String
     ): Resource<BalanceGame> {
         return getResult {
-            balanceService.swipe(Swipe(swiperId, swiperEmail, swipedId))
+            balanceService.swipe(SwipeRequest(swiperId, swiperEmail, swipedId))
         }
     }
 
@@ -50,7 +52,17 @@ class BalanceRDSImpl(
         swipeId: Long
     ): Resource<Click> {
         return getResult {
-            balanceService.click(Swipe(swiperId, swiperEmail, swipedId, swipeId))
+            balanceService.click(SwipeRequest(swiperId, swiperEmail, swipedId, swipeId))
+        }
+    }
+
+    override suspend fun postFirebaseMessagingToken(
+        accountId: String,
+        email: String,
+        token: String
+    ): Resource<EmptyJsonResponse> {
+        return getResult {
+            balanceService.postFirebaseMessagingToken(FirebaseMessagingTokenRequest(accountId, email, token))
         }
     }
 

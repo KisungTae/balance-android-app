@@ -34,14 +34,18 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().matchDAO() }
         bind() from singleton { instance<BalanceDatabase>().messageDAO() }
         bind() from singleton { instance<BalanceDatabase>().failedClickDAO() }
+        bind() from singleton { instance<BalanceDatabase>().firebaseMessagingTokenDAO() }
         bind<BalanceRepository>() with singleton {
-            BalanceRepositoryImpl(instance(),
-                                  instance(),
-                                  instance(),
-                                  instance(),
-                                  instance())
+            BalanceRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
 
-            
+
         }
 
         // Factory

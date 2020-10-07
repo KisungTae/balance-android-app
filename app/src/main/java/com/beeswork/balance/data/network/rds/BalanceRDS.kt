@@ -3,6 +3,7 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.entity.Click
 import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.Card
+import com.beeswork.balance.data.network.response.EmptyJsonResponse
 import com.beeswork.balance.internal.Resource
 
 interface BalanceRDS {
@@ -29,6 +30,12 @@ interface BalanceRDS {
         swipedId: String,
         swipeId: Long
     ): Resource<Click>
+
+    suspend fun postFirebaseMessagingToken(
+        accountId: String,
+        email:String,
+        token: String
+    ): Resource<EmptyJsonResponse>
 
 //    suspend fun fetchCards(
 //        id: String,
