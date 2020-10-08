@@ -68,13 +68,15 @@ class BalanceRepositoryImpl(
 
 
                 val cardsResource =
-                    balanceRDS.fetchCards(accountId,
-                                          latitude,
-                                          longitude,
-                                          minAge,
-                                          maxAge,
-                                          gender,
-                                          distance)
+                    balanceRDS.fetchCards(
+                        accountId,
+                        latitude,
+                        longitude,
+                        minAge,
+                        maxAge,
+                        gender,
+                        distance
+                    )
 
                 if (cardsResource.status == Resource.Status.SUCCESS) {
                     val matchedIds = matchDAO.getMatchedIds().toHashSet()
@@ -110,7 +112,7 @@ class BalanceRepositoryImpl(
     }
 
     //  TEST 1. even if you leave the app before completing the network call, when you come back to the app
-//          you will get the response. The response is received in the background
+    //          you will get the response. The response is received in the background
     override fun click(swipedId: String, swipeId: Long) {
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -138,15 +140,17 @@ class BalanceRepositoryImpl(
             val accountId = preferenceProvider.getAccountId()
             val email = preferenceProvider.getEmail()
 
-            val toke = firebaseMessagingTokenDAO.get()
-
-            firebaseMessagingTokenDAO.insert(FirebaseMessagingToken(token, false, OffsetDateTime.now()))
+            firebaseMessagingTokenDAO.insert(
+                FirebaseMessagingToken(
+                    token,
+                    false,
+                    OffsetDateTime.now()
+                )
+            )
             val tokenResource = balanceRDS.postFirebaseMessagingToken(accountId, email, token)
             if (tokenResource.status == Resource.Status.SUCCESS) {
                 firebaseMessagingTokenDAO.updatePosted(FirebaseMessagingTokenConstant.id, true)
             }
-
-
         }
     }
 
@@ -156,35 +160,16 @@ class BalanceRepositoryImpl(
 
             val matchedId = Random.nextInt(0, 100000)
 
-
-            val ids = mutableListOf(
-                "456cb6c4-91e3-4b9d-8dda-062306154c6f",
-                "743e394b-9779-437e-8028-769994e08582",
-                "65efa75d-2427-42bb-b8d4-014e39a1676e",
-                "c0ca134c-9fd1-4cc5-a8cc-2fb424a9ece5",
-                "6115de7b-c18c-4cf9-bca1-b707c2074438",
-                "64bf31be-35c9-451b-8f63-42147e2d69ca",
-                "12ad4ace-f398-4762-b077-20be7c39a088",
-                "e05f7775-7177-489d-9baf-78287ba4e8d9",
-                "b5e8f581-eb5f-42e8-9751-b1fd81908eb7",
-                "9e10a345-f96c-41ae-8028-f25f962f24a4",
-                "3b89913e-ad48-4179-bee7-500adaca19df",
-                "880e8f70-852a-411a-8f8d-1a0aa5b0a4fb",
-                "87d81a6c-ba4c-4c1d-94ea-288b883fb840",
-                "ad48930a-c7de-4901-880b-329eac5a44a6",
-                "81b5fac0-e232-46c0-934f-697f39d2d7a5")
-
-
-            val match = Match(null,
-                              matchedId.toString(),
-                              "name - $matchedId",
-                              false,
-                              "recent message $matchedId",
-                              OffsetDateTime.now(),
-                              OffsetDateTime.now())
+            val match = Match(
+                null,
+                matchedId.toString(),
+                "name - $matchedId",
+                false,
+                "recent message $matchedId",
+                OffsetDateTime.now(),
+                OffsetDateTime.now()
+            )
             matchDAO.insert(match)
-
-
         }
     }
 
@@ -212,11 +197,13 @@ class BalanceRepositoryImpl(
 
             val randomMessage = Random.nextInt(0, 100000)
 
-            val message = Message(null,
-                                  2,
-                                  Random.nextBoolean(),
-                                  "message - $randomMessage",
-                                  OffsetDateTime.now())
+            val message = Message(
+                null,
+                2,
+                Random.nextBoolean(),
+                "message - $randomMessage",
+                OffsetDateTime.now()
+            )
             messageDAO.insert(message)
         }
     }
