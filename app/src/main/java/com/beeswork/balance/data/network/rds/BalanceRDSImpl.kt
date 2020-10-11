@@ -3,7 +3,7 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.entity.Click
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.BalanceService
-import com.beeswork.balance.data.network.request.FirebaseMessagingTokenRequest
+import com.beeswork.balance.data.network.request.FCMTokenRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
 import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
@@ -25,7 +25,7 @@ class BalanceRDSImpl(
     ): Resource<MutableList<Card>> {
 
         return getResult {
-            balanceService.fetchCardsAsync(accountId,
+            balanceService.fetchCards(accountId,
                                            latitude,
                                            longitude,
                                            minAge,
@@ -56,13 +56,13 @@ class BalanceRDSImpl(
         }
     }
 
-    override suspend fun postFirebaseMessagingToken(
+    override suspend fun postFCMToken(
         accountId: String,
         email: String,
         token: String
     ): Resource<EmptyJsonResponse> {
         return getResult {
-            balanceService.postFirebaseMessagingToken(FirebaseMessagingTokenRequest(accountId, email, token))
+            balanceService.postFCMToken(FCMTokenRequest(accountId, email, token))
         }
     }
 

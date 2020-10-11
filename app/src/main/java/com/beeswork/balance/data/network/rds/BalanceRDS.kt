@@ -31,7 +31,7 @@ interface BalanceRDS {
         swipeId: Long
     ): Resource<Click>
 
-    suspend fun postFirebaseMessagingToken(
+    suspend fun postFCMToken(
         accountId: String,
         email:String,
         token: String

@@ -7,22 +7,27 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
+import com.beeswork.balance.data.dao.FCMTokenDAO
 import com.beeswork.balance.data.network.BalanceService
 import com.beeswork.balance.data.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.Resource
-import com.beeswork.balance.internal.constant.CardStack
 import com.beeswork.balance.internal.constant.DialogTag
+import com.beeswork.balance.internal.constant.MIN_CARD_STACK_SIZE
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.SwipeableMethod
 import kotlinx.android.synthetic.main.fragment_swipe.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+
+
 
 
 class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
@@ -36,6 +41,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     //  TODO: remove me
     private val balanceService: BalanceService by instance()
     private val balanceRepository: BalanceRepository by instance()
+    private val fcmTokenDAO: FCMTokenDAO by instance()
 
 
     override fun onCreateView(
@@ -63,7 +69,11 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
         photoBtn.setOnClickListener {
 //            balanceRepository.insertMatch()
-            balanceRepository.insertFirebaseMessagingToken("test token")
+//            balanceRepository.insertFCMToken("test token")
+            CoroutineScope(Dispatchers.IO).launch {
+                println("fcm token:"+ fcmTokenDAO.get()[0].token)
+            }
+
         }
 
         cardStackAdapter = CardStackAdapter()
@@ -143,7 +153,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
         val removedCard = cardStackAdapter.removeCard()
 
-        if (cardStackAdapter.itemCount < CardStack.MIN_SIZE)
+        if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE)
             viewModel.fetchCards()
 
         if (direction == Direction.Right && removedCard != null) {

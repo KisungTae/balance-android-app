@@ -4,18 +4,18 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.beeswork.balance.data.entity.FirebaseMessagingToken
+import com.beeswork.balance.data.entity.FCMToken
 
 @Dao
-interface FirebaseMessagingTokenDAO {
+interface FCMTokenDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(firebaseMessagingToken: FirebaseMessagingToken)
+    fun insert(FCMToken: FCMToken)
 
     @Query("update firebaseMessagingToken set posted = :posted where id = :id")
     fun updatePosted(id:Int, posted: Boolean)
 
     @Query("select * from firebaseMessagingToken")
-    fun get(): List<FirebaseMessagingToken>
+    fun get(): List<FCMToken>
 
 }

@@ -1,7 +1,6 @@
 package com.beeswork.balance.ui.swipe
 
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import androidx.preference.PreferenceManager

@@ -4,20 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.dao.ClickDAO
-import com.beeswork.balance.data.dao.FirebaseMessagingTokenDAO
+import com.beeswork.balance.data.dao.FCMTokenDAO
 import com.beeswork.balance.data.dao.MatchDAO
 import com.beeswork.balance.data.dao.MessageDAO
-import com.beeswork.balance.data.entity.Click
-import com.beeswork.balance.data.entity.FirebaseMessagingToken
+import com.beeswork.balance.data.entity.*
 import com.beeswork.balance.data.network.response.Card
-import com.beeswork.balance.data.entity.Match
-import com.beeswork.balance.data.entity.Message
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.CURRENT_FCM_TOKEN_ID
 import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.constant.FirebaseMessagingTokenConstant
 import com.beeswork.balance.internal.converter.Convert
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
@@ -28,7 +25,7 @@ class BalanceRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val messageDAO: MessageDAO,
     private val clickDAO: ClickDAO,
-    private val firebaseMessagingTokenDAO: FirebaseMessagingTokenDAO,
+    private val fcmTokenDAO: FCMTokenDAO,
     private val balanceRDS: BalanceRDS,
     private val preferenceProvider: PreferenceProvider
 ) : BalanceRepository {
@@ -135,21 +132,16 @@ class BalanceRepositoryImpl(
 
     }
 
-    override fun insertFirebaseMessagingToken(token: String) {
+    override fun insertFCMToken(token: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
             val email = preferenceProvider.getEmail()
 
-            firebaseMessagingTokenDAO.insert(
-                FirebaseMessagingToken(
-                    token,
-                    false,
-                    OffsetDateTime.now()
-                )
-            )
-            val tokenResource = balanceRDS.postFirebaseMessagingToken(accountId, email, token)
+            fcmTokenDAO.insert(FCMToken(token, false, OffsetDateTime.now()))
+
+            val tokenResource = balanceRDS.postFCMToken(accountId, email, token)
             if (tokenResource.status == Resource.Status.SUCCESS) {
-                firebaseMessagingTokenDAO.updatePosted(FirebaseMessagingTokenConstant.id, true)
+                fcmTokenDAO.updatePosted(CURRENT_FCM_TOKEN_ID, true)
             }
         }
     }

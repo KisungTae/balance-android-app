@@ -3,11 +3,12 @@ package com.beeswork.balance.data.network
 import com.beeswork.balance.data.entity.Click
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
-import com.beeswork.balance.data.network.request.FirebaseMessagingTokenRequest
+import com.beeswork.balance.data.network.request.FCMTokenRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
 import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
-import com.beeswork.balance.internal.constant.NetworkConstant
+import com.beeswork.balance.internal.constant.NETWORK_CONNECTION_TIMEOUT
+import com.beeswork.balance.internal.constant.NETWORK_READ_TIMEOUT
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -24,7 +25,7 @@ interface BalanceService {
 
 
     @GET("recommend")
-    suspend fun fetchCardsAsync(
+    suspend fun fetchCards(
         @Query(value = "account_id") accountId: String,
         @Query(value = "latitude") latitude: Double,
         @Query(value = "longitude") longitude: Double,
@@ -40,8 +41,8 @@ interface BalanceService {
     @POST("click")
     suspend fun click(@Body swipeRequest: SwipeRequest): Response<Click>
 
-    @POST("account/message-token/save")
-    suspend fun postFirebaseMessagingToken(@Body firebaseMessagingTokenRequest: FirebaseMessagingTokenRequest): Response<EmptyJsonResponse>
+    @POST("account/fcm/token/save")
+    suspend fun postFCMToken(@Body fcmTokenRequest: FCMTokenRequest): Response<EmptyJsonResponse>
 
     companion object {
         operator fun invoke(
@@ -50,8 +51,8 @@ interface BalanceService {
 
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(connectivityInterceptor)
-                .readTimeout(NetworkConstant.READ_TIMEOUT, TimeUnit.SECONDS)
-                .connectTimeout(NetworkConstant.CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(NETWORK_READ_TIMEOUT, TimeUnit.SECONDS)
+                .connectTimeout(NETWORK_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                 .build();
 
             return Retrofit.Builder()

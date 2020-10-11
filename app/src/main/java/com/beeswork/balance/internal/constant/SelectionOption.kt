@@ -1,6 +1,6 @@
 package com.beeswork.balance.internal.constant
 
-class QuestionOption {
+class SelectionOption {
 
     companion object {
         const val TOP = true

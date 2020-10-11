@@ -12,7 +12,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.IntentAction
-import com.beeswork.balance.internal.constant.IntentDataKey
 import com.beeswork.balance.internal.constant.NotificationChannelConstant
 import com.beeswork.balance.ui.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -28,60 +27,62 @@ class BalanceFirebaseMessagingService : FirebaseMessagingService(), KodeinAware 
     private val balanceRepository: BalanceRepository by instance()
 
     override fun onNewToken(token: String) {
-        balanceRepository.insertFirebaseMessagingToken(token)
+
+        balanceRepository.insertFCMToken(token)
     }
-
-
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+
         super.onMessageReceived(remoteMessage)
 
-        val messageReceived = remoteMessage.data
-        println("message received: $messageReceived")
+        val intent = Intent().apply { action = IntentAction.RECEIVED_FCM_NOTIFICATION }
 
-        createNotificationChannel()
+        for ((key, value) in remoteMessage.data) {
+            intent.putExtra(key, value)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
 
-//        val intent = Intent().apply {
-//            action = IntentAction.SEND_MESSAGE
-//            putExtra(IntentDataKey.MESSAGE, "this is test message from fireabseservice")
+    override fun onDeletedMessages() {
+
+        super.onDeletedMessages()
+    }
+
+//    private fun showNotification() {
+//        val intent = Intent(this, MainActivity::class.java).apply {
+//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 //        }
-//        LocalBroadcastManager.getInstance(this)
-
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-
-        var builder = NotificationCompat.Builder(this, NotificationChannelConstant.ID)
-            .setSmallIcon(R.drawable.ic_baseline_account_circle)
-            .setContentTitle("this is notification title")
-            .setContentText("this is notification message")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        with(NotificationManagerCompat.from(this)) {
-            // notificationId is a unique int for each notification that you must define
-            notify(3, builder.build())
-        }
-
-    }
-
-    private fun createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = NotificationChannelConstant.NAME
-            val descriptionText = NotificationChannelConstant.DESCRIPTION
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel =
-                NotificationChannel(NotificationChannelConstant.ID, name, importance).apply {
-                    description = descriptionText
-                }
-            // Register the channel with the system
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
+//        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+//
+//        val builder = NotificationCompat.Builder(this, "CHANNEL_ID")
+//            .setSmallIcon(R.drawable.ic_baseline_account_circle)
+//            .setContentTitle("My notification")
+//            .setContentText("Hello World!")
+//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//            // Set the intent that will fire when the user taps the notification
+//            .setContentIntent(pendingIntent)
+//            .setAutoCancel(true)
+//
+//        with(NotificationManagerCompat.from(this)) {
+//            // notificationId is a unique int for each notification that you must define
+//            notify(1, builder.build())
+//        }
+//    }
+//
+//
+//    private fun createNotificationChannel() {
+//        // Create the NotificationChannel, but only on API 26+ because
+//        // the NotificationChannel class is new and not in the support library
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//
+//            val importance = NotificationManager.IMPORTANCE_DEFAULT
+//            val channel = NotificationChannel("CHANNEL_ID", "name", importance).apply {
+//                description = "descriptionText"
+//            }
+//            // Register the channel with the system
+//            val notificationManager: NotificationManager =
+//                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//    }
 }

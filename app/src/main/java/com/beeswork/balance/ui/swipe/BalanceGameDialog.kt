@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Question
-import com.beeswork.balance.internal.constant.QuestionOption
+import com.beeswork.balance.internal.constant.SelectionOption
 import kotlinx.android.synthetic.main.dialog_balance_game.*
 
 class BalanceGameDialog(
@@ -31,14 +31,13 @@ class BalanceGameDialog(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        println("onCreateView")
         return inflater.inflate(R.layout.dialog_balance_game, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btnTopOption.setOnClickListener { checkAnswer(QuestionOption.TOP) }
-        btnBottomOption.setOnClickListener { checkAnswer(QuestionOption.BOTTOM) }
+        btnTopOption.setOnClickListener { checkAnswer(SelectionOption.TOP) }
+        btnBottomOption.setOnClickListener { checkAnswer(SelectionOption.BOTTOM) }
         btnBalanceGameReload.setOnClickListener { balanceGameListener.onBalanceGameReload(swipedId) }
         btnBalanceGameErrorClose.setOnClickListener { dismiss() }
         btnBalanceGameCompletionClose.setOnClickListener { dismiss() }

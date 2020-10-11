@@ -3,18 +3,18 @@ package com.beeswork.balance.data.database
 import android.content.Context
 import androidx.room.*
 import com.beeswork.balance.data.dao.ClickDAO
-import com.beeswork.balance.data.dao.FirebaseMessagingTokenDAO
+import com.beeswork.balance.data.dao.FCMTokenDAO
 import com.beeswork.balance.data.dao.MatchDAO
 import com.beeswork.balance.data.dao.MessageDAO
 import com.beeswork.balance.data.entity.Click
-import com.beeswork.balance.data.entity.FirebaseMessagingToken
+import com.beeswork.balance.data.entity.FCMToken
 import com.beeswork.balance.data.entity.Match
 import com.beeswork.balance.data.entity.Message
 import com.beeswork.balance.internal.converter.OffsetDateTimeConverter
 
 
 @Database(
-    entities = [Match::class, Message::class, Click::class, FirebaseMessagingToken::class],
+    entities = [Match::class, Message::class, Click::class, FCMToken::class],
     version = 1
 )
 @TypeConverters(OffsetDateTimeConverter::class)
@@ -23,7 +23,7 @@ abstract class BalanceDatabase : RoomDatabase() {
     abstract fun matchDAO(): MatchDAO
     abstract fun messageDAO(): MessageDAO
     abstract fun failedClickDAO(): ClickDAO
-    abstract fun firebaseMessagingTokenDAO(): FirebaseMessagingTokenDAO
+    abstract fun firebaseMessagingTokenDAO(): FCMTokenDAO
 
     companion object {
 

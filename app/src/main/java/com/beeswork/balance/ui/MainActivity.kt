@@ -1,20 +1,25 @@
 package com.beeswork.balance.ui
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.*
-import com.beeswork.balance.internal.constant.PreferencesDefault
-import com.beeswork.balance.internal.constant.PreferencesKey
-import com.beeswork.balance.internal.constant.PermissionRequestCode
+import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.ui.dialog.MatchDialog
+import com.google.android.gms.cloudmessaging.CloudMessagingReceiver
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
@@ -31,6 +36,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
+    private lateinit var broadcastReceiver: BroadcastReceiver
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,26 +49,36 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         nvBottom.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
         nvBottom.setupWithNavController(navHostFragment.navController)
 
+        setupBroadcastReceiver()
+
         if (hasLocationPermission()) bindLocationManager()
         else requestLocationPermission()
+    }
 
-//        FirebaseInstanceId.getInstance().instanceId
-//            .addOnCompleteListener(OnCompleteListener { task ->
-//                if (!task.isSuccessful) {
-//                    return@OnCompleteListener
-//                }
-//
-//                // Get new Instance ID token
-//                val token = task.result?.token
-//
-//                // Log and toast
-////                val msg = getString(R.string.msg_token_fmt, token)
-////                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-//
-//                val bac = 123
-//            })
-        // [END retrieve_current_token]
+    override fun onResume() {
+        super.onResume()
 
+        val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
+        println("main activity on resume get intent")
+        println(type ?: "null")
+
+        val filter = IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter)
+    }
+
+    override fun onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
+        super.onPause()
+    }
+
+    private fun setupBroadcastReceiver() {
+        broadcastReceiver = object: BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val notificationType = intent?.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
+                println("broadcast received: $notificationType")
+                MatchDialog("", "").show(supportFragmentManager, DialogTag.MATCH_DIALOG)
+            }
+        }
     }
 
     private fun hasLocationPermission(): Boolean {

@@ -3,6 +3,6 @@ package com.beeswork.balance.internal.constant
 class IntentAction {
 
     companion object {
-        const val SEND_MESSAGE = "INTENT_ACTION_SEND_MESSAGE"
+        const val RECEIVED_FCM_NOTIFICATION = "INTENT_ACTION_RECEIVED_FCM_NOTIFICATION"
     }
 }
