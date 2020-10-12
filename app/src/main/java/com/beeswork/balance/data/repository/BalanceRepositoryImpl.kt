@@ -3,10 +3,7 @@ package com.beeswork.balance.data.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
-import com.beeswork.balance.data.dao.ClickDAO
-import com.beeswork.balance.data.dao.FCMTokenDAO
-import com.beeswork.balance.data.dao.MatchDAO
-import com.beeswork.balance.data.dao.MessageDAO
+import com.beeswork.balance.data.dao.*
 import com.beeswork.balance.data.entity.*
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.rds.BalanceRDS
@@ -26,6 +23,7 @@ class BalanceRepositoryImpl(
     private val messageDAO: MessageDAO,
     private val clickDAO: ClickDAO,
     private val fcmTokenDAO: FCMTokenDAO,
+    private val clickedDAO: ClickedDAO,
     private val balanceRDS: BalanceRDS,
     private val preferenceProvider: PreferenceProvider
 ) : BalanceRepository {
@@ -39,7 +37,6 @@ class BalanceRepositoryImpl(
         get() = mutableBalanceGame
 
     private var cardsBeingFetched = false
-
 
     override fun fetchCards() {
 
@@ -55,25 +52,9 @@ class BalanceRepositoryImpl(
                 val gender = preferenceProvider.getGender()
                 val distance = preferenceProvider.getDistance()
 
-//                println("accountId: $accountId")
-//                println("latitude: $latitude")
-//                println("longitude: $longitude")
-//                println("minAge: $minAge")
-//                println("maxAge: $maxAge")
-//                println("gender: $gender")
-//                println("distance: $distance")
-
 
                 val cardsResource =
-                    balanceRDS.fetchCards(
-                        accountId,
-                        latitude,
-                        longitude,
-                        minAge,
-                        maxAge,
-                        gender,
-                        distance
-                    )
+                    balanceRDS.fetchCards(accountId, latitude, longitude, minAge, maxAge, gender, distance)
 
                 if (cardsResource.status == Resource.Status.SUCCESS) {
                     val matchedIds = matchDAO.getMatchedIds().toHashSet()
@@ -146,6 +127,7 @@ class BalanceRepositoryImpl(
         }
     }
 
+
     override fun insertMatch() {
 
         GlobalScope.launch(Dispatchers.IO) {
@@ -155,15 +137,21 @@ class BalanceRepositoryImpl(
             val match = Match(
                 null,
                 matchedId.toString(),
-                "name - $matchedId",
+                "",
+                "",
                 false,
-                "recent message $matchedId",
+                "",
                 OffsetDateTime.now(),
                 OffsetDateTime.now()
             )
             matchDAO.insert(match)
         }
     }
+
+    override suspend fun fetchMatches() {
+        TODO("Not yet implemented")
+    }
+
 
     override suspend fun getMatches(): LiveData<List<Match>> {
         return withContext(Dispatchers.IO) {

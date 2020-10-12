@@ -6,9 +6,8 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.beeswork.balance.data.entity.Message
 import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.internal.constant.CHAT_PAGE_SIZE
 import com.beeswork.balance.internal.lazyDeferred
-
-const val PAGE_SIZE = 30
 
 class ChatViewModel(
     private val matchId: Int,
@@ -17,8 +16,8 @@ class ChatViewModel(
 
     private val pagedListConfig = PagedList.Config.Builder()
         .setEnablePlaceholders(false)
-        .setInitialLoadSizeHint(PAGE_SIZE)
-        .setPageSize(PAGE_SIZE)
+        .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
+        .setPageSize(CHAT_PAGE_SIZE)
         .build()
 
     val messages by lazyDeferred {

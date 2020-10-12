@@ -15,6 +15,7 @@ data class Match(
     val id: Long? = null,
 
     val matchedId: String,
+    val photoKey: String,
     val name: String,
     val unmatched: Boolean,
     val recentMessage: String,

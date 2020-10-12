@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui
+package com.beeswork.balance.ui.main
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -18,15 +18,10 @@ import androidx.preference.PreferenceManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.*
 import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
-import com.google.android.gms.cloudmessaging.CloudMessagingReceiver
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.activity_main.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -37,7 +32,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
     private lateinit var broadcastReceiver: BroadcastReceiver
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,9 +68,16 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private fun setupBroadcastReceiver() {
         broadcastReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                val notificationType = intent?.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
-                println("broadcast received: $notificationType")
-                MatchDialog("", "").show(supportFragmentManager, DialogTag.MATCH_DIALOG)
+
+                when (intent?.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)) {
+                    NotificationType.MATCH -> {
+                        MatchDialog("", "").show(supportFragmentManager, DialogTag.MATCH_DIALOG)
+                    }
+                    NotificationType.CLICKED -> {
+                        ClickedDialog("").show(supportFragmentManager, DialogTag.CLICKED_DIALOG)
+                    }
+                }
+
             }
         }
     }

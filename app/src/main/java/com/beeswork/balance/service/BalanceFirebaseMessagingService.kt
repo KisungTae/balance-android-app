@@ -1,19 +1,9 @@
 package com.beeswork.balance.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.beeswork.balance.R
 import com.beeswork.balance.data.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.IntentAction
-import com.beeswork.balance.internal.constant.NotificationChannelConstant
-import com.beeswork.balance.ui.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.kodein.di.KodeinAware

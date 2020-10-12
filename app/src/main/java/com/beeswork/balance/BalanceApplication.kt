@@ -13,6 +13,7 @@ import com.beeswork.balance.data.provider.PreferenceProviderImpl
 import com.beeswork.balance.data.repository.BalanceRepository
 import com.beeswork.balance.data.repository.BalanceRepositoryImpl
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
+import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
@@ -33,10 +34,12 @@ class BalanceApplication : Application(), KodeinAware {
         // DAO
         bind() from singleton { instance<BalanceDatabase>().matchDAO() }
         bind() from singleton { instance<BalanceDatabase>().messageDAO() }
-        bind() from singleton { instance<BalanceDatabase>().failedClickDAO() }
-        bind() from singleton { instance<BalanceDatabase>().firebaseMessagingTokenDAO() }
+        bind() from singleton { instance<BalanceDatabase>().clickDAO() }
+        bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
+        bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
         bind<BalanceRepository>() with singleton {
             BalanceRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -52,6 +55,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { MatchViewModelFactory(instance()) }
         bind() from factory { matchId: Int -> ChatViewModelFactory(matchId, instance()) }
         bind() from provider { SwipeViewModelFactory(instance()) }
+        bind() from provider { ClickedViewModelFactory(instance()) }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }

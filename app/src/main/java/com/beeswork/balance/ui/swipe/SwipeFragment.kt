@@ -159,7 +159,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         if (direction == Direction.Right && removedCard != null) {
             viewModel.swipe(removedCard.accountId)
             BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(childFragmentManager,
-                                                                              DialogTag.BALANCE_DIALOG)
+                DialogTag.BALANCE_DIALOG)
         }
     }
 

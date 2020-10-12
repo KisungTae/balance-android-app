@@ -8,7 +8,7 @@ import org.threeten.bp.OffsetDateTime
 
 
 
-@Entity(tableName = "firebaseMessagingToken")
+@Entity(tableName = "fcmToken")
 data class FCMToken(
 
     val token: String,

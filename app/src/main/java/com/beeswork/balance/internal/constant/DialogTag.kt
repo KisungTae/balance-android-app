@@ -6,5 +6,6 @@ class DialogTag {
         const val SWIPE_FILTER_DIALOG = "swipeFilterDialog"
         const val BALANCE_DIALOG = "balanceDialog"
         const val MATCH_DIALOG = "matchDialog"
+        const val CLICKED_DIALOG = "clickedDialog"
     }
 }

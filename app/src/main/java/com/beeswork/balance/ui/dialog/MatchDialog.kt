@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
+import kotlinx.android.synthetic.main.dialog_match.*
 
 class MatchDialog(
     private val matcherPhotoKey: String,
@@ -24,5 +25,15 @@ class MatchDialog(
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.dialog_match, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnMatchDialogClose.setOnClickListener { dismiss() }
+        btnMatchDialogGoToChat.setOnClickListener {
+            // go to chat
+
+            dismiss()
+        }
     }
 }

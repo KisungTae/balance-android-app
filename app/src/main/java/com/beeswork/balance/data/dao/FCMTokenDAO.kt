@@ -12,10 +12,10 @@ interface FCMTokenDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(FCMToken: FCMToken)
 
-    @Query("update firebaseMessagingToken set posted = :posted where id = :id")
+    @Query("update fcmToken set posted = :posted where id = :id")
     fun updatePosted(id:Int, posted: Boolean)
 
-    @Query("select * from firebaseMessagingToken")
+    @Query("select * from fcmToken")
     fun get(): List<FCMToken>
 
 }

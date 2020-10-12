@@ -36,4 +36,16 @@
         android:name="com.beeswork.balance.ui.settings.SettingsFragment"
         android:label="SettingsFragment"/>
 
+    <fragment
+        android:id="@+id/clickedFragment"
+        android:name="com.beeswork.balance.ui.clicked.ClickedFragment"
+        android:label="ClickedFragment"
+        tools:layout="@layout/fragment_clicked" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.beeswork.balance.ui.profile.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile"/>
+
 </navigation>

@@ -41,8 +41,8 @@ class ChatFragment: ScopeFragment(), KodeinAware {
         return inflater.inflate(R.layout.fragment_chat, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val safeArgs = arguments?.let { ChatFragmentArgs.fromBundle(it) }
         val matchId = safeArgs?.chatId ?: throw MatchIdNotFoundException()

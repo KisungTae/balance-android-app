@@ -12,6 +12,7 @@ import com.beeswork.balance.internal.Resource
 interface BalanceRepository {
 
     // match
+    suspend fun fetchMatches()
     fun insertMatch()
     fun unmatch()
     suspend fun getMatches(): LiveData<List<Match>>
