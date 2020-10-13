@@ -15,10 +15,10 @@ data class Match(
     val id: Long? = null,
 
     val matchedId: String,
-    val photoKey: String,
-    val name: String,
-    val unmatched: Boolean,
-    val recentMessage: String,
-    val lastRead: OffsetDateTime? = null,
-    val updatedAt: OffsetDateTime? = null
+    var photoKey: String,
+    var name: String,
+    var unmatched: Boolean,
+    var recentMessage: String,
+    var lastRead: OffsetDateTime? = null,
+    var updatedAt: OffsetDateTime? = null
 )

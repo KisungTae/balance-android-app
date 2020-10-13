@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.network
 
 import com.beeswork.balance.data.entity.Click
+import com.beeswork.balance.data.entity.Match
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.request.FCMTokenRequest
@@ -43,6 +44,11 @@ interface BalanceService {
 
     @POST("account/fcm/token/save")
     suspend fun postFCMToken(@Body fcmTokenRequest: FCMTokenRequest): Response<EmptyJsonResponse>
+
+    @GET("match/list")
+    suspend fun fetchMatches(
+        @Query(value = "matcherId") matcherId: String
+    ): Response<MutableList<Match>>
 
     companion object {
         operator fun invoke(

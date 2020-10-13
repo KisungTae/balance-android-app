@@ -21,6 +21,7 @@ class ChatRecyclerViewAdapter: PagedListAdapter<Message, ChatRecyclerViewAdapter
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+        println("itemCount: $itemCount")
         println("binding message at $position | message = ${getItem(position)}" )
         holder.bind(getItem(position))
     }

@@ -36,6 +36,8 @@ class BalanceRepositoryImpl(
     override val balanceGame: LiveData<Resource<BalanceGame>>
         get() = mutableBalanceGame
 
+    override val fetchMatchResource: MutableLiveData<Resource<String>> = MutableLiveData()
+
     private var cardsBeingFetched = false
 
     override fun fetchCards() {
@@ -60,13 +62,13 @@ class BalanceRepositoryImpl(
                     val matchedIds = matchDAO.getMatchedIds().toHashSet()
                     matchedIds.addAll(clickDAO.getSwipedIds())
 
-                    val data = cardsResource.data!!
-                    val endIndex = data.size - 1
+                    val fetchedCards = cardsResource.data!!
+                    val endIndex = fetchedCards.size - 1
 
                     for (i in endIndex downTo 0) {
-                        data[i].birthYear = Convert.birthYearToAge(data[i].birthYear)
-                        if (matchedIds.contains(data[i].accountId))
-                            data.removeAt(i)
+                        fetchedCards[i].birthYear = Convert.birthYearToAge(fetchedCards[i].birthYear)
+                        if (matchedIds.contains(fetchedCards[i].accountId))
+                            fetchedCards.removeAt(i)
                     }
                 }
 
@@ -127,6 +129,36 @@ class BalanceRepositoryImpl(
         }
     }
 
+    override fun fetchMatches() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val accountId = preferenceProvider.getAccountId()
+            val matchResource = balanceRDS.fetchMatches(accountId)
+
+            if (matchResource.status == Resource.Status.SUCCESS) {
+
+                for (fetchedMatch in matchResource.data!!) {
+
+                    val match = matchDAO.getMatch(fetchedMatch.matchedId)
+
+                    if (match == null) {
+                        fetchedMatch.recentMessage = ""
+                        fetchedMatch.lastRead = OffsetDateTime.now()
+                        fetchedMatch.updatedAt = OffsetDateTime.now()
+                    } else {
+                        fetchedMatch.recentMessage = match.recentMessage
+                        
+                    }
+
+
+                    match.recentMessage = "test last read"
+                    match.lastRead = OffsetDateTime.now()
+                    match.updatedAt = OffsetDateTime.now()
+                }
+            }
+        }
+    }
+
+
 
     override fun insertMatch() {
 
@@ -144,18 +176,16 @@ class BalanceRepositoryImpl(
                 OffsetDateTime.now(),
                 OffsetDateTime.now()
             )
-            matchDAO.insert(match)
+            matchDAO.insertMatch(match)
         }
     }
 
-    override suspend fun fetchMatches() {
-        TODO("Not yet implemented")
-    }
+
 
 
     override suspend fun getMatches(): LiveData<List<Match>> {
         return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.getMatches()
+            return@withContext matchDAO.getMatchesAsLiveData()
         }
     }
 
@@ -172,19 +202,27 @@ class BalanceRepositoryImpl(
         }
     }
 
+//  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
+//          out of screen.
+//  TEST 2. when update all entries in database, it will update the items in list as well
     override fun insertMessage() {
         GlobalScope.launch(Dispatchers.IO) {
+
 
             val randomMessage = Random.nextInt(0, 100000)
 
             val message = Message(
                 null,
-                2,
+                1,
                 Random.nextBoolean(),
                 "message - $randomMessage",
                 OffsetDateTime.now()
             )
             messageDAO.insert(message)
+
+            messageDAO.updateMessages()
+
+
         }
     }
 

@@ -10,6 +10,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.ui.base.ScopeFragment
 import kotlinx.android.synthetic.main.fragment_match.*
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment: ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnMatchListener {
+class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnMatchListener {
 
     override val kodein by closestKodein()
 
@@ -26,7 +27,7 @@ class MatchFragment: ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnMa
     private lateinit var matchRecyclerViewAdapter: MatchRecyclerViewAdapter
 
 
-//  TODO: remove me
+    //  TODO: remove me
     private val balanceRepository: BalanceRepository by instance()
 
     override fun onCreateView(
@@ -51,7 +52,8 @@ class MatchFragment: ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnMa
         //  TODO: remove me
         editMatchBtn.setOnClickListener {
             println("click edit match btn")
-            balanceRepository.unmatch()
+//            balanceRepository.unmatch()
+            viewModel.fetchMatches()
         }
     }
 
@@ -68,10 +70,30 @@ class MatchFragment: ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnMa
             matchRecyclerViewAdapter.setMatches(currentMatches)
         })
 
+        viewModel.fetchMatchResource.observe(viewLifecycleOwner, { fetchMatchResource ->
+
+            when (fetchMatchResource.status) {
+                Resource.Status.SUCCESS -> {
+
+                }
+
+                Resource.Status.EXCEPTION -> {
+
+                }
+
+                Resource.Status.LOADING -> {
+
+                }
+            }
+
+        })
+
+
     }
 
     override fun onMatchClick(view: View, matchId: Int) {
-        Navigation.findNavController(view).navigate(MatchFragmentDirections.matchToChatAction(matchId))
+        Navigation.findNavController(view)
+            .navigate(MatchFragmentDirections.matchToChatAction(matchId))
     }
 }
 

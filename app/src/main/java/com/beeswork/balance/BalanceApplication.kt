@@ -87,6 +87,8 @@ class BalanceApplication : Application(), KodeinAware {
 //       3. match viewholder override fun onClick(view: View?) handle nullable for view and matchid, try to use match instead of tag
 //       4. cold boost start on AVD removes the Macbook noise what is it?
 //       5. httpclient timeout setting extend the timeout seconds it is too short
+//       6. put saving messages in onMessageReceived
+//       7. can't find setMaxsize() in PagedList.Config.Builder()
 
 
 

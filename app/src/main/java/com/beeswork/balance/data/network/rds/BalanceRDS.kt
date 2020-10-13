@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.network.rds
 
 import com.beeswork.balance.data.entity.Click
+import com.beeswork.balance.data.entity.Match
 import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
@@ -36,6 +37,10 @@ interface BalanceRDS {
         email:String,
         token: String
     ): Resource<EmptyJsonResponse>
+
+    suspend fun fetchMatches(
+        matcherId: String
+    ): Resource<MutableList<Match>>
 
 //    suspend fun fetchCards(
 //        id: String,

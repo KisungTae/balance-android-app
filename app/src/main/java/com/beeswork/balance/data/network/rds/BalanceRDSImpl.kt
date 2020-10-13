@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.network.rds
 
 import com.beeswork.balance.data.entity.Click
+import com.beeswork.balance.data.entity.Match
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.BalanceService
 import com.beeswork.balance.data.network.request.FCMTokenRequest
@@ -63,6 +64,12 @@ class BalanceRDSImpl(
     ): Resource<EmptyJsonResponse> {
         return getResult {
             balanceService.postFCMToken(FCMTokenRequest(accountId, email, token))
+        }
+    }
+
+    override suspend fun fetchMatches(matcherId: String): Resource<MutableList<Match>> {
+        return getResult {
+            balanceService.fetchMatches(matcherId)
         }
     }
 

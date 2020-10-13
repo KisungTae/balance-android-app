@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.repository
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.entity.Match
@@ -12,7 +13,8 @@ import com.beeswork.balance.internal.Resource
 interface BalanceRepository {
 
     // match
-    suspend fun fetchMatches()
+    fun fetchMatches()
+    val fetchMatchResource: MutableLiveData<Resource<String>>
     fun insertMatch()
     fun unmatch()
     suspend fun getMatches(): LiveData<List<Match>>

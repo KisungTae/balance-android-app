@@ -17,4 +17,8 @@ interface MessageDAO {
 
     @Query("select * from message where matchId = :matchId order by createdAt desc")
     fun getMessages(matchId: Int): DataSource.Factory<Int, Message>
+
+//  TODO: remove me
+    @Query("update message set message = 'test message here'")
+    fun updateMessages()
 }
