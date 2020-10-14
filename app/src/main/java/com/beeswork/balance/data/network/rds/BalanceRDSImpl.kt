@@ -26,13 +26,15 @@ class BalanceRDSImpl(
     ): Resource<MutableList<Card>> {
 
         return getResult {
-            balanceService.fetchCards(accountId,
-                                           latitude,
-                                           longitude,
-                                           minAge,
-                                           maxAge,
-                                           gender,
-                                           distance)
+            balanceService.fetchCards(
+                accountId,
+                latitude,
+                longitude,
+                minAge,
+                maxAge,
+                gender,
+                distance
+            )
         }
     }
 
@@ -67,9 +69,12 @@ class BalanceRDSImpl(
         }
     }
 
-    override suspend fun fetchMatches(matcherId: String): Resource<MutableList<Match>> {
+    override suspend fun fetchMatches(
+        matcherId: String,
+        fetchedAt: String
+    ): Resource<MutableList<Match>> {
         return getResult {
-            balanceService.fetchMatches(matcherId)
+            balanceService.fetchMatches(matcherId, fetchedAt)
         }
     }
 

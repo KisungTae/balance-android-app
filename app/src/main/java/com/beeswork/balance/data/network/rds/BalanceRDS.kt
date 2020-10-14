@@ -39,7 +39,8 @@ interface BalanceRDS {
     ): Resource<EmptyJsonResponse>
 
     suspend fun fetchMatches(
-        matcherId: String
+        matcherId: String,
+        fetchedAt: String
     ): Resource<MutableList<Match>>
 
 //    suspend fun fetchCards(

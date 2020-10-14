@@ -8,7 +8,7 @@ import com.beeswork.balance.data.entity.*
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.BalanceGame
-import com.beeswork.balance.data.provider.PreferenceProvider
+import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.CURRENT_FCM_TOKEN_ID
 import com.beeswork.balance.internal.constant.ExceptionCode
@@ -52,7 +52,7 @@ class BalanceRepositoryImpl(
                 val minAge = preferenceProvider.getMinAgeBirthYear()
                 val maxAge = preferenceProvider.getMaxAgeBirthYear()
                 val gender = preferenceProvider.getGender()
-                val distance = preferenceProvider.getDistance()
+                val distance = preferenceProvider.getDistanceInMeters()
 
 
                 val cardsResource =
@@ -132,27 +132,14 @@ class BalanceRepositoryImpl(
     override fun fetchMatches() {
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
-            val matchResource = balanceRDS.fetchMatches(accountId)
+//            val fetchedAt = preferenceProvider.getMatchFetchedAt()
+            val fetchedAt = "2020-10-14T13:07:57.270+00:00"
+            val matchResource = balanceRDS.fetchMatches(accountId, fetchedAt)
 
             if (matchResource.status == Resource.Status.SUCCESS) {
 
                 for (fetchedMatch in matchResource.data!!) {
-
-                    val match = matchDAO.getMatch(fetchedMatch.matchedId)
-
-                    if (match == null) {
-                        fetchedMatch.recentMessage = ""
-                        fetchedMatch.lastRead = OffsetDateTime.now()
-                        fetchedMatch.updatedAt = OffsetDateTime.now()
-                    } else {
-                        fetchedMatch.recentMessage = match.recentMessage
-                        
-                    }
-
-
-                    match.recentMessage = "test last read"
-                    match.lastRead = OffsetDateTime.now()
-                    match.updatedAt = OffsetDateTime.now()
+                    
                 }
             }
         }

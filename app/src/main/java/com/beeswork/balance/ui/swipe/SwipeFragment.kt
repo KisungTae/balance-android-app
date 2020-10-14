@@ -14,6 +14,7 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.DialogTag
 import com.beeswork.balance.internal.constant.MIN_CARD_STACK_SIZE
+import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -37,6 +38,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     private val viewModelFactory: SwipeViewModelFactory by instance()
     private lateinit var viewModel: SwipeViewModel
     private lateinit var cardStackAdapter: CardStackAdapter
+    private val preferenceProvider: PreferenceProvider by instance()
 
     //  TODO: remove me
     private val balanceService: BalanceService by instance()
@@ -62,7 +64,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         btnSwipeFilter.setOnClickListener {
 //            TODO: remove me fetchCards
             viewModel.fetchCards()
-            SwipeFilterDialog().show(childFragmentManager, DialogTag.SWIPE_FILTER_DIALOG)
+            SwipeFilterDialog(preferenceProvider).show(childFragmentManager, DialogTag.SWIPE_FILTER_DIALOG)
         }
 
 

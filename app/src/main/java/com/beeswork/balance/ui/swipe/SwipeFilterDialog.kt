@@ -8,11 +8,14 @@ import com.beeswork.balance.R
 import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.constant.PreferencesDefault
 import com.beeswork.balance.internal.constant.PreferencesKey
+import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.dialog_swipe_filter.*
 
 
-class SwipeFilterDialog: BottomSheetDialogFragment() {
+class SwipeFilterDialog(
+    private val preferenceProvider: PreferenceProvider
+): BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,15 +26,13 @@ class SwipeFilterDialog: BottomSheetDialogFragment() {
     }
 
     override fun onStop() {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
-        val editor = preferences.edit()
 
-        editor.putBoolean(PreferencesKey.GENDER, (rgSwipeFilterGender.checkedRadioButtonId == R.id.rbSwipeFilterFemale))
-        editor.putFloat(PreferencesKey.DISTANCE, sliderSwipeFilterDistance.value)
+        val gender = rgSwipeFilterGender.checkedRadioButtonId == R.id.rbSwipeFilterFemale
+        val minAge = rsSwipeFilterAge.values[0]
+        val maxAge = rsSwipeFilterAge.values[1]
+        val distance = sliderSwipeFilterDistance.value
 
-        editor.putFloat(PreferencesKey.MIN_AGE, rsSwipeFilterAge.values[0])
-        editor.putFloat(PreferencesKey.MAX_AGE, rsSwipeFilterAge.values[1])
-        editor.apply()
+        preferenceProvider.putSwipeFilterValues(gender, minAge, maxAge, distance)
         super.onStop()
     }
 
@@ -47,14 +48,11 @@ class SwipeFilterDialog: BottomSheetDialogFragment() {
             tvSwipeFilterDistance.text = value.toInt().toString()
         }
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(context?.applicationContext)
-        sliderSwipeFilterDistance.value = preferences?.getFloat(PreferencesKey.DISTANCE, PreferencesDefault.DISTANCE)!!
+        sliderSwipeFilterDistance.value = preferenceProvider.getDistance()
 
-        val minAge = preferences.getFloat(PreferencesKey.MIN_AGE, PreferencesDefault.MIN_AGE)
-        val maxAge = preferences.getFloat(PreferencesKey.MAX_AGE, PreferencesDefault.MAX_AGE)
-        rsSwipeFilterAge.values = arrayListOf(minAge, maxAge)
+        rsSwipeFilterAge.values = arrayListOf(preferenceProvider.getMinAge(), preferenceProvider.getMaxAge())
 
-        when (preferences.getBoolean(PreferencesKey.GENDER, PreferencesDefault.GENDER)) {
+        when (preferenceProvider.getGender()) {
             Gender.FEMALE -> rbSwipeFilterFemale.isChecked = true
             Gender.MALE -> rbSwipeFilterMale.isChecked = true
         }

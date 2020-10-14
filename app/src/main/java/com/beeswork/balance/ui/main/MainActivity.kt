@@ -18,6 +18,7 @@ import androidx.preference.PreferenceManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.*
 import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
 import com.google.android.gms.location.*
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
     private lateinit var broadcastReceiver: BroadcastReceiver
+    private val preferenceProvider: PreferenceProvider by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,11 +125,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun updateLocation(lat: Double, lon: Double) {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val editor = preferences.edit()
-        editor.putDouble(PreferencesKey.LATITUDE, lat)
-        editor.putDouble(PreferencesKey.LONGITUDE, lon)
-        editor.apply()
+        preferenceProvider.putLocation(lat, lon)
     }
 
 }

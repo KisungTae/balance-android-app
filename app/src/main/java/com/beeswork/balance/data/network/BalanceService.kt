@@ -47,7 +47,8 @@ interface BalanceService {
 
     @GET("match/list")
     suspend fun fetchMatches(
-        @Query(value = "matcherId") matcherId: String
+        @Query(value = "matcherId") matcherId: String,
+        @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Match>>
 
     companion object {

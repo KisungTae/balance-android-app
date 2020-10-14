@@ -11,7 +11,7 @@ import java.net.SocketTimeoutException
 
 abstract class BaseRDS {
 
-    protected suspend fun <T>   getResult(call: suspend () -> Response<T>): Resource<T> {
+    protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
         try {
 
             val response = call()

@@ -10,5 +10,7 @@ class PreferencesKey {
         const val ACCOUNT_GENDER = "accountGender"
         const val LATITUDE = "latitude"
         const val LONGITUDE = "longitude"
+        const val MATCH_FETCHED_AT = "matchFetchedAt"
+        const val CLICKED_FETCHED_AT = "clickedFetchedAt"
     }
 }
