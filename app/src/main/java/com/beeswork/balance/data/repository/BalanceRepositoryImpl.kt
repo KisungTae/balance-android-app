@@ -133,13 +133,17 @@ class BalanceRepositoryImpl(
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
 //            val fetchedAt = preferenceProvider.getMatchFetchedAt()
-            val fetchedAt = "2020-10-14T13:07:57.270+00:00"
+//            val fetchedAt = "2020-10-15T10:06:26.032+00:00"
+            val fetchedAt = "2020-10-15T10:06:26.032Z"
             val matchResource = balanceRDS.fetchMatches(accountId, fetchedAt)
+
+
+
 
             if (matchResource.status == Resource.Status.SUCCESS) {
 
                 for (fetchedMatch in matchResource.data!!) {
-                    
+
                 }
             }
         }
