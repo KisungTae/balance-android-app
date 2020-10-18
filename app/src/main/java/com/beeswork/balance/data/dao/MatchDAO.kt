@@ -12,17 +12,18 @@ import com.beeswork.balance.data.entity.Message
 interface MatchDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMatch(match: Match)
-
-    @Query("select * from `match` where matchedId = :matchedId")
-    fun getMatch(matchedId: String): Match
+    fun insertMatches(matches: List<Match>)
 
     @Query("select * from `match` order by date(updatedAt) desc")
-    fun getMatchesAsLiveData(): LiveData<List<Match>>
+    fun getMatches(): LiveData<List<Match>>
 
     @Query("update `match` set unmatched = 1 where matchedId = :matchedId")
     fun unmatch(matchedId: String)
 
-    @Query("select matchedId from `match`")
-    fun getMatchedIds(): List<String>
+    @Query("select exists (select * from `match` where chatId = :chatId)")
+    fun existsByChatId(chatId: Long): Boolean
+
+    @Query("update `match` set photoKey = :photoKey, unmatched = :unmatched where chatId = :chatId")
+    fun updatePhotoKeyAndUnmatched(chatId: Long, photoKey: String, unmatched: Boolean)
+
 }

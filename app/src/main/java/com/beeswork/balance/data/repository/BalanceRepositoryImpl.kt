@@ -26,7 +26,7 @@ class BalanceRepositoryImpl(
     private val clickedDAO: ClickedDAO,
     private val balanceRDS: BalanceRDS,
     private val preferenceProvider: PreferenceProvider
-) : BalanceRepository {
+): BalanceRepository {
 
     private val mutableCards = MutableLiveData<Resource<List<Card>>>()
     override val cards: LiveData<Resource<List<Card>>>
@@ -59,15 +59,16 @@ class BalanceRepositoryImpl(
                     balanceRDS.fetchCards(accountId, latitude, longitude, minAge, maxAge, gender, distance)
 
                 if (cardsResource.status == Resource.Status.SUCCESS) {
-                    val matchedIds = matchDAO.getMatchedIds().toHashSet()
-                    matchedIds.addAll(clickDAO.getSwipedIds())
+
+                    val clickIds = clickDAO.getSwipedIds().toHashSet()
 
                     val fetchedCards = cardsResource.data!!
                     val endIndex = fetchedCards.size - 1
 
                     for (i in endIndex downTo 0) {
-                        fetchedCards[i].birthYear = Convert.birthYearToAge(fetchedCards[i].birthYear)
-                        if (matchedIds.contains(fetchedCards[i].accountId))
+                        fetchedCards[i].birthYear =
+                            Convert.birthYearToAge(fetchedCards[i].birthYear)
+                        if (clickIds.contains(fetchedCards[i].accountId))
                             fetchedCards.removeAt(i)
                     }
                 }
@@ -129,54 +130,51 @@ class BalanceRepositoryImpl(
         }
     }
 
+
+
     override fun fetchMatches() {
         CoroutineScope(Dispatchers.IO).launch {
+            fetchMatchResource.postValue(Resource.loading())
+
             val accountId = preferenceProvider.getAccountId()
-//            val fetchedAt = preferenceProvider.getMatchFetchedAt()
-//            val fetchedAt = "2020-10-15T10:06:26.032+00:00"
-            val fetchedAt = "2020-10-15T10:06:26.032Z"
-            val matchResource = balanceRDS.fetchMatches(accountId, fetchedAt)
-
-
+            val email = preferenceProvider.getEmail()
+            var fetchedAt = preferenceProvider.getMatchFetchedAt()
+            val matchResource = balanceRDS.fetchMatches(accountId, email, fetchedAt)
 
 
             if (matchResource.status == Resource.Status.SUCCESS) {
 
-                for (fetchedMatch in matchResource.data!!) {
+                val fetchedMatches = matchResource.data!!
+                for (i in (fetchedMatches.size - 1) downTo 0) {
+                    val fetchedMatch = fetchedMatches[i]
 
+                    val newFetchedAt = fetchedMatch.updatedAt.toString()
+                    if (newFetchedAt > fetchedAt) fetchedAt = newFetchedAt
+
+                    if (matchDAO.existsByChatId(fetchedMatch.chatId)) {
+                        matchDAO.updatePhotoKeyAndUnmatched(
+                            fetchedMatch.chatId,
+                            fetchedMatch.photoKey,
+                            fetchedMatch.unmatched
+                        )
+                        fetchedMatches.removeAt(i)
+                    } else {
+                        fetchedMatch.lastRead = OffsetDateTime.now()
+                        fetchedMatch.recentMessage = ""
+                    }
                 }
+                matchDAO.insertMatches(fetchedMatches)
+                preferenceProvider.putMatchFetchedAt(fetchedAt)
+                fetchMatchResource.postValue(Resource.success(""))
+            } else if (matchResource.status == Resource.Status.EXCEPTION){
+//                fetchMatchResource.postValue(matchResource)
             }
         }
     }
 
-
-
-    override fun insertMatch() {
-
-        GlobalScope.launch(Dispatchers.IO) {
-
-            val matchedId = Random.nextInt(0, 100000)
-
-            val match = Match(
-                null,
-                matchedId.toString(),
-                "",
-                "",
-                false,
-                "",
-                OffsetDateTime.now(),
-                OffsetDateTime.now()
-            )
-            matchDAO.insertMatch(match)
-        }
-    }
-
-
-
-
     override suspend fun getMatches(): LiveData<List<Match>> {
         return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.getMatchesAsLiveData()
+            return@withContext matchDAO.getMatches()
         }
     }
 
@@ -187,31 +185,38 @@ class BalanceRepositoryImpl(
     }
 
 
-    override suspend fun getMessages(matchId: Int): DataSource.Factory<Int, Message> {
+    override suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message> {
         return withContext(Dispatchers.IO) {
-            return@withContext messageDAO.getMessages(matchId)
+            return@withContext messageDAO.getMessages(chatId)
         }
     }
+
+
+
 
 //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
 //          out of screen.
 //  TEST 2. when update all entries in database, it will update the items in list as well
-    override fun insertMessage() {
+    override fun insertMessage(chatId: Long) {
         GlobalScope.launch(Dispatchers.IO) {
 
 
-            val randomMessage = Random.nextInt(0, 100000)
+            for (i in 1..2000) {
+                val randomMessage = Random.nextInt(0, 100000)
 
-            val message = Message(
-                null,
-                1,
-                Random.nextBoolean(),
-                "message - $randomMessage",
-                OffsetDateTime.now()
-            )
-            messageDAO.insert(message)
+                val message = Message(
+                    null,
+                    chatId,
+                    Random.nextBoolean(),
+                    "message - $randomMessage",
+                    OffsetDateTime.now()
+                )
+                messageDAO.insert(message)
+                println("inserting messages at $i")
+//                messageDAO.updateMessages()
+            }
 
-            messageDAO.updateMessages()
+
 
 
         }

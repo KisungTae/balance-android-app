@@ -5,12 +5,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.repository.BalanceRepository
 
 class ChatViewModelFactory(
-    private val matchId: Int,
+    private val chatId: Long,
     private val balanceRepository: BalanceRepository
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ChatViewModel(matchId, balanceRepository) as T
+        return ChatViewModel(chatId, balanceRepository) as T
     }
 }

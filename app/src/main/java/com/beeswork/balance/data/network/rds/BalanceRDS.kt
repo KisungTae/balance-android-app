@@ -40,6 +40,7 @@ interface BalanceRDS {
 
     suspend fun fetchMatches(
         matcherId: String,
+        email: String,
         fetchedAt: String
     ): Resource<MutableList<Match>>
 

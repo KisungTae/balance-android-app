@@ -8,6 +8,7 @@ interface PreferenceProvider {
     fun putLocation(latitude: Double, longitude: Double)
     fun putAccountId(accountId: String)
     fun putEmail(email: String)
+    fun putMatchFetchedAt(matchFetchedAt: String)
 
 
     fun getMatchFetchedAt(): String

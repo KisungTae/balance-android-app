@@ -44,12 +44,6 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnM
         bindUI()
 
         //  TODO: remove me
-        addMatchBtn.setOnClickListener {
-            println("click add match btn")
-            balanceRepository.insertMatch()
-        }
-
-        //  TODO: remove me
         editMatchBtn.setOnClickListener {
             println("click edit match btn")
 //            balanceRepository.unmatch()
@@ -74,15 +68,15 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnM
 
             when (fetchMatchResource.status) {
                 Resource.Status.SUCCESS -> {
-
+                    println("fetchMatch success")
                 }
 
                 Resource.Status.EXCEPTION -> {
-
+                    println("fetchMatch exception")
                 }
 
                 Resource.Status.LOADING -> {
-
+                    println("fetchMatch loading")
                 }
             }
 
@@ -91,9 +85,9 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnM
 
     }
 
-    override fun onMatchClick(view: View, matchId: Int) {
+    override fun onMatchClick(view: View, chatId: Long) {
         Navigation.findNavController(view)
-            .navigate(MatchFragmentDirections.matchToChatAction(matchId))
+            .navigate(MatchFragmentDirections.matchToChatAction(chatId))
     }
 }
 

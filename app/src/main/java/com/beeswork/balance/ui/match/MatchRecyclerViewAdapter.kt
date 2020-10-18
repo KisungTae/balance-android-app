@@ -36,7 +36,7 @@ class MatchRecyclerViewAdapter(
     }
 
     interface OnMatchListener {
-        fun onMatchClick(view: View, matchId: Int)
+        fun onMatchClick(view: View, chatId: Long)
     }
 
     class MatchHolder(
@@ -53,14 +53,14 @@ class MatchRecyclerViewAdapter(
         fun bind(match: Match) {
             this.match = match
             Picasso.get().load(R.drawable.personsmall).into(itemView.ivMatch)
-            itemView.tvMatchName.text = match.name
-            itemView.tvMatchRecentMessage.text = match.recentMessage
-            itemView.tvMatchUnmatch.text = match.unmatched.toString()
-            itemView.tag = match.id
+            itemView.tvMatchName.text = match.toString()
+//            itemView.tvMatchRecentMessage.text = match.recentMessage
+//            itemView.tvMatchUnmatch.text = match.unmatched.toString()
+            itemView.tag = match.chatId
         }
 
         override fun onClick(view: View?) {
-            if (view != null) onMatchListener.onMatchClick(view, view.tag.toString().toInt())
+            if (view != null) onMatchListener.onMatchClick(view, view.tag.toString().toLong())
         }
     }
 

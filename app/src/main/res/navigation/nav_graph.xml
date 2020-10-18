@@ -28,7 +28,7 @@
         tools:layout="@layout/fragment_chat">
         <argument
             android:name="chatId"
-            app:argType="integer" />
+            app:argType="long" />
     </fragment>
 
     <fragment

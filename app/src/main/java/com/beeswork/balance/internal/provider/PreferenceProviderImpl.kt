@@ -41,8 +41,16 @@ class PreferenceProviderImpl(
     override fun putEmail(email: String) {
     }
 
+    override fun putMatchFetchedAt(matchFetchedAt: String) {
+        editor.putString(PreferencesKey.MATCH_FETCHED_AT, matchFetchedAt)
+    }
+
+
+
+
+
     override fun getMatchFetchedAt(): String {
-        return preferences.getString(PreferencesKey.MATCH_FETCHED_AT, OffsetDateTime.now().toString())!!
+        return preferences.getString(PreferencesKey.MATCH_FETCHED_AT, "2020-01-01T10:06:26.032Z")!!
     }
 
     override fun getGender(): Boolean {
@@ -76,11 +84,11 @@ class PreferenceProviderImpl(
     }
 
     override fun getAccountId(): String {
-        return "d4bb601d-b0b1-40fe-9539-10046f1267f8"
+        return "10177a84-b6f1-487f-af69-9b10ea3d938e"
     }
 
     override fun getEmail(): String {
-        return "29@gmail.com"
+        return "26@gmail.com"
     }
 
     override fun getLatitude(): Double {

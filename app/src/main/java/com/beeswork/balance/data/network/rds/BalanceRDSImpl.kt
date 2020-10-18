@@ -71,10 +71,11 @@ class BalanceRDSImpl(
 
     override suspend fun fetchMatches(
         matcherId: String,
+        email: String,
         fetchedAt: String
     ): Resource<MutableList<Match>> {
         return getResult {
-            balanceService.fetchMatches(matcherId, fetchedAt)
+            balanceService.fetchMatches(matcherId, email, fetchedAt)
         }
     }
 

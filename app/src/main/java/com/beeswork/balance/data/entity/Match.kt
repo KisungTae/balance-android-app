@@ -11,8 +11,8 @@ import org.threeten.bp.OffsetDateTime
         indices = [Index(value = ["matchedId"], unique = true)])
 data class Match(
 
-    @PrimaryKey(autoGenerate = true)
-    val id: Long? = null,
+    @PrimaryKey
+    val chatId: Long,
 
     val matchedId: String,
     var photoKey: String,

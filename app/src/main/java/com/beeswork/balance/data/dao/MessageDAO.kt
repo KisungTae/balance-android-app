@@ -15,8 +15,8 @@ interface MessageDAO {
     @Insert
     fun insert(message: Message)
 
-    @Query("select * from message where matchId = :matchId order by createdAt desc")
-    fun getMessages(matchId: Int): DataSource.Factory<Int, Message>
+    @Query("select * from message where chatId = :chatId order by createdAt desc")
+    fun getMessages(chatId: Long): DataSource.Factory<Int, Message>
 
 //  TODO: remove me
     @Query("update message set message = 'test message here'")

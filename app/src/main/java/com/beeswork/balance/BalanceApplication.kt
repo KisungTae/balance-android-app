@@ -53,7 +53,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance()) }
-        bind() from factory { matchId: Int -> ChatViewModelFactory(matchId, instance()) }
+        bind() from factory { chatId: Long -> ChatViewModelFactory(chatId, instance()) }
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
 

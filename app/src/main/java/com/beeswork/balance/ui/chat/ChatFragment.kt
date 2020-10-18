@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.entity.Message
 import com.beeswork.balance.data.repository.BalanceRepository
-import com.beeswork.balance.internal.MatchIdNotFoundException
+import com.beeswork.balance.internal.ChatIdNotFoundException
 import com.beeswork.balance.ui.base.ScopeFragment
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.launch
@@ -23,15 +23,12 @@ import org.kodein.di.generic.instance
 class ChatFragment: ScopeFragment(), KodeinAware {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((Int) -> ChatViewModelFactory) by factory()
+    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
 
-
     //  TODO: remove me
     private val balanceRepository: BalanceRepository by instance()
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,14 +42,14 @@ class ChatFragment: ScopeFragment(), KodeinAware {
         super.onViewCreated(view, savedInstanceState)
 
         val safeArgs = arguments?.let { ChatFragmentArgs.fromBundle(it) }
-        val matchId = safeArgs?.chatId ?: throw MatchIdNotFoundException()
-        viewModel = ViewModelProvider(this, viewModelFactory(matchId)).get(ChatViewModel::class.java)
+        val chatId = safeArgs?.chatId ?: throw ChatIdNotFoundException()
+        viewModel = ViewModelProvider(this, viewModelFactory(chatId)).get(ChatViewModel::class.java)
 
         bindUI()
 
         btnAddMessage.setOnClickListener {
             println("clicked to add message")
-            balanceRepository.insertMessage()
+            balanceRepository.insertMessage(chatId)
         }
     }
 
@@ -72,7 +69,9 @@ class ChatFragment: ScopeFragment(), KodeinAware {
         rvChat.scrollToPosition(0)
 
         messages.observe(viewLifecycleOwner, Observer { pagedMessageList ->
-            pagedMessageList?.let { render(pagedMessageList) }
+            pagedMessageList?.let {
+                render(pagedMessageList)
+            }
         })
     }
 

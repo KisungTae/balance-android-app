@@ -1,16 +1,14 @@
 package com.beeswork.balance.ui.chat
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.beeswork.balance.data.entity.Message
 import com.beeswork.balance.data.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.CHAT_PAGE_SIZE
 import com.beeswork.balance.internal.lazyDeferred
 
 class ChatViewModel(
-    private val matchId: Int,
+    private val chatId: Long,
     private val balanceRepository: BalanceRepository
 ): ViewModel() {
 
@@ -21,6 +19,6 @@ class ChatViewModel(
         .build()
 
     val messages by lazyDeferred {
-        LivePagedListBuilder(balanceRepository.getMessages(matchId), pagedListConfig).build()
+        LivePagedListBuilder(balanceRepository.getMessages(chatId), pagedListConfig).build()
     }
 }
