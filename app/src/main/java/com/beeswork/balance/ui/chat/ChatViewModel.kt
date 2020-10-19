@@ -10,15 +10,19 @@ import com.beeswork.balance.internal.lazyDeferred
 class ChatViewModel(
     private val chatId: Long,
     private val balanceRepository: BalanceRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val pagedListConfig = PagedList.Config.Builder()
         .setEnablePlaceholders(false)
+        .setMaxSize((CHAT_PAGE_SIZE * 2 * 2) + CHAT_PAGE_SIZE)
         .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
         .setPageSize(CHAT_PAGE_SIZE)
+        .setPrefetchDistance(CHAT_PAGE_SIZE * 2)
         .build()
 
+
     val messages by lazyDeferred {
+
         LivePagedListBuilder(balanceRepository.getMessages(chatId), pagedListConfig).build()
     }
 }

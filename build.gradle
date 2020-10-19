@@ -9,6 +9,7 @@ buildscript {
         lifecycle_version = '2.2.0'
         room_version = '2.2.5'
         paging_version = '2.1.2'
+//        paging_version = '3.0.0-alpha07'
         retrofit_version = '2.9.0'
     }
 
