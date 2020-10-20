@@ -14,9 +14,9 @@ interface BalanceRepository {
 
     // match
     fun fetchMatches()
-    val fetchMatchResource: MutableLiveData<Resource<String>>
+    val fetchMatchesResource: LiveData<Resource<List<Match>>>
     fun unmatch()
-    suspend fun getMatches(): LiveData<List<Match>>
+    suspend fun getMatches(): DataSource.Factory<Int, Match>
 
     // message
     suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message>

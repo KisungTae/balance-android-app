@@ -36,7 +36,9 @@ class BalanceRepositoryImpl(
     override val balanceGame: LiveData<Resource<BalanceGame>>
         get() = mutableBalanceGame
 
-    override val fetchMatchResource: MutableLiveData<Resource<String>> = MutableLiveData()
+    private val mutableFetchMatchesResource = MutableLiveData<Resource<List<Match>>>()
+    override val fetchMatchesResource: LiveData<Resource<List<Match>>>
+        get() = mutableFetchMatchesResource
 
     private var cardsBeingFetched = false
 
@@ -66,8 +68,7 @@ class BalanceRepositoryImpl(
                     val endIndex = fetchedCards.size - 1
 
                     for (i in endIndex downTo 0) {
-                        fetchedCards[i].birthYear =
-                            Convert.birthYearToAge(fetchedCards[i].birthYear)
+                        fetchedCards[i].birthYear = Convert.birthYearToAge(fetchedCards[i].birthYear)
                         if (clickIds.contains(fetchedCards[i].accountId))
                             fetchedCards.removeAt(i)
                     }
@@ -130,11 +131,10 @@ class BalanceRepositoryImpl(
         }
     }
 
-
-
     override fun fetchMatches() {
         CoroutineScope(Dispatchers.IO).launch {
-            fetchMatchResource.postValue(Resource.loading())
+
+            mutableFetchMatchesResource.postValue(Resource.loading())
 
             val accountId = preferenceProvider.getAccountId()
             val email = preferenceProvider.getEmail()
@@ -163,20 +163,26 @@ class BalanceRepositoryImpl(
                         fetchedMatch.recentMessage = ""
                     }
                 }
-                matchDAO.insertMatches(fetchedMatches)
+
+                if (fetchedMatches.size > 0) {
+                    matchDAO.insertMatches(fetchedMatches)
+                    fetchedMatches.clear()
+                }
                 preferenceProvider.putMatchFetchedAt(fetchedAt)
-                fetchMatchResource.postValue(Resource.success(""))
-            } else if (matchResource.status == Resource.Status.EXCEPTION){
-//                fetchMatchResource.postValue(matchResource)
             }
+
+            mutableFetchMatchesResource.postValue(matchResource)
         }
     }
 
-    override suspend fun getMatches(): LiveData<List<Match>> {
+    override suspend fun getMatches(): DataSource.Factory<Int, Match> {
         return withContext(Dispatchers.IO) {
             return@withContext matchDAO.getMatches()
         }
     }
+
+
+
 
     override fun unmatch() {
         GlobalScope.launch(Dispatchers.IO) {

@@ -17,5 +17,5 @@ data class Message(
     val chatId: Long,
     val isReceived: Boolean,
     val message: String,
-    val createdAt: OffsetDateTime? = null
+    val createdAt: OffsetDateTime
 )

@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -15,7 +16,7 @@ interface MatchDAO {
     fun insertMatches(matches: List<Match>)
 
     @Query("select * from `match` order by date(updatedAt) desc")
-    fun getMatches(): LiveData<List<Match>>
+    fun getMatches(): DataSource.Factory<Int, Match>
 
     @Query("update `match` set unmatched = 1 where matchedId = :matchedId")
     fun unmatch(matchedId: String)

@@ -19,6 +19,6 @@ data class Match(
     var name: String,
     var unmatched: Boolean,
     var recentMessage: String,
-    var lastRead: OffsetDateTime? = null,
-    var updatedAt: OffsetDateTime? = null
+    var lastRead: OffsetDateTime,
+    var updatedAt: OffsetDateTime
 )

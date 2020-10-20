@@ -18,13 +18,13 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnMatchListener {
+class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatchListener {
 
     override val kodein by closestKodein()
 
     private val viewModelFactory: MatchViewModelFactory by instance()
     private lateinit var viewModel: MatchViewModel
-    private lateinit var matchRecyclerViewAdapter: MatchRecyclerViewAdapter
+    private lateinit var matchPagedListAdapter: MatchPagedListAdapter
 
 
     //  TODO: remove me
@@ -52,19 +52,23 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnM
     }
 
     private fun bindUI() = launch {
-        matchRecyclerViewAdapter = MatchRecyclerViewAdapter(this@MatchFragment)
 
-        rvMatch.adapter = matchRecyclerViewAdapter
+        matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
+
+        rvMatch.adapter = matchPagedListAdapter
         rvMatch.layoutManager = LinearLayoutManager(this@MatchFragment.context)
 
         val matches = viewModel.matches.await()
 
-        matches.observe(viewLifecycleOwner, Observer { currentMatches ->
-            if (currentMatches == null) return@Observer
-            matchRecyclerViewAdapter.setMatches(currentMatches)
+        matches.observe(viewLifecycleOwner, Observer { pagedMatchList ->
+            pagedMatchList?.apply {
+                matchPagedListAdapter.submitList(pagedMatchList)
+            }
         })
 
-        viewModel.fetchMatchResource.observe(viewLifecycleOwner, { fetchMatchResource ->
+        viewModel.fetchMatches()
+
+        viewModel.fetchMatchesResource.observe(viewLifecycleOwner, { fetchMatchResource ->
 
             when (fetchMatchResource.status) {
                 Resource.Status.SUCCESS -> {
@@ -79,15 +83,11 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnM
                     println("fetchMatch loading")
                 }
             }
-
         })
-
-
     }
 
     override fun onMatchClick(view: View, chatId: Long) {
-        Navigation.findNavController(view)
-            .navigate(MatchFragmentDirections.matchToChatAction(chatId))
+        Navigation.findNavController(view).navigate(MatchFragmentDirections.matchToChatAction(chatId))
     }
 }
 

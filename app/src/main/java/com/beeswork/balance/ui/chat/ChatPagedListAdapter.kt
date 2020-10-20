@@ -6,14 +6,11 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.entity.Match
 import com.beeswork.balance.data.entity.Message
 import com.beeswork.balance.internal.inflate
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.item_match.view.*
 import kotlinx.android.synthetic.main.item_message.view.*
 
-class ChatRecyclerViewAdapter: PagedListAdapter<Message, ChatRecyclerViewAdapter.MessageViewHolder>(diffCallback) {
+class ChatPagedListAdapter: PagedListAdapter<Message, ChatPagedListAdapter.MessageViewHolder>(diffCallback) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -23,7 +20,7 @@ class ChatRecyclerViewAdapter: PagedListAdapter<Message, ChatRecyclerViewAdapter
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         println("itemCount: $itemCount")
         println("binding message at $position | message = ${getItem(position)}" )
-        holder.bind(getItem(position))
+        holder.bind(getItem(position)!!)
     }
 
     companion object {
@@ -41,11 +38,9 @@ class ChatRecyclerViewAdapter: PagedListAdapter<Message, ChatRecyclerViewAdapter
         itemView: View
     ): RecyclerView.ViewHolder(itemView) {
 
-        fun bind(message: Message?) {
-            itemView.tvMessage.text = message?.message ?: ""
-
-//            itemView.tvMessageCreatedAt.text = message?.createdAt?.toString() ?: ""
-            itemView.tvMessageCreatedAt.text = message?.createdAt?.toLocalTime().toString()
+        fun bind(message: Message) {
+            itemView.tvMessage.text = message.message
+            itemView.tvMessageCreatedAt.text = message.createdAt.toLocalTime().toString()
         }
 
     }

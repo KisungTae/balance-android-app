@@ -1,9 +1,9 @@
 package com.beeswork.balance.ui.match
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.entity.Match
@@ -11,11 +11,9 @@ import com.beeswork.balance.internal.inflate
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_match.view.*
 
-class MatchRecyclerViewAdapter(
+class MatchPagedListAdapter(
     private val onMatchListener: OnMatchListener
-): RecyclerView.Adapter<MatchRecyclerViewAdapter.MatchHolder>() {
-
-    private var matches: List<Match> = ArrayList()
+): PagedListAdapter<Match, MatchPagedListAdapter.MatchHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchHolder {
         val view = parent.inflate(R.layout.item_match)
@@ -23,16 +21,18 @@ class MatchRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: MatchHolder, position: Int) {
-        holder.bind(matches[position])
+        holder.bind(getItem(position)!!)
     }
 
-    override fun getItemCount(): Int {
-        return matches.size
-    }
+    companion object {
 
-    fun setMatches(matches: List<Match>) {
-        this.matches = matches
-        notifyDataSetChanged()
+        private val diffCallback = object : DiffUtil.ItemCallback<Match>() {
+            override fun areItemsTheSame(oldItem: Match, newItem: Match): Boolean =
+                oldItem.chatId == newItem.chatId
+
+            override fun areContentsTheSame(oldItem: Match, newItem: Match): Boolean =
+                oldItem == newItem
+        }
     }
 
     interface OnMatchListener {
@@ -59,8 +59,8 @@ class MatchRecyclerViewAdapter(
             itemView.tag = match.chatId
         }
 
-        override fun onClick(view: View?) {
-            if (view != null) onMatchListener.onMatchClick(view, view.tag.toString().toLong())
+        override fun onClick(view: View) {
+            onMatchListener.onMatchClick(view, view.tag.toString().toLong())
         }
     }
 

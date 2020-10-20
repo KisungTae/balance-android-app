@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
-import com.beeswork.balance.data.entity.Message
 import com.beeswork.balance.data.repository.BalanceRepository
 import com.beeswork.balance.internal.ChatIdNotFoundException
 import com.beeswork.balance.ui.base.ScopeFragment
@@ -25,7 +23,7 @@ class ChatFragment: ScopeFragment(), KodeinAware {
     override val kodein by closestKodein()
     private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
-    private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
+    private lateinit var chatPagedListAdapter: ChatPagedListAdapter
 
     //  TODO: remove me
     private val balanceRepository: BalanceRepository by instance()
@@ -56,9 +54,9 @@ class ChatFragment: ScopeFragment(), KodeinAware {
     private fun bindUI() = launch {
         val messages = viewModel.messages.await()
 
-        chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
+        chatPagedListAdapter = ChatPagedListAdapter()
 
-        rvChat.adapter = chatRecyclerViewAdapter
+        rvChat.adapter = chatPagedListAdapter
 
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -70,13 +68,8 @@ class ChatFragment: ScopeFragment(), KodeinAware {
 
         messages.observe(viewLifecycleOwner, Observer { pagedMessageList ->
             pagedMessageList?.let {
-                render(pagedMessageList)
+                chatPagedListAdapter.submitList(pagedMessageList)
             }
         })
     }
-
-    private fun render(pagedNoteList: PagedList<Message>) {
-        chatRecyclerViewAdapter.submitList(pagedNoteList)
-    }
-
 }

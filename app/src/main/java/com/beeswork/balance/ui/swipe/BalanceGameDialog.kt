@@ -16,7 +16,7 @@ class BalanceGameDialog(
     private val balanceGameListener: BalanceGameListener
 ): DialogFragment() {
 
-    lateinit var questions: List<Question>
+    private lateinit var questions: List<Question>
     var swipeId: Long = -1
     private var currentIndex = -1
     private var click = true
