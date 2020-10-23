@@ -1,16 +1,20 @@
-package com.beeswork.balance.data.repository
+package com.beeswork.balance.data.database.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
+import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.network.response.Card
-import com.beeswork.balance.data.entity.Match
-import com.beeswork.balance.data.entity.Message
+import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.Message
 import com.beeswork.balance.data.network.response.BalanceGame
-import com.beeswork.balance.data.network.response.Question
 import com.beeswork.balance.internal.Resource
 
 interface BalanceRepository {
+
+    // clicked
+    suspend fun getClicked(): DataSource.Factory<Int, Clicked>
+    fun fetchClicked()
+    val fetchClickedResource: LiveData<Resource<List<Clicked>>>
 
     // match
     fun fetchMatches()

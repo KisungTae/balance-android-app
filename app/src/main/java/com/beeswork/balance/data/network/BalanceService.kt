@@ -1,7 +1,8 @@
 package com.beeswork.balance.data.network
 
-import com.beeswork.balance.data.entity.Click
-import com.beeswork.balance.data.entity.Match
+import com.beeswork.balance.data.database.entity.Click
+import com.beeswork.balance.data.database.entity.Clicked
+import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.request.FCMTokenRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
@@ -54,6 +55,13 @@ interface BalanceService {
         @Query(value = "email") email: String,
         @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Match>>
+
+    @GET("clicked/list")
+    suspend fun fetchClicked(
+        @Query(value = "clickedId") clickedId: String,
+        @Query(value = "email") email: String,
+        @Query(value = "fetchedAt") fetchedAt: String
+    ): Response<MutableList<Clicked>>
 
     companion object {
         operator fun invoke(

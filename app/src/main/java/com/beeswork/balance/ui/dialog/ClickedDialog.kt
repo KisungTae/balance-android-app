@@ -3,7 +3,8 @@ package com.beeswork.balance.ui.dialog
 import androidx.fragment.app.DialogFragment
 
 class ClickedDialog(
-    private val clickerPhotoKey: String
+    private val clickerPhotoKey: String?,
+    private val message: String?
 ): DialogFragment() {
 
 

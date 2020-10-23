@@ -10,8 +10,8 @@ import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.rds.BalanceRDSImpl
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.provider.PreferenceProviderImpl
-import com.beeswork.balance.data.repository.BalanceRepository
-import com.beeswork.balance.data.repository.BalanceRepositoryImpl
+import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
@@ -37,6 +37,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().clickDAO() }
         bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
         bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
+
+        // Repository
         bind<BalanceRepository>() with singleton {
             BalanceRepositoryImpl(
                 instance(),
@@ -89,6 +91,15 @@ class BalanceApplication : Application(), KodeinAware {
 //       5. httpclient timeout setting extend the timeout seconds it is too short
 //       6. put saving messages in onMessageReceived
 //       7. can't find setMaxsize() in PagedList.Config.Builder()
-
+//       8. remove clicked if match
+//       9. add ACCOUNT_BLOCKED_EXCEPTION and add it in when clause of network call response
+//      10. change click, no answer in baalance game but post answer to servers and wati for the response, if success then
+//      11. Location update should be one when current location is out of saved location by 1 km
+//      12. exception class changes - DONE
+//      13. when receving notification, then just call the corresponding API
+//      14. finish clicked
+//      15. swipe fragment should have update on number of clickeds, and chat
+//      16. change the flow of balanceGame
+//      17. add localization and exception Message in network call, need my own message not the exception.message
 
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.Card
-import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
 
 class SwipeViewModel(

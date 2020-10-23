@@ -8,7 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
-import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.ChatIdNotFoundException
 import com.beeswork.balance.ui.base.ScopeFragment
 import kotlinx.android.synthetic.main.fragment_chat.*

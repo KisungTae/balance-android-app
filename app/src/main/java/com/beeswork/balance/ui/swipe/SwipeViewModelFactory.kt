@@ -2,7 +2,7 @@ package com.beeswork.balance.ui.swipe
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.BalanceRepository
 
 class SwipeViewModelFactory(
     private val balanceRepository: BalanceRepository

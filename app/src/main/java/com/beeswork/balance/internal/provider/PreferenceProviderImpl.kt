@@ -45,8 +45,18 @@ class PreferenceProviderImpl(
         editor.putString(PreferencesKey.MATCH_FETCHED_AT, matchFetchedAt)
     }
 
+    override fun putClickedFetchedAt(clickedFetchedAt: String) {
+        editor.putString(PreferencesKey.CLICKED_FETCHED_AT, clickedFetchedAt)
+    }
 
 
+
+
+
+
+    override fun getClickedFetchedAt(): String {
+        return preferences.getString(PreferencesKey.CLICKED_FETCHED_AT, "2020-01-01T10:06:26.032Z")!!
+    }
 
 
     override fun getMatchFetchedAt(): String {

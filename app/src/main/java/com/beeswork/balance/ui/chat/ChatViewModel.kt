@@ -3,7 +3,7 @@ package com.beeswork.balance.ui.chat
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.CHAT_MAX_PAGE_SIZE
 import com.beeswork.balance.internal.constant.CHAT_PAGE_PREFETCH_DISTANCE
 import com.beeswork.balance.internal.constant.CHAT_PAGE_SIZE

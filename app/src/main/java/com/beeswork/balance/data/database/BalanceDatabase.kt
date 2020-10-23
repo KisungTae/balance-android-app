@@ -2,8 +2,8 @@ package com.beeswork.balance.data.database
 
 import android.content.Context
 import androidx.room.*
-import com.beeswork.balance.data.dao.*
-import com.beeswork.balance.data.entity.*
+import com.beeswork.balance.data.database.dao.*
+import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.internal.converter.OffsetDateTimeConverter
 
 

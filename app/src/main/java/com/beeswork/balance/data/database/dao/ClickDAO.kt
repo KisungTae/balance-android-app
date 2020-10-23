@@ -1,7 +1,7 @@
-package com.beeswork.balance.data.dao
+package com.beeswork.balance.data.database.dao
 
 import androidx.room.*
-import com.beeswork.balance.data.entity.Click
+import com.beeswork.balance.data.database.entity.Click
 
 @Dao
 interface ClickDAO {
@@ -18,4 +18,7 @@ interface ClickDAO {
 
     @Query("select swipedId from click")
     fun getSwipedIds(): List<String>
+
+    @Query("delete from click where swipedId = :swipedId")
+    fun deleteBySwipedId(swipedId: String)
 }

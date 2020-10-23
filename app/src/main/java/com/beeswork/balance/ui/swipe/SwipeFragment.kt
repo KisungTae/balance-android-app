@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
-import com.beeswork.balance.data.dao.FCMTokenDAO
+import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.network.BalanceService
-import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.DialogTag

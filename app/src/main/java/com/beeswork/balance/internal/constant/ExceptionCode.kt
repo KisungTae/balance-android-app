@@ -3,6 +3,7 @@ package com.beeswork.balance.internal.constant
 class ExceptionCode {
 
     companion object {
+        const val EXCEPTION = "exception"
         const val ACCOUNT_NOT_FOUND_EXCEPTION = "account.not.found.exception"
         const val ACCOUNT_SHORT_OF_POINT_EXCEPTION = "account.short.of.point.exception"
         const val SWIPE_CLICKED_EXISTS_EXCEPTION = "swipe.clicked.exists.exception"

@@ -1,10 +1,10 @@
-package com.beeswork.balance.data.repository
+package com.beeswork.balance.data.database.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
-import com.beeswork.balance.data.dao.*
-import com.beeswork.balance.data.entity.*
+import com.beeswork.balance.data.database.dao.*
+import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.BalanceGame
@@ -40,7 +40,92 @@ class BalanceRepositoryImpl(
     override val fetchMatchesResource: LiveData<Resource<List<Match>>>
         get() = mutableFetchMatchesResource
 
+    private val mutableFetchClickedResource = MutableLiveData<Resource<List<Clicked>>>()
+    override val fetchClickedResource: LiveData<Resource<List<Clicked>>>
+        get() = mutableFetchClickedResource
+
+
     private var cardsBeingFetched = false
+
+
+
+
+    override suspend fun getClicked(): DataSource.Factory<Int, Clicked> {
+        return withContext(Dispatchers.IO) {
+            return@withContext clickedDAO.getClicked()
+        }
+    }
+
+    override fun fetchClicked() {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            val accountId = preferenceProvider.getAccountId()
+            val email = preferenceProvider.getEmail()
+            var fetchedAt = preferenceProvider.getClickedFetchedAt()
+            val clickedResource = balanceRDS.fetchClicked(accountId, email, fetchedAt)
+
+            val a = 123
+
+            if (clickedResource.status == Resource.Status.SUCCESS) {
+                val fetchedClickedList = clickedResource.data!!
+
+                for (i in (fetchedClickedList.size - 1) downTo 0) {
+                    val fetchedClicked = fetchedClickedList[i]
+
+                    val newFetchedAt = fetchedClicked.updatedAt.toString()
+                    if (newFetchedAt > fetchedAt) fetchedAt = newFetchedAt
+
+                    
+                }
+
+            }
+        }
+    }
+
+    override fun fetchMatches() {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            mutableFetchMatchesResource.postValue(Resource.loading())
+
+            val accountId = preferenceProvider.getAccountId()
+            val email = preferenceProvider.getEmail()
+            var fetchedAt = preferenceProvider.getMatchFetchedAt()
+            val matchResource = balanceRDS.fetchMatches(accountId, email, fetchedAt)
+
+
+            if (matchResource.status == Resource.Status.SUCCESS) {
+
+                val fetchedMatches = matchResource.data!!
+                for (i in (fetchedMatches.size - 1) downTo 0) {
+                    val fetchedMatch = fetchedMatches[i]
+
+                    val newFetchedAt = fetchedMatch.updatedAt.toString()
+                    if (newFetchedAt > fetchedAt) fetchedAt = newFetchedAt
+
+                    if (matchDAO.existsByChatId(fetchedMatch.chatId)) {
+                        matchDAO.updatePhotoKeyAndUnmatched(
+                            fetchedMatch.chatId,
+                            fetchedMatch.photoKey,
+                            fetchedMatch.unmatched
+                        )
+                        fetchedMatches.removeAt(i)
+                    } else {
+                        fetchedMatch.lastRead = OffsetDateTime.now()
+                        fetchedMatch.recentMessage = ""
+                    }
+                }
+
+                if (fetchedMatches.size > 0) {
+                    matchDAO.insertMatches(fetchedMatches)
+                    fetchedMatches.clear()
+                }
+                preferenceProvider.putMatchFetchedAt(fetchedAt)
+            }
+
+            mutableFetchMatchesResource.postValue(matchResource)
+        }
+    }
+
 
     override fun fetchCards() {
 
@@ -63,6 +148,7 @@ class BalanceRepositoryImpl(
                 if (cardsResource.status == Resource.Status.SUCCESS) {
 
                     val clickIds = clickDAO.getSwipedIds().toHashSet()
+                    clickIds.addAll(matchDAO.getMatchedIds())
 
                     val fetchedCards = cardsResource.data!!
                     val endIndex = fetchedCards.size - 1
@@ -131,49 +217,8 @@ class BalanceRepositoryImpl(
         }
     }
 
-    override fun fetchMatches() {
-        CoroutineScope(Dispatchers.IO).launch {
-
-            mutableFetchMatchesResource.postValue(Resource.loading())
-
-            val accountId = preferenceProvider.getAccountId()
-            val email = preferenceProvider.getEmail()
-            var fetchedAt = preferenceProvider.getMatchFetchedAt()
-            val matchResource = balanceRDS.fetchMatches(accountId, email, fetchedAt)
 
 
-            if (matchResource.status == Resource.Status.SUCCESS) {
-
-                val fetchedMatches = matchResource.data!!
-                for (i in (fetchedMatches.size - 1) downTo 0) {
-                    val fetchedMatch = fetchedMatches[i]
-
-                    val newFetchedAt = fetchedMatch.updatedAt.toString()
-                    if (newFetchedAt > fetchedAt) fetchedAt = newFetchedAt
-
-                    if (matchDAO.existsByChatId(fetchedMatch.chatId)) {
-                        matchDAO.updatePhotoKeyAndUnmatched(
-                            fetchedMatch.chatId,
-                            fetchedMatch.photoKey,
-                            fetchedMatch.unmatched
-                        )
-                        fetchedMatches.removeAt(i)
-                    } else {
-                        fetchedMatch.lastRead = OffsetDateTime.now()
-                        fetchedMatch.recentMessage = ""
-                    }
-                }
-
-                if (fetchedMatches.size > 0) {
-                    matchDAO.insertMatches(fetchedMatches)
-                    fetchedMatches.clear()
-                }
-                preferenceProvider.putMatchFetchedAt(fetchedAt)
-            }
-
-            mutableFetchMatchesResource.postValue(matchResource)
-        }
-    }
 
     override suspend fun getMatches(): DataSource.Factory<Int, Match> {
         return withContext(Dispatchers.IO) {

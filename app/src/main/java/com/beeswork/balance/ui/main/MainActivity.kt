@@ -68,25 +68,42 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun setupBroadcastReceiver() {
-        broadcastReceiver = object: BroadcastReceiver() {
+        broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-
-                when (intent?.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)) {
-                    NotificationType.MATCH -> {
-                        MatchDialog("", "").show(supportFragmentManager, DialogTag.MATCH_DIALOG)
-                    }
-                    NotificationType.CLICKED -> {
-                        ClickedDialog("").show(supportFragmentManager, DialogTag.CLICKED_DIALOG)
-                    }
+                when (intent?.action) {
+                    IntentAction.RECEIVED_FCM_NOTIFICATION -> onReceiveFCMNotification(intent)
                 }
+            }
+        }
+    }
 
+    private fun onReceiveFCMNotification(intent: Intent?) {
+
+        val notificationType = intent!!.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
+        val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
+        val message = intent.getStringExtra(FCMDataKey.MESSAGE)
+
+        when (notificationType) {
+            NotificationType.MATCH -> {
+                MatchDialog("", photoKey, message).show(
+                    supportFragmentManager,
+                    DialogTag.MATCH_DIALOG
+                )
+            }
+            NotificationType.CLICKED -> {
+                ClickedDialog(photoKey, message).show(
+                    supportFragmentManager,
+                    DialogTag.CLICKED_DIALOG
+                )
             }
         }
     }
 
     private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this,
-                                                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private val locationCallback = object : LocationCallback() {
@@ -100,14 +117,15 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun bindLocationManager() {
-        println("bindLocationManager")
         LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
     }
 
     private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(this,
-                                          arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                                          PermissionRequestCode.ACCESS_FINE_LOCATION)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            PermissionRequestCode.ACCESS_FINE_LOCATION
+        )
     }
 
     override fun onRequestPermissionsResult(

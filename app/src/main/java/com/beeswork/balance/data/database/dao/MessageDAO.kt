@@ -1,12 +1,10 @@
-package com.beeswork.balance.data.dao
+package com.beeswork.balance.data.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.beeswork.balance.data.entity.Message
+import com.beeswork.balance.data.database.entity.Message
 
 @Dao
 interface MessageDAO {

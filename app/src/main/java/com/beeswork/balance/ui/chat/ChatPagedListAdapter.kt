@@ -6,7 +6,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.entity.Message
+import com.beeswork.balance.data.database.entity.Message
 import com.beeswork.balance.internal.inflate
 import kotlinx.android.synthetic.main.item_message.view.*
 

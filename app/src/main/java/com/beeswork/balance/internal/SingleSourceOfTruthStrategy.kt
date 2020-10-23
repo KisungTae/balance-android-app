@@ -20,7 +20,7 @@ fun <T, A> resourceLiveData (
     if (responseStatus.status == Resource.Status.SUCCESS) {
         saveCallResult(responseStatus.data!!)
     } else if (responseStatus.status == Resource.Status.EXCEPTION) {
-        emit(Resource.exception<T>(responseStatus.exceptionMessage!!))
+        emit(Resource.exception<T>(responseStatus.exceptionMessage!!, "", null))
         emitSource(source)
     }
 }

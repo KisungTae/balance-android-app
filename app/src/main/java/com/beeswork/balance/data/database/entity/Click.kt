@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.entity
+package com.beeswork.balance.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

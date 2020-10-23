@@ -16,22 +16,36 @@ abstract class BaseRDS {
 
             val response = call()
 
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) return Resource.success(body)
-            }
+            if (response.isSuccessful)
+                return Resource.success(response.body()!!)
 
-            val exceptionBody =
+            val exceptionResponse =
                 Gson().fromJson(response.errorBody()?.string(), ExceptionResponse::class.java)
 
-            return Resource.exception(exceptionBody.exceptionMessage, exceptionBody.exceptionCode)
+            return Resource.exception(
+                exceptionResponse.message,
+                exceptionResponse.error,
+                exceptionResponse.fieldErrorMessages
+            )
 
         } catch (e: SocketTimeoutException) {
-            return Resource.exception(e.message ?: "", ExceptionCode.SOCKET_TIMEOUT_EXCEPTION)
+            return Resource.exception(
+                e.message ?: "",
+                ExceptionCode.SOCKET_TIMEOUT_EXCEPTION,
+                null
+            )
         } catch (e: NoInternetConnectivityException) {
-            return Resource.exception(e.message ?: "", ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION)
+            return Resource.exception(
+                e.message ?: "",
+                ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION,
+                null
+            )
         } catch (e: Exception) {
-            return Resource.exception("Network call has failed for a following reason: ${e.message ?: ""}")
+            return Resource.exception(
+                e.message ?: "",
+                ExceptionCode.EXCEPTION,
+                null
+            )
         }
     }
 }

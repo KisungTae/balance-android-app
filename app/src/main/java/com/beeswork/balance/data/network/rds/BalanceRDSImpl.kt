@@ -1,7 +1,8 @@
 package com.beeswork.balance.data.network.rds
 
-import com.beeswork.balance.data.entity.Click
-import com.beeswork.balance.data.entity.Match
+import com.beeswork.balance.data.database.entity.Click
+import com.beeswork.balance.data.database.entity.Clicked
+import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.BalanceService
 import com.beeswork.balance.data.network.request.FCMTokenRequest
@@ -76,6 +77,16 @@ class BalanceRDSImpl(
     ): Resource<MutableList<Match>> {
         return getResult {
             balanceService.fetchMatches(matcherId, email, fetchedAt)
+        }
+    }
+
+    override suspend fun fetchClicked(
+        clickedId: String,
+        email: String,
+        fetchedAt: String
+    ): Resource<MutableList<Clicked>> {
+        return getResult {
+            balanceService.fetchClicked(clickedId, email, fetchedAt)
         }
     }
 

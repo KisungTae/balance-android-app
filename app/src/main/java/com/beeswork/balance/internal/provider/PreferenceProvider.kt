@@ -9,8 +9,10 @@ interface PreferenceProvider {
     fun putAccountId(accountId: String)
     fun putEmail(email: String)
     fun putMatchFetchedAt(matchFetchedAt: String)
+    fun putClickedFetchedAt(clickedFetchedAt: String)
 
 
+    fun getClickedFetchedAt(): String
     fun getMatchFetchedAt(): String
     fun getGender(): Boolean
     fun getMinAgeBirthYear(): Int

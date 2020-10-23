@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.beeswork.balance.data.entity.Match
-import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.lazyDeferred

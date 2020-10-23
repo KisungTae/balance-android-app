@@ -9,8 +9,9 @@ import com.beeswork.balance.R
 import kotlinx.android.synthetic.main.dialog_match.*
 
 class MatchDialog(
-    private val matcherPhotoKey: String,
-    private val matchedPhotoKey: String
+    private val matcherPhotoKey: String?,
+    private val matchedPhotoKey: String?,
+    private val message: String?
 ): DialogFragment() {
 
 

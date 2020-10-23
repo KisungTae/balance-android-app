@@ -2,7 +2,7 @@ package com.beeswork.balance.ui.match
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.beeswork.balance.data.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.BalanceRepository
 
 class MatchViewModelFactory(
     private val balanceRepository: BalanceRepository
