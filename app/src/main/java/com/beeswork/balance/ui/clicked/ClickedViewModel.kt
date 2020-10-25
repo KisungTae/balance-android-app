@@ -22,10 +22,10 @@ class ClickedViewModel(
         .build()
 
     val clicked by lazyDeferred {
-        LivePagedListBuilder(balanceRepository.getClicked(), pagedListConfig).build()
+        LivePagedListBuilder(balanceRepository.getClickedList(), pagedListConfig).build()
     }
 
     fun fetchClicked() {
-        balanceRepository.fetchClicked()
+        balanceRepository.fetchClickedList()
     }
 }

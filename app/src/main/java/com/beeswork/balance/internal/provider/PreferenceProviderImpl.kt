@@ -94,11 +94,11 @@ class PreferenceProviderImpl(
     }
 
     override fun getAccountId(): String {
-        return "10177a84-b6f1-487f-af69-9b10ea3d938e"
+        return "65db8e52-a64d-4d0f-84a2-bd05b8c22897"
     }
 
     override fun getEmail(): String {
-        return "26@gmail.com"
+        return "22@gmail.com"
     }
 
     override fun getLatitude(): Double {

@@ -28,4 +28,9 @@ interface MatchDAO {
     @Query("select matchedId from `match`")
     fun getMatchedIds(): List<String>
 
+
+//  TODO: removeme
+    @Query("select * from `match`")
+    fun get(): List<Match>
+
 }

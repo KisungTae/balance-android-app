@@ -80,13 +80,13 @@ class BalanceRDSImpl(
         }
     }
 
-    override suspend fun fetchClicked(
+    override suspend fun fetchClickedList(
         clickedId: String,
         email: String,
         fetchedAt: String
     ): Resource<MutableList<Clicked>> {
         return getResult {
-            balanceService.fetchClicked(clickedId, email, fetchedAt)
+            balanceService.fetchClickedList(clickedId, email, fetchedAt)
         }
     }
 

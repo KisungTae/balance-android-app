@@ -19,5 +19,5 @@ data class Match(
     var unmatched: Boolean,
     var recentMessage: String,
     var lastRead: OffsetDateTime,
-    var updatedAt: OffsetDateTime
+    var 
 )

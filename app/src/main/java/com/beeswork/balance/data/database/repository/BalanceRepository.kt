@@ -12,9 +12,10 @@ import com.beeswork.balance.internal.Resource
 interface BalanceRepository {
 
     // clicked
-    suspend fun getClicked(): DataSource.Factory<Int, Clicked>
-    fun fetchClicked()
-    val fetchClickedResource: LiveData<Resource<List<Clicked>>>
+    suspend fun getClickedList(): DataSource.Factory<Int, Clicked>
+    fun fetchClickedList()
+    val fetchClickedListResource: LiveData<Resource<List<Clicked>>>
+    suspend fun getClickedCount(): LiveData<Int>
 
     // match
     fun fetchMatches()

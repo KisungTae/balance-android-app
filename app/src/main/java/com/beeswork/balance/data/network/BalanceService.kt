@@ -57,7 +57,7 @@ interface BalanceService {
     ): Response<MutableList<Match>>
 
     @GET("clicked/list")
-    suspend fun fetchClicked(
+    suspend fun fetchClickedList(
         @Query(value = "clickedId") clickedId: String,
         @Query(value = "email") email: String,
         @Query(value = "fetchedAt") fetchedAt: String

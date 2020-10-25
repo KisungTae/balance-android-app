@@ -1,34 +1,29 @@
 package com.beeswork.balance.ui.swipe
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.dao.FCMTokenDAO
-import com.beeswork.balance.data.network.BalanceService
-import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.Resource
-import com.beeswork.balance.internal.constant.DialogTag
-import com.beeswork.balance.internal.constant.MIN_CARD_STACK_SIZE
-import com.beeswork.balance.internal.provider.PreferenceProvider
+import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.SwipeableMethod
 import kotlinx.android.synthetic.main.fragment_swipe.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-
-
 
 
 class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
@@ -38,13 +33,27 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     private val viewModelFactory: SwipeViewModelFactory by instance()
     private lateinit var viewModel: SwipeViewModel
     private lateinit var cardStackAdapter: CardStackAdapter
-    private val preferenceProvider: PreferenceProvider by instance()
+    private lateinit var broadcastReceiver: BroadcastReceiver
 
-    //  TODO: remove me
-    private val balanceService: BalanceService by instance()
-    private val balanceRepository: BalanceRepository by instance()
-    private val fcmTokenDAO: FCMTokenDAO by instance()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setupBroadcastReceiver()
+    }
 
+    private fun setupBroadcastReceiver() {
+        broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                when (intent?.action) {
+                    IntentAction.RECEIVED_FCM_NOTIFICATION -> {
+                        when (intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)) {
+                            NotificationType.MATCH -> viewModel.fetchMatches()
+                            NotificationType.CLICKED -> viewModel.fetchClickedList()
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,52 +66,19 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
+        viewModel.fetchCards()
     }
 
     private fun bindUI() = launch {
-
-        btnSwipeFilter.setOnClickListener {
-//            TODO: remove me fetchCards
-            viewModel.fetchCards()
-            SwipeFilterDialog(preferenceProvider).show(childFragmentManager, DialogTag.SWIPE_FILTER_DIALOG)
-        }
-
-
-
-        photoBtn.setOnClickListener {
-//            balanceRepository.insertMatch()
-//            balanceRepository.insertFCMToken("test token")
-            CoroutineScope(Dispatchers.IO).launch {
-                println("fcm token:"+ fcmTokenDAO.get()[0].token)
-            }
-
-        }
-
-        cardStackAdapter = CardStackAdapter()
-        val manager = CardStackLayoutManager(context, this@SwipeFragment)
-
-        manager.setCanScrollVertical(false)
-        manager.setSwipeableMethod(SwipeableMethod.Manual)
-
-        cardStackView.layoutManager = manager
-        cardStackView.adapter = cardStackAdapter
-        cardStackView.itemAnimator = DefaultItemAnimator()
-
-        viewModel.cards.observe(viewLifecycleOwner, { cardResource ->
-
-            when (cardResource.status) {
-                Resource.Status.SUCCESS -> {
-                    cardStackAdapter.addCards(cardResource.data!!)
-                }
-                Resource.Status.LOADING -> {
-                    println("loading")
-                }
-                Resource.Status.EXCEPTION -> {
-                    println("error")
-                }
-            }
+        setupSwipeCardStackView()
+        setupCardsObserver()
+        setupBalanceGameObserver()
+        viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
+            tvClickedCount.text = clickedCount.toString()
         })
+    }
 
+    private fun setupBalanceGameObserver() {
         viewModel.balanceGame.observe(viewLifecycleOwner, { balanceGameResource ->
 
             var balanceGameDialog = childFragmentManager.findFragmentByTag(DialogTag.BALANCE_DIALOG)
@@ -112,8 +88,10 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                 when (balanceGameResource.status) {
                     Resource.Status.SUCCESS -> {
                         println(balanceGameResource.data!!.questions)
-                        balanceGameDialog.setBalanceGame(balanceGameResource.data!!.swipeId,
-                                                         balanceGameResource.data.questions)
+                        balanceGameDialog.setBalanceGame(
+                            balanceGameResource.data!!.swipeId,
+                            balanceGameResource.data.questions
+                        )
                     }
                     Resource.Status.LOADING -> {
                         balanceGameDialog.setBalanceGameLoading()
@@ -130,13 +108,55 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                             }
                         }
 
-                        balanceGameDialog.setBalanceGameError(reloadable,
-                                                              balanceGameResource.exceptionMessage!!)
+                        balanceGameDialog.setBalanceGameError(
+                            reloadable,
+                            balanceGameResource.exceptionMessage!!
+                        )
                     }
                 }
             }
-
         })
+    }
+
+    private fun setupCardsObserver() {
+        viewModel.cards.observe(viewLifecycleOwner, { cardResource ->
+            when (cardResource.status) {
+                Resource.Status.SUCCESS -> {
+                    cardStackAdapter.addCards(cardResource.data!!)
+                }
+                Resource.Status.LOADING -> {
+                    println("loading")
+                }
+                Resource.Status.EXCEPTION -> {
+                    println("error")
+                }
+            }
+        })
+    }
+
+    private fun setupSwipeCardStackView() {
+        cardStackAdapter = CardStackAdapter()
+
+        val cardStackLayoutManager = CardStackLayoutManager(context, this@SwipeFragment)
+        cardStackLayoutManager.setCanScrollVertical(false)
+        cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
+
+        stvSwipe.layoutManager = cardStackLayoutManager
+        stvSwipe.adapter = cardStackAdapter
+        stvSwipe.itemAnimator = DefaultItemAnimator()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+            broadcastReceiver,
+            IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
+        )
+    }
+
+    override fun onPause() {
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(broadcastReceiver)
+        super.onPause()
     }
 
     override fun onBalanceGameClicked(swipedId: String, swipeId: Long) {
@@ -148,9 +168,6 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         viewModel.swipe(swipedId)
     }
 
-    override fun onCardDragging(direction: Direction?, ratio: Float) {
-    }
-
     override fun onCardSwiped(direction: Direction?) {
 
         val removedCard = cardStackAdapter.removeCard()
@@ -160,9 +177,14 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
         if (direction == Direction.Right && removedCard != null) {
             viewModel.swipe(removedCard.accountId)
-            BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(childFragmentManager,
-                DialogTag.BALANCE_DIALOG)
+            BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(
+                childFragmentManager,
+                DialogTag.BALANCE_DIALOG
+            )
         }
+    }
+
+    override fun onCardDragging(direction: Direction?, ratio: Float) {
     }
 
     override fun onCardRewound() {

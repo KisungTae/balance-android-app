@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.*
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.PreferenceProvider
@@ -55,8 +56,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         super.onResume()
 
         val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
-        println("main activity on resume get intent")
-        println(type ?: "null")
+        if (type != null) onReceiveFCMNotification(intent)
 
         val filter = IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter)

@@ -101,5 +101,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      15. swipe fragment should have update on number of clickeds, and chat
 //      16. change the flow of balanceGame
 //      17. add localization and exception Message in network call, need my own message not the exception.message
+//      18. consider after click, give match result or not
 
 
