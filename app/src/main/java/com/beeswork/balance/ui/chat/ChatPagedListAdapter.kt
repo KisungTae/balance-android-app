@@ -19,7 +19,7 @@ class ChatPagedListAdapter: PagedListAdapter<Message, ChatPagedListAdapter.Messa
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         println("itemCount: $itemCount")
-        println("binding message at $position | message = ${getItem(position)}" )
+        println("binding message at $position | messa000ge = ${getItem(position)}" )
         holder.bind(getItem(position)!!)
     }
 
@@ -40,7 +40,7 @@ class ChatPagedListAdapter: PagedListAdapter<Message, ChatPagedListAdapter.Messa
 
         fun bind(message: Message) {
             itemView.tvMessage.text = message.message
-            itemView.tvMessageCreatedAt.text = message.createdAt.toLocalTime().toString()
+            itemView.tvMessageCreatedAt.text = message.sentAt.toLocalTime().toString()
         }
 
     }

@@ -3,11 +3,10 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
+import com.beeswork.balance.data.network.response.Question
 import com.beeswork.balance.internal.Resource
-import retrofit2.http.Query
 
 interface BalanceRDS {
 
@@ -25,7 +24,7 @@ interface BalanceRDS {
         swiperId: String,
         swiperEmail: String,
         swipedId: String
-    ): Resource<BalanceGame>
+    ): Resource<Question>
 
     suspend fun click(
         swiperId: String,

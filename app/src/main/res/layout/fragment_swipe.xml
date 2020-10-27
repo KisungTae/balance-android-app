@@ -13,25 +13,40 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clicked Count: "/>
+            android:text="Clicked Count: " />
 
         <TextView
             android:id="@+id/tvClickedCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BALANCE"/>
+            android:text="" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="||  unread messge count: " />
+
+        <TextView
+            android:id="@+id/tvUnreadMessageCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="" />
 
         <Button
             android:id="@+id/btnSwipeFilter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="filter"/>
+            android:text="filter" />
 
-        <Button
-            android:id="@+id/photoBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="photobtn" />
+
+
+<!--        <Button-->
+<!--            android:id="@+id/photoBtn"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="photobtn" />-->
+
+
 
     </LinearLayout>
 
@@ -39,7 +54,7 @@
         android:id="@+id/stvSwipe"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="15dp"
-        android:clipToPadding="false"/>
+        android:clipToPadding="false"
+        android:padding="15dp" />
 
 </LinearLayout>

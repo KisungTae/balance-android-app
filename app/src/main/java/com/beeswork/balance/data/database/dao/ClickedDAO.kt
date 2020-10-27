@@ -13,7 +13,7 @@ import com.beeswork.balance.data.database.entity.Clicked
 interface ClickedDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertClickedList(clickedList: List<Clicked>)
+    fun insert(clickedList: List<Clicked>)
 
     @Query("select * from clicked order by updatedAt desc")
     fun getClickedList(): DataSource.Factory<Int, Clicked>

@@ -7,8 +7,8 @@ import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.BalanceService
 import com.beeswork.balance.data.network.request.FCMTokenRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
-import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
+import com.beeswork.balance.data.network.response.Question
 import com.beeswork.balance.internal.Resource
 
 class BalanceRDSImpl(
@@ -43,7 +43,7 @@ class BalanceRDSImpl(
         swiperId: String,
         swiperEmail: String,
         swipedId: String
-    ): Resource<BalanceGame> {
+    ): Resource<Question> {
         return getResult {
             balanceService.swipe(SwipeRequest(swiperId, swiperEmail, swipedId))
         }

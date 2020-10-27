@@ -6,9 +6,9 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.request.FCMTokenRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
-import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
+import com.beeswork.balance.data.network.response.Question
 import com.beeswork.balance.internal.constant.NETWORK_CONNECTION_TIMEOUT
 import com.beeswork.balance.internal.constant.NETWORK_READ_TIMEOUT
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
@@ -41,7 +41,7 @@ interface BalanceService {
     ): Response<MutableList<Card>>
 
     @POST("swipe")
-    suspend fun swipe(@Body swipeRequest: SwipeRequest): Response<BalanceGame>
+    suspend fun swipe(@Body swipeRequest: SwipeRequest): Response<Question>
 
     @POST("click")
     suspend fun click(@Body swipeRequest: SwipeRequest): Response<Click>

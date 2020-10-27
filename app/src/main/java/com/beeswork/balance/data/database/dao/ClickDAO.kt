@@ -11,7 +11,7 @@ interface ClickDAO {
     fun insert(click: Click)
 
     @Query("update click set posted = :posted where swipeId = :swipeId")
-    fun updatePosted(swipeId: Long, posted: Boolean)
+    fun update(swipeId: Long, posted: Boolean)
 
     @Query("delete from click where swipeId = :swipeId")
     fun delete(swipeId: Long)

@@ -1,13 +1,14 @@
 package com.beeswork.balance.data.database.repository
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
+import com.beeswork.balance.R
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.network.rds.BalanceRDS
-import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.CURRENT_FCM_TOKEN_ID
@@ -19,6 +20,7 @@ import kotlin.random.Random
 
 
 class BalanceRepositoryImpl(
+    private val context: Context,
     private val matchDAO: MatchDAO,
     private val messageDAO: MessageDAO,
     private val clickDAO: ClickDAO,
@@ -28,29 +30,17 @@ class BalanceRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : BalanceRepository {
 
-    private val mutableCards = MutableLiveData<Resource<List<Card>>>()
-    override val cards: LiveData<Resource<List<Card>>>
-        get() = mutableCards
+//  ################################################################################# //
+//  ##################################### SWIPE ##################################### //
+//  ################################################################################# //
 
     private val mutableBalanceGame = MutableLiveData<Resource<BalanceGame>>()
     override val balanceGame: LiveData<Resource<BalanceGame>>
         get() = mutableBalanceGame
 
-    private val mutableFetchMatchesResource = MutableLiveData<Resource<List<Match>>>()
-    override val fetchMatchesResource: LiveData<Resource<List<Match>>>
-        get() = mutableFetchMatchesResource
-
     private val mutableFetchClickedResource = MutableLiveData<Resource<List<Clicked>>>()
     override val fetchClickedListResource: LiveData<Resource<List<Clicked>>>
         get() = mutableFetchClickedResource
-
-    private var cardsBeingFetched = false
-
-    override suspend fun getClickedList(): DataSource.Factory<Int, Clicked> {
-        return withContext(Dispatchers.IO) {
-            return@withContext clickedDAO.getClickedList()
-        }
-    }
 
     override fun fetchClickedList() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -64,7 +54,7 @@ class BalanceRepositoryImpl(
             if (clickedResource.status == Resource.Status.SUCCESS) {
                 val clickedList = clickedResource.data!!
                 if (clickedList.size > 0) {
-                    clickedDAO.insertClickedList(clickedList)
+                    clickedDAO.insert(clickedList)
                     clickedResource.data.sortByDescending { c -> c.updatedAt }
                     preferenceProvider.putClickedFetchedAt(clickedList[0].updatedAt.toString())
                     clickedList.clear()
@@ -80,7 +70,78 @@ class BalanceRepositoryImpl(
         }
     }
 
+    override suspend fun getClickedList(): DataSource.Factory<Int, Clicked> {
+        return withContext(Dispatchers.IO) {
+            return@withContext clickedDAO.getClickedList()
+        }
+    }
+
+    override fun swipe(swipedId: String) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val accountId = preferenceProvider.getAccountId()
+            val email = preferenceProvider.getEmail()
+
+            mutableBalanceGame.postValue(Resource.loading())
+            val questionResource = balanceRDS.swipe(accountId, email, swipedId)
+            mutableBalanceGame.postValue(questionResource)
+        }
+    }
+
+    //  TEST 1. even if you leave the app before completing the network call, when you come back to the app
+    //          you will get the response. The response is received in the background
+    override fun click(swipedId: String, swipeId: Long) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val accountId = preferenceProvider.getAccountId()
+            val email = preferenceProvider.getEmail()
+
+            clickDAO.insert(Click(swipeId, swipedId, false, OffsetDateTime.now()))
+            val clickResource = balanceRDS.click(accountId, email, swipedId, swipeId)
+
+            if (clickResource.status == Resource.Status.SUCCESS) {
+                clickDAO.update(swipeId, true)
+            } else if (clickResource.status == Resource.Status.EXCEPTION) {
+                when (clickResource.exceptionCode) {
+                    ExceptionCode.ACCOUNT_INVALID_EXCEPTION,
+                    ExceptionCode.SWIPE_NOT_FOUND_EXCEPTION -> clickDAO.delete(swipeId)
+                    ExceptionCode.MATCH_EXISTS_EXCEPTION -> clickDAO.update(swipeId, true)
+                }
+            }
+        }
+    }
+
+
+//  ################################################################################# //
+//  ##################################### MATCH ##################################### //
+//  ################################################################################# //
+
+
+    private val mutableFetchMatchesResource = MutableLiveData<Resource<List<Match>>>()
+    override val fetchMatchesResource: LiveData<Resource<List<Match>>>
+        get() = mutableFetchMatchesResource
+
+    override suspend fun getMatches(): DataSource.Factory<Int, Match> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.getMatches()
+        }
+    }
+
+    override suspend fun getUnreadMessageCount(): LiveData<Int> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.countUnreadMessageCount()
+        }
+    }
+
+
+    override fun unmatch() {
+        CoroutineScope(Dispatchers.IO).launch {
+            matchDAO.unmatch("88277")
+        }
+    }
+
     override fun fetchMatches() {
+
         CoroutineScope(Dispatchers.IO).launch {
 
             var fetchedAt = preferenceProvider.getMatchFetchedAt()
@@ -91,29 +152,28 @@ class BalanceRepositoryImpl(
             )
 
             if (matchResource.status == Resource.Status.SUCCESS) {
-
                 val fetchedMatches = matchResource.data!!
                 for (i in (fetchedMatches.size - 1) downTo 0) {
                     val fetchedMatch = fetchedMatches[i]
-                    val newFetchedAt = fetchedMatch.updatedAt.toString()
-
-                    if (newFetchedAt > fetchedAt) fetchedAt = newFetchedAt
 
                     if (matchDAO.existsByChatId(fetchedMatch.chatId)) {
-                        matchDAO.updatePhotoKeyAndUnmatched(
+                        matchDAO.update(
                             fetchedMatch.chatId,
                             fetchedMatch.photoKey,
                             fetchedMatch.unmatched
                         )
                         fetchedMatches.removeAt(i)
                     } else {
-                        fetchedMatch.lastRead = OffsetDateTime.now()
-                        fetchedMatch.recentMessage = ""
+                        val currentOffsetDateTime = OffsetDateTime.now()
+                        fetchedMatch.unreadMessageCount = 1
+                        fetchedMatch.recentMessage = context.getString(R.string.default_recent_message)
+                        fetchedMatch.lastReadAt = currentOffsetDateTime
+                        fetchedMatch.lastReceivedAt = currentOffsetDateTime
                     }
                 }
 
                 if (fetchedMatches.size > 0) {
-                    matchDAO.insertMatches(fetchedMatches)
+                    matchDAO.insert(fetchedMatches)
                     fetchedMatches.clear()
                 }
 
@@ -124,6 +184,17 @@ class BalanceRepositoryImpl(
         }
     }
 
+
+
+//  ################################################################################# //
+//  ##################################### ACCOUNT ################################### //
+//  ################################################################################# //
+
+    private val mutableCards = MutableLiveData<Resource<List<Card>>>()
+    override val cards: LiveData<Resource<List<Card>>>
+        get() = mutableCards
+
+    private var cardsBeingFetched = false
 
     override fun fetchCards() {
 
@@ -173,43 +244,6 @@ class BalanceRepositoryImpl(
         }
     }
 
-
-    override fun swipe(swipedId: String) {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId()
-            val email = preferenceProvider.getEmail()
-
-            mutableBalanceGame.postValue(Resource.loading())
-            val questionResource = balanceRDS.swipe(accountId, email, swipedId)
-            mutableBalanceGame.postValue(questionResource)
-        }
-    }
-
-    //  TEST 1. even if you leave the app before completing the network call, when you come back to the app
-    //          you will get the response. The response is received in the background
-    override fun click(swipedId: String, swipeId: Long) {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId()
-            val email = preferenceProvider.getEmail()
-
-            clickDAO.insert(Click(swipeId, swipedId, false, OffsetDateTime.now()))
-            val clickResource = balanceRDS.click(accountId, email, swipedId, swipeId)
-
-            if (clickResource.status == Resource.Status.SUCCESS) {
-                clickDAO.updatePosted(swipeId, true)
-            } else if (clickResource.status == Resource.Status.EXCEPTION) {
-                when (clickResource.exceptionCode) {
-                    ExceptionCode.ACCOUNT_INVALID_EXCEPTION,
-                    ExceptionCode.SWIPE_NOT_FOUND_EXCEPTION -> clickDAO.delete(swipeId)
-                    ExceptionCode.MATCH_EXISTS_EXCEPTION -> clickDAO.updatePosted(swipeId, true)
-                }
-            }
-        }
-
-    }
-
     override fun insertFCMToken(token: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
@@ -219,24 +253,21 @@ class BalanceRepositoryImpl(
 
             val tokenResource = balanceRDS.postFCMToken(accountId, email, token)
             if (tokenResource.status == Resource.Status.SUCCESS) {
-                fcmTokenDAO.updatePosted(CURRENT_FCM_TOKEN_ID, true)
+                fcmTokenDAO.update(CURRENT_FCM_TOKEN_ID, true)
             }
         }
     }
 
 
-    override suspend fun getMatches(): DataSource.Factory<Int, Match> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.getMatches()
-        }
-    }
+
+//  ################################################################################# //
+//  ##################################### MESSAGE ##################################### //
+//  ################################################################################# //
 
 
-    override fun unmatch() {
-        CoroutineScope(Dispatchers.IO).launch {
-            matchDAO.unmatch("88277")
-        }
-    }
+
+
+
 
 
     override suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message> {
@@ -246,12 +277,11 @@ class BalanceRepositoryImpl(
     }
 
 
-    //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
+//  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
 //          out of screen.
 //  TEST 2. when update all entries in database, it will update the items in list as well
     override fun insertMessage(chatId: Long) {
         GlobalScope.launch(Dispatchers.IO) {
-
 
             for (i in 1..2000) {
                 val randomMessage = Random.nextInt(0, 100000)
@@ -259,16 +289,14 @@ class BalanceRepositoryImpl(
                 val message = Message(
                     null,
                     chatId,
-                    Random.nextBoolean(),
                     "message - $randomMessage",
+                    Random.nextBoolean(),
+                    Random.nextBoolean(),
                     OffsetDateTime.now()
                 )
                 messageDAO.insert(message)
-                println("inserting messages at $i")
 //                messageDAO.updateMessages()
             }
-
-
         }
     }
 

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -31,6 +32,8 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
+    private val preferenceProvider: PreferenceProvider by instance()
+
     private lateinit var viewModel: SwipeViewModel
     private lateinit var cardStackAdapter: CardStackAdapter
     private lateinit var broadcastReceiver: BroadcastReceiver
@@ -73,9 +76,18 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         setupSwipeCardStackView()
         setupCardsObserver()
         setupBalanceGameObserver()
+
         viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
             tvClickedCount.text = clickedCount.toString()
         })
+
+        viewModel.unreadMessageCount.await().observe(viewLifecycleOwner, { unreadMessageCount ->
+            tvUnreadMessageCount.text = unreadMessageCount.toString()
+        })
+
+        btnSwipeFilter.setOnClickListener {
+            SwipeFilterDialog(preferenceProvider).show(childFragmentManager, DialogTag.SWIPE_FILTER_DIALOG)
+        }
     }
 
     private fun setupBalanceGameObserver() {

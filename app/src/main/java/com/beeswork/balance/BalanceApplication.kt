@@ -47,6 +47,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 instance()
             )
 
@@ -102,5 +103,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      16. change the flow of balanceGame
 //      17. add localization and exception Message in network call, need my own message not the exception.message
 //      18. consider after click, give match result or not
+//      19. chat algorithm, message came then increment unreadMessageCount in Match and if it is added to the message list, then adapter in chat fragment calls minus the unreadMessageCount of match
 
 

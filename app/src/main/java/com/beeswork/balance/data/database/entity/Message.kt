@@ -15,7 +15,8 @@ data class Message(
     val id: Long? = null,
 
     val chatId: Long,
-    val isReceived: Boolean,
     val message: String,
-    val createdAt: OffsetDateTime
+    val isReceived: Boolean,
+    val isRead: Boolean,
+    val sentAt: OffsetDateTime
 )

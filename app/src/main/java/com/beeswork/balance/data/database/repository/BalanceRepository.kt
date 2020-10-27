@@ -6,7 +6,6 @@ import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.network.response.Card
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Message
-import com.beeswork.balance.data.network.response.BalanceGame
 import com.beeswork.balance.internal.Resource
 
 interface BalanceRepository {
@@ -22,6 +21,7 @@ interface BalanceRepository {
     val fetchMatchesResource: LiveData<Resource<List<Match>>>
     fun unmatch()
     suspend fun getMatches(): DataSource.Factory<Int, Match>
+    suspend fun getUnreadMessageCount(): LiveData<Int>
 
     // message
     suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message>

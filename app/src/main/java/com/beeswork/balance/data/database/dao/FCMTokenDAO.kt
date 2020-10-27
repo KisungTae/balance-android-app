@@ -13,7 +13,7 @@ interface FCMTokenDAO {
     fun insert(FCMToken: FCMToken)
 
     @Query("update fcmToken set posted = :posted where id = :id")
-    fun updatePosted(id:Int, posted: Boolean)
+    fun update(id:Int, posted: Boolean)
 
     @Query("select * from fcmToken")
     fun get(): List<FCMToken>
