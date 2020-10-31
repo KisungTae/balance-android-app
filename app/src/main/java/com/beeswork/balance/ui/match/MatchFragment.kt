@@ -68,7 +68,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
 
         viewModel.fetchMatches()
 
-        viewModel.fetchMatchesResource.observe(viewLifecycleOwner, { fetchMatchResource ->
+        viewModel.fetchMatchesResponse.observe(viewLifecycleOwner, { fetchMatchResource ->
 
             when (fetchMatchResource.status) {
                 Resource.Status.SUCCESS -> {

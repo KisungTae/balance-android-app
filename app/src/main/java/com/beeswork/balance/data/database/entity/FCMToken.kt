@@ -13,7 +13,6 @@ data class FCMToken(
 
     val token: String,
     val posted: Boolean,
-    val createdAt: OffsetDateTime,
 
     @PrimaryKey
     val id: Int = CURRENT_FCM_TOKEN_ID

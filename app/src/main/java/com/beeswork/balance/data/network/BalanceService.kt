@@ -4,11 +4,13 @@ import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
+import com.beeswork.balance.data.network.request.ClickRequest
 import com.beeswork.balance.data.network.request.FCMTokenRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
-import com.beeswork.balance.data.network.response.Card
+import com.beeswork.balance.data.network.response.BalanceGameResponse
+import com.beeswork.balance.data.network.response.CardResponse
+import com.beeswork.balance.data.network.response.ClickResponse
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
-import com.beeswork.balance.data.network.response.Question
 import com.beeswork.balance.internal.constant.NETWORK_CONNECTION_TIMEOUT
 import com.beeswork.balance.internal.constant.NETWORK_READ_TIMEOUT
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
@@ -29,34 +31,35 @@ import java.util.concurrent.TimeUnit
 interface BalanceService {
 
 
-    @GET("recommend")
+    @GET("account/recommend")
     suspend fun fetchCards(
-        @Query(value = "account_id") accountId: String,
+        @Query(value = "accountId") accountId: String,
+        @Query(value = "email") email: String,
         @Query(value = "latitude") latitude: Double,
         @Query(value = "longitude") longitude: Double,
-        @Query(value = "min_age") minAge: Int,
-        @Query(value = "max_age") maxAge: Int,
+        @Query(value = "minAge") minAge: Int,
+        @Query(value = "maxAge") maxAge: Int,
         @Query(value = "gender") gender: Boolean,
         @Query(value = "distance") distance: Int
-    ): Response<MutableList<Card>>
+    ): Response<MutableList<CardResponse>>
 
     @POST("swipe")
-    suspend fun swipe(@Body swipeRequest: SwipeRequest): Response<Question>
+    suspend fun swipe(@Body swipeRequest: SwipeRequest): Response<BalanceGameResponse>
 
-    @POST("click")
-    suspend fun click(@Body swipeRequest: SwipeRequest): Response<Click>
+    @POST("swipe/click")
+    suspend fun click(@Body clickRequest: ClickRequest): Response<ClickResponse>
 
     @POST("account/fcm/token/save")
     suspend fun postFCMToken(@Body fcmTokenRequest: FCMTokenRequest): Response<EmptyJsonResponse>
 
     @GET("match/list")
     suspend fun fetchMatches(
-        @Query(value = "matcherId") matcherId: String,
+        @Query(value = "accountId") accountId: String,
         @Query(value = "email") email: String,
         @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Match>>
 
-    @GET("clicked/list")
+    @GET("swipe/clicked/list")
     suspend fun fetchClickedList(
         @Query(value = "clickedId") clickedId: String,
         @Query(value = "email") email: String,
@@ -78,6 +81,8 @@ interface BalanceService {
                 OffsetDateTime::class.java,
                 StringToOffsetDateTimeDeserializer()
             ).create()
+
+
 
             return Retrofit.Builder()
                 .client(okHttpClient)

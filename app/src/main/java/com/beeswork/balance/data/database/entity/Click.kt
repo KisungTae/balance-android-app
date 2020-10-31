@@ -9,9 +9,5 @@ import org.threeten.bp.OffsetDateTime
 data class Click(
 
     @PrimaryKey
-    val swipeId: Long,
-
-    val swipedId: String,
-    val posted: Boolean,
-    val createdAt: OffsetDateTime
+    val swipedId: String
 )

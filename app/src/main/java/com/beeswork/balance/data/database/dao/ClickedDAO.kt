@@ -22,7 +22,7 @@ interface ClickedDAO {
     fun deleteBySwiperId(swiperId: String)
 
     @Query("delete from clicked where swiperId in (select matchedId from `match`)")
-    fun syncWithMatch()
+    fun deleteIfMatched()
 
     @Query("select count(*) from clicked")
     fun count(): LiveData<Int>

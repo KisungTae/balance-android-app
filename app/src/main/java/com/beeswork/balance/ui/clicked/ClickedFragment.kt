@@ -6,9 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
+import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.ui.base.ScopeFragment
-import com.beeswork.balance.ui.match.MatchViewModel
-import com.beeswork.balance.ui.match.MatchViewModelFactory
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -40,11 +39,28 @@ class ClickedFragment: ScopeFragment(), KodeinAware, ClickedPagedListAdapter.OnS
 
         clickedPagedListAdapter = ClickedPagedListAdapter(this@ClickedFragment)
 
-        viewModel.clicked.await().observe(viewLifecycleOwner, { pagedClickedList ->
+        viewModel.clickedList.await().observe(viewLifecycleOwner, { pagedClickedList ->
             clickedPagedListAdapter.submitList(pagedClickedList)
         })
 
-        viewModel.fetchClicked()
+        viewModel.fetchClickedList()
+
+        viewModel.fetchClickedListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
+
+            when (fetchClickedListResponse.status) {
+                Resource.Status.SUCCESS -> {
+                    println("fetchMatch success")
+                }
+
+                Resource.Status.EXCEPTION -> {
+                    println("fetchMatch exception")
+                }
+
+                Resource.Status.LOADING -> {
+                    println("fetchMatch loading")
+                }
+            }
+        })
     }
 
     override fun onSwipeRight() {

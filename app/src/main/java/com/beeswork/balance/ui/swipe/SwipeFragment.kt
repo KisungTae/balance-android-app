@@ -86,45 +86,46 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         })
 
         btnSwipeFilter.setOnClickListener {
-            SwipeFilterDialog(preferenceProvider).show(childFragmentManager, DialogTag.SWIPE_FILTER_DIALOG)
+            SwipeFilterDialog(preferenceProvider).show(
+                childFragmentManager,
+                DialogTag.SWIPE_FILTER_DIALOG
+            )
         }
     }
 
     private fun setupBalanceGameObserver() {
+
         viewModel.balanceGame.observe(viewLifecycleOwner, { balanceGameResource ->
 
-            var balanceGameDialog = childFragmentManager.findFragmentByTag(DialogTag.BALANCE_DIALOG)
-            if (balanceGameDialog != null) {
-                balanceGameDialog = balanceGameDialog as BalanceGameDialog
+            val balanceGameDialog =
+                childFragmentManager.findFragmentByTag(DialogTag.BALANCE_DIALOG) as BalanceGameDialog
 
-                when (balanceGameResource.status) {
-                    Resource.Status.SUCCESS -> {
-                        println(balanceGameResource.data!!.questions)
-                        balanceGameDialog.setBalanceGame(
-                            balanceGameResource.data!!.swipeId,
-                            balanceGameResource.data.questions
-                        )
-                    }
-                    Resource.Status.LOADING -> {
-                        balanceGameDialog.setBalanceGameLoading()
-                    }
-                    Resource.Status.EXCEPTION -> {
-                        var reloadable = true
+            when (balanceGameResource.status) {
+                Resource.Status.SUCCESS -> {
+                    balanceGameDialog.setBalanceGame(
+                        balanceGameResource.data!!.swipeId,
+                        balanceGameResource.data.questions
+                    )
+                }
+                Resource.Status.LOADING -> {
+                    balanceGameDialog.setBalanceGameLoading(getString(R.string.question_loading))
+                }
+                Resource.Status.EXCEPTION -> {
+                    var reloadable = true
 
-                        when (balanceGameResource.exceptionCode) {
-                            ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
-                            ExceptionCode.ACCOUNT_SHORT_OF_POINT_EXCEPTION,
-                            ExceptionCode.SWIPE_CLICKED_EXISTS_EXCEPTION -> {
-                                println("balanceGameError - errorCode: ${balanceGameResource.exceptionCode} | errorMessage: ${balanceGameResource.exceptionMessage}")
-                                reloadable = false
-                            }
+                    when (balanceGameResource.exceptionCode) {
+                        ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
+                        ExceptionCode.ACCOUNT_SHORT_OF_POINT_EXCEPTION,
+                        ExceptionCode.SWIPE_CLICKED_EXISTS_EXCEPTION -> {
+//                            println("balanceGameError - errorCode: ${balanceGameResource.exceptionCode} | errorMessage: ${balanceGameResource.exceptionMessage}")
+                            reloadable = false
                         }
-
-                        balanceGameDialog.setBalanceGameError(
-                            reloadable,
-                            balanceGameResource.exceptionMessage!!
-                        )
                     }
+
+                    balanceGameDialog.setBalanceGameError(
+                        reloadable,
+                        balanceGameResource.exceptionMessage!!
+                    )
                 }
             }
         })
@@ -171,9 +172,9 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         super.onPause()
     }
 
-    override fun onBalanceGameClicked(swipedId: String, swipeId: Long) {
+    override fun onBalanceGameClick(swipedId: String, swipeId: Long, answers: Map<Long, Boolean>) {
         println("swipedId: $swipeId | swipeId: $swipeId")
-        viewModel.click(swipedId, swipeId)
+        viewModel.click(swipedId, swipeId, answers)
     }
 
     override fun onBalanceGameReload(swipedId: String) {
@@ -188,11 +189,12 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
             viewModel.fetchCards()
 
         if (direction == Direction.Right && removedCard != null) {
-            viewModel.swipe(removedCard.accountId)
             BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(
                 childFragmentManager,
                 DialogTag.BALANCE_DIALOG
             )
+
+            viewModel.swipe(removedCard.accountId)
         }
     }
 

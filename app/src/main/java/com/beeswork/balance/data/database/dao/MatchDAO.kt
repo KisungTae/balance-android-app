@@ -14,6 +14,9 @@ interface MatchDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(matches: List<Match>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(match: Match)
+
     @Query("select * from `match` where unmatched != 1 order by lastReceivedAt desc")
     fun getMatches(): DataSource.Factory<Int, Match>
 

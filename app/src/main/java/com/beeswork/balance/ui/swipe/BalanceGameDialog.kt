@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Question
-import com.beeswork.balance.internal.constant.SelectionOption
+import com.beeswork.balance.data.network.response.QuestionResponse
+import com.beeswork.balance.internal.constant.AnswerOption
 import kotlinx.android.synthetic.main.dialog_balance_game.*
 
 class BalanceGameDialog(
@@ -16,10 +16,10 @@ class BalanceGameDialog(
     private val balanceGameListener: BalanceGameListener
 ): DialogFragment() {
 
-    private lateinit var questions: List<Question>
-    var swipeId: Long = -1
+    private lateinit var questionResponses: List<QuestionResponse>
+    private var swipeId: Long = -1
     private var currentIndex = -1
-    private var click = true
+    private val answers: MutableMap<Long, Boolean> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +36,8 @@ class BalanceGameDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btnTopOption.setOnClickListener { checkAnswer(SelectionOption.TOP) }
-        btnBottomOption.setOnClickListener { checkAnswer(SelectionOption.BOTTOM) }
+        btnTopOption.setOnClickListener { selectAnswer(AnswerOption.TOP) }
+        btnBottomOption.setOnClickListener { selectAnswer(AnswerOption.BOTTOM) }
         btnBalanceGameReload.setOnClickListener { balanceGameListener.onBalanceGameReload(swipedId) }
         btnBalanceGameErrorClose.setOnClickListener { dismiss() }
         btnBalanceGameCompletionClose.setOnClickListener { dismiss() }
@@ -48,49 +48,47 @@ class BalanceGameDialog(
         dialog?.window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
     }
 
-    private fun checkAnswer(answer: Boolean) {
-        val question = questions[currentIndex]
-        if (question.selected != answer) click = false
+    private fun selectAnswer(answer: Boolean) {
+        val question = questionResponses[currentIndex]
+        answers[question.id] = answer
         nextQuestion()
     }
 
     private fun nextQuestion() {
         currentIndex++
-        if (currentIndex < questions.size) {
-            val question = questions[currentIndex]
+        if (currentIndex < questionResponses.size) {
+            val question = questionResponses[currentIndex]
             tvQuestionDescription.text = question.description
             btnTopOption.text = question.topOption
             btnBottomOption.text = question.bottomOption
         } else {
-            if (click) balanceGameListener.onBalanceGameClicked(swipedId, swipeId)
-            setBalanceGameCompletion()
+            balanceGameListener.onBalanceGameClick(swipedId, swipeId, answers)
+            setBalanceGameLoading(getString(R.string.question_checking))
         }
     }
 
-    fun setBalanceGame(newSwipeId: Long, newQuestions: List<Question>) {
+    fun setBalanceGame(newSwipeId: Long, newQuestionResponses: List<QuestionResponse>) {
+        println("balance game starts with swipeId: $newSwipeId")
         hideLayouts()
         llBalanceGame.visibility = LinearLayout.VISIBLE
 
         swipeId = newSwipeId
-        questions = newQuestions
+        questionResponses = newQuestionResponses
         nextQuestion()
     }
 
     fun setBalanceGameError(reloadable: Boolean, exceptionMessage: String) {
         hideLayouts()
         llBalanceGameError.visibility = LinearLayout.VISIBLE
+        if (!reloadable) btnBalanceGameReload.visibility = View.GONE
         btnBalanceGameReload.isEnabled = reloadable
         tvBalanceGameExceptionMessage.text = exceptionMessage
     }
 
-    fun setBalanceGameLoading() {
+    fun setBalanceGameLoading(message: String) {
         hideLayouts()
         llBalanceGameLoading.visibility = LinearLayout.VISIBLE
-    }
-
-    private fun setBalanceGameCompletion() {
-        hideLayouts()
-        llBalanceGameCompletion.visibility = LinearLayout.VISIBLE
+        tvBalanceGameLoadingTitle.text = message
     }
 
     private fun hideLayouts() {
@@ -101,7 +99,7 @@ class BalanceGameDialog(
     }
 
     interface BalanceGameListener {
-        fun onBalanceGameClicked(swipedId:String, swipeId: Long)
+        fun onBalanceGameClick(swipedId:String, swipeId: Long, answers: Map<Long, Boolean>)
         fun onBalanceGameReload(swipedId:String)
     }
 

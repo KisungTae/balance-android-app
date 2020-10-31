@@ -14,7 +14,7 @@ class MatchViewModel (
     private val balanceRepository: BalanceRepository
 ): ViewModel() {
 
-    val fetchMatchesResource: LiveData<Resource<List<Match>>> = balanceRepository.fetchMatchesResource
+    val fetchMatchesResponse: LiveData<Resource<List<Match>>> = balanceRepository.fetchMatchesResponse
 
     private val pagedListConfig = PagedList.Config.Builder()
         .setEnablePlaceholders(false)

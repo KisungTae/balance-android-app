@@ -3,23 +3,33 @@ package com.beeswork.balance.data.database.repository
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicked
-import com.beeswork.balance.data.network.response.Card
+import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Message
+import com.beeswork.balance.data.network.response.BalanceGameResponse
+import com.beeswork.balance.data.network.response.ClickResponse
 import com.beeswork.balance.internal.Resource
 
 interface BalanceRepository {
 
-    // clicked
+    // swipe
+    val fetchClickedListResponse: LiveData<Resource<List<Clicked>>>
+    val balanceGame: LiveData<Resource<BalanceGameResponse>>
+    val clickResponse: LiveData<Resource<ClickResponse>>
+
     suspend fun getClickedList(): DataSource.Factory<Int, Clicked>
-    fun fetchClickedList()
-    val fetchClickedListResource: LiveData<Resource<List<Clicked>>>
     suspend fun getClickedCount(): LiveData<Int>
 
+    fun fetchClickedList()
+    fun swipe(swipedId: String)
+    fun click(swipedId: String, swipeId:Long, answers: Map<Long, Boolean>)
+
     // match
+    val fetchMatchesResponse: LiveData<Resource<List<Match>>>
+
     fun fetchMatches()
-    val fetchMatchesResource: LiveData<Resource<List<Match>>>
     fun unmatch()
+
     suspend fun getMatches(): DataSource.Factory<Int, Match>
     suspend fun getUnreadMessageCount(): LiveData<Int>
 
@@ -27,17 +37,8 @@ interface BalanceRepository {
     suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message>
     fun insertMessage(chatId: Long)
 
-    // card
-    val cards: LiveData<Resource<List<Card>>>
+    // account
+    val cards: LiveData<Resource<List<CardResponse>>>
     fun fetchCards()
-
-    // balance
-    val balanceGame: LiveData<Resource<BalanceGame>>
-    fun swipe(swipedId: String)
-
-    // match
-    fun click(swipedId: String, swipeId:Long)
-
-    // firebaseMessagingToken
     fun insertFCMToken(token: String)
 }

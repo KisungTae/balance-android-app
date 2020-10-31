@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Card
+import com.beeswork.balance.data.network.response.CardResponse
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.item_card_stack.view.*
 
@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.item_card_stack.view.*
 class CardStackAdapter: RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     private lateinit var cardImageViewPager: ViewPager2
-    private val cards: MutableList<Card> = arrayListOf()
+    private val cardResponses: MutableList<CardResponse> = arrayListOf()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,19 +34,19 @@ class CardStackAdapter: RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
         TabLayoutMediator(holder.itemView.tlCardImage, holder.itemView.vpCardImage) { tab, pos -> }.attach()
         println("onBindViewHolder")
-        holder.itemView.tvCardStackName.text = "position: $position | size: ${cards.size}"
+        holder.itemView.tvCardStackName.text = "position: $position | size: ${cardResponses.size}"
     }
 
-    fun addCards(newCards: List<Card>) {
-        val startIndex = if (cards.size > 0) cards.size - 1 else 0
-        cards.addAll(startIndex, newCards)
-        notifyItemRangeInserted(startIndex, newCards.size)
+    fun addCards(newCardResponses: List<CardResponse>) {
+        val startIndex = if (cardResponses.size > 0) cardResponses.size - 1 else 0
+        cardResponses.addAll(startIndex, newCardResponses)
+        notifyItemRangeInserted(startIndex, newCardResponses.size)
     }
 
-    fun removeCard(): Card? {
+    fun removeCard(): CardResponse? {
 
-        if (cards.size > 0) {
-            val removedCard = cards.removeAt(0)
+        if (cardResponses.size > 0) {
+            val removedCard = cardResponses.removeAt(0)
             notifyItemRemoved(0)
             return removedCard
         }
@@ -68,7 +68,7 @@ class CardStackAdapter: RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return cards.size
+        return cardResponses.size
     }
 
 

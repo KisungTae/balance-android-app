@@ -6,4 +6,7 @@
 
     <string name="default_recent_message">대화를 시작해보세요!</string>
 
+    <string name="question_loading">질문을 가져오고있습니다</string>
+    <string name="question_checking">질문을 체크하고있습니다</string>
+
 </resources>

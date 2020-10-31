@@ -1,6 +1,6 @@
 package com.beeswork.balance.data.network.response
 
-data class Card (
+data class CardResponse (
     val accountId: String,
     val name: String,
     val about: String,

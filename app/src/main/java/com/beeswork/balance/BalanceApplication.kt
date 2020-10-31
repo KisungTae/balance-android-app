@@ -104,5 +104,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      17. add localization and exception Message in network call, need my own message not the exception.message
 //      18. consider after click, give match result or not
 //      19. chat algorithm, message came then increment unreadMessageCount in Match and if it is added to the message list, then adapter in chat fragment calls minus the unreadMessageCount of match
+//      20. refresh button for matches and clicked to sync whole list using fetchedAt = 2020-01-01
+//      21. check if udpatedAt of match or clicked is vlaid date before put fetchedAt to sharedprefrerence
+//      22. change cardbeingfetched for fetchCards to something else
 
 
