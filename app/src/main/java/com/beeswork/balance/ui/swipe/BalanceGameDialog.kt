@@ -68,7 +68,7 @@ class BalanceGameDialog(
     }
 
     fun setBalanceGame(newSwipeId: Long, newQuestionResponses: List<QuestionResponse>) {
-        println("balance game starts with swipeId: $newSwipeId")
+        println("balance game starts with swipeId: $newSwipeId and swipedId: $swipedId")
         hideLayouts()
         llBalanceGame.visibility = LinearLayout.VISIBLE
 
@@ -77,12 +77,16 @@ class BalanceGameDialog(
         nextQuestion()
     }
 
-    fun setBalanceGameError(reloadable: Boolean, exceptionMessage: String) {
+    fun setBalanceGameLoadError(enableRetryBtn: Boolean, exceptionMessage: String) {
         hideLayouts()
-        llBalanceGameError.visibility = LinearLayout.VISIBLE
-        if (!reloadable) btnBalanceGameReload.visibility = View.GONE
-        btnBalanceGameReload.isEnabled = reloadable
-        tvBalanceGameExceptionMessage.text = exceptionMessage
+        llBalanceGameLoadError.visibility = LinearLayout.VISIBLE
+        btnBalanceGameLoadErrorRetryBtn.visibility = if (enableRetryBtn) View.GONE else View.VISIBLE
+        btnBalanceGameLoadErrorClose.isEnabled = enableRetryBtn
+        tvBalanceGameLoadErrorMessage.text = exceptionMessage
+    }
+
+    fun setBalanceGameClickError(enableRetryBtn: Boolean, exceptionMessage: String) {
+
     }
 
     fun setBalanceGameLoading(message: String) {
@@ -94,7 +98,7 @@ class BalanceGameDialog(
     private fun hideLayouts() {
         llBalanceGameLoading.visibility = LinearLayout.GONE
         llBalanceGame.visibility = LinearLayout.GONE
-        llBalanceGameError.visibility = LinearLayout.GONE
+        llBalanceGameLoadError.visibility = LinearLayout.GONE
         llBalanceGameCompletion.visibility = LinearLayout.GONE
     }
 

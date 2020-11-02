@@ -76,6 +76,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         setupSwipeCardStackView()
         setupCardsObserver()
         setupBalanceGameObserver()
+        setupClickResponseObserver()
 
         viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
             tvClickedCount.text = clickedCount.toString()
@@ -91,6 +92,22 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                 DialogTag.SWIPE_FILTER_DIALOG
             )
         }
+    }
+
+    private fun setupClickResponseObserver() {
+        viewModel.clickResponse.observe(viewLifecycleOwner, { clickResponse ->
+            when (clickResponse.status) {
+                Resource.Status.SUCCESS -> {
+
+                }
+                Resource.Status.LOADING -> {
+
+                }
+                Resource.Status.EXCEPTION -> {
+
+                }
+            }
+        })
     }
 
     private fun setupBalanceGameObserver() {
@@ -122,7 +139,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                         }
                     }
 
-                    balanceGameDialog.setBalanceGameError(
+                    balanceGameDialog.setBalanceGameLoadError(
                         reloadable,
                         balanceGameResource.exceptionMessage!!
                     )

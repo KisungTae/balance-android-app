@@ -35,26 +35,26 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/llBalanceGameError"
+        android:id="@+id/llBalanceGameLoadError"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/darker_gray"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvBalanceGameExceptionMessage"
+            android:id="@+id/tvBalanceGameLoadErrorMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="this is Error page" />
 
         <Button
-            android:id="@+id/btnBalanceGameReload"
+            android:id="@+id/btnBalanceGameLoadErrorRetryBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="load questions" />
 
         <Button
-            android:id="@+id/btnBalanceGameErrorClose"
+            android:id="@+id/btnBalanceGameLoadErrorClose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="close"/>
@@ -92,6 +92,70 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="this is loading page" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBalanceGameClickError"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvBalanceGameClickErrorMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This is balance game click error message"/>
+
+        <Button
+            android:id="@+id/btnBalanceGameClickErrorCloseBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="close"/>
+
+        <Button
+            android:id="@+id/btnBalanceGameClickErrorRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="retry"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBalanceGameNotClick"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="상대방 밸런스에 클릭하지 못했습니다"/>
+
+        <Button
+            android:id="@+id/btnBalanceGameNotClickRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="retry"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBalanceGameClick"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="상대방 밸러스에 클릭했어요!! 상대방도 내 밸런스에 클릭할때까지 스와이프를 계속 즐겨주세요"/>
+
+        <Button
+            android:id="@+id/btnBalanceGameClickKeepSwiping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="스와이프 계속하기"/>
+
     </LinearLayout>
 
 </FrameLayout>

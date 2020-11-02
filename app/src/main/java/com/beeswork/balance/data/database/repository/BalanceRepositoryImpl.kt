@@ -114,14 +114,11 @@ class BalanceRepositoryImpl(
                 if (notificationType == NotificationType.MATCH) {
                     setNewMatch(match)
                     matchDAO.insert(match)
-                    val matches = matchDAO.get()
-                    val acb = 123
                 } else if (notificationType == NotificationType.CLICK) {
                     clickDAO.insert(Click(match.matchedId))
-                    val clicks = clickDAO.get()
-                    val abc = 123
                 }
             }
+            mutableClickResponse.postValue(clickResource)
         }
     }
 
@@ -230,16 +227,7 @@ class BalanceRepositoryImpl(
 
 
                 val cardsResource =
-                    balanceRDS.fetchCards(
-                        accountId,
-                        email,
-                        latitude,
-                        longitude,
-                        minAge,
-                        maxAge,
-                        gender,
-                        distance
-                    )
+                    balanceRDS.fetchCards(accountId, email, latitude, longitude, minAge, maxAge, gender, distance)
 
                 if (cardsResource.status == Resource.Status.SUCCESS) {
 
@@ -250,10 +238,11 @@ class BalanceRepositoryImpl(
                     val endIndex = fetchedCards.size - 1
 
                     for (i in endIndex downTo 0) {
-                        fetchedCards[i].birthYear =
-                            Convert.birthYearToAge(fetchedCards[i].birthYear)
-                        if (clickIds.contains(fetchedCards[i].accountId))
+                        if (clickIds.contains(fetchedCards[i].accountId)) {
                             fetchedCards.removeAt(i)
+                            continue
+                        }
+                        fetchedCards[i].birthYear = Convert.birthYearToAge(fetchedCards[i].birthYear)
                     }
                 }
 
