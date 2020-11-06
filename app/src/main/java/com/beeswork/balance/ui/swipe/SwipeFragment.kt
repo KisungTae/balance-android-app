@@ -131,6 +131,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                     }
                     Resource.Status.EXCEPTION -> {
                         var enableClickBtn = true
+                        var enableRefreshBtn = false
 
                         when (clickResponse.exceptionCode) {
                             ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
@@ -140,10 +141,15 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                             ExceptionCode.SWIPED_NOT_FOUND_EXCEPTION -> {
                                 enableClickBtn = false
                             }
+                            ExceptionCode.QUESTION_SET_CHANGED_EXCEPTION -> {
+                                enableClickBtn = false
+                                enableRefreshBtn = true
+                            }
                         }
 
                         balanceGameDialog.setBalanceGameClickError(
                             enableClickBtn,
+                            enableRefreshBtn,
                             clickResponse.exceptionMessage!!
                         )
                     }

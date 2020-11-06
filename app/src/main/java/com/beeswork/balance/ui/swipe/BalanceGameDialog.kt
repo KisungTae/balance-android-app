@@ -43,8 +43,8 @@ class BalanceGameDialog(
         btnBalanceGameLoadErrorClose.setOnClickListener { dismiss() }
 
         btnBalanceGameClick.setOnClickListener { balanceGameListener.onBalanceGameClick(swipedId, swipeId, answers) }
-
         btnBalanceGameClickErrorCloseBtn.setOnClickListener { dismiss() }
+        btnBalanceGameRefresh.setOnClickListener { balanceGameListener.onBalanceGameReload(swipedId) }
 
         btnBalanceGameRetry.setOnClickListener { balanceGameListener.onBalanceGameReload(swipedId) }
         btnBalanceGameNotClickClose.setOnClickListener { dismiss() }
@@ -96,11 +96,13 @@ class BalanceGameDialog(
         tvBalanceGameLoadErrorMessage.text = exceptionMessage
     }
 
-    fun setBalanceGameClickError(enableClickBtn: Boolean, exceptionMessage: String) {
+    fun setBalanceGameClickError(enableClickBtn: Boolean, enableRefreshBtn: Boolean, exceptionMessage: String) {
         hideLayouts()
         llBalanceGameClickError.visibility = LinearLayout.VISIBLE
-        btnBalanceGameClick.isEnabled = enableClickBtn
-        btnBalanceGameClick.visibility = if (enableClickBtn) View.GONE else View.VISIBLE
+
+        btnBalanceGameClick.visibility = if (enableClickBtn) View.VISIBLE else View.GONE
+        btnBalanceGameRefresh.visibility = if (enableRefreshBtn) View.VISIBLE else View.GONE
+
         tvBalanceGameClickErrorMessage.text =exceptionMessage
     }
 

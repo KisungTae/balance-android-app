@@ -15,6 +15,8 @@ class ExceptionCode {
         const val ACCOUNT_BLOCKED_EXCEPTION = "account.blocked.exception"
 
         const val QUESTION_NOT_FOUND_EXCEPTION = "question.not.found.exception"
+        const val QUESTION_SET_CHANGED_EXCEPTION = "question.set.changed.exception"
+
 
         const val SWIPE_CLICKED_EXISTS_EXCEPTION = "swipe.clicked.exists.exception"
         const val SWIPE_NOT_FOUND_EXCEPTION = "swipe.not.found.exception"

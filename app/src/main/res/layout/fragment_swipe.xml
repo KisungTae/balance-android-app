@@ -90,11 +90,6 @@
                 android:text="card stack is loading"
                 android:textAlignment="center" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="loading btn" />
-
         </LinearLayout>
 
         <com.yuyakaido.android.cardstackview.CardStackView
