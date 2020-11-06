@@ -39,22 +39,72 @@
             android:text="filter" />
 
 
-
-<!--        <Button-->
-<!--            android:id="@+id/photoBtn"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="photobtn" />-->
-
+        <!--        <Button-->
+        <!--            android:id="@+id/photoBtn"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:text="photobtn" />-->
 
 
     </LinearLayout>
 
-    <com.yuyakaido.android.cardstackview.CardStackView
-        android:id="@+id/stvSwipe"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:padding="15dp" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/llCardStackLoadError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="17dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="card stack error"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/btnCardStackReload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="reload" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llCardStackLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="17dp"
+            android:background="@android:color/white"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="card stack is loading"
+                android:textAlignment="center" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="loading btn" />
+
+        </LinearLayout>
+
+        <com.yuyakaido.android.cardstackview.CardStackView
+            android:id="@+id/csvSwipe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="15dp" />
+
+    </FrameLayout>
+
 
 </LinearLayout>

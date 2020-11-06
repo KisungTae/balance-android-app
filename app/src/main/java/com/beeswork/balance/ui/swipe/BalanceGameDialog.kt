@@ -16,7 +16,7 @@ class BalanceGameDialog(
     private val balanceGameListener: BalanceGameListener
 ): DialogFragment() {
 
-    private lateinit var questionResponses: List<QuestionResponse>
+    private lateinit var questions: List<QuestionResponse>
     private var swipeId: Long = -1
     private var currentIndex = -1
     private val answers: MutableMap<Long, Boolean> = mutableMapOf()
@@ -38,9 +38,18 @@ class BalanceGameDialog(
         super.onViewCreated(view, savedInstanceState)
         btnTopOption.setOnClickListener { selectAnswer(AnswerOption.TOP) }
         btnBottomOption.setOnClickListener { selectAnswer(AnswerOption.BOTTOM) }
+
         btnBalanceGameReload.setOnClickListener { balanceGameListener.onBalanceGameReload(swipedId) }
-        btnBalanceGameErrorClose.setOnClickListener { dismiss() }
-        btnBalanceGameCompletionClose.setOnClickListener { dismiss() }
+        btnBalanceGameLoadErrorClose.setOnClickListener { dismiss() }
+
+        btnBalanceGameClick.setOnClickListener { balanceGameListener.onBalanceGameClick(swipedId, swipeId, answers) }
+
+        btnBalanceGameClickErrorCloseBtn.setOnClickListener { dismiss() }
+
+        btnBalanceGameRetry.setOnClickListener { balanceGameListener.onBalanceGameReload(swipedId) }
+        btnBalanceGameNotClickClose.setOnClickListener { dismiss() }
+
+        btnBalanceGameClickedClose.setOnClickListener { dismiss() }
     }
 
     override fun onResume() {
@@ -48,16 +57,28 @@ class BalanceGameDialog(
         dialog?.window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
     }
 
+    fun setBalanceGame(newSwipeId: Long, newQuestionResponses: List<QuestionResponse>) {
+        println("balance game starts with swipeId: $newSwipeId and swipedId: $swipedId")
+        currentIndex = -1
+        answers.clear()
+        hideLayouts()
+        llBalanceGame.visibility = LinearLayout.VISIBLE
+
+        swipeId = newSwipeId
+        questions = newQuestionResponses
+        nextQuestion()
+    }
+
     private fun selectAnswer(answer: Boolean) {
-        val question = questionResponses[currentIndex]
+        val question = questions[currentIndex]
         answers[question.id] = answer
         nextQuestion()
     }
 
     private fun nextQuestion() {
         currentIndex++
-        if (currentIndex < questionResponses.size) {
-            val question = questionResponses[currentIndex]
+        if (currentIndex < questions.size) {
+            val question = questions[currentIndex]
             tvQuestionDescription.text = question.description
             btnTopOption.text = question.topOption
             btnBottomOption.text = question.bottomOption
@@ -67,39 +88,45 @@ class BalanceGameDialog(
         }
     }
 
-    fun setBalanceGame(newSwipeId: Long, newQuestionResponses: List<QuestionResponse>) {
-        println("balance game starts with swipeId: $newSwipeId and swipedId: $swipedId")
-        hideLayouts()
-        llBalanceGame.visibility = LinearLayout.VISIBLE
-
-        swipeId = newSwipeId
-        questionResponses = newQuestionResponses
-        nextQuestion()
-    }
-
-    fun setBalanceGameLoadError(enableRetryBtn: Boolean, exceptionMessage: String) {
+    fun setBalanceGameLoadError(enableReloadBtn: Boolean, exceptionMessage: String) {
         hideLayouts()
         llBalanceGameLoadError.visibility = LinearLayout.VISIBLE
-        btnBalanceGameLoadErrorRetryBtn.visibility = if (enableRetryBtn) View.GONE else View.VISIBLE
-        btnBalanceGameLoadErrorClose.isEnabled = enableRetryBtn
+        btnBalanceGameReload.isEnabled = enableReloadBtn
+        btnBalanceGameReload.visibility = if (enableReloadBtn) View.GONE else View.VISIBLE
         tvBalanceGameLoadErrorMessage.text = exceptionMessage
     }
 
-    fun setBalanceGameClickError(enableRetryBtn: Boolean, exceptionMessage: String) {
+    fun setBalanceGameClickError(enableClickBtn: Boolean, exceptionMessage: String) {
+        hideLayouts()
+        llBalanceGameClickError.visibility = LinearLayout.VISIBLE
+        btnBalanceGameClick.isEnabled = enableClickBtn
+        btnBalanceGameClick.visibility = if (enableClickBtn) View.GONE else View.VISIBLE
+        tvBalanceGameClickErrorMessage.text =exceptionMessage
+    }
 
+    fun setBalanceGameNotClicked() {
+        hideLayouts()
+        llBalanceGameNotClick.visibility = LinearLayout.VISIBLE
+    }
+
+    fun setBalanceGameClicked(swipedPhotoKey: String) {
+        hideLayouts()
+        llBalanceGameClicked.visibility = LinearLayout.VISIBLE
     }
 
     fun setBalanceGameLoading(message: String) {
         hideLayouts()
         llBalanceGameLoading.visibility = LinearLayout.VISIBLE
-        tvBalanceGameLoadingTitle.text = message
+        tvBalanceGameLoadingMessage.text = message
     }
 
     private fun hideLayouts() {
         llBalanceGameLoading.visibility = LinearLayout.GONE
         llBalanceGame.visibility = LinearLayout.GONE
         llBalanceGameLoadError.visibility = LinearLayout.GONE
-        llBalanceGameCompletion.visibility = LinearLayout.GONE
+        llBalanceGameClicked.visibility = LinearLayout.GONE
+        llBalanceGameClickError.visibility = LinearLayout.GONE
+        llBalanceGameNotClick.visibility = LinearLayout.GONE
     }
 
     interface BalanceGameListener {
@@ -108,6 +135,3 @@ class BalanceGameDialog(
     }
 
 }
-
-
-// TODO: loading page, error page,

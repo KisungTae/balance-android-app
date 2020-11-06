@@ -81,21 +81,16 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
         val notificationType = intent!!.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
         val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
-        val message = intent.getStringExtra(FCMDataKey.MESSAGE)
 
         when (notificationType) {
-            NotificationType.MATCH -> {
-                MatchDialog("", photoKey, message).show(
-                    supportFragmentManager,
-                    DialogTag.MATCH_DIALOG
-                )
-            }
-            NotificationType.CLICKED -> {
-                ClickedDialog(photoKey, message).show(
-                    supportFragmentManager,
-                    DialogTag.CLICKED_DIALOG
-                )
-            }
+            NotificationType.MATCH -> MatchDialog("", photoKey).show(
+                supportFragmentManager,
+                DialogTag.MATCH_DIALOG
+            )
+            NotificationType.CLICKED -> ClickedDialog(photoKey).show(
+                supportFragmentManager,
+                DialogTag.CLICKED_DIALOG
+            )
         }
     }
 

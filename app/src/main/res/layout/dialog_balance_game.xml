@@ -38,17 +38,17 @@
         android:id="@+id/llBalanceGameLoadError"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/darker_gray"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvBalanceGameLoadErrorMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="this is Error page" />
+            android:text="this is Error page"
+            android:textColor="@color/textBlack"/>
 
         <Button
-            android:id="@+id/btnBalanceGameLoadErrorRetryBtn"
+            android:id="@+id/btnBalanceGameReload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="load questions" />
@@ -62,36 +62,16 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/llBalanceGameCompletion"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/textBlack"
-            android:text="this is you passed or not pass questions page"/>
-
-        <Button
-            android:id="@+id/btnBalanceGameCompletionClose"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="close" />
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/llBalanceGameLoading"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray">
+        android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/tvBalanceGameLoadingTitle"
+            android:id="@+id/tvBalanceGameLoadingMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="this is loading page" />
+            android:text="this is loading page"
+            android:textColor="@color/textBlack"/>
     </LinearLayout>
 
     <LinearLayout
@@ -104,7 +84,8 @@
             android:id="@+id/tvBalanceGameClickErrorMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="This is balance game click error message"/>
+            android:text="This is balance game click error message"
+            android:textColor="@color/textBlack"/>
 
         <Button
             android:id="@+id/btnBalanceGameClickErrorCloseBtn"
@@ -113,7 +94,7 @@
             android:text="close"/>
 
         <Button
-            android:id="@+id/btnBalanceGameClickErrorRetry"
+            android:id="@+id/btnBalanceGameClick"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="retry"/>
@@ -129,29 +110,42 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="상대방 밸런스에 클릭하지 못했습니다"/>
+            android:text="상대방 밸런스에 클릭하지 못했습니다"
+            android:textColor="@color/textBlack"/>
 
         <Button
-            android:id="@+id/btnBalanceGameNotClickRetry"
+            android:id="@+id/btnBalanceGameRetry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="retry"/>
 
+        <Button
+            android:id="@+id/btnBalanceGameNotClickClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="keep swiping"/>
+
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/llBalanceGameClick"
+        android:id="@+id/llBalanceGameClicked"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/ivBalanceGameClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="상대방 밸러스에 클릭했어요!! 상대방도 내 밸런스에 클릭할때까지 스와이프를 계속 즐겨주세요"/>
+            android:text="상대방 밸러스에 클릭했어요!! 상대방도 내 밸런스에 클릭할때까지 스와이프를 계속 즐겨주세요"
+            android:textColor="@color/textBlack"/>
 
         <Button
-            android:id="@+id/btnBalanceGameClickKeepSwiping"
+            android:id="@+id/btnBalanceGameClickedClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="스와이프 계속하기"/>

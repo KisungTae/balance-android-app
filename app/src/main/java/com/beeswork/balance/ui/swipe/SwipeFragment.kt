@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -16,6 +17,7 @@ import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.base.ScopeFragment
+import com.beeswork.balance.ui.dialog.MatchDialog
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -92,19 +94,59 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                 DialogTag.SWIPE_FILTER_DIALOG
             )
         }
+
+        btnCardStackReload.setOnClickListener {
+            println("btnCardStackReload.setOnClickListener")
+            viewModel.fetchCards()
+        }
     }
 
     private fun setupClickResponseObserver() {
         viewModel.clickResponse.observe(viewLifecycleOwner, { clickResponse ->
-            when (clickResponse.status) {
-                Resource.Status.SUCCESS -> {
 
-                }
-                Resource.Status.LOADING -> {
+            val dialog = childFragmentManager.findFragmentByTag(DialogTag.BALANCE_DIALOG)
 
-                }
-                Resource.Status.EXCEPTION -> {
+            if (dialog != null) {
+                val balanceGameDialog = dialog as BalanceGameDialog
 
+                when (clickResponse.status) {
+                    Resource.Status.SUCCESS -> {
+
+                        val match = clickResponse.data!!.match
+
+                        when (clickResponse.data.notificationType) {
+                            NotificationType.CLICKED -> balanceGameDialog.setBalanceGameClicked(match.photoKey)
+                            NotificationType.NOT_CLICKED -> balanceGameDialog.setBalanceGameNotClicked()
+                            NotificationType.MATCH -> {
+                                balanceGameDialog.dismiss()
+                                MatchDialog("", match.photoKey).show(
+                                    childFragmentManager,
+                                    DialogTag.MATCH_DIALOG
+                                )
+                            }
+                        }
+                    }
+                    Resource.Status.LOADING -> {
+                        balanceGameDialog.setBalanceGameLoading(getString(R.string.question_checking))
+                    }
+                    Resource.Status.EXCEPTION -> {
+                        var enableClickBtn = true
+
+                        when (clickResponse.exceptionCode) {
+                            ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
+                            ExceptionCode.ACCOUNT_SHORT_OF_POINT_EXCEPTION,
+                            ExceptionCode.SWIPE_CLICKED_EXISTS_EXCEPTION,
+                            ExceptionCode.SWIPED_BLOCKED_EXCEPTION,
+                            ExceptionCode.SWIPED_NOT_FOUND_EXCEPTION -> {
+                                enableClickBtn = false
+                            }
+                        }
+
+                        balanceGameDialog.setBalanceGameClickError(
+                            enableClickBtn,
+                            clickResponse.exceptionMessage!!
+                        )
+                    }
                 }
             }
         })
@@ -114,35 +156,40 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
         viewModel.balanceGame.observe(viewLifecycleOwner, { balanceGameResource ->
 
-            val balanceGameDialog =
-                childFragmentManager.findFragmentByTag(DialogTag.BALANCE_DIALOG) as BalanceGameDialog
+            val dialog = childFragmentManager.findFragmentByTag(DialogTag.BALANCE_DIALOG)
 
-            when (balanceGameResource.status) {
-                Resource.Status.SUCCESS -> {
-                    balanceGameDialog.setBalanceGame(
-                        balanceGameResource.data!!.swipeId,
-                        balanceGameResource.data.questions
-                    )
-                }
-                Resource.Status.LOADING -> {
-                    balanceGameDialog.setBalanceGameLoading(getString(R.string.question_loading))
-                }
-                Resource.Status.EXCEPTION -> {
-                    var reloadable = true
-
-                    when (balanceGameResource.exceptionCode) {
-                        ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
-                        ExceptionCode.ACCOUNT_SHORT_OF_POINT_EXCEPTION,
-                        ExceptionCode.SWIPE_CLICKED_EXISTS_EXCEPTION -> {
-//                            println("balanceGameError - errorCode: ${balanceGameResource.exceptionCode} | errorMessage: ${balanceGameResource.exceptionMessage}")
-                            reloadable = false
-                        }
+            if (dialog != null) {
+                val balanceGameDialog = dialog as BalanceGameDialog
+                when (balanceGameResource.status) {
+                    Resource.Status.SUCCESS -> {
+                        balanceGameDialog.setBalanceGame(
+                            balanceGameResource.data!!.swipeId,
+                            balanceGameResource.data.questions
+                        )
                     }
+                    Resource.Status.LOADING -> {
+                        balanceGameDialog.setBalanceGameLoading(getString(R.string.question_loading))
+                    }
+                    Resource.Status.EXCEPTION -> {
 
-                    balanceGameDialog.setBalanceGameLoadError(
-                        reloadable,
-                        balanceGameResource.exceptionMessage!!
-                    )
+                        var enableReloadBtn = true
+
+                        when (balanceGameResource.exceptionCode) {
+                            ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
+                            ExceptionCode.ACCOUNT_SHORT_OF_POINT_EXCEPTION,
+                            ExceptionCode.SWIPE_CLICKED_EXISTS_EXCEPTION,
+                            ExceptionCode.SWIPED_BLOCKED_EXCEPTION,
+                            ExceptionCode.SWIPED_NOT_FOUND_EXCEPTION
+                            -> {
+                                enableReloadBtn = false
+                            }
+                        }
+
+                        balanceGameDialog.setBalanceGameLoadError(
+                            enableReloadBtn,
+                            balanceGameResource.exceptionMessage!!
+                        )
+                    }
                 }
             }
         })
@@ -153,12 +200,19 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
             when (cardResource.status) {
                 Resource.Status.SUCCESS -> {
                     cardStackAdapter.addCards(cardResource.data!!)
+                    csvSwipe.visibility = View.VISIBLE
                 }
                 Resource.Status.LOADING -> {
-                    println("loading")
+                    println("card stack is loading")
+                    llCardStackLoading.visibility = View.VISIBLE
+                    llCardStackLoadError.visibility = View.GONE
+                    csvSwipe.visibility = View.GONE
                 }
                 Resource.Status.EXCEPTION -> {
-                    println("error")
+                    println("card stack loading is exception")
+                    llCardStackLoading.visibility = View.GONE
+                    llCardStackLoadError.visibility = View.VISIBLE
+                    csvSwipe.visibility = View.GONE
                 }
             }
         })
@@ -171,9 +225,9 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         cardStackLayoutManager.setCanScrollVertical(false)
         cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
 
-        stvSwipe.layoutManager = cardStackLayoutManager
-        stvSwipe.adapter = cardStackAdapter
-        stvSwipe.itemAnimator = DefaultItemAnimator()
+        csvSwipe.layoutManager = cardStackLayoutManager
+        csvSwipe.adapter = cardStackAdapter
+        csvSwipe.itemAnimator = DefaultItemAnimator()
     }
 
     override fun onResume() {

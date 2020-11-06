@@ -114,7 +114,7 @@ class BalanceRepositoryImpl(
                 if (notificationType == NotificationType.MATCH) {
                     setNewMatch(match)
                     matchDAO.insert(match)
-                } else if (notificationType == NotificationType.CLICK) {
+                } else if (notificationType == NotificationType.CLICKED) {
                     clickDAO.insert(Click(match.matchedId))
                 }
             }
@@ -214,6 +214,8 @@ class BalanceRepositoryImpl(
 
         if (!cardsBeingFetched) {
             cardsBeingFetched = true
+
+            mutableCards.postValue(Resource.loading())
 
             CoroutineScope(Dispatchers.IO).launch {
                 val accountId = preferenceProvider.getAccountId()

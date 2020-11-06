@@ -107,5 +107,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      20. refresh button for matches and clicked to sync whole list using fetchedAt = 2020-01-01
 //      21. check if udpatedAt of match or clicked is vlaid date before put fetchedAt to sharedprefrerence
 //      22. change cardbeingfetched for fetchCards to something else
+//      23. if accountBlockedException then logs him out on repository level
 
 

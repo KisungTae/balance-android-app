@@ -5,6 +5,6 @@ class NotificationType {
     companion object {
         const val MATCH = "match"
         const val CLICKED = "clicked"
-        const val CLICK = "click"
+        const val NOT_CLICKED = "notClicked"
     }
 }

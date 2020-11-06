@@ -10,8 +10,7 @@ import kotlinx.android.synthetic.main.dialog_clicked.*
 import kotlinx.android.synthetic.main.dialog_match.*
 
 class ClickedDialog(
-    private val clickerPhotoKey: String?,
-    private val message: String?
+    private val clickerPhotoKey: String?
 ): DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

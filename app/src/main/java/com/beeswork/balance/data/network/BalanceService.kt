@@ -49,7 +49,7 @@ interface BalanceService {
     @POST("swipe/click")
     suspend fun click(@Body clickRequest: ClickRequest): Response<ClickResponse>
 
-    @POST("account/fcm/token/save")
+    @POST("account/fcm/token")
     suspend fun postFCMToken(@Body fcmTokenRequest: FCMTokenRequest): Response<EmptyJsonResponse>
 
     @GET("match/list")
@@ -61,7 +61,7 @@ interface BalanceService {
 
     @GET("swipe/clicked/list")
     suspend fun fetchClickedList(
-        @Query(value = "clickedId") clickedId: String,
+        @Query(value = "accountId") clickedId: String,
         @Query(value = "email") email: String,
         @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Clicked>>
