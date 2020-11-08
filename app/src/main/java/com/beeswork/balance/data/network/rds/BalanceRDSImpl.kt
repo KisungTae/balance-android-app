@@ -46,10 +46,11 @@ class BalanceRDSImpl(
     override suspend fun swipe(
         accountId: String,
         email: String,
+        swipeId: Long?,
         swipedId: String
     ): Resource<BalanceGameResponse> {
         return getResult {
-            balanceService.swipe(SwipeRequest(accountId, email, swipedId))
+            balanceService.swipe(SwipeRequest(accountId, email, swipeId, swipedId))
         }
     }
 
@@ -86,12 +87,12 @@ class BalanceRDSImpl(
     }
 
     override suspend fun fetchClickedList(
-        clickedId: String,
+        accountId: String,
         email: String,
         fetchedAt: String
     ): Resource<MutableList<Clicked>> {
         return getResult {
-            balanceService.fetchClickedList(clickedId, email, fetchedAt)
+            balanceService.fetchClickedList(accountId, email, fetchedAt)
         }
     }
 

@@ -21,7 +21,7 @@ interface BalanceRepository {
     suspend fun getClickedCount(): LiveData<Int>
 
     fun fetchClickedList()
-    fun swipe(swipedId: String)
+    fun swipe(swipeId: Long?, swipedId: String)
     fun click(swipedId: String, swipeId:Long, answers: Map<Long, Boolean>)
 
     // match

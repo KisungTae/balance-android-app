@@ -50,7 +50,7 @@ class MatchPagedListAdapter(
 
         fun bind(match: Match) {
 
-            Picasso.get().load(R.drawable.personsmall).into(itemView.ivMatch)
+            Picasso.get().load(R.drawable.person1).into(itemView.ivMatch)
             itemView.tvMatchName.text = match.toString()
 //            itemView.tvMatchRecentMessage.text = match.recentMessage
 //            itemView.tvMatchUnmatch.text = match.unmatched.toString()

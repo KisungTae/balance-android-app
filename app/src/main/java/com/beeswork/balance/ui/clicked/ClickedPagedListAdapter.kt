@@ -7,24 +7,25 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Clicked
-import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.internal.inflate
-import com.beeswork.balance.ui.match.MatchPagedListAdapter
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.item_match.view.*
+
+import kotlinx.android.synthetic.main.item_clicked.view.*
+
 
 class ClickedPagedListAdapter(
-    private val onSwipeListener: OnSwipeListener
-): PagedListAdapter<Clicked, ClickedPagedListAdapter.ClickedHolder>(ClickedPagedListAdapter.diffCallback) {
+    private val onClickedSwipeListener: OnClickedSwipeListener
+): PagedListAdapter<Clicked, ClickedPagedListAdapter.ClickedHolder>(diffCallback) {
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClickedPagedListAdapter.ClickedHolder {
-        val view = parent.inflate(R.layout.item_match)
-        return ClickedPagedListAdapter.ClickedHolder(view, onSwipeListener)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClickedHolder {
+        val view = parent.inflate(R.layout.item_clicked)
+        return ClickedHolder(view, onClickedSwipeListener)
     }
 
-    override fun onBindViewHolder(holder: ClickedPagedListAdapter.ClickedHolder, position: Int) {
+    override fun onBindViewHolder(holder: ClickedHolder, position: Int) {
         holder.bind(getItem(position)!!)
+
     }
 
     companion object {
@@ -38,17 +39,26 @@ class ClickedPagedListAdapter(
         }
     }
 
-    interface OnSwipeListener {
+    interface OnClickedSwipeListener {
         fun onSwipeRight()
         fun onSwipeLeft()
     }
 
     class ClickedHolder(
         itemView: View,
-        private val onSwipeListener: ClickedPagedListAdapter.OnSwipeListener
-    ) : RecyclerView.ViewHolder(itemView) {
+        private val onClickedSwipeListener: OnClickedSwipeListener
+    ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+
+        init {
+            itemView.setOnClickListener(this)
+        }
 
         fun bind(clicked: Clicked) {
+            Picasso.get().load(R.drawable.person1).into(itemView.ivClicked)
+        }
+
+        override fun onClick(v: View?) {
+            println("clicked clicked hahaha that's a joke? are you serious?")
 
         }
     }

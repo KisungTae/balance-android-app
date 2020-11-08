@@ -1,19 +1,26 @@
 package com.beeswork.balance.ui.clicked
 
+import android.R.attr.data
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.ui.base.ScopeFragment
+import kotlinx.android.synthetic.main.fragment_clicked.*
+import kotlinx.android.synthetic.main.fragment_swipe.*
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import kotlin.math.ceil
 
-class ClickedFragment: ScopeFragment(), KodeinAware, ClickedPagedListAdapter.OnSwipeListener {
+
+class ClickedFragment : ScopeFragment(), KodeinAware,
+    ClickedPagedListAdapter.OnClickedSwipeListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ClickedViewModelFactory by instance()
@@ -37,27 +44,34 @@ class ClickedFragment: ScopeFragment(), KodeinAware, ClickedPagedListAdapter.OnS
 
     private fun bindUI() = launch {
 
-        clickedPagedListAdapter = ClickedPagedListAdapter(this@ClickedFragment)
+        clickedPagedListAdapter = ClickedPagedListAdapter(
+            this@ClickedFragment
+        )
+
+        rvClicked.adapter = clickedPagedListAdapter
+        val gridLayoutManager = GridLayoutManager(this@ClickedFragment.context, 2)
+        rvClicked.layoutManager = gridLayoutManager
+
+
+        viewModel.fetchClickedList()
 
         viewModel.clickedList.await().observe(viewLifecycleOwner, { pagedClickedList ->
             clickedPagedListAdapter.submitList(pagedClickedList)
         })
 
-        viewModel.fetchClickedList()
-
         viewModel.fetchClickedListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
 
             when (fetchClickedListResponse.status) {
                 Resource.Status.SUCCESS -> {
-                    println("fetchMatch success")
+                    println("fetchClickedList success")
                 }
 
                 Resource.Status.EXCEPTION -> {
-                    println("fetchMatch exception")
+                    println("fetchClickedList exception")
                 }
 
                 Resource.Status.LOADING -> {
-                    println("fetchMatch loading")
+                    println("fetchClickedList loading")
                 }
             }
         })

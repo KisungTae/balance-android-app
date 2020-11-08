@@ -12,6 +12,7 @@ import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.provider.PreferenceProviderImpl
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
+import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
@@ -59,6 +60,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from factory { chatId: Long -> ChatViewModelFactory(chatId, instance()) }
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
+        bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
@@ -108,5 +110,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      21. check if udpatedAt of match or clicked is vlaid date before put fetchedAt to sharedprefrerence
 //      22. change cardbeingfetched for fetchCards to something else
 //      23. if accountBlockedException then logs him out on repository level
+//      24. click the same button in the nativigation bar throws exception of lifecycler to the same observer
 
 

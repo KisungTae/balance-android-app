@@ -36,9 +36,9 @@ class BalanceRepositoryImpl(
 //  ##################################### SWIPE ##################################### //
 //  ################################################################################# //
 
-    private val mutableFetchClickedList = MutableLiveData<Resource<List<Clicked>>>()
+    private val mutableFetchClickedListResponse = MutableLiveData<Resource<List<Clicked>>>()
     override val fetchClickedListResponse: LiveData<Resource<List<Clicked>>>
-        get() = mutableFetchClickedList
+        get() = mutableFetchClickedListResponse
 
     override fun fetchClickedList() {
 
@@ -60,7 +60,7 @@ class BalanceRepositoryImpl(
                 }
             }
             clickedDAO.deleteIfMatched()
-            mutableFetchClickedList.postValue(clickedResource)
+            mutableFetchClickedListResponse.postValue(clickedResource)
         }
     }
 
@@ -80,14 +80,14 @@ class BalanceRepositoryImpl(
     override val balanceGame: LiveData<Resource<BalanceGameResponse>>
         get() = mutableBalanceGameResponse
 
-    override fun swipe(swipedId: String) {
+    override fun swipe(swipeId: Long?, swipedId: String) {
 
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
             val email = preferenceProvider.getEmail()
 
             mutableBalanceGameResponse.postValue(Resource.loading())
-            val questionResource = balanceRDS.swipe(accountId, email, swipedId)
+            val questionResource = balanceRDS.swipe(accountId, email, swipeId, swipedId)
             mutableBalanceGameResponse.postValue(questionResource)
         }
     }

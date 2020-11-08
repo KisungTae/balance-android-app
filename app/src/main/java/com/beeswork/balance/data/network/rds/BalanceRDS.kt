@@ -25,6 +25,7 @@ interface BalanceRDS {
     suspend fun swipe(
         accountId: String,
         email: String,
+        swipeId: Long?,
         swipedId: String
     ): Resource<BalanceGameResponse>
 
@@ -49,7 +50,7 @@ interface BalanceRDS {
     ): Resource<MutableList<Match>>
 
     suspend fun fetchClickedList(
-        clickedId: String,
+        accountId: String,
         email: String,
         fetchedAt: String
     ): Resource<MutableList<Clicked>>

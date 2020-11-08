@@ -31,7 +31,7 @@ class SwipeViewModel(
     }
 
     fun swipe(swipeId: String) {
-        balanceRepository.swipe(swipeId)
+        balanceRepository.swipe(null, swipeId)
     }
 
     fun click(swipedId:String, swipeId:Long, answers: Map<Long, Boolean>) {

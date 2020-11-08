@@ -26,4 +26,7 @@ interface ClickedDAO {
 
     @Query("select count(*) from clicked")
     fun count(): LiveData<Int>
+
+    @Query("select * from clicked")
+    fun get(): List<Clicked>
 }

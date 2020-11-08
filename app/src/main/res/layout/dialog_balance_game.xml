@@ -129,7 +129,7 @@
             android:id="@+id/btnBalanceGameNotClickClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="keep swiping"/>
+            android:text="닫기"/>
 
     </LinearLayout>
 
@@ -154,7 +154,7 @@
             android:id="@+id/btnBalanceGameClickedClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="스와이프 계속하기"/>
+            android:text="닫기"/>
 
     </LinearLayout>
 
