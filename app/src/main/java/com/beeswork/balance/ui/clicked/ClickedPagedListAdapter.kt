@@ -14,13 +14,13 @@ import kotlinx.android.synthetic.main.item_clicked.view.*
 
 
 class ClickedPagedListAdapter(
-    private val onClickedSwipeListener: OnClickedSwipeListener
+    private val onClickedListener: OnClickedListener
 ): PagedListAdapter<Clicked, ClickedPagedListAdapter.ClickedHolder>(diffCallback) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClickedHolder {
         val view = parent.inflate(R.layout.item_clicked)
-        return ClickedHolder(view, onClickedSwipeListener)
+        return ClickedHolder(view, onClickedListener)
     }
 
     override fun onBindViewHolder(holder: ClickedHolder, position: Int) {
@@ -39,14 +39,13 @@ class ClickedPagedListAdapter(
         }
     }
 
-    interface OnClickedSwipeListener {
-        fun onSwipeRight()
-        fun onSwipeLeft()
+    interface OnClickedListener {
+        fun onClickedClick(swipedId: String)
     }
 
     class ClickedHolder(
         itemView: View,
-        private val onClickedSwipeListener: OnClickedSwipeListener
+        private val onClickedListener: OnClickedListener
     ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
         init {
@@ -54,12 +53,13 @@ class ClickedPagedListAdapter(
         }
 
         fun bind(clicked: Clicked) {
+            itemView.tag = clicked.swiperId
+            itemView.tvClicked.text = clicked.swiperId
             Picasso.get().load(R.drawable.person1).into(itemView.ivClicked)
         }
 
         override fun onClick(v: View?) {
-            println("clicked clicked hahaha that's a joke? are you serious?")
-
+            onClickedListener.onClickedClick(v?.tag as String)
         }
     }
 }

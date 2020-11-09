@@ -114,6 +114,7 @@ class BalanceRepositoryImpl(
                 if (notificationType == NotificationType.MATCH) {
                     setNewMatch(match)
                     matchDAO.insert(match)
+                    clickedDAO.deleteIfMatched()
                 } else if (notificationType == NotificationType.CLICKED) {
                     clickDAO.insert(Click(match.matchedId))
                 }

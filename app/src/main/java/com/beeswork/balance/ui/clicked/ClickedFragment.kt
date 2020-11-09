@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.clicked
 
-import android.R.attr.data
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,18 +8,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.DialogTag
+import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.base.ScopeFragment
+import com.beeswork.balance.ui.dialog.FetchErrorDialog
+import com.beeswork.balance.ui.dialog.MatchDialog
 import kotlinx.android.synthetic.main.fragment_clicked.*
-import kotlinx.android.synthetic.main.fragment_swipe.*
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-import kotlin.math.ceil
 
 
 class ClickedFragment : ScopeFragment(), KodeinAware,
-    ClickedPagedListAdapter.OnClickedSwipeListener {
+    ClickedPagedListAdapter.OnClickedListener, BalanceGameDialog.BalanceGameListener,
+    FetchErrorDialog.FetchErrorListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ClickedViewModelFactory by instance()
@@ -62,27 +64,33 @@ class ClickedFragment : ScopeFragment(), KodeinAware,
         viewModel.fetchClickedListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
 
             when (fetchClickedListResponse.status) {
-                Resource.Status.SUCCESS -> {
-                    println("fetchClickedList success")
-                }
-
                 Resource.Status.EXCEPTION -> {
-                    println("fetchClickedList exception")
-                }
-
-                Resource.Status.LOADING -> {
-                    println("fetchClickedList loading")
+                    FetchErrorDialog(
+                        fetchClickedListResponse.exceptionMessage,
+                        this@ClickedFragment
+                    ).show(childFragmentManager, DialogTag.FETCH_ERROR_DIALOG)
                 }
             }
         })
     }
 
-    override fun onSwipeRight() {
-        println("swipe right")
+    override fun onClickedClick(swipedId: String) {
+        BalanceGameDialog(swipedId, this@ClickedFragment).show(
+            childFragmentManager,
+            DialogTag.BALANCE_DIALOG
+        )
+        viewModel.swipe(swipedId)
     }
 
-    override fun onSwipeLeft() {
-        println("swipe left")
+    override fun onBalanceGameMatch(matchedPhotoKey: String) {
+        MatchDialog("", matchedPhotoKey).show(
+            childFragmentManager,
+            DialogTag.MATCH_DIALOG
+        )
+    }
+
+    override fun onRefetch() {
+        viewModel.fetchClickedList()
     }
 
 }

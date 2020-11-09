@@ -15,8 +15,6 @@ class SwipeViewModel(
 ): ViewModel() {
 
     val cards: LiveData<Resource<List<CardResponse>>> = balanceRepository.cards
-    val balanceGame: LiveData<Resource<BalanceGameResponse>> = balanceRepository.balanceGame
-    val clickResponse: LiveData<Resource<ClickResponse>> = balanceRepository.clickResponse
 
     val clickedCount by lazyDeferred {
         balanceRepository.getClickedCount()
@@ -32,10 +30,6 @@ class SwipeViewModel(
 
     fun swipe(swipeId: String) {
         balanceRepository.swipe(null, swipeId)
-    }
-
-    fun click(swipedId:String, swipeId:Long, answers: Map<Long, Boolean>) {
-        balanceRepository.click(swipedId, swipeId, answers)
     }
 
     fun fetchMatches() {

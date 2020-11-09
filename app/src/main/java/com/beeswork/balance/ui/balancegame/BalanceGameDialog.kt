@@ -110,10 +110,7 @@ class BalanceGameDialog(
                         NotificationType.NOT_CLICKED -> setBalanceGameNotClicked()
                         NotificationType.MATCH -> {
                             dismiss()
-//                            MatchDialog("", match.photoKey).show(
-//                                childFragmentManager,
-//                                DialogTag.MATCH_DIALOG
-//                            )
+                            balanceGameListener.onBalanceGameMatch(match.photoKey)
                         }
                     }
                 }
@@ -245,7 +242,7 @@ class BalanceGameDialog(
     }
 
     interface BalanceGameListener {
-        fun onBalanceGameMatch()
+        fun onBalanceGameMatch(matchedPhotoKey: String)
     }
 
 }

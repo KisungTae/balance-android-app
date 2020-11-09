@@ -32,4 +32,9 @@ class ClickedViewModel(
     fun fetchClickedList() {
         balanceRepository.fetchClickedList()
     }
+
+    fun swipe(swipeId: String) {
+        balanceRepository.swipe(null, swipeId)
+    }
+
 }

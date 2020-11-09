@@ -11,14 +11,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.DialogTag
+import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.base.ScopeFragment
+import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import kotlinx.android.synthetic.main.fragment_match.*
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatchListener {
+class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatchListener,
+    FetchErrorDialog.FetchErrorListener {
 
     override val kodein by closestKodein()
 
@@ -68,26 +72,26 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
 
         viewModel.fetchMatches()
 
-        viewModel.fetchMatchesResponse.observe(viewLifecycleOwner, { fetchMatchResource ->
+        viewModel.fetchMatchesResponse.observe(viewLifecycleOwner, { fetchMatchesResponse ->
 
-            when (fetchMatchResource.status) {
-                Resource.Status.SUCCESS -> {
-                    println("fetchMatch success")
-                }
-
+            when (fetchMatchesResponse.status) {
                 Resource.Status.EXCEPTION -> {
-                    println("fetchMatch exception")
-                }
-
-                Resource.Status.LOADING -> {
-                    println("fetchMatch loading")
+                    FetchErrorDialog(
+                        fetchMatchesResponse.exceptionMessage,
+                        this@MatchFragment
+                    ).show(childFragmentManager, DialogTag.FETCH_ERROR_DIALOG)
                 }
             }
         })
     }
 
     override fun onMatchClick(view: View, chatId: Long) {
-        Navigation.findNavController(view).navigate(MatchFragmentDirections.matchToChatAction(chatId))
+        Navigation.findNavController(view)
+            .navigate(MatchFragmentDirections.matchToChatAction(chatId))
+    }
+
+    override fun onRefetch() {
+        viewModel.fetchMatches()
     }
 }
 
