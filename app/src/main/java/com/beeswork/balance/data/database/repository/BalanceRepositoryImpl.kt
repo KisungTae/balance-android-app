@@ -28,6 +28,7 @@ class BalanceRepositoryImpl(
     private val clickDAO: ClickDAO,
     private val fcmTokenDAO: FCMTokenDAO,
     private val clickedDAO: ClickedDAO,
+    private val profileDAO: ProfileDAO,
     private val balanceRDS: BalanceRDS,
     private val preferenceProvider: PreferenceProvider
 ) : BalanceRepository {
@@ -46,7 +47,7 @@ class BalanceRepositoryImpl(
 
             val clickedResource = balanceRDS.fetchClickedList(
                 preferenceProvider.getAccountId(),
-                preferenceProvider.getEmail(),
+                preferenceProvider.getIdentityToken(),
                 preferenceProvider.getClickedFetchedAt()
             )
 
@@ -84,10 +85,10 @@ class BalanceRepositoryImpl(
 
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
-            val email = preferenceProvider.getEmail()
+            val identityToken = preferenceProvider.getIdentityToken()
 
             mutableBalanceGameResponse.postValue(Resource.loading())
-            val questionResource = balanceRDS.swipe(accountId, email, swipeId, swipedId)
+            val questionResource = balanceRDS.swipe(accountId, identityToken, swipeId, swipedId)
             mutableBalanceGameResponse.postValue(questionResource)
         }
     }
@@ -102,9 +103,9 @@ class BalanceRepositoryImpl(
 
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
-            val email = preferenceProvider.getEmail()
+            val identityToken = preferenceProvider.getIdentityToken()
 
-            val clickResource = balanceRDS.click(accountId, email, swipedId, swipeId, answers)
+            val clickResource = balanceRDS.click(accountId, identityToken, swipedId, swipeId, answers)
 
             if (clickResource.status == Resource.Status.SUCCESS) {
                 val data = clickResource.data!!
@@ -159,7 +160,7 @@ class BalanceRepositoryImpl(
             var fetchedAt = preferenceProvider.getMatchFetchedAt()
             val matchResource = balanceRDS.fetchMatches(
                 preferenceProvider.getAccountId(),
-                preferenceProvider.getEmail(),
+                preferenceProvider.getIdentityToken(),
                 fetchedAt
             )
 
@@ -220,17 +221,21 @@ class BalanceRepositoryImpl(
 
             CoroutineScope(Dispatchers.IO).launch {
                 val accountId = preferenceProvider.getAccountId()
-                val email = preferenceProvider.getEmail()
-                val latitude = preferenceProvider.getLatitude()
-                val longitude = preferenceProvider.getLongitude()
+                val identityToken = preferenceProvider.getIdentityToken()
                 val minAge = preferenceProvider.getMinAgeBirthYear()
                 val maxAge = preferenceProvider.getMaxAgeBirthYear()
                 val gender = preferenceProvider.getGender()
                 val distance = preferenceProvider.getDistanceInMeters()
+                var latitude: Double? = null
+                var longitude: Double? = null
 
+                if (!preferenceProvider.isLocationSynced()) {
+                    latitude = preferenceProvider.getLatitude()
+                    longitude = preferenceProvider.getLongitude()
+                }
 
                 val cardsResource =
-                    balanceRDS.fetchCards(accountId, email, latitude, longitude, minAge, maxAge, gender, distance)
+                    balanceRDS.fetchCards(accountId, identityToken, minAge, maxAge, gender, distance, latitude, longitude)
 
                 if (cardsResource.status == Resource.Status.SUCCESS) {
 
@@ -258,11 +263,11 @@ class BalanceRepositoryImpl(
     override fun insertFCMToken(token: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
-            val email = preferenceProvider.getEmail()
+            val identityToken = preferenceProvider.getIdentityToken()
 
             fcmTokenDAO.insert(FCMToken(token, false))
 
-            val tokenResource = balanceRDS.postFCMToken(accountId, email, token)
+            val tokenResource = balanceRDS.postFCMToken(accountId, identityToken, token)
             if (tokenResource.status == Resource.Status.SUCCESS) {
                 fcmTokenDAO.update(CURRENT_FCM_TOKEN_ID, true)
             }
@@ -282,7 +287,7 @@ class BalanceRepositoryImpl(
     }
 
 
-    //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
+//  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
 //          out of screen.
 //  TEST 2. when update all entries in database, it will update the items in list as well
     override fun insertMessage(chatId: Long) {

@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.network.rds
 
-import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.CardResponse
@@ -20,79 +19,78 @@ class BalanceRDSImpl(
 
     override suspend fun fetchCards(
         accountId: String,
-        email: String,
-        latitude: Double,
-        longitude: Double,
+        identityToken: String,
         minAge: Int,
         maxAge: Int,
         gender: Boolean,
-        distance: Int
+        distance: Int,
+        latitude: Double?,
+        longitude: Double?
     ): Resource<MutableList<CardResponse>> {
 
         return getResult {
-            balanceService.fetchCards(
-                accountId,
-                email,
-                latitude,
-                longitude,
+            balanceService.fetchCards(accountId,
+                identityToken,
                 minAge,
                 maxAge,
                 gender,
-                distance
+                distance,
+                latitude,
+                longitude
             )
         }
     }
 
     override suspend fun swipe(
         accountId: String,
-        email: String,
+        identityToken: String,
         swipeId: Long?,
         swipedId: String
     ): Resource<BalanceGameResponse> {
         return getResult {
-            balanceService.swipe(SwipeRequest(accountId, email, swipeId, swipedId))
+            balanceService.swipe(SwipeRequest(accountId, identityToken, swipeId, swipedId))
         }
     }
 
     override suspend fun click(
         accountId: String,
-        email: String,
+        identityToken: String,
         swipedId: String,
         swipeId: Long,
         answers: Map<Long, Boolean>
     ): Resource<ClickResponse> {
         return getResult {
-            balanceService.click(ClickRequest(accountId, email, swipedId, swipeId, answers))
+            balanceService.click(ClickRequest(accountId, identityToken, swipedId, swipeId, answers))
         }
     }
 
     override suspend fun postFCMToken(
         accountId: String,
-        email: String,
+        identityToken: String,
         token: String
     ): Resource<EmptyJsonResponse> {
         return getResult {
-            balanceService.postFCMToken(FCMTokenRequest(accountId, email, token))
+            balanceService.postFCMToken(FCMTokenRequest(accountId, identityToken, token))
         }
     }
 
     override suspend fun fetchMatches(
         accountId: String,
-        email: String,
+        identityToken: String,
         fetchedAt: String
     ): Resource<MutableList<Match>> {
         return getResult {
-            balanceService.fetchMatches(accountId, email, fetchedAt)
+            balanceService.fetchMatches(accountId, identityToken, fetchedAt)
         }
     }
 
     override suspend fun fetchClickedList(
         accountId: String,
-        email: String,
+        identityToken: String,
         fetchedAt: String
     ): Resource<MutableList<Clicked>> {
         return getResult {
-            balanceService.fetchClickedList(accountId, email, fetchedAt)
+            balanceService.fetchClickedList(accountId, identityToken, fetchedAt)
         }
     }
 

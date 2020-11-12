@@ -6,19 +6,6 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/addMatchBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="add match" />
-
-
-    <Button
-        android:id="@+id/editMatchBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="edit match" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMatch"
         android:layout_width="match_parent"

@@ -3,11 +3,8 @@ package com.beeswork.balance.ui.swipe
 
 import android.os.Bundle
 import android.view.*
-import androidx.preference.PreferenceManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.constant.Gender
-import com.beeswork.balance.internal.constant.PreferencesDefault
-import com.beeswork.balance.internal.constant.PreferencesKey
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.dialog_swipe_filter.*

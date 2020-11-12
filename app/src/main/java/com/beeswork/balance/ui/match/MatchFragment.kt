@@ -30,10 +30,6 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagedListAdapter: MatchPagedListAdapter
 
-
-    //  TODO: remove me
-    private val balanceRepository: BalanceRepository by instance()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,19 +42,11 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(MatchViewModel::class.java)
         bindUI()
-
-        //  TODO: remove me
-        editMatchBtn.setOnClickListener {
-            println("click edit match btn")
-//            balanceRepository.unmatch()
-            viewModel.fetchMatches()
-        }
     }
 
     private fun bindUI() = launch {
 
         matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
-
         rvMatch.adapter = matchPagedListAdapter
         rvMatch.layoutManager = LinearLayoutManager(this@MatchFragment.context)
 
@@ -69,8 +57,6 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
                 matchPagedListAdapter.submitList(pagedMatchList)
             }
         })
-
-        viewModel.fetchMatches()
 
         viewModel.fetchMatchesResponse.observe(viewLifecycleOwner, { fetchMatchesResponse ->
 
@@ -83,6 +69,8 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
                 }
             }
         })
+
+        viewModel.fetchMatches()
     }
 
     override fun onMatchClick(view: View, chatId: Long) {

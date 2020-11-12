@@ -8,7 +8,7 @@ import com.beeswork.balance.internal.converter.OffsetDateTimeConverter
 
 
 @Database(
-    entities = [Match::class, Message::class, Click::class, FCMToken::class, Clicked::class],
+    entities = [Match::class, Message::class, Click::class, FCMToken::class, Clicked::class, Profile::class],
     version = 1
 )
 @TypeConverters(OffsetDateTimeConverter::class)
@@ -19,6 +19,7 @@ abstract class BalanceDatabase : RoomDatabase() {
     abstract fun clickDAO(): ClickDAO
     abstract fun fcmTokenDAO(): FCMTokenDAO
     abstract fun clickedDAO(): ClickedDAO
+    abstract fun profileDAO(): ProfileDAO
 
     companion object {
 

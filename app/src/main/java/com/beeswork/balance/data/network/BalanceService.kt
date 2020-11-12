@@ -34,13 +34,13 @@ interface BalanceService {
     @GET("account/recommend")
     suspend fun fetchCards(
         @Query(value = "accountId") accountId: String,
-        @Query(value = "email") email: String,
-        @Query(value = "latitude") latitude: Double,
-        @Query(value = "longitude") longitude: Double,
+        @Query(value = "identityToken") identityToken: String,
         @Query(value = "minAge") minAge: Int,
         @Query(value = "maxAge") maxAge: Int,
         @Query(value = "gender") gender: Boolean,
-        @Query(value = "distance") distance: Int
+        @Query(value = "distance") distance: Int,
+        @Query(value = "latitude") latitude: Double?,
+        @Query(value = "longitude") longitude: Double?
     ): Response<MutableList<CardResponse>>
 
     @POST("swipe")
@@ -55,14 +55,14 @@ interface BalanceService {
     @GET("match/list")
     suspend fun fetchMatches(
         @Query(value = "accountId") accountId: String,
-        @Query(value = "email") email: String,
+        @Query(value = "identityToken") identityToken: String,
         @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Match>>
 
     @GET("swipe/clicked/list")
     suspend fun fetchClickedList(
         @Query(value = "accountId") accountId: String,
-        @Query(value = "email") email: String,
+        @Query(value = "identityToken") identityToken: String,
         @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Clicked>>
 

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
     private lateinit var broadcastReceiver: BroadcastReceiver
     private val preferenceProvider: PreferenceProvider by instance()
+    private val balanceRepository: BalanceRepository by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,8 +108,22 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
             val location = locationResult?.lastLocation
-            if (location != null)
-                updateLocation(location.latitude, location.longitude)
+            if (location != null) {
+
+                val latitude = preferenceProvider.getLatitude()
+                val longitude = preferenceProvider.getLongitude()
+                val results = floatArrayOf()
+                Location.distanceBetween(latitude, longitude, location.latitude, location.longitude, results)
+                val distance = results[0]
+
+                if (distance > 1) {
+                    preferenceProvider.putLocation(location.latitude, location.longitude)
+
+                }
+
+//                updateLocation(location.latitude, location.longitude)
+            }
+
         }
     }
 
@@ -129,16 +145,9 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         grantResults: IntArray
     ) {
         if (requestCode == PermissionRequestCode.ACCESS_FINE_LOCATION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) bindLocationManager()
-            else {
-                updateLocation(PreferencesDefault.LATITUDE, PreferencesDefault.LONGITUDE)
-                Toast.makeText(this, "manually configure location", Toast.LENGTH_LONG).show()
-            }
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                bindLocationManager()
         }
-    }
-
-    private fun updateLocation(lat: Double, lon: Double) {
-        preferenceProvider.putLocation(lat, lon)
     }
 
 }

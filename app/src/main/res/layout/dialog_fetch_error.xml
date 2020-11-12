@@ -20,12 +20,12 @@
         android:id="@+id/btnRefetch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="fetch"/>
+        android:text="다시시도"/>
 
     <Button
         android:id="@+id/btnFetchErrorClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Close"/>
+        android:text="닫기"/>
 
 </LinearLayout>

@@ -13,25 +13,25 @@ interface BalanceRDS {
 
     suspend fun fetchCards(
         accountId: String,
-        email: String,
-        latitude: Double,
-        longitude: Double,
+        identityToken: String,
         minAge: Int,
         maxAge: Int,
         gender: Boolean,
-        distance: Int
+        distance: Int,
+        latitude: Double?,
+        longitude: Double?
     ): Resource<MutableList<CardResponse>>
 
     suspend fun swipe(
         accountId: String,
-        email: String,
+        identityToken: String,
         swipeId: Long?,
         swipedId: String
     ): Resource<BalanceGameResponse>
 
     suspend fun click(
         accountId: String,
-        email: String,
+        identityToken: String,
         swipedId: String,
         swipeId: Long,
         answers: Map<Long, Boolean>
@@ -39,19 +39,19 @@ interface BalanceRDS {
 
     suspend fun postFCMToken(
         accountId: String,
-        email:String,
+        identityToken:String,
         token: String
     ): Resource<EmptyJsonResponse>
 
     suspend fun fetchMatches(
         accountId: String,
-        email: String,
+        identityToken: String,
         fetchedAt: String
     ): Resource<MutableList<Match>>
 
     suspend fun fetchClickedList(
         accountId: String,
-        email: String,
+        identityToken: String,
         fetchedAt: String
     ): Resource<MutableList<Clicked>>
 }

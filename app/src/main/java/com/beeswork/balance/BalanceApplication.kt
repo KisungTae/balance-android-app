@@ -38,10 +38,13 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().clickDAO() }
         bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
         bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
+        bind() from singleton { instance<BalanceDatabase>().profileDAO() }
+
 
         // Repository
         bind<BalanceRepository>() with singleton {
             BalanceRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -111,5 +114,10 @@ class BalanceApplication : Application(), KodeinAware {
 //      22. change cardbeingfetched for fetchCards to something else
 //      23. if accountBlockedException then logs him out on repository level
 //      24. click the same button in the nativigation bar throws exception of lifecycler to the same observer
+//      25. when swipe in clicked or try to get in chat with deleted account, then you should remove clicked or match from the list
+//          let the users delete the deleted account in clicked and match but when users click on them, let them know this account is deleted
+//      26. users should be enabled in android app after saving their first profile, if disabled, then they should be directed to profile setup page
+
+
 
 
