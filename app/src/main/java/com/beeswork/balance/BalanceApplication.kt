@@ -39,11 +39,14 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
         bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
-
+        bind() from singleton { instance<BalanceDatabase>().photoDAO() }
+        bind() from singleton { instance<BalanceDatabase>().locationDAO() }
 
         // Repository
         bind<BalanceRepository>() with singleton {
             BalanceRepositoryImpl(
+                instance(),
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -117,6 +120,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      25. when swipe in clicked or try to get in chat with deleted account, then you should remove clicked or match from the list
 //          let the users delete the deleted account in clicked and match but when users click on them, let them know this account is deleted
 //      26. users should be enabled in android app after saving their first profile, if disabled, then they should be directed to profile setup page
+//      27. consider interval and fastest interval for location request
 
 
 

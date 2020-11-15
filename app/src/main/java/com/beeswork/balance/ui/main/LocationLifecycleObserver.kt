@@ -8,11 +8,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
-import com.beeswork.balance.internal.constant.LOCATION_REQUEST_FASTEST_INTERVAL
-import com.beeswork.balance.internal.constant.LOCATION_REQUEST_INTERVAL
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+
+const val LOCATION_REQUEST_INTERVAL = 5000L
+const val LOCATION_REQUEST_FASTEST_INTERVAL = 5000L
+const val SMALLEST_DISPLACEMENT = 25f
 
 class LocationLifecycleObserver(
     lifecycleOwner: LifecycleOwner,
@@ -29,6 +31,7 @@ class LocationLifecycleObserver(
         interval = LOCATION_REQUEST_INTERVAL
         fastestInterval = LOCATION_REQUEST_FASTEST_INTERVAL
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        smallestDisplacement = SMALLEST_DISPLACEMENT
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)

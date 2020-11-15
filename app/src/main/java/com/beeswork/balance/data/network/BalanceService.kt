@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.request.ClickRequest
 import com.beeswork.balance.data.network.request.FCMTokenRequest
+import com.beeswork.balance.data.network.request.LocationRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
 import com.beeswork.balance.data.network.response.BalanceGameResponse
 import com.beeswork.balance.data.network.response.CardResponse
@@ -40,7 +41,9 @@ interface BalanceService {
         @Query(value = "gender") gender: Boolean,
         @Query(value = "distance") distance: Int,
         @Query(value = "latitude") latitude: Double?,
-        @Query(value = "longitude") longitude: Double?
+        @Query(value = "longitude") longitude: Double?,
+        @Query(value = "locationUpdatedAt") locationUpdatedAt: String?,
+        @Query(value = "reset") reset: Boolean
     ): Response<MutableList<CardResponse>>
 
     @POST("swipe")
@@ -65,6 +68,11 @@ interface BalanceService {
         @Query(value = "identityToken") identityToken: String,
         @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Clicked>>
+
+    @POST("account/location")
+    suspend fun postLocation(
+        @Body locationRequest: LocationRequest
+    ): Response<EmptyJsonResponse>
 
     companion object {
         operator fun invoke(

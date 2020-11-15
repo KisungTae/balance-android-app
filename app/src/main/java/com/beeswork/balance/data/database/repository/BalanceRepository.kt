@@ -39,6 +39,9 @@ interface BalanceRepository {
 
     // account
     val cards: LiveData<Resource<List<CardResponse>>>
-    fun fetchCards()
+    fun fetchCards(reset: Boolean)
     fun insertFCMToken(token: String)
+
+    // location
+    fun saveLocation(latitude: Double, longitude: Double)
 }

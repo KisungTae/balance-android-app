@@ -11,8 +11,6 @@ const val GENDER = "gender"
 const val MIN_AGE = "minAge"
 const val MAX_AGE = "maxAge"
 const val DISTANCE = "distance"
-const val LATITUDE = "latitude"
-const val LONGITUDE = "longitude"
 const val MATCH_FETCHED_AT = "matchFetchedAt"
 const val CLICKED_FETCHED_AT = "clickedFetchedAt"
 
@@ -20,8 +18,7 @@ const val DEFAULT_DISTANCE = 10f
 const val DEFAULT_MIN_AGE = 20f
 const val DEFAULT_MAX_AGE = 100f
 const val DEFAULT_GENDER = true
-const val DEFAULT_LATITUDE = 37.570475
-const val DEFAULT_LONGITUDE = 126.983405
+
 
 
 class PreferenceProviderImpl(
@@ -45,13 +42,6 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
-    override fun putLocation(latitude: Double, longitude: Double) {
-
-        editor.putDouble(LATITUDE, latitude)
-        editor.putDouble(LONGITUDE, longitude)
-        editor.apply()
-    }
-
     override fun putAccountId(accountId: String) {
     }
 
@@ -66,11 +56,6 @@ class PreferenceProviderImpl(
     override fun putClickedFetchedAt(clickedFetchedAt: String) {
         editor.putString(CLICKED_FETCHED_AT, clickedFetchedAt)
     }
-
-    override fun putLocationSynced(locationSynced: Boolean) {
-
-    }
-
 
     override fun getClickedFetchedAt(): String {
         return preferences.getString(CLICKED_FETCHED_AT, "2020-01-01T10:06:26.032Z")!!
@@ -112,23 +97,11 @@ class PreferenceProviderImpl(
     }
 
     override fun getAccountId(): String {
-        return "d1ca10d8-8954-42fd-958e-634fdee618d4"
+        return "9c766da7-7a95-4ce1-8393-22c1b6d7db41"
     }
 
     override fun getIdentityToken(): String {
-        return "d3c8e7cc-4ff0-4bc3-903d-185b923b64ce"
-    }
-
-    override fun getLatitude(): Double {
-        return preferences.getDouble(LATITUDE, DEFAULT_LATITUDE)
-    }
-
-    override fun getLongitude(): Double {
-        return preferences.getDouble(LONGITUDE, DEFAULT_LONGITUDE)
-    }
-
-    override fun isLocationSynced(): Boolean {
-        return false
+        return "4f9da004-e6a6-4a5f-8de5-1c6a803017ac"
     }
 
 }

@@ -53,7 +53,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/llCardStackLoadError"
+            android:id="@+id/llCardStackError"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="17dp"
@@ -89,6 +89,28 @@
                 android:layout_height="wrap_content"
                 android:text="card stack is loading"
                 android:textAlignment="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llCardStackReset"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="17dp"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="모든 카드를 봤습니다, 필터를 재설정 하던지 아니면 뒤로 돌아가자"/>
+
+            <Button
+                android:id="@+id/btnCardStackReset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="카드 다시보기"/>
+
 
         </LinearLayout>
 

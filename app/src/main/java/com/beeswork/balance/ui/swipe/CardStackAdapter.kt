@@ -33,8 +33,6 @@ class CardStackAdapter: RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
                                                   R.drawable.person1), holder)
 
         TabLayoutMediator(holder.itemView.tlCardImage, holder.itemView.vpCardImage) { tab, pos -> }.attach()
-        println("onBindViewHolder")
-        holder.itemView.tvCardStackName.text = "position: $position | size: ${cardResponses.size}"
     }
 
     fun addCards(newCardResponses: List<CardResponse>) {

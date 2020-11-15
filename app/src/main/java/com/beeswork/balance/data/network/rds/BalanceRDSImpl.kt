@@ -6,11 +6,13 @@ import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.network.BalanceService
 import com.beeswork.balance.data.network.request.ClickRequest
 import com.beeswork.balance.data.network.request.FCMTokenRequest
+import com.beeswork.balance.data.network.request.LocationRequest
 import com.beeswork.balance.data.network.request.SwipeRequest
 import com.beeswork.balance.data.network.response.BalanceGameResponse
 import com.beeswork.balance.data.network.response.ClickResponse
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
 import com.beeswork.balance.internal.Resource
+import org.threeten.bp.OffsetDateTime
 
 class BalanceRDSImpl(
     private val balanceService: BalanceService
@@ -25,18 +27,23 @@ class BalanceRDSImpl(
         gender: Boolean,
         distance: Int,
         latitude: Double?,
-        longitude: Double?
+        longitude: Double?,
+        locationUpdatedAt: String?,
+        reset: Boolean
     ): Resource<MutableList<CardResponse>> {
 
         return getResult {
-            balanceService.fetchCards(accountId,
+            balanceService.fetchCards(
+                accountId,
                 identityToken,
                 minAge,
                 maxAge,
                 gender,
                 distance,
                 latitude,
-                longitude
+                longitude,
+                locationUpdatedAt,
+                reset
             )
         }
     }
@@ -91,6 +98,18 @@ class BalanceRDSImpl(
     ): Resource<MutableList<Clicked>> {
         return getResult {
             balanceService.fetchClickedList(accountId, identityToken, fetchedAt)
+        }
+    }
+
+    override suspend fun postLocation(
+        accountId: String,
+        identityToken: String,
+        latitude: Double,
+        longitude: Double,
+        updatedAt: String
+    ): Resource<EmptyJsonResponse> {
+        return getResult {
+            balanceService.postLocation(LocationRequest(accountId, identityToken, latitude, longitude, updatedAt))
         }
     }
 

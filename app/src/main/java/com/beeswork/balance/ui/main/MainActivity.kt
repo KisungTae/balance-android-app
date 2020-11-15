@@ -108,22 +108,8 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
             val location = locationResult?.lastLocation
-            if (location != null) {
-
-                val latitude = preferenceProvider.getLatitude()
-                val longitude = preferenceProvider.getLongitude()
-                val results = floatArrayOf()
-                Location.distanceBetween(latitude, longitude, location.latitude, location.longitude, results)
-                val distance = results[0]
-
-                if (distance > 1) {
-                    preferenceProvider.putLocation(location.latitude, location.longitude)
-
-                }
-
-//                updateLocation(location.latitude, location.longitude)
-            }
-
+            if (location != null)
+                balanceRepository.saveLocation(location.latitude, location.longitude)
         }
     }
 

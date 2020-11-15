@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.network.response.ClickResponse
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
 import com.beeswork.balance.internal.Resource
+import org.threeten.bp.OffsetDateTime
 
 interface BalanceRDS {
 
@@ -19,7 +20,9 @@ interface BalanceRDS {
         gender: Boolean,
         distance: Int,
         latitude: Double?,
-        longitude: Double?
+        longitude: Double?,
+        locationUpdatedAt: String?,
+        reset: Boolean
     ): Resource<MutableList<CardResponse>>
 
     suspend fun swipe(
@@ -54,4 +57,12 @@ interface BalanceRDS {
         identityToken: String,
         fetchedAt: String
     ): Resource<MutableList<Clicked>>
+
+    suspend fun postLocation(
+        accountId: String,
+        identityToken: String,
+        latitude: Double,
+        longitude: Double,
+        updatedAt: String
+    ): Resource<EmptyJsonResponse>
 }

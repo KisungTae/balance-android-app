@@ -2,16 +2,18 @@ package com.beeswork.balance.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.OffsetDateTime
+import org.threeten.bp.OffsetDateTime
+
+const val LOCATION_ID = 0
 
 @Entity(tableName = "location")
-data class Location (
+data class Location(
 
-    val synced: Boolean,
-    val updatedAt: OffsetDateTime,
     val latitude: Double,
     val longitude: Double,
+    val synced: Boolean,
+    val updatedAt: OffsetDateTime,
 
     @PrimaryKey
-    val id: Int = 0
+    val id: Int = LOCATION_ID
 )

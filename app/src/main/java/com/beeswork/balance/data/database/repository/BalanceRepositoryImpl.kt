@@ -16,6 +16,7 @@ import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.CURRENT_FCM_TOKEN_ID
 import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.converter.Convert
+import com.google.android.gms.common.internal.ResourceUtils
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import kotlin.random.Random
@@ -29,6 +30,8 @@ class BalanceRepositoryImpl(
     private val fcmTokenDAO: FCMTokenDAO,
     private val clickedDAO: ClickedDAO,
     private val profileDAO: ProfileDAO,
+    private val locationDAO: LocationDAO,
+    private val photoDAO: PhotoDAO,
     private val balanceRDS: BalanceRDS,
     private val preferenceProvider: PreferenceProvider
 ) : BalanceRepository {
@@ -210,12 +213,13 @@ class BalanceRepositoryImpl(
     override val cards: LiveData<Resource<List<CardResponse>>>
         get() = mutableCards
 
-    private var cardsBeingFetched = false
+    private var fetchingCards = false
+    private var fetchedNoCards = false
 
-    override fun fetchCards() {
+    override fun fetchCards(reset: Boolean) {
 
-        if (!cardsBeingFetched) {
-            cardsBeingFetched = true
+        if (!fetchingCards && (reset || !fetchedNoCards)) {
+            fetchingCards = true
 
             mutableCards.postValue(Resource.loading())
 
@@ -228,34 +232,61 @@ class BalanceRepositoryImpl(
                 val distance = preferenceProvider.getDistanceInMeters()
                 var latitude: Double? = null
                 var longitude: Double? = null
+                var locationUpdatedAt: OffsetDateTime? = null
 
-                if (!preferenceProvider.isLocationSynced()) {
-                    latitude = preferenceProvider.getLatitude()
-                    longitude = preferenceProvider.getLongitude()
+                val location = locationDAO.get()
+                if (!location.synced) {
+                    latitude = location.latitude
+                    longitude = location.longitude
+                    locationUpdatedAt = location.updatedAt
                 }
 
                 val cardsResource =
-                    balanceRDS.fetchCards(accountId, identityToken, minAge, maxAge, gender, distance, latitude, longitude)
+                    balanceRDS.fetchCards(
+                        accountId,
+                        identityToken,
+                        minAge,
+                        maxAge,
+                        gender,
+                        distance,
+                        latitude,
+                        longitude,
+                        locationUpdatedAt?.toString(),
+                        reset
+                    )
 
                 if (cardsResource.status == Resource.Status.SUCCESS) {
 
-                    val clickIds = clickDAO.getSwipedIds().toHashSet()
-                    clickIds.addAll(matchDAO.getMatchedIds())
+                    val fetchedCards = cardsResource.data
 
-                    val fetchedCards = cardsResource.data!!
-                    val endIndex = fetchedCards.size - 1
+                    if (fetchedCards == null || fetchedCards.size == 0) {
+                        fetchedNoCards = true
+                    } else {
 
-                    for (i in endIndex downTo 0) {
-                        if (clickIds.contains(fetchedCards[i].accountId)) {
-                            fetchedCards.removeAt(i)
-                            continue
+                        fetchedNoCards = false
+
+                        val clickIds = clickDAO.getSwipedIds().toHashSet()
+                        clickIds.addAll(matchDAO.getMatchedIds())
+
+                        val endIndex = fetchedCards.size - 1
+
+                        for (i in endIndex downTo 0) {
+                            if (clickIds.contains(fetchedCards[i].accountId)) {
+                                fetchedCards.removeAt(i)
+                                continue
+                            }
+                            fetchedCards[i].birthYear = Convert.birthYearToAge(fetchedCards[i].birthYear)
                         }
-                        fetchedCards[i].birthYear = Convert.birthYearToAge(fetchedCards[i].birthYear)
                     }
+
+                    if (locationUpdatedAt != null)
+                        locationDAO.sync(locationUpdatedAt)
+                } else if (cardsResource.status == Resource.Status.EXCEPTION) {
+                    fetchedNoCards = false
                 }
 
-                cardsBeingFetched = false
                 mutableCards.postValue(cardsResource)
+                fetchingCards = false
             }
         }
     }
@@ -272,6 +303,27 @@ class BalanceRepositoryImpl(
                 fcmTokenDAO.update(CURRENT_FCM_TOKEN_ID, true)
             }
         }
+    }
+
+    override fun saveLocation(latitude: Double, longitude: Double) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            val accountId = preferenceProvider.getAccountId()
+            val identityToken = preferenceProvider.getIdentityToken()
+            val updatedAt = OffsetDateTime.now()
+
+            val currentLocation = Location(latitude, longitude, false, updatedAt)
+            locationDAO.insert(currentLocation)
+
+            val response =
+                balanceRDS.postLocation(accountId, identityToken, latitude, longitude, updatedAt.toString())
+
+            if (response.status == Resource.Status.SUCCESS)
+                locationDAO.sync(updatedAt)
+        }
+
+
     }
 
 

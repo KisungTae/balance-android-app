@@ -71,7 +71,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
-        viewModel.fetchCards()
+        viewModel.fetchCards(false)
     }
 
     private fun bindUI() = launch {
@@ -94,7 +94,11 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         }
 
         btnCardStackReload.setOnClickListener {
-            viewModel.fetchCards()
+            viewModel.fetchCards(false)
+        }
+
+        btnCardStackReset.setOnClickListener {
+            viewModel.fetchCards(true)
         }
     }
 
@@ -102,21 +106,38 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         viewModel.cards.observe(viewLifecycleOwner, { cardResource ->
             when (cardResource.status) {
                 Resource.Status.SUCCESS -> {
-                    cardStackAdapter.addCards(cardResource.data!!)
-                    csvSwipe.visibility = View.VISIBLE
+
+                    val cards = cardResource.data
+
+                    if (cards == null || cards.isEmpty()) {
+                        resetCardStackLayouts()
+                        llCardStackReset.visibility = View.VISIBLE
+                    } else {
+                        cardStackAdapter.addCards(cardResource.data)
+                        csvSwipe.visibility = View.VISIBLE
+                    }
+
                 }
                 Resource.Status.LOADING -> {
+                    resetCardStackLayouts()
                     llCardStackLoading.visibility = View.VISIBLE
-                    llCardStackLoadError.visibility = View.GONE
-                    csvSwipe.visibility = View.GONE
+
                 }
                 Resource.Status.EXCEPTION -> {
-                    llCardStackLoading.visibility = View.GONE
-                    llCardStackLoadError.visibility = View.VISIBLE
-                    csvSwipe.visibility = View.GONE
+                    resetCardStackLayouts()
+                    llCardStackError.visibility = View.VISIBLE
                 }
             }
         })
+    }
+
+    private fun resetCardStackLayouts() {
+        if (cardStackAdapter.itemCount == 0)
+            csvSwipe.visibility = View.GONE
+
+        llCardStackLoading.visibility = View.GONE
+        llCardStackError.visibility = View.GONE
+        llCardStackReset.visibility = View.GONE
     }
 
     private fun setupSwipeCardStackView() {
@@ -155,8 +176,11 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
         val removedCard = cardStackAdapter.removeCard()
 
+        if (cardStackAdapter.itemCount == 0)
+            csvSwipe.visibility = View.GONE
+
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE)
-            viewModel.fetchCards()
+            viewModel.fetchCards(false)
 
         if (direction == Direction.Right && removedCard != null) {
             BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(

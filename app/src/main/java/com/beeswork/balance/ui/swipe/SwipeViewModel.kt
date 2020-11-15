@@ -24,8 +24,8 @@ class SwipeViewModel(
         balanceRepository.getUnreadMessageCount()
     }
 
-    fun fetchCards() {
-        balanceRepository.fetchCards()
+    fun fetchCards(reset: Boolean) {
+        balanceRepository.fetchCards(reset)
     }
 
     fun swipe(swipeId: String) {
