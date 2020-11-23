@@ -10,17 +10,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.Resource
-import com.beeswork.balance.internal.constant.AnswerOption
-import com.beeswork.balance.internal.constant.DialogTag
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
-import com.beeswork.balance.ui.clicked.ClickedViewModel
-import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
-import com.beeswork.balance.ui.dialog.MatchDialog
 import kotlinx.android.synthetic.main.dialog_balance_game.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+
+const val ANSWER_TOP = true
+const val ANSWER_BOTTOM = false
 
 class BalanceGameDialog(
     private val swipedId: String,
@@ -225,8 +223,8 @@ class BalanceGameDialog(
     }
 
     private fun setupListeners() {
-        btnTopOption.setOnClickListener { selectAnswer(AnswerOption.TOP) }
-        btnBottomOption.setOnClickListener { selectAnswer(AnswerOption.BOTTOM) }
+        btnTopOption.setOnClickListener { selectAnswer(ANSWER_TOP) }
+        btnBottomOption.setOnClickListener { selectAnswer(ANSWER_BOTTOM) }
 
         btnBalanceGameReload.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
         btnBalanceGameLoadErrorClose.setOnClickListener { dismiss() }
@@ -239,6 +237,10 @@ class BalanceGameDialog(
         btnBalanceGameNotClickClose.setOnClickListener { dismiss() }
 
         btnBalanceGameClickedClose.setOnClickListener { dismiss() }
+    }
+
+    companion object {
+        const val TAG = "balanceGameDialog"
     }
 
     interface BalanceGameListener {

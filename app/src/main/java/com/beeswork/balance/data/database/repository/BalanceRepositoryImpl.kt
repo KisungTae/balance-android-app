@@ -13,10 +13,8 @@ import com.beeswork.balance.data.network.response.BalanceGameResponse
 import com.beeswork.balance.data.network.response.ClickResponse
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
-import com.beeswork.balance.internal.constant.CURRENT_FCM_TOKEN_ID
 import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.converter.Convert
-import com.google.android.gms.common.internal.ResourceUtils
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import kotlin.random.Random
@@ -31,7 +29,6 @@ class BalanceRepositoryImpl(
     private val clickedDAO: ClickedDAO,
     private val profileDAO: ProfileDAO,
     private val locationDAO: LocationDAO,
-    private val photoDAO: PhotoDAO,
     private val balanceRDS: BalanceRDS,
     private val preferenceProvider: PreferenceProvider
 ) : BalanceRepository {
@@ -234,8 +231,8 @@ class BalanceRepositoryImpl(
                 var longitude: Double? = null
                 var locationUpdatedAt: OffsetDateTime? = null
 
-                val location = locationDAO.get()
-                if (!location.synced) {
+                val location: Location? = locationDAO.get()
+                if (location != null && !location.synced) {
                     latitude = location.latitude
                     longitude = location.longitude
                     locationUpdatedAt = location.updatedAt
@@ -299,9 +296,9 @@ class BalanceRepositoryImpl(
             fcmTokenDAO.insert(FCMToken(token, false))
 
             val tokenResource = balanceRDS.postFCMToken(accountId, identityToken, token)
-            if (tokenResource.status == Resource.Status.SUCCESS) {
-                fcmTokenDAO.update(CURRENT_FCM_TOKEN_ID, true)
-            }
+            if (tokenResource.status == Resource.Status.SUCCESS)
+                fcmTokenDAO.sync()
+
         }
     }
 

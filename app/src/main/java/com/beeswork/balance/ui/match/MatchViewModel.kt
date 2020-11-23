@@ -10,6 +10,11 @@ import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.lazyDeferred
 
+
+const val MATCH_PAGE_SIZE = 30
+const val MATCH_PAGE_PREFETCH_DISTANCE = MATCH_PAGE_SIZE * 2
+const val MATCH_MAX_PAGE_SIZE = MATCH_PAGE_PREFETCH_DISTANCE * 2 + MATCH_PAGE_SIZE
+
 class MatchViewModel (
     private val balanceRepository: BalanceRepository
 ): ViewModel() {

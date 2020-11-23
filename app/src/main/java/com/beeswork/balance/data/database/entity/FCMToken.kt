@@ -2,11 +2,8 @@ package com.beeswork.balance.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.beeswork.balance.internal.constant.CURRENT_FCM_TOKEN_ID
-import org.threeten.bp.OffsetDateTime
 
-
-
+const val FCM_TOKEN_ID = 0
 
 @Entity(tableName = "fcmToken")
 data class FCMToken(
@@ -15,5 +12,5 @@ data class FCMToken(
     val posted: Boolean,
 
     @PrimaryKey
-    val id: Int = CURRENT_FCM_TOKEN_ID
+    val id: Int = FCM_TOKEN_ID
 )

@@ -6,19 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.internal.*
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ClickedDialog
@@ -87,11 +83,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         when (notificationType) {
             NotificationType.MATCH -> MatchDialog("", photoKey).show(
                 supportFragmentManager,
-                DialogTag.MATCH_DIALOG
+                MatchDialog.TAG
             )
             NotificationType.CLICKED -> ClickedDialog(photoKey).show(
                 supportFragmentManager,
-                DialogTag.CLICKED_DIALOG
+                ClickedDialog.TAG
             )
         }
     }
@@ -121,7 +117,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            PermissionRequestCode.ACCESS_FINE_LOCATION
+            RequestCode.ACCESS_FINE_LOCATION
         )
     }
 
@@ -130,7 +126,8 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == PermissionRequestCode.ACCESS_FINE_LOCATION) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == RequestCode.ACCESS_FINE_LOCATION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 bindLocationManager()
         }

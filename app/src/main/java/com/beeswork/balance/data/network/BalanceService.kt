@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.network
 
-import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
@@ -12,8 +11,6 @@ import com.beeswork.balance.data.network.response.BalanceGameResponse
 import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.network.response.ClickResponse
 import com.beeswork.balance.data.network.response.EmptyJsonResponse
-import com.beeswork.balance.internal.constant.NETWORK_CONNECTION_TIMEOUT
-import com.beeswork.balance.internal.constant.NETWORK_READ_TIMEOUT
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -28,6 +25,8 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
+const val NETWORK_READ_TIMEOUT = 100L
+const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 interface BalanceService {
 
@@ -94,7 +93,9 @@ interface BalanceService {
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("http://10.0.2.2:8080/")
+//                .baseUrl("http://10.0.2.2:8080/")
+//                .baseUrl("http://localhost:8081/")
+                .baseUrl("http://192.168.1.100:8081/")
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()

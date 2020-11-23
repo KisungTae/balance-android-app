@@ -28,6 +28,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
+const val MIN_CARD_STACK_SIZE = 15
 
 class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     BalanceGameDialog.BalanceGameListener {
@@ -89,7 +90,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         btnSwipeFilter.setOnClickListener {
             SwipeFilterDialog(preferenceProvider).show(
                 childFragmentManager,
-                DialogTag.SWIPE_FILTER_DIALOG
+                SwipeFilterDialog.TAG
             )
         }
 
@@ -168,7 +169,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
         MatchDialog("", matchedPhotoKey).show(
             childFragmentManager,
-            DialogTag.MATCH_DIALOG
+            MatchDialog.TAG
         )
     }
 
@@ -185,7 +186,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         if (direction == Direction.Right && removedCard != null) {
             BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(
                 childFragmentManager,
-                DialogTag.BALANCE_DIALOG
+                BalanceGameDialog.TAG
             )
 
             viewModel.swipe(removedCard.accountId)

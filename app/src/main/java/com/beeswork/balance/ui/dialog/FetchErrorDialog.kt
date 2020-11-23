@@ -13,6 +13,11 @@ class FetchErrorDialog(
     private val fetchErrorListener: FetchErrorListener
 ): DialogFragment() {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,6 +35,10 @@ class FetchErrorDialog(
             fetchErrorListener.onRefetch()
         }
         tvFetchErrorMessage.text = exceptionMessage
+    }
+
+    companion object {
+        const val TAG = "fetchErrorDialog"
     }
 
     interface FetchErrorListener {

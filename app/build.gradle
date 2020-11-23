@@ -104,4 +104,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:21.0.0'
     implementation 'com.google.firebase:firebase-analytics:18.0.0'
 
+
+    // Spin kit
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+
 }

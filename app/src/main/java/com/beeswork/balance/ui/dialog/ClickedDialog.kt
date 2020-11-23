@@ -34,4 +34,8 @@ class ClickedDialog(
         }
     }
 
+    companion object {
+        const val TAG = "clickedDialog"
+    }
+
 }

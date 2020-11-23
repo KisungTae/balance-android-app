@@ -55,5 +55,9 @@ class SwipeFilterDialog(
         }
     }
 
+    companion object {
+        const val TAG = "swipeFilterDialog"
+
+    }
 
 }

@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.Resource
-import com.beeswork.balance.internal.constant.DialogTag
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
@@ -68,7 +67,7 @@ class ClickedFragment : ScopeFragment(), KodeinAware,
                     FetchErrorDialog(
                         fetchClickedListResponse.exceptionMessage,
                         this@ClickedFragment
-                    ).show(childFragmentManager, DialogTag.FETCH_ERROR_DIALOG)
+                    ).show(childFragmentManager, FetchErrorDialog.TAG)
                 }
             }
         })
@@ -77,7 +76,7 @@ class ClickedFragment : ScopeFragment(), KodeinAware,
     override fun onClickedClick(swipedId: String) {
         BalanceGameDialog(swipedId, this@ClickedFragment).show(
             childFragmentManager,
-            DialogTag.BALANCE_DIALOG
+            BalanceGameDialog.TAG
         )
         viewModel.swipe(swipedId)
     }
@@ -85,7 +84,7 @@ class ClickedFragment : ScopeFragment(), KodeinAware,
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
         MatchDialog("", matchedPhotoKey).show(
             childFragmentManager,
-            DialogTag.MATCH_DIALOG
+            MatchDialog.TAG
         )
     }
 

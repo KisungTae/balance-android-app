@@ -39,13 +39,11 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
         bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
-        bind() from singleton { instance<BalanceDatabase>().photoDAO() }
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
 
         // Repository
         bind<BalanceRepository>() with singleton {
             BalanceRepositoryImpl(
-                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -121,6 +119,11 @@ class BalanceApplication : Application(), KodeinAware {
 //          let the users delete the deleted account in clicked and match but when users click on them, let them know this account is deleted
 //      26. users should be enabled in android app after saving their first profile, if disabled, then they should be directed to profile setup page
 //      27. consider interval and fastest interval for location request
+//      28. you retrieve 15 cards, but remove them all in clicked and match comparison, then it will pass zero list then, reset layout will display change the logic
+//      29. remove android:usesCleartextTraffic="true" in manifest
+//      30. when comparing cards against match and clicked, you should remove yourself as well
+//      31. implement loading page in the card's picture, when users click left or right then it goes to next picutre, then loadin gpage when loading image from AWs
+
 
 
 

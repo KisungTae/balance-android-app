@@ -11,6 +11,10 @@ import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.lazyDeferred
 
+const val CLICKED_PAGE_SIZE = 15
+const val CLICKED_PAGE_PREFETCH_DISTANCE = CLICKED_PAGE_SIZE * 2
+const val CLICKED_MAX_PAGE_SIZE = CLICKED_PAGE_PREFETCH_DISTANCE * 2 + CLICKED_PAGE_SIZE
+
 class ClickedViewModel(
     private val balanceRepository: BalanceRepository
 ): ViewModel() {

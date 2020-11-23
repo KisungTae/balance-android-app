@@ -36,4 +36,8 @@ class MatchDialog(
             dismiss()
         }
     }
+
+    companion object {
+        const val TAG = "matchDialog"
+    }
 }

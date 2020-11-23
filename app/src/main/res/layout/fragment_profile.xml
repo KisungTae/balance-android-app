@@ -1,11 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llProfileWrapper"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <GridLayout
+        android:id="@+id/llPhotoPicker"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="profile fragment"/>
+        android:columnCount="3">
+
+        <FrameLayout
+            android:background="@android:color/holo_blue_dark"
+            android:id="@+id/flFirst"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:tag="flFirst"
+            android:layout_columnWeight="1">
+
+<!--            <ImageView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:tag="ivPhoto"-->
+<!--                android:src="@drawable/person2" />-->
+
+<!--            <ImageView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:background="#CC000000"-->
+<!--                android:padding="20dp"-->
+<!--                android:src="@drawable/ic_refresh"-->
+<!--                android:visibility="gone"-->
+<!--                android:tag="ivRefresh"-->
+<!--                app:tint="@android:color/white" />-->
+
+<!--            <com.github.ybq.android.spinkit.SpinKitView-->
+<!--                android:id="@+id/skvLoading"-->
+<!--                style="@style/SpinKitView.Large.Circle"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:padding="0dp"-->
+<!--                android:tag="skvLoading"-->
+<!--                app:SpinKit_Color="@android:color/black" />-->
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:background="@android:color/black"
+            android:id="@+id/flSecond"
+            android:tag="flSecond"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1">
+
+<!--            <ImageView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:src="@drawable/person1" />-->
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/flThird"
+            android:background="@android:color/darker_gray"
+            android:tag="flThird"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1">
+
+<!--            <ImageView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:src="@drawable/person3" />-->
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:background="@android:color/holo_green_dark"
+            android:tag="flThird"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:background="@android:color/holo_purple"
+            android:tag="flThird"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:background="@android:color/holo_red_dark"
+            android:tag="flThird"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/flPhotoPlaceholder"
+            android:background="@android:color/transparent"
+            android:tag="placeholder"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:visibility="gone">
+
+        </FrameLayout>
+
+    </GridLayout>
+
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="name" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:text="tae ki sung" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="gender" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:text="male" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="birth" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:text="1987-12-10" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="email" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:text="c0go23@gmail.com" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="About" />-->
+
+<!--    <EditText-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="10dp" />-->
+
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="question" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:text="balance game question" />-->
+
 
 </LinearLayout>
