@@ -3,14 +3,33 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.network.response.BalanceGameResponse
-import com.beeswork.balance.data.network.response.CardResponse
-import com.beeswork.balance.data.network.response.ClickResponse
-import com.beeswork.balance.data.network.response.EmptyJsonResponse
+import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 import org.threeten.bp.OffsetDateTime
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface BalanceRDS {
+
+    suspend fun fetchQuestions(
+        accountId: String,
+        identityToken: String
+    ): Resource<List<QuestionResponse>>
+
+
+    suspend fun fetchRandomQuestion(
+        accountId: String,
+        identityToken: String,
+        currentQuestionIds: List<Int>
+    ): Resource<QuestionResponse>
+
+    suspend fun postAnswers(
+        accountId: String,
+        identityToken: String,
+        answers: Map<Int, Boolean>
+    ): Resource<EmptyJsonResponse>
 
     suspend fun fetchCards(
         accountId: String,
@@ -37,7 +56,7 @@ interface BalanceRDS {
         identityToken: String,
         swipedId: String,
         swipeId: Long,
-        answers: Map<Long, Boolean>
+        answers: Map<Int, Boolean>
     ): Resource<ClickResponse>
 
     suspend fun postFCMToken(

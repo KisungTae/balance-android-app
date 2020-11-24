@@ -8,6 +8,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Message
 import com.beeswork.balance.data.network.response.BalanceGameResponse
 import com.beeswork.balance.data.network.response.ClickResponse
+import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.Resource
 
 interface BalanceRepository {
@@ -22,7 +23,7 @@ interface BalanceRepository {
 
     fun fetchClickedList()
     fun swipe(swipeId: Long?, swipedId: String)
-    fun click(swipedId: String, swipeId:Long, answers: Map<Long, Boolean>)
+    fun click(swipedId: String, swipeId:Long, answers: Map<Int, Boolean>)
 
     // match
     val fetchMatchesResponse: LiveData<Resource<List<Match>>>
@@ -39,8 +40,10 @@ interface BalanceRepository {
 
     // account
     val cards: LiveData<Resource<List<CardResponse>>>
+    val questions: LiveData<Resource<List<QuestionResponse>>>
     fun fetchCards(reset: Boolean)
     fun insertFCMToken(token: String)
+    fun fetchQuestions()
 
     // location
     fun saveLocation(latitude: Double, longitude: Double)

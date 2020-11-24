@@ -2,21 +2,37 @@ package com.beeswork.balance.data.network.rds
 
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.network.BalanceService
-import com.beeswork.balance.data.network.request.ClickRequest
-import com.beeswork.balance.data.network.request.FCMTokenRequest
-import com.beeswork.balance.data.network.request.LocationRequest
-import com.beeswork.balance.data.network.request.SwipeRequest
-import com.beeswork.balance.data.network.response.BalanceGameResponse
-import com.beeswork.balance.data.network.response.ClickResponse
-import com.beeswork.balance.data.network.response.EmptyJsonResponse
+import com.beeswork.balance.data.network.request.*
+import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
-import org.threeten.bp.OffsetDateTime
 
 class BalanceRDSImpl(
     private val balanceService: BalanceService
 ) : BaseRDS(), BalanceRDS {
+
+    override suspend fun fetchQuestions(
+        accountId: String,
+        identityToken: String
+    ): Resource<List<QuestionResponse>> {
+        return getResult { balanceService.fetchQuestions(accountId, identityToken) }
+    }
+
+    override suspend fun fetchRandomQuestion(
+        accountId: String,
+        identityToken: String,
+        currentQuestionIds: List<Int>
+    ): Resource<QuestionResponse> {
+        return getResult { balanceService.fetchRandomQuestion(accountId, identityToken, currentQuestionIds) }
+    }
+
+    override suspend fun postAnswers(
+        accountId: String,
+        identityToken: String,
+        answers: Map<Int, Boolean>
+    ): Resource<EmptyJsonResponse> {
+        return getResult { balanceService.postAnswers(PostAnswersRequest(accountId, identityToken, answers)) }
+    }
 
 
     override suspend fun fetchCards(
@@ -64,7 +80,7 @@ class BalanceRDSImpl(
         identityToken: String,
         swipedId: String,
         swipeId: Long,
-        answers: Map<Long, Boolean>
+        answers: Map<Int, Boolean>
     ): Resource<ClickResponse> {
         return getResult {
             balanceService.click(ClickRequest(accountId, identityToken, swipedId, swipeId, answers))
@@ -109,7 +125,15 @@ class BalanceRDSImpl(
         updatedAt: String
     ): Resource<EmptyJsonResponse> {
         return getResult {
-            balanceService.postLocation(LocationRequest(accountId, identityToken, latitude, longitude, updatedAt))
+            balanceService.postLocation(
+                LocationRequest(
+                    accountId,
+                    identityToken,
+                    latitude,
+                    longitude,
+                    updatedAt
+                )
+            )
         }
     }
 

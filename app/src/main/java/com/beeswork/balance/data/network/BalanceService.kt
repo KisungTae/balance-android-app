@@ -3,14 +3,8 @@ package com.beeswork.balance.data.network
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
-import com.beeswork.balance.data.network.request.ClickRequest
-import com.beeswork.balance.data.network.request.FCMTokenRequest
-import com.beeswork.balance.data.network.request.LocationRequest
-import com.beeswork.balance.data.network.request.SwipeRequest
-import com.beeswork.balance.data.network.response.BalanceGameResponse
-import com.beeswork.balance.data.network.response.CardResponse
-import com.beeswork.balance.data.network.response.ClickResponse
-import com.beeswork.balance.data.network.response.EmptyJsonResponse
+import com.beeswork.balance.data.network.request.*
+import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -30,6 +24,21 @@ const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 interface BalanceService {
 
+    @GET("/question/list")
+    suspend fun fetchQuestions(
+        @Query(value = "accountId") accountId: String,
+        @Query(value = "identityToken") identityToken: String
+    ): Response<List<QuestionResponse>>
+
+    @GET("/question/random")
+    suspend fun fetchRandomQuestion(
+        @Query(value = "accountId") accountId: String,
+        @Query(value = "identityToken") identityToken: String,
+        @Query(value = "currentQuestionIds") currentQuestionIds: List<Int>
+    ): Response<QuestionResponse>
+
+    @POST("/account/answers")
+    suspend fun postAnswers(@Body postAnswersRequest: PostAnswersRequest): Response<EmptyJsonResponse>
 
     @GET("account/recommend")
     suspend fun fetchCards(

@@ -37,6 +37,11 @@ class ProfileFragment : ScopeFragment(), PhotoUploadOptionDialog.PhotoUploadOpti
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        tvEditBalanceGame.setOnClickListener {
+            EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
+        }
+
+
         for (i in 0 until llPhotoPicker.childCount) {
             val childView = llPhotoPicker.getChildAt(i)
 

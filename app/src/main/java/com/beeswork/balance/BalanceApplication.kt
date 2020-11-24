@@ -16,6 +16,7 @@ import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
+import com.beeswork.balance.ui.profile.EditBalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -65,6 +66,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
+        bind() from provider { EditBalanceGameDialogViewModelFactory(instance()) }
+
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
@@ -123,6 +126,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      29. remove android:usesCleartextTraffic="true" in manifest
 //      30. when comparing cards against match and clicked, you should remove yourself as well
 //      31. implement loading page in the card's picture, when users click left or right then it goes to next picutre, then loadin gpage when loading image from AWs
+//      32. implement listClick
+//      33. listClick, listClicked, listMatches, uses the fetchedAt from database not store it in sharedPreference
+//      34. move preferences to database, just store information in database rather than sharedPreference
 
 
 

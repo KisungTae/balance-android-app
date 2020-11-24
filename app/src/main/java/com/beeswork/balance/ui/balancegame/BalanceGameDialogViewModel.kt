@@ -14,7 +14,7 @@ class BalanceGameDialogViewModel(
     val balanceGame: LiveData<Resource<BalanceGameResponse>> = balanceRepository.balanceGame
     val clickResponse: LiveData<Resource<ClickResponse>> = balanceRepository.clickResponse
 
-    fun click(swipedId:String, swipeId:Long, answers: Map<Long, Boolean>) {
+    fun click(swipedId:String, swipeId:Long, answers: Map<Int, Boolean>) {
         balanceRepository.click(swipedId, swipeId, answers)
     }
 

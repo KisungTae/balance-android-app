@@ -32,7 +32,7 @@ class BalanceGameDialog(
     private lateinit var questions: List<QuestionResponse>
     private var swipeId: Long? = null
     private var currentIndex = -1
-    private val answers: MutableMap<Long, Boolean> = mutableMapOf()
+    private val answers: MutableMap<Int, Boolean> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

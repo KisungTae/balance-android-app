@@ -11,6 +11,7 @@ import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.BalanceGameResponse
 import com.beeswork.balance.data.network.response.ClickResponse
+import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.NotificationType
@@ -99,7 +100,7 @@ class BalanceRepositoryImpl(
 
     //  TEST 1. even if you leave the app before completing the network call, when you come back to the app
     //          you will get the response. The response is received in the background
-    override fun click(swipedId: String, swipeId: Long, answers: Map<Long, Boolean>) {
+    override fun click(swipedId: String, swipeId: Long, answers: Map<Int, Boolean>) {
 
         CoroutineScope(Dispatchers.IO).launch {
             val accountId = preferenceProvider.getAccountId()
@@ -319,9 +320,24 @@ class BalanceRepositoryImpl(
             if (response.status == Resource.Status.SUCCESS)
                 locationDAO.sync(updatedAt)
         }
-
-
     }
+
+
+    private val mutableQuestions = MutableLiveData<Resource<List<QuestionResponse>>>()
+    override val questions: LiveData<Resource<List<QuestionResponse>>>
+        get() = mutableQuestions
+
+    override fun fetchQuestions() {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val accountId = preferenceProvider.getAccountId()
+            val identityToken = preferenceProvider.getIdentityToken()
+            mutableQuestions.postValue(Resource.loading())
+            val response = balanceRDS.fetchQuestions(accountId, identityToken)
+            mutableQuestions.postValue(response)
+        }
+    }
+
 
 
 //  ################################################################################# //
