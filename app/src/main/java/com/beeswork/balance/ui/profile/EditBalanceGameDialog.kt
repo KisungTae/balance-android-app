@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.BalanceGameAnswer
 import kotlinx.android.synthetic.main.dialog_edit_balance_game.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -23,7 +24,7 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
     private lateinit var viewModel: EditBalanceGameDialogViewModel
 
     private lateinit var questions: List<QuestionResponse>
-    private val currentQuestionIndex = -1
+    private var currentQuestionIndex = -1
     private val answers: MutableMap<Int, Boolean> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +47,16 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
     }
 
     private fun bindUI() {
+
+        setupQuestionsObserver()
+        btnEditBalanceGameTopOption.setOnClickListener { answer(BalanceGameAnswer.TOP) }
+        btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
+        btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
         btnEditBalanceGameClose.setOnClickListener { dismiss() }
-        setupBalanceGameQuestionsObserver()
+        viewModel.fetchQuestions()
     }
 
-    private fun setupBalanceGameQuestionsObserver() {
+    private fun setupQuestionsObserver() {
         viewModel.questions.observe(viewLifecycleOwner, {
             when (it.status) {
                 Resource.Status.SUCCESS -> setupBalanceGame(it.data!!)
@@ -62,7 +68,13 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
                 }
             }
         })
-        viewModel.fetchQuestions()
+    }
+
+    private fun answer(answer: Boolean) {
+
+        if (currentQuestionIndex >= 0 && currentQuestionIndex < questions.size)
+            answers[questions[currentQuestionIndex].id] = answer
+        nextQuestion()
     }
 
     private fun setupBalanceGame(questionResponses: List<QuestionResponse>) {
@@ -71,10 +83,40 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
             if (questionResponse.answer != null)
                 answers[questionResponse.id] = questionResponse.answer
         }
+        nextQuestion()
     }
 
     private fun nextQuestion() {
 
+        if (currentQuestionIndex < questions.size)
+            currentQuestionIndex++
+
+        btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
+
+        if (currentQuestionIndex == questions.size) {
+            viewModel.saveAnswers()
+            println("save answers ===================")
+            println(answers)
+            //show loading page
+        } else {
+            setupQuestion(questions[currentQuestionIndex])
+        }
+    }
+
+    private fun previousQuestion() {
+        if (currentQuestionIndex >= questions.size)
+            currentQuestionIndex = (questions.size - 2)
+        else if (currentQuestionIndex > 0)
+            currentQuestionIndex--
+
+        btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
+        setupQuestion(questions[currentQuestionIndex])
+    }
+
+    private fun setupQuestion(question: QuestionResponse) {
+        tvEditBalanceGameDescription.text = question.description
+        btnEditBalanceGameTopOption.text = question.topOption
+        btnEditBalanceGameBottomOption.text = question.bottomOption
     }
 
     companion object {

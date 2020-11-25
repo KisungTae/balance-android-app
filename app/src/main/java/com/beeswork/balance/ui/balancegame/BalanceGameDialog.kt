@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.BalanceGameAnswer
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
 import kotlinx.android.synthetic.main.dialog_balance_game.*
@@ -17,8 +18,6 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-const val ANSWER_TOP = true
-const val ANSWER_BOTTOM = false
 
 class BalanceGameDialog(
     private val swipedId: String,
@@ -223,8 +222,8 @@ class BalanceGameDialog(
     }
 
     private fun setupListeners() {
-        btnTopOption.setOnClickListener { selectAnswer(ANSWER_TOP) }
-        btnBottomOption.setOnClickListener { selectAnswer(ANSWER_BOTTOM) }
+        btnTopOption.setOnClickListener { selectAnswer(BalanceGameAnswer.TOP) }
+        btnBottomOption.setOnClickListener { selectAnswer(BalanceGameAnswer.BOTTOM) }
 
         btnBalanceGameReload.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
         btnBalanceGameLoadErrorClose.setOnClickListener { dismiss() }

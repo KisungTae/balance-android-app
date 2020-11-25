@@ -6,49 +6,52 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btnEditBalanceGameBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="back"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:enabled="false"
+            android:text="back" />
+
+
+        <Button
+            android:id="@+id/btnEditBalanceGameClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="done" />
 
 
         <Button
             android:id="@+id/btnEditBalanceGameRefreshQuestion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="refresh balance question"/>
-
-        <Button
-            android:id="@+id/btnEditBalanceGameClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="close"/>
-
-
+            android:layout_marginRight="10dp"
+            android:text="refresh" />
 
     </LinearLayout>
 
-    
+
     <Button
         android:id="@+id/btnEditBalanceGameTopOption"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/tvEditBalanceGameDescription"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/btnEditBalanceGameBottomOption"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
-
+        android:layout_weight="1" />
 
 
 </LinearLayout>

@@ -12,7 +12,6 @@ class EditBalanceGameDialogViewModel (
 
     val questions: LiveData<Resource<List<QuestionResponse>>> = balanceRepository.questions
 
-    fun fetchQuestions() {
-        balanceRepository.fetchQuestions()
-    }
+    fun fetchQuestions() { balanceRepository.fetchQuestions() }
+    fun saveAnswers() {}
 }
