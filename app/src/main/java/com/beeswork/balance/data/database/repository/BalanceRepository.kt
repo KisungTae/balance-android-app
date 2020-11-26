@@ -3,12 +3,9 @@ package com.beeswork.balance.data.database.repository
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicked
-import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Message
-import com.beeswork.balance.data.network.response.BalanceGameResponse
-import com.beeswork.balance.data.network.response.ClickResponse
-import com.beeswork.balance.data.network.response.QuestionResponse
+import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 
 interface BalanceRepository {
@@ -40,10 +37,18 @@ interface BalanceRepository {
 
     // account
     val cards: LiveData<Resource<List<CardResponse>>>
-    val questions: LiveData<Resource<List<QuestionResponse>>>
     fun fetchCards(reset: Boolean)
+
     fun insertFCMToken(token: String)
+
+    val questions: LiveData<Resource<List<QuestionResponse>>>
     fun fetchQuestions()
+
+    val saveAnswers: LiveData<Resource<EmptyJsonResponse>>
+    fun saveAnswers(answers: Map<Int, Boolean>)
+
+    val fetchRandomQuestion: LiveData<Resource<QuestionResponse>>
+    fun fetchRandomQuestion(questionIds: List<Int>)
 
     // location
     fun saveLocation(latitude: Double, longitude: Double)

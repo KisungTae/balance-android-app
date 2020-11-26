@@ -24,6 +24,9 @@ const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 interface BalanceService {
 
+    @POST("/account/answers")
+    suspend fun saveAnswers(@Body saveAnswersRequest: SaveAnswersRequest): Response<EmptyJsonResponse>
+
     @GET("/question/list")
     suspend fun fetchQuestions(
         @Query(value = "accountId") accountId: String,
@@ -32,9 +35,7 @@ interface BalanceService {
 
     @GET("/question/random")
     suspend fun fetchRandomQuestion(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String,
-        @Query(value = "currentQuestionIds") currentQuestionIds: List<Int>
+        @Query(value = "questionIds") questionIds: List<Int>
     ): Response<QuestionResponse>
 
     @POST("/account/answers")

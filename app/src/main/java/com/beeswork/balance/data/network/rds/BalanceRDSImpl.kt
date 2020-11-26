@@ -7,9 +7,17 @@ import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 
-class BalanceRDSImpl(
+class BalanceRDSImpl (
     private val balanceService: BalanceService
 ) : BaseRDS(), BalanceRDS {
+
+    override suspend fun saveAnswers(
+        accountId: String,
+        identityToken: String,
+        answers: Map<Int, Boolean>
+    ): Resource<EmptyJsonResponse> {
+        return getResult { balanceService.saveAnswers(SaveAnswersRequest(accountId, identityToken, answers)) }
+    }
 
     override suspend fun fetchQuestions(
         accountId: String,
@@ -19,11 +27,9 @@ class BalanceRDSImpl(
     }
 
     override suspend fun fetchRandomQuestion(
-        accountId: String,
-        identityToken: String,
-        currentQuestionIds: List<Int>
+        questionIds: List<Int>
     ): Resource<QuestionResponse> {
-        return getResult { balanceService.fetchRandomQuestion(accountId, identityToken, currentQuestionIds) }
+        return getResult { balanceService.fetchRandomQuestion(questionIds) }
     }
 
     override suspend fun postAnswers(

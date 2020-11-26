@@ -7,11 +7,8 @@ import androidx.paging.DataSource
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.network.rds.BalanceRDS
-import com.beeswork.balance.data.network.response.BalanceGameResponse
-import com.beeswork.balance.data.network.response.ClickResponse
-import com.beeswork.balance.data.network.response.QuestionResponse
+import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.NotificationType
@@ -322,7 +319,6 @@ class BalanceRepositoryImpl(
         }
     }
 
-
     private val mutableQuestions = MutableLiveData<Resource<List<QuestionResponse>>>()
     override val questions: LiveData<Resource<List<QuestionResponse>>>
         get() = mutableQuestions
@@ -338,6 +334,34 @@ class BalanceRepositoryImpl(
         }
     }
 
+
+    private val mutableSaveAnswers = MutableLiveData<Resource<EmptyJsonResponse>>()
+    override val saveAnswers: LiveData<Resource<EmptyJsonResponse>>
+        get() = mutableSaveAnswers
+
+    override fun saveAnswers(answers: Map<Int, Boolean>) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val accountId = preferenceProvider.getAccountId()
+            val identityToken = preferenceProvider.getIdentityToken()
+            mutableSaveAnswers.postValue(Resource.loading())
+            val response = balanceRDS.saveAnswers(accountId, identityToken, answers)
+            mutableSaveAnswers.postValue(response)
+        }
+    }
+
+    private val mutableFetchRandomQuestion = MutableLiveData<Resource<QuestionResponse>>()
+    override val fetchRandomQuestion: LiveData<Resource<QuestionResponse>>
+        get() = mutableFetchRandomQuestion
+
+    override fun fetchRandomQuestion(questionIds: List<Int>) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            mutableFetchRandomQuestion.postValue(Resource.loading())
+            val response = balanceRDS.fetchRandomQuestion(questionIds)
+            mutableFetchRandomQuestion.postValue(response)
+        }
+    }
 
 
 //  ################################################################################# //

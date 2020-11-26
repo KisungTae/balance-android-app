@@ -13,6 +13,12 @@ import retrofit2.http.Query
 
 interface BalanceRDS {
 
+    suspend fun saveAnswers(
+        accountId: String,
+        identityToken: String,
+        answers: Map<Int, Boolean>
+    ): Resource<EmptyJsonResponse>
+
     suspend fun fetchQuestions(
         accountId: String,
         identityToken: String
@@ -20,9 +26,7 @@ interface BalanceRDS {
 
 
     suspend fun fetchRandomQuestion(
-        accountId: String,
-        identityToken: String,
-        currentQuestionIds: List<Int>
+        questionIds: List<Int>
     ): Resource<QuestionResponse>
 
     suspend fun postAnswers(
