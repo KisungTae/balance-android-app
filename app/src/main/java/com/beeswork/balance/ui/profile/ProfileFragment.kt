@@ -16,6 +16,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.base.ScopeFragment
 import kotlinx.android.synthetic.main.fragment_profile.*
@@ -34,14 +35,26 @@ class ProfileFragment : ScopeFragment(), PhotoUploadOptionDialog.PhotoUploadOpti
     private lateinit var lastTouch: Point
     private lateinit var photoShadowBuilder: CustomDragShadowBuilder
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindUI()
+    }
 
+    private fun bindUI() {
         tvEditBalanceGame.setOnClickListener {
             EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
         }
+    }
 
 
+
+
+
+
+
+    private fun setupDragListener() {
         for (i in 0 until llPhotoPicker.childCount) {
             val childView = llPhotoPicker.getChildAt(i)
 
@@ -88,8 +101,6 @@ class ProfileFragment : ScopeFragment(), PhotoUploadOptionDialog.PhotoUploadOpti
 
             childView.tag = PhotoTag("photo-$i", PhotoStatus.EMPTY)
         }
-
-//        llPhotoPicker.setOnDragListener { v, event -> onDragPhoto(v, event) }
     }
 
     private fun onDragPhoto(v: View, event: DragEvent): Boolean {
@@ -118,9 +129,6 @@ class ProfileFragment : ScopeFragment(), PhotoUploadOptionDialog.PhotoUploadOpti
         }
     }
 
-    private fun reorder() {
-
-    }
 
     override fun onUploadFromGallery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

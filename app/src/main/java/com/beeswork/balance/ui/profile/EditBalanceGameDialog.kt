@@ -11,14 +11,14 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceGameAnswer
+import com.beeswork.balance.internal.observeOnce
 import kotlinx.android.synthetic.main.dialog_edit_balance_game.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 
-
-class EditBalanceGameDialog: DialogFragment(), KodeinAware {
+class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
     override val kodein by closestKodein()
     private val viewModelFactory: EditBalanceGameDialogViewModelFactory by instance()
@@ -26,12 +26,14 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
 
     private lateinit var questions: MutableList<QuestionResponse>
     private var currentQuestionIndex = -1
-    private val answers: MutableMap<Int, Boolean> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(EditBalanceGameDialogViewModel::class.java)
+        viewModel = ViewModelProvider(
+            this,
+            viewModelFactory
+        ).get(EditBalanceGameDialogViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -57,47 +59,86 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
         btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
         btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
         btnEditBalanceGameClose.setOnClickListener { dismiss() }
-        btnEditBalanceGameRefreshQuestion.setOnClickListener {
-            val questionIds = ArrayList<Int>(questions.size)
-            for (question in questions)
-                questionIds.add(question.id)
-            viewModel.fetchRandomQuestion(questionIds)
-            //TODO: show loading page here not through observer
+        btnEditBalanceGameRandomQuestion.setOnClickListener { fetchRandomQuestion() }
+
+        btnEditBalanceGameLoadQuestions.setOnClickListener { viewModel.fetchQuestions() }
+        btnEditBalanceGameSaveAnswers.setOnClickListener { viewModel.saveAnswers(getAnswers()) }
+        btnEditBalanceGameErrorClose.setOnClickListener {
+            showLayout(loading = false, error = false)
+            if (questions.size <= 0) dismiss()
         }
+
         viewModel.fetchQuestions()
     }
 
+    private fun showLayout(loading: Boolean, error: Boolean) {
+
+        llEditBalanceGameLoading.visibility = if (loading) View.VISIBLE else View.GONE
+        llEditBalanceGameError.visibility = if (error) View.VISIBLE else View.GONE
+    }
+
+
+    private fun fetchRandomQuestion() {
+
+        val questionIds = ArrayList<Int>(questions.size)
+        for (question in questions)
+            questionIds.add(question.id)
+        showLayout(loading = true, error = false)
+        viewModel.fetchRandomQuestion(questionIds)
+    }
+
     private fun setupFetchRandomQuestionObserver() {
+
         viewModel.fetchRandomQuestion.observe(viewLifecycleOwner, {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
-                    println("fetch random question: success")
-                    answers.remove(questions[currentQuestionIndex].id)
-                    questions[currentQuestionIndex] = it.data!!
-                    setupQuestion(it.data)
+                    if (it.data != null) {
+                        println("random question: " + it.data)
+                        questions[currentQuestionIndex] = it.data
+                        setupQuestion(it.data)
+                        showLayout(loading = false, error = false)
+                    }
                 }
                 Resource.Status.LOADING -> {
-                    println("fetch random question: loading")
+                    showLayout(loading = true, error = false)
                 }
-                Resource.Status.EXCEPTION -> {
-                    println("fetch random question: exception: ${it.exceptionMessage}")
-                }
+                Resource.Status.EXCEPTION -> showErrorLayout(
+                    it.exceptionMessage,
+                    showSaveQuestionsBtn = false,
+                    showLoadQuestionsBtn = false
+                )
             }
         })
+    }
+
+
+    private fun showErrorLayout(
+        exceptionMessage: String?,
+        showSaveQuestionsBtn: Boolean,
+        showLoadQuestionsBtn: Boolean
+    ) {
+        tvEditBalanceGameErrorMessage.text = exceptionMessage
+        btnEditBalanceGameSaveAnswers.visibility =
+            if (showSaveQuestionsBtn) View.VISIBLE else View.GONE
+        btnEditBalanceGameLoadQuestions.visibility =
+            if (showLoadQuestionsBtn) View.VISIBLE else View.GONE
+        showLayout(loading = false, error = true)
     }
 
     private fun setupSaveAnswersObserver() {
         viewModel.saveAnswers.observe(viewLifecycleOwner, {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
-                    println("save answers: success")
+                    println("setupSaveAnswersObserver susccess")
+                    showLayout(loading = false, error = false)
+                    dismiss()
                 }
-                Resource.Status.LOADING -> {
-                    println("save answers: loading")
-                }
-                Resource.Status.EXCEPTION -> {
-                    println("save answers: exception: ${it.exceptionMessage}")
-                }
+                Resource.Status.LOADING -> showLayout(loading = true, error = false)
+                Resource.Status.EXCEPTION -> showErrorLayout(
+                    it.exceptionMessage,
+                    showSaveQuestionsBtn = true,
+                    showLoadQuestionsBtn = false
+                )
             }
         })
     }
@@ -105,12 +146,19 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
     private fun setupQuestionsObserver() {
         viewModel.questions.observe(viewLifecycleOwner, {
             when (it.status) {
-                Resource.Status.SUCCESS -> setupBalanceGame(it.data!!)
-                Resource.Status.LOADING -> {
-
+                Resource.Status.SUCCESS -> {
+                    if (it.data != null) {
+                        setupBalanceGame(it.data)
+                        showLayout(loading = false, error = false)
+                    }
                 }
+                Resource.Status.LOADING -> showLayout(loading = true, error = false)
                 Resource.Status.EXCEPTION -> {
-
+                    showErrorLayout(
+                        it.exceptionMessage,
+                        showSaveQuestionsBtn = false,
+                        showLoadQuestionsBtn = true
+                    )
                 }
             }
         })
@@ -118,21 +166,20 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
 
     private fun answer(answer: Boolean) {
 
+        if (currentQuestionIndex == questions.size)
+            currentQuestionIndex--
+
         if (currentQuestionIndex >= 0 && currentQuestionIndex < questions.size) {
-            answers[questions[currentQuestionIndex].id] = answer
+            questions[currentQuestionIndex].answer = answer
             highlightAnswer(answer)
         }
-
         nextQuestion()
     }
 
     private fun setupBalanceGame(questionResponses: List<QuestionResponse>) {
         questions = questionResponses.toMutableList()
-        for (questionResponse in questionResponses) {
-            if (questionResponse.answer != null)
-                answers[questionResponse.id] = questionResponse.answer
-        }
         nextQuestion()
+        showLayout(loading = false, error = false)
     }
 
     private fun nextQuestion() {
@@ -143,8 +190,15 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
         btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
 
         if (currentQuestionIndex == questions.size)
-            viewModel.saveAnswers(answers)
+            viewModel.saveAnswers(getAnswers())
         else setupQuestion(questions[currentQuestionIndex])
+    }
+
+    private fun getAnswers(): Map<Int, Boolean> {
+        val answers: MutableMap<Int, Boolean> = mutableMapOf()
+        for (question in questions)
+            answers[question.id] = question.answer!!
+        return answers
     }
 
     private fun previousQuestion() {
@@ -159,52 +213,30 @@ class EditBalanceGameDialog: DialogFragment(), KodeinAware {
     }
 
     private fun setupQuestion(question: QuestionResponse) {
+
         tvEditBalanceGameDescription.text = question.description
         btnEditBalanceGameTopOption.text = question.topOption
         btnEditBalanceGameBottomOption.text = question.bottomOption
 
-        if (answers.containsKey(question.id)) {
-            val answer = answers[question.id]
-            highlightAnswer(answer)
-        } else {
-            btnEditBalanceGameTopOption.setBackgroundColor(Color.GRAY)
-            btnEditBalanceGameBottomOption.setBackgroundColor(Color.GRAY)
-        }
+        if (question.answer != null) highlightAnswer(question.answer)
+        else resetAnswer()
+    }
+
+    private fun resetAnswer() {
+        btnEditBalanceGameTopOption.setBackgroundColor(Color.GRAY)
+        btnEditBalanceGameBottomOption.setBackgroundColor(Color.GRAY)
     }
 
     private fun highlightAnswer(answer: Boolean?) {
-        if (answer == BalanceGameAnswer.TOP) {
+        resetAnswer()
+        if (answer == BalanceGameAnswer.TOP)
             btnEditBalanceGameTopOption.setBackgroundColor(Color.GREEN)
-            btnEditBalanceGameBottomOption.setBackgroundColor(Color.GRAY)
-        } else {
-            btnEditBalanceGameTopOption.setBackgroundColor(Color.GRAY)
-            btnEditBalanceGameBottomOption.setBackgroundColor(Color.GREEN)
-        }
+        else btnEditBalanceGameBottomOption.setBackgroundColor(Color.GREEN)
     }
-
-
 
     companion object {
         const val TAG = "editBalanceGameDialog"
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

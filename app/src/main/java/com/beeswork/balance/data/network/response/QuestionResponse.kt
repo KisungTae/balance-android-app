@@ -5,5 +5,5 @@ data class QuestionResponse(
     val description: String,
     val topOption: String,
     val bottomOption: String,
-    val answer: Boolean?
+    var answer: Boolean?
 )

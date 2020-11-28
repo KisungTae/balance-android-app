@@ -1,57 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/llEditBalanceGame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnEditBalanceGameBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:enabled="false"
-            android:text="back" />
-
-
-        <Button
-            android:id="@+id/btnEditBalanceGameClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="close" />
-
-
-        <Button
-            android:id="@+id/btnEditBalanceGameRefreshQuestion"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="refresh" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnEditBalanceGameBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:enabled="false"
+                android:text="back" />
+
+
+            <Button
+                android:id="@+id/btnEditBalanceGameClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="close" />
+
+
+            <Button
+                android:id="@+id/btnEditBalanceGameRandomQuestion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="random" />
+
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/btnEditBalanceGameTopOption"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tvEditBalanceGameDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btnEditBalanceGameBottomOption"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llEditBalanceGameError"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvEditBalanceGameErrorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="error page"
+            android:textColor="@color/textBlack" />
+
+        <Button
+            android:id="@+id/btnEditBalanceGameSaveAnswers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="save answers" />
+
+        <Button
+            android:id="@+id/btnEditBalanceGameLoadQuestions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="load questions" />
+
+        <Button
+            android:id="@+id/btnEditBalanceGameErrorClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="close"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llEditBalanceGameLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="loading......"
+            android:textColor="@color/textBlack" />
+
 
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/btnEditBalanceGameTopOption"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+</FrameLayout>
 
-    <TextView
-        android:id="@+id/tvEditBalanceGameDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/btnEditBalanceGameBottomOption"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-
-</LinearLayout>

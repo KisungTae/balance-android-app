@@ -129,6 +129,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      32. implement listClick
 //      33. listClick, listClicked, listMatches, uses the fetchedAt from database not store it in sharedPreference
 //      34. move preferences to database, just store information in database rather than sharedPreference
+//      35. top right of swipe is settings not filter, settings include filters
+//      36. changing email is in settings not in profile
 
 
 
