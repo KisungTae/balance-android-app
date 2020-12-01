@@ -8,11 +8,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceGameAnswer
-import com.beeswork.balance.internal.observeOnce
 import kotlinx.android.synthetic.main.dialog_edit_balance_game.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -21,8 +25,7 @@ import org.kodein.di.generic.instance
 class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: EditBalanceGameDialogViewModelFactory by instance()
-    private lateinit var viewModel: EditBalanceGameDialogViewModel
+    private val balanceRepository: BalanceRepository by instance()
 
     private lateinit var questions: MutableList<QuestionResponse>
     private var currentQuestionIndex = -1
@@ -30,10 +33,6 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
-        viewModel = ViewModelProvider(
-            this,
-            viewModelFactory
-        ).get(EditBalanceGameDialogViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -51,117 +50,96 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
     private fun bindUI() {
 
-        setupQuestionsObserver()
-        setupSaveAnswersObserver()
-        setupFetchRandomQuestionObserver()
-
         btnEditBalanceGameTopOption.setOnClickListener { answer(BalanceGameAnswer.TOP) }
         btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
         btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
         btnEditBalanceGameClose.setOnClickListener { dismiss() }
         btnEditBalanceGameRandomQuestion.setOnClickListener { fetchRandomQuestion() }
 
-        btnEditBalanceGameLoadQuestions.setOnClickListener { viewModel.fetchQuestions() }
-        btnEditBalanceGameSaveAnswers.setOnClickListener { viewModel.saveAnswers(getAnswers()) }
+        btnEditBalanceGameErrorFetchQuestions.setOnClickListener { fetchQuestions() }
+        btnEditBalanceGameErrorSaveAnswers.setOnClickListener { saveAnswers() }
         btnEditBalanceGameErrorClose.setOnClickListener {
-            showLayout(loading = false, error = false)
-            if (questions.size <= 0) dismiss()
+            if (btnEditBalanceGameErrorFetchQuestions.visibility == View.VISIBLE)
+                dismiss()
+            else showLayout(loading = false, error = false)
         }
-
-        viewModel.fetchQuestions()
+        fetchQuestions()
     }
 
-    private fun showLayout(loading: Boolean, error: Boolean) {
+    private fun fetchQuestions() {
 
-        llEditBalanceGameLoading.visibility = if (loading) View.VISIBLE else View.GONE
-        llEditBalanceGameError.visibility = if (error) View.VISIBLE else View.GONE
+        showLayout(loading = true, error = false)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = balanceRepository.fetchQuestions()
+            withContext(Dispatchers.Main) {
+                when (response.status) {
+                    Resource.Status.SUCCESS -> {
+                        if (response.data != null) {
+                            setupBalanceGame(response.data)
+                            showLayout(loading = false, error = false)
+                        }
+                    }
+                    Resource.Status.LOADING -> {}
+                    Resource.Status.EXCEPTION -> {
+                        showErrorLayout(
+                            response.exceptionMessage,
+                            showSaveQuestionsBtn = false,
+                            showFetchQuestionsBtn = true
+                        )
+                    }
+                }
+            }
+        }
     }
-
 
     private fun fetchRandomQuestion() {
 
-        val questionIds = ArrayList<Int>(questions.size)
-        for (question in questions)
-            questionIds.add(question.id)
         showLayout(loading = true, error = false)
-        viewModel.fetchRandomQuestion(questionIds)
-    }
 
-    private fun setupFetchRandomQuestionObserver() {
-
-        viewModel.fetchRandomQuestion.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-                    if (it.data != null) {
-                        println("random question: " + it.data)
-                        questions[currentQuestionIndex] = it.data
-                        setupQuestion(it.data)
-                        showLayout(loading = false, error = false)
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = balanceRepository.fetchRandomQuestion(questions.map { it.id })
+            withContext(Dispatchers.Main) {
+                when (response.status) {
+                    Resource.Status.SUCCESS -> {
+                        if (response.data != null) {
+                            questions[currentQuestionIndex] = response.data
+                            setupQuestion(response.data)
+                            showLayout(loading = false, error = false)
+                        }
                     }
-                }
-                Resource.Status.LOADING -> {
-                    showLayout(loading = true, error = false)
-                }
-                Resource.Status.EXCEPTION -> showErrorLayout(
-                    it.exceptionMessage,
-                    showSaveQuestionsBtn = false,
-                    showLoadQuestionsBtn = false
-                )
-            }
-        })
-    }
-
-
-    private fun showErrorLayout(
-        exceptionMessage: String?,
-        showSaveQuestionsBtn: Boolean,
-        showLoadQuestionsBtn: Boolean
-    ) {
-        tvEditBalanceGameErrorMessage.text = exceptionMessage
-        btnEditBalanceGameSaveAnswers.visibility =
-            if (showSaveQuestionsBtn) View.VISIBLE else View.GONE
-        btnEditBalanceGameLoadQuestions.visibility =
-            if (showLoadQuestionsBtn) View.VISIBLE else View.GONE
-        showLayout(loading = false, error = true)
-    }
-
-    private fun setupSaveAnswersObserver() {
-        viewModel.saveAnswers.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-                    println("setupSaveAnswersObserver susccess")
-                    showLayout(loading = false, error = false)
-                    dismiss()
-                }
-                Resource.Status.LOADING -> showLayout(loading = true, error = false)
-                Resource.Status.EXCEPTION -> showErrorLayout(
-                    it.exceptionMessage,
-                    showSaveQuestionsBtn = true,
-                    showLoadQuestionsBtn = false
-                )
-            }
-        })
-    }
-
-    private fun setupQuestionsObserver() {
-        viewModel.questions.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-                    if (it.data != null) {
-                        setupBalanceGame(it.data)
-                        showLayout(loading = false, error = false)
-                    }
-                }
-                Resource.Status.LOADING -> showLayout(loading = true, error = false)
-                Resource.Status.EXCEPTION -> {
-                    showErrorLayout(
-                        it.exceptionMessage,
+                    Resource.Status.LOADING -> {}
+                    Resource.Status.EXCEPTION -> showErrorLayout(
+                        response.exceptionMessage,
                         showSaveQuestionsBtn = false,
-                        showLoadQuestionsBtn = true
+                        showFetchQuestionsBtn = false
                     )
                 }
             }
-        })
+        }
+    }
+
+    private fun saveAnswers() {
+
+        showLayout(loading = true, error = false)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = balanceRepository.saveAnswers(getAnswers())
+            withContext(Dispatchers.Main) {
+                when (response.status) {
+                    Resource.Status.SUCCESS -> {
+                        showLayout(loading = false, error = false)
+                        dismiss()
+                    }
+                    Resource.Status.LOADING -> {}
+                    Resource.Status.EXCEPTION -> showErrorLayout(
+                        response.exceptionMessage,
+                        showSaveQuestionsBtn = true,
+                        showFetchQuestionsBtn = false
+                    )
+                }
+            }
+        }
     }
 
     private fun answer(answer: Boolean) {
@@ -190,7 +168,7 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
         btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
 
         if (currentQuestionIndex == questions.size)
-            viewModel.saveAnswers(getAnswers())
+            saveAnswers()
         else setupQuestion(questions[currentQuestionIndex])
     }
 
@@ -232,6 +210,23 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
         if (answer == BalanceGameAnswer.TOP)
             btnEditBalanceGameTopOption.setBackgroundColor(Color.GREEN)
         else btnEditBalanceGameBottomOption.setBackgroundColor(Color.GREEN)
+    }
+
+    private fun showErrorLayout(
+        exceptionMessage: String?,
+        showSaveQuestionsBtn: Boolean,
+        showFetchQuestionsBtn: Boolean
+    ) {
+        tvEditBalanceGameErrorMessage.text = exceptionMessage
+        btnEditBalanceGameErrorSaveAnswers.visibility = if (showSaveQuestionsBtn) View.VISIBLE else View.GONE
+        btnEditBalanceGameErrorFetchQuestions.visibility = if (showFetchQuestionsBtn) View.VISIBLE else View.GONE
+        showLayout(loading = false, error = true)
+    }
+
+    private fun showLayout(loading: Boolean, error: Boolean) {
+
+        llEditBalanceGameLoading.visibility = if (loading) View.VISIBLE else View.GONE
+        llEditBalanceGameError.visibility = if (error) View.VISIBLE else View.GONE
     }
 
     companion object {

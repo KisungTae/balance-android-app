@@ -16,7 +16,6 @@ import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
-import com.beeswork.balance.ui.profile.EditBalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -41,10 +40,12 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
+        bind() from singleton { instance<BalanceDatabase>().photoDAO() }
 
         // Repository
         bind<BalanceRepository>() with singleton {
             BalanceRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -66,7 +67,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
-        bind() from provider { EditBalanceGameDialogViewModelFactory(instance()) }
 
 
         // Interceptor

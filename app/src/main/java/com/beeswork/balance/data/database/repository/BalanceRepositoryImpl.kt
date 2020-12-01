@@ -26,6 +26,7 @@ class BalanceRepositoryImpl(
     private val fcmTokenDAO: FCMTokenDAO,
     private val clickedDAO: ClickedDAO,
     private val profileDAO: ProfileDAO,
+    private val photoDAO: PhotoDAO,
     private val locationDAO: LocationDAO,
     private val balanceRDS: BalanceRDS,
     private val preferenceProvider: PreferenceProvider
@@ -103,7 +104,8 @@ class BalanceRepositoryImpl(
             val accountId = preferenceProvider.getAccountId()
             val identityToken = preferenceProvider.getIdentityToken()
 
-            val clickResource = balanceRDS.click(accountId, identityToken, swipedId, swipeId, answers)
+            val clickResource =
+                balanceRDS.click(accountId, identityToken, swipedId, swipeId, answers)
 
             if (clickResource.status == Resource.Status.SUCCESS) {
                 val data = clickResource.data!!
@@ -173,7 +175,11 @@ class BalanceRepositoryImpl(
                         fetchedAt = fetchedMatch.updatedAt
 
                     if (matchDAO.existsByChatId(fetchedMatch.chatId)) {
-                        matchDAO.update(fetchedMatch.chatId, fetchedMatch.photoKey, fetchedMatch.unmatched)
+                        matchDAO.update(
+                            fetchedMatch.chatId,
+                            fetchedMatch.photoKey,
+                            fetchedMatch.unmatched
+                        )
                         fetchedMatches.removeAt(i)
                     } else {
                         setNewMatch(fetchedMatch)
@@ -270,7 +276,8 @@ class BalanceRepositoryImpl(
                                 fetchedCards.removeAt(i)
                                 continue
                             }
-                            fetchedCards[i].birthYear = Convert.birthYearToAge(fetchedCards[i].birthYear)
+                            fetchedCards[i].birthYear =
+                                Convert.birthYearToAge(fetchedCards[i].birthYear)
                         }
                     }
 
@@ -312,55 +319,68 @@ class BalanceRepositoryImpl(
             locationDAO.insert(currentLocation)
 
             val response =
-                balanceRDS.postLocation(accountId, identityToken, latitude, longitude, updatedAt.toString())
+                balanceRDS.postLocation(
+                    accountId,
+                    identityToken,
+                    latitude,
+                    longitude,
+                    updatedAt.toString()
+                )
 
             if (response.status == Resource.Status.SUCCESS)
                 locationDAO.sync(updatedAt)
         }
     }
 
-    private val mutableQuestions = MutableLiveData<Resource<List<QuestionResponse>>>()
-    override val questions: LiveData<Resource<List<QuestionResponse>>>
-        get() = mutableQuestions
+    override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyJsonResponse> {
+        return balanceRDS.saveAnswers(
+            preferenceProvider.getAccountId(),
+            preferenceProvider.getIdentityToken(),
+            answers
+        )
+    }
 
-    override fun fetchQuestions() {
+    override suspend fun fetchQuestions(): Resource<List<QuestionResponse>> {
+        return balanceRDS.fetchQuestions(
+            preferenceProvider.getAccountId(),
+            preferenceProvider.getIdentityToken()
+        )
+    }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId()
-            val identityToken = preferenceProvider.getIdentityToken()
-            mutableQuestions.postValue(Resource.loading())
-            val response = balanceRDS.fetchQuestions(accountId, identityToken)
-            mutableQuestions.postValue(response)
-        }
+    override suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionResponse> {
+        return balanceRDS.fetchRandomQuestion(questionIds)
     }
 
 
-    private val mutableSaveAnswers = MutableLiveData<Resource<EmptyJsonResponse>>()
-    override val saveAnswers: LiveData<Resource<EmptyJsonResponse>>
-        get() = mutableSaveAnswers
+//  ################################################################################# //
+//  ##################################### MESSAGE ##################################### //
+//  ################################################################################# //
 
-    override fun saveAnswers(answers: Map<Int, Boolean>) {
+    override suspend fun fetchPhotos(): Resource<List<Photo>> {
 
-        CoroutineScope(Dispatchers.IO).launch {
+        if (photoDAO.existsBySynced(false)) {
+
             val accountId = preferenceProvider.getAccountId()
             val identityToken = preferenceProvider.getIdentityToken()
-            mutableSaveAnswers.postValue(Resource.loading())
-            val response = balanceRDS.saveAnswers(accountId, identityToken, answers)
-            mutableSaveAnswers.postValue(response)
+
+            val response = balanceRDS.fetchPhotos(accountId, identityToken)
+
+            if (response.status == Resource.Status.EXCEPTION)
+                return response
+
+            val photos = response.data
+
+            if (photos == null || photos.isEmpty())
+                photoDAO.deletePhotosIn(listOf(""))
+            else {
+                photoDAO.deletePhotosIn(photos.map { it.key })
+                photos.forEach { it.synced = true }
+                photoDAO.insert(photos)
+            }
+
         }
-    }
 
-    private val mutableFetchRandomQuestion = MutableLiveData<Resource<QuestionResponse>>()
-    override val fetchRandomQuestion: LiveData<Resource<QuestionResponse>>
-        get() = mutableFetchRandomQuestion
-
-    override fun fetchRandomQuestion(questionIds: List<Int>) {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            mutableFetchRandomQuestion.postValue(Resource.loading())
-            val response = balanceRDS.fetchRandomQuestion(questionIds)
-            mutableFetchRandomQuestion.postValue(response)
-        }
+        return Resource.success(photoDAO.getPhotos())
     }
 
 
@@ -376,7 +396,7 @@ class BalanceRepositoryImpl(
     }
 
 
-//  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
+    //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
 //          out of screen.
 //  TEST 2. when update all entries in database, it will update the items in list as well
     override fun insertMessage(chatId: Long) {

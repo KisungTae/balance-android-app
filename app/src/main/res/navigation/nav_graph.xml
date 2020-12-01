@@ -42,10 +42,11 @@
         android:label="ClickedFragment"
         tools:layout="@layout/fragment_clicked" />
 
+
     <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.beeswork.balance.ui.profile.ProfileFragment"
-        android:label="ProfileFragment"
-        tools:layout="@layout/fragment_profile"/>
+        android:id="@+id/accountFragment"
+        android:name="com.beeswork.balance.ui.account.AccountFragment"
+        android:label="AccountFragment"
+        tools:layout="@layout/fragment_account"/>
 
 </navigation>

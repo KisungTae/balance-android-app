@@ -2,6 +2,7 @@ package com.beeswork.balance.data.network
 
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
@@ -23,6 +24,12 @@ const val NETWORK_READ_TIMEOUT = 100L
 const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 interface BalanceService {
+
+    @GET("/photo/list")
+    suspend fun fetchPhotos(
+        @Query(value = "accountId") accountId: String,
+        @Query(value = "identityToken") identityToken: String
+    ): Response<List<Photo>>
 
     @POST("/account/answers")
     suspend fun saveAnswers(@Body saveAnswersRequest: SaveAnswersRequest): Response<EmptyJsonResponse>

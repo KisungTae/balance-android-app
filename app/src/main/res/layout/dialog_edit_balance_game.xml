@@ -77,16 +77,16 @@
             android:textColor="@color/textBlack" />
 
         <Button
-            android:id="@+id/btnEditBalanceGameSaveAnswers"
+            android:id="@+id/btnEditBalanceGameErrorSaveAnswers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="save answers" />
 
         <Button
-            android:id="@+id/btnEditBalanceGameLoadQuestions"
+            android:id="@+id/btnEditBalanceGameErrorFetchQuestions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="load questions" />
+            android:text="fetch questions" />
 
         <Button
             android:id="@+id/btnEditBalanceGameErrorClose"

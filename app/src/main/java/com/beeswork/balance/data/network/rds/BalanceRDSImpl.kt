@@ -2,6 +2,7 @@ package com.beeswork.balance.data.network.rds
 
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.BalanceService
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
@@ -10,6 +11,13 @@ import com.beeswork.balance.internal.Resource
 class BalanceRDSImpl (
     private val balanceService: BalanceService
 ) : BaseRDS(), BalanceRDS {
+
+    override suspend fun fetchPhotos(
+        accountId: String,
+        identityToken: String
+    ): Resource<List<Photo>> {
+        return getResult { balanceService.fetchPhotos(accountId, identityToken) }
+    }
 
     override suspend fun saveAnswers(
         accountId: String,

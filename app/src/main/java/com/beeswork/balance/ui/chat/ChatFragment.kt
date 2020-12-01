@@ -72,4 +72,6 @@ class ChatFragment: ScopeFragment(), KodeinAware {
             }
         })
     }
+
+
 }

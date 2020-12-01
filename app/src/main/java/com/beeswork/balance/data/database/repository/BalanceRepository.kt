@@ -5,6 +5,7 @@ import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Message
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 
@@ -41,15 +42,15 @@ interface BalanceRepository {
 
     fun insertFCMToken(token: String)
 
-    val questions: LiveData<Resource<List<QuestionResponse>>>
-    fun fetchQuestions()
 
-    val saveAnswers: LiveData<Resource<EmptyJsonResponse>>
-    fun saveAnswers(answers: Map<Int, Boolean>)
 
-    val fetchRandomQuestion: LiveData<Resource<QuestionResponse>>
-    fun fetchRandomQuestion(questionIds: List<Int>)
+    suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyJsonResponse>
+    suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionResponse>
+    suspend fun fetchQuestions(): Resource<List<QuestionResponse>>
 
     // location
     fun saveLocation(latitude: Double, longitude: Double)
+
+    // photo
+    suspend fun fetchPhotos(): Resource<List<Photo>>
 }

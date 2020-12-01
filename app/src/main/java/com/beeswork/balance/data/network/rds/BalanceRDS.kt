@@ -3,6 +3,7 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 import org.threeten.bp.OffsetDateTime
@@ -12,6 +13,11 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface BalanceRDS {
+
+    suspend fun fetchPhotos(
+        accountId: String,
+        identityToken: String,
+    ): Resource<List<Photo>>
 
     suspend fun saveAnswers(
         accountId: String,
