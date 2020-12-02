@@ -1,32 +1,29 @@
 package com.beeswork.balance.ui.profile
 
-import android.Manifest
-import android.app.Activity.RESULT_OK
-import android.content.ClipData
-import android.content.ClipDescription
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Canvas
-import android.graphics.Point
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.view.View.DragShadowBuilder
-import android.widget.FrameLayout
-import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.internal.Resource
 import kotlinx.android.synthetic.main.dialog_profile.*
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.closestKodein
+import org.kodein.di.generic.instance
 
 
-class ProfileDialog : DialogFragment(), PhotoUploadOptionDialog.PhotoUploadOptionListener,
+class ProfileDialog : DialogFragment(), KodeinAware, PhotoUploadOptionDialog.PhotoUploadOptionListener,
     PhotoPickerRecyclerViewAdapter.PhotoPickerListener {
+
+    override val kodein by closestKodein()
+    private val balanceRepository: BalanceRepository by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,16 +44,11 @@ class ProfileDialog : DialogFragment(), PhotoUploadOptionDialog.PhotoUploadOptio
     }
 
     private fun bindUI() {
-        
-
-        val photos = mutableListOf("a", "b", "c", "d", "e", "f")
-
-        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(photos, this)
-        rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
-
-        btnChangeItem.setOnClickListener {
-            (rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter).updateItem()
-        }
+        println("bindUI")
+        btnProfileDialogClose.setOnClickListener { dismiss() }
+        btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
+        setupPhotoPickerRecyclerView()
+        fetchPhotos()
 
 
 
@@ -65,11 +57,41 @@ class ProfileDialog : DialogFragment(), PhotoUploadOptionDialog.PhotoUploadOptio
 //        }
     }
 
+    private fun setupPhotoPickerRecyclerView() {
+
+        val photoPickers = mutableListOf<PhotoPicker>()
+        for (i in 0 until MAXIMUM_NUM_OF_PHOTOS) {
+            photoPickers.add(i, PhotoPicker(null, PhotoPicker.Status.EMPTY))
+        }
+        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(photoPickers, this)
+        rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
+    }
+
+    private fun fetchPhotos() {
+
+        val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
+        adapter.showAllLoadingViews()
+        llPhotoPickerGalleryError.visibility = View.GONE
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            val response = balanceRepository.fetchPhotos()
+
+            withContext(Dispatchers.Main) {
+                if (response.status == Resource.Status.EXCEPTION)
+                    llPhotoPickerGalleryError.visibility = View.VISIBLE
+                else if (response.status == Resource.Status.SUCCESS) {
+                    adapter.updateFromPhotos(response.data)
+                }
+            }
+        }
+    }
+
 
     private fun setupPhotoPicker() {
         val photos = mutableListOf("a", "b", "c", "d", "e", "f")
 
-        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(photos, this)
+
         rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
 
 
@@ -127,7 +149,10 @@ class ProfileDialog : DialogFragment(), PhotoUploadOptionDialog.PhotoUploadOptio
 
     companion object {
         const val TAG = "profileDialog"
+        const val MAXIMUM_NUM_OF_PHOTOS = 6
+
     }
+
 
 
 //    private fun setupDragListener() {

@@ -1,26 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/llProfileWrapper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvPhotoPicker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <Button
-            android:id="@+id/btnChangeItem"
+            android:id="@+id/btnProfileDialogClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="change item"/>
+            android:text="close"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPhotoPicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/llPhotoPickerGalleryError"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Error fetching photos" />
+
+                <Button
+                    android:id="@+id/btnProfileDialogReloadPhotos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="reload photos" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
 
         <TextView
             android:layout_width="match_parent"
@@ -77,9 +103,6 @@
             android:layout_marginBottom="10dp"
             android:text="balance game question" />
 
-
     </LinearLayout>
 
-
-</FrameLayout>
-
+</ScrollView>
