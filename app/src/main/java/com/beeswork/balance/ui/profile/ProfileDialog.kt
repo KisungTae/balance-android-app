@@ -1,7 +1,18 @@
 package com.beeswork.balance.ui.profile
 
+import android.Manifest
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.MimeTypeMap
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -9,6 +20,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.RequestCode
+import com.bumptech.glide.Glide
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
+import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.dialog_profile.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +33,13 @@ import kotlinx.coroutines.withContext
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 
 
-class ProfileDialog : DialogFragment(), KodeinAware, PhotoUploadOptionDialog.PhotoUploadOptionListener,
+class ProfileDialog : DialogFragment(), KodeinAware,
+    PhotoUploadOptionDialog.PhotoUploadOptionListener,
     PhotoPickerRecyclerViewAdapter.PhotoPickerListener {
 
     override val kodein by closestKodein()
@@ -44,26 +64,22 @@ class ProfileDialog : DialogFragment(), KodeinAware, PhotoUploadOptionDialog.Pho
     }
 
     private fun bindUI() {
-        println("bindUI")
         btnProfileDialogClose.setOnClickListener { dismiss() }
         btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
         setupPhotoPickerRecyclerView()
-        fetchPhotos()
-
-
-
 //        tvEditBalanceGame.setOnClickListener {
-//            EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
+        //            EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
 //        }
+        fetchPhotos()
     }
 
     private fun setupPhotoPickerRecyclerView() {
 
         val photoPickers = mutableListOf<PhotoPicker>()
         for (i in 0 until MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(i, PhotoPicker(null, PhotoPicker.Status.EMPTY))
+            photoPickers.add(i, PhotoPicker(null, PhotoPicker.Status.EMPTY, null))
         }
-        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(photoPickers, this)
+        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(requireContext(), photoPickers, this)
         rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
     }
 
@@ -81,10 +97,115 @@ class ProfileDialog : DialogFragment(), KodeinAware, PhotoUploadOptionDialog.Pho
                 if (response.status == Resource.Status.EXCEPTION)
                     llPhotoPickerGalleryError.visibility = View.VISIBLE
                 else if (response.status == Resource.Status.SUCCESS) {
-                    adapter.updateFromPhotos(response.data)
+                    llPhotoPickerGalleryError.visibility = View.GONE
+                    adapter.initializePhotoPickers(response.data!!)
                 }
             }
         }
+    }
+
+    override fun onClickAddPhoto() {
+        PhotoUploadOptionDialog(this).show(childFragmentManager, PhotoUploadOptionDialog.TAG)
+    }
+
+    override fun onClickUploadFromGallery() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (hasExternalStoragePermission()) {
+                selectPhotoFromGallery()
+            } else {
+                requestPermissions(
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    RequestCode.READ_PHOTO_FROM_GALLERY
+                )
+            }
+        } else {
+            selectPhotoFromGallery()
+        }
+    }
+
+    private fun hasExternalStoragePermission(): Boolean {
+
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == RequestCode.READ_PHOTO_FROM_GALLERY) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                selectPhotoFromGallery()
+        }
+    }
+
+    private fun selectPhotoFromGallery() {
+
+        val intent = Intent(Intent.ACTION_PICK);
+        intent.type = "image/*"
+        val mimeTypes = arrayOf("image/jpeg", "image/png", "image/jpg")
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        startActivityForResult(intent, RequestCode.READ_PHOTO_FROM_GALLERY)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        when (requestCode) {
+            RequestCode.READ_PHOTO_FROM_GALLERY -> {
+                if (resultCode == RESULT_OK) {
+                    data?.data?.let { uri ->
+                        launchImageCrop(uri)
+                    }
+                }
+            }
+
+            CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                val result = CropImage.getActivityResult(data)
+                if (resultCode == RESULT_OK) {
+                    result.uri?.let { uri ->
+
+                        val photoName =
+                            DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC)) + ".jpeg"
+                        val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
+                        adapter.uploadPhoto(photoName, uri)
+
+                        CoroutineScope(Dispatchers.IO).launch {
+//                            balanceRepository.uploadPhoto(uri.path!!)
+                        }
+
+                        Glide.with(this).load(uri).into(cropImageView)
+                    }
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Log.d("crop image error", "crop error: ${result.error}")
+                }
+            }
+
+        }
+    }
+
+    private fun launchImageCrop(uri: Uri) {
+        CropImage.activity()
+        CropImage.activity(uri)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setAspectRatio(MAX_PHOTO_WIDTH, MAX_PHOTO_HEIGHT)
+            .setAutoZoomEnabled(false)
+            .setFixAspectRatio(true)
+            .setMaxCropResultSize(MAX_PHOTO_WIDTH, MAX_PHOTO_HEIGHT)
+            .setMinCropResultSize(MAX_PHOTO_WIDTH, MAX_PHOTO_HEIGHT)
+            .setCropShape(CropImageView.CropShape.RECTANGLE)
+            .start(requireContext(), this)
+
+    }
+
+    override fun onClickUploadFromCapture() {
+
     }
 
 
@@ -93,8 +214,6 @@ class ProfileDialog : DialogFragment(), KodeinAware, PhotoUploadOptionDialog.Pho
 
 
         rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
-
-
 
 
         val simpleCallback = object : ItemTouchHelper.SimpleCallback(
@@ -135,116 +254,20 @@ class ProfileDialog : DialogFragment(), KodeinAware, PhotoUploadOptionDialog.Pho
         itemTouchHelper.attachToRecyclerView(rvPhotoPicker)
     }
 
-    override fun onUploadFromGallery() {
 
+    override fun onClickDeletePhoto(key: String) {
     }
 
-    override fun onUploadFromCapture() {
-
+    override fun onClickPhotoUploadError(key: String) {
     }
 
-    override fun onClickPhotoPicker() {
-
-    }
 
     companion object {
         const val TAG = "profileDialog"
         const val MAXIMUM_NUM_OF_PHOTOS = 6
+        const val MAX_PHOTO_WIDTH = 1200
+        const val MAX_PHOTO_HEIGHT = 1920
 
     }
-
-
-
-//    private fun setupDragListener() {
-
-
-//
-
-//
-//
-//    override fun onUploadFromGallery() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (hasExternalStoragePermission()) {
-//                selectPhotoFromGallery()
-//            } else {
-//                requestPermissions(
-//                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-//                    RequestCode.READ_PHOTO
-//                )
-//            }
-//        } else {
-//            selectPhotoFromGallery()
-//        }
-//    }
-//
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == RequestCode.READ_PHOTO) {
-//            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//                selectPhotoFromGallery()
-//        }
-//    }
-//
-//    private fun selectPhotoFromGallery() {
-//        val intent = Intent(Intent.ACTION_PICK);
-//        intent.type = "image/*"
-//
-//        startActivityForResult(intent, RequestCode.READ_PHOTO)
-//    }
-//
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//
-//        if (resultCode == RESULT_OK && requestCode == RequestCode.READ_PHOTO) {
-//
-//            for (i in 0 until llPhotoPicker.childCount) {
-//                val view = llPhotoPicker.getChildAt(i) as ImageView
-//                if (!(view.tag as Boolean)) {
-//
-//                }
-//            }
-//        }
-//    }
-//
-//
-//    private fun hasExternalStoragePermission(): Boolean {
-//        return ContextCompat.checkSelfPermission(
-//            requireContext(),
-//            Manifest.permission.READ_EXTERNAL_STORAGE
-//        ) == PackageManager.PERMISSION_GRANTED
-//    }
-//
-//
-//    override fun onUploadFromCapture() {
-//    }
-//
-//    class PhotoTag(
-//        var key: String,
-//        var photoStatus: PhotoStatus
-//    )
-//
-//    enum class PhotoStatus {
-//        EMPTY,
-//        LOADING,
-//        OCCUPIED,
-//        PLACEHOLDER
-//    }
-//
-//    class CustomDragShadowBuilder(
-//        v: View,
-//        private val lastTouch: Point?
-//    ) : View.DragShadowBuilder(v) {
-//
-//        override fun onProvideShadowMetrics(size: Point?, touch: Point) {
-//            println("onProvideShadowMetrics: size: ${size.toString()}")
-//            super.onProvideShadowMetrics(size, touch)
-//
-//            if (lastTouch != null)
-//                touch.set(lastTouch.x, lastTouch.y)
-//        }
-//    }
 
 }

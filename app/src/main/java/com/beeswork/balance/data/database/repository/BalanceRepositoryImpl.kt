@@ -15,6 +15,7 @@ import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.converter.Convert
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
+import java.io.File
 import kotlin.random.Random
 
 
@@ -381,6 +382,11 @@ class BalanceRepositoryImpl(
         }
 
         return Resource.success(photoDAO.getPhotos())
+    }
+
+    override suspend fun uploadPhoto(imagePath: String, imageName: String): Resource<EmptyJsonResponse> {
+
+        return Resource.success(EmptyJsonResponse())
     }
 
 

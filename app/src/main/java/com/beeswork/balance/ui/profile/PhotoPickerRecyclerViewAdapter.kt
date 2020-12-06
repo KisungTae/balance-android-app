@@ -1,6 +1,10 @@
 package com.beeswork.balance.ui.profile
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.media.Image
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -8,10 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.internal.inflate
-import com.beeswork.balance.ui.chat.ChatPagedListAdapter
+import com.bumptech.glide.Glide
 import com.github.ybq.android.spinkit.SpinKitView
+import java.net.URI
 
 class PhotoPickerRecyclerViewAdapter(
+    private val context: Context,
     private val photoPickers: MutableList<PhotoPicker>,
     private val photoPickerListener: PhotoPickerListener
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
@@ -23,13 +29,26 @@ class PhotoPickerRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        when (photoPickers[position].status) {
+        val photoPicker = photoPickers[position]
+
+        when (photoPicker.status) {
+            PhotoPicker.Status.EMPTY -> showLayout(holder.itemView, loading = false, error = false)
             PhotoPicker.Status.LOADING -> showLayout(holder.itemView, loading = true, error = false)
+            PhotoPicker.Status.ERROR -> showLayout(holder.itemView, loading = false, error = true)
+        }
+
+        holder.itemView.tag = photoPicker.key
+
+        val photoImageView = holder.itemView.findViewWithTag<ImageView>("photoPickerPhoto")
+
+        if (photoPicker.uri != null)
+            Glide.with(context).load(photoPicker.uri).into(photoImageView)
+        else if (photoPicker.key != null) {
+
         }
 
 
 
-        println("onBindViewHolder")
         when (position) {
             0 -> holder.itemView.setBackgroundColor(Color.parseColor("#f8b4b4"))
             1 -> holder.itemView.setBackgroundColor(Color.parseColor("#d6d6d6"))
@@ -59,26 +78,61 @@ class PhotoPickerRecyclerViewAdapter(
         }
     }
 
-    fun updateFromPhotos(photos: List<Photo>?) {
+    fun initializePhotoPickers(photos: List<Photo>) {
+
+        for (i in photos.indices) {
+            photoPickers[i].key = photos[i].key
+        }
+
+        for (i in photos.size until photoPickers.size) {
+            photoPickers[i].status = PhotoPicker.Status.EMPTY
+        }
+    }
+
+    fun uploadPhoto(photoName: String, photoUri: Uri) {
+        for (i in photoPickers.indices) {
+            val photoPicker = photoPickers[i]
+            if (photoPicker.status == PhotoPicker.Status.EMPTY) {
+                photoPicker.key = photoName
+                photoPicker.status = PhotoPicker.Status.LOADING
+                photoPicker.uri = photoUri
+                notifyItemChanged(i)
+                break
+            }
+        }
+    }
+
+    fun showPhoto(bitmap: Bitmap) {
 
     }
 
     companion object {
-        private const val PHOTO_PICKER_LOADING_VIEW_TAG = "skvPhotoPickerLoading"
-        private const val PHOTO_PICKER_ERROR_VIEW_TAG = "ivPhotoPickerError"
+        private const val PHOTO_PICKER_PHOTO_VIEW_TAG = "photoPickerPhoto"
+        private const val PHOTO_PICKER_LOADING_VIEW_TAG = "photoPickerLoading"
+        private const val PHOTO_PICKER_ERROR_VIEW_TAG = "photoPickerError"
     }
 
     interface PhotoPickerListener {
-        fun onClickPhotoPicker()
+        fun onClickAddPhoto()
+        fun onClickDeletePhoto(key: String)
+        fun onClickPhotoUploadError(key: String)
     }
 
     class ViewHolder(
         view: View,
         private val photoPickerListener: PhotoPickerListener
-    ) : RecyclerView.ViewHolder(view), View.OnClickListener {
+    ): RecyclerView.ViewHolder(view) {
 
-        override fun onClick(v: View?) {
-            photoPickerListener.onClickPhotoPicker()
+        init {
+            view.findViewWithTag<ImageView>(PHOTO_PICKER_PHOTO_VIEW_TAG).setOnClickListener {
+                val key = (it.parent as View).tag
+                if (key == null) photoPickerListener.onClickAddPhoto()
+                else photoPickerListener.onClickDeletePhoto(key.toString())
+            }
+
+            view.findViewWithTag<ImageView>(PHOTO_PICKER_ERROR_VIEW_TAG).setOnClickListener {
+                println("click on error")
+            }
         }
     }
 

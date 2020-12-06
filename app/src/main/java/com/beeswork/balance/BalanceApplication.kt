@@ -131,6 +131,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      34. move preferences to database, just store information in database rather than sharedPreference
 //      35. top right of swipe is settings not filter, settings include filters
 //      36. changing email is in settings not in profile
+//      37. photopucker recyclerview has scrolling disable it
 
 
 

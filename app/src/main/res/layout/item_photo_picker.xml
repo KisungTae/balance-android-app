@@ -3,11 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="100dp">
 
-
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_baseline_add" />
+        android:src="@drawable/ic_baseline_add"
+        android:tag="photoPickerPhoto" />
 
     <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/spin_kit"
@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:tag="skvPhotoPickerLoading"
+        android:tag="photoPickerLoading"
         android:visibility="gone"
         app:SpinKit_Color="@color/colorAccent" />
 
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/ic_baseline_warning"
-        android:tag="ivPhotoPickerError"
+        android:tag="photoPickerError"
         android:visibility="gone" />
 
 </FrameLayout>

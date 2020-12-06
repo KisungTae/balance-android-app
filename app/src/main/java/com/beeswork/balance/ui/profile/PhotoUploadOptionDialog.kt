@@ -25,11 +25,11 @@ class PhotoUploadOptionDialog(
 
         btnUploadFromGallery.setOnClickListener {
             dismiss()
-            photoUploadOptionListener.onUploadFromGallery()
+            photoUploadOptionListener.onClickUploadFromGallery()
         }
         btnUploadFromCapture.setOnClickListener {
             dismiss()
-            photoUploadOptionListener.onUploadFromCapture()
+            photoUploadOptionListener.onClickUploadFromCapture()
         }
     }
 
@@ -38,7 +38,7 @@ class PhotoUploadOptionDialog(
     }
 
     interface PhotoUploadOptionListener {
-        fun onUploadFromGallery()
-        fun onUploadFromCapture()
+        fun onClickUploadFromGallery()
+        fun onClickUploadFromCapture()
     }
 }
