@@ -132,6 +132,10 @@ class BalanceApplication : Application(), KodeinAware {
 //      35. top right of swipe is settings not filter, settings include filters
 //      36. changing email is in settings not in profile
 //      37. photopucker recyclerview has scrolling disable it
+//      38. check if cropped image stays in data/usr/,,../cache folder
+//      39. when fnished cropping image, saveLocation is called why
+//      40. check what is returned from puploading images to s3
+
 
 
 

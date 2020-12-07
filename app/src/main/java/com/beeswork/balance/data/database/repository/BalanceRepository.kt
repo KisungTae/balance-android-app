@@ -53,5 +53,5 @@ interface BalanceRepository {
 
     // photo
     suspend fun fetchPhotos(): Resource<List<Photo>>
-    suspend fun uploadPhoto(imagePath: String, imageName: String): Resource<EmptyJsonResponse>
+    suspend fun uploadPhoto(photoKey: String, fileType:String, photoUri: String): Resource<EmptyJsonResponse>
 }

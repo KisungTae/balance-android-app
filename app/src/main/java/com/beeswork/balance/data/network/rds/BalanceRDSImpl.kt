@@ -8,9 +8,28 @@ import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 
-class BalanceRDSImpl (
+class BalanceRDSImpl(
     private val balanceService: BalanceService
 ) : BaseRDS(), BalanceRDS {
+
+
+    override suspend fun fetchPreSignedUrl(
+        accountId: String,
+        identityToken: String,
+        photoKey: String,
+        fileType: String
+    ): Resource<PreSignedUrlResponse> {
+        return getResult {
+            balanceService.fetchPreSignedUrl(
+                FetchPreSignedUrlRequest(
+                    accountId,
+                    identityToken,
+                    photoKey,
+                    fileType
+                )
+            )
+        }
+    }
 
     override suspend fun fetchPhotos(
         accountId: String,
@@ -24,7 +43,15 @@ class BalanceRDSImpl (
         identityToken: String,
         answers: Map<Int, Boolean>
     ): Resource<EmptyJsonResponse> {
-        return getResult { balanceService.saveAnswers(SaveAnswersRequest(accountId, identityToken, answers)) }
+        return getResult {
+            balanceService.saveAnswers(
+                SaveAnswersRequest(
+                    accountId,
+                    identityToken,
+                    answers
+                )
+            )
+        }
     }
 
     override suspend fun fetchQuestions(
@@ -45,7 +72,15 @@ class BalanceRDSImpl (
         identityToken: String,
         answers: Map<Int, Boolean>
     ): Resource<EmptyJsonResponse> {
-        return getResult { balanceService.postAnswers(PostAnswersRequest(accountId, identityToken, answers)) }
+        return getResult {
+            balanceService.postAnswers(
+                PostAnswersRequest(
+                    accountId,
+                    identityToken,
+                    answers
+                )
+            )
+        }
     }
 
 

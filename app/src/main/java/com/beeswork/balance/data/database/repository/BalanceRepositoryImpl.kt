@@ -16,6 +16,7 @@ import com.beeswork.balance.internal.converter.Convert
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import java.io.File
+import java.lang.Exception
 import kotlin.random.Random
 
 
@@ -384,7 +385,18 @@ class BalanceRepositoryImpl(
         return Resource.success(photoDAO.getPhotos())
     }
 
-    override suspend fun uploadPhoto(imagePath: String, imageName: String): Resource<EmptyJsonResponse> {
+    override suspend fun uploadPhoto(photoKey: String, fileType: String, photoUri: String): Resource<EmptyJsonResponse> {
+
+        val accountId = preferenceProvider.getAccountId()
+        val identityToken = preferenceProvider.getIdentityToken()
+        val response = balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey, fileType)
+
+        if (response.status == Resource.Status.SUCCESS) {
+            val photoFile = File(photoUri)
+        }
+
+
+
 
         return Resource.success(EmptyJsonResponse())
     }

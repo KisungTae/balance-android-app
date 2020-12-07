@@ -171,13 +171,22 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 if (resultCode == RESULT_OK) {
                     result.uri?.let { uri ->
 
-                        val photoName =
-                            DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC)) + ".jpeg"
+
+                        val contentResolver = requireContext().contentResolver
+
+                        var fileType = MimeTypeMap.getSingleton()
+                            .getExtensionFromMimeType(contentResolver.getType(uri))
+
+                        if (fileType == null)
+                            fileType = "jpeg"
+
+                        val photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
+
                         val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
-                        adapter.uploadPhoto(photoName, uri)
+                        adapter.uploadPhoto("$photoKey.$fileType", uri)
 
                         CoroutineScope(Dispatchers.IO).launch {
-//                            balanceRepository.uploadPhoto(uri.path!!)
+                            balanceRepository.uploadPhoto(photoKey, fileType, uri.path!!)
                         }
 
                         Glide.with(this).load(uri).into(cropImageView)

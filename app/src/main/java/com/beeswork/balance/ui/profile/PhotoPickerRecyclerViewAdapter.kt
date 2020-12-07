@@ -89,11 +89,11 @@ class PhotoPickerRecyclerViewAdapter(
         }
     }
 
-    fun uploadPhoto(photoName: String, photoUri: Uri) {
+    fun uploadPhoto(photoKey: String, photoUri: Uri) {
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
             if (photoPicker.status == PhotoPicker.Status.EMPTY) {
-                photoPicker.key = photoName
+                photoPicker.key = photoKey
                 photoPicker.status = PhotoPicker.Status.LOADING
                 photoPicker.uri = photoUri
                 notifyItemChanged(i)

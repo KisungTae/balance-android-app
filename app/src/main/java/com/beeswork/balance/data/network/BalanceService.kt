@@ -14,16 +14,24 @@ import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 import java.util.concurrent.TimeUnit
 
 const val NETWORK_READ_TIMEOUT = 100L
 const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 interface BalanceService {
+
+    @Multipart
+    @POST("https://s3.ap-northeast-2.amazonaws.com/balance-photo-bucket")
+    suspend fun uploadPhotoToS3(
+
+    ): Response<EmptyJsonResponse>
+
+    @POST("photo/presigned-url")
+    suspend fun fetchPreSignedUrl(
+        @Body fetchPreSignedUrlRequest: FetchPreSignedUrlRequest
+    ): Response<PreSignedUrlResponse>
 
     @GET("/photo/list")
     suspend fun fetchPhotos(
@@ -110,7 +118,8 @@ interface BalanceService {
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("http://10.0.2.2:8080/")
+                .baseUrl("https://nw9pdhgsp6.execute-api.ap-northeast-2.amazonaws.com/prod/balance/")
+//                .baseUrl("http://10.0.2.2:8080/")
 //                .baseUrl("http://localhost:8080/")
 //                .baseUrl("http://192.168.1.100:8081/")
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())

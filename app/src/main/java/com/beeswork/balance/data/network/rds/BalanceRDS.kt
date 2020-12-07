@@ -14,6 +14,17 @@ import retrofit2.http.Query
 
 interface BalanceRDS {
 
+//    suspend fun uploadPhotoToS3(
+//        val headers: Map<String, String>
+//    ): Resource<EmptyJsonResponse>
+
+    suspend fun fetchPreSignedUrl(
+        accountId: String,
+        identityToken: String,
+        photoKey: String,
+        fileType: String
+    ): Resource<PreSignedUrlResponse>
+
     suspend fun fetchPhotos(
         accountId: String,
         identityToken: String,
