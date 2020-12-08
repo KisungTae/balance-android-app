@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.database.repository
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicked
@@ -53,5 +54,5 @@ interface BalanceRepository {
 
     // photo
     suspend fun fetchPhotos(): Resource<List<Photo>>
-    suspend fun uploadPhoto(photoKey: String, fileType:String, photoUri: String): Resource<EmptyJsonResponse>
+    suspend fun uploadPhoto(photoKey: String, photoUri: Uri): Resource<EmptyJsonResponse>
 }

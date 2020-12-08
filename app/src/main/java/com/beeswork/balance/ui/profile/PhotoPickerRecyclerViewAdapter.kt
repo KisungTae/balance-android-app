@@ -63,8 +63,8 @@ class PhotoPickerRecyclerViewAdapter(
 
     private fun showLayout(itemView: View, loading: Boolean, error: Boolean) {
 
-        val loadingView = itemView.findViewWithTag<SpinKitView>(PHOTO_PICKER_LOADING_VIEW_TAG)
-        loadingView.visibility = if (loading) View.VISIBLE else View.GONE
+//        val loadingView = itemView.findViewWithTag<SpinKitView>(PHOTO_PICKER_LOADING_VIEW_TAG)
+//        loadingView.visibility = if (loading) View.VISIBLE else View.GONE
 
         val errorView = itemView.findViewWithTag<ImageView>(PHOTO_PICKER_ERROR_VIEW_TAG)
         errorView.visibility = if (error) View.VISIBLE else View.GONE

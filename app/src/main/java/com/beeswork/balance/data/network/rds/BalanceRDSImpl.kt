@@ -3,29 +3,35 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
-import com.beeswork.balance.data.network.BalanceService
+import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
+import okhttp3.MultipartBody
 
 class BalanceRDSImpl(
-    private val balanceService: BalanceService
+    private val balanceAPI: BalanceAPI
 ) : BaseRDS(), BalanceRDS {
 
+    override suspend fun uploadPhotoToS3(
+        url: String,
+        headers: Map<String, String>,
+        photoFormData: MultipartBody.Part
+    ): Resource<EmptyJsonResponse> {
+        return getResult { balanceAPI.uploadPhotoToS3(headers, url, photoFormData) }
+    }
 
     override suspend fun fetchPreSignedUrl(
         accountId: String,
         identityToken: String,
-        photoKey: String,
-        fileType: String
+        photoKey: String
     ): Resource<PreSignedUrlResponse> {
         return getResult {
-            balanceService.fetchPreSignedUrl(
+            balanceAPI.fetchPreSignedUrl(
                 FetchPreSignedUrlRequest(
                     accountId,
                     identityToken,
-                    photoKey,
-                    fileType
+                    photoKey
                 )
             )
         }
@@ -35,7 +41,7 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String
     ): Resource<List<Photo>> {
-        return getResult { balanceService.fetchPhotos(accountId, identityToken) }
+        return getResult { balanceAPI.fetchPhotos(accountId, identityToken) }
     }
 
     override suspend fun saveAnswers(
@@ -44,7 +50,7 @@ class BalanceRDSImpl(
         answers: Map<Int, Boolean>
     ): Resource<EmptyJsonResponse> {
         return getResult {
-            balanceService.saveAnswers(
+            balanceAPI.saveAnswers(
                 SaveAnswersRequest(
                     accountId,
                     identityToken,
@@ -58,13 +64,13 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String
     ): Resource<List<QuestionResponse>> {
-        return getResult { balanceService.fetchQuestions(accountId, identityToken) }
+        return getResult { balanceAPI.fetchQuestions(accountId, identityToken) }
     }
 
     override suspend fun fetchRandomQuestion(
         questionIds: List<Int>
     ): Resource<QuestionResponse> {
-        return getResult { balanceService.fetchRandomQuestion(questionIds) }
+        return getResult { balanceAPI.fetchRandomQuestion(questionIds) }
     }
 
     override suspend fun postAnswers(
@@ -73,7 +79,7 @@ class BalanceRDSImpl(
         answers: Map<Int, Boolean>
     ): Resource<EmptyJsonResponse> {
         return getResult {
-            balanceService.postAnswers(
+            balanceAPI.postAnswers(
                 PostAnswersRequest(
                     accountId,
                     identityToken,
@@ -98,7 +104,7 @@ class BalanceRDSImpl(
     ): Resource<MutableList<CardResponse>> {
 
         return getResult {
-            balanceService.fetchCards(
+            balanceAPI.fetchCards(
                 accountId,
                 identityToken,
                 minAge,
@@ -120,7 +126,7 @@ class BalanceRDSImpl(
         swipedId: String
     ): Resource<BalanceGameResponse> {
         return getResult {
-            balanceService.swipe(SwipeRequest(accountId, identityToken, swipeId, swipedId))
+            balanceAPI.swipe(SwipeRequest(accountId, identityToken, swipeId, swipedId))
         }
     }
 
@@ -132,7 +138,7 @@ class BalanceRDSImpl(
         answers: Map<Int, Boolean>
     ): Resource<ClickResponse> {
         return getResult {
-            balanceService.click(ClickRequest(accountId, identityToken, swipedId, swipeId, answers))
+            balanceAPI.click(ClickRequest(accountId, identityToken, swipedId, swipeId, answers))
         }
     }
 
@@ -142,7 +148,7 @@ class BalanceRDSImpl(
         token: String
     ): Resource<EmptyJsonResponse> {
         return getResult {
-            balanceService.postFCMToken(FCMTokenRequest(accountId, identityToken, token))
+            balanceAPI.postFCMToken(FCMTokenRequest(accountId, identityToken, token))
         }
     }
 
@@ -152,7 +158,7 @@ class BalanceRDSImpl(
         fetchedAt: String
     ): Resource<MutableList<Match>> {
         return getResult {
-            balanceService.fetchMatches(accountId, identityToken, fetchedAt)
+            balanceAPI.fetchMatches(accountId, identityToken, fetchedAt)
         }
     }
 
@@ -162,7 +168,7 @@ class BalanceRDSImpl(
         fetchedAt: String
     ): Resource<MutableList<Clicked>> {
         return getResult {
-            balanceService.fetchClickedList(accountId, identityToken, fetchedAt)
+            balanceAPI.fetchClickedList(accountId, identityToken, fetchedAt)
         }
     }
 
@@ -174,7 +180,7 @@ class BalanceRDSImpl(
         updatedAt: String
     ): Resource<EmptyJsonResponse> {
         return getResult {
-            balanceService.postLocation(
+            balanceAPI.postLocation(
                 LocationRequest(
                     accountId,
                     identityToken,

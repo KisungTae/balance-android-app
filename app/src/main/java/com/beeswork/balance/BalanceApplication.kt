@@ -3,7 +3,7 @@ package com.beeswork.balance
 import android.app.Application
 import android.content.Context
 import com.beeswork.balance.data.database.BalanceDatabase
-import com.beeswork.balance.data.network.BalanceService
+import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptorImpl
 import com.beeswork.balance.data.network.rds.BalanceRDS
@@ -19,11 +19,15 @@ import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
+import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
 import org.kodein.di.generic.*
+import java.util.concurrent.TimeUnit
 
+const val NETWORK_READ_TIMEOUT = 100L
+const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 class BalanceApplication : Application(), KodeinAware {
     override val kodein = Kodein.lazy {
@@ -72,8 +76,16 @@ class BalanceApplication : Application(), KodeinAware {
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
 
+        bind<OkHttpClient>() with singleton {
+            OkHttpClient.Builder()
+                .addInterceptor(instance())
+                .readTimeout(NETWORK_READ_TIMEOUT, TimeUnit.SECONDS)
+                .connectTimeout(NETWORK_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .build()
+        }
+
         // API
-        bind() from singleton { BalanceService(instance()) }
+        bind() from singleton { BalanceAPI(instance()) }
 
         // NDS
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
@@ -83,6 +95,8 @@ class BalanceApplication : Application(), KodeinAware {
 
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
+
+
 
 
     }

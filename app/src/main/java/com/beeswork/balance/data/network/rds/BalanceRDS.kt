@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
+import okhttp3.MultipartBody
 import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
 import retrofit2.http.GET
@@ -14,15 +15,16 @@ import retrofit2.http.Query
 
 interface BalanceRDS {
 
-//    suspend fun uploadPhotoToS3(
-//        val headers: Map<String, String>
-//    ): Resource<EmptyJsonResponse>
+    suspend fun uploadPhotoToS3(
+        url: String,
+        headers: Map<String, String>,
+        photoFormData: MultipartBody.Part
+    ): Resource<EmptyJsonResponse>
 
     suspend fun fetchPreSignedUrl(
         accountId: String,
         identityToken: String,
-        photoKey: String,
-        fileType: String
+        photoKey: String
     ): Resource<PreSignedUrlResponse>
 
     suspend fun fetchPhotos(

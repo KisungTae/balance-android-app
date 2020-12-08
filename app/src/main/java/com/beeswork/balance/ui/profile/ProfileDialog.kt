@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.profile
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
+import android.content.ContentResolver
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -24,7 +25,6 @@ import com.beeswork.balance.internal.constant.RequestCode
 import com.bumptech.glide.Glide
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.dialog_profile.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +36,7 @@ import org.kodein.di.generic.instance
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
+import java.io.File
 
 
 class ProfileDialog : DialogFragment(), KodeinAware,
@@ -174,19 +175,36 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 
                         val contentResolver = requireContext().contentResolver
 
-                        var fileType = MimeTypeMap.getSingleton()
-                            .getExtensionFromMimeType(contentResolver.getType(uri))
+                        val fileType = contentResolver.getType(uri)
 
-                        if (fileType == null)
-                            fileType = "jpeg"
+                        val uriString = uri.path
 
-                        val photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
+                        var extension: String? = uri.path!!.substring(uri.path!!.lastIndexOf("."))
+
+                        //Check uri format to avoid null
+                        if (uri.scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+                            //If scheme is a content
+                            val mime = MimeTypeMap.getSingleton();
+                            extension = mime.getExtensionFromMimeType(contentResolver.getType(uri))
+                        } else {
+                            //If scheme is a File
+                            //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
+                            extension = MimeTypeMap.getFileExtensionFromUrl(
+                                Uri.fromFile(File(uri.path!!)).toString()
+                            );
+
+                        }
+
+                        println("extension: $extension")
+
+                        val photoKey =
+                            DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC)) + "." + fileType
 
                         val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
-                        adapter.uploadPhoto("$photoKey.$fileType", uri)
+                        adapter.uploadPhoto(photoKey, uri)
 
                         CoroutineScope(Dispatchers.IO).launch {
-                            balanceRepository.uploadPhoto(photoKey, fileType, uri.path!!)
+                            balanceRepository.uploadPhoto(photoKey, uri)
                         }
 
                         Glide.with(this).load(uri).into(cropImageView)

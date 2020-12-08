@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network
+package com.beeswork.balance.data.network.api
 
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
@@ -9,6 +9,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
@@ -17,15 +18,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.util.concurrent.TimeUnit
 
-const val NETWORK_READ_TIMEOUT = 100L
-const val NETWORK_CONNECTION_TIMEOUT = 100L
+//const val NETWORK_READ_TIMEOUT = 100L
+//const val NETWORK_CONNECTION_TIMEOUT = 100L
 
-interface BalanceService {
+interface BalanceAPI {
 
+    @POST
     @Multipart
-    @POST("https://s3.ap-northeast-2.amazonaws.com/balance-photo-bucket")
     suspend fun uploadPhotoToS3(
-
+        @HeaderMap headers: Map<String, String>,
+        @Url url: String,
+        @Part photoFormData: MultipartBody.Part
     ): Response<EmptyJsonResponse>
 
     @POST("photo/presigned-url")
@@ -100,21 +103,13 @@ interface BalanceService {
 
     companion object {
         operator fun invoke(
-            connectivityInterceptor: ConnectivityInterceptor
-        ): BalanceService {
-
-            val okHttpClient = OkHttpClient.Builder()
-                .addInterceptor(connectivityInterceptor)
-                .readTimeout(NETWORK_READ_TIMEOUT, TimeUnit.SECONDS)
-                .connectTimeout(NETWORK_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
-                .build();
+            okHttpClient: OkHttpClient
+        ): BalanceAPI {
 
             val gson = GsonBuilder().registerTypeAdapter(
                 OffsetDateTime::class.java,
                 StringToOffsetDateTimeDeserializer()
             ).create()
-
-
 
             return Retrofit.Builder()
                 .client(okHttpClient)
@@ -125,7 +120,7 @@ interface BalanceService {
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
-                .create(BalanceService::class.java)
+                .create(BalanceAPI::class.java)
         }
     }
 }

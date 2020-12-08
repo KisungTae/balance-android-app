@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.repository
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
@@ -14,9 +15,11 @@ import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.converter.Convert
 import kotlinx.coroutines.*
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import java.io.File
-import java.lang.Exception
 import kotlin.random.Random
 
 
@@ -385,14 +388,22 @@ class BalanceRepositoryImpl(
         return Resource.success(photoDAO.getPhotos())
     }
 
-    override suspend fun uploadPhoto(photoKey: String, fileType: String, photoUri: String): Resource<EmptyJsonResponse> {
+    override suspend fun uploadPhoto(photoKey: String, photoUri: Uri): Resource<EmptyJsonResponse> {
 
         val accountId = preferenceProvider.getAccountId()
         val identityToken = preferenceProvider.getIdentityToken()
-        val response = balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey, fileType)
+        val response = balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey)
 
         if (response.status == Resource.Status.SUCCESS) {
-            val photoFile = File(photoUri)
+
+            val mediaType = MediaType.parse(context.contentResolver.getType(photoUri)!!)
+            val requestBody = RequestBody.create(mediaType, File(photoUri.path!!))
+            val photoFormData = MultipartBody.Part.createFormData("file", photoKey, requestBody)
+            val preSignedUrl = response.data!!
+
+            balanceRDS.uploadPhotoToS3(preSignedUrl.url, preSignedUrl.fields, photoFormData)
+        } else if (response.status == Resource.Status.EXCEPTION) {
+            println("exception thrown: ${response.exceptionMessage}")
         }
 
 
