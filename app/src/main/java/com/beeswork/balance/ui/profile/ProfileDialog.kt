@@ -2,7 +2,6 @@ package com.beeswork.balance.ui.profile
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
-import android.content.ContentResolver
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -30,13 +29,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
-import java.io.File
+import java.util.*
 
 
 class ProfileDialog : DialogFragment(), KodeinAware,
@@ -172,33 +172,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 if (resultCode == RESULT_OK) {
                     result.uri?.let { uri ->
 
-
-                        val contentResolver = requireContext().contentResolver
-
-                        val fileType = contentResolver.getType(uri)
-
-                        val uriString = uri.path
-
-                        var extension: String? = uri.path!!.substring(uri.path!!.lastIndexOf("."))
-
-                        //Check uri format to avoid null
-                        if (uri.scheme.equals(ContentResolver.SCHEME_CONTENT)) {
-                            //If scheme is a content
-                            val mime = MimeTypeMap.getSingleton();
-                            extension = mime.getExtensionFromMimeType(contentResolver.getType(uri))
-                        } else {
-                            //If scheme is a File
-                            //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
-                            extension = MimeTypeMap.getFileExtensionFromUrl(
-                                Uri.fromFile(File(uri.path!!)).toString()
-                            );
-
-                        }
-
-                        println("extension: $extension")
-
-                        val photoKey =
-                            DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC)) + "." + fileType
+                        val photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
 
                         val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
                         adapter.uploadPhoto(photoKey, uri)

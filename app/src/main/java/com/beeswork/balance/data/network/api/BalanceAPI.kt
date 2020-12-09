@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -26,9 +27,9 @@ interface BalanceAPI {
     @POST
     @Multipart
     suspend fun uploadPhotoToS3(
-        @HeaderMap headers: Map<String, String>,
         @Url url: String,
-        @Part photoFormData: MultipartBody.Part
+        @PartMap formData: Map<String, RequestBody>,
+        @Part photo: MultipartBody.Part
     ): Response<EmptyJsonResponse>
 
     @POST("photo/presigned-url")

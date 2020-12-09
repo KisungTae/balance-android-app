@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
@@ -15,10 +16,10 @@ class BalanceRDSImpl(
 
     override suspend fun uploadPhotoToS3(
         url: String,
-        headers: Map<String, String>,
-        photoFormData: MultipartBody.Part
+        formData: Map<String, RequestBody>,
+        photo: MultipartBody.Part
     ): Resource<EmptyJsonResponse> {
-        return getResult { balanceAPI.uploadPhotoToS3(headers, url, photoFormData) }
+        return getResult { balanceAPI.uploadPhotoToS3(url, formData, photo) }
     }
 
     override suspend fun fetchPreSignedUrl(

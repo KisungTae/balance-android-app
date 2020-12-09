@@ -7,6 +7,7 @@ import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
 import retrofit2.http.GET
@@ -17,8 +18,8 @@ interface BalanceRDS {
 
     suspend fun uploadPhotoToS3(
         url: String,
-        headers: Map<String, String>,
-        photoFormData: MultipartBody.Part
+        formData: Map<String, RequestBody>,
+        photo: MultipartBody.Part
     ): Resource<EmptyJsonResponse>
 
     suspend fun fetchPreSignedUrl(

@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.repository
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
@@ -20,6 +21,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import java.io.File
+import java.util.*
 import kotlin.random.Random
 
 
@@ -394,14 +396,25 @@ class BalanceRepositoryImpl(
         val identityToken = preferenceProvider.getIdentityToken()
         val response = balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey)
 
+        println(response)
+
         if (response.status == Resource.Status.SUCCESS) {
 
-            val mediaType = MediaType.parse(context.contentResolver.getType(photoUri)!!)
-            val requestBody = RequestBody.create(mediaType, File(photoUri.path!!))
-            val photoFormData = MultipartBody.Part.createFormData("file", photoKey, requestBody)
             val preSignedUrl = response.data!!
 
-            balanceRDS.uploadPhotoToS3(preSignedUrl.url, preSignedUrl.fields, photoFormData)
+
+            val formData = mutableMapOf<String, RequestBody>()
+            for ((key, value) in preSignedUrl.fields) {
+                formData[key] = RequestBody.create(MultipartBody.FORM, value)
+            }
+
+            val photoExtension = MimeTypeMap.getFileExtensionFromUrl(photoUri.toString())
+            val mediaType = MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)!!)
+
+            val requestBody = RequestBody.create(mediaType, File(photoUri.path!!))
+            val photo = MultipartBody.Part.createFormData("file", photoKey, requestBody)
+
+            balanceRDS.uploadPhotoToS3(preSignedUrl.url, formData, photo)
         } else if (response.status == Resource.Status.EXCEPTION) {
             println("exception thrown: ${response.exceptionMessage}")
         }
