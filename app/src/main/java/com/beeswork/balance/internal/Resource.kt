@@ -15,7 +15,7 @@ class Resource<out T>(
     }
 
     companion object {
-        fun <T> success(data: T): Resource<T> {
+        fun <T> success(data: T?): Resource<T> {
             return Resource(Status.SUCCESS, data, null, null, null)
         }
 

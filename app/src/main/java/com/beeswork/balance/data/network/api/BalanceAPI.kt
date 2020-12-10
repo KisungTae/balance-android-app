@@ -12,7 +12,9 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import org.threeten.bp.OffsetDateTime
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -28,7 +30,7 @@ interface BalanceAPI {
     @Multipart
     suspend fun uploadPhotoToS3(
         @Url url: String,
-        @PartMap formData: Map<String, RequestBody>,
+        @PartMap formData: Map<String, @JvmSuppressWildcards RequestBody>,
         @Part photo: MultipartBody.Part
     ): Response<EmptyJsonResponse>
 

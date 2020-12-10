@@ -17,7 +17,7 @@ abstract class BaseRDS {
             val response = call()
 
             if (response.isSuccessful)
-                return Resource.success(response.body()!!)
+                return Resource.success(response.body())
 
             val exceptionResponse =
                 Gson().fromJson(response.errorBody()?.string(), ExceptionResponse::class.java)

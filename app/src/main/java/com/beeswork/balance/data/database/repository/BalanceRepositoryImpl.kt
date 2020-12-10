@@ -390,29 +390,38 @@ class BalanceRepositoryImpl(
         return Resource.success(photoDAO.getPhotos())
     }
 
-    override suspend fun uploadPhoto(photoKey: String, photoUri: Uri): Resource<EmptyJsonResponse> {
+
+
+    override suspend fun uploadPhoto(
+        photoKey: String,
+        photoExtension: String,
+        photoUri: Uri
+    ): Resource<EmptyJsonResponse> {
 
         val accountId = preferenceProvider.getAccountId()
         val identityToken = preferenceProvider.getIdentityToken()
         val response = balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey)
 
-        println(response)
-
         if (response.status == Resource.Status.SUCCESS) {
 
             val preSignedUrl = response.data!!
-
 
             val formData = mutableMapOf<String, RequestBody>()
             for ((key, value) in preSignedUrl.fields) {
                 formData[key] = RequestBody.create(MultipartBody.FORM, value)
             }
 
-            val photoExtension = MimeTypeMap.getFileExtensionFromUrl(photoUri.toString())
-            val mediaType = MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)!!)
+            val mediaType = MediaType.parse(
+                MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)!!
+            )
 
-            val requestBody = RequestBody.create(mediaType, File(photoUri.path!!))
+            val photoFile = File(photoUri.path!!)
+            val requestBody = RequestBody.create(mediaType, photoFile)
             val photo = MultipartBody.Part.createFormData("file", photoKey, requestBody)
+
+            val photoSize = photoFile.length() / 1024
+            println("photo size: $photoSize")
+            
 
             balanceRDS.uploadPhotoToS3(preSignedUrl.url, formData, photo)
         } else if (response.status == Resource.Status.EXCEPTION) {

@@ -14,13 +14,13 @@ fun <T, A> resourceLiveData (
     emit(Resource.loading<T>())
 
     val source = databaseQuery.invoke().map { Resource.success(it) }
-    emitSource(source)
+//    emitSource(source)
 
     val responseStatus = networkCall.invoke()
     if (responseStatus.status == Resource.Status.SUCCESS) {
         saveCallResult(responseStatus.data!!)
     } else if (responseStatus.status == Resource.Status.EXCEPTION) {
         emit(Resource.exception<T>(responseStatus.exceptionMessage!!, "", null))
-        emitSource(source)
+//        emitSource(source)
     }
 }
