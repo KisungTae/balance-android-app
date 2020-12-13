@@ -149,6 +149,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      38. check if cropped image stays in data/usr/,,../cache folder
 //      39. when fnished cropping image, saveLocation is called why
 //      40. check what is returned from puploading images to s3
+//      41. change url and other logic related to s3 becuase I deploy cloudFront, acl:public-read in lambda
 
 
 

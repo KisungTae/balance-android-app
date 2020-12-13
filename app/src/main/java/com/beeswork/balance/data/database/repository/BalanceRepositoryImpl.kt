@@ -15,13 +15,14 @@ import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.converter.Convert
+import com.beeswork.balance.internal.exception.PhotoOutOfSizeException
+import id.zelory.compressor.Compressor
 import kotlinx.coroutines.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import java.io.File
-import java.util.*
 import kotlin.random.Random
 
 
@@ -391,47 +392,53 @@ class BalanceRepositoryImpl(
     }
 
 
-
     override suspend fun uploadPhoto(
         photoKey: String,
         photoExtension: String,
         photoUri: Uri
     ): Resource<EmptyJsonResponse> {
 
+        val photoFile = Compressor.compress(context, File(photoUri.path!!))
+
+        if (photoFile.length() > Photo.MAX_SIZE)
+            throw PhotoOutOfSizeException()
+
+        photoDAO.insert(Photo(photoKey, Long.MAX_VALUE, false))
+
         val accountId = preferenceProvider.getAccountId()
         val identityToken = preferenceProvider.getIdentityToken()
-        val response = balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey)
+        val fetchPreSignedUrlResponse =
+            balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey)
 
-        if (response.status == Resource.Status.SUCCESS) {
+        if (fetchPreSignedUrlResponse.status == Resource.Status.SUCCESS) {
 
-            val preSignedUrl = response.data!!
+            val preSignedUrl = fetchPreSignedUrlResponse.data!!
+
+            photoDAO.sync(preSignedUrl.sequence, true, photoKey)
 
             val formData = mutableMapOf<String, RequestBody>()
+
             for ((key, value) in preSignedUrl.fields) {
                 formData[key] = RequestBody.create(MultipartBody.FORM, value)
             }
+
+//            formData["x-amz-acl"] = RequestBody.create(MultipartBody.FORM, "public-read")
 
             val mediaType = MediaType.parse(
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)!!
             )
 
-            val photoFile = File(photoUri.path!!)
             val requestBody = RequestBody.create(mediaType, photoFile)
             val photo = MultipartBody.Part.createFormData("file", photoKey, requestBody)
 
-            val photoSize = photoFile.length() / 1024
-            println("photo size: $photoSize")
-            
+            return balanceRDS.uploadPhotoToS3(preSignedUrl.url, formData, photo)
 
-            balanceRDS.uploadPhotoToS3(preSignedUrl.url, formData, photo)
-        } else if (response.status == Resource.Status.EXCEPTION) {
-            println("exception thrown: ${response.exceptionMessage}")
+        } else {
+            return Resource.exception(
+                fetchPreSignedUrlResponse.exceptionMessage,
+                fetchPreSignedUrlResponse.exceptionCode
+            )
         }
-
-
-
-
-        return Resource.success(EmptyJsonResponse())
     }
 
 

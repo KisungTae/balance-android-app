@@ -24,8 +24,14 @@ class Resource<out T>(
             exceptionCode: String,
             fieldErrorMessages: Map<String, String>?
         ): Resource<T> {
-
             return Resource(Status.EXCEPTION, null, exceptionMessage, exceptionCode, fieldErrorMessages)
+        }
+
+        fun <T> exception(
+            exceptionMessage: String?,
+            exceptionCode: String?,
+        ): Resource<T> {
+            return Resource(Status.EXCEPTION, null, exceptionMessage, exceptionCode, null)
         }
 
         fun <T> loading(): Resource<T> {

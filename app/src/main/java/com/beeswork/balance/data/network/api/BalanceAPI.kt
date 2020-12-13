@@ -28,6 +28,7 @@ interface BalanceAPI {
 
     @POST
     @Multipart
+//    @Headers("x-amz-acl: public-read")
     suspend fun uploadPhotoToS3(
         @Url url: String,
         @PartMap formData: Map<String, @JvmSuppressWildcards RequestBody>,

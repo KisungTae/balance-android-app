@@ -19,7 +19,8 @@ import java.net.URI
 class PhotoPickerRecyclerViewAdapter(
     private val context: Context,
     private val photoPickers: MutableList<PhotoPicker>,
-    private val photoPickerListener: PhotoPickerListener
+    private val photoPickerListener: PhotoPickerListener,
+    private val accountId: String
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,6 +36,7 @@ class PhotoPickerRecyclerViewAdapter(
             PhotoPicker.Status.EMPTY -> showLayout(holder.itemView, loading = false, error = false)
             PhotoPicker.Status.LOADING -> showLayout(holder.itemView, loading = true, error = false)
             PhotoPicker.Status.ERROR -> showLayout(holder.itemView, loading = false, error = true)
+            PhotoPicker.Status.UPLOADED -> showLayout(holder.itemView, loading = false, error = false)
         }
 
         holder.itemView.tag = photoPicker.key
@@ -44,6 +46,7 @@ class PhotoPickerRecyclerViewAdapter(
         if (photoPicker.uri != null)
             Glide.with(context).load(photoPicker.uri).into(photoImageView)
         else if (photoPicker.key != null) {
+
 
         }
 
@@ -63,8 +66,8 @@ class PhotoPickerRecyclerViewAdapter(
 
     private fun showLayout(itemView: View, loading: Boolean, error: Boolean) {
 
-//        val loadingView = itemView.findViewWithTag<SpinKitView>(PHOTO_PICKER_LOADING_VIEW_TAG)
-//        loadingView.visibility = if (loading) View.VISIBLE else View.GONE
+        val loadingView = itemView.findViewWithTag<SpinKitView>(PHOTO_PICKER_LOADING_VIEW_TAG)
+        loadingView.visibility = if (loading) View.VISIBLE else View.GONE
 
         val errorView = itemView.findViewWithTag<ImageView>(PHOTO_PICKER_ERROR_VIEW_TAG)
         errorView.visibility = if (error) View.VISIBLE else View.GONE
@@ -102,6 +105,28 @@ class PhotoPickerRecyclerViewAdapter(
         }
     }
 
+    fun deletePhoto(photoKey: String) {
+        val photoToDelete = photoPickers.find { it.key == photoKey }
+        photoPickers.remove(photoToDelete)
+
+        if (photoPickers.size < PhotoPicker.MAXIMUM_NUM_OF_PHOTOS)
+            photoPickers.add(PhotoPicker.empty())
+    }
+
+    fun onPhotoUploaded(photoKey: String) {
+        updatePhotoPickerStatus(photoKey, PhotoPicker.Status.UPLOADED)
+    }
+
+    fun onPhotoUploadError(photoKey: String) {
+        updatePhotoPickerStatus(photoKey, PhotoPicker.Status.ERROR)
+    }
+
+    private fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
+        val photoPicker = photoPickers.find { it.key == photoKey }
+        photoPicker?.status = photoPickerStatus
+        notifyItemChanged(photoPickers.indexOf(photoPicker))
+    }
+
     fun showPhoto(bitmap: Bitmap) {
 
     }
@@ -110,6 +135,7 @@ class PhotoPickerRecyclerViewAdapter(
         private const val PHOTO_PICKER_PHOTO_VIEW_TAG = "photoPickerPhoto"
         private const val PHOTO_PICKER_LOADING_VIEW_TAG = "photoPickerLoading"
         private const val PHOTO_PICKER_ERROR_VIEW_TAG = "photoPickerError"
+        private const val BALANCE_PHOTO_BUCKET_URL = "https://balance-photo-bucket.s3.ap-northeast-2.amazonaws.com"
     }
 
     interface PhotoPickerListener {

@@ -18,9 +18,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.exception.PhotoOutOfSizeException
+import com.beeswork.balance.internal.provider.PreferenceProvider
+import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.bumptech.glide.Glide
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
@@ -29,14 +33,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
 
 
 class ProfileDialog : DialogFragment(), KodeinAware,
@@ -45,6 +47,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 
     override val kodein by closestKodein()
     private val balanceRepository: BalanceRepository by instance()
+    private val preferenceProvider: PreferenceProvider by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,17 +80,24 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     private fun setupPhotoPickerRecyclerView() {
 
         val photoPickers = mutableListOf<PhotoPicker>()
-        for (i in 0 until MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(i, PhotoPicker(null, PhotoPicker.Status.EMPTY, null))
+        for (i in 0 until PhotoPicker.MAXIMUM_NUM_OF_PHOTOS) {
+            photoPickers.add(PhotoPicker.empty())
         }
-        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(requireContext(), photoPickers, this)
+
+        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
+            requireContext(),
+            photoPickers,
+            this,
+            preferenceProvider.getAccountId()
+        )
+
         rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
     }
 
     private fun fetchPhotos() {
 
         val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
-        adapter.showAllLoadingViews()
+//        adapter.showAllLoadingViews()
         llPhotoPickerGalleryError.visibility = View.GONE
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -172,7 +182,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 if (resultCode == RESULT_OK) {
                     result.uri?.let { uri ->
 
-                        var photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
+                        var photoKey =
+                            DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
                         val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
                         photoKey = photoKey.replace(".", "")
                         photoKey = "$photoKey.$photoExtension"
@@ -181,7 +192,31 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                         adapter.uploadPhoto(photoKey, uri)
 
                         CoroutineScope(Dispatchers.IO).launch {
-                            balanceRepository.uploadPhoto(photoKey, photoExtension, uri)
+                            try {
+                                val response =
+                                    balanceRepository.uploadPhoto(photoKey, photoExtension, uri)
+
+                                withContext(Dispatchers.Main) {
+                                    if (response.status == Resource.Status.SUCCESS) {
+                                        adapter.onPhotoUploaded(photoKey)
+                                    } else if (response.status == Resource.Status.EXCEPTION) {
+                                        adapter.onPhotoUploadError(photoKey)
+                                    }
+                                }
+
+
+                            } catch (e: PhotoOutOfSizeException) {
+
+                                val exceptionMessage =
+                                    getString(e.exceptionCode, Photo.maxInMB())
+
+                                ExceptionDialog(exceptionMessage).show(
+                                    childFragmentManager,
+                                    ExceptionDialog.TAG
+                                )
+
+                                adapter.deletePhoto(photoKey)
+                            }
                         }
 
                         Glide.with(this).load(uri).into(cropImageView)
@@ -198,11 +233,11 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         CropImage.activity()
         CropImage.activity(uri)
             .setGuidelines(CropImageView.Guidelines.ON)
-            .setAspectRatio(MAX_PHOTO_WIDTH, MAX_PHOTO_HEIGHT)
+            .setAspectRatio(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
             .setAutoZoomEnabled(false)
             .setFixAspectRatio(true)
-            .setMaxCropResultSize(MAX_PHOTO_WIDTH, MAX_PHOTO_HEIGHT)
-            .setMinCropResultSize(MAX_PHOTO_WIDTH, MAX_PHOTO_HEIGHT)
+            .setMaxCropResultSize(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
+            .setMinCropResultSize(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
             .setCropShape(CropImageView.CropShape.RECTANGLE)
             .start(requireContext(), this)
 
@@ -268,9 +303,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 
     companion object {
         const val TAG = "profileDialog"
-        const val MAXIMUM_NUM_OF_PHOTOS = 6
-        const val MAX_PHOTO_WIDTH = 1200
-        const val MAX_PHOTO_HEIGHT = 1920
+
 
     }
 

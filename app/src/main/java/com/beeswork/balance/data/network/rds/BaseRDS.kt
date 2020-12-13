@@ -31,20 +31,17 @@ abstract class BaseRDS {
         } catch (e: SocketTimeoutException) {
             return Resource.exception(
                 e.message ?: "",
-                ExceptionCode.SOCKET_TIMEOUT_EXCEPTION,
-                null
+                ExceptionCode.SOCKET_TIMEOUT_EXCEPTION
             )
         } catch (e: NoInternetConnectivityException) {
             return Resource.exception(
                 e.message ?: "",
-                ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION,
-                null
+                ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION
             )
         } catch (e: Exception) {
             return Resource.exception(
                 e.message ?: "",
-                ExceptionCode.EXCEPTION,
-                null
+                ExceptionCode.EXCEPTION
             )
         }
     }

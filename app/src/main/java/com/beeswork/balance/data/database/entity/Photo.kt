@@ -1,8 +1,8 @@
 package com.beeswork.balance.data.database.entity
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import kotlin.math.pow
 
 @Entity(tableName = "photo")
 data class Photo(
@@ -12,4 +12,14 @@ data class Photo(
 
     val sequence: Long,
     var synced: Boolean,
-)
+) {
+    companion object {
+
+        const val MAX_SIZE = 1048576
+
+        fun maxInMB(): Int {
+            val divider = 1024.0.pow(2.0)
+            return (MAX_SIZE / divider).toInt()
+        }
+    }
+}

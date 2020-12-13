@@ -15,4 +15,15 @@ data class PhotoPicker(
         ERROR,
         UPLOADED
     }
+
+    companion object {
+
+        const val MAXIMUM_NUM_OF_PHOTOS = 6
+        const val MAX_PHOTO_WIDTH = 1200
+        const val MAX_PHOTO_HEIGHT = 1920
+
+        fun empty(): PhotoPicker {
+            return PhotoPicker(null, PhotoPicker.Status.EMPTY, null)
+        }
+    }
 }

@@ -15,11 +15,11 @@ interface PhotoDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(photos: List<Photo>)
 
-    @Query("select * from photo")
+    @Query("select * from photo order by sequence")
     fun getPhotos(): List<Photo>
 
-    @Query("update photo set synced = 1 where `key` = :key")
-    fun sync(key: String)
+    @Query("update photo set sequence = :sequence, synced = :synced where `key` = :key")
+    fun sync(sequence: Long, synced: Boolean, key: String)
 
     @Query("select exists (select * from photo where synced = :synced)")
     fun existsBySynced(synced: Boolean): Boolean
