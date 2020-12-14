@@ -28,12 +28,12 @@ interface BalanceAPI {
 
     @POST
     @Multipart
-//    @Headers("x-amz-acl: public-read")
+//    @Headers(value = ["Content-Type: multipart/form-data"])
     suspend fun uploadPhotoToS3(
         @Url url: String,
         @PartMap formData: Map<String, @JvmSuppressWildcards RequestBody>,
         @Part photo: MultipartBody.Part
-    ): Response<EmptyJsonResponse>
+    ): Response<ResponseBody>
 
     @POST("photo/presigned-url")
     suspend fun fetchPreSignedUrl(

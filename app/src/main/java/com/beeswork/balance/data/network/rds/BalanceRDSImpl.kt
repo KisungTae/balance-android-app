@@ -23,7 +23,8 @@ class BalanceRDSImpl(
         formData: Map<String, RequestBody>,
         photo: MultipartBody.Part
     ): Resource<EmptyJsonResponse> {
-        return getResult { balanceAPI.uploadPhotoToS3(url, formData, photo) }
+        val response = getResult { balanceAPI.uploadPhotoToS3(url, formData, photo) }
+        return getResult { balanceAPI.postFCMToken(FCMTokenRequest("", "", "")) }
     }
 
     override suspend fun fetchPreSignedUrl(
