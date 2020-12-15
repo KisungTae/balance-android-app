@@ -33,7 +33,7 @@ interface BalanceAPI {
         @Url url: String,
         @PartMap formData: Map<String, @JvmSuppressWildcards RequestBody>,
         @Part photo: MultipartBody.Part
-    ): Response<ResponseBody>
+    ): Response<EmptyJsonResponse>
 
     @POST("photo/presigned-url")
     suspend fun fetchPreSignedUrl(

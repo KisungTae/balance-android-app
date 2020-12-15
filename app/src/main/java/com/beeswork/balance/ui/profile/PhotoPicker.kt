@@ -13,7 +13,7 @@ data class PhotoPicker(
         EMPTY,
         LOADING,
         ERROR,
-        UPLOADED
+        OCCUPIED
     }
 
     companion object {

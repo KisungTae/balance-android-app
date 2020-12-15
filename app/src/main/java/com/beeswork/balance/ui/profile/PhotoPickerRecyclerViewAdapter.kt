@@ -3,7 +3,7 @@ package com.beeswork.balance.ui.profile
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.media.Image
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +13,14 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.internal.inflate
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.github.ybq.android.spinkit.SpinKitView
-import java.net.URI
 
 class PhotoPickerRecyclerViewAdapter(
     private val context: Context,
@@ -28,6 +34,9 @@ class PhotoPickerRecyclerViewAdapter(
         return ViewHolder(parent.inflate(R.layout.item_photo_picker), photoPickerListener)
     }
 
+//    TODO: uploding, deleting, downloading, and deleted column in photo, if sync false then send all phjotos and if deleted true then remove it from databse
+//    downloading and uploading error different error pic?
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val photoPicker = photoPickers[position]
@@ -36,7 +45,7 @@ class PhotoPickerRecyclerViewAdapter(
             PhotoPicker.Status.EMPTY -> showLayout(holder.itemView, loading = false, error = false)
             PhotoPicker.Status.LOADING -> showLayout(holder.itemView, loading = true, error = false)
             PhotoPicker.Status.ERROR -> showLayout(holder.itemView, loading = false, error = true)
-            PhotoPicker.Status.UPLOADED -> showLayout(holder.itemView, loading = false, error = false)
+            PhotoPicker.Status.OCCUPIED -> showLayout(holder.itemView, loading = false, error = false)
         }
 
         holder.itemView.tag = photoPicker.key
@@ -46,7 +55,40 @@ class PhotoPickerRecyclerViewAdapter(
         if (photoPicker.uri != null)
             Glide.with(context).load(photoPicker.uri).into(photoImageView)
         else if (photoPicker.key != null) {
+            val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}1"
+            val options = RequestOptions().centerCrop()
+//                .placeholder(R.drawable.default_avatar)
+//                .error(R.drawable.default_avatar)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH);
 
+            Glide.with(context).load(photoUrl).apply(options).listener(object :
+                RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+
+                    photoPicker.status = PhotoPicker.Status.ERROR
+
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+
+                    photoPicker.status = PhotoPicker.Status.OCCUPIED
+
+                    return false
+                }
+            }).into(photoImageView)
 
         }
 
@@ -114,7 +156,7 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun onPhotoUploaded(photoKey: String) {
-        updatePhotoPickerStatus(photoKey, PhotoPicker.Status.UPLOADED)
+        updatePhotoPickerStatus(photoKey, PhotoPicker.Status.OCCUPIED)
     }
 
     fun onPhotoUploadError(photoKey: String) {

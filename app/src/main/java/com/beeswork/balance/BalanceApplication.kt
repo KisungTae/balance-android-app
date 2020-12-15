@@ -150,6 +150,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      39. when fnished cropping image, saveLocation is called why
 //      40. check what is returned from puploading images to s3
 //      41. change url and other logic related to s3 becuase I deploy cloudFront, acl:public-read in lambda
+//      42. cropped image when there is not enough space in memory or storage, handle exception outofstorage or osmething
 
 
 
