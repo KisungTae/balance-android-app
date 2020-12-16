@@ -71,39 +71,28 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         btnProfileDialogClose.setOnClickListener { dismiss() }
         btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
         setupPhotoPickerRecyclerView()
+        fetchPhotos()
 //        tvEditBalanceGame.setOnClickListener {
         //            EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
 //        }
-        fetchPhotos()
+
     }
 
     private fun setupPhotoPickerRecyclerView() {
 
-        val photoPickers = mutableListOf<PhotoPicker>()
-        for (i in 0 until PhotoPicker.MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(PhotoPicker.empty())
-        }
-
         rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
             requireContext(),
-            photoPickers,
             this,
             preferenceProvider.getAccountId()
         )
-
         rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
     }
 
     private fun fetchPhotos() {
-
         val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
-//        adapter.showAllLoadingViews()
         llPhotoPickerGalleryError.visibility = View.GONE
-
         CoroutineScope(Dispatchers.IO).launch {
-
             val response = balanceRepository.fetchPhotos()
-
             withContext(Dispatchers.Main) {
                 if (response.status == Resource.Status.EXCEPTION)
                     llPhotoPickerGalleryError.visibility = View.VISIBLE

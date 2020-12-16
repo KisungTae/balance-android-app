@@ -12,13 +12,16 @@ data class PhotoPicker(
     enum class Status {
         EMPTY,
         LOADING,
-        ERROR,
+        DOWNLOADING,
+        UPLOADING,
+        UPLOAD_ERROR,
+        DOWNLOAD_ERROR,
         OCCUPIED
     }
 
     companion object {
 
-        const val MAXIMUM_NUM_OF_PHOTOS = 6
+
         const val MAX_PHOTO_WIDTH = 1200
         const val MAX_PHOTO_HEIGHT = 1920
 

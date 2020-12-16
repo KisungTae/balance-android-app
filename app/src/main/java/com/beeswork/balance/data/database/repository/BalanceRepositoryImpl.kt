@@ -379,15 +379,13 @@ class BalanceRepositoryImpl(
             val photos = response.data
 
             if (photos == null || photos.isEmpty())
-                photoDAO.deletePhotosIn(listOf(""))
+                photoDAO.deletePhotosNotIn(listOf(""))
             else {
-                photoDAO.deletePhotosIn(photos.map { it.key })
+                photoDAO.deletePhotosNotIn(photos.map { it.key })
                 photos.forEach { it.synced = true }
                 photoDAO.insert(photos)
             }
-
         }
-
         return Resource.success(photoDAO.getPhotos())
     }
 
