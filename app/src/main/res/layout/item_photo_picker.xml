@@ -23,7 +23,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/ic_baseline_warning"
-        android:tag="photoPickerError"
+        android:tag="photoPickerDownloadError"
         android:visibility="gone" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_baseline_error"
+        android:tag="photoPickerUploadError"
+        android:visibility="gone" />
+
+
 
 </FrameLayout>

@@ -23,6 +23,8 @@ class ExceptionCode {
         const val SWIPED_NOT_FOUND_EXCEPTION = "swiped.not.found.exception"
         const val SWIPED_BLOCKED_EXCEPTION = "swiped.blocked.exception"
 
+
+        const val PHOTO_OUT_OF_SIZE_EXCEPTION = "photo_size_out_of_exception"
     }
 
 }

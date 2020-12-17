@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -45,8 +46,8 @@ class PhotoPickerRecyclerViewAdapter(
         holder.itemView.tag = photoPicker.key
 
         when (photoPicker.status) {
-            PhotoPicker.Status.EMPTY -> showLayout(holder.itemView, loading = false, error = false)
-            PhotoPicker.Status.LOADING -> showLayout(holder.itemView, loading = true, error = false)
+            PhotoPicker.Status.EMPTY -> showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
+            PhotoPicker.Status.LOADING -> showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
             PhotoPicker.Status.UPLOADING -> {
                 if (photoPicker.uri != null) {
                     val ivPhotoPickerPhoto =
@@ -54,16 +55,12 @@ class PhotoPickerRecyclerViewAdapter(
                     Glide.with(context).load(photoPicker.uri)
                         .apply(glideRequestOptions())
                         .into(ivPhotoPickerPhoto)
-                    showLayout(holder.itemView, loading = true, error = false)
+                    showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
                 }
             }
-            PhotoPicker.Status.UPLOAD_ERROR -> println("upload error")
-            PhotoPicker.Status.DOWNLOAD_ERROR -> println("download error")
-            PhotoPicker.Status.OCCUPIED -> showLayout(
-                holder.itemView,
-                loading = false,
-                error = false
-            )
+            PhotoPicker.Status.UPLOAD_ERROR -> showLayout(holder.itemView, View.GONE, View.VISIBLE, View.GONE)
+            PhotoPicker.Status.DOWNLOAD_ERROR -> showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
+            PhotoPicker.Status.OCCUPIED -> showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
             PhotoPicker.Status.DOWNLOADING -> {
                 if (photoPicker.key != null) {
                     val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}"
@@ -79,9 +76,8 @@ class PhotoPickerRecyclerViewAdapter(
                                 target: Target<Drawable>?,
                                 isFirstResource: Boolean
                             ): Boolean {
-
                                 photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
-
+                                showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
                                 return false
                             }
 
@@ -92,9 +88,8 @@ class PhotoPickerRecyclerViewAdapter(
                                 dataSource: DataSource?,
                                 isFirstResource: Boolean
                             ): Boolean {
-
                                 photoPicker.status = PhotoPicker.Status.OCCUPIED
-
+                                showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
                                 return false
                             }
                         }).into(ivPhotoPickerPhoto)
@@ -118,17 +113,18 @@ class PhotoPickerRecyclerViewAdapter(
 
     }
 
-    private fun showLayout(itemView: View, loading: Boolean, error: Boolean) {
-
-        val loadingView = itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING_TAG)
-        loadingView.visibility = if (loading) View.VISIBLE else View.GONE
-
-        val errorView = itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_ERROR_TAG)
-        errorView.visibility = if (error) View.VISIBLE else View.GONE
+    private fun showLayout(
+        itemView: View,
+        loading: Int,
+        uploadError: Int,
+        downloadError: Int
+    ) {
+        itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING_TAG).visibility = loading
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR_TAG).visibility = uploadError
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG).visibility = downloadError
     }
 
     fun initializePhotoPickers(photos: List<Photo>) {
-
         for (i in photos.indices) {
             val photoPicker = photoPickers[i]
             photoPicker.status = PhotoPicker.Status.DOWNLOADING
@@ -171,15 +167,17 @@ class PhotoPickerRecyclerViewAdapter(
 
     private fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
         val photoPicker = photoPickers.find { it.key == photoKey }
-        photoPicker?.status = photoPickerStatus
-        notifyItemChanged(photoPickers.indexOf(photoPicker))
+        if (photoPicker != null) {
+            photoPicker.status = photoPickerStatus
+            notifyItemChanged(photoPickers.indexOf(photoPicker))
+        }
     }
-
 
     companion object {
         private const val IV_PHOTO_PICKER_PHOTO_TAG = "photoPickerPhoto"
         private const val SKV_PHOTO_PICKER_LOADING_TAG = "photoPickerLoading"
-        private const val IV_PHOTO_PICKER_ERROR_TAG = "photoPickerError"
+        private const val IV_PHOTO_PICKER_UPLOAD_ERROR_TAG = "photoPickerUploadError"
+        private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG = "photoPickerDownloadError"
         private const val BALANCE_PHOTO_BUCKET_URL =
             "https://balance-photo-bucket.s3.ap-northeast-2.amazonaws.com"
         private const val MAXIMUM_NUM_OF_PHOTOS = 6
@@ -203,8 +201,12 @@ class PhotoPickerRecyclerViewAdapter(
                 else photoPickerListener.onClickDeletePhoto(key.toString())
             }
 
-            view.findViewWithTag<ImageView>(IV_PHOTO_PICKER_ERROR_TAG).setOnClickListener {
+            view.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR_TAG).setOnClickListener {
                 println("click on error")
+            }
+
+            view.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG).setOnClickListener {
+
             }
         }
     }

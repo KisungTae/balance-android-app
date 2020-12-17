@@ -9,12 +9,7 @@ import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
 import kotlinx.android.synthetic.main.dialog_exception.*
 
-class ExceptionDialog(private val exceptionMessage: String) : DialogFragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
-    }
+class ExceptionDialog(private val exceptionMessage: String?) : DialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,

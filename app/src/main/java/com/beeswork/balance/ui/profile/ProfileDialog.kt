@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,11 +20,10 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.RequestCode
-import com.beeswork.balance.internal.exception.PhotoOutOfSizeException
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ExceptionDialog
-import com.bumptech.glide.Glide
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.dialog_profile.*
@@ -79,13 +77,13 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     private fun setupPhotoPickerRecyclerView() {
-
         rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
             requireContext(),
             this,
             preferenceProvider.getAccountId()
         )
-        rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
+        rvPhotoPicker.layoutManager =
+            GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM)
     }
 
     private fun fetchPhotos() {
@@ -109,23 +107,16 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     override fun onClickUploadFromGallery() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (hasExternalStoragePermission()) {
-                selectPhotoFromGallery()
-            } else {
-                requestPermissions(
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    RequestCode.READ_PHOTO_FROM_GALLERY
-                )
-            }
-        } else {
-            selectPhotoFromGallery()
-        }
+            if (hasExternalStoragePermission()) selectPhotoFromGallery()
+            else requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                RequestCode.READ_PHOTO_FROM_GALLERY
+            )
+        } else selectPhotoFromGallery()
     }
 
     private fun hasExternalStoragePermission(): Boolean {
-
         return ContextCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -137,16 +128,15 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == RequestCode.READ_PHOTO_FROM_GALLERY) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                selectPhotoFromGallery()
-        }
+        if (requestCode == RequestCode.READ_PHOTO_FROM_GALLERY &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        )
+            selectPhotoFromGallery()
     }
 
     private fun selectPhotoFromGallery() {
-
         val intent = Intent(Intent.ACTION_PICK);
         intent.type = "image/*"
         val mimeTypes = arrayOf("image/jpeg", "image/png", "image/jpg")
@@ -156,66 +146,49 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
         when (requestCode) {
             RequestCode.READ_PHOTO_FROM_GALLERY -> {
-                if (resultCode == RESULT_OK) {
-                    data?.data?.let { uri ->
-                        launchImageCrop(uri)
-                    }
-                }
+                if (resultCode == RESULT_OK)
+                    data?.data?.let { uri -> launchImageCrop(uri) }
             }
-
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val result = CropImage.getActivityResult(data)
-                if (resultCode == RESULT_OK) {
-                    result.uri?.let { uri ->
+                if (resultCode == RESULT_OK)
+                    result.uri?.let { uri -> uploadPhoto(uri) }
+                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE)
+                    ExceptionDialog(result.error.localizedMessage).show(
+                        childFragmentManager,
+                        ExceptionDialog.TAG
+                    )
+            }
+        }
+    }
 
-                        var photoKey =
-                            DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
-                        val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
-                        photoKey = photoKey.replace(".", "")
-                        photoKey = "$photoKey.$photoExtension"
+    private fun uploadPhoto(uri: Uri) {
+        val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+        val photoKey = "${generatePhotoKey()}.$photoExtension"
+        val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
+        adapter.uploadPhoto(photoKey, uri)
 
-                        val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
-                        adapter.uploadPhoto(photoKey, uri)
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-                                val response =
-                                    balanceRepository.uploadPhoto(photoKey, photoExtension, uri)
-
-                                withContext(Dispatchers.Main) {
-                                    if (response.status == Resource.Status.SUCCESS) {
-                                        adapter.onPhotoUploaded(photoKey)
-                                    } else if (response.status == Resource.Status.EXCEPTION) {
-                                        adapter.onPhotoUploadError(photoKey)
-                                    }
-                                }
-
-
-                            } catch (e: PhotoOutOfSizeException) {
-
-                                val exceptionMessage =
-                                    getString(e.exceptionCode, Photo.maxInMB())
-
-                                ExceptionDialog(exceptionMessage).show(
-                                    childFragmentManager,
-                                    ExceptionDialog.TAG
-                                )
-
-                                adapter.deletePhoto(photoKey)
-                            }
-                        }
-
-                        Glide.with(this).load(uri).into(cropImageView)
-                    }
-                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    Log.d("crop image error", "crop error: ${result.error}")
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = balanceRepository.uploadPhoto(photoKey, photoExtension, uri)
+            withContext(Dispatchers.Main) {
+                if (response.status == Resource.Status.SUCCESS) {
+                    adapter.onPhotoUploaded(photoKey)
+                } else if (response.status == Resource.Status.EXCEPTION) {
+                    var exceptionMessage = response.exceptionMessage
+                    if (response.exceptionCode == ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
+                        exceptionMessage = getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
+                    ExceptionDialog(exceptionMessage).show(childFragmentManager, ExceptionDialog.TAG)
+                    adapter.onPhotoUploadError(photoKey)
                 }
             }
-
         }
+    }
+
+    private fun generatePhotoKey(): String {
+        val photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
+        return photoKey.replace(".", "")
     }
 
     private fun launchImageCrop(uri: Uri) {
@@ -229,7 +202,6 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             .setMinCropResultSize(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
             .setCropShape(CropImageView.CropShape.RECTANGLE)
             .start(requireContext(), this)
-
     }
 
     override fun onClickUploadFromCapture() {
@@ -292,8 +264,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 
     companion object {
         const val TAG = "profileDialog"
-
-
+        const val PHOTO_PICKER_GALLERY_COLUMN_NUM = 3
     }
 
 }

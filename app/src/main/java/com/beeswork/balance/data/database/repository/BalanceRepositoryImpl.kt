@@ -13,9 +13,9 @@ import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.converter.Convert
-import com.beeswork.balance.internal.exception.PhotoOutOfSizeException
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.*
 import okhttp3.MediaType
@@ -399,7 +399,7 @@ class BalanceRepositoryImpl(
         val photoFile = Compressor.compress(context, File(photoUri.path!!))
 
         if (photoFile.length() > Photo.MAX_SIZE)
-            throw PhotoOutOfSizeException()
+            return Resource.exception(null, ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
 
         photoDAO.insert(Photo(photoKey, Long.MAX_VALUE, false))
 
@@ -419,8 +419,6 @@ class BalanceRepositoryImpl(
             for ((key, value) in preSignedUrl.fields) {
                 formData[key] = RequestBody.create(MultipartBody.FORM, value)
             }
-
-//            formData["x-amz-acl"] = RequestBody.create(MultipartBody.FORM, "public-read")
 
             val mediaType = MediaType.parse(
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)!!
