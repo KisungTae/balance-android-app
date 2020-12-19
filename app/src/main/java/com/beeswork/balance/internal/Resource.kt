@@ -8,6 +8,18 @@ class Resource<out T>(
     val fieldErrorMessages: Map<String, String>?
 ) {
 
+    fun isSuccess(): Boolean {
+        return this.status == Status.SUCCESS
+    }
+
+    fun isLoading(): Boolean {
+        return this.status == Status.LOADING
+    }
+
+    fun isException(): Boolean {
+        return this.status == Status.EXCEPTION
+    }
+
     enum class Status {
         SUCCESS,
         EXCEPTION,

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="100dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/holo_purple"
+        android:clickable="false"
         android:src="@drawable/ic_baseline_add"
         android:tag="photoPickerPhoto" />
 
@@ -15,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:alpha="0.5"
         android:tag="photoPickerLoading"
         android:visibility="gone"
         app:SpinKit_Color="@color/colorAccent" />
@@ -22,6 +27,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="false"
         android:src="@drawable/ic_baseline_warning"
         android:tag="photoPickerDownloadError"
         android:visibility="gone" />
@@ -29,6 +35,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="false"
         android:src="@drawable/ic_baseline_error"
         android:tag="photoPickerUploadError"
         android:visibility="gone" />

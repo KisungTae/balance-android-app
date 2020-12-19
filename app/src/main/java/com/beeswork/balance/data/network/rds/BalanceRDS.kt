@@ -16,6 +16,12 @@ import retrofit2.http.Query
 
 interface BalanceRDS {
 
+    suspend fun deletePhoto(
+        accountId: String,
+        identityToken: String,
+        photoKey: String
+    ): Resource<EmptyJsonResponse>
+
     suspend fun uploadPhotoToS3(
         url: String,
         formData: Map<String, RequestBody>,

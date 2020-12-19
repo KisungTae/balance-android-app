@@ -18,12 +18,18 @@ interface PhotoDAO {
     @Query("select * from photo order by sequence")
     fun getPhotos(): List<Photo>
 
-    @Query("update photo set sequence = :sequence, synced = :synced where `key` = :key")
-    fun sync(sequence: Long, synced: Boolean, key: String)
+    @Query("update photo set sequence = :sequence, synced = 1 where `key` = :photoKey")
+    fun sync(sequence: Long, photoKey: String)
+
+    @Query("update photo set synced = :synced where `key` = :photoKey")
+    fun sync(photoKey: String, synced: Boolean)
 
     @Query("select exists (select * from photo where synced = :synced)")
     fun existsBySynced(synced: Boolean): Boolean
 
     @Query("delete from photo where `key` not in (:photoIds)")
     fun deletePhotosNotIn(photoIds: List<String>)
+
+    @Query("delete from photo where `key` = :photoKey")
+    fun deletePhoto(photoKey: String)
 }

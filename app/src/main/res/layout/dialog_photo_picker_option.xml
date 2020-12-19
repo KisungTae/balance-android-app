@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btnPhotoErrorUpload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="다시업로드"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnPhotoErrorDownload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="다시다운로드"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnUploadPhotoFromGallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="upload from gallery"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnUploadPhotoFromCapture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="upload from capture"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnPhotoErrorDelete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="삭제하기"
+        android:visibility="gone" />
+
+</LinearLayout>

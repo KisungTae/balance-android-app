@@ -412,7 +412,7 @@ class BalanceRepositoryImpl(
 
             val preSignedUrl = fetchPreSignedUrlResponse.data!!
 
-            photoDAO.sync(preSignedUrl.sequence, true, photoKey)
+            photoDAO.sync(preSignedUrl.sequence, photoKey)
 
             val formData = mutableMapOf<String, RequestBody>()
 
@@ -435,6 +435,17 @@ class BalanceRepositoryImpl(
                 fetchPreSignedUrlResponse.exceptionCode
             )
         }
+    }
+
+    override suspend fun deletePhoto(photoKey: String): Resource<EmptyJsonResponse> {
+        val accountId = preferenceProvider.getAccountId()
+        val identityToken = preferenceProvider.getIdentityToken()
+        photoDAO.sync(photoKey, false)
+        val response = balanceRDS.deletePhoto(accountId, identityToken, photoKey)
+        if (response.isSuccess())
+            photoDAO.deletePhoto(photoKey)
+
+        return response
     }
 
 

@@ -26,9 +26,13 @@ import java.util.concurrent.TimeUnit
 
 interface BalanceAPI {
 
+    @POST("photo/delete")
+    suspend fun deletePhoto(
+        @Body deletePhotoRequest: DeletePhotoRequest
+    ): Response<EmptyJsonResponse>
+
     @POST
     @Multipart
-//    @Headers(value = ["Content-Type: multipart/form-data"])
     suspend fun uploadPhotoToS3(
         @Url url: String,
         @PartMap formData: Map<String, @JvmSuppressWildcards RequestBody>,

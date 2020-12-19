@@ -18,6 +18,22 @@ class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), BalanceRDS {
 
+    override suspend fun deletePhoto(
+        accountId: String,
+        identityToken: String,
+        photoKey: String
+    ): Resource<EmptyJsonResponse> {
+        return getResult {
+            balanceAPI.deletePhoto(
+                DeletePhotoRequest(
+                    accountId,
+                    identityToken,
+                    photoKey
+                )
+            )
+        }
+    }
+
     override suspend fun uploadPhotoToS3(
         url: String,
         formData: Map<String, RequestBody>,

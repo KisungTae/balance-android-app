@@ -40,8 +40,8 @@ import org.threeten.bp.format.DateTimeFormatter
 
 
 class ProfileDialog : DialogFragment(), KodeinAware,
-    PhotoUploadOptionDialog.PhotoUploadOptionListener,
-    PhotoPickerRecyclerViewAdapter.PhotoPickerListener {
+    PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
+    PhotoPickerOptionDialog.PhotoPickerOptionListener {
 
     override val kodein by closestKodein()
     private val balanceRepository: BalanceRepository by instance()
@@ -63,13 +63,13 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindUI()
+        fetchPhotos()
     }
 
     private fun bindUI() {
         btnProfileDialogClose.setOnClickListener { dismiss() }
         btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
         setupPhotoPickerRecyclerView()
-        fetchPhotos()
 //        tvEditBalanceGame.setOnClickListener {
         //            EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
 //        }
@@ -87,7 +87,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     private fun fetchPhotos() {
-        val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
+        val adapter = photoPickerRecyclerViewAdapter()
         llPhotoPickerGalleryError.visibility = View.GONE
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.fetchPhotos()
@@ -100,20 +100,6 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 }
             }
         }
-    }
-
-    override fun onClickAddPhoto() {
-        PhotoUploadOptionDialog(this).show(childFragmentManager, PhotoUploadOptionDialog.TAG)
-    }
-
-    override fun onClickUploadFromGallery() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (hasExternalStoragePermission()) selectPhotoFromGallery()
-            else requestPermissions(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                RequestCode.READ_PHOTO_FROM_GALLERY
-            )
-        } else selectPhotoFromGallery()
     }
 
     private fun hasExternalStoragePermission(): Boolean {
@@ -167,20 +153,24 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     private fun uploadPhoto(uri: Uri) {
         val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
         val photoKey = "${generatePhotoKey()}.$photoExtension"
-        val adapter = rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
+        val adapter = photoPickerRecyclerViewAdapter()
         adapter.uploadPhoto(photoKey, uri)
 
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.uploadPhoto(photoKey, photoExtension, uri)
             withContext(Dispatchers.Main) {
                 if (response.status == Resource.Status.SUCCESS) {
-                    adapter.onPhotoUploaded(photoKey)
+                    adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.OCCUPIED)
                 } else if (response.status == Resource.Status.EXCEPTION) {
                     var exceptionMessage = response.exceptionMessage
                     if (response.exceptionCode == ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
-                        exceptionMessage = getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
-                    ExceptionDialog(exceptionMessage).show(childFragmentManager, ExceptionDialog.TAG)
-                    adapter.onPhotoUploadError(photoKey)
+                        exceptionMessage =
+                            getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
+                    ExceptionDialog(exceptionMessage).show(
+                        childFragmentManager,
+                        ExceptionDialog.TAG
+                    )
+                    adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.UPLOAD_ERROR)
                 }
             }
         }
@@ -204,14 +194,59 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             .start(requireContext(), this)
     }
 
-    override fun onClickUploadFromCapture() {
+    override fun onClickPhotoPicker(photoKey: String?, photoPickerStatus: PhotoPicker.Status) {
+        PhotoPickerOptionDialog(this, photoKey, photoPickerStatus).show(
+            childFragmentManager,
+            PhotoPickerOptionDialog.TAG
+        )
+    }
 
+    override fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
+        photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
+            photoKey,
+            PhotoPicker.Status.LOADING
+        )
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = balanceRepository.deletePhoto(photoKey)
+            if (response.isSuccess()) {
+                photoPickerRecyclerViewAdapter().deletePhoto(photoKey)
+            } else if (response.isException()) {
+                photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
+                    photoKey,
+                    photoPickerStatus
+                )
+            }
+        }
+    }
+
+    override fun onUploadPhoto(photoKey: String) {
+
+    }
+
+    override fun onDownloadPhoto(photoKey: String) {
+        photoPickerRecyclerViewAdapter().downloadPhoto(photoKey)
+    }
+
+    override fun onUploadPhotoFromGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (hasExternalStoragePermission()) selectPhotoFromGallery()
+            else requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                RequestCode.READ_PHOTO_FROM_GALLERY
+            )
+        } else selectPhotoFromGallery()
+    }
+
+    override fun onUploadPhotoFromCapture() {
+
+    }
+
+    private fun photoPickerRecyclerViewAdapter(): PhotoPickerRecyclerViewAdapter {
+        return rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
     }
 
 
     private fun setupPhotoPicker() {
-        val photos = mutableListOf("a", "b", "c", "d", "e", "f")
-
 
         rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
 
@@ -255,16 +290,10 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
 
-    override fun onClickDeletePhoto(key: String) {
-    }
-
-    override fun onClickPhotoUploadError(key: String) {
-    }
-
-
     companion object {
         const val TAG = "profileDialog"
         const val PHOTO_PICKER_GALLERY_COLUMN_NUM = 3
     }
+
 
 }

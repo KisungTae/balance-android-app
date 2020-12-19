@@ -37,7 +37,18 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(parent.inflate(R.layout.item_photo_picker), photoPickerListener)
+        val view = parent.inflate(R.layout.item_photo_picker)
+        view.setOnClickListener {
+            val photoKey = it.tag
+            if (photoKey == null)
+                photoPickerListener.onClickPhotoPicker(null, PhotoPicker.Status.EMPTY)
+            else  {
+                val photoPicker = photoPickers.find { p -> p.key == view.tag.toString() }
+                if (photoPicker != null)
+                    photoPickerListener.onClickPhotoPicker(photoPicker.key, photoPicker.status)
+            }
+        }
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -47,7 +58,12 @@ class PhotoPickerRecyclerViewAdapter(
 
         when (photoPicker.status) {
             PhotoPicker.Status.EMPTY -> showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
-            PhotoPicker.Status.LOADING -> showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
+            PhotoPicker.Status.LOADING -> showLayout(
+                holder.itemView,
+                View.VISIBLE,
+                View.GONE,
+                View.GONE
+            )
             PhotoPicker.Status.UPLOADING -> {
                 if (photoPicker.uri != null) {
                     val ivPhotoPickerPhoto =
@@ -58,14 +74,30 @@ class PhotoPickerRecyclerViewAdapter(
                     showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
                 }
             }
-            PhotoPicker.Status.UPLOAD_ERROR -> showLayout(holder.itemView, View.GONE, View.VISIBLE, View.GONE)
-            PhotoPicker.Status.DOWNLOAD_ERROR -> showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
-            PhotoPicker.Status.OCCUPIED -> showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
+            PhotoPicker.Status.UPLOAD_ERROR -> showLayout(
+                holder.itemView,
+                View.GONE,
+                View.VISIBLE,
+                View.GONE
+            )
+            PhotoPicker.Status.DOWNLOAD_ERROR -> showLayout(
+                holder.itemView,
+                View.GONE,
+                View.GONE,
+                View.VISIBLE
+            )
+            PhotoPicker.Status.OCCUPIED -> showLayout(
+                holder.itemView,
+                View.GONE,
+                View.GONE,
+                View.GONE
+            )
             PhotoPicker.Status.DOWNLOADING -> {
                 if (photoPicker.key != null) {
-                    val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}"
+                    val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}1"
                     val ivPhotoPickerPhoto =
                         holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
+                    showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
 
                     Glide.with(context).load(photoUrl)
                         .apply(glideRequestOptions())
@@ -106,11 +138,6 @@ class PhotoPickerRecyclerViewAdapter(
         return RequestOptions().centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .priority(Priority.HIGH)
-    }
-
-
-    private fun downloadPhoto() {
-
     }
 
     private fun showLayout(
@@ -157,15 +184,15 @@ class PhotoPickerRecyclerViewAdapter(
             photoPickers.add(PhotoPicker.empty())
     }
 
-    fun onPhotoUploaded(photoKey: String) {
-        updatePhotoPickerStatus(photoKey, PhotoPicker.Status.OCCUPIED)
+    fun downloadPhoto(photoKey: String) {
+        val photoPicker = photoPickers.find { it.key == photoKey }
+        if (photoPicker != null) {
+            photoPicker.status = PhotoPicker.Status.DOWNLOADING
+            notifyItemChanged(photoPickers.indexOf(photoPicker))
+        }
     }
 
-    fun onPhotoUploadError(photoKey: String) {
-        updatePhotoPickerStatus(photoKey, PhotoPicker.Status.UPLOAD_ERROR)
-    }
-
-    private fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
+    fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
         val photoPicker = photoPickers.find { it.key == photoKey }
         if (photoPicker != null) {
             photoPicker.status = photoPickerStatus
@@ -184,31 +211,11 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     interface PhotoPickerListener {
-        fun onClickAddPhoto()
-        fun onClickDeletePhoto(key: String)
-        fun onClickPhotoUploadError(key: String)
+        fun onClickPhotoPicker(photoKey: String?, photoPickerStatus: PhotoPicker.Status)
     }
 
     class ViewHolder(
-        view: View,
-        private val photoPickerListener: PhotoPickerListener
-    ) : RecyclerView.ViewHolder(view) {
-
-        init {
-            view.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG).setOnClickListener {
-                val key = (it.parent as View).tag
-                if (key == null) photoPickerListener.onClickAddPhoto()
-                else photoPickerListener.onClickDeletePhoto(key.toString())
-            }
-
-            view.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR_TAG).setOnClickListener {
-                println("click on error")
-            }
-
-            view.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG).setOnClickListener {
-
-            }
-        }
-    }
+        view: View
+    ) : RecyclerView.ViewHolder(view)
 
 }
