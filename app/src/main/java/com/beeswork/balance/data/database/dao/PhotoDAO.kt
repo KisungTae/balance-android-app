@@ -27,6 +27,9 @@ interface PhotoDAO {
     @Query("select exists (select * from photo where synced = :synced)")
     fun existsBySynced(synced: Boolean): Boolean
 
+    @Query("select count(*) from photo")
+    fun count(): Int
+
     @Query("delete from photo where `key` not in (:photoIds)")
     fun deletePhotosNotIn(photoIds: List<String>)
 

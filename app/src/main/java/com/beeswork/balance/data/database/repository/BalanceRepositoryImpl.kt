@@ -23,6 +23,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import java.io.File
+import java.lang.Exception
 import kotlin.random.Random
 
 
@@ -366,7 +367,7 @@ class BalanceRepositoryImpl(
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
 
-        if (photoDAO.existsBySynced(false)) {
+        if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
 
             val accountId = preferenceProvider.getAccountId()
             val identityToken = preferenceProvider.getIdentityToken()
@@ -442,7 +443,7 @@ class BalanceRepositoryImpl(
         val identityToken = preferenceProvider.getIdentityToken()
         photoDAO.sync(photoKey, false)
         val response = balanceRDS.deletePhoto(accountId, identityToken, photoKey)
-        if (response.isSuccess())
+        if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
             photoDAO.deletePhoto(photoKey)
 
         return response

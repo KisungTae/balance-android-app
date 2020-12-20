@@ -29,11 +29,13 @@ class PhotoPickerOptionDialog(
             PhotoPicker.Status.EMPTY -> {
                 btnUploadPhotoFromCapture.visibility = View.VISIBLE
                 btnUploadPhotoFromCapture.setOnClickListener {
+                    dismiss()
                     photoPickerOptionListener.onUploadPhotoFromCapture()
                 }
 
                 btnUploadPhotoFromGallery.visibility = View.VISIBLE
                 btnUploadPhotoFromGallery.setOnClickListener {
+                    dismiss()
                     photoPickerOptionListener.onUploadPhotoFromGallery()
                 }
             }
@@ -43,7 +45,7 @@ class PhotoPickerOptionDialog(
                 photoKey?.let { key ->
                     btnPhotoErrorUpload.setOnClickListener {
                         dismiss()
-                        photoPickerOptionListener.onUploadPhoto(key)
+                        photoPickerOptionListener.onReuploadPhoto(key)
                     }
                     btnPhotoErrorDelete.setOnClickListener {
                         dismiss()
@@ -57,7 +59,7 @@ class PhotoPickerOptionDialog(
                 photoKey?.let { key ->
                     btnPhotoErrorDownload.setOnClickListener {
                         dismiss()
-                        photoPickerOptionListener.onDownloadPhoto(key)
+                        photoPickerOptionListener.onRedownloadPhoto(key)
                     }
                     btnPhotoErrorDelete.setOnClickListener {
                         dismiss()
@@ -71,8 +73,8 @@ class PhotoPickerOptionDialog(
 
     interface PhotoPickerOptionListener {
         fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status)
-        fun onUploadPhoto(photoKey: String)
-        fun onDownloadPhoto(photoKey: String)
+        fun onReuploadPhoto(photoKey: String)
+        fun onRedownloadPhoto(photoKey: String)
         fun onUploadPhotoFromGallery()
         fun onUploadPhotoFromCapture()
     }

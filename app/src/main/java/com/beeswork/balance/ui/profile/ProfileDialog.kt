@@ -154,7 +154,9 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
         val photoKey = "${generatePhotoKey()}.$photoExtension"
         val adapter = photoPickerRecyclerViewAdapter()
-        adapter.uploadPhoto(photoKey, uri)
+        val uploaded = adapter.uploadPhoto(photoKey, uri)
+
+        if (!uploaded) return
 
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.uploadPhoto(photoKey, photoExtension, uri)
@@ -174,6 +176,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 }
             }
         }
+
     }
 
     private fun generatePhotoKey(): String {
@@ -208,23 +211,37 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         )
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.deletePhoto(photoKey)
-            if (response.isSuccess()) {
-                photoPickerRecyclerViewAdapter().deletePhoto(photoKey)
-            } else if (response.isException()) {
-                photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
-                    photoKey,
-                    photoPickerStatus
-                )
+            withContext(Dispatchers.Main) {
+                if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION) {
+                    photoPickerRecyclerViewAdapter().deletePhoto(photoKey)
+                } else if (response.isException()) {
+                    ExceptionDialog(response.exceptionMessage).show(
+                        childFragmentManager,
+                        ExceptionDialog.TAG
+                    )
+                    photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
+                        photoKey,
+                        photoPickerStatus
+                    )
+                }
             }
         }
     }
 
-    override fun onUploadPhoto(photoKey: String) {
-
+    override fun onReuploadPhoto(photoKey: String) {
+        val uri = photoPickerRecyclerViewAdapter().getUriByPhotoKey(photoKey)
+        if (uri == null) photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
+            photoKey,
+            PhotoPicker.Status.UPLOAD_ERROR
+        )
+        else uploadPhoto(uri)
     }
 
-    override fun onDownloadPhoto(photoKey: String) {
-        photoPickerRecyclerViewAdapter().downloadPhoto(photoKey)
+    override fun onRedownloadPhoto(photoKey: String) {
+        photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
+            photoKey,
+            PhotoPicker.Status.DOWNLOADING
+        )
     }
 
     override fun onUploadPhotoFromGallery() {

@@ -26,7 +26,7 @@ data class PhotoPicker(
         const val MAX_PHOTO_HEIGHT = 1920
 
         fun empty(): PhotoPicker {
-            return PhotoPicker(null, PhotoPicker.Status.EMPTY, null)
+            return PhotoPicker(null, Status.EMPTY, null)
         }
     }
 }

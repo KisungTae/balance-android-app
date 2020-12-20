@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.profile
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.media.Image
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +43,7 @@ class PhotoPickerRecyclerViewAdapter(
             val photoKey = it.tag
             if (photoKey == null)
                 photoPickerListener.onClickPhotoPicker(null, PhotoPicker.Status.EMPTY)
-            else  {
+            else {
                 val photoPicker = photoPickers.find { p -> p.key == view.tag.toString() }
                 if (photoPicker != null)
                     photoPickerListener.onClickPhotoPicker(photoPicker.key, photoPicker.status)
@@ -52,12 +53,15 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val photoPicker = photoPickers[position]
         holder.itemView.tag = photoPicker.key
 
         when (photoPicker.status) {
-            PhotoPicker.Status.EMPTY -> showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
+            PhotoPicker.Status.EMPTY -> {
+                showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
+                holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
+                    .setImageResource(R.drawable.ic_baseline_add)
+            }
             PhotoPicker.Status.LOADING -> showLayout(
                 holder.itemView,
                 View.VISIBLE,
@@ -147,8 +151,10 @@ class PhotoPickerRecyclerViewAdapter(
         downloadError: Int
     ) {
         itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING_TAG).visibility = loading
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR_TAG).visibility = uploadError
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG).visibility = downloadError
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR_TAG).visibility =
+            uploadError
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG).visibility =
+            downloadError
     }
 
     fun initializePhotoPickers(photos: List<Photo>) {
@@ -161,34 +167,44 @@ class PhotoPickerRecyclerViewAdapter(
         for (i in photos.size until photoPickers.size) {
             photoPickers[i].status = PhotoPicker.Status.EMPTY
         }
+        notifyDataSetChanged()
     }
 
-    fun uploadPhoto(photoKey: String, photoUri: Uri) {
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-            if (photoPicker.status == PhotoPicker.Status.EMPTY) {
-                photoPicker.key = photoKey
-                photoPicker.status = PhotoPicker.Status.UPLOADING
-                photoPicker.uri = photoUri
-                notifyItemChanged(i)
-                break
-            }
+    fun uploadPhoto(photoKey: String, photoUri: Uri): Boolean {
+        var photoPicker = photoPickers.find { it.key == photoKey }
+
+        if (photoPicker == null)
+            photoPicker = photoPickers.find { it.status == PhotoPicker.Status.EMPTY }
+
+        if (photoPicker == null)
+            return false
+
+        photoPicker.key = photoKey
+        photoPicker.status = PhotoPicker.Status.UPLOADING
+        photoPicker.uri = photoUri
+        notifyItemChanged(photoPickers.indexOf(photoPicker))
+        return true
+    }
+
+    fun getUriByPhotoKey(photoKey: String): Uri? {
+        val photoPicker = photoPickers.find { it.key == photoKey }
+        photoPicker?.let {
+            return photoPicker.uri
         }
+        return null
     }
 
     fun deletePhoto(photoKey: String) {
-        val photoToDelete = photoPickers.find { it.key == photoKey }
-        photoPickers.remove(photoToDelete)
-
-        if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS)
-            photoPickers.add(PhotoPicker.empty())
-    }
-
-    fun downloadPhoto(photoKey: String) {
         val photoPicker = photoPickers.find { it.key == photoKey }
-        if (photoPicker != null) {
-            photoPicker.status = PhotoPicker.Status.DOWNLOADING
-            notifyItemChanged(photoPickers.indexOf(photoPicker))
+        photoPicker?.let {
+            photoPickers.remove(it)
+            notifyItemRemoved(photoPickers.indexOf(it))
+        }
+
+        if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS) {
+            photoPickers.add(PhotoPicker.empty())
+            val index = photoPickers.size - 1
+            notifyItemInserted(index)
         }
     }
 
