@@ -84,6 +84,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         )
         rvPhotoPicker.layoutManager =
             GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM)
+        setupItemTouchHelperToPhotoPickerRecyclerView()
     }
 
     private fun fetchPhotos() {
@@ -140,7 +141,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == RESULT_OK)
-                    result.uri?.let { uri -> uploadPhoto(uri) }
+                    result.uri?.let { uri -> uploadPhoto(uri, null) }
                 else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE)
                     ExceptionDialog(result.error.localizedMessage).show(
                         childFragmentManager,
@@ -150,12 +151,11 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         }
     }
 
-    private fun uploadPhoto(uri: Uri) {
+    private fun uploadPhoto(uri: Uri, _photoKey: String?) {
         val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
-        val photoKey = "${generatePhotoKey()}.$photoExtension"
+        val photoKey = _photoKey ?: "${generatePhotoKey()}.$photoExtension"
         val adapter = photoPickerRecyclerViewAdapter()
         val uploaded = adapter.uploadPhoto(photoKey, uri)
-
         if (!uploaded) return
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -176,11 +176,11 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 }
             }
         }
-
     }
 
     private fun generatePhotoKey(): String {
-        val photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
+        var photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
+        photoKey = photoKey.replace(":", "")
         return photoKey.replace(".", "")
     }
 
@@ -234,7 +234,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             photoKey,
             PhotoPicker.Status.UPLOAD_ERROR
         )
-        else uploadPhoto(uri)
+        else uploadPhoto(uri, photoKey)
     }
 
     override fun onRedownloadPhoto(photoKey: String) {
@@ -263,11 +263,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
 
-    private fun setupPhotoPicker() {
-
-        rvPhotoPicker.layoutManager = GridLayoutManager(requireContext(), 3)
-
-
+    private fun setupItemTouchHelperToPhotoPickerRecyclerView() {
         val simpleCallback = object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
             0
@@ -277,16 +273,13 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-
-//                val from = viewHolder.adapterPosition
-//                val to = target.adapterPosition
-//                Collections.swap(photos, from, to)
-//                recyclerView.adapter?.notifyItemMoved(from, to)
-
+                photoPickerRecyclerViewAdapter().swapPhotos(viewHolder.adapterPosition, target.adapterPosition)
                 return false
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                println("onSwiped")
+            }
 
             override fun clearView(
                 recyclerView: RecyclerView,
@@ -297,6 +290,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             }
 
             override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                println("onSelectedChanged")
                 super.onSelectedChanged(viewHolder, actionState)
             }
 
@@ -305,7 +299,6 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         val itemTouchHelper = ItemTouchHelper(simpleCallback)
         itemTouchHelper.attachToRecyclerView(rvPhotoPicker)
     }
-
 
     companion object {
         const val TAG = "profileDialog"

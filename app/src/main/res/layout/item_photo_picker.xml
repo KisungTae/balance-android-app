@@ -11,8 +11,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/holo_purple"
         android:src="@drawable/ic_baseline_add"
-        android:tag="photoPickerPhoto"
-        app:tint="@android:color/black" />
+        android:tag="photoPickerPhoto"/>
 
     <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/spin_kit"
@@ -21,11 +20,12 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:alpha="0.5"
+        android:background="@color/transparent"
+        android:clickable="true"
+        android:focusable="true"
         android:tag="photoPickerLoading"
         android:visibility="gone"
-        android:clickable="true"
-        app:SpinKit_Color="@color/colorAccent"
-        android:focusable="true" />
+        app:SpinKit_Color="@color/colorAccent" />
 
     <ImageView
         android:layout_width="match_parent"
@@ -42,7 +42,6 @@
         android:src="@drawable/ic_baseline_error"
         android:tag="photoPickerUploadError"
         android:visibility="gone" />
-
 
 
 </FrameLayout>

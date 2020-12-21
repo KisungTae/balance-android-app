@@ -1,13 +1,10 @@
 package com.beeswork.balance.ui.profile
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.media.Image
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -22,6 +19,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.github.ybq.android.spinkit.SpinKitView
+import java.util.*
 
 class PhotoPickerRecyclerViewAdapter(
     private val context: Context,
@@ -69,21 +67,19 @@ class PhotoPickerRecyclerViewAdapter(
                 View.GONE
             )
             PhotoPicker.Status.UPLOADING -> {
-                if (photoPicker.uri != null) {
-                    val ivPhotoPickerPhoto =
-                        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
-                    Glide.with(context).load(photoPicker.uri)
-                        .apply(glideRequestOptions())
-                        .into(ivPhotoPickerPhoto)
-                    showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
-                }
+                loadPhotoFromUri(holder, photoPicker.uri)
+                showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
             }
-            PhotoPicker.Status.UPLOAD_ERROR -> showLayout(
-                holder.itemView,
-                View.GONE,
-                View.VISIBLE,
-                View.GONE
-            )
+            PhotoPicker.Status.UPLOAD_ERROR -> {
+                loadPhotoFromUri(holder, photoPicker.uri)
+                showLayout(
+                    holder.itemView,
+                    View.GONE,
+                    View.VISIBLE,
+                    View.GONE
+                )
+
+            }
             PhotoPicker.Status.DOWNLOAD_ERROR -> showLayout(
                 holder.itemView,
                 View.GONE,
@@ -98,7 +94,7 @@ class PhotoPickerRecyclerViewAdapter(
             )
             PhotoPicker.Status.DOWNLOADING -> {
                 if (photoPicker.key != null) {
-                    val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}1"
+                    val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}"
                     val ivPhotoPickerPhoto =
                         holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
                     showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
@@ -137,6 +133,16 @@ class PhotoPickerRecyclerViewAdapter(
 
     override fun getItemCount(): Int = photoPickers.size
 
+
+    private fun loadPhotoFromUri(holder: ViewHolder, uri: Uri?) {
+        uri?.let {
+            val ivPhotoPickerPhoto =
+                holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
+            Glide.with(context).load(uri)
+                .apply(glideRequestOptions())
+                .into(ivPhotoPickerPhoto)
+        }
+    }
 
     private fun glideRequestOptions(): RequestOptions {
         return RequestOptions().centerCrop()
@@ -197,14 +203,14 @@ class PhotoPickerRecyclerViewAdapter(
     fun deletePhoto(photoKey: String) {
         val photoPicker = photoPickers.find { it.key == photoKey }
         photoPicker?.let {
+            val index = photoPickers.indexOf(it)
             photoPickers.remove(it)
-            notifyItemRemoved(photoPickers.indexOf(it))
+            notifyItemRemoved(index)
         }
 
         if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS) {
             photoPickers.add(PhotoPicker.empty())
-            val index = photoPickers.size - 1
-            notifyItemInserted(index)
+            notifyItemInserted((photoPickers.size - 1))
         }
     }
 
@@ -214,6 +220,14 @@ class PhotoPickerRecyclerViewAdapter(
             photoPicker.status = photoPickerStatus
             notifyItemChanged(photoPickers.indexOf(photoPicker))
         }
+    }
+
+    fun swapPhotos(from: Int, to: Int) {
+
+
+
+        Collections.swap(photoPickers, from, to)
+        notifyItemMoved(from, to)
     }
 
     companion object {
