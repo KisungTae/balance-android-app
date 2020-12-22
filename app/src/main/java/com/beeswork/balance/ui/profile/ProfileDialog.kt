@@ -268,30 +268,41 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
             0
         ) {
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                photoPickerRecyclerViewAdapter().swapPhotos(viewHolder.adapterPosition, target.adapterPosition)
+                photoPickerRecyclerViewAdapter().swapPhotos(
+                    viewHolder.adapterPosition,
+                    target.adapterPosition
+                )
                 return false
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                println("onSwiped")
-            }
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
 
             override fun clearView(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ) {
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    val response =
+                        balanceRepository.reorderPhoto(photoPickerRecyclerViewAdapter().getPhotoOrders())
+
+                }
                 super.clearView(recyclerView, viewHolder)
-                println("clearView")
             }
 
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-                println("onSelectedChanged")
-                super.onSelectedChanged(viewHolder, actionState)
+
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                if (!photoPickerRecyclerViewAdapter().isPhotoPickerDraggable(viewHolder.layoutPosition)) return 0
+                return super.getMovementFlags(recyclerView, viewHolder)
             }
 
         }

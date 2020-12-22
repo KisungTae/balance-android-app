@@ -16,6 +16,12 @@ import retrofit2.http.Query
 
 interface BalanceRDS {
 
+    suspend fun reorderPhotos(
+        accountId: String,
+        identityToken: String,
+        photoOrders: Map<String, Long>
+    ): Resource<EmptyJsonResponse>
+
     suspend fun deletePhoto(
         accountId: String,
         identityToken: String,

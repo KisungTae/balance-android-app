@@ -223,11 +223,26 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun swapPhotos(from: Int, to: Int) {
+        val toPhotoPicker = photoPickers[to]
+        if (toPhotoPicker.status == PhotoPicker.Status.OCCUPIED) {
+            Collections.swap(photoPickers, from, to)
+            notifyItemMoved(from, to)
+        }
+    }
 
+    fun isPhotoPickerDraggable(position: Int): Boolean {
+        val photoPicker = photoPickers[position]
+        return photoPicker.status == PhotoPicker.Status.OCCUPIED
+    }
 
-
-        Collections.swap(photoPickers, from, to)
-        notifyItemMoved(from, to)
+    fun getPhotoOrders(): Map<String, Long> {
+        val photoOrders = mutableMapOf<String, Long>()
+        for (i in photoPickers.indices) {
+            val photoPicker = photoPickers[i]
+            if (photoPicker.key != null)
+                photoOrders[photoPicker.key!!] = i.toLong()
+        }
+        return photoOrders
     }
 
     companion object {

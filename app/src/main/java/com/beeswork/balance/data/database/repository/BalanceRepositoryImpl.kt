@@ -23,7 +23,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import java.io.File
-import java.lang.Exception
 import kotlin.random.Random
 
 
@@ -367,6 +366,8 @@ class BalanceRepositoryImpl(
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
 
+        // TODO: when sync should i post photos in database so that sync with database in server?
+
         if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
 
             val accountId = preferenceProvider.getAccountId()
@@ -445,6 +446,24 @@ class BalanceRepositoryImpl(
         val response = balanceRDS.deletePhoto(accountId, identityToken, photoKey)
         if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
             photoDAO.deletePhoto(photoKey)
+
+        return response
+    }
+
+    override suspend fun reorderPhoto(photoOrders: Map<String, Long>): Resource<EmptyJsonResponse> {
+        val accountId = preferenceProvider.getAccountId()
+        val identityToken = preferenceProvider.getIdentityToken()
+
+        for ((k, v) in photoOrders) {
+            photoDAO.sync(k, false)
+            photoDAO.updateSequence(k, v)
+        }
+
+        val response = balanceRDS.reorderPhotos(accountId, identityToken, photoOrders)
+        if (response.isSuccess()) {
+            for ((k, v) in photoOrders)
+                photoDAO.sync(k, true)
+        }
 
         return response
     }

@@ -18,6 +18,22 @@ class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), BalanceRDS {
 
+    override suspend fun reorderPhotos(
+        accountId: String,
+        identityToken: String,
+        photoOrders: Map<String, Long>
+    ): Resource<EmptyJsonResponse> {
+        return getResult {
+            balanceAPI.reorderPhotos(
+                ReorderPhotosRequest(
+                    accountId,
+                    identityToken,
+                    photoOrders
+                )
+            )
+        }
+    }
+
     override suspend fun deletePhoto(
         accountId: String,
         identityToken: String,

@@ -26,6 +26,11 @@ import java.util.concurrent.TimeUnit
 
 interface BalanceAPI {
 
+    @POST("photo/reorder")
+    suspend fun reorderPhotos(
+        @Body reorderPhotosRequest: ReorderPhotosRequest
+    ): Response<EmptyJsonResponse>
+
     @POST("photo/delete")
     suspend fun deletePhoto(
         @Body deletePhotoRequest: DeletePhotoRequest
