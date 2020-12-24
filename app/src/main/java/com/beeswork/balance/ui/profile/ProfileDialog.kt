@@ -293,6 +293,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                         balanceRepository.reorderPhoto(photoPickerRecyclerViewAdapter().getPhotoOrders())
 
                 }
+
                 super.clearView(recyclerView, viewHolder)
             }
 
