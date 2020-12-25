@@ -34,10 +34,11 @@ interface BalanceRDS {
         photo: MultipartBody.Part
     ): Resource<EmptyJsonResponse>
 
-    suspend fun fetchPreSignedUrl(
+    suspend fun addPhoto(
         accountId: String,
         identityToken: String,
-        photoKey: String
+        photoKey: String,
+        sequence: Int
     ): Resource<PreSignedUrlResponse>
 
     suspend fun fetchPhotos(

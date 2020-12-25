@@ -9,10 +9,6 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Response
-import java.lang.Exception
 
 class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
@@ -58,17 +54,19 @@ class BalanceRDSImpl(
         return getResult { balanceAPI.uploadPhotoToS3(url, formData, photo) }
     }
 
-    override suspend fun fetchPreSignedUrl(
+    override suspend fun addPhoto(
         accountId: String,
         identityToken: String,
-        photoKey: String
+        photoKey: String,
+        sequence: Int
     ): Resource<PreSignedUrlResponse> {
         return getResult {
-            balanceAPI.fetchPreSignedUrl(
-                FetchPreSignedUrlRequest(
+            balanceAPI.addPhoto(
+                AddPhotoRequest(
                     accountId,
                     identityToken,
-                    photoKey
+                    photoKey,
+                    sequence
                 )
             )
         }

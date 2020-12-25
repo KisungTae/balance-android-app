@@ -10,7 +10,7 @@ data class Photo(
     @PrimaryKey
     val key: String,
 
-    val sequence: Long,
+    val sequence: Int,
     var synced: Boolean,
 ) {
     companion object {

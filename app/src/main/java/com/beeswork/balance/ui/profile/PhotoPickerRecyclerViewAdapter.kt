@@ -31,7 +31,7 @@ class PhotoPickerRecyclerViewAdapter(
 
     init {
         repeat(MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(PhotoPicker(null, PhotoPicker.Status.LOADING, null))
+            photoPickers.add(PhotoPicker(null, PhotoPicker.Status.LOADING, null, Int.MAX_VALUE))
         }
     }
 
@@ -86,12 +86,21 @@ class PhotoPickerRecyclerViewAdapter(
                 View.GONE,
                 View.VISIBLE
             )
-            PhotoPicker.Status.OCCUPIED -> showLayout(
-                holder.itemView,
-                View.GONE,
-                View.GONE,
-                View.GONE
-            )
+            PhotoPicker.Status.OCCUPIED -> {
+                showLayout(
+                    holder.itemView,
+                    View.GONE,
+                    View.GONE,
+                    View.GONE
+                )
+
+                photoPicker.uri?.let {
+                    val ivPhotoPickerPhoto =
+                        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
+                    Glide.with(context).load(photoPicker.uri).apply(glideRequestOptions())
+                        .into(ivPhotoPickerPhoto)
+                }
+            }
             PhotoPicker.Status.DOWNLOADING -> {
                 if (photoPicker.key != null) {
                     val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}"
@@ -176,20 +185,33 @@ class PhotoPickerRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    fun uploadPhoto(photoKey: String, photoUri: Uri): Boolean {
-        var photoPicker = photoPickers.find { it.key == photoKey }
+    fun uploadPhoto(photoKey: String, photoUri: Uri): Int {
+        var sequence = 0
+        for (i in photoPickers.indices) {
+            val photoPicker = photoPickers[i]
 
-        if (photoPicker == null)
-            photoPicker = photoPickers.find { it.status == PhotoPicker.Status.EMPTY }
-
-        if (photoPicker == null)
-            return false
-
-        photoPicker.key = photoKey
-        photoPicker.status = PhotoPicker.Status.UPLOADING
-        photoPicker.uri = photoUri
-        notifyItemChanged(photoPickers.indexOf(photoPicker))
-        return true
+            when {
+                photoPicker.status == PhotoPicker.Status.EMPTY -> {
+                    sequence++
+                    photoPicker.key = photoKey
+                    photoPicker.status = PhotoPicker.Status.UPLOADING
+                    photoPicker.uri = photoUri
+                    photoPicker.sequence = sequence
+                    notifyItemChanged(photoPickers.indexOf(photoPicker))
+                    return sequence
+                }
+                photoPicker.key == photoKey -> {
+                    photoPicker.status = PhotoPicker.Status.UPLOADING
+                    photoPicker.uri = photoUri
+                    notifyItemChanged(photoPickers.indexOf(photoPicker))
+                    return photoPicker.sequence
+                }
+                photoPicker.sequence > sequence -> {
+                    sequence = photoPicker.sequence
+                }
+            }
+        }
+        return -1
     }
 
     fun getUriByPhotoKey(photoKey: String): Uri? {
@@ -209,7 +231,7 @@ class PhotoPickerRecyclerViewAdapter(
         }
 
         if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(PhotoPicker.empty())
+            photoPickers.add(PhotoPicker.asEmpty())
             notifyItemInserted((photoPickers.size - 1))
         }
     }
@@ -235,8 +257,33 @@ class PhotoPickerRecyclerViewAdapter(
         return photoPicker.status == PhotoPicker.Status.OCCUPIED
     }
 
+
+
     fun getPhotoOrders(): Map<String, Long> {
+        var preSequence = photoPickers[0].sequence
+
+        for (i in 1 until photoPickers.size) {
+            val photoPicker = photoPickers[i]
+            when {
+                preSequence > photoPicker.sequence -> {
+
+                }
+                preSequence == photoPicker.sequence -> {
+
+                }
+                else -> {
+                    preSequence = photoPicker.sequence
+                }
+            }
+        }
+
+
         val photoOrders = mutableMapOf<String, Long>()
+
+
+
+
+
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
             if (photoPicker.key != null)
@@ -264,3 +311,6 @@ class PhotoPickerRecyclerViewAdapter(
     ) : RecyclerView.ViewHolder(view)
 
 }
+
+
+//

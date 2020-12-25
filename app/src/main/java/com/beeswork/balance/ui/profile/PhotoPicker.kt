@@ -6,7 +6,8 @@ import com.google.firebase.iid.GmsRpc
 data class PhotoPicker(
     var key: String?,
     var status: Status,
-    var uri: Uri?
+    var uri: Uri?,
+    var sequence: Int
 ) {
 
     enum class Status {
@@ -25,8 +26,8 @@ data class PhotoPicker(
         const val MAX_PHOTO_WIDTH = 1200
         const val MAX_PHOTO_HEIGHT = 1920
 
-        fun empty(): PhotoPicker {
-            return PhotoPicker(null, Status.EMPTY, null)
+        fun asEmpty(): PhotoPicker {
+            return PhotoPicker(null, Status.EMPTY, null, Int.MAX_VALUE)
         }
     }
 }

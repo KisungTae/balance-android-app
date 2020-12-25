@@ -3,7 +3,6 @@ package com.beeswork.balance.data.network.api
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
-import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
@@ -12,14 +11,11 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import org.threeten.bp.OffsetDateTime
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-import java.util.concurrent.TimeUnit
 
 //const val NETWORK_READ_TIMEOUT = 100L
 //const val NETWORK_CONNECTION_TIMEOUT = 100L
@@ -44,9 +40,9 @@ interface BalanceAPI {
         @Part photo: MultipartBody.Part
     ): Response<EmptyJsonResponse>
 
-    @POST("photo/presigned-url")
-    suspend fun fetchPreSignedUrl(
-        @Body fetchPreSignedUrlRequest: FetchPreSignedUrlRequest
+    @POST("photo/add")
+    suspend fun addPhoto(
+        @Body addPhotoRequest: AddPhotoRequest
     ): Response<PreSignedUrlResponse>
 
     @GET("/photo/list")

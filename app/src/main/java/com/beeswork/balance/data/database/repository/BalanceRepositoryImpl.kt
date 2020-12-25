@@ -365,11 +365,7 @@ class BalanceRepositoryImpl(
 //  ################################################################################# //
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
-
-        // TODO: when sync should i post photos in database so that sync with database in server?
-
         if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
-
             val accountId = preferenceProvider.getAccountId()
             val identityToken = preferenceProvider.getIdentityToken()
 
@@ -379,7 +375,6 @@ class BalanceRepositoryImpl(
                 return response
 
             val photos = response.data
-
             if (photos == null || photos.isEmpty())
                 photoDAO.deletePhotosNotIn(listOf(""))
             else {
@@ -395,27 +390,22 @@ class BalanceRepositoryImpl(
     override suspend fun uploadPhoto(
         photoKey: String,
         photoExtension: String,
-        photoUri: Uri
+        photoUri: Uri,
+        sequence: Int
     ): Resource<EmptyJsonResponse> {
-
         val photoFile = Compressor.compress(context, File(photoUri.path!!))
-
         if (photoFile.length() > Photo.MAX_SIZE)
             return Resource.exception(null, ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
 
-        photoDAO.insert(Photo(photoKey, Long.MAX_VALUE, false))
-
+        photoDAO.insert(Photo(photoKey, sequence, false))
         val accountId = preferenceProvider.getAccountId()
         val identityToken = preferenceProvider.getIdentityToken()
         val fetchPreSignedUrlResponse =
-            balanceRDS.fetchPreSignedUrl(accountId, identityToken, photoKey)
+            balanceRDS.addPhoto(accountId, identityToken, photoKey, sequence)
 
         if (fetchPreSignedUrlResponse.status == Resource.Status.SUCCESS) {
-
             val preSignedUrl = fetchPreSignedUrlResponse.data!!
-
-            photoDAO.sync(preSignedUrl.sequence, photoKey)
-
+            photoDAO.sync(photoKey, true)
             val formData = mutableMapOf<String, RequestBody>()
 
             for ((key, value) in preSignedUrl.fields) {
@@ -428,9 +418,7 @@ class BalanceRepositoryImpl(
 
             val requestBody = RequestBody.create(mediaType, photoFile)
             val photo = MultipartBody.Part.createFormData("file", photoKey, requestBody)
-
             return balanceRDS.uploadPhotoToS3(preSignedUrl.url, formData, photo)
-
         } else {
             return Resource.exception(
                 fetchPreSignedUrlResponse.exceptionMessage,

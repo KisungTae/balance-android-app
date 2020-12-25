@@ -22,7 +22,7 @@ interface BalanceRepository {
 
     fun fetchClickedList()
     fun swipe(swipeId: Long?, swipedId: String)
-    fun click(swipedId: String, swipeId:Long, answers: Map<Int, Boolean>)
+    fun click(swipedId: String, swipeId: Long, answers: Map<Int, Boolean>)
 
     // match
     val fetchMatchesResponse: LiveData<Resource<List<Match>>>
@@ -44,7 +44,6 @@ interface BalanceRepository {
     fun insertFCMToken(token: String)
 
 
-
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyJsonResponse>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionResponse>
     suspend fun fetchQuestions(): Resource<List<QuestionResponse>>
@@ -54,7 +53,13 @@ interface BalanceRepository {
 
     // photo
     suspend fun fetchPhotos(): Resource<List<Photo>>
-    suspend fun uploadPhoto(photoKey: String, photoExtension: String, photoUri: Uri): Resource<EmptyJsonResponse>
+    suspend fun uploadPhoto(
+        photoKey: String,
+        photoExtension: String,
+        photoUri: Uri,
+        sequence: Int
+    ): Resource<EmptyJsonResponse>
+
     suspend fun deletePhoto(photoKey: String): Resource<EmptyJsonResponse>
     suspend fun reorderPhoto(photoOrders: Map<String, Long>): Resource<EmptyJsonResponse>
 }

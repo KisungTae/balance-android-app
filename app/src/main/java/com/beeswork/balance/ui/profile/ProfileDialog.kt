@@ -155,19 +155,18 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
         val photoKey = _photoKey ?: "${generatePhotoKey()}.$photoExtension"
         val adapter = photoPickerRecyclerViewAdapter()
-        val uploaded = adapter.uploadPhoto(photoKey, uri)
-        if (!uploaded) return
+        val sequence = adapter.uploadPhoto(photoKey, uri)
+        if (sequence == -1) return
 
         CoroutineScope(Dispatchers.IO).launch {
-            val response = balanceRepository.uploadPhoto(photoKey, photoExtension, uri)
+            val response = balanceRepository.uploadPhoto(photoKey, photoExtension, uri, sequence)
             withContext(Dispatchers.Main) {
                 if (response.status == Resource.Status.SUCCESS) {
                     adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.OCCUPIED)
                 } else if (response.status == Resource.Status.EXCEPTION) {
                     var exceptionMessage = response.exceptionMessage
                     if (response.exceptionCode == ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
-                        exceptionMessage =
-                            getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
+                        exceptionMessage = getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
                     ExceptionDialog(exceptionMessage).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
@@ -289,8 +288,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             ) {
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    val response =
-                        balanceRepository.reorderPhoto(photoPickerRecyclerViewAdapter().getPhotoOrders())
+//                    val response =
+//                        balanceRepository.reorderPhoto(photoPickerRecyclerViewAdapter().getPhotoOrders())
 
                 }
 

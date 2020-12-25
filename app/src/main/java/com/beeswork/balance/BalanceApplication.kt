@@ -151,7 +151,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      40. check what is returned from puploading images to s3
 //      41. change url and other logic related to s3 becuase I deploy cloudFront, acl:public-read in lambda
 //      42. cropped image when there is not enough space in memory or storage, handle exception outofstorage or osmething
-
+//      43.             val exceptionResponse =
+//                Gson().fromJson(response.errorBody()?.string(), ExceptionResponse::class.java) throws error when no error body
+//      44. when done crop image, savelocation fired why and prevent it
 
 
 

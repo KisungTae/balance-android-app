@@ -18,9 +18,6 @@ interface PhotoDAO {
     @Query("select * from photo order by sequence")
     fun getPhotos(): List<Photo>
 
-    @Query("update photo set sequence = :sequence, synced = 1 where `key` = :photoKey")
-    fun sync(sequence: Long, photoKey: String)
-
     @Query("update photo set synced = :synced where `key` = :photoKey")
     fun sync(photoKey: String, synced: Boolean)
 
