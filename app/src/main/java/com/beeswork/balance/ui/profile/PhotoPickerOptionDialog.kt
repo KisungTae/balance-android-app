@@ -42,32 +42,33 @@ class PhotoPickerOptionDialog(
             PhotoPicker.Status.UPLOAD_ERROR -> {
                 btnPhotoErrorDelete.visibility = View.VISIBLE
                 btnPhotoErrorUpload.visibility = View.VISIBLE
-                photoKey?.let { key ->
-                    btnPhotoErrorUpload.setOnClickListener {
-                        dismiss()
-                        photoPickerOptionListener.onReuploadPhoto(key)
-                    }
-                    btnPhotoErrorDelete.setOnClickListener {
-                        dismiss()
-                        photoPickerOptionListener.onDeletePhoto(key, photoPickerStatus)
-                    }
+                btnPhotoErrorUpload.setOnClickListener {
+                    dismiss()
+                    photoKey?.let { photoPickerOptionListener.onRedownloadPhoto(it) }
                 }
+                setDeleteBtnListener()
             }
             PhotoPicker.Status.DOWNLOAD_ERROR -> {
                 btnPhotoErrorDelete.visibility = View.VISIBLE
                 btnPhotoErrorDownload.visibility = View.VISIBLE
-                photoKey?.let { key ->
-                    btnPhotoErrorDownload.setOnClickListener {
-                        dismiss()
-                        photoPickerOptionListener.onRedownloadPhoto(key)
-                    }
-                    btnPhotoErrorDelete.setOnClickListener {
-                        dismiss()
-                        photoPickerOptionListener.onDeletePhoto(key, photoPickerStatus)
-                    }
+                btnPhotoErrorDownload.setOnClickListener {
+                    dismiss()
+                    photoKey?.let { photoPickerOptionListener.onRedownloadPhoto(it) }
                 }
+                setDeleteBtnListener()
+            }
+            PhotoPicker.Status.OCCUPIED -> {
+                btnPhotoErrorDelete.visibility = View.VISIBLE
+                setDeleteBtnListener()
             }
             else -> dismiss()
+        }
+    }
+
+    private fun setDeleteBtnListener() {
+        btnPhotoErrorDelete.setOnClickListener {
+            dismiss()
+            photoKey?.let { photoPickerOptionListener.onDeletePhoto(it, photoPickerStatus) }
         }
     }
 

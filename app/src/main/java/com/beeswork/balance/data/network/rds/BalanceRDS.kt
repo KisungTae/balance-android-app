@@ -19,7 +19,7 @@ interface BalanceRDS {
     suspend fun reorderPhotos(
         accountId: String,
         identityToken: String,
-        photoOrders: Map<String, Long>
+        photoOrders: Map<String, Int>
     ): Resource<EmptyJsonResponse>
 
     suspend fun deletePhoto(

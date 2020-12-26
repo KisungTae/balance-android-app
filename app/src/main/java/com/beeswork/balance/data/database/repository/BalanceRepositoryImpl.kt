@@ -438,7 +438,7 @@ class BalanceRepositoryImpl(
         return response
     }
 
-    override suspend fun reorderPhoto(photoOrders: Map<String, Long>): Resource<EmptyJsonResponse> {
+    override suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyJsonResponse> {
         val accountId = preferenceProvider.getAccountId()
         val identityToken = preferenceProvider.getIdentityToken()
 
@@ -452,7 +452,6 @@ class BalanceRepositoryImpl(
             for ((k, v) in photoOrders)
                 photoDAO.sync(k, true)
         }
-
         return response
     }
 

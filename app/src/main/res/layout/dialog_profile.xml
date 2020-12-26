@@ -2,8 +2,11 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:clipChildren="false"
+    android:paddingHorizontal="30dp"
+    android:paddingVertical="10dp"
     android:layout_height="match_parent">
 
+    <!--  if you put padding in this LinearLayout then moving photoPicker clipped  -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,11 +53,6 @@
             </LinearLayout>
 
         </FrameLayout>
-
-        <ImageView
-            android:id="@+id/cropImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
         <!--        <TextView-->
         <!--            android:layout_width="match_parent"-->
@@ -114,3 +112,4 @@
     </LinearLayout>
 
 </ScrollView>
+

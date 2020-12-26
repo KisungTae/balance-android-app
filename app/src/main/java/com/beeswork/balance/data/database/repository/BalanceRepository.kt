@@ -61,5 +61,5 @@ interface BalanceRepository {
     ): Resource<EmptyJsonResponse>
 
     suspend fun deletePhoto(photoKey: String): Resource<EmptyJsonResponse>
-    suspend fun reorderPhoto(photoOrders: Map<String, Long>): Resource<EmptyJsonResponse>
+    suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyJsonResponse>
 }

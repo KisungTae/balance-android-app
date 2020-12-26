@@ -21,10 +21,8 @@ data class PhotoPicker(
     }
 
     companion object {
-
-
         const val MAX_PHOTO_WIDTH = 1200
-        const val MAX_PHOTO_HEIGHT = 1920
+        const val MAX_PHOTO_HEIGHT = 1560
 
         fun asEmpty(): PhotoPicker {
             return PhotoPicker(null, Status.EMPTY, null, Int.MAX_VALUE)

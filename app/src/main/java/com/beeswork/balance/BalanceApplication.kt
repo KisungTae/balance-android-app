@@ -154,6 +154,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      43.             val exceptionResponse =
 //                Gson().fromJson(response.errorBody()?.string(), ExceptionResponse::class.java) throws error when no error body
 //      44. when done crop image, savelocation fired why and prevent it
+//      45. compressor and cropedimage temp files in cache
+//      46. modify ratio on photopicker and cropped image to final card
+
 
 
 

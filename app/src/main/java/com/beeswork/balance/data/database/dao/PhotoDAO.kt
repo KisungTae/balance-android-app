@@ -34,5 +34,5 @@ interface PhotoDAO {
     fun deletePhoto(photoKey: String)
 
     @Query("update photo set sequence = :sequence where `key` = :photoKey")
-    fun updateSequence(photoKey: String, sequence: Long)
+    fun updateSequence(photoKey: String, sequence: Int)
 }

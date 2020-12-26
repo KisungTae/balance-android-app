@@ -119,15 +119,13 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         if (requestCode == RequestCode.READ_PHOTO_FROM_GALLERY &&
             grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED
-        )
-            selectPhotoFromGallery()
+        ) selectPhotoFromGallery()
     }
 
     private fun selectPhotoFromGallery() {
         val intent = Intent(Intent.ACTION_PICK);
-        intent.type = "image/*"
-        val mimeTypes = arrayOf("image/jpeg", "image/png", "image/jpg")
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+        intent.type = PHOTO_INTENT_TYPE
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, PHOTO_MIME_TYPES)
         intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         startActivityForResult(intent, RequestCode.READ_PHOTO_FROM_GALLERY)
     }
@@ -166,7 +164,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 } else if (response.status == Resource.Status.EXCEPTION) {
                     var exceptionMessage = response.exceptionMessage
                     if (response.exceptionCode == ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
-                        exceptionMessage = getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
+                        exceptionMessage =
+                            getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
                     ExceptionDialog(exceptionMessage).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
@@ -218,6 +217,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
+                    // TODO: if occupied, set image in when() in adapter
                     photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
                         photoKey,
                         photoPickerStatus
@@ -286,13 +286,21 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ) {
-
-                CoroutineScope(Dispatchers.IO).launch {
-//                    val response =
-//                        balanceRepository.reorderPhoto(photoPickerRecyclerViewAdapter().getPhotoOrders())
-
+                photoPickerRecyclerViewAdapter().getPhotoPickerSequences()?.let {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val response = balanceRepository.reorderPhoto(it)
+                        withContext(Dispatchers.Main) {
+                            if (response.isSuccess()) photoPickerRecyclerViewAdapter().reorderPhotoPickers(it)
+                            else if (response.isException()) {
+                                ExceptionDialog(response.exceptionMessage).show(
+                                    childFragmentManager,
+                                    ExceptionDialog.TAG
+                                )
+                                photoPickerRecyclerViewAdapter().reorderPhotoPickers(null)
+                            }
+                        }
+                    }
                 }
-
                 super.clearView(recyclerView, viewHolder)
             }
 
@@ -302,6 +310,13 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
                 if (!photoPickerRecyclerViewAdapter().isPhotoPickerDraggable(viewHolder.layoutPosition)) return 0
+                if (!photoPickerRecyclerViewAdapter().isOrderable()) {
+                    ExceptionDialog(getString(R.string.photo_not_orderable_exception)).show(
+                        childFragmentManager,
+                        ExceptionDialog.TAG
+                    )
+                    return 0
+                }
                 return super.getMovementFlags(recyclerView, viewHolder)
             }
 
@@ -314,6 +329,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     companion object {
         const val TAG = "profileDialog"
         const val PHOTO_PICKER_GALLERY_COLUMN_NUM = 3
+        val PHOTO_MIME_TYPES = arrayOf("image/jpeg", "image/png", "image/jpg")
+        const val PHOTO_INTENT_TYPE = "image/*"
     }
 
 

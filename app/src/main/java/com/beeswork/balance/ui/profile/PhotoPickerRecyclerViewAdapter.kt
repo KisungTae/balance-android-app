@@ -9,6 +9,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
+import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.inflate
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
@@ -60,96 +61,71 @@ class PhotoPickerRecyclerViewAdapter(
                 holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
                     .setImageResource(R.drawable.ic_baseline_add)
             }
-            PhotoPicker.Status.LOADING -> showLayout(
-                holder.itemView,
-                View.VISIBLE,
-                View.GONE,
-                View.GONE
-            )
+            PhotoPicker.Status.LOADING -> {
+                showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
+            }
             PhotoPicker.Status.UPLOADING -> {
                 loadPhotoFromUri(holder, photoPicker.uri)
                 showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
             }
             PhotoPicker.Status.UPLOAD_ERROR -> {
                 loadPhotoFromUri(holder, photoPicker.uri)
-                showLayout(
-                    holder.itemView,
-                    View.GONE,
-                    View.VISIBLE,
-                    View.GONE
-                )
-
+                showLayout(holder.itemView, View.GONE, View.VISIBLE, View.GONE)
             }
-            PhotoPicker.Status.DOWNLOAD_ERROR -> showLayout(
-                holder.itemView,
-                View.GONE,
-                View.GONE,
-                View.VISIBLE
-            )
+            PhotoPicker.Status.DOWNLOAD_ERROR -> {
+                showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
+            }
             PhotoPicker.Status.OCCUPIED -> {
-                showLayout(
-                    holder.itemView,
-                    View.GONE,
-                    View.GONE,
-                    View.GONE
-                )
-
-                photoPicker.uri?.let {
-                    val ivPhotoPickerPhoto =
-                        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
-                    Glide.with(context).load(photoPicker.uri).apply(glideRequestOptions())
-                        .into(ivPhotoPickerPhoto)
-                }
+                showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
+                val loaded = loadPhotoFromUri(holder, photoPicker.uri)
+                if (!loaded) loadPhotoFromUrl(holder, photoPicker)
             }
-            PhotoPicker.Status.DOWNLOADING -> {
-                if (photoPicker.key != null) {
-                    val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${photoPicker.key}"
-                    val ivPhotoPickerPhoto =
-                        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
-                    showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
-
-                    Glide.with(context).load(photoUrl)
-                        .apply(glideRequestOptions())
-                        .listener(object : RequestListener<Drawable> {
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
-                                showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
-                                return false
-                            }
-
-                            override fun onResourceReady(
-                                resource: Drawable?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                dataSource: DataSource?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                photoPicker.status = PhotoPicker.Status.OCCUPIED
-                                showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
-                                return false
-                            }
-                        }).into(ivPhotoPickerPhoto)
-                }
-            }
+            PhotoPicker.Status.DOWNLOADING -> loadPhotoFromUrl(holder, photoPicker)
         }
     }
 
 
     override fun getItemCount(): Int = photoPickers.size
 
-
-    private fun loadPhotoFromUri(holder: ViewHolder, uri: Uri?) {
+    private fun loadPhotoFromUri(holder: ViewHolder, uri: Uri?): Boolean {
         uri?.let {
-            val ivPhotoPickerPhoto =
-                holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
-            Glide.with(context).load(uri)
+            Glide.with(context).load(it).apply(glideRequestOptions())
+                .into(holder.itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO_TAG))
+            return true
+        }
+        return false
+    }
+
+    private fun loadPhotoFromUrl(holder: ViewHolder, photoPicker: PhotoPicker) {
+        photoPicker.key?.let {
+            val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${it}"
+            showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
+            Glide.with(context).load(photoUrl)
                 .apply(glideRequestOptions())
-                .into(ivPhotoPickerPhoto)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
+                        showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        photoPicker.status = PhotoPicker.Status.OCCUPIED
+                        showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
+                        return false
+                    }
+                }).into(holder.itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO_TAG))
         }
     }
 
@@ -157,6 +133,7 @@ class PhotoPickerRecyclerViewAdapter(
         return RequestOptions().centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .priority(Priority.HIGH)
+            .centerCrop()
     }
 
     private fun showLayout(
@@ -175,8 +152,10 @@ class PhotoPickerRecyclerViewAdapter(
     fun initializePhotoPickers(photos: List<Photo>) {
         for (i in photos.indices) {
             val photoPicker = photoPickers[i]
+            val photo = photos[i]
             photoPicker.status = PhotoPicker.Status.DOWNLOADING
-            photoPicker.key = photos[i].key
+            photoPicker.key = photo.key
+            photoPicker.sequence = photo.sequence
         }
 
         for (i in photos.size until photoPickers.size) {
@@ -257,39 +236,53 @@ class PhotoPickerRecyclerViewAdapter(
         return photoPicker.status == PhotoPicker.Status.OCCUPIED
     }
 
-
-
-    fun getPhotoOrders(): Map<String, Long> {
-        var preSequence = photoPickers[0].sequence
-
-        for (i in 1 until photoPickers.size) {
+    fun isOrderable(): Boolean {
+        for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
-            when {
-                preSequence > photoPicker.sequence -> {
+            if (photoPicker.status != PhotoPicker.Status.EMPTY && photoPicker.status != PhotoPicker.Status.OCCUPIED)
+                return false
+        }
+        return true
+    }
 
-                }
-                preSequence == photoPicker.sequence -> {
+    fun getPhotoPickerSequences(): Map<String, Int>? {
+        var isOutOfOrder = false
+        var prevSequence = Int.MIN_VALUE
+        for (i in photoPickers.indices) {
+            val photoPicker = photoPickers[i]
+            if (photoPicker.status == PhotoPicker.Status.EMPTY) break
+            if (prevSequence > photoPicker.sequence) {
+                isOutOfOrder = true
+                break
+            } else prevSequence = photoPicker.sequence
+        }
+        if (!isOutOfOrder) return null
 
-                }
-                else -> {
-                    preSequence = photoPicker.sequence
+        val photoPickerSequences = mutableMapOf<String, Int>()
+        for (i in photoPickers.indices) {
+            val photoPicker = photoPickers[i]
+            if (photoPicker.status == PhotoPicker.Status.OCCUPIED) {
+                photoPicker.key?.let { photoPickerSequences.put(it, i) }
+                photoPicker.status = PhotoPicker.Status.LOADING
+                notifyItemChanged(i)
+            }
+        }
+        return photoPickerSequences
+    }
+
+    fun reorderPhotoPickers(photoPickerSequences: Map<String, Int>?) {
+        photoPickerSequences?.let { sequences ->
+            for (i in photoPickers.indices) {
+                val photoPicker = photoPickers[i]
+                val sequence = sequences[photoPicker.key]
+                sequence?.let {
+                    photoPicker.status = PhotoPicker.Status.OCCUPIED
+                    photoPicker.sequence = it
                 }
             }
         }
-
-
-        val photoOrders = mutableMapOf<String, Long>()
-
-
-
-
-
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-            if (photoPicker.key != null)
-                photoOrders[photoPicker.key!!] = i.toLong()
-        }
-        return photoOrders
+        photoPickers.sortBy { it.sequence }
+        notifyDataSetChanged()
     }
 
     companion object {
@@ -313,4 +306,8 @@ class PhotoPickerRecyclerViewAdapter(
 }
 
 
-//
+// TODO: reorder image disappears
+// TODO: delete cropped image and compressed image
+// TODO: when no order changed then refresh image why?
+// TODO: recyclerview scroll disable
+// TODO: check delete error goes bakc to its status
