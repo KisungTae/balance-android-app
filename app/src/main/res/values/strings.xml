@@ -10,5 +10,7 @@
     <string name="question_checking">질문을 체크하고있습니다</string>
     <string name="photo_size_out_of_exception">포토사이즈는 %1$d MB 이하만 가능</string>
     <string name="photo_not_orderable_exception">에러나 로딩중인 사진이 없을때 다시 시도해주세여</string>
+    <string name="photo_not_exist_exception">사진을 존재하지 않습니다</string>
+    <string name="photo_uri_null_exception">사진을 찾을수가 없습니다 사진을 다시 선택하시거나 삭제 해주세요</string>
 
 </resources>

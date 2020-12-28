@@ -156,6 +156,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      44. when done crop image, savelocation fired why and prevent it
 //      45. compressor and cropedimage temp files in cache
 //      46. modify ratio on photopicker and cropped image to final card
+//      47. delete cropped image when start app or end app
+//      48. delete image on cards, when siwped, glide remove cached iamges
 
 
 

@@ -9,7 +9,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
-import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.inflate
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
@@ -51,15 +51,13 @@ class PhotoPickerRecyclerViewAdapter(
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
         val photoPicker = photoPickers[position]
         holder.itemView.tag = photoPicker.key
 
         when (photoPicker.status) {
             PhotoPicker.Status.EMPTY -> {
                 showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
-                holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG)
-                    .setImageResource(R.drawable.ic_baseline_add)
             }
             PhotoPicker.Status.LOADING -> {
                 showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
@@ -69,36 +67,31 @@ class PhotoPickerRecyclerViewAdapter(
                 showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
             }
             PhotoPicker.Status.UPLOAD_ERROR -> {
-                loadPhotoFromUri(holder, photoPicker.uri)
                 showLayout(holder.itemView, View.GONE, View.VISIBLE, View.GONE)
+            }
+            PhotoPicker.Status.DOWNLOADING -> {
+                loadPhotoFromUrl(holder, photoPicker)
             }
             PhotoPicker.Status.DOWNLOAD_ERROR -> {
                 showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
             }
             PhotoPicker.Status.OCCUPIED -> {
                 showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
-                val loaded = loadPhotoFromUri(holder, photoPicker.uri)
-                if (!loaded) loadPhotoFromUrl(holder, photoPicker)
             }
-            PhotoPicker.Status.DOWNLOADING -> loadPhotoFromUrl(holder, photoPicker)
         }
     }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {}
 
     override fun getItemCount(): Int = photoPickers.size
 
-    private fun loadPhotoFromUri(holder: ViewHolder, uri: Uri?): Boolean {
-        uri?.let {
-            Glide.with(context).load(it).apply(glideRequestOptions())
-                .into(holder.itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO_TAG))
-            return true
-        }
-        return false
+    private fun loadPhotoFromUri(holder: ViewHolder, photoUri: Uri?) {
+        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG).setImageURI(photoUri)
     }
 
     private fun loadPhotoFromUrl(holder: ViewHolder, photoPicker: PhotoPicker) {
         photoPicker.key?.let {
-            val photoUrl = "$BALANCE_PHOTO_BUCKET_URL/$accountId/${it}"
+            val photoUrl = "${BalanceURL.PHOTO_BUCKET}/$accountId/${it}"
             showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
             Glide.with(context).load(photoUrl)
                 .apply(glideRequestOptions())
@@ -164,11 +157,10 @@ class PhotoPickerRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    fun uploadPhoto(photoKey: String, photoUri: Uri): Int {
+    fun uploadPhoto(photoKey: String, photoUri: Uri?): Int {
         var sequence = 0
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
-
             when {
                 photoPicker.status == PhotoPicker.Status.EMPTY -> {
                     sequence++
@@ -181,7 +173,6 @@ class PhotoPickerRecyclerViewAdapter(
                 }
                 photoPicker.key == photoKey -> {
                     photoPicker.status = PhotoPicker.Status.UPLOADING
-                    photoPicker.uri = photoUri
                     notifyItemChanged(photoPickers.indexOf(photoPicker))
                     return photoPicker.sequence
                 }
@@ -194,16 +185,11 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun getUriByPhotoKey(photoKey: String): Uri? {
-        val photoPicker = photoPickers.find { it.key == photoKey }
-        photoPicker?.let {
-            return photoPicker.uri
-        }
-        return null
+        return photoPickers.find { it.key == photoKey }?.uri
     }
 
     fun deletePhoto(photoKey: String) {
-        val photoPicker = photoPickers.find { it.key == photoKey }
-        photoPicker?.let {
+        photoPickers.find { it.key == photoKey }?.let {
             val index = photoPickers.indexOf(it)
             photoPickers.remove(it)
             notifyItemRemoved(index)
@@ -216,10 +202,9 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
-        val photoPicker = photoPickers.find { it.key == photoKey }
-        if (photoPicker != null) {
-            photoPicker.status = photoPickerStatus
-            notifyItemChanged(photoPickers.indexOf(photoPicker))
+        photoPickers.find { it.key == photoKey }?.let {
+            it.status = photoPickerStatus
+            notifyItemChanged(photoPickers.indexOf(it), PHOTO_PICKER_PAYLOAD)
         }
     }
 
@@ -290,9 +275,8 @@ class PhotoPickerRecyclerViewAdapter(
         private const val SKV_PHOTO_PICKER_LOADING_TAG = "photoPickerLoading"
         private const val IV_PHOTO_PICKER_UPLOAD_ERROR_TAG = "photoPickerUploadError"
         private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG = "photoPickerDownloadError"
-        private const val BALANCE_PHOTO_BUCKET_URL =
-            "https://balance-photo-bucket.s3.ap-northeast-2.amazonaws.com"
         private const val MAXIMUM_NUM_OF_PHOTOS = 6
+        private const val PHOTO_PICKER_PAYLOAD = "photoPickerPayload"
     }
 
     interface PhotoPickerListener {
@@ -303,6 +287,7 @@ class PhotoPickerRecyclerViewAdapter(
         view: View
     ) : RecyclerView.ViewHolder(view)
 
+
 }
 
 
@@ -311,3 +296,4 @@ class PhotoPickerRecyclerViewAdapter(
 // TODO: when no order changed then refresh image why?
 // TODO: recyclerview scroll disable
 // TODO: check delete error goes bakc to its status
+// TODO: glide cache background thread

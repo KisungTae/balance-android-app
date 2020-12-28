@@ -37,7 +37,7 @@ interface BalanceAPI {
     suspend fun uploadPhotoToS3(
         @Url url: String,
         @PartMap formData: Map<String, @JvmSuppressWildcards RequestBody>,
-        @Part photo: MultipartBody.Part
+        @Part multipartBody: MultipartBody.Part
     ): Response<EmptyJsonResponse>
 
     @POST("photo/add")

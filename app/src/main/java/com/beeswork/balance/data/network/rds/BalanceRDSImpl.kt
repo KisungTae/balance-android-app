@@ -49,9 +49,9 @@ class BalanceRDSImpl(
     override suspend fun uploadPhotoToS3(
         url: String,
         formData: Map<String, RequestBody>,
-        photo: MultipartBody.Part
+        multipartBody: MultipartBody.Part
     ): Resource<EmptyJsonResponse> {
-        return getResult { balanceAPI.uploadPhotoToS3(url, formData, photo) }
+        return getResult { balanceAPI.uploadPhotoToS3(url, formData, multipartBody) }
     }
 
     override suspend fun addPhoto(

@@ -31,7 +31,7 @@ interface BalanceRDS {
     suspend fun uploadPhotoToS3(
         url: String,
         formData: Map<String, RequestBody>,
-        photo: MultipartBody.Part
+        multipartBody: MultipartBody.Part
     ): Resource<EmptyJsonResponse>
 
     suspend fun addPhoto(

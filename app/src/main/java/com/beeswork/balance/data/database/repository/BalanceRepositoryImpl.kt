@@ -23,6 +23,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import java.io.File
+import java.io.IOException
 import kotlin.random.Random
 
 
@@ -361,7 +362,7 @@ class BalanceRepositoryImpl(
 
 
 //  ################################################################################# //
-//  ##################################### MESSAGE ##################################### //
+//  ##################################### PHOTO ##################################### //
 //  ################################################################################# //
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
@@ -370,7 +371,6 @@ class BalanceRepositoryImpl(
             val identityToken = preferenceProvider.getIdentityToken()
 
             val response = balanceRDS.fetchPhotos(accountId, identityToken)
-
             if (response.status == Resource.Status.EXCEPTION)
                 return response
 
@@ -390,40 +390,78 @@ class BalanceRepositoryImpl(
     override suspend fun uploadPhoto(
         photoKey: String,
         photoExtension: String,
-        photoUri: Uri,
+        photoUri: Uri?,
         sequence: Int
     ): Resource<EmptyJsonResponse> {
-        val photoFile = Compressor.compress(context, File(photoUri.path!!))
-        if (photoFile.length() > Photo.MAX_SIZE)
-            return Resource.exception(null, ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
+        photoUri?.let { uri ->
+            uri.path?.let { path ->
+                val photo = File(path)
+                if (!fileExists(photo))
+                    return Resource.exception(null, ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION)
 
-        photoDAO.insert(Photo(photoKey, sequence, false))
-        val accountId = preferenceProvider.getAccountId()
-        val identityToken = preferenceProvider.getIdentityToken()
-        val fetchPreSignedUrlResponse =
-            balanceRDS.addPhoto(accountId, identityToken, photoKey, sequence)
+                val compressedPhoto = Compressor.compress(context, photo)
+                if (compressedPhoto.length() > Photo.MAX_SIZE)
+                    return Resource.exception(null, ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
 
-        if (fetchPreSignedUrlResponse.status == Resource.Status.SUCCESS) {
-            val preSignedUrl = fetchPreSignedUrlResponse.data!!
-            photoDAO.sync(photoKey, true)
-            val formData = mutableMapOf<String, RequestBody>()
+                photoDAO.insert(Photo(photoKey, sequence, false))
 
-            for ((key, value) in preSignedUrl.fields) {
-                formData[key] = RequestBody.create(MultipartBody.FORM, value)
+                val fetchPreSignedUrlResponse = balanceRDS.addPhoto(
+                    preferenceProvider.getAccountId(),
+                    preferenceProvider.getIdentityToken(),
+                    photoKey,
+                    sequence
+                )
+
+                if (fetchPreSignedUrlResponse.isSuccess()) {
+                    val preSignedUrl = fetchPreSignedUrlResponse.data!!
+                    photoDAO.sync(photoKey, true)
+                    val formData = mutableMapOf<String, RequestBody>()
+
+                    for ((key, value) in preSignedUrl.fields) {
+                        formData[key] = RequestBody.create(MultipartBody.FORM, value)
+                    }
+
+                    val mediaType = MediaType.parse(
+                        MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)!!
+                    )
+
+                    val requestBody = RequestBody.create(mediaType, compressedPhoto)
+                    val multiPartBody =
+                        MultipartBody.Part.createFormData("file", photoKey, requestBody)
+                    val uploadPhotoToS3Response =
+                        balanceRDS.uploadPhotoToS3(preSignedUrl.url, formData, multiPartBody)
+
+                    if (uploadPhotoToS3Response.isSuccess()) {
+                        deleteFile(compressedPhoto)
+                        deleteFile(photo)
+                    }
+                    return uploadPhotoToS3Response
+                }
+                return Resource.exception(
+                    fetchPreSignedUrlResponse.exceptionMessage,
+                    fetchPreSignedUrlResponse.exceptionCode
+                )
             }
+        }
+        return Resource.exception(null, ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION)
+    }
 
-            val mediaType = MediaType.parse(
-                MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)!!
-            )
+    private fun fileExists(file: File): Boolean {
+        return try {
+            file.exists()
+        } catch (e: IOException) {
+            // TODO: log exception?
+            false
+        }
+    }
 
-            val requestBody = RequestBody.create(mediaType, photoFile)
-            val photo = MultipartBody.Part.createFormData("file", photoKey, requestBody)
-            return balanceRDS.uploadPhotoToS3(preSignedUrl.url, formData, photo)
-        } else {
-            return Resource.exception(
-                fetchPreSignedUrlResponse.exceptionMessage,
-                fetchPreSignedUrlResponse.exceptionCode
-            )
+    private fun deleteFile(file: File) {
+        try {
+            file.delete()
+        } catch (e: IOException) {
+            // TODO: log exception?
+        } catch (e: SecurityException) {
+            // TODO: log exception?
         }
     }
 

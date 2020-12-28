@@ -44,7 +44,7 @@ class PhotoPickerOptionDialog(
                 btnPhotoErrorUpload.visibility = View.VISIBLE
                 btnPhotoErrorUpload.setOnClickListener {
                     dismiss()
-                    photoKey?.let { photoPickerOptionListener.onRedownloadPhoto(it) }
+                    photoKey?.let { photoPickerOptionListener.onReuploadPhoto(it) }
                 }
                 setDeleteBtnListener()
             }

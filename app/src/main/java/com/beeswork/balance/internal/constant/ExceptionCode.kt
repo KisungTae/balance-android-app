@@ -26,6 +26,7 @@ class ExceptionCode {
 
         const val PHOTO_OUT_OF_SIZE_EXCEPTION = "photo_size_out_of_exception"
         const val PHOTO_NOT_FOUND_EXCEPTION = "photo.not.found.exception"
+        const val PHOTO_NOT_EXIST_EXCEPTION = "photo.not.exist.exception"
     }
 
 }

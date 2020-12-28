@@ -130,16 +130,17 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         startActivityForResult(intent, RequestCode.READ_PHOTO_FROM_GALLERY)
     }
 
+    // CASE 1. Read an image from gallery and deleted when launch CropImage --> CropImage activity will result in error
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RequestCode.READ_PHOTO_FROM_GALLERY -> {
                 if (resultCode == RESULT_OK)
-                    data?.data?.let { uri -> launchImageCrop(uri) }
+                    data?.data?.let { uri -> launchCropImage(uri) }
             }
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == RESULT_OK)
-                    result.uri?.let { uri -> uploadPhoto(uri, null) }
+                    uploadPhoto(result.uri, null)
                 else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE)
                     ExceptionDialog(result.error.localizedMessage).show(
                         childFragmentManager,
@@ -149,31 +150,42 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         }
     }
 
-    private fun uploadPhoto(uri: Uri, _photoKey: String?) {
-        val photoExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
-        val photoKey = _photoKey ?: "${generatePhotoKey()}.$photoExtension"
-        val adapter = photoPickerRecyclerViewAdapter()
-        val sequence = adapter.uploadPhoto(photoKey, uri)
-        if (sequence == -1) return
+    override fun onReuploadPhoto(photoKey: String) {
+        uploadPhoto(photoPickerRecyclerViewAdapter().getUriByPhotoKey(photoKey), photoKey)
+    }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val response = balanceRepository.uploadPhoto(photoKey, photoExtension, uri, sequence)
-            withContext(Dispatchers.Main) {
-                if (response.status == Resource.Status.SUCCESS) {
-                    adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.OCCUPIED)
-                } else if (response.status == Resource.Status.EXCEPTION) {
-                    var exceptionMessage = response.exceptionMessage
-                    if (response.exceptionCode == ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
-                        exceptionMessage =
-                            getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
-                    ExceptionDialog(exceptionMessage).show(
-                        childFragmentManager,
-                        ExceptionDialog.TAG
-                    )
-                    adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.UPLOAD_ERROR)
+    private fun uploadPhoto(photoUri: Uri?, _photoKey: String?) {
+        photoUri?.let {
+            val photoExtension = MimeTypeMap.getFileExtensionFromUrl(it.toString())
+            val photoKey = _photoKey ?: "${generatePhotoKey()}.$photoExtension"
+            val adapter = photoPickerRecyclerViewAdapter()
+            val sequence = adapter.uploadPhoto(photoKey, it)
+            if (sequence == -1) return
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val response = balanceRepository.uploadPhoto(photoKey, photoExtension, it, sequence)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccess())
+                        adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.OCCUPIED)
+                    else if (response.isException()) {
+                        var msg = response.exceptionMessage
+                        if (response.exceptionCode == ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
+                            msg = getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
+                        else if (response.exceptionCode == ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION)
+                            msg = getString(R.string.photo_not_exist_exception)
+
+                        ExceptionDialog(msg).show(
+                            childFragmentManager,
+                            ExceptionDialog.TAG
+                        )
+                        adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.UPLOAD_ERROR)
+                    }
                 }
             }
-        }
+        } ?: ExceptionDialog(getString(R.string.photo_uri_null_exception)).show(
+            childFragmentManager,
+            ExceptionDialog.TAG
+        )
     }
 
     private fun generatePhotoKey(): String {
@@ -182,8 +194,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         return photoKey.replace(".", "")
     }
 
-    private fun launchImageCrop(uri: Uri) {
-        CropImage.activity()
+    private fun launchCropImage(uri: Uri) {
         CropImage.activity(uri)
             .setGuidelines(CropImageView.Guidelines.ON)
             .setAspectRatio(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
@@ -227,14 +238,6 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         }
     }
 
-    override fun onReuploadPhoto(photoKey: String) {
-        val uri = photoPickerRecyclerViewAdapter().getUriByPhotoKey(photoKey)
-        if (uri == null) photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
-            photoKey,
-            PhotoPicker.Status.UPLOAD_ERROR
-        )
-        else uploadPhoto(uri, photoKey)
-    }
 
     override fun onRedownloadPhoto(photoKey: String) {
         photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
@@ -267,7 +270,6 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
             0
         ) {
-
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -290,7 +292,9 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                     CoroutineScope(Dispatchers.IO).launch {
                         val response = balanceRepository.reorderPhoto(it)
                         withContext(Dispatchers.Main) {
-                            if (response.isSuccess()) photoPickerRecyclerViewAdapter().reorderPhotoPickers(it)
+                            if (response.isSuccess()) photoPickerRecyclerViewAdapter().reorderPhotoPickers(
+                                it
+                            )
                             else if (response.isException()) {
                                 ExceptionDialog(response.exceptionMessage).show(
                                     childFragmentManager,
