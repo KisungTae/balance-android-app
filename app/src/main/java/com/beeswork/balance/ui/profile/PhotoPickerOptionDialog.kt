@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.profile
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,8 @@ import kotlinx.android.synthetic.main.dialog_photo_picker_option.*
 class PhotoPickerOptionDialog(
     private val photoPickerOptionListener: PhotoPickerOptionListener,
     private val photoKey: String?,
-    private val photoPickerStatus: PhotoPicker.Status
+    private val photoPickerStatus: PhotoPicker.Status,
+    private val photoUri: Uri?
 ) : BottomSheetDialogFragment() {
 
     override fun onCreateView(
@@ -44,7 +46,7 @@ class PhotoPickerOptionDialog(
                 btnPhotoErrorUpload.visibility = View.VISIBLE
                 btnPhotoErrorUpload.setOnClickListener {
                     dismiss()
-                    photoKey?.let { photoPickerOptionListener.onReuploadPhoto(it) }
+                    photoKey?.let { photoPickerOptionListener.onReuploadPhoto(it, photoUri) }
                 }
                 setDeleteBtnListener()
             }
@@ -74,7 +76,7 @@ class PhotoPickerOptionDialog(
 
     interface PhotoPickerOptionListener {
         fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status)
-        fun onReuploadPhoto(photoKey: String)
+        fun onReuploadPhoto(photoKey: String, photoUri: Uri?)
         fun onRedownloadPhoto(photoKey: String)
         fun onUploadPhotoFromGallery()
         fun onUploadPhotoFromCapture()

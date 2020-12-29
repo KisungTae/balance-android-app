@@ -158,6 +158,10 @@ class BalanceApplication : Application(), KodeinAware {
 //      46. modify ratio on photopicker and cropped image to final card
 //      47. delete cropped image when start app or end app
 //      48. delete image on cards, when siwped, glide remove cached iamges
+//      49. implement coroutine exception handler
+//      50. implement global exception handler
+//      51. implement account not found and blocked exception they should be in baseACtivty or somthing
+
 
 
 

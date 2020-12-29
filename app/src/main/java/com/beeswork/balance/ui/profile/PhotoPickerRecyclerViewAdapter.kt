@@ -19,7 +19,10 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.signature.ObjectKey
 import com.github.ybq.android.spinkit.SpinKitView
+import kotlinx.android.synthetic.main.item_photo_picker.view.*
+import org.threeten.bp.Instant
 import java.util.*
 
 class PhotoPickerRecyclerViewAdapter(
@@ -39,25 +42,31 @@ class PhotoPickerRecyclerViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = parent.inflate(R.layout.item_photo_picker)
         view.setOnClickListener {
-            val photoKey = it.tag
-            if (photoKey == null)
-                photoPickerListener.onClickPhotoPicker(null, PhotoPicker.Status.EMPTY)
-            else {
-                val photoPicker = photoPickers.find { p -> p.key == view.tag.toString() }
-                if (photoPicker != null)
-                    photoPickerListener.onClickPhotoPicker(photoPicker.key, photoPicker.status)
+            photoPickers.find { p ->
+                p.key == it.tag?.let { tag -> return@let tag.toString() }
+            }?.let { p ->
+                photoPickerListener.onClickPhotoPicker(p.key, p.status, p.uri)
             }
         }
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        val photoPicker = photoPickers[position]
-        holder.itemView.tag = photoPicker.key
+        updateViewHolder(holder, photoPickers[position])
+    }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        updateViewHolder(holder, photoPickers[position])
+    }
+
+    private fun updateViewHolder(holder: ViewHolder, photoPicker: PhotoPicker) {
+        holder.itemView.tvSequence.text = photoPicker.sequence.toString()
+        holder.itemView.tag = photoPicker.key
         when (photoPicker.status) {
             PhotoPicker.Status.EMPTY -> {
                 showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
+                holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO)
+                    .setImageResource(R.drawable.ic_baseline_add)
             }
             PhotoPicker.Status.LOADING -> {
                 showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
@@ -76,17 +85,16 @@ class PhotoPickerRecyclerViewAdapter(
                 showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
             }
             PhotoPicker.Status.OCCUPIED -> {
+                photoPicker.uri = null
                 showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
             }
         }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {}
-
     override fun getItemCount(): Int = photoPickers.size
 
     private fun loadPhotoFromUri(holder: ViewHolder, photoUri: Uri?) {
-        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO_TAG).setImageURI(photoUri)
+        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO).setImageURI(photoUri)
     }
 
     private fun loadPhotoFromUrl(holder: ViewHolder, photoPicker: PhotoPicker) {
@@ -118,12 +126,14 @@ class PhotoPickerRecyclerViewAdapter(
                         showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
                         return false
                     }
-                }).into(holder.itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO_TAG))
+                }).into(holder.itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
         }
     }
 
+    // NOTE 1. DiskCacheStrategy.NONE, then image is not stored in cache directory
     private fun glideRequestOptions(): RequestOptions {
-        return RequestOptions().centerCrop()
+        return RequestOptions()
+            .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .priority(Priority.HIGH)
             .centerCrop()
@@ -135,10 +145,9 @@ class PhotoPickerRecyclerViewAdapter(
         uploadError: Int,
         downloadError: Int
     ) {
-        itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING_TAG).visibility = loading
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR_TAG).visibility =
-            uploadError
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG).visibility =
+        itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING).visibility = loading
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR).visibility = uploadError
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility =
             downloadError
     }
 
@@ -184,14 +193,10 @@ class PhotoPickerRecyclerViewAdapter(
         return -1
     }
 
-    fun getUriByPhotoKey(photoKey: String): Uri? {
-        return photoPickers.find { it.key == photoKey }?.uri
-    }
-
     fun deletePhoto(photoKey: String) {
         photoPickers.find { it.key == photoKey }?.let {
             val index = photoPickers.indexOf(it)
-            photoPickers.remove(it)
+            photoPickers.removeAt(index)
             notifyItemRemoved(index)
         }
 
@@ -209,9 +214,10 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun swapPhotos(from: Int, to: Int) {
-        val toPhotoPicker = photoPickers[to]
-        if (toPhotoPicker.status == PhotoPicker.Status.OCCUPIED) {
-            Collections.swap(photoPickers, from, to)
+        if (photoPickers[to].status == PhotoPicker.Status.OCCUPIED) {
+            val photoPicker = photoPickers.removeAt(from)
+            photoPickers.add(to, photoPicker)
+//            Collections.swap(photoPickers, from, to)
             notifyItemMoved(from, to)
         }
     }
@@ -230,27 +236,29 @@ class PhotoPickerRecyclerViewAdapter(
         return true
     }
 
-    fun getPhotoPickerSequences(): Map<String, Int>? {
-        var isOutOfOrder = false
-        var prevSequence = Int.MIN_VALUE
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-            if (photoPicker.status == PhotoPicker.Status.EMPTY) break
-            if (prevSequence > photoPicker.sequence) {
-                isOutOfOrder = true
-                break
-            } else prevSequence = photoPicker.sequence
-        }
-        if (!isOutOfOrder) return null
-
+    fun getPhotoPickerSequences(): Map<String, Int> {
         val photoPickerSequences = mutableMapOf<String, Int>()
+        var isOutOfOrder = false
+        var smallestSequence = photoPickers[0].sequence
+
+        for (i in 0 until photoPickers.size - 1) {
+            val next = photoPickers[i + 1]
+            if (next.status != PhotoPicker.Status.OCCUPIED) break
+            if (photoPickers[i].sequence > next.sequence) isOutOfOrder = true
+            if (next.sequence < smallestSequence) smallestSequence = next.sequence
+        }
+        if (!isOutOfOrder) return photoPickerSequences
+
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
-            if (photoPicker.status == PhotoPicker.Status.OCCUPIED) {
-                photoPicker.key?.let { photoPickerSequences.put(it, i) }
-                photoPicker.status = PhotoPicker.Status.LOADING
-                notifyItemChanged(i)
+            if (photoPicker.status == PhotoPicker.Status.OCCUPIED && photoPicker.sequence != smallestSequence) {
+                photoPicker.key?.let {
+                    photoPickerSequences[it] = smallestSequence
+//                    photoPicker.status = PhotoPicker.Status.LOADING
+//                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+                }
             }
+            smallestSequence++
         }
         return photoPickerSequences
     }
@@ -267,20 +275,25 @@ class PhotoPickerRecyclerViewAdapter(
             }
         }
         photoPickers.sortBy { it.sequence }
-        notifyDataSetChanged()
+//        notifyDataSetChanged()
+        notifyItemRangeChanged(0, photoPickers.size - 1, PHOTO_PICKER_PAYLOAD)
     }
 
     companion object {
-        private const val IV_PHOTO_PICKER_PHOTO_TAG = "photoPickerPhoto"
-        private const val SKV_PHOTO_PICKER_LOADING_TAG = "photoPickerLoading"
-        private const val IV_PHOTO_PICKER_UPLOAD_ERROR_TAG = "photoPickerUploadError"
-        private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR_TAG = "photoPickerDownloadError"
+        private const val IV_PHOTO_PICKER_PHOTO = "photoPickerPhoto"
+        private const val SKV_PHOTO_PICKER_LOADING = "photoPickerLoading"
+        private const val IV_PHOTO_PICKER_UPLOAD_ERROR = "photoPickerUploadError"
+        private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR = "photoPickerDownloadError"
         private const val MAXIMUM_NUM_OF_PHOTOS = 6
         private const val PHOTO_PICKER_PAYLOAD = "photoPickerPayload"
     }
 
     interface PhotoPickerListener {
-        fun onClickPhotoPicker(photoKey: String?, photoPickerStatus: PhotoPicker.Status)
+        fun onClickPhotoPicker(
+            photoKey: String?,
+            photoPickerStatus: PhotoPicker.Status,
+            photoUri: Uri?
+        )
     }
 
     class ViewHolder(
@@ -292,8 +305,7 @@ class PhotoPickerRecyclerViewAdapter(
 
 
 // TODO: reorder image disappears
-// TODO: delete cropped image and compressed image
+// TODO: delete cropped image and compressed image - done
 // TODO: when no order changed then refresh image why?
 // TODO: recyclerview scroll disable
-// TODO: check delete error goes bakc to its status
-// TODO: glide cache background thread
+// TODO: check delete error goes bakc to its status - done

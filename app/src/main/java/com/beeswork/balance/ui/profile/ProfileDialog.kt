@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
@@ -93,11 +92,11 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.fetchPhotos()
             withContext(Dispatchers.Main) {
-                if (response.status == Resource.Status.EXCEPTION)
-                    llPhotoPickerGalleryError.visibility = View.VISIBLE
-                else if (response.status == Resource.Status.SUCCESS) {
+                response.data?.let {
                     llPhotoPickerGalleryError.visibility = View.GONE
-                    adapter.initializePhotoPickers(response.data!!)
+                    adapter.initializePhotoPickers(it)
+                } ?: kotlin.run {
+                    llPhotoPickerGalleryError.visibility = View.VISIBLE
                 }
             }
         }
@@ -150,39 +149,33 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         }
     }
 
-    override fun onReuploadPhoto(photoKey: String) {
-        uploadPhoto(photoPickerRecyclerViewAdapter().getUriByPhotoKey(photoKey), photoKey)
+    override fun onReuploadPhoto(photoKey: String, photoUri: Uri?) {
+        uploadPhoto(photoUri, photoKey)
     }
 
-    private fun uploadPhoto(photoUri: Uri?, _photoKey: String?) {
-        photoUri?.let {
-            val photoExtension = MimeTypeMap.getFileExtensionFromUrl(it.toString())
-            val photoKey = _photoKey ?: "${generatePhotoKey()}.$photoExtension"
+    private fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
+        photoUri?.path?.let { path ->
+            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
+            val key = photoKey ?: "${generatePhotoKey()}.$extension"
             val adapter = photoPickerRecyclerViewAdapter()
-            val sequence = adapter.uploadPhoto(photoKey, it)
+            val sequence = adapter.uploadPhoto(key, photoUri)
             if (sequence == -1) return
 
             CoroutineScope(Dispatchers.IO).launch {
-                val response = balanceRepository.uploadPhoto(photoKey, photoExtension, it, sequence)
+                val response = balanceRepository.uploadPhoto(key, extension, path, sequence)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccess())
-                        adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.OCCUPIED)
+                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.OCCUPIED)
                     else if (response.isException()) {
-                        var msg = response.exceptionMessage
-                        if (response.exceptionCode == ExceptionCode.PHOTO_OUT_OF_SIZE_EXCEPTION)
-                            msg = getString(R.string.photo_size_out_of_exception, Photo.maxSizeInMB())
-                        else if (response.exceptionCode == ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION)
-                            msg = getString(R.string.photo_not_exist_exception)
-
-                        ExceptionDialog(msg).show(
+                        ExceptionDialog(response.exceptionMessage).show(
                             childFragmentManager,
                             ExceptionDialog.TAG
                         )
-                        adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.UPLOAD_ERROR)
+                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.UPLOAD_ERROR)
                     }
                 }
             }
-        } ?: ExceptionDialog(getString(R.string.photo_uri_null_exception)).show(
+        } ?: ExceptionDialog(getString(R.string.photo_not_found_exception)).show(
             childFragmentManager,
             ExceptionDialog.TAG
         )
@@ -206,38 +199,32 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             .start(requireContext(), this)
     }
 
-    override fun onClickPhotoPicker(photoKey: String?, photoPickerStatus: PhotoPicker.Status) {
-        PhotoPickerOptionDialog(this, photoKey, photoPickerStatus).show(
+    override fun onClickPhotoPicker(photoKey: String?, photoPickerStatus: PhotoPicker.Status, photoUri: Uri?) {
+        PhotoPickerOptionDialog(this, photoKey, photoPickerStatus, photoUri).show(
             childFragmentManager,
             PhotoPickerOptionDialog.TAG
         )
     }
 
     override fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
-        photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
-            photoKey,
-            PhotoPicker.Status.LOADING
-        )
+        val adapter = photoPickerRecyclerViewAdapter()
+        adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.LOADING)
+
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.deletePhoto(photoKey)
             withContext(Dispatchers.Main) {
-                if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION) {
-                    photoPickerRecyclerViewAdapter().deletePhoto(photoKey)
-                } else if (response.isException()) {
+                if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
+                    adapter.deletePhoto(photoKey)
+                else if (response.isException()) {
                     ExceptionDialog(response.exceptionMessage).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
-                    // TODO: if occupied, set image in when() in adapter
-                    photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
-                        photoKey,
-                        photoPickerStatus
-                    )
+                    adapter.updatePhotoPickerStatus(photoKey, photoPickerStatus)
                 }
             }
         }
     }
-
 
     override fun onRedownloadPhoto(photoKey: String) {
         photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
@@ -288,24 +275,28 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ) {
-                photoPickerRecyclerViewAdapter().getPhotoPickerSequences()?.let {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val response = balanceRepository.reorderPhoto(it)
-                        withContext(Dispatchers.Main) {
-                            if (response.isSuccess()) photoPickerRecyclerViewAdapter().reorderPhotoPickers(
-                                it
-                            )
-                            else if (response.isException()) {
-                                ExceptionDialog(response.exceptionMessage).show(
-                                    childFragmentManager,
-                                    ExceptionDialog.TAG
-                                )
-                                photoPickerRecyclerViewAdapter().reorderPhotoPickers(null)
-                            }
-                        }
-                    }
-                }
-                super.clearView(recyclerView, viewHolder)
+
+                val sequences = photoPickerRecyclerViewAdapter().getPhotoPickerSequences()
+                for ((k, v) in sequences)
+                    println("$k - $v")
+
+//                photoPickerRecyclerViewAdapter().getPhotoPickerSequences()?.let {
+//                    CoroutineScope(Dispatchers.IO).launch {
+//                        val response = balanceRepository.reorderPhoto(it)
+//                        withContext(Dispatchers.Main) {
+//                            if (response.isSuccess()) photoPickerRecyclerViewAdapter().reorderPhotoPickers(
+//                                it
+//                            )
+//                            else if (response.isException()) {
+//                                ExceptionDialog(response.exceptionMessage).show(
+//                                    childFragmentManager,
+//                                    ExceptionDialog.TAG
+//                                )
+//                                photoPickerRecyclerViewAdapter().reorderPhotoPickers(null)
+//                            }
+//                        }
+//                    }
+//                }
             }
 
 

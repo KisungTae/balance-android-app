@@ -56,8 +56,8 @@ interface BalanceRepository {
     suspend fun uploadPhoto(
         photoKey: String,
         photoExtension: String,
-        photoUri: Uri?,
-        sequence: Int
+        photoPath: String,
+        photoSequence: Int
     ): Resource<EmptyJsonResponse>
 
     suspend fun deletePhoto(photoKey: String): Resource<EmptyJsonResponse>
