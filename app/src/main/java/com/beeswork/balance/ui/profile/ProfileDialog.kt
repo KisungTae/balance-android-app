@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -83,6 +85,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         )
         rvPhotoPicker.layoutManager =
             GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM)
+
         setupItemTouchHelperToPhotoPickerRecyclerView()
     }
 
@@ -269,36 +272,33 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 return false
             }
 
+
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
 
             override fun clearView(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ) {
-
-                val sequences = photoPickerRecyclerViewAdapter().getPhotoPickerSequences()
-                for ((k, v) in sequences)
-                    println("$k - $v")
-
-//                photoPickerRecyclerViewAdapter().getPhotoPickerSequences()?.let {
+                viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
+//                val sequences = photoPickerRecyclerViewAdapter().getPhotoPickerSequences()
+//                if (sequences.isNotEmpty()) {
 //                    CoroutineScope(Dispatchers.IO).launch {
-//                        val response = balanceRepository.reorderPhoto(it)
+//                        val response = balanceRepository.reorderPhoto(sequences)
 //                        withContext(Dispatchers.Main) {
-//                            if (response.isSuccess()) photoPickerRecyclerViewAdapter().reorderPhotoPickers(
-//                                it
-//                            )
+//                            if (response.isSuccess())
+//                                photoPickerRecyclerViewAdapter().reorderPhotoPickers(sequences)
 //                            else if (response.isException()) {
 //                                ExceptionDialog(response.exceptionMessage).show(
 //                                    childFragmentManager,
 //                                    ExceptionDialog.TAG
 //                                )
-//                                photoPickerRecyclerViewAdapter().reorderPhotoPickers(null)
+//                                photoPickerRecyclerViewAdapter().revertPhotoPickersSequence(sequences)
 //                            }
 //                        }
 //                    }
 //                }
             }
-
 
             override fun getMovementFlags(
                 recyclerView: RecyclerView,
@@ -315,6 +315,25 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 return super.getMovementFlags(recyclerView, viewHolder)
             }
 
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                super.onChildDraw(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
+            }
         }
 
         val itemTouchHelper = ItemTouchHelper(simpleCallback)

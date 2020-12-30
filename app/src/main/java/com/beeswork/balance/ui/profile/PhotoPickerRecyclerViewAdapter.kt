@@ -60,7 +60,9 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     private fun updateViewHolder(holder: ViewHolder, photoPicker: PhotoPicker) {
-        holder.itemView.tvSequence.text = photoPicker.sequence.toString()
+        val text = "${photoPicker.sequence}: ${holder.itemView.elevation}: ${holder.itemView.z}"
+        holder.itemView.tvSequence.text = text
+
         holder.itemView.tag = photoPicker.key
         when (photoPicker.status) {
             PhotoPicker.Status.EMPTY -> {
@@ -147,8 +149,7 @@ class PhotoPickerRecyclerViewAdapter(
     ) {
         itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING).visibility = loading
         itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR).visibility = uploadError
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility =
-            downloadError
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility = downloadError
     }
 
     fun initializePhotoPickers(photos: List<Photo>) {
@@ -215,9 +216,9 @@ class PhotoPickerRecyclerViewAdapter(
 
     fun swapPhotos(from: Int, to: Int) {
         if (photoPickers[to].status == PhotoPicker.Status.OCCUPIED) {
+//            Collections.swap(photoPickers, from, to)
             val photoPicker = photoPickers.removeAt(from)
             photoPickers.add(to, photoPicker)
-//            Collections.swap(photoPickers, from, to)
             notifyItemMoved(from, to)
         }
     }
@@ -254,8 +255,8 @@ class PhotoPickerRecyclerViewAdapter(
             if (photoPicker.status == PhotoPicker.Status.OCCUPIED && photoPicker.sequence != smallestSequence) {
                 photoPicker.key?.let {
                     photoPickerSequences[it] = smallestSequence
-//                    photoPicker.status = PhotoPicker.Status.LOADING
-//                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+                    photoPicker.status = PhotoPicker.Status.LOADING
+                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
                 }
             }
             smallestSequence++
@@ -263,21 +264,32 @@ class PhotoPickerRecyclerViewAdapter(
         return photoPickerSequences
     }
 
-    fun reorderPhotoPickers(photoPickerSequences: Map<String, Int>?) {
-        photoPickerSequences?.let { sequences ->
-            for (i in photoPickers.indices) {
-                val photoPicker = photoPickers[i]
-                val sequence = sequences[photoPicker.key]
-                sequence?.let {
-                    photoPicker.status = PhotoPicker.Status.OCCUPIED
-                    photoPicker.sequence = it
-                }
+    fun reorderPhotoPickers(photoPickerSequences: Map<String, Int>) {
+
+//        TODO: drag item goes under another
+
+        for (i in photoPickers.indices) {
+            val photoPicker = photoPickers[i]
+            val sequence = photoPickerSequences[photoPicker.key]
+            sequence?.let { s ->
+                photoPicker.sequence = s
+                photoPicker.status = PhotoPicker.Status.OCCUPIED
+                notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
             }
         }
-        photoPickers.sortBy { it.sequence }
-//        notifyDataSetChanged()
+    }
+
+    fun revertPhotoPickersSequence(photoPickerSequences: Map<String, Int>) {
+        for (i in photoPickers.indices) {
+            val photoPicker = photoPickers[i]
+            if (photoPickerSequences.containsKey(photoPicker.key))
+                photoPicker.status = PhotoPicker.Status.OCCUPIED
+        }
+        photoPickers.sortBy { p -> p.sequence }
         notifyItemRangeChanged(0, photoPickers.size - 1, PHOTO_PICKER_PAYLOAD)
     }
+
+
 
     companion object {
         private const val IV_PHOTO_PICKER_PHOTO = "photoPickerPhoto"
@@ -299,7 +311,6 @@ class PhotoPickerRecyclerViewAdapter(
     class ViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view)
-
 
 }
 
