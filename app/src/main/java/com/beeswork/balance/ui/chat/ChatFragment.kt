@@ -17,6 +17,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
+import ua.naiksoftware.stomp.Stomp
 
 class ChatFragment: ScopeFragment(), KodeinAware {
 
@@ -24,9 +25,6 @@ class ChatFragment: ScopeFragment(), KodeinAware {
     private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatPagedListAdapter: ChatPagedListAdapter
-
-    //  TODO: remove me
-    private val balanceRepository: BalanceRepository by instance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,30 +40,23 @@ class ChatFragment: ScopeFragment(), KodeinAware {
         val safeArgs = arguments?.let { ChatFragmentArgs.fromBundle(it) }
         val chatId = safeArgs?.chatId ?: throw ChatIdNotFoundException()
         viewModel = ViewModelProvider(this, viewModelFactory(chatId)).get(ChatViewModel::class.java)
-
         bindUI()
-
-        btnAddMessage.setOnClickListener {
-            println("clicked to add message")
-            balanceRepository.insertMessage(chatId)
-        }
     }
 
     private fun bindUI() = launch {
+        setupChatPagedList()
+        setupMessageObserver()
+        setupStompClient()
+    }
+
+    private fun setupStompClient() {
+        val stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://10.0.2.2:8080/example-endpoint/websocket")
+        stompClient.connect()
+        stompClient.topic("dd")
+    }
+
+    private suspend fun setupMessageObserver() {
         val messages = viewModel.messages.await()
-
-        chatPagedListAdapter = ChatPagedListAdapter()
-
-        rvChat.adapter = chatPagedListAdapter
-
-        val layoutManager = LinearLayoutManager(this@ChatFragment.context)
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
-        layoutManager.reverseLayout = true
-
-        rvChat.layoutManager = layoutManager
-
-        rvChat.scrollToPosition(0)
-
         messages.observe(viewLifecycleOwner, Observer { pagedMessageList ->
             pagedMessageList?.let {
                 chatPagedListAdapter.submitList(pagedMessageList)
@@ -73,5 +64,15 @@ class ChatFragment: ScopeFragment(), KodeinAware {
         })
     }
 
+    private fun setupChatPagedList() {
+        chatPagedListAdapter = ChatPagedListAdapter()
+        rvChat.adapter = chatPagedListAdapter
+
+        val layoutManager = LinearLayoutManager(this@ChatFragment.context)
+        layoutManager.orientation = LinearLayoutManager.VERTICAL
+        layoutManager.reverseLayout = true
+        rvChat.layoutManager = layoutManager
+        rvChat.scrollToPosition(0)
+    }
 
 }

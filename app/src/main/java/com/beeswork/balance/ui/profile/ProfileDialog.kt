@@ -71,9 +71,9 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         btnProfileDialogClose.setOnClickListener { dismiss() }
         btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
         setupPhotoPickerRecyclerView()
-//        tvEditBalanceGame.setOnClickListener {
-        //            EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
-//        }
+        tvEditBalanceGame.setOnClickListener {
+                    EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
+        }
 
     }
 
@@ -83,8 +83,17 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             this,
             preferenceProvider.getAccountId()
         )
+
         rvPhotoPicker.layoutManager =
-            GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM)
+            object : GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+
+                override fun canScrollHorizontally(): Boolean {
+                    return false
+                }
+            }
 
         setupItemTouchHelperToPhotoPickerRecyclerView()
     }
@@ -202,7 +211,11 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             .start(requireContext(), this)
     }
 
-    override fun onClickPhotoPicker(photoKey: String?, photoPickerStatus: PhotoPicker.Status, photoUri: Uri?) {
+    override fun onClickPhotoPicker(
+        photoKey: String?,
+        photoPickerStatus: PhotoPicker.Status,
+        photoUri: Uri?
+    ) {
         PhotoPickerOptionDialog(this, photoKey, photoPickerStatus, photoUri).show(
             childFragmentManager,
             PhotoPickerOptionDialog.TAG
@@ -272,32 +285,32 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 return false
             }
 
-
-
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
 
             override fun clearView(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ) {
-                viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
-//                val sequences = photoPickerRecyclerViewAdapter().getPhotoPickerSequences()
-//                if (sequences.isNotEmpty()) {
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        val response = balanceRepository.reorderPhoto(sequences)
-//                        withContext(Dispatchers.Main) {
-//                            if (response.isSuccess())
-//                                photoPickerRecyclerViewAdapter().reorderPhotoPickers(sequences)
-//                            else if (response.isException()) {
-//                                ExceptionDialog(response.exceptionMessage).show(
-//                                    childFragmentManager,
-//                                    ExceptionDialog.TAG
-//                                )
-//                                photoPickerRecyclerViewAdapter().revertPhotoPickersSequence(sequences)
-//                            }
-//                        }
-//                    }
-//                }
+                viewHolder.itemView.setTag(
+                    androidx.recyclerview.R.id.item_touch_helper_previous_elevation,
+                    null
+                )
+                val sequences = photoPickerRecyclerViewAdapter().getPhotoPickerSequences()
+                if (sequences.isEmpty()) return
+                CoroutineScope(Dispatchers.IO).launch {
+                    val response = balanceRepository.reorderPhoto(sequences)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccess())
+                            photoPickerRecyclerViewAdapter().reorderPhotoPickers(sequences)
+                        else if (response.isException()) {
+                            ExceptionDialog(response.exceptionMessage).show(
+                                childFragmentManager,
+                                ExceptionDialog.TAG
+                            )
+                            photoPickerRecyclerViewAdapter().revertPhotoPickersSequence(sequences)
+                        }
+                    }
+                }
             }
 
             override fun getMovementFlags(

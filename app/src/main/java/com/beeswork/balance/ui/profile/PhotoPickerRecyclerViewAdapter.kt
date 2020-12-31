@@ -19,11 +19,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.signature.ObjectKey
 import com.github.ybq.android.spinkit.SpinKitView
 import kotlinx.android.synthetic.main.item_photo_picker.view.*
-import org.threeten.bp.Instant
-import java.util.*
 
 class PhotoPickerRecyclerViewAdapter(
     private val context: Context,
@@ -32,6 +29,9 @@ class PhotoPickerRecyclerViewAdapter(
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
 
     private val photoPickers: MutableList<PhotoPicker> = mutableListOf()
+    private var lastFromIndex = 0
+    private var lastToIndex = 0
+
 
     init {
         repeat(MAXIMUM_NUM_OF_PHOTOS) {
@@ -60,8 +60,7 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     private fun updateViewHolder(holder: ViewHolder, photoPicker: PhotoPicker) {
-        val text = "${photoPicker.sequence}: ${holder.itemView.elevation}: ${holder.itemView.z}"
-        holder.itemView.tvSequence.text = text
+        holder.itemView.tvSequence.text = photoPicker.sequence.toString()
 
         holder.itemView.tag = photoPicker.key
         when (photoPicker.status) {
@@ -149,7 +148,8 @@ class PhotoPickerRecyclerViewAdapter(
     ) {
         itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING).visibility = loading
         itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR).visibility = uploadError
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility = downloadError
+        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility =
+            downloadError
     }
 
     fun initializePhotoPickers(photos: List<Photo>) {
@@ -216,9 +216,10 @@ class PhotoPickerRecyclerViewAdapter(
 
     fun swapPhotos(from: Int, to: Int) {
         if (photoPickers[to].status == PhotoPicker.Status.OCCUPIED) {
-//            Collections.swap(photoPickers, from, to)
             val photoPicker = photoPickers.removeAt(from)
             photoPickers.add(to, photoPicker)
+            lastFromIndex = from
+            lastToIndex = to
             notifyItemMoved(from, to)
         }
     }
@@ -240,34 +241,29 @@ class PhotoPickerRecyclerViewAdapter(
     fun getPhotoPickerSequences(): Map<String, Int> {
         val photoPickerSequences = mutableMapOf<String, Int>()
         var isOutOfOrder = false
-        var smallestSequence = photoPickers[0].sequence
-
         for (i in 0 until photoPickers.size - 1) {
-            val next = photoPickers[i + 1]
-            if (next.status != PhotoPicker.Status.OCCUPIED) break
-            if (photoPickers[i].sequence > next.sequence) isOutOfOrder = true
-            if (next.sequence < smallestSequence) smallestSequence = next.sequence
+            if (photoPickers[i].sequence > photoPickers[i + 1].sequence) {
+                isOutOfOrder = true
+                break
+            }
         }
+
         if (!isOutOfOrder) return photoPickerSequences
 
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
-            if (photoPicker.status == PhotoPicker.Status.OCCUPIED && photoPicker.sequence != smallestSequence) {
+            if (photoPicker.status == PhotoPicker.Status.OCCUPIED) {
                 photoPicker.key?.let {
-                    photoPickerSequences[it] = smallestSequence
+                    photoPickerSequences[it] = i
                     photoPicker.status = PhotoPicker.Status.LOADING
                     notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
                 }
             }
-            smallestSequence++
         }
         return photoPickerSequences
     }
 
     fun reorderPhotoPickers(photoPickerSequences: Map<String, Int>) {
-
-//        TODO: drag item goes under another
-
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
             val sequence = photoPickerSequences[photoPicker.key]
@@ -280,15 +276,18 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun revertPhotoPickersSequence(photoPickerSequences: Map<String, Int>) {
+        val removed = photoPickers.removeAt(lastToIndex)
+        photoPickers.add(lastFromIndex, removed)
+        notifyItemMoved(lastToIndex, lastFromIndex)
+
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
-            if (photoPickerSequences.containsKey(photoPicker.key))
+            if (photoPickerSequences.containsKey(photoPicker.key)) {
                 photoPicker.status = PhotoPicker.Status.OCCUPIED
+                notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+            }
         }
-        photoPickers.sortBy { p -> p.sequence }
-        notifyItemRangeChanged(0, photoPickers.size - 1, PHOTO_PICKER_PAYLOAD)
     }
-
 
 
     companion object {
@@ -313,10 +312,3 @@ class PhotoPickerRecyclerViewAdapter(
     ) : RecyclerView.ViewHolder(view)
 
 }
-
-
-// TODO: reorder image disappears
-// TODO: delete cropped image and compressed image - done
-// TODO: when no order changed then refresh image why?
-// TODO: recyclerview scroll disable
-// TODO: check delete error goes bakc to its status - done
