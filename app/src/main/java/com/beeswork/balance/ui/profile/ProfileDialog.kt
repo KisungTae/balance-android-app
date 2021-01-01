@@ -153,7 +153,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 if (resultCode == RESULT_OK)
                     uploadPhoto(result.uri, null)
                 else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE)
-                    ExceptionDialog(result.error.localizedMessage).show(
+                    ExceptionDialog(result.error.localizedMessage, null).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
@@ -179,7 +179,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                     if (response.isSuccess())
                         adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.OCCUPIED)
                     else if (response.isException()) {
-                        ExceptionDialog(response.exceptionMessage).show(
+                        ExceptionDialog(response.exceptionMessage, null).show(
                             childFragmentManager,
                             ExceptionDialog.TAG
                         )
@@ -187,7 +187,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                     }
                 }
             }
-        } ?: ExceptionDialog(getString(R.string.photo_not_found_exception)).show(
+        } ?: ExceptionDialog(getString(R.string.photo_not_found_exception), null).show(
             childFragmentManager,
             ExceptionDialog.TAG
         )
@@ -232,7 +232,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
                     adapter.deletePhoto(photoKey)
                 else if (response.isException()) {
-                    ExceptionDialog(response.exceptionMessage).show(
+                    ExceptionDialog(response.exceptionMessage, null).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
@@ -303,7 +303,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                         if (response.isSuccess())
                             photoPickerRecyclerViewAdapter().reorderPhotoPickers(sequences)
                         else if (response.isException()) {
-                            ExceptionDialog(response.exceptionMessage).show(
+                            ExceptionDialog(response.exceptionMessage, null).show(
                                 childFragmentManager,
                                 ExceptionDialog.TAG
                             )
@@ -319,7 +319,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             ): Int {
                 if (!photoPickerRecyclerViewAdapter().isPhotoPickerDraggable(viewHolder.layoutPosition)) return 0
                 if (!photoPickerRecyclerViewAdapter().isOrderable()) {
-                    ExceptionDialog(getString(R.string.photo_not_orderable_exception)).show(
+                    ExceptionDialog(getString(R.string.photo_not_orderable_exception), null).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )

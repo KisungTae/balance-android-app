@@ -9,7 +9,10 @@ import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
 import kotlinx.android.synthetic.main.dialog_exception.*
 
-class ExceptionDialog(private val exceptionMessage: String?) : DialogFragment() {
+class ExceptionDialog(
+    private val exceptionMessage: String?,
+    private val exceptionDialogListener: ExceptionDialogListener?
+) : DialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
