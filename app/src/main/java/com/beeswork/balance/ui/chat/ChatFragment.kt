@@ -6,11 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.ChatIdNotFoundException
+import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.base.ScopeFragment
+import com.beeswork.balance.ui.dialog.ExceptionDialog
+import com.beeswork.balance.ui.dialog.ExceptionDialogListener
+import com.beeswork.balance.ui.match.MatchFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -27,16 +32,13 @@ import ua.naiksoftware.stomp.dto.LifecycleEvent
 import ua.naiksoftware.stomp.dto.StompHeader
 
 
-class ChatFragment: ScopeFragment(), KodeinAware {
+class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
     private val preferenceProvider: PreferenceProvider by instance()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatPagedListAdapter: ChatPagedListAdapter
-    private lateinit var stompClient: StompClient
-    private lateinit var compositeDisposable: CompositeDisposable
-    private var chatId: Long = -1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,70 +53,22 @@ class ChatFragment: ScopeFragment(), KodeinAware {
         arguments?.let {
             ChatFragmentArgs.fromBundle(it)
         }?.let {
-            chatId = it.chatId
-            viewModel = ViewModelProvider(this, viewModelFactory(chatId)).get(ChatViewModel::class.java)
+            viewModel = ViewModelProvider(
+                this,
+                viewModelFactory(it.chatId)
+            ).get(ChatViewModel::class.java)
             bindUI()
         } ?: kotlin.run {
-            println("argument is null")
+            ExceptionDialog(getString(R.string.chat_id_not_found_exception), this).show(
+                childFragmentManager,
+                ExceptionDialog.TAG
+            )
         }
     }
 
     private fun bindUI() = launch {
         setupChatPagedList()
         setupMessageObserver()
-        setupStompClient()
-    }
-
-    private fun resetSubscription() {
-        compositeDisposable = CompositeDisposable()
-    }
-
-    private fun setupStompClient() {
-        stompClient = Stomp.over(
-            Stomp.ConnectionProvider.OKHTTP,
-            "ws://10.0.2.2:8080/chat/websocket"
-        )
-
-        val headers = mutableListOf<StompHeader>()
-        headers.add(StompHeader("LOGIN", "guest"))
-        headers.add(StompHeader("PASSCODE", "guest"))
-
-        stompClient.withClientHeartbeat(0).withServerHeartbeat(0)
-
-        resetSubscription()
-
-        val dispLifecycle: Disposable = stompClient.lifecycle()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { lifecycleEvent ->
-                when (lifecycleEvent.type) {
-                    LifecycleEvent.Type.OPENED -> println("Stomp connection opened")
-                    LifecycleEvent.Type.ERROR -> println("Stomp connection error: ${lifecycleEvent.exception}")
-                    LifecycleEvent.Type.CLOSED -> {
-                        println("Stomp connection closed")
-                        resetSubscription()
-                    }
-                    LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> println("Stomp failed server heartbeat")
-                }
-            }
-
-        compositeDisposable.add(dispLifecycle)
-
-        val queue = "/queue/${preferenceProvider.getAccountId()}-1"
-//        stompClient.topic(queue).subscribe { topicMessage ->
-//            println(topicMessage.getPayload())
-//        }
-        val dispTopic: Disposable = stompClient.topic(queue)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ topicMessage ->
-                println("Received " + topicMessage.getPayload())
-//                addItem(mGson.fromJson(topicMessage.getPayload(), EchoModel::class.java))
-            }) { throwable -> println("Error on subscribe topic: $throwable") }
-
-        compositeDisposable.add(dispTopic)
-
-        stompClient.connect(headers)
     }
 
     private suspend fun setupMessageObserver() {
@@ -135,6 +89,11 @@ class ChatFragment: ScopeFragment(), KodeinAware {
         layoutManager.reverseLayout = true
         rvChat.layoutManager = layoutManager
         rvChat.scrollToPosition(0)
+    }
+
+    override fun onClickExceptionDialogCloseBtn() {
+        Navigation.findNavController(requireView())
+            .navigate(R.id.action_chatFragment_to_matchFragment)
     }
 
 }

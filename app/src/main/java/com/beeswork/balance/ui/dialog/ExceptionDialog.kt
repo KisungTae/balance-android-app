@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.dialog
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +23,10 @@ class ExceptionDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btnExceptionDialogClose.setOnClickListener { dismiss() }
+        btnExceptionDialogClose.setOnClickListener {
+            dismiss()
+            exceptionDialogListener?.onClickExceptionDialogCloseBtn()
+        }
         tvExceptionDialogMessage.text = exceptionMessage
     }
 

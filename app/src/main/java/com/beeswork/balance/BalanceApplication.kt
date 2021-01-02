@@ -65,9 +65,12 @@ class BalanceApplication : Application(), KodeinAware {
 
         }
 
+        // Provider
+        bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
+
         // Factory
         bind() from provider { MatchViewModelFactory(instance()) }
-        bind() from factory { chatId: Long -> ChatViewModelFactory(chatId, instance()) }
+        bind() from factory { chatId: Long -> ChatViewModelFactory(chatId, instance(), instance()) }
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
@@ -90,8 +93,7 @@ class BalanceApplication : Application(), KodeinAware {
         // NDS
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
-        // Provider
-        bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
+
 
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
