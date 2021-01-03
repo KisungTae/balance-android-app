@@ -13,11 +13,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
-import ua.naiksoftware.stomp.Stomp
-import ua.naiksoftware.stomp.StompClient
-import ua.naiksoftware.stomp.dto.LifecycleEvent
-import ua.naiksoftware.stomp.dto.StompHeader
-import ua.naiksoftware.stomp.dto.StompMessage
+
 
 
 class ChatViewModel(
@@ -38,97 +34,79 @@ class ChatViewModel(
         LivePagedListBuilder(balanceRepository.getMessages(chatId), pagedListConfig).build()
     }
 
-    private lateinit var stompClient: StompClient
-    private lateinit var compositeDisposables: CompositeDisposable
+//    private lateinit var stompClient: StompClient
+//    private lateinit var compositeDisposables: CompositeDisposable
 
     init {
-        setupStompClient()
+//        setupStompClient()
     }
 
-    private fun setupStompClient() {
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, BalanceURL.WEB_SOCKET_ENDPOINT)
-        compositeDisposables = CompositeDisposable()
-        compositeDisposables.add(setupStompClientLifeCycle())
-        setupSubscription()
-        stompClient.connect()
-    }
-
-    private fun getStompConnectionHeaders(): MutableList<StompHeader> {
-        val headers = mutableListOf<StompHeader>()
-        headers.add(StompHeader("LOGIN", "guest"))
-        headers.add(StompHeader("PASSCODE", "guest"))
-        return headers
-    }
-
-    private fun setupSubscription() {
-        stompClient.topic(queueName(), subscriptionHeaders())
-            .doOnError {
-                println("setupSubscription doOnError: ${it.message}")
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Subscriber<StompMessage> {
-                override fun onSubscribe(s: Subscription?) {
-
-                }
-
-                override fun onNext(t: StompMessage?) {
-
-                }
-
-                override fun onError(t: Throwable?) {
-                    println("onError123123123")
-                }
-
-                override fun onComplete() {
-
-                }
-
-            })
-
-
+//    private fun setupStompClient() {
+//        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, BalanceURL.WEB_SOCKET_ENDPOINT)
+//        compositeDisposables = CompositeDisposable()
+//        compositeDisposables.add(setupStompClientLifeCycle())
+//        setupSubscription()
+//        stompClient.connect()
+//    }
+//
+//    private fun getStompConnectionHeaders(): MutableList<StompHeader> {
+//        val headers = mutableListOf<StompHeader>()
+//        headers.add(StompHeader("LOGIN", "guest"))
+//        headers.add(StompHeader("PASSCODE", "guest"))
+//        return headers
+//    }
+//
+//    private fun setupSubscription() {
+//        compositeDisposables.add(stompClient.topic(queueName(), subscriptionHeaders())
+//            .doOnError {
+//                println("setupSubscription doOnError: ${it.message}")
+//            }
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
 //            .subscribe({ topicMessage ->
+//                println("stompCommand: " + topicMessage.stompCommand)
 //                println("Received " + topicMessage.payload)
-//            }) { throwable -> println("Error on subscribe topic: $throwable") }
-    }
-
-    private fun subscriptionHeaders(): MutableList<StompHeader> {
-        val headers = mutableListOf<StompHeader>()
-        headers.add(StompHeader("accountId", preferenceProvider.getAccountId()))
-        headers.add(StompHeader("identityToken", preferenceProvider.getIdentityToken()))
-        headers.add(StompHeader("chatId", chatId.toString()))
-        return headers
-    }
-
-    private fun setupStompClientLifeCycle(): Disposable {
-        return stompClient.lifecycle()
-            .doOnError {
-                println("setupStompClientLifeCycle doOnError")
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ lifecycleEvent ->
-                when (lifecycleEvent.type) {
-                    LifecycleEvent.Type.OPENED -> println("Stomp connection opened")
-                    LifecycleEvent.Type.ERROR -> println("Stomp connection error: ${lifecycleEvent.exception}")
-                    LifecycleEvent.Type.CLOSED -> {
-                        println("Stomp connection closed!!!!!!123")
-                        compositeDisposables.clear()
-                    }
-                    LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> println("Stomp failed server heartbeat")
-                    else -> println("dddd")
-                }
-            }) { throwable -> println("lifecycle error!!!!!!!!!: $throwable") }
-    }
-
-    private fun queueName(): String {
-        return "/queue/${preferenceProvider.getAccountId()}-$chatId"
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposables.clear()
-    }
+//            }) { throwable -> println("Error on subscribe topic: $throwable") })
+//    }
+//
+//    private fun subscriptionHeaders(): MutableList<StompHeader> {
+//        val headers = mutableListOf<StompHeader>()
+//        headers.add(StompHeader("accountId", preferenceProvider.getAccountId()))
+//        headers.add(StompHeader("identityToken", preferenceProvider.getIdentityToken()))
+//        headers.add(StompHeader("chatId", chatId.toString()))
+//        headers.add(StompHeader("accept-language", "kr"))
+//        return headers
+//    }
+//
+//    private fun setupStompClientLifeCycle(): Disposable {
+//        return stompClient.lifecycle()
+//            .doOnError {
+//                println("setupStompClientLifeCycle doOnError")
+//            }
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe({ lifecycleEvent ->
+//                when (lifecycleEvent.type) {
+//                    LifecycleEvent.Type.OPENED -> println("Stomp connection opened")
+//                    LifecycleEvent.Type.ERROR -> println("Stomp connection error: ${lifecycleEvent.exception}")
+//                    LifecycleEvent.Type.CLOSED -> {
+//                        println("Stomp connection closed!!!!!!123")
+//                        compositeDisposables.clear()
+//                    }
+//                    LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> println("Stomp failed server heartbeat")
+//                    else -> println("dddd")
+//                }
+//            }) { throwable -> println("lifecycle error!!!!!!!!!: $throwable") }
+//    }
+//
+//    private fun queueName(): String {
+//        return "/queue/${preferenceProvider.getAccountId()}-$chatId"
+//    }
+//
+//    override fun onCleared() {
+//        super.onCleared()
+//        compositeDisposables.clear()
+//    }
 
     companion object {
         const val CHAT_PAGE_SIZE = 30

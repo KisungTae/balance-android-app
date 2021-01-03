@@ -26,10 +26,6 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
-import ua.naiksoftware.stomp.Stomp
-import ua.naiksoftware.stomp.StompClient
-import ua.naiksoftware.stomp.dto.LifecycleEvent
-import ua.naiksoftware.stomp.dto.StompHeader
 
 
 class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
