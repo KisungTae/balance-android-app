@@ -7,10 +7,6 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.lazyDeferred
 import com.beeswork.balance.internal.provider.PreferenceProvider
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 
