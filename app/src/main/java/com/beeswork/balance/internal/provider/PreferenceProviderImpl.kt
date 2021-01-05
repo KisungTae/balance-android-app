@@ -97,11 +97,11 @@ class PreferenceProviderImpl(
     }
 
     override fun getAccountId(): String {
-        return "ea11c916-515e-475d-97ad-e82d82c84fed"
+        return "9f881819-638a-4098-954c-ce34b133d32a"
     }
 
     override fun getIdentityToken(): String {
-        return "2ce84fab-6a73-45b4-93b3-d2b44e9ec5e3"
+        return "96c80a98-8807-4aee-999c-ceca92e009c3"
     }
 
 }
