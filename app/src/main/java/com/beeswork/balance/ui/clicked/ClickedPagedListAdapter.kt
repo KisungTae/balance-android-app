@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.internal.inflate
-import com.squareup.picasso.Picasso
 
 import kotlinx.android.synthetic.main.item_clicked.view.*
 
@@ -55,7 +54,7 @@ class ClickedPagedListAdapter(
         fun bind(clicked: Clicked) {
             itemView.tag = clicked.swiperId
             itemView.tvClicked.text = clicked.swiperId
-            Picasso.get().load(R.drawable.person1).into(itemView.ivClicked)
+            itemView.ivClicked.setImageResource(R.drawable.person1)
         }
 
         override fun onClick(v: View?) {

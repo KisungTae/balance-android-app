@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.internal.inflate
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_match.view.*
 
 class MatchPagedListAdapter(
@@ -50,7 +49,7 @@ class MatchPagedListAdapter(
 
         fun bind(match: Match) {
 
-            Picasso.get().load(R.drawable.person1).into(itemView.ivMatch)
+            itemView.ivMatch.setImageResource(R.drawable.person1)
             itemView.tvMatchName.text = match.toString()
 //            itemView.tvMatchRecentMessage.text = match.recentMessage
 //            itemView.tvMatchUnmatch.text = match.unmatched.toString()

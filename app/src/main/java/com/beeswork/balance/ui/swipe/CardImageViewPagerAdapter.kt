@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_card_image.view.*
 
 class CardImageViewPagerAdapter(
@@ -27,8 +26,7 @@ class CardImageViewPagerAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Picasso.get().load(images[position]).fit().centerCrop().into(holder.itemView.imageView)
-
+        holder.itemView.imageView.setImageResource(images[position])
     }
 
     interface CardImageListener {

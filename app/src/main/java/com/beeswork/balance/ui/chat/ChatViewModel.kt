@@ -7,6 +7,13 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.lazyDeferred
 import com.beeswork.balance.internal.provider.PreferenceProvider
+import com.neovisionaries.ws.client.WebSocket
+import com.neovisionaries.ws.client.WebSocketAdapter
+import com.neovisionaries.ws.client.WebSocketException
+import com.neovisionaries.ws.client.WebSocketFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 
@@ -30,12 +37,47 @@ class ChatViewModel(
         LivePagedListBuilder(balanceRepository.getMessages(chatId), pagedListConfig).build()
     }
 
+    init {
+        val webSocket = WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
+        webSocket.addListener(object : WebSocketAdapter() {
+            override fun onConnected(
+                websocket: WebSocket?,
+                headers: MutableMap<String, MutableList<String>>?
+            ) {
+                println("onConnected")
+                super.onConnected(websocket, headers)
+            }
+
+            override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
+                println("onConnectError")
+                super.onConnectError(websocket, exception)
+            }
+        })
+
+        CoroutineScope(Dispatchers.IO).launch {
+            webSocket.connect()
+        }
+
+    }
+
+
+    companion object {
+        const val CHAT_PAGE_SIZE = 30
+        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE * 2
+        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 2 + CHAT_PAGE_SIZE
+    }
+}
+
+
+
+
+
+
+
+
+
 //    private lateinit var stompClient: StompClient
 //    private lateinit var compositeDisposables: CompositeDisposable
-
-    init {
-//        setupStompClient()
-    }
 
 //    private fun setupStompClient() {
 //        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, BalanceURL.WEB_SOCKET_ENDPOINT)
@@ -103,10 +145,3 @@ class ChatViewModel(
 //        super.onCleared()
 //        compositeDisposables.clear()
 //    }
-
-    companion object {
-        const val CHAT_PAGE_SIZE = 30
-        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE * 2
-        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 2 + CHAT_PAGE_SIZE
-    }
-}

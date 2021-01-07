@@ -59,9 +59,6 @@ dependencies {
     // CardStack
     implementation "com.yuyakaido.android:card-stack-view:2.3.4"
 
-    // Picasso
-    implementation 'com.squareup.picasso:picasso:2.71828'
-
     // Coroutine
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
@@ -121,6 +118,10 @@ dependencies {
     // rx-java
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
+
+    // websocket
+    implementation 'com.neovisionaries:nv-websocket-client:2.10'
+
 
 
 }
