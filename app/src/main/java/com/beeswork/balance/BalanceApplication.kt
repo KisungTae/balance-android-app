@@ -12,6 +12,8 @@ import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.provider.PreferenceProviderImpl
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
+import com.beeswork.balance.data.network.stomp.StompClient
+import com.beeswork.balance.data.network.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
@@ -61,16 +63,17 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance()
             )
-
-
         }
+
+        // StompClient
+        bind() from singleton { StompClientImpl() }
 
         // Provider
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance()) }
-        bind() from factory { chatId: Long -> ChatViewModelFactory(chatId, instance(), instance()) }
+        bind() from factory { chatId: Long -> ChatViewModelFactory(chatId, instance(), instance(), instance()) }
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
@@ -93,11 +96,8 @@ class BalanceApplication : Application(), KodeinAware {
         // NDS
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
-
-
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
-
 
 
 

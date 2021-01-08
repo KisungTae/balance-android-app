@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.data.network.stomp.StompClient
 import com.beeswork.balance.data.network.stomp.StompFrame
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.lazyDeferred
@@ -20,7 +21,8 @@ import java.util.*
 class ChatViewModel(
     private val chatId: Long,
     private val balanceRepository: BalanceRepository,
-    private val preferenceProvider: PreferenceProvider
+    private val preferenceProvider: PreferenceProvider,
+    private val stompClient: StompClient
 ) : ViewModel() {
 
     private val pagedListConfig = PagedList.Config.Builder()
@@ -37,60 +39,7 @@ class ChatViewModel(
 
     init {
         val webSocket = WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
-        webSocket.addListener(object : WebSocketAdapter() {
-            override fun onConnected(
-                websocket: WebSocket?,
-                headers: MutableMap<String, MutableList<String>>?
-            ) {
-                println("onConnected")
-                super.onConnected(websocket, headers)
-            }
-
-            override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-                println("onFrame")
-                println(frame)
-                Thread.sleep(10000)
-                super.onFrame(websocket, frame)
-            }
-
-            override fun onFrameError(
-                websocket: WebSocket?,
-                cause: WebSocketException?,
-                frame: WebSocketFrame?
-            ) {
-                println("onFrameError")
-                super.onFrameError(websocket, cause, frame)
-            }
-
-            override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
-                println("onConnectError")
-                super.onConnectError(websocket, exception)
-            }
-
-            override fun onDisconnected(
-                websocket: WebSocket?,
-                serverCloseFrame: WebSocketFrame?,
-                clientCloseFrame: WebSocketFrame?,
-                closedByServer: Boolean
-            ) {
-                println("onDisconnected")
-                super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
-            }
-        })
-
-        CoroutineScope(Dispatchers.IO).launch {
-            webSocket.connect()
-
-            val headers = mutableMapOf<String, String>()
-            headers["id"] = UUID.randomUUID().toString()
-            headers["destination"] = queueName()
-            headers["ack"] = "auto"
-
-            val stompFrame = StompFrame(StompFrame.Command.SUBSCRIBE, headers, null)
-            webSocket.sendText(stompFrame.compile())
-
-        }
-
+        stompClient.send()
     }
 
     private fun queueName(): String {

@@ -61,6 +61,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private fun bindUI() = launch {
         setupChatPagedList()
         setupMessageObserver()
+
     }
 
     private suspend fun setupMessageObserver() {
