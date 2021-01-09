@@ -1,13 +1,22 @@
 package com.beeswork.balance.data.network.stomp
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.neovisionaries.ws.client.*
-import com.neovisionaries.ws.client.WebSocket
-import okhttp3.*
-import okio.ByteString
+import io.reactivex.rxjava3.subjects.PublishSubject
+import java.util.*
 
 
 class StompClientImpl : StompClient {
+    private val mutableWebSocketLifeCycleEvent = MutableLiveData<Resource<WebSocketLifeCycleEvent>>()
+    override val webSocketLifeCycleEvent: LiveData<Resource<WebSocketLifeCycleEvent>>
+        get() = mutableWebSocketLifeCycleEvent
+
+    private val mutableStompFrame = MutableLiveData<Resource<StompFrame>>()
+    override val stompFrame: LiveData<Resource<StompFrame>>
+        get() = mutableStompFrame
 
     private val webSocket: WebSocket =
         WebSocketFactory().setConnectionTimeout(50000).createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
@@ -22,15 +31,12 @@ class StompClientImpl : StompClient {
                 websocket: WebSocket?,
                 headers: MutableMap<String, MutableList<String>>?
             ) {
-                println("onConnected")
-                super.onConnected(websocket, headers)
             }
 
             override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-                println("onFrame")
-                println(frame)
-                Thread.sleep(10000)
-                super.onFrame(websocket, frame)
+                frame?.let {
+
+                }
             }
 
             override fun onFrameError(
@@ -63,8 +69,22 @@ class StompClientImpl : StompClient {
         })
     }
 
+    override fun subscribe(path: String) {
+        val headers = mutableMapOf<String, String>()
+        headers[StompHeader.ID] = UUID.randomUUID().toString()
+        headers[StompHeader.DESTINATION] = path
+        headers[StompHeader.ACK] = DEFAULT_ACK
+        webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+    }
+
     override fun send() {
         println("stomp client send!!!!!!!!!!!!!!!")
+    }
+
+
+    companion object {
+        const val SUPPORTED_VERSIONS = "1.1,1.2"
+        const val DEFAULT_ACK = "auto"
     }
 
 }

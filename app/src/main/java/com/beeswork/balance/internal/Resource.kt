@@ -8,6 +8,18 @@ class Resource<out T>(
     val fieldErrorMessages: Map<String, String>?
 ) {
 
+    var hasBeenHandled = false
+        private set
+
+    fun getContentIfNotHandledOrReturnNull(): T? {
+        return if (hasBeenHandled) {
+            null
+        } else {
+            hasBeenHandled = true
+            data
+        }
+    }
+
     fun isSuccess(): Boolean {
         return this.status == Status.SUCCESS
     }

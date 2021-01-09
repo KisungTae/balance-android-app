@@ -61,7 +61,27 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private fun bindUI() = launch {
         setupChatPagedList()
         setupMessageObserver()
+        setupWebSocketLifeCycleEventObserver()
+        setupStompFrameObserver()
 
+        // TODO: remove me
+        btnChatSubscribe.setOnClickListener {
+
+            println(etChatAccountId.text)
+        }
+
+    }
+
+    private fun setupWebSocketLifeCycleEventObserver() {
+        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
+
+        })
+    }
+
+    private fun setupStompFrameObserver() {
+        viewModel.stompFrame.observe(viewLifecycleOwner, {
+
+        })
     }
 
     private suspend fun setupMessageObserver() {

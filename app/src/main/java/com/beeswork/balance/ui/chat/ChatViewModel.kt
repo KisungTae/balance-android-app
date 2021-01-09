@@ -6,10 +6,12 @@ import androidx.paging.PagedList
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.stomp.StompClient
 import com.beeswork.balance.data.network.stomp.StompFrame
+import com.beeswork.balance.data.network.stomp.WebSocketLifeCycleEvent
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.lazyDeferred
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.neovisionaries.ws.client.*
+import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,14 +39,18 @@ class ChatViewModel(
         LivePagedListBuilder(balanceRepository.getMessages(chatId), pagedListConfig).build()
     }
 
-    init {
-        val webSocket = WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
-        stompClient.send()
-    }
+    val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent
+    val stompFrame = stompClient.stompFrame
 
     private fun queueName(): String {
         return "/queue/${preferenceProvider.getAccountId()}-$chatId"
     }
+
+    fun subscribe() {
+
+    }
+
+
 
 
     companion object {
