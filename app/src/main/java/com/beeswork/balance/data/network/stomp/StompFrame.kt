@@ -70,6 +70,7 @@ class StompFrame(
 
     enum class Command {
         SEND,
+        CONNECT,
         SUBSCRIBE,
         UNSUBSCRIBE,
         BEGIN,

@@ -11,12 +11,21 @@ import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.lazyDeferred
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.neovisionaries.ws.client.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+
 import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
+import ua.naiksoftware.stomp.Stomp
+
+import ua.naiksoftware.stomp.dto.LifecycleEvent
+import ua.naiksoftware.stomp.dto.StompHeader
 import java.util.*
 
 
@@ -46,30 +55,33 @@ class ChatViewModel(
         return "/queue/${preferenceProvider.getAccountId()}-$chatId"
     }
 
-    fun subscribe() {
+    // TODO: remove id parameter
+    fun subscribe(id: String) {
+        stompClient.subscribe("/queue/$id-$chatId")
+    }
 
+    // TODO: remove matchedId
+    fun send(matchedId: String, message: String) {
+        stompClient.send(matchedId, chatId, message)
     }
 
 
 
 
-    companion object {
-        const val CHAT_PAGE_SIZE = 30
-        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE * 2
-        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 2 + CHAT_PAGE_SIZE
-    }
-}
-
-
-//    private lateinit var stompClient: StompClient
+//    private lateinit var stompClient2: ua.naiksoftware.stomp.StompClient
 //    private lateinit var compositeDisposables: CompositeDisposable
-
+//
+//    init {
+//
+//        setupStompClient()
+//    }
+//
 //    private fun setupStompClient() {
-//        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, BalanceURL.WEB_SOCKET_ENDPOINT)
+//        stompClient2 = Stomp.over(Stomp.ConnectionProvider.OKHTTP, BalanceURL.WEB_SOCKET_ENDPOINT)
 //        compositeDisposables = CompositeDisposable()
 //        compositeDisposables.add(setupStompClientLifeCycle())
 //        setupSubscription()
-//        stompClient.connect()
+//        stompClient2.connect()
 //    }
 //
 //    private fun getStompConnectionHeaders(): MutableList<StompHeader> {
@@ -80,7 +92,7 @@ class ChatViewModel(
 //    }
 //
 //    private fun setupSubscription() {
-//        compositeDisposables.add(stompClient.topic(queueName(), subscriptionHeaders())
+//        compositeDisposables.add(stompClient2.topic("/queue/test-1", subscriptionHeaders())
 //            .doOnError {
 //                println("setupSubscription doOnError: ${it.message}")
 //            }
@@ -102,7 +114,7 @@ class ChatViewModel(
 //    }
 //
 //    private fun setupStompClientLifeCycle(): Disposable {
-//        return stompClient.lifecycle()
+//        return stompClient2.lifecycle()
 //            .doOnError {
 //                println("setupStompClientLifeCycle doOnError")
 //            }
@@ -121,10 +133,23 @@ class ChatViewModel(
 //                }
 //            }) { throwable -> println("lifecycle error!!!!!!!!!: $throwable") }
 //    }
-//
 
-//
+
+
 //    override fun onCleared() {
 //        super.onCleared()
 //        compositeDisposables.clear()
 //    }
+
+
+
+
+
+    companion object {
+        const val CHAT_PAGE_SIZE = 30
+        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE * 2
+        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 2 + CHAT_PAGE_SIZE
+    }
+}
+
+

@@ -10,5 +10,5 @@ interface StompClient {
     val stompFrame: LiveData<Resource<StompFrame>>
 
     fun subscribe(path: String)
-    fun send()
+    fun send(matchedId: String, chatId: Long, message: String)
 }

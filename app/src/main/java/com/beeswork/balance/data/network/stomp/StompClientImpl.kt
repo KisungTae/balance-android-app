@@ -4,8 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceURL
+import com.google.gson.JsonObject
 import com.neovisionaries.ws.client.*
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
@@ -18,11 +24,11 @@ class StompClientImpl : StompClient {
     override val stompFrame: LiveData<Resource<StompFrame>>
         get() = mutableStompFrame
 
-    private val webSocket: WebSocket =
-        WebSocketFactory().setConnectionTimeout(50000).createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
+    private val webSocket: WebSocket = WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
     init {
         setupWebSocketListener()
+        connectWebSocket()
     }
 
     private fun setupWebSocketListener() {
@@ -31,9 +37,13 @@ class StompClientImpl : StompClient {
                 websocket: WebSocket?,
                 headers: MutableMap<String, MutableList<String>>?
             ) {
+                connect()
+                println("onConnected")
             }
 
             override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
+                println("onFrame")
+                
                 frame?.let {
 
                 }
@@ -69,16 +79,50 @@ class StompClientImpl : StompClient {
         })
     }
 
-    override fun subscribe(path: String) {
-        val headers = mutableMapOf<String, String>()
-        headers[StompHeader.ID] = UUID.randomUUID().toString()
-        headers[StompHeader.DESTINATION] = path
-        headers[StompHeader.ACK] = DEFAULT_ACK
-        webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+    private fun connectWebSocket() {
+        CoroutineScope(Dispatchers.IO).launch {
+            webSocket.connect()
+        }
     }
 
-    override fun send() {
-        println("stomp client send!!!!!!!!!!!!!!!")
+    private fun connect() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val headers = mutableMapOf<String, String>()
+            headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
+            headers[StompHeader.HEART_BEAT] = "0,0"
+            webSocket.sendText(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
+        }
+    }
+
+    override fun subscribe(path: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val headers = mutableMapOf<String, String>()
+            headers[StompHeader.ID] = "sub-${UUID.randomUUID()}"
+            headers[StompHeader.DESTINATION] = path
+            headers[StompHeader.ACK] = DEFAULT_ACK
+            headers[StompHeader.AUTO_DELETE] = true.toString()
+            headers[StompHeader.EXCLUSIVE] = false.toString()
+            headers[StompHeader.DURABLE] = true.toString()
+            headers["accept-language"] = "kr"
+            webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+        }
+    }
+
+    override fun send(matchedId: String, chatId: Long, message: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val headers = mutableMapOf<String, String>()
+            headers[StompHeader.DESTINATION] = "/app/chat/send"
+            headers[StompHeader.RECIPIENT_ID] = matchedId
+            headers["chat-id"] = chatId.toString()
+
+            val json = JSONObject()
+            json.put("message", message)
+            json.put("createdAt", OffsetDateTime.now().toString())
+
+            println(json.toString())
+
+            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, json.toString()).compile())
+        }
     }
 
 

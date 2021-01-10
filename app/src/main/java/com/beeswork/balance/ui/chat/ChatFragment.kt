@@ -64,24 +64,27 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupWebSocketLifeCycleEventObserver()
         setupStompFrameObserver()
 
+        btnChatSend.setOnClickListener {
+            viewModel.send(etMatchedId.text.toString(), etChatMessage.text.toString())
+        }
+
         // TODO: remove me
         btnChatSubscribe.setOnClickListener {
-
-            println(etChatAccountId.text)
+            viewModel.subscribe(etChatAccountId.text.toString())
         }
 
     }
 
     private fun setupWebSocketLifeCycleEventObserver() {
-        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
-
-        })
+//        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
+//
+//        })
     }
 
     private fun setupStompFrameObserver() {
-        viewModel.stompFrame.observe(viewLifecycleOwner, {
-
-        })
+//        viewModel.stompFrame.observe(viewLifecycleOwner, {
+//
+//        })
     }
 
     private suspend fun setupMessageObserver() {
@@ -108,5 +111,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         Navigation.findNavController(requireView())
             .navigate(R.id.action_chatFragment_to_matchFragment)
     }
+
+
 
 }
