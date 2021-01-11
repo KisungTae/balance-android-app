@@ -69,9 +69,11 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
         viewModel.fetchMatches()
     }
 
-    override fun onMatchClick(view: View, chatId: Long) {
-        Navigation.findNavController(view)
-            .navigate(MatchFragmentDirections.matchToChatAction(chatId))
+    override fun onMatchClick(view: View, position: Int) {
+        matchPagedListAdapter.getMatchByPosition(position)?.let {
+            Navigation.findNavController(view)
+                .navigate(MatchFragmentDirections.matchToChatAction(it.chatId, it.matchedId))
+        }
     }
 
     override fun onRefetch() {

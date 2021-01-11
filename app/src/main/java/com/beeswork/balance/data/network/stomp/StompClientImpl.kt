@@ -2,8 +2,11 @@ package com.beeswork.balance.data.network.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceURL
+import com.beeswork.balance.internal.constant.HttpHeader
+import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.google.gson.JsonObject
 import com.neovisionaries.ws.client.*
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -15,7 +18,10 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
-class StompClientImpl : StompClient {
+class StompClientImpl(
+    private val balanceRepository: BalanceRepository,
+    private val preferenceProvider: PreferenceProvider
+) : StompClient {
     private val mutableWebSocketLifeCycleEvent = MutableLiveData<Resource<WebSocketLifeCycleEvent>>()
     override val webSocketLifeCycleEvent: LiveData<Resource<WebSocketLifeCycleEvent>>
         get() = mutableWebSocketLifeCycleEvent
@@ -31,6 +37,7 @@ class StompClientImpl : StompClient {
         connectWebSocket()
     }
 
+
     private fun setupWebSocketListener() {
         webSocket.addListener(object : WebSocketAdapter() {
             override fun onConnected(
@@ -42,9 +49,11 @@ class StompClientImpl : StompClient {
             }
 
             override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-                println("onFrame")
-                
                 frame?.let {
+                    println("onFrame")
+
+
+                    println(frame.payloadText)
 
                 }
             }
@@ -89,31 +98,31 @@ class StompClientImpl : StompClient {
         CoroutineScope(Dispatchers.IO).launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
-            headers[StompHeader.HEART_BEAT] = "0,0"
+            headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
             webSocket.sendText(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
         }
     }
 
-    override fun subscribe(path: String) {
+    override fun subscribe(chatId: Long) {
         CoroutineScope(Dispatchers.IO).launch {
             val headers = mutableMapOf<String, String>()
-            headers[StompHeader.ID] = "sub-${UUID.randomUUID()}"
-            headers[StompHeader.DESTINATION] = path
+            headers[StompHeader.ID] = UUID.randomUUID().toString()
+            headers[StompHeader.DESTINATION] = queueName(chatId)
             headers[StompHeader.ACK] = DEFAULT_ACK
             headers[StompHeader.AUTO_DELETE] = true.toString()
             headers[StompHeader.EXCLUSIVE] = false.toString()
             headers[StompHeader.DURABLE] = true.toString()
-            headers["accept-language"] = "kr"
+            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().language
             webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }
 
-    override fun send(matchedId: String, chatId: Long, message: String) {
+    override fun send(chatId: Long, message: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val headers = mutableMapOf<String, String>()
-            headers[StompHeader.DESTINATION] = "/app/chat/send"
-            headers[StompHeader.RECIPIENT_ID] = matchedId
-            headers["chat-id"] = chatId.toString()
+            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
+//            headers[StompHeader.RECIPIENT_ID] = matchedId
+            headers[StompHeader.CHAT_ID] = chatId.toString()
 
             val json = JSONObject()
             json.put("message", message)
@@ -121,14 +130,22 @@ class StompClientImpl : StompClient {
 
             println(json.toString())
 
-            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, json.toString()).compile())
+//            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, json.toString()).compile())
         }
     }
 
 
+
+    private fun queueName(chatId: Long): String {
+        return "/queue/${preferenceProvider.getAccountId()}-$chatId"
+    }
+
+
     companion object {
-        const val SUPPORTED_VERSIONS = "1.1,1.2"
-        const val DEFAULT_ACK = "auto"
+        private const val SUPPORTED_VERSIONS = "1.1,1.2"
+        private const val DEFAULT_ACK = "auto"
+        private const val DEFAULT_HEART_BEAT = "0,0"
+
     }
 
 }

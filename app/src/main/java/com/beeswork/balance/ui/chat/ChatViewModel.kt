@@ -31,8 +31,8 @@ import java.util.*
 
 class ChatViewModel(
     private val chatId: Long,
+    private val matchedId: String,
     private val balanceRepository: BalanceRepository,
-    private val preferenceProvider: PreferenceProvider,
     private val stompClient: StompClient
 ) : ViewModel() {
 
@@ -51,18 +51,14 @@ class ChatViewModel(
     val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent
     val stompFrame = stompClient.stompFrame
 
-    private fun queueName(): String {
-        return "/queue/${preferenceProvider.getAccountId()}-$chatId"
+
+    fun subscribe() {
+        println("matchedID from chatviewmodel: $matchedId")
+        stompClient.subscribe(chatId)
     }
 
-    // TODO: remove id parameter
-    fun subscribe(id: String) {
-        stompClient.subscribe("/queue/$id-$chatId")
-    }
-
-    // TODO: remove matchedId
-    fun send(matchedId: String, message: String) {
-        stompClient.send(matchedId, chatId, message)
+    fun send(message: String) {
+        stompClient.send(chatId, message)
     }
 
 

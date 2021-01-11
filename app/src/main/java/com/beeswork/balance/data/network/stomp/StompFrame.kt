@@ -1,5 +1,7 @@
 package com.beeswork.balance.data.network.stomp
 
+import com.beeswork.balance.data.database.entity.Message
+import com.google.gson.Gson
 import java.io.StringReader
 import java.util.*
 import java.util.regex.Matcher
@@ -8,14 +10,14 @@ import java.util.regex.Pattern
 class StompFrame(
     private val command: Command,
     private val headers: Map<String, String>?,
-    private val payload: String?
+    private val message: Message?
 ) {
 
     constructor(
         command: String,
         headers: Map<String, String>?,
-        payload: String?
-    ) : this(Command.valueOfDefault(command), headers, payload)
+        message: Message?
+    ) : this(Command.valueOfDefault(command), headers, message)
 
 
 
@@ -28,8 +30,9 @@ class StompFrame(
         }
 
         builder.append(System.lineSeparator())
-        payload?.let {
-            builder.append(payload)
+        message?.let {
+            Gson().toJson(message)
+//            builder.append(payload)
             builder.append(System.lineSeparator() + System.lineSeparator())
         }
 
@@ -42,8 +45,8 @@ class StompFrame(
         private const val HEADER_PATTERN = "([^:\\s]+)\\s*:\\s*([^\\n]+)"
 
         fun from(data: String?): StompFrame {
-            if (data == null || data.trim().isEmpty())
-                return StompFrame(Command.UNKNOWN, null, data)
+//            if (data == null || data.trim().isEmpty())
+//                return StompFrame(Command.UNKNOWN, null, data)
 
             val reader = Scanner(StringReader(data))
             reader.useDelimiter(System.lineSeparator())
@@ -64,7 +67,11 @@ class StompFrame(
             reader.skip(System.lineSeparator() + System.lineSeparator())
             reader.useDelimiter(TERMINATE_MESSAGE_SYMBOL)
             val payload = if (reader.hasNext()) reader.next() else null
-            return StompFrame(command, headers, payload)
+            payload?.let {
+
+            }
+            // TODO: modify to return message in stompFrame
+            return StompFrame(command, headers, null)
         }
     }
 

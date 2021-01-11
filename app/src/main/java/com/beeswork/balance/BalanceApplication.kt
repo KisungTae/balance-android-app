@@ -66,14 +66,14 @@ class BalanceApplication : Application(), KodeinAware {
         }
 
         // StompClient
-        bind() from singleton { StompClientImpl() }
+        bind() from singleton { StompClientImpl(instance(), instance()) }
 
         // Provider
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance()) }
-        bind() from factory { chatId: Long -> ChatViewModelFactory(chatId, instance(), instance(), instance()) }
+        bind() from factory { chatId: Long, matchedId: String -> ChatViewModelFactory(chatId, matchedId, instance(), instance()) }
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }

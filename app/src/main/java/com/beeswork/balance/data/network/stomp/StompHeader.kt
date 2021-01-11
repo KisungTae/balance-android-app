@@ -15,6 +15,7 @@ class StompHeader {
         const val AUTO_DELETE = "auto-delete"
         const val EXCLUSIVE = "exclusive"
         const val DURABLE = "durable"
+        const val CHAT_ID = "chat-id"
 
     }
 }

@@ -23,6 +23,10 @@ class MatchPagedListAdapter(
         holder.bind(getItem(position)!!)
     }
 
+    fun getMatchByPosition(position: Int): Match? {
+        return getItem(position)
+    }
+
     companion object {
 
         private val diffCallback = object : DiffUtil.ItemCallback<Match>() {
@@ -35,7 +39,7 @@ class MatchPagedListAdapter(
     }
 
     interface OnMatchListener {
-        fun onMatchClick(view: View, chatId: Long)
+        fun onMatchClick(view: View, position: Int)
     }
 
     class MatchHolder(
@@ -48,16 +52,14 @@ class MatchPagedListAdapter(
         }
 
         fun bind(match: Match) {
-
             itemView.ivMatch.setImageResource(R.drawable.person1)
             itemView.tvMatchName.text = match.toString()
 //            itemView.tvMatchRecentMessage.text = match.recentMessage
 //            itemView.tvMatchUnmatch.text = match.unmatched.toString()
-            itemView.tag = match.chatId
         }
 
         override fun onClick(view: View) {
-            onMatchListener.onMatchClick(view, view.tag.toString().toLong())
+            onMatchListener.onMatchClick(view, layoutPosition)
         }
     }
 

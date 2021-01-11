@@ -8,13 +8,13 @@ import com.beeswork.balance.internal.provider.PreferenceProvider
 
 class ChatViewModelFactory(
     private val chatId: Long,
+    private val matchedId: String,
     private val balanceRepository: BalanceRepository,
-    private val preferenceProvider: PreferenceProvider,
     private val stompClient: StompClient
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ChatViewModel(chatId, balanceRepository, preferenceProvider, stompClient) as T
+        return ChatViewModel(chatId, matchedId, balanceRepository, stompClient) as T
     }
 }

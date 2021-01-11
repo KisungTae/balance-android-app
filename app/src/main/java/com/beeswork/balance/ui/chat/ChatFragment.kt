@@ -28,7 +28,6 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
-    private val preferenceProvider: PreferenceProvider by instance()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatPagedListAdapter: ChatPagedListAdapter
 
@@ -50,6 +49,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
                 viewModelFactory(it.chatId)
             ).get(ChatViewModel::class.java)
             bindUI()
+            println("matchedId: ${it.matchedId}")
         } ?: kotlin.run {
             ExceptionDialog(getString(R.string.chat_id_not_found_exception), this).show(
                 childFragmentManager,
@@ -63,16 +63,10 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         setupStompFrameObserver()
-
         btnChatSend.setOnClickListener {
-            viewModel.send(etMatchedId.text.toString(), etChatMessage.text.toString())
+            viewModel.send(etChatMessage.text.toString())
         }
-
-        // TODO: remove me
-        btnChatSubscribe.setOnClickListener {
-            viewModel.subscribe(etChatAccountId.text.toString())
-        }
-
+        viewModel.subscribe()
     }
 
     private fun setupWebSocketLifeCycleEventObserver() {
