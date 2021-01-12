@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
+import com.beeswork.balance.internal.provider.GsonProvider
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
@@ -115,11 +116,6 @@ interface BalanceAPI {
             okHttpClient: OkHttpClient
         ): BalanceAPI {
 
-            val gson = GsonBuilder().registerTypeAdapter(
-                OffsetDateTime::class.java,
-                StringToOffsetDateTimeDeserializer()
-            ).create()
-
             return Retrofit.Builder()
                 .client(okHttpClient)
 //                .baseUrl("https://nw9pdhgsp6.execute-api.ap-northeast-2.amazonaws.com/prod/balance/")
@@ -127,7 +123,7 @@ interface BalanceAPI {
 //                .baseUrl("http://localhost:8080/")
 //                .baseUrl("http://192.168.1.100:8081/")
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create(GsonProvider.gson))
                 .build()
                 .create(BalanceAPI::class.java)
         }

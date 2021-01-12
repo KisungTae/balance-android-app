@@ -521,8 +521,8 @@ class BalanceRepositoryImpl(
             Message(
                 null,
                 chatId,
-                Message.Status.SENDING,
                 message,
+                Message.Status.SENDING,
                 received = false,
                 read = true,
                 createdAt

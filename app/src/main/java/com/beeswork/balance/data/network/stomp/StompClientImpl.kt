@@ -2,21 +2,18 @@ package com.beeswork.balance.data.network.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.beeswork.balance.data.database.entity.Message
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.provider.PreferenceProvider
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.neovisionaries.ws.client.*
-import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 
 
@@ -24,7 +21,8 @@ class StompClientImpl(
     private val balanceRepository: BalanceRepository,
     private val preferenceProvider: PreferenceProvider
 ) : StompClient {
-    private val mutableWebSocketLifeCycleEvent = MutableLiveData<Resource<WebSocketLifeCycleEvent>>()
+    private val mutableWebSocketLifeCycleEvent =
+        MutableLiveData<Resource<WebSocketLifeCycleEvent>>()
     override val webSocketLifeCycleEvent: LiveData<Resource<WebSocketLifeCycleEvent>>
         get() = mutableWebSocketLifeCycleEvent
 
@@ -32,7 +30,8 @@ class StompClientImpl(
     override val stompFrame: LiveData<Resource<StompFrame>>
         get() = mutableStompFrame
 
-    private val webSocket: WebSocket = WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
+    private val webSocket: WebSocket =
+        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
     init {
         setupWebSocketListener()
@@ -101,7 +100,7 @@ class StompClientImpl(
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
             headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
-            webSocket.sendText(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
+            webSocket.sendText(StompFrame(StompFrame.Command.CONNECT, headers).compile())
         }
     }
 
@@ -113,11 +112,15 @@ class StompClientImpl(
             headers[StompHeader.AUTO_DELETE] = true.toString()
             headers[StompHeader.EXCLUSIVE] = false.toString()
             headers[StompHeader.DURABLE] = true.toString()
-            webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+            webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
         }
     }
 
-    private fun stompIdentityHeaders(destination: String, matchedId: String, chatId: Long): MutableMap<String, String> {
+    private fun stompIdentityHeaders(
+        destination: String,
+        matchedId: String,
+        chatId: Long
+    ): MutableMap<String, String> {
         val headers = mutableMapOf<String, String>()
         headers[StompHeader.DESTINATION] = destination
         headers[StompHeader.ACCOUNT_ID] = preferenceProvider.getAccountId()
@@ -130,25 +133,12 @@ class StompClientImpl(
 
     override fun send(chatId: Long, matchedId: String, message: String) {
         CoroutineScope(Dispatchers.IO).launch {
+            val now = OffsetDateTime.now(ZoneOffset.UTC)
             val headers = stompIdentityHeaders(BalanceURL.STOMP_SEND_ENDPOINT, matchedId, chatId)
-            val messageId = balanceRepository.sendMessage(chatId, message, OffsetDateTime.now())
-
-            val msg = Message(null, chatId, Message.Status.SENDING, message, false, false, OffsetDateTime.now())
-            val msgJson = Gson().toJson(msg)
-
-
-
-
-            val json = JSONObject()
-            json.put("message", message)
-            json.put("createdAt", OffsetDateTime.now().toString())
-
-            println(json.toString())
-
-//            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, json.toString()).compile())
+            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message, now).toString()
+            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, message, now).compile())
         }
     }
-
 
 
     private fun queueName(chatId: Long): String {

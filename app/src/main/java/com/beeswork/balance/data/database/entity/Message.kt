@@ -15,11 +15,9 @@ data class Message(
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
 
-    @Expose
     val chatId: Long,
-
-    val status: Status,
     val message: String,
+    val status: Status,
     val received: Boolean,
     val read: Boolean,
     val createdAt: OffsetDateTime

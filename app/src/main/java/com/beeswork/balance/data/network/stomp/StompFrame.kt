@@ -1,24 +1,35 @@
 package com.beeswork.balance.data.network.stomp
 
 import com.beeswork.balance.data.database.entity.Message
+import com.beeswork.balance.internal.converter.OffsetDateTimeToISOStringSerializer
+import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
+import com.beeswork.balance.internal.provider.GsonProvider
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import org.threeten.bp.OffsetDateTime
 import java.io.StringReader
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class StompFrame(
+data class StompFrame(
     private val command: Command,
     private val headers: Map<String, String>?,
-    private val message: Message?
+    private val message: Message?,
+    private val exception: Exception?
 ) {
 
     constructor(
-        command: String,
-        headers: Map<String, String>?,
-        message: Message?
-    ) : this(Command.valueOfDefault(command), headers, message)
+        command: Command,
+        headers: Map<String, String>,
+        message: String,
+        createdAt: OffsetDateTime
+    ) : this(command, headers, Message(message, createdAt), null)
 
+    constructor(
+        command: Command,
+        headers: Map<String, String>?
+    ) : this(command, headers, null, null)
 
 
     fun compile(): String {
@@ -31,8 +42,7 @@ class StompFrame(
 
         builder.append(System.lineSeparator())
         message?.let {
-            Gson().toJson(message)
-//            builder.append(payload)
+            builder.append(GsonProvider.gson.toJson(message))
             builder.append(System.lineSeparator() + System.lineSeparator())
         }
 
@@ -71,9 +81,19 @@ class StompFrame(
 
             }
             // TODO: modify to return message in stompFrame
-            return StompFrame(command, headers, null)
+            return StompFrame(Command.valueOfDefault(command), headers)
         }
     }
+
+    class Message(
+        val message: String,
+        val createdAt: OffsetDateTime
+    )
+
+    class Exception(
+        val error: String,
+        val message: String
+    )
 
     enum class Command {
         SEND,
