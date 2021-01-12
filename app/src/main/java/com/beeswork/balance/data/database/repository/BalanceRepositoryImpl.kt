@@ -509,29 +509,28 @@ class BalanceRepositoryImpl(
         }
     }
 
-
     //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
-//          out of screen.
-//  TEST 2. when update all entries in database, it will update the items in list as well
-    override fun insertMessage(chatId: Long) {
-        GlobalScope.launch(Dispatchers.IO) {
-
-            for (i in 1..2000) {
-                val randomMessage = Random.nextInt(0, 100000)
-
-                val message = Message(
-                    null,
-                    chatId,
-                    "message - $randomMessage",
-                    Random.nextBoolean(),
-                    Random.nextBoolean(),
-                    OffsetDateTime.now()
-                )
-                messageDAO.insert(message)
-//                messageDAO.updateMessages()
-            }
-        }
+    //          out of screen.
+    //  TEST 2. when update all entries in database, it will update the items in list as well
+    override suspend fun sendMessage(
+        chatId: Long,
+        message: String,
+        createdAt: OffsetDateTime
+    ): Long {
+        return messageDAO.insert(
+            Message(
+                null,
+                chatId,
+                Message.Status.SENDING,
+                message,
+                received = false,
+                read = true,
+                createdAt
+            )
+        )
     }
+
+
 
 }
 

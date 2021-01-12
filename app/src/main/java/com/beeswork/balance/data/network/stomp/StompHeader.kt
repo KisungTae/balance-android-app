@@ -16,6 +16,10 @@ class StompHeader {
         const val EXCLUSIVE = "exclusive"
         const val DURABLE = "durable"
         const val CHAT_ID = "chat-id"
+        const val MATCHED_ID = "matched-id"
+        const val ACCOUNT_ID = ""
+        const val IDENTITY_TOKEN = ""
+
 
     }
 }

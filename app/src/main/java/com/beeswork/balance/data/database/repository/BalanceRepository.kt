@@ -9,6 +9,7 @@ import com.beeswork.balance.data.database.entity.Message
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
+import org.threeten.bp.OffsetDateTime
 
 interface BalanceRepository {
 
@@ -35,7 +36,7 @@ interface BalanceRepository {
 
     // message
     suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message>
-    fun insertMessage(chatId: Long)
+    suspend fun sendMessage(chatId: Long, message: String, createdAt: OffsetDateTime): Long
 
     // account
     val cards: LiveData<Resource<List<CardResponse>>>

@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.entity
 
 import androidx.room.*
+import com.google.gson.annotations.Expose
 import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "message",
@@ -14,9 +15,18 @@ data class Message(
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
 
+    @Expose
     val chatId: Long,
+
+    val status: Status,
     val message: String,
-    val isReceived: Boolean,
-    val isRead: Boolean,
-    val sentAt: OffsetDateTime
-)
+    val received: Boolean,
+    val read: Boolean,
+    val createdAt: OffsetDateTime
+) {
+    enum class Status {
+        SENDING,
+        SENT,
+        ERROR
+    }
+}

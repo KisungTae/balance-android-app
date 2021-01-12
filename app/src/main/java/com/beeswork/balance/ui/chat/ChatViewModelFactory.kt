@@ -7,14 +7,18 @@ import com.beeswork.balance.data.network.stomp.StompClient
 import com.beeswork.balance.internal.provider.PreferenceProvider
 
 class ChatViewModelFactory(
-    private val chatId: Long,
-    private val matchedId: String,
+    private val chatViewModelFactoryParameter: ChatViewModelFactoryParameter,
     private val balanceRepository: BalanceRepository,
     private val stompClient: StompClient
-): ViewModelProvider.NewInstanceFactory() {
+) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ChatViewModel(chatId, matchedId, balanceRepository, stompClient) as T
+        return ChatViewModel(
+            chatViewModelFactoryParameter.chatId,
+            chatViewModelFactoryParameter.matchedId,
+            balanceRepository,
+            stompClient
+        ) as T
     }
 }

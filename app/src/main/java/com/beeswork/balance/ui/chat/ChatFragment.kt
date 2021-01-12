@@ -27,7 +27,7 @@ import org.kodein.di.generic.instance
 class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
+    private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatPagedListAdapter: ChatPagedListAdapter
 
@@ -46,10 +46,9 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         }?.let {
             viewModel = ViewModelProvider(
                 this,
-                viewModelFactory(it.chatId)
+                viewModelFactory(ChatViewModelFactoryParameter(it.chatId, it.matchedId))
             ).get(ChatViewModel::class.java)
             bindUI()
-            println("matchedId: ${it.matchedId}")
         } ?: kotlin.run {
             ExceptionDialog(getString(R.string.chat_id_not_found_exception), this).show(
                 childFragmentManager,
@@ -63,9 +62,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         setupStompFrameObserver()
-        btnChatSend.setOnClickListener {
-            viewModel.send(etChatMessage.text.toString())
-        }
+        btnChatSend.setOnClickListener { viewModel.send(etChatMessage.text.toString()) }
         viewModel.subscribe()
     }
 

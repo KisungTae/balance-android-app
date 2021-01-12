@@ -11,21 +11,13 @@ import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.lazyDeferred
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.neovisionaries.ws.client.*
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 
 import io.reactivex.rxjava3.subjects.PublishSubject
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
-import ua.naiksoftware.stomp.Stomp
-
-import ua.naiksoftware.stomp.dto.LifecycleEvent
-import ua.naiksoftware.stomp.dto.StompHeader
 import java.util.*
 
 
@@ -53,12 +45,11 @@ class ChatViewModel(
 
 
     fun subscribe() {
-        println("matchedID from chatviewmodel: $matchedId")
-        stompClient.subscribe(chatId)
+        stompClient.subscribe(chatId, matchedId)
     }
 
     fun send(message: String) {
-        stompClient.send(chatId, message)
+        stompClient.send(chatId, matchedId, message)
     }
 
 

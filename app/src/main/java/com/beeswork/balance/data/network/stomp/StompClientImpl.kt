@@ -2,11 +2,13 @@ package com.beeswork.balance.data.network.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.data.database.entity.Message
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.provider.PreferenceProvider
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.neovisionaries.ws.client.*
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -103,26 +105,39 @@ class StompClientImpl(
         }
     }
 
-    override fun subscribe(chatId: Long) {
+    override fun subscribe(chatId: Long, matchedId: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val headers = mutableMapOf<String, String>()
+            val headers = stompIdentityHeaders(queueName(chatId), matchedId, chatId)
             headers[StompHeader.ID] = UUID.randomUUID().toString()
-            headers[StompHeader.DESTINATION] = queueName(chatId)
             headers[StompHeader.ACK] = DEFAULT_ACK
             headers[StompHeader.AUTO_DELETE] = true.toString()
             headers[StompHeader.EXCLUSIVE] = false.toString()
             headers[StompHeader.DURABLE] = true.toString()
-            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().language
             webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }
 
-    override fun send(chatId: Long, message: String) {
+    private fun stompIdentityHeaders(destination: String, matchedId: String, chatId: Long): MutableMap<String, String> {
+        val headers = mutableMapOf<String, String>()
+        headers[StompHeader.DESTINATION] = destination
+        headers[StompHeader.ACCOUNT_ID] = preferenceProvider.getAccountId()
+        headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
+        headers[StompHeader.MATCHED_ID] = matchedId
+        headers[StompHeader.CHAT_ID] = chatId.toString()
+        headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().language
+        return headers
+    }
+
+    override fun send(chatId: Long, matchedId: String, message: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val headers = mutableMapOf<String, String>()
-            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
-//            headers[StompHeader.RECIPIENT_ID] = matchedId
-            headers[StompHeader.CHAT_ID] = chatId.toString()
+            val headers = stompIdentityHeaders(BalanceURL.STOMP_SEND_ENDPOINT, matchedId, chatId)
+            val messageId = balanceRepository.sendMessage(chatId, message, OffsetDateTime.now())
+
+            val msg = Message(null, chatId, Message.Status.SENDING, message, false, false, OffsetDateTime.now())
+            val msgJson = Gson().toJson(msg)
+
+
+
 
             val json = JSONObject()
             json.put("message", message)
