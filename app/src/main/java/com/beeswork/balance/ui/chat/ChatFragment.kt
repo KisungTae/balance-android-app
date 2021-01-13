@@ -9,19 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
-import com.beeswork.balance.internal.ChatIdNotFoundException
-import com.beeswork.balance.internal.constant.BalanceURL
-import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.dialog.ExceptionDialogListener
-import com.beeswork.balance.ui.match.MatchFragment
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
-import org.kodein.di.generic.instance
 
 
 class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
@@ -62,8 +57,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         setupStompFrameObserver()
-        btnChatSend.setOnClickListener { viewModel.send(etChatMessage.text.toString()) }
-        viewModel.subscribe()
+        btnChatSend.setOnClickListener { viewModel.sendChatMessage(etChatMessage.text.toString()) }
+        viewModel.connectChat()
     }
 
     private fun setupWebSocketLifeCycleEventObserver() {

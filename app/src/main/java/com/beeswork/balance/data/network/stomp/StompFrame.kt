@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.entity.Message
 import com.beeswork.balance.internal.converter.OffsetDateTimeToISOStringSerializer
 import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
 import com.beeswork.balance.internal.provider.GsonProvider
+import com.beeswork.balance.internal.safeLet
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.threeten.bp.OffsetDateTime
@@ -13,10 +14,10 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 data class StompFrame(
-    private val command: Command,
-    private val headers: Map<String, String>?,
-    private val message: Message?,
-    private val exception: Exception?
+    val command: Command,
+    val headers: Map<String, String>?,
+    val message: Message?,
+    val exception: Exception?
 ) {
 
     constructor(
@@ -55,44 +56,45 @@ data class StompFrame(
         private const val HEADER_PATTERN = "([^:\\s]+)\\s*:\\s*([^\\n]+)"
 
         fun from(data: String?): StompFrame {
-//            if (data == null || data.trim().isEmpty())
-//                return StompFrame(Command.UNKNOWN, null, data)
+            if (data == null || data.trim().isEmpty())
+                return StompFrame(Command.UNKNOWN, null)
 
             val reader = Scanner(StringReader(data))
             reader.useDelimiter(System.lineSeparator())
-            val command = reader.next()
+            val command = Command.valueOfDefault(reader.next())
             val headers = mutableMapOf<String, String>()
 
             val pattern = Pattern.compile(HEADER_PATTERN)
             while (reader.hasNext(pattern)) {
                 val matcher: Matcher = pattern.matcher(reader.next())
                 if (matcher.find()) {
-                    matcher.group(1)?.let { key ->
-                        matcher.group(2)?.let { value ->
-                            headers[key] = value
-                        }
+                    safeLet(matcher.group(1), matcher.group(2)) { key, value ->
+                        headers[key] = value
                     }
                 }
             }
             reader.skip(System.lineSeparator() + System.lineSeparator())
             reader.useDelimiter(TERMINATE_MESSAGE_SYMBOL)
+
             val payload = if (reader.hasNext()) reader.next() else null
             payload?.let {
-
+                when (command) {
+                    Command.MESSAGE -> return StompFrame(
+                        command,
+                        headers,
+                        GsonProvider.gson.fromJson(it, Message::class.java),
+                        null
+                    )
+                    else -> println("")
+                }
             }
-            // TODO: modify to return message in stompFrame
-            return StompFrame(Command.valueOfDefault(command), headers)
+            return StompFrame(command, headers)
         }
     }
 
     class Message(
         val message: String,
         val createdAt: OffsetDateTime
-    )
-
-    class Exception(
-        val error: String,
-        val message: String
     )
 
     enum class Command {
@@ -106,7 +108,10 @@ data class StompFrame(
         ACK,
         NACK,
         DISCONNECT,
-        UNKNOWN;
+        UNKNOWN,
+        MESSAGE,
+        CONNECTED,
+        ERROR;
 
         companion object {
             fun valueOfDefault(command: String): Command {

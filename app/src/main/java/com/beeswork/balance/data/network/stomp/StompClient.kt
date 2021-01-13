@@ -9,6 +9,6 @@ interface StompClient {
     val webSocketLifeCycleEvent: LiveData<Resource<WebSocketLifeCycleEvent>>
     val stompFrame: LiveData<Resource<StompFrame>>
 
-    fun subscribe(chatId: Long, matchedId: String)
+    fun connectChat(chatId: Long, matchedId: String)
     fun send(chatId: Long, matchedId: String, message: String)
 }

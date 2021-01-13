@@ -7,13 +7,13 @@ import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.provider.PreferenceProvider
+import com.beeswork.balance.internal.safeLet
 import com.neovisionaries.ws.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 
 
@@ -33,9 +33,12 @@ class StompClientImpl(
     private val webSocket: WebSocket =
         WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
+    private var chatId: Long? = 123
+    private var matchedId: String? = null
+
     init {
         setupWebSocketListener()
-        connectWebSocket()
+//        connectWebSocket()
     }
 
 
@@ -45,17 +48,21 @@ class StompClientImpl(
                 websocket: WebSocket?,
                 headers: MutableMap<String, MutableList<String>>?
             ) {
-                connect()
                 println("onConnected")
+                connectStomp()
             }
 
+//          TODO: what happens when exception is thrown in onFrame()
             override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
                 frame?.let {
-                    println("onFrame")
+                    val stompFrame = StompFrame.from(frame.payloadText)
+                    when (stompFrame.command) {
+                        StompFrame.Command.CONNECTED -> subscribe()
+                        StompFrame.Command.MESSAGE -> {
 
-
-                    println(frame.payloadText)
-
+                        }
+                        else -> println("stompframe.command when else here")
+                    }
                 }
             }
 
@@ -95,7 +102,7 @@ class StompClientImpl(
         }
     }
 
-    private fun connect() {
+    private fun connectStomp() {
         CoroutineScope(Dispatchers.IO).launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
@@ -104,16 +111,26 @@ class StompClientImpl(
         }
     }
 
-    override fun subscribe(chatId: Long, matchedId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val headers = stompIdentityHeaders(queueName(chatId), matchedId, chatId)
-            headers[StompHeader.ID] = UUID.randomUUID().toString()
-            headers[StompHeader.ACK] = DEFAULT_ACK
-            headers[StompHeader.AUTO_DELETE] = true.toString()
-            headers[StompHeader.EXCLUSIVE] = false.toString()
-            headers[StompHeader.DURABLE] = true.toString()
-            webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
+    private fun subscribe() {
+        safeLet(chatId, matchedId) { chatId, matchedId ->
+            CoroutineScope(Dispatchers.IO).launch {
+                val headers = stompIdentityHeaders(queueName(chatId), matchedId, chatId)
+                headers[StompHeader.ID] = UUID.randomUUID().toString()
+                headers[StompHeader.ACK] = DEFAULT_ACK
+                headers[StompHeader.AUTO_DELETE] = true.toString()
+                headers[StompHeader.EXCLUSIVE] = false.toString()
+                headers[StompHeader.DURABLE] = true.toString()
+                webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
+            }
+        } ?: kotlin.run {
+//          TODO: lifecycle event error and close socket
         }
+    }
+
+    override fun connectChat(chatId: Long, matchedId: String) {
+        this.chatId = chatId
+        this.matchedId = matchedId
+        connectWebSocket()
     }
 
     private fun stompIdentityHeaders(
@@ -135,7 +152,8 @@ class StompClientImpl(
         CoroutineScope(Dispatchers.IO).launch {
             val now = OffsetDateTime.now(ZoneOffset.UTC)
             val headers = stompIdentityHeaders(BalanceURL.STOMP_SEND_ENDPOINT, matchedId, chatId)
-            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message, now).toString()
+            headers[StompHeader.MESSAGE_ID] =
+                balanceRepository.sendMessage(chatId, message, now).toString()
             webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, message, now).compile())
         }
     }
