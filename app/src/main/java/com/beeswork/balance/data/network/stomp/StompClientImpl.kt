@@ -142,7 +142,7 @@ class StompClientImpl(
         headers[StompHeader.DESTINATION] = destination
         headers[StompHeader.ACCOUNT_ID] = preferenceProvider.getAccountId()
         headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
-        headers[StompHeader.MATCHED_ID] = matchedId
+        headers[StompHeader.RECIPIENT_ID] = matchedId
         headers[StompHeader.CHAT_ID] = chatId.toString()
         headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().language
         return headers
