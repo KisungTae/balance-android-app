@@ -151,10 +151,14 @@ class StompClientImpl(
     override fun send(chatId: Long, matchedId: String, message: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val now = OffsetDateTime.now(ZoneOffset.UTC)
-            val headers = stompIdentityHeaders(BalanceURL.STOMP_SEND_ENDPOINT, matchedId, chatId)
-            headers[StompHeader.MESSAGE_ID] =
-                balanceRepository.sendMessage(chatId, message, now).toString()
-            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, message, now).compile())
+//            val headers = stompIdentityHeaders(BalanceURL.STOMP_SEND_ENDPOINT, matchedId, chatId)
+            val headers = mutableMapOf<String, String>()
+            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
+            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
+            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().language
+//            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message, now).toString()
+            val stompMessage = StompFrame.Message(message, preferenceProvider.getAccountId(), matchedId, chatId.toString(), now)
+            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, stompMessage, null).compile())
         }
     }
 

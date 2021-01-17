@@ -20,7 +20,7 @@ data class Message(
     val status: Status,
     val received: Boolean,
     val read: Boolean,
-    val createdAt: OffsetDateTime
+    val createdAt: OffsetDateTime?
 ) {
     enum class Status {
         SENDING,

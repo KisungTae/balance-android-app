@@ -13,10 +13,6 @@ interface MessageDAO {
     @Insert
     fun insert(message: Message): Long
 
-    @Query("select * from message where chatId = :chatId order by createdAt desc")
+    @Query("select * from message where chatId = :chatId order by CASE WHEN createdAt IS NULL THEN 0 ELSE 1 END, createdAt DESC")
     fun getMessages(chatId: Long): DataSource.Factory<Int, Message>
-
-//  TODO: remove me
-    @Query("update message set message = 'test message here'")
-    fun updateMessages()
 }

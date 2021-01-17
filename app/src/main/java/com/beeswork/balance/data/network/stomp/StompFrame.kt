@@ -23,9 +23,8 @@ data class StompFrame(
     constructor(
         command: Command,
         headers: Map<String, String>,
-        message: String,
-        createdAt: OffsetDateTime
-    ) : this(command, headers, Message(message, createdAt), null)
+        message: Message
+    ) : this(command, headers, message, null)
 
     constructor(
         command: Command,
@@ -94,6 +93,9 @@ data class StompFrame(
 
     class Message(
         val message: String,
+        val accountId: String,
+        val recipientId: String,
+        val chatId: String,
         val createdAt: OffsetDateTime
     )
 

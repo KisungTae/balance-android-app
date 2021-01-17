@@ -1,7 +1,6 @@
 package com.beeswork.balance.data.database.repository
 
 import android.content.Context
-import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,7 +23,6 @@ import okhttp3.RequestBody
 import org.threeten.bp.OffsetDateTime
 import java.io.File
 import java.io.IOException
-import kotlin.random.Random
 
 
 class BalanceRepositoryImpl(
@@ -118,14 +116,15 @@ class BalanceRepositoryImpl(
 
             if (clickResource.status == Resource.Status.SUCCESS) {
                 val data = clickResource.data!!
-                val notificationType = data.notificationType
+                val result = data.result
                 val match = data.match
 
-                if (notificationType == NotificationType.MATCH) {
+                if (result == NotificationType.MATCH) {
                     setNewMatch(match)
                     matchDAO.insert(match)
                     clickedDAO.deleteIfMatched()
-                } else if (notificationType == NotificationType.CLICKED) {
+                } else if (result == NotificationType.CLICKED) {
+//                    TODO: check if clicked is in match table if so not inserting
                     clickDAO.insert(Click(match.matchedId))
                 }
             }
@@ -525,7 +524,7 @@ class BalanceRepositoryImpl(
                 Message.Status.SENDING,
                 received = false,
                 read = true,
-                createdAt
+                null
             )
         )
     }
