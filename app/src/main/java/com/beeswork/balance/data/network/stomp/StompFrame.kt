@@ -78,7 +78,7 @@ data class StompFrame(
             val payload = if (reader.hasNext()) reader.next() else null
             payload?.let {
                 when (command) {
-                    Command.MESSAGE -> return StompFrame(
+                    Command.MESSAGE, Command.RECEIPT -> return StompFrame(
                         command,
                         headers,
                         GsonProvider.gson.fromJson(it, Message::class.java),
@@ -92,11 +92,12 @@ data class StompFrame(
     }
 
     class Message(
+        val id: Long?,
         val message: String,
         val accountId: String,
         val recipientId: String,
         val chatId: String,
-        val createdAt: OffsetDateTime
+        val createdAt: OffsetDateTime?
     )
 
     enum class Command {
@@ -113,6 +114,7 @@ data class StompFrame(
         UNKNOWN,
         MESSAGE,
         CONNECTED,
+        RECEIPT,
         ERROR;
 
         companion object {

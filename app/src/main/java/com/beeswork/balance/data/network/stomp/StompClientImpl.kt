@@ -48,13 +48,16 @@ class StompClientImpl(
                 connectStomp()
             }
 
-//          TODO: what happens when exception is thrown in onFrame()
+            //          TODO: what happens when exception is thrown in onFrame()
             override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
                 frame?.let {
                     val stompFrame = StompFrame.from(frame.payloadText)
                     when (stompFrame.command) {
                         StompFrame.Command.CONNECTED -> subscribe()
                         StompFrame.Command.MESSAGE -> {
+
+                        }
+                        StompFrame.Command.RECEIPT -> {
 
                         }
                         else -> println("stompframe.command when else here")
@@ -90,10 +93,6 @@ class StompClientImpl(
                 super.onUnexpectedError(websocket, cause)
             }
         })
-    }
-
-    private fun disconnect() {
-        webSocket.disconnect()
     }
 
     private fun connectWebSocket() {
@@ -150,19 +149,31 @@ class StompClientImpl(
         return headers
     }
 
-//  TODO: before sending, check if subscribtion or connection is open
+    //  TODO: before sending, check if subscribtion or connection is open
     override fun send(chatId: Long, matchedId: String, message: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val now = OffsetDateTime.now(ZoneOffset.UTC)
-//            val headers = stompIdentityHeaders(BalanceURL.STOMP_SEND_ENDPOINT, matchedId, chatId)
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
             headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
             headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
-//            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message, now).toString()
-            val stompMessage = StompFrame.Message(message, preferenceProvider.getAccountId(), matchedId, chatId.toString(), now)
-            webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, stompMessage, null).compile())
+            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message).toString()
+            val stompMessage = StompFrame.Message(
+                null,
+                message,
+                preferenceProvider.getAccountId(),
+                matchedId,
+                chatId.toString(),
+                null
+            )
+            webSocket.sendText(
+                StompFrame(
+                    StompFrame.Command.SEND,
+                    headers,
+                    stompMessage,
+                    null
+                ).compile()
+            )
         }
     }
 

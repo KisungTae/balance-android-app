@@ -513,22 +513,25 @@ class BalanceRepositoryImpl(
     //  TEST 2. when update all entries in database, it will update the items in list as well
     override suspend fun sendMessage(
         chatId: Long,
-        message: String,
-        createdAt: OffsetDateTime
+        message: String
     ): Long {
         return messageDAO.insert(
             Message(
+                null,
                 null,
                 chatId,
                 message,
                 Message.Status.SENDING,
                 received = false,
-                read = true,
+                read = false,
                 null
             )
         )
     }
 
+    override suspend fun onMessageProcessed(chatId: Long, messageId: Long, id: Long) {
+
+    }
 
 
 }

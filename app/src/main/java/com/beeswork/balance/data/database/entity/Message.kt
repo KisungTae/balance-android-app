@@ -13,8 +13,9 @@ import org.threeten.bp.OffsetDateTime
 data class Message(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Long? = null,
+    val messageId: Long? = null,
 
+    val id: Long?,
     val chatId: Long,
     val message: String,
     val status: Status,

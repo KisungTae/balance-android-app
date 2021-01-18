@@ -15,4 +15,7 @@ interface MessageDAO {
 
     @Query("select * from message where chatId = :chatId order by CASE WHEN createdAt IS NULL THEN 0 ELSE 1 END, createdAt DESC")
     fun getMessages(chatId: Long): DataSource.Factory<Int, Message>
+
+    @Query("update message set id = :id where chatId = :chatId and messageId = :messageId")
+    fun sync(chatId: Long, messageId: Long, id: Long)
 }
