@@ -21,24 +21,20 @@ class StompClientImpl(
     private val balanceRepository: BalanceRepository,
     private val preferenceProvider: PreferenceProvider
 ) : StompClient {
+
     private val mutableWebSocketLifeCycleEvent =
         MutableLiveData<Resource<WebSocketLifeCycleEvent>>()
     override val webSocketLifeCycleEvent: LiveData<Resource<WebSocketLifeCycleEvent>>
         get() = mutableWebSocketLifeCycleEvent
 
-    private val mutableStompFrame = MutableLiveData<Resource<StompFrame>>()
-    override val stompFrame: LiveData<Resource<StompFrame>>
-        get() = mutableStompFrame
-
-    private val webSocket: WebSocket =
+    private var webSocket: WebSocket =
         WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
-    private var chatId: Long? = 123
+    private var chatId: Long? = null
     private var matchedId: String? = null
 
     init {
         setupWebSocketListener()
-//        connectWebSocket()
     }
 
 
@@ -96,7 +92,13 @@ class StompClientImpl(
         })
     }
 
+    private fun disconnect() {
+        webSocket.disconnect()
+    }
+
     private fun connectWebSocket() {
+        if (webSocket.state != WebSocketState.CREATED)
+            webSocket = webSocket.recreate()
         CoroutineScope(Dispatchers.IO).launch {
             webSocket.connect()
         }
@@ -144,10 +146,11 @@ class StompClientImpl(
         headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
         headers[StompHeader.RECIPIENT_ID] = matchedId
         headers[StompHeader.CHAT_ID] = chatId.toString()
-        headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().language
+        headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
         return headers
     }
 
+//  TODO: before sending, check if subscribtion or connection is open
     override fun send(chatId: Long, matchedId: String, message: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val now = OffsetDateTime.now(ZoneOffset.UTC)
@@ -155,11 +158,16 @@ class StompClientImpl(
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
             headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
-            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().language
+            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+            headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
 //            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message, now).toString()
             val stompMessage = StompFrame.Message(message, preferenceProvider.getAccountId(), matchedId, chatId.toString(), now)
             webSocket.sendText(StompFrame(StompFrame.Command.SEND, headers, stompMessage, null).compile())
         }
+    }
+
+    override fun disconnectChat() {
+        webSocket.disconnect()
     }
 
 

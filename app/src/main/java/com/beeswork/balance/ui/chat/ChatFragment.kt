@@ -56,19 +56,12 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupChatPagedList()
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
-        setupStompFrameObserver()
         btnChatSend.setOnClickListener { viewModel.sendChatMessage(etChatMessage.text.toString()) }
         viewModel.connectChat()
     }
 
     private fun setupWebSocketLifeCycleEventObserver() {
 //        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
-//
-//        })
-    }
-
-    private fun setupStompFrameObserver() {
-//        viewModel.stompFrame.observe(viewLifecycleOwner, {
 //
 //        })
     }
@@ -96,6 +89,16 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     override fun onClickExceptionDialogCloseBtn() {
         Navigation.findNavController(requireView())
             .navigate(R.id.action_chatFragment_to_matchFragment)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.connectChat()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.disconnectChat()
     }
 
 

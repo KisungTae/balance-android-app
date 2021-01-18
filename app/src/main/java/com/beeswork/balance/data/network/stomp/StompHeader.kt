@@ -18,6 +18,7 @@ class StompHeader {
         const val RECIPIENT_ID = "recipient-id"
         const val ACCOUNT_ID = "account-id"
         const val IDENTITY_TOKEN = "identity-token"
+        const val RECEIPT = "receipt"
 
 
     }

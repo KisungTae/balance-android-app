@@ -28,8 +28,6 @@ class ChatViewModel(
     }
 
     val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent
-    val stompFrame = stompClient.stompFrame
-
 
     fun connectChat() {
         stompClient.connectChat(chatId, matchedId)
@@ -37,6 +35,10 @@ class ChatViewModel(
 
     fun sendChatMessage(message: String) {
         stompClient.send(chatId, matchedId, message)
+    }
+
+    fun disconnectChat() {
+        stompClient.disconnectChat()
     }
 
 
