@@ -57,13 +57,14 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener { viewModel.sendChatMessage(etChatMessage.text.toString()) }
+        println("viewModel.connectChat()")
         viewModel.connectChat()
     }
 
     private fun setupWebSocketLifeCycleEventObserver() {
-//        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
-//
-//        })
+        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
+            println("webSocketLifeCycleEvent.observe")
+        })
     }
 
     private suspend fun setupMessageObserver() {

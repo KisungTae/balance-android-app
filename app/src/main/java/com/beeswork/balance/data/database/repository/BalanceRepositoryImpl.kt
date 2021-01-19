@@ -530,7 +530,7 @@ class BalanceRepositoryImpl(
     }
 
     override suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime) {
-//        messageDAO.sync(chatId, messageId, id, createdAt, Message.Status.SENT)
+        messageDAO.sync(chatId, messageId, id, createdAt, Message.Status.SENT)
     }
 
 

@@ -8,6 +8,7 @@ import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.safeLet
+import com.google.android.gms.common.ErrorDialogFragment
 import com.neovisionaries.ws.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,12 +24,11 @@ class StompClientImpl(
 ) : StompClient {
 
     private val mutableWebSocketLifeCycleEvent =
-        MutableLiveData<Resource<WebSocketLifeCycleEvent>>()
-    override val webSocketLifeCycleEvent: LiveData<Resource<WebSocketLifeCycleEvent>>
+        MutableLiveData<WebSocketLifeCycleEvent>()
+    override val webSocketLifeCycleEvent: LiveData<WebSocketLifeCycleEvent>
         get() = mutableWebSocketLifeCycleEvent
 
-    private var webSocket: WebSocket =
-        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
+    private var webSocket: WebSocket = WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
     private var chatId: Long? = null
     private var matchedId: String? = null
@@ -48,7 +48,7 @@ class StompClientImpl(
                 connectStomp()
             }
 
-            //          TODO: what happens when exception is thrown in onFrame()
+            // TODO: what happens when exception is thrown in onFrame()
             override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
                 frame?.let {
                     val stompFrame = StompFrame.from(frame.payloadText)
@@ -68,6 +68,15 @@ class StompClientImpl(
                                     balanceRepository.syncMessage(chatId, messageId, id, createdAt)
                                 }
                             }
+                        }
+                        StompFrame.Command.ERROR -> {
+                            mutableWebSocketLifeCycleEvent.postValue(
+                                WebSocketLifeCycleEvent(
+                                    WebSocketLifeCycleEvent.Type.ERROR,
+                                    stompFrame.getError(),
+                                    stompFrame.getErrorMessage()
+                                )
+                            )
                         }
                         else -> println("stompframe.command when else here")
                     }
@@ -99,6 +108,7 @@ class StompClientImpl(
             }
 
             override fun onUnexpectedError(websocket: WebSocket?, cause: WebSocketException?) {
+                println("onUnexpectedError")
                 super.onUnexpectedError(websocket, cause)
             }
         })
@@ -160,14 +170,17 @@ class StompClientImpl(
 
     //  TODO: before sending, check if subscribtion or connection is open
     override fun send(chatId: Long, matchedId: String, message: String) {
+        if (message.toByteArray().size > MAX_MESSAGE_SIZE) {
+            mutableWebSocketLifeCycleEvent.postValue(WebSocketLifeCycleEvent.error())
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
             headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
             headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
-            headers[StompHeader.MESSAGE_ID] =
-                balanceRepository.sendMessage(chatId, message).toString()
+            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message).toString()
             val stompMessage = StompFrame.Message(
                 null,
                 message,
@@ -187,13 +200,6 @@ class StompClientImpl(
         }
     }
 
-    fun test(): Long? {
-        val headers: MutableMap<String, String>? = null
-        return headers?.let {
-            headers["ddd"]?.toLongOrNull()
-        }
-    }
-
     override fun disconnectChat() {
         webSocket.disconnect()
     }
@@ -208,6 +214,7 @@ class StompClientImpl(
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_ACK = "auto"
         private const val DEFAULT_HEART_BEAT = "0,0"
+        private const val MAX_MESSAGE_SIZE = 1024
 
     }
 

@@ -56,6 +56,18 @@ data class StompFrame(
         }
     }
 
+    fun getError(): String? {
+        return headers?.let {
+            it[StompHeader.ERROR]
+        }
+    }
+
+    fun getErrorMessage(): String? {
+        return headers?.let {
+            it[StompHeader.MESSAGE]
+        }
+    }
+
     companion object {
         const val TERMINATE_MESSAGE_SYMBOL = "\u0000"
         private const val HEADER_PATTERN = "([^:\\s]+)\\s*:\\s*([^\\n]+)"

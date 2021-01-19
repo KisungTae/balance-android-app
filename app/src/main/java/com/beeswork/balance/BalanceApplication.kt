@@ -164,7 +164,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      50. implement global exception handler
 //      51. implement account not found and blocked exception they should be in baseACtivty or somthing
 //      52. click response result change to enum type
-
+//      53. when typeing messag ein chat, let user know if the message exceeds x bytes
 
 
 
