@@ -1,7 +1,6 @@
 package com.beeswork.balance.data.network.stomp
 
 class StompHeader {
-
     companion object {
         const val VERSION = "accept-version"
         const val HEART_BEAT = "heart-beat"
@@ -19,7 +18,5 @@ class StompHeader {
         const val ACCOUNT_ID = "account-id"
         const val IDENTITY_TOKEN = "identity-token"
         const val RECEIPT = "receipt"
-
-
     }
 }

@@ -523,14 +523,14 @@ class BalanceRepositoryImpl(
                 message,
                 Message.Status.SENDING,
                 received = false,
-                read = false,
+                read = true,
                 null
             )
         )
     }
 
-    override suspend fun onMessageProcessed(chatId: Long, messageId: Long, id: Long) {
-
+    override suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime) {
+//        messageDAO.sync(chatId, messageId, id, createdAt, Message.Status.SENT)
     }
 
 

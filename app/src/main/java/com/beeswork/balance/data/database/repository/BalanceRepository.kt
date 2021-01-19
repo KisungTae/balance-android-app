@@ -37,7 +37,7 @@ interface BalanceRepository {
     // message
     suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message>
     suspend fun sendMessage(chatId: Long, message: String): Long
-    suspend fun onMessageProcessed(chatId: Long, messageId: Long, id: Long)
+    suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
 
     // account
     val cards: LiveData<Resource<List<CardResponse>>>

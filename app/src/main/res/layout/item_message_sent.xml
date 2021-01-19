@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="end">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom">
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvMessageSentLoading"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:alpha="1"
+                android:background="@color/transparent"
+                android:clickable="true"
+                app:SpinKit_Color="@color/colorAccent"
+                android:focusable="true"
+                android:tag="photoPickerLoading"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/llMessageSentErrorOptions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnMessageSentResend"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_baseline_refresh" />
+
+                <ImageButton
+                    android:id="@+id/btnMessageSentDelete"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_baseline_close" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvMessageSentCreatedAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvMessageSentMessage"
+            android:layout_width="wrap_content"
+            android:maxWidth="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/sh_round_border_box"
+            android:padding="10dp"
+            android:text="this is messafdfsafdsfdsfdsfdsfdsafafdsfdsaffdsfdsafdsfge here" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

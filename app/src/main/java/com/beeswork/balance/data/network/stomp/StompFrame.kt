@@ -50,6 +50,12 @@ data class StompFrame(
         return builder.toString()
     }
 
+    fun getMessageId(): Long? {
+        return headers?.let {
+            it[StompHeader.MESSAGE_ID]?.toLongOrNull()
+        }
+    }
+
     companion object {
         const val TERMINATE_MESSAGE_SYMBOL = "\u0000"
         private const val HEADER_PATTERN = "([^:\\s]+)\\s*:\\s*([^\\n]+)"
@@ -96,7 +102,7 @@ data class StompFrame(
         val message: String,
         val accountId: String,
         val recipientId: String,
-        val chatId: String,
+        val chatId: Long?,
         val createdAt: OffsetDateTime?
     )
 

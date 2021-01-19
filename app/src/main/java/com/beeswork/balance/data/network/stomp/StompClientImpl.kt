@@ -58,7 +58,16 @@ class StompClientImpl(
 
                         }
                         StompFrame.Command.RECEIPT -> {
-
+                            safeLet(
+                                stompFrame.message?.chatId,
+                                stompFrame.getMessageId(),
+                                stompFrame.message?.id,
+                                stompFrame.message?.createdAt,
+                            ) { chatId, messageId, id, createdAt ->
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    balanceRepository.syncMessage(chatId, messageId, id, createdAt)
+                                }
+                            }
                         }
                         else -> println("stompframe.command when else here")
                     }
@@ -157,13 +166,14 @@ class StompClientImpl(
             headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
             headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
-            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message).toString()
+            headers[StompHeader.MESSAGE_ID] =
+                balanceRepository.sendMessage(chatId, message).toString()
             val stompMessage = StompFrame.Message(
                 null,
                 message,
                 preferenceProvider.getAccountId(),
                 matchedId,
-                chatId.toString(),
+                chatId,
                 null
             )
             webSocket.sendText(
@@ -174,6 +184,13 @@ class StompClientImpl(
                     null
                 ).compile()
             )
+        }
+    }
+
+    fun test(): Long? {
+        val headers: MutableMap<String, String>? = null
+        return headers?.let {
+            headers["ddd"]?.toLongOrNull()
         }
     }
 
