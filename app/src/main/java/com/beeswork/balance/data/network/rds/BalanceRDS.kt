@@ -1,9 +1,6 @@
 package com.beeswork.balance.data.network.rds
 
-import com.beeswork.balance.data.database.entity.Click
-import com.beeswork.balance.data.database.entity.Clicked
-import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.database.entity.Photo
+import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
 import okhttp3.MultipartBody
@@ -16,9 +13,13 @@ import retrofit2.http.Query
 
 interface BalanceRDS {
 
-    suspend fun fetchMessages(
-
-    ): Resource<List<>>
+    suspend fun fetchChatMessages(
+        accountId: String,
+        identityToken: String,
+        chatId: Long,
+        recipientId: String,
+        lastChatMessageId: Long
+    ): Resource<List<ChatMessage>>
 
     suspend fun reorderPhotos(
         accountId: String,
@@ -102,7 +103,7 @@ interface BalanceRDS {
 
     suspend fun postFCMToken(
         accountId: String,
-        identityToken:String,
+        identityToken: String,
         token: String
     ): Resource<EmptyJsonResponse>
 

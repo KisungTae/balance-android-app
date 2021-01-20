@@ -1,11 +1,10 @@
 package com.beeswork.balance.data.database.repository
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.database.entity.Message
+import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.Resource
@@ -35,7 +34,7 @@ interface BalanceRepository {
     suspend fun getUnreadMessageCount(): LiveData<Int>
 
     // message
-    suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message>
+    suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
     suspend fun saveMessage(chatId: Long, message: String): Long
     suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
     suspend fun fetchMessages(chatId: Long, recipientId: String)

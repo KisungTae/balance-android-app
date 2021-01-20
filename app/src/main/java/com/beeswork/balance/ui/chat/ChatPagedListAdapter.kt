@@ -1,27 +1,25 @@
 package com.beeswork.balance.ui.chat
 
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.Message
+import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.internal.inflate
-import kotlinx.android.synthetic.main.item_message_received.view.*
-import kotlinx.android.synthetic.main.item_message_sent.view.*
+import kotlinx.android.synthetic.main.item_chat_message_received.view.*
+import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
 
 
-class ChatPagedListAdapter: PagedListAdapter<Message, ChatPagedListAdapter.MessageViewHolder>(
+class ChatPagedListAdapter: PagedListAdapter<ChatMessage, ChatPagedListAdapter.MessageViewHolder>(
     diffCallback
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return when (viewType) {
-            MessageType.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_message_received))
-            MessageType.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_message_sent))
-            else -> MessageViewHolder(parent.inflate(R.layout.item_message_received))
+            MessageType.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
+            MessageType.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
+            else -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
         }
     }
 
@@ -43,11 +41,11 @@ class ChatPagedListAdapter: PagedListAdapter<Message, ChatPagedListAdapter.Messa
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<Message>() {
-            override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean =
+        private val diffCallback = object : DiffUtil.ItemCallback<ChatMessage>() {
+            override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
                 oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean =
+            override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
                 oldItem == newItem
         }
     }
@@ -60,29 +58,29 @@ class ChatPagedListAdapter: PagedListAdapter<Message, ChatPagedListAdapter.Messa
     class MessageViewHolder(
         itemView: View
     ): RecyclerView.ViewHolder(itemView) {
-        fun bindMessageSent(message: Message) {
-            itemView.tvMessageSentMessage.text = "messageId: ${message.messageId} | ${message.message}"
+        fun bindMessageSent(chatMessage: ChatMessage) {
+            itemView.tvChatMessageSentBody.text = "messageId: ${chatMessage.messageId} | ${chatMessage.body}"
 
-            when (message.status) {
-                Message.Status.SENT -> {
-                    itemView.tvMessageSentCreatedAt.text = message.createdAt.toString()
+            when (chatMessage.status) {
+                ChatMessage.Status.SENT -> {
+                    itemView.tvChatMessageSentCreatedAt.text = chatMessage.createdAt.toString()
                     showLayout(itemView, View.VISIBLE, View.GONE, View.GONE)
                 }
-                Message.Status.SENDING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE)
-                Message.Status.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
+                ChatMessage.Status.SENDING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE)
+                ChatMessage.Status.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
             }
         }
 
-        fun bindMessageReceived(message: Message) {
-            itemView.tvMessageReceivedMessage.text = message.message
-            itemView.tvMessageReceivedCreatedAt.text = message.createdAt.toString()
+        fun bindMessageReceived(chatMessage: ChatMessage) {
+            itemView.tvChatMessageReceivedBody.text = chatMessage.body
+            itemView.tvChatMessageReceivedCreatedAt.text = chatMessage.createdAt.toString()
         }
 
         companion object {
             fun showLayout(itemView: View, createdAt: Int, loading: Int, errorOptions: Int) {
-                itemView.tvMessageSentCreatedAt.visibility = createdAt
-                itemView.skvMessageSentLoading.visibility = loading
-                itemView.llMessageSentErrorOptions.visibility = errorOptions
+                itemView.tvChatMessageSentCreatedAt.visibility = createdAt
+                itemView.skvChatMessageSentLoading.visibility = loading
+                itemView.llChatMessageSentErrorOptions.visibility = errorOptions
             }
         }
     }

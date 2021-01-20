@@ -75,8 +75,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     }
 
     private suspend fun setupMessageObserver() {
-        val messages = viewModel.messages.await()
-        messages.observe(viewLifecycleOwner, Observer { pagedMessageList ->
+        val chatMessages = viewModel.chatMessages.await()
+        chatMessages.observe(viewLifecycleOwner, Observer { pagedMessageList ->
             pagedMessageList?.let {
                 chatPagedListAdapter.submitList(pagedMessageList)
             }

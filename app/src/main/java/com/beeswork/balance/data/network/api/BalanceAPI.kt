@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.network.api
 
+import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
@@ -22,6 +23,14 @@ import retrofit2.http.*
 //const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 interface BalanceAPI {
+
+    suspend fun fetchChatMessages(
+        @Query(value = "accountId") accountId: String,
+        @Query(value = "identityToken") identityToken: String,
+        @Query(value = "chatId") chatId: Long,
+        @Query(value = "recipientId") recipientId: String,
+        @Query(value = "lastChatMessageId") lastChatMessageId: Long
+    ): Response<List<ChatMessage>>
 
     @POST("photo/reorder")
     suspend fun reorderPhotos(

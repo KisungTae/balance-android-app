@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.network.rds
 
+import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
@@ -13,6 +14,18 @@ import okhttp3.RequestBody
 class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), BalanceRDS {
+
+    override suspend fun fetchChatMessages(
+        accountId: String,
+        identityToken: String,
+        chatId: Long,
+        recipientId: String,
+        lastChatMessageId: Long
+    ): Resource<List<ChatMessage>> {
+        return getResult {
+            balanceAPI.fetchChatMessages(accountId, identityToken, chatId, recipientId, lastChatMessageId)
+        }
+    }
 
     override suspend fun reorderPhotos(
         accountId: String,

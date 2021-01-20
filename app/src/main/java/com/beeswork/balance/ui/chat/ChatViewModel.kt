@@ -23,8 +23,8 @@ class ChatViewModel(
         .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
         .build()
 
-    val messages by lazyDeferred {
-        LivePagedListBuilder(balanceRepository.getMessages(chatId), pagedListConfig).build()
+    val chatMessages by lazyDeferred {
+        LivePagedListBuilder(balanceRepository.getChatMessages(chatId), pagedListConfig).build()
     }
 
     val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent

@@ -28,7 +28,7 @@ import java.io.IOException
 class BalanceRepositoryImpl(
     private val context: Context,
     private val matchDAO: MatchDAO,
-    private val messageDAO: MessageDAO,
+    private val chatMessageDAO: ChatMessageDAO,
     private val clickDAO: ClickDAO,
     private val fcmTokenDAO: FCMTokenDAO,
     private val clickedDAO: ClickedDAO,
@@ -502,9 +502,9 @@ class BalanceRepositoryImpl(
 //  ################################################################################# //
 
 
-    override suspend fun getMessages(chatId: Long): DataSource.Factory<Int, Message> {
+    override suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage> {
         return withContext(Dispatchers.IO) {
-            return@withContext messageDAO.getMessages(chatId)
+            return@withContext chatMessageDAO.getChatMessages(chatId)
         }
     }
 
@@ -515,13 +515,13 @@ class BalanceRepositoryImpl(
         chatId: Long,
         message: String
     ): Long {
-        return messageDAO.insert(
-            Message(
+        return chatMessageDAO.insert(
+            ChatMessage(
                 null,
                 null,
                 chatId,
                 message,
-                Message.Status.SENDING,
+                ChatMessage.Status.SENDING,
                 received = false,
                 read = true,
                 null
@@ -530,7 +530,7 @@ class BalanceRepositoryImpl(
     }
 
     override suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime) {
-        messageDAO.sync(chatId, messageId, id, createdAt, Message.Status.SENT)
+        chatMessageDAO.sync(chatId, messageId, id, createdAt, ChatMessage.Status.SENT)
     }
 
     override suspend fun fetchMessages(chatId: Long, recipientId: String) {

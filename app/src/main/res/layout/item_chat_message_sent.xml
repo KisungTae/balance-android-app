@@ -17,7 +17,7 @@
             android:layout_gravity="bottom">
 
             <com.github.ybq.android.spinkit.SpinKitView
-                android:id="@+id/skvMessageSentLoading"
+                android:id="@+id/skvChatMessageSentLoading"
                 style="@style/SpinKitView.Large.Circle"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -31,19 +31,19 @@
                 android:visibility="gone" />
 
             <LinearLayout
-                android:id="@+id/llMessageSentErrorOptions"
+                android:id="@+id/llChatMessageSentErrorOptions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/btnMessageSentResend"
+                    android:id="@+id/btnChatMessageSentResend"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_baseline_refresh" />
 
                 <ImageButton
-                    android:id="@+id/btnMessageSentDelete"
+                    android:id="@+id/btnChatMessageSentDelete"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_baseline_close" />
@@ -51,13 +51,13 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvMessageSentCreatedAt"
+                android:id="@+id/tvChatMessageSentCreatedAt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </FrameLayout>
 
         <TextView
-            android:id="@+id/tvMessageSentMessage"
+            android:id="@+id/tvChatMessageSentBody"
             android:layout_width="wrap_content"
             android:maxWidth="250dp"
             android:layout_height="wrap_content"

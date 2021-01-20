@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.constant.HttpHeader
@@ -103,6 +104,7 @@ class StompClientImpl(
                 clientCloseFrame: WebSocketFrame?,
                 closedByServer: Boolean
             ) {
+                println("onDisconnected")
                 mutableWebSocketLifeCycleEvent.postValue(WebSocketLifeCycleEvent.disconnect())
                 super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
             }
@@ -188,7 +190,7 @@ class StompClientImpl(
             val stompMessage = StompFrame.Message(
                 null,
                 message,
-                preferenceProvider.getAccountId(),
+                "preferenceProvider.getAccountId()",
                 matchedId,
                 chatId,
                 null

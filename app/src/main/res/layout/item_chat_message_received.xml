@@ -15,7 +15,7 @@
             android:layout_height="50dp" />
 
         <TextView
-            android:id="@+id/tvMessageReceivedMessage"
+            android:id="@+id/tvChatMessageReceivedBody"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -25,7 +25,7 @@
             android:text="this is message here" />
 
         <TextView
-            android:id="@+id/tvMessageReceivedCreatedAt"
+            android:id="@+id/tvChatMessageReceivedCreatedAt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
