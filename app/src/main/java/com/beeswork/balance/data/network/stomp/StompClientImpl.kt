@@ -1,26 +1,25 @@
 package com.beeswork.balance.data.network.stomp
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.internal.Resource
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.provider.PreferenceProvider
 import com.beeswork.balance.internal.safeLet
-import com.google.android.gms.common.ErrorDialogFragment
 import com.neovisionaries.ws.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
 import java.util.*
 
 
 class StompClientImpl(
     private val balanceRepository: BalanceRepository,
-    private val preferenceProvider: PreferenceProvider
+    private val preferenceProvider: PreferenceProvider,
+    private val context: Context
 ) : StompClient {
 
     private val mutableWebSocketLifeCycleEvent =
@@ -28,7 +27,8 @@ class StompClientImpl(
     override val webSocketLifeCycleEvent: LiveData<WebSocketLifeCycleEvent>
         get() = mutableWebSocketLifeCycleEvent
 
-    private var webSocket: WebSocket = WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
+    private var webSocket: WebSocket =
+        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
     private var chatId: Long? = null
     private var matchedId: String? = null
@@ -44,16 +44,16 @@ class StompClientImpl(
                 websocket: WebSocket?,
                 headers: MutableMap<String, MutableList<String>>?
             ) {
-                println("onConnected")
                 connectStomp()
             }
 
-            // TODO: what happens when exception is thrown in onFrame()
             override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
                 frame?.let {
                     val stompFrame = StompFrame.from(frame.payloadText)
                     when (stompFrame.command) {
-                        StompFrame.Command.CONNECTED -> subscribe()
+                        StompFrame.Command.CONNECTED -> {
+                            subscribe()
+                        }
                         StompFrame.Command.MESSAGE -> {
 
                         }
@@ -103,7 +103,7 @@ class StompClientImpl(
                 clientCloseFrame: WebSocketFrame?,
                 closedByServer: Boolean
             ) {
-                println("onDisconnected")
+                mutableWebSocketLifeCycleEvent.postValue(WebSocketLifeCycleEvent.disconnect())
                 super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
             }
 
@@ -143,7 +143,6 @@ class StompClientImpl(
                 webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
             }
         } ?: kotlin.run {
-//          TODO: lifecycle event error and close socket
         }
     }
 
@@ -168,10 +167,15 @@ class StompClientImpl(
         return headers
     }
 
-    //  TODO: before sending, check if subscribtion or connection is open
     override fun send(chatId: Long, matchedId: String, message: String) {
         if (message.toByteArray().size > MAX_MESSAGE_SIZE) {
-            mutableWebSocketLifeCycleEvent.postValue(WebSocketLifeCycleEvent.error())
+            mutableWebSocketLifeCycleEvent.postValue(
+                WebSocketLifeCycleEvent.error(
+                    null,
+                    context.resources.getString(R.string.chat_message_out_of_size_exception)
+                )
+            )
+            return
         }
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -180,7 +184,7 @@ class StompClientImpl(
             headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
             headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
-            headers[StompHeader.MESSAGE_ID] = balanceRepository.sendMessage(chatId, message).toString()
+            headers[StompHeader.MESSAGE_ID] = balanceRepository.saveMessage(chatId, message).toString()
             val stompMessage = StompFrame.Message(
                 null,
                 message,
@@ -204,11 +208,9 @@ class StompClientImpl(
         webSocket.disconnect()
     }
 
-
     private fun queueName(chatId: Long): String {
         return "/queue/${preferenceProvider.getAccountId()}-$chatId"
     }
-
 
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
@@ -220,3 +222,9 @@ class StompClientImpl(
 
 }
 
+
+// TODO: change message in stompframe to message entity
+// TODO: lifecycle event error and close socket in subscribe()
+// TODO: what happens when exception is thrown in onFrame()
+// TODO: before sending, check if subscribtion or connection is open
+// TODO: no internet connection then what?

@@ -66,7 +66,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
 
         // StompClient
-        bind() from singleton { StompClientImpl(instance(), instance()) }
+        bind() from singleton { StompClientImpl(instance(), instance(), instance()) }
 
         // Provider
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
@@ -165,6 +165,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      51. implement account not found and blocked exception they should be in baseACtivty or somthing
 //      52. click response result change to enum type
 //      53. when typeing messag ein chat, let user know if the message exceeds x bytes
+//      54. listener for message received via notification and then observer in chatFragment, if in chat then connect()
+//      55. include message and id and other stuffs to save it to databsae in app
 
 
 

@@ -511,7 +511,7 @@ class BalanceRepositoryImpl(
     //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
     //          out of screen.
     //  TEST 2. when update all entries in database, it will update the items in list as well
-    override suspend fun sendMessage(
+    override suspend fun saveMessage(
         chatId: Long,
         message: String
     ): Long {
@@ -531,6 +531,10 @@ class BalanceRepositoryImpl(
 
     override suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime) {
         messageDAO.sync(chatId, messageId, id, createdAt, Message.Status.SENT)
+    }
+
+    override suspend fun fetchMessages(chatId: Long, recipientId: String) {
+
     }
 
 

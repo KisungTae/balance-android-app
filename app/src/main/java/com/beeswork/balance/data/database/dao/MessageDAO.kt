@@ -22,4 +22,7 @@ interface MessageDAO {
 
     @Query("select * from message where chatId = :chatId and messageId = :messageId")
     fun getMessage(chatId: Long, messageId: Long): Message?
+
+    @Query("select id from message order by id desc limit 1")
+    fun getLastId(): Long
 }

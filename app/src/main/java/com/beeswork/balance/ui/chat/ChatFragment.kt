@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.stomp.WebSocketLifeCycleEvent
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.dialog.ExceptionDialogListener
@@ -57,13 +58,19 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener { viewModel.sendChatMessage(etChatMessage.text.toString()) }
-        println("viewModel.connectChat()")
         viewModel.connectChat()
     }
 
     private fun setupWebSocketLifeCycleEventObserver() {
         viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
-            println("webSocketLifeCycleEvent.observe")
+            when (it.type) {
+                WebSocketLifeCycleEvent.Type.ERROR -> {
+                    ExceptionDialog(it.errorMessage, null).show(
+                        childFragmentManager,
+                        ExceptionDialog.TAG
+                    )
+                }
+            }
         })
     }
 
@@ -101,7 +108,6 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         super.onPause()
         viewModel.disconnectChat()
     }
-
 
 
 }
