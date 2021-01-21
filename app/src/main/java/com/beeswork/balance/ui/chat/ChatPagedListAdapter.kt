@@ -12,13 +12,13 @@ import kotlinx.android.synthetic.main.item_chat_message_received.view.*
 import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
 
 
-class ChatPagedListAdapter: PagedListAdapter<ChatMessage, ChatPagedListAdapter.MessageViewHolder>(
+class ChatPagedListAdapter : PagedListAdapter<ChatMessage, ChatPagedListAdapter.MessageViewHolder>(
     diffCallback
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return when (viewType) {
-            MessageType.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
-            MessageType.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
+            ChatMessage.Status.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
+            ChatMessage.Status.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
             else -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
         }
     }
@@ -26,17 +26,19 @@ class ChatPagedListAdapter: PagedListAdapter<ChatMessage, ChatPagedListAdapter.M
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         getItem(position)?.let {
             when (holder.itemViewType) {
-                MessageType.RECEIVED.ordinal -> holder.bindMessageReceived(it)
-                MessageType.SENT.ordinal -> holder.bindMessageSent(it)
+                ChatMessage.Status.RECEIVED.ordinal -> holder.bindMessageReceived(it)
+                ChatMessage.Status.SENT.ordinal -> holder.bindMessageSent(it)
             }
         }
     }
 
+
+
     override fun getItemViewType(position: Int): Int {
         return getItem(position)?.let {
-            return if (it.received) MessageType.RECEIVED.ordinal else MessageType.SENT.ordinal
+            return if (it.status == ChatMessage.Status.RECEIVED) ChatMessage.Status.RECEIVED.ordinal else ChatMessage.Status.SENT.ordinal
         } ?: kotlin.run {
-            return MessageType.RECEIVED.ordinal
+            return ChatMessage.Status.RECEIVED.ordinal
         }
     }
 
@@ -44,29 +46,29 @@ class ChatPagedListAdapter: PagedListAdapter<ChatMessage, ChatPagedListAdapter.M
         private val diffCallback = object : DiffUtil.ItemCallback<ChatMessage>() {
             override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
                 oldItem.id == newItem.id
-
             override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
                 oldItem == newItem
         }
     }
 
-    enum class MessageType {
-        RECEIVED,
-        SENT
-    }
-
     class MessageViewHolder(
         itemView: View
-    ): RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(itemView) {
         fun bindMessageSent(chatMessage: ChatMessage) {
-            itemView.tvChatMessageSentBody.text = "messageId: ${chatMessage.messageId} | ${chatMessage.body}"
+            itemView.tvChatMessageSentBody.text =
+                "messageId: ${chatMessage.messageId} | ${chatMessage.body}"
 
             when (chatMessage.status) {
                 ChatMessage.Status.SENT -> {
                     itemView.tvChatMessageSentCreatedAt.text = chatMessage.createdAt.toString()
                     showLayout(itemView, View.VISIBLE, View.GONE, View.GONE)
                 }
-                ChatMessage.Status.SENDING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE)
+                ChatMessage.Status.SENDING -> showLayout(
+                    itemView,
+                    View.GONE,
+                    View.VISIBLE,
+                    View.GONE
+                )
                 ChatMessage.Status.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
             }
         }
@@ -84,9 +86,6 @@ class ChatPagedListAdapter: PagedListAdapter<ChatMessage, ChatPagedListAdapter.M
             }
         }
     }
-
-
-
 
 
 }

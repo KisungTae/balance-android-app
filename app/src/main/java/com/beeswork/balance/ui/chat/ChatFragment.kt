@@ -57,8 +57,11 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupChatPagedList()
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
-        btnChatSend.setOnClickListener { viewModel.sendChatMessage(etChatMessage.text.toString()) }
-        viewModel.connectChat()
+        btnChatSend.setOnClickListener {
+            rvChat.scrollToPosition(20)
+//            viewModel.sendChatMessage(etChatMessage.text.toString())
+        }
+//        viewModel.connectChat()
     }
 
     private fun setupWebSocketLifeCycleEventObserver() {

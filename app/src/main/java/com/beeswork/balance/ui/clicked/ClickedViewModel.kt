@@ -26,7 +26,7 @@ class ClickedViewModel(
         .setMaxSize(CLICKED_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(CLICKED_PAGE_SIZE)
         .setPageSize(CLICKED_PAGE_SIZE)
-        .setPrefetchDistance(CLICKED_PAGE_PREFETCH_DISTANCE)
+//        .setPrefetchDistance(CLICKED_PAGE_PREFETCH_DISTANCE)
         .build()
 
     val clickedList by lazyDeferred {

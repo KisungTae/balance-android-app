@@ -3,8 +3,6 @@ package com.beeswork.balance.data.network.stomp
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.BalanceURL
 import com.beeswork.balance.internal.constant.HttpHeader
@@ -30,6 +28,7 @@ class StompClientImpl(
 
     private var webSocket: WebSocket =
         WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
+
 
     private var chatId: Long? = null
     private var matchedId: String? = null
@@ -169,41 +168,49 @@ class StompClientImpl(
         return headers
     }
 
-    override fun send(chatId: Long, matchedId: String, message: String) {
-        if (message.toByteArray().size > MAX_MESSAGE_SIZE) {
-            mutableWebSocketLifeCycleEvent.postValue(
-                WebSocketLifeCycleEvent.error(
-                    null,
-                    context.resources.getString(R.string.chat_message_out_of_size_exception)
-                )
-            )
-            return
+    override fun send(chatId: Long, matchedId: String, body: String) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            balanceRepository.fetchChatMessages(chatId, matchedId)
+//        }
+
+//        if (message.toByteArray().size > MAX_MESSAGE_SIZE) {
+//            mutableWebSocketLifeCycleEvent.postValue(
+//                WebSocketLifeCycleEvent.error(
+//                    null,
+//                    context.resources.getString(R.string.chat_message_out_of_size_exception)
+//                )
+//            )
+//            return
+//        }
+        CoroutineScope(Dispatchers.IO).launch {
+            balanceRepository.saveChatMessage(chatId, body)
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val headers = mutableMapOf<String, String>()
-            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
-            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
-            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-            headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
-            headers[StompHeader.MESSAGE_ID] = balanceRepository.saveMessage(chatId, message).toString()
-            val stompMessage = StompFrame.Message(
-                null,
-                message,
-                "preferenceProvider.getAccountId()",
-                matchedId,
-                chatId,
-                null
-            )
-            webSocket.sendText(
-                StompFrame(
-                    StompFrame.Command.SEND,
-                    headers,
-                    stompMessage,
-                    null
-                ).compile()
-            )
-        }
+
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val headers = mutableMapOf<String, String>()
+//            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
+//            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
+//            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+//            headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
+//            headers[StompHeader.MESSAGE_ID] = balanceRepository.saveMessage(chatId, message).toString()
+//            val stompMessage = StompFrame.Message(
+//                null,
+//                message,
+//                preferenceProvider.getAccountId(),
+//                matchedId,
+//                chatId,
+//                null
+//            )
+//            webSocket.sendText(
+//                StompFrame(
+//                    StompFrame.Command.SEND,
+//                    headers,
+//                    stompMessage,
+//                    null
+//                ).compile()
+//            )
+//        }
     }
 
     override fun disconnectChat() {

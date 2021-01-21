@@ -72,7 +72,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
-        viewModel.fetchCards(false)
+//        viewModel.fetchCards(false)
     }
 
     private fun bindUI() = launch {

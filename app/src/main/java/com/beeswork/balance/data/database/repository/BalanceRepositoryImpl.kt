@@ -511,30 +511,55 @@ class BalanceRepositoryImpl(
     //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
     //          out of screen.
     //  TEST 2. when update all entries in database, it will update the items in list as well
-    override suspend fun saveMessage(
+    override suspend fun saveChatMessage(
         chatId: Long,
-        message: String
+        body: String
     ): Long {
         return chatMessageDAO.insert(
             ChatMessage(
                 null,
                 null,
                 chatId,
-                message,
+                body,
                 ChatMessage.Status.SENDING,
-                received = false,
                 read = true,
                 null
             )
         )
     }
 
-    override suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime) {
+    override suspend fun syncMessage(
+        chatId: Long,
+        messageId: Long,
+        id: Long,
+        createdAt: OffsetDateTime
+    ) {
         chatMessageDAO.sync(chatId, messageId, id, createdAt, ChatMessage.Status.SENT)
     }
 
-    override suspend fun fetchMessages(chatId: Long, recipientId: String) {
+    override suspend fun fetchChatMessages(chatId: Long, recipientId: String) {
+        val response = balanceRDS.fetchChatMessages(
+            preferenceProvider.getAccountId(),
+            preferenceProvider.getIdentityToken(),
+            chatId,
+            recipientId,
+            chatMessageDAO.getLastId()
+        )
 
+
+        response.data?.let {
+            for (i in it.indices) {
+                val chatMessage = it[i]
+                chatMessage.messageId?.let {
+
+                } ?: kotlin.run {
+
+                }
+            }
+        }
+
+
+        println(response.data)
     }
 
 

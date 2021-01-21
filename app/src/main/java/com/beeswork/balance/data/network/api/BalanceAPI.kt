@@ -24,6 +24,7 @@ import retrofit2.http.*
 
 interface BalanceAPI {
 
+    @GET("chat/message/list")
     suspend fun fetchChatMessages(
         @Query(value = "accountId") accountId: String,
         @Query(value = "identityToken") identityToken: String,

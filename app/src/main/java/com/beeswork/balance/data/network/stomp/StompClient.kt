@@ -8,6 +8,6 @@ interface StompClient {
 
     val webSocketLifeCycleEvent: LiveData<WebSocketLifeCycleEvent>
     fun connectChat(chatId: Long, matchedId: String)
-    fun send(chatId: Long, matchedId: String, message: String)
+    fun send(chatId: Long, matchedId: String, body: String)
     fun disconnectChat()
 }

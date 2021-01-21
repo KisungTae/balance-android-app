@@ -26,7 +26,7 @@ class MatchViewModel (
         .setMaxSize(MATCH_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(MATCH_PAGE_SIZE)
         .setPageSize(MATCH_PAGE_SIZE)
-        .setPrefetchDistance(MATCH_PAGE_PREFETCH_DISTANCE)
+//        .setPrefetchDistance(MATCH_PAGE_PREFETCH_DISTANCE)
         .build()
 
     val matches by lazyDeferred {

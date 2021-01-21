@@ -106,7 +106,7 @@ data class StompFrame(
 
     class Message(
         val id: Long?,
-        val message: String,
+        val body: String,
         val accountId: String,
         val recipientId: String,
         val chatId: Long?,

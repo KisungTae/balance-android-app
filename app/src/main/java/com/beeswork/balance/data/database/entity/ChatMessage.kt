@@ -21,7 +21,6 @@ data class ChatMessage(
     val chatId: Long,
     val body: String,
     val status: Status,
-    val received: Boolean,
     val read: Boolean,
     val createdAt: OffsetDateTime?
 ) {
@@ -32,6 +31,7 @@ data class ChatMessage(
     enum class Status {
         SENDING,
         SENT,
+        RECEIVED,
         ERROR
     }
 }

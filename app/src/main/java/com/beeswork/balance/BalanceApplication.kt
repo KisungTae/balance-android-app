@@ -167,6 +167,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      53. when typeing messag ein chat, let user know if the message exceeds x bytes
 //      54. listener for message received via notification and then observer in chatFragment, if in chat then connect()
 //      55. include message and id and other stuffs to save it to databsae in app
+//      56. SocketFactory().create() already tries to connect to endpoint?
 
 
 

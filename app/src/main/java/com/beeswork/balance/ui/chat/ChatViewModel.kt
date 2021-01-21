@@ -20,7 +20,7 @@ class ChatViewModel(
         .setMaxSize(CHAT_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
         .setPageSize(CHAT_PAGE_SIZE)
-        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
+//        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
         .build()
 
     val chatMessages by lazyDeferred {
@@ -33,8 +33,8 @@ class ChatViewModel(
         stompClient.connectChat(chatId, matchedId)
     }
 
-    fun sendChatMessage(message: String) {
-        stompClient.send(chatId, matchedId, message)
+    fun sendChatMessage(body: String) {
+        stompClient.send(chatId, matchedId, body)
     }
 
     fun disconnectChat() {
