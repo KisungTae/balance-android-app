@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.stomp.WebSocketLifeCycleEvent
 import com.beeswork.balance.ui.base.ScopeFragment
@@ -58,8 +59,9 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener {
-            rvChat.scrollToPosition(20)
-//            viewModel.sendChatMessage(etChatMessage.text.toString())
+//            rvChat.smoothScrollToPosition(0)
+            viewModel.sendChatMessage(etChatMessage.text.toString())
+
         }
 //        viewModel.connectChat()
     }
@@ -88,13 +90,28 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     private fun setupChatPagedList() {
         chatPagedListAdapter = ChatPagedListAdapter()
+
+        chatPagedListAdapter.registerAdapterDataObserver(object :
+            RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                if (positionStart == 0) {
+                    println("onItemRangeInserted")
+//                    rvChat.smoothScrollToPosition(100)
+//                    println("onItemRangeInserted item count: ${rvChat.adapter?.itemCount}")
+                    rvChat.scrollToPosition(0)
+                }
+            }
+        })
+
+
         rvChat.adapter = chatPagedListAdapter
 
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         rvChat.layoutManager = layoutManager
-        rvChat.scrollToPosition(0)
+
+
     }
 
     override fun onClickExceptionDialogCloseBtn() {

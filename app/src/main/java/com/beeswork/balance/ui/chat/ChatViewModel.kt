@@ -16,8 +16,8 @@ class ChatViewModel(
 ) : ViewModel() {
 
     private val pagedListConfig = PagedList.Config.Builder()
-        .setEnablePlaceholders(false)
-        .setMaxSize(CHAT_MAX_PAGE_SIZE)
+        .setEnablePlaceholders(true)
+//        .setMaxSize(CHAT_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
         .setPageSize(CHAT_PAGE_SIZE)
 //        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)

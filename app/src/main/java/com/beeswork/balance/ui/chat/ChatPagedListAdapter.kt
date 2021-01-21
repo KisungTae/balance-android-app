@@ -32,8 +32,6 @@ class ChatPagedListAdapter : PagedListAdapter<ChatMessage, ChatPagedListAdapter.
         }
     }
 
-
-
     override fun getItemViewType(position: Int): Int {
         return getItem(position)?.let {
             return if (it.status == ChatMessage.Status.RECEIVED) ChatMessage.Status.RECEIVED.ordinal else ChatMessage.Status.SENT.ordinal
@@ -41,6 +39,7 @@ class ChatPagedListAdapter : PagedListAdapter<ChatMessage, ChatPagedListAdapter.
             return ChatMessage.Status.RECEIVED.ordinal
         }
     }
+
 
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<ChatMessage>() {
