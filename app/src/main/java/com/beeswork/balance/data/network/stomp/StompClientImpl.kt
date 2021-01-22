@@ -26,8 +26,8 @@ class StompClientImpl(
     override val webSocketLifeCycleEvent: LiveData<WebSocketLifeCycleEvent>
         get() = mutableWebSocketLifeCycleEvent
 
-    private var webSocket: WebSocket =
-        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
+//    private var webSocket: WebSocket =
+//        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
 
     private var chatId: Long? = null
@@ -39,112 +39,112 @@ class StompClientImpl(
 
 
     private fun setupWebSocketListener() {
-        webSocket.addListener(object : WebSocketAdapter() {
-            override fun onConnected(
-                websocket: WebSocket?,
-                headers: MutableMap<String, MutableList<String>>?
-            ) {
-                connectStomp()
-            }
-
-            override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-                frame?.let {
-                    val stompFrame = StompFrame.from(frame.payloadText)
-                    when (stompFrame.command) {
-                        StompFrame.Command.CONNECTED -> {
-                            subscribe()
-                        }
-                        StompFrame.Command.MESSAGE -> {
-
-                        }
-                        StompFrame.Command.RECEIPT -> {
-                            safeLet(
-                                stompFrame.message?.chatId,
-                                stompFrame.getMessageId(),
-                                stompFrame.message?.id,
-                                stompFrame.message?.createdAt,
-                            ) { chatId, messageId, id, createdAt ->
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    balanceRepository.syncMessage(chatId, messageId, id, createdAt)
-                                }
-                            }
-                        }
-                        StompFrame.Command.ERROR -> {
-                            mutableWebSocketLifeCycleEvent.postValue(
-                                WebSocketLifeCycleEvent(
-                                    WebSocketLifeCycleEvent.Type.ERROR,
-                                    stompFrame.getError(),
-                                    stompFrame.getErrorMessage()
-                                )
-                            )
-                        }
-                        else -> println("stompframe.command when else here")
-                    }
-                }
-            }
-
-            override fun onFrameError(
-                websocket: WebSocket?,
-                cause: WebSocketException?,
-                frame: WebSocketFrame?
-            ) {
-                println("onFrameError")
-                super.onFrameError(websocket, cause, frame)
-            }
-
-            override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
-                println("onConnectError")
-                super.onConnectError(websocket, exception)
-            }
-
-            override fun onDisconnected(
-                websocket: WebSocket?,
-                serverCloseFrame: WebSocketFrame?,
-                clientCloseFrame: WebSocketFrame?,
-                closedByServer: Boolean
-            ) {
-                println("onDisconnected")
-                mutableWebSocketLifeCycleEvent.postValue(WebSocketLifeCycleEvent.disconnect())
-                super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
-            }
-
-            override fun onUnexpectedError(websocket: WebSocket?, cause: WebSocketException?) {
-                println("onUnexpectedError")
-                super.onUnexpectedError(websocket, cause)
-            }
-        })
+//        webSocket.addListener(object : WebSocketAdapter() {
+//            override fun onConnected(
+//                websocket: WebSocket?,
+//                headers: MutableMap<String, MutableList<String>>?
+//            ) {
+//                connectStomp()
+//            }
+//
+//            override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
+//                frame?.let {
+//                    val stompFrame = StompFrame.from(frame.payloadText)
+//                    when (stompFrame.command) {
+//                        StompFrame.Command.CONNECTED -> {
+//                            subscribe()
+//                        }
+//                        StompFrame.Command.MESSAGE -> {
+//
+//                        }
+//                        StompFrame.Command.RECEIPT -> {
+//                            safeLet(
+//                                stompFrame.message?.chatId,
+//                                stompFrame.getMessageId(),
+//                                stompFrame.message?.id,
+//                                stompFrame.message?.createdAt,
+//                            ) { chatId, messageId, id, createdAt ->
+//                                CoroutineScope(Dispatchers.IO).launch {
+//                                    balanceRepository.syncMessage(chatId, messageId, id, createdAt)
+//                                }
+//                            }
+//                        }
+//                        StompFrame.Command.ERROR -> {
+//                            mutableWebSocketLifeCycleEvent.postValue(
+//                                WebSocketLifeCycleEvent(
+//                                    WebSocketLifeCycleEvent.Type.ERROR,
+//                                    stompFrame.getError(),
+//                                    stompFrame.getErrorMessage()
+//                                )
+//                            )
+//                        }
+//                        else -> println("stompframe.command when else here")
+//                    }
+//                }
+//            }
+//
+//            override fun onFrameError(
+//                websocket: WebSocket?,
+//                cause: WebSocketException?,
+//                frame: WebSocketFrame?
+//            ) {
+//                println("onFrameError")
+//                super.onFrameError(websocket, cause, frame)
+//            }
+//
+//            override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
+//                println("onConnectError")
+//                super.onConnectError(websocket, exception)
+//            }
+//
+//            override fun onDisconnected(
+//                websocket: WebSocket?,
+//                serverCloseFrame: WebSocketFrame?,
+//                clientCloseFrame: WebSocketFrame?,
+//                closedByServer: Boolean
+//            ) {
+//                println("onDisconnected")
+//                mutableWebSocketLifeCycleEvent.postValue(WebSocketLifeCycleEvent.disconnect())
+//                super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
+//            }
+//
+//            override fun onUnexpectedError(websocket: WebSocket?, cause: WebSocketException?) {
+//                println("onUnexpectedError")
+//                super.onUnexpectedError(websocket, cause)
+//            }
+//        })
     }
 
     private fun connectWebSocket() {
-        if (webSocket.state != WebSocketState.CREATED)
-            webSocket = webSocket.recreate()
-        CoroutineScope(Dispatchers.IO).launch {
-            webSocket.connect()
-        }
+//        if (webSocket.state != WebSocketState.CREATED)
+//            webSocket = webSocket.recreate()
+//        CoroutineScope(Dispatchers.IO).launch {
+//            webSocket.connect()
+//        }
     }
 
     private fun connectStomp() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val headers = mutableMapOf<String, String>()
-            headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
-            headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
-            webSocket.sendText(StompFrame(StompFrame.Command.CONNECT, headers).compile())
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val headers = mutableMapOf<String, String>()
+//            headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
+//            headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
+//            webSocket.sendText(StompFrame(StompFrame.Command.CONNECT, headers).compile())
+//        }
     }
 
     private fun subscribe() {
-        safeLet(chatId, matchedId) { chatId, matchedId ->
-            CoroutineScope(Dispatchers.IO).launch {
-                val headers = stompIdentityHeaders(queueName(chatId), matchedId, chatId)
-                headers[StompHeader.ID] = UUID.randomUUID().toString()
-                headers[StompHeader.ACK] = DEFAULT_ACK
-                headers[StompHeader.AUTO_DELETE] = true.toString()
-                headers[StompHeader.EXCLUSIVE] = false.toString()
-                headers[StompHeader.DURABLE] = true.toString()
-                webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
-            }
-        } ?: kotlin.run {
-        }
+//        safeLet(chatId, matchedId) { chatId, matchedId ->
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val headers = stompIdentityHeaders(queueName(chatId), matchedId, chatId)
+//                headers[StompHeader.ID] = UUID.randomUUID().toString()
+//                headers[StompHeader.ACK] = DEFAULT_ACK
+//                headers[StompHeader.AUTO_DELETE] = true.toString()
+//                headers[StompHeader.EXCLUSIVE] = false.toString()
+//                headers[StompHeader.DURABLE] = true.toString()
+//                webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
+//            }
+//        } ?: kotlin.run {
+//        }
     }
 
     override fun connectChat(chatId: Long, matchedId: String) {
@@ -214,7 +214,7 @@ class StompClientImpl(
     }
 
     override fun disconnectChat() {
-        webSocket.disconnect()
+//        webSocket.disconnect()
     }
 
     private fun queueName(chatId: Long): String {

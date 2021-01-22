@@ -16,8 +16,8 @@ class ChatViewModel(
 ) : ViewModel() {
 
     private val pagedListConfig = PagedList.Config.Builder()
-        .setEnablePlaceholders(true)
-//        .setMaxSize(CHAT_MAX_PAGE_SIZE)
+        .setEnablePlaceholders(false)
+        .setMaxSize(CHAT_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
         .setPageSize(CHAT_PAGE_SIZE)
 //        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
@@ -25,6 +25,7 @@ class ChatViewModel(
 
     val chatMessages by lazyDeferred {
         LivePagedListBuilder(balanceRepository.getChatMessages(chatId), pagedListConfig).build()
+
     }
 
     val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent
@@ -124,7 +125,7 @@ class ChatViewModel(
     companion object {
         const val CHAT_PAGE_SIZE = 30
         const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE * 2
-        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 2 + CHAT_PAGE_SIZE
+        const val CHAT_MAX_PAGE_SIZE = 180
     }
 }
 

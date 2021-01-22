@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.network.stomp.WebSocketLifeCycleEvent
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
@@ -59,7 +61,20 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener {
-//            rvChat.smoothScrollToPosition(0)
+            println("item count: ${rvChat.adapter?.itemCount}")
+            val text = etChatMessage.text
+            println("text: $text")
+            if (!text.isEmpty()) {
+                println("rvChat.smoothScrollToPosition(0)")
+
+
+            } else {
+                println("rvChat.scrollToPosition(0)")
+                rvChat.scrollToPosition(0)
+            }
+
+            rvChat.smoothScrollToPosition(0)
+            println("before viewModel.sendChatMessage(etChatMessage.text.toString())")
             viewModel.sendChatMessage(etChatMessage.text.toString())
 
         }
@@ -91,14 +106,19 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private fun setupChatPagedList() {
         chatPagedListAdapter = ChatPagedListAdapter()
 
+
+
         chatPagedListAdapter.registerAdapterDataObserver(object :
             RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                println("==================onItemRangeInserted================")
+                println("item count inserted: $itemCount")
+                println("list size: ${rvChat.adapter?.itemCount}")
                 if (positionStart == 0) {
-                    println("onItemRangeInserted")
-//                    rvChat.smoothScrollToPosition(100)
-//                    println("onItemRangeInserted item count: ${rvChat.adapter?.itemCount}")
+                    println("positionStart == 0")
                     rvChat.scrollToPosition(0)
+//                    println("onItemRangeInserted item count: ${rvChat.adapter?.itemCount}")
+//                    rvChat.scrollToPosition(0)
                 }
             }
         })
