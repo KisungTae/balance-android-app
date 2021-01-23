@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.paging.PagedListAdapter
+import androidx.paging.PositionalDataSource
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -61,21 +62,51 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupMessageObserver()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener {
-            println("item count: ${rvChat.adapter?.itemCount}")
-            val text = etChatMessage.text
-            println("text: $text")
-            if (!text.isEmpty()) {
-                println("rvChat.smoothScrollToPosition(0)")
-
-
-            } else {
-                println("rvChat.scrollToPosition(0)")
-                rvChat.scrollToPosition(0)
-            }
-
-            rvChat.smoothScrollToPosition(0)
-            println("before viewModel.sendChatMessage(etChatMessage.text.toString())")
+//            println("item count: ${rvChat.adapter?.itemCount}")
+//            val text = etChatMessage.text
+//            println("text: $text")
+//            if (!text.isEmpty()) {
+//                println("rvChat.smoothScrollToPosition(0)")
+//
+//
+//            } else {
+//                println("rvChat.scrollToPosition(0)")
+//                rvChat.scrollToPosition(0)
+//            }
+//
+//            rvChat.smoothScrollToPosition(0)
+//            println("before viewModel.sendChatMessage(etChatMessage.text.toString())")
             viewModel.sendChatMessage(etChatMessage.text.toString())
+//            chatPagedListAdapter.currentList?.loadAround(0)
+
+//            val offset = chatPagedListAdapter.currentList?.positionOffset
+//            offset?.let {
+//                if (it == 0) rvChat.scrollToPosition(0)
+//                else chatPagedListAdapter.currentList?.loadAround(0)
+//            }
+
+//            chatPagedListAdapter.currentList?.loadAround(50)
+//            val d = chatPagedListAdapter.currentList?.dataSource as PositionalDataSource
+
+//            chatPagedListAdapter.currentList?.positionOffset?.let {
+//                if (it == 0) rvChat.scrollToPosition(0)
+//                else chatPagedListAdapter.currentList?.loadAround(0)
+//            }
+
+
+
+//            val layoutManager = rvChat.layoutManager as LinearLayoutManager
+//            println("layoutManager.findFirstCompletelyVisibleItemPosition(): ${layoutManager.findFirstCompletelyVisibleItemPosition()}")
+//            println("layoutManager.findFirstVisibleItemPosition(): ${layoutManager.findFirstVisibleItemPosition()}")
+//            println("layoutManager.findLastCompletelyVisibleItemPosition(): ${layoutManager.findLastCompletelyVisibleItemPosition()}")
+//            println("layoutManager.findLastVisibleItemPosition(): ${layoutManager.findLastVisibleItemPosition()}")
+//
+//            println("chatPagedListAdapter.currentList?.positionOffset: ${chatPagedListAdapter.currentList?.positionOffset}")
+//            println("chatPagedListAdapter.currentList?.lastKey: ${chatPagedListAdapter.currentList?.lastKey}")
+
+//            chatPagedListAdapter.currentList?.loadAround(0)
+
+
 
         }
 //        viewModel.connectChat()
@@ -94,35 +125,48 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         })
     }
 
+    var init = true
+
     private suspend fun setupMessageObserver() {
         val chatMessages = viewModel.chatMessages.await()
         chatMessages.observe(viewLifecycleOwner, Observer { pagedMessageList ->
             pagedMessageList?.let {
+                val list = chatPagedListAdapter.currentList
+
                 chatPagedListAdapter.submitList(pagedMessageList)
             }
         })
+
+        rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+//                println("onScrolled")
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+//                    println("newState == RecyclerView.SCROLL_STATE_IDLE")
+                }
+            }
+        })
+
     }
 
     private fun setupChatPagedList() {
         chatPagedListAdapter = ChatPagedListAdapter()
 
 
-
         chatPagedListAdapter.registerAdapterDataObserver(object :
             RecyclerView.AdapterDataObserver() {
+
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                println("==================onItemRangeInserted================")
-                println("item count inserted: $itemCount")
-                println("list size: ${rvChat.adapter?.itemCount}")
-                if (positionStart == 0) {
-                    println("positionStart == 0")
-                    rvChat.scrollToPosition(0)
-//                    println("onItemRangeInserted item count: ${rvChat.adapter?.itemCount}")
-//                    rvChat.scrollToPosition(0)
-                }
+//                println("==================onItemRangeInserted START================")
+//                println("item count inserted: $itemCount")
+//                println("list size: ${rvChat.adapter?.itemCount}")
+//                println("positionStart: $positionStart")
             }
         })
-
 
         rvChat.adapter = chatPagedListAdapter
 
@@ -130,7 +174,6 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         rvChat.layoutManager = layoutManager
-
 
     }
 

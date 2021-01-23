@@ -28,4 +28,7 @@ interface ChatMessageDAO {
 
     @Query("select id from chatMessage order by id desc limit 1")
     fun getLastId(): Long
+
+
+    fun getChatMessages()
 }

@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.chat
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -25,12 +26,14 @@ class ChatPagedListAdapter : PagedListAdapter<ChatMessage, ChatPagedListAdapter.
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         getItem(position)?.let {
+            println("onBindViewHolder: ${it.messageId}")
             when (holder.itemViewType) {
                 ChatMessage.Status.RECEIVED.ordinal -> holder.bindMessageReceived(it)
                 ChatMessage.Status.SENT.ordinal -> holder.bindMessageSent(it)
             }
         }
     }
+
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position)?.let {
