@@ -20,7 +20,7 @@ class ChatViewModel(
         .setMaxSize(CHAT_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
         .setPageSize(CHAT_PAGE_SIZE)
-//        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
+        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
         .build()
 
     val chatMessages by lazyDeferred {
@@ -123,9 +123,9 @@ class ChatViewModel(
 
 
     companion object {
-        const val CHAT_PAGE_SIZE = 30
-        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE * 2
-        const val CHAT_MAX_PAGE_SIZE = 180
+        const val CHAT_PAGE_SIZE = 50
+        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
+        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_SIZE + (CHAT_PAGE_PREFETCH_DISTANCE * 2)
     }
 }
 

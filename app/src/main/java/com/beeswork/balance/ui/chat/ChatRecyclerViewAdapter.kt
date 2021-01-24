@@ -2,8 +2,6 @@ package com.beeswork.balance.ui.chat
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedList
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -12,47 +10,44 @@ import com.beeswork.balance.internal.inflate
 import kotlinx.android.synthetic.main.item_chat_message_received.view.*
 import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
 
+class ChatRecyclerViewAdapter :
+    RecyclerView.Adapter<ChatRecyclerViewAdapter.ChatMessageViewHolder>() {
 
-class ChatPagedListAdapter : PagedListAdapter<ChatMessage, ChatPagedListAdapter.MessageViewHolder>(
-    diffCallback
-) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+    private val chatMessages = mutableListOf<ChatMessage>()
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {
         return when (viewType) {
-            ChatMessage.Status.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
-            ChatMessage.Status.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
-            else -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
+            ChatMessage.Status.RECEIVED.ordinal -> ChatMessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
+            ChatMessage.Status.SENT.ordinal -> ChatMessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
+            else -> ChatMessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
         }
     }
 
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        getItem(position)?.let {
-            when (holder.itemViewType) {
-                ChatMessage.Status.RECEIVED.ordinal -> holder.bindMessageReceived(it)
-                ChatMessage.Status.SENT.ordinal -> holder.bindMessageSent(it)
-            }
+    override fun onBindViewHolder(holderChat: ChatMessageViewHolder, position: Int) {
+        val chatMessage = chatMessages[position]
+        when (holderChat.itemViewType) {
+            ChatMessage.Status.RECEIVED.ordinal -> holderChat.bindMessageReceived(chatMessage)
+            ChatMessage.Status.SENT.ordinal -> holderChat.bindMessageSent(chatMessage)
         }
     }
-
 
     override fun getItemViewType(position: Int): Int {
-        return getItem(position)?.let {
-            return if (it.status == ChatMessage.Status.RECEIVED) ChatMessage.Status.RECEIVED.ordinal else ChatMessage.Status.SENT.ordinal
-        } ?: kotlin.run {
-            return ChatMessage.Status.RECEIVED.ordinal
-        }
+        val chatMessage = chatMessages[position]
+        return if (chatMessage.status == ChatMessage.Status.RECEIVED) ChatMessage.Status.RECEIVED.ordinal
+        else ChatMessage.Status.SENT.ordinal
+    }
+
+    override fun getItemCount(): Int {
+        return chatMessages.size
+    }
+
+    fun submitList(chatMessages: List<ChatMessage>) {
+
     }
 
 
-    companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<ChatMessage>() {
-            override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
-                oldItem.id == newItem.id
-            override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
-                oldItem == newItem
-        }
-    }
 
-    class MessageViewHolder(
+    class ChatMessageViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
         fun bindMessageSent(chatMessage: ChatMessage) {
@@ -88,5 +83,14 @@ class ChatPagedListAdapter : PagedListAdapter<ChatMessage, ChatPagedListAdapter.
         }
     }
 
+    companion object {
+        private val diffCallback = object : DiffUtil.ItemCallback<ChatMessage>() {
+            override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
+                oldItem.id == newItem.id
+
+            override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
+                oldItem == newItem
+        }
+    }
 
 }

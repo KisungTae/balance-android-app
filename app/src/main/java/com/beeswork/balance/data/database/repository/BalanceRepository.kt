@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.repository
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
@@ -38,6 +39,9 @@ interface BalanceRepository {
     suspend fun saveChatMessage(chatId: Long, body: String): Long
     suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
     suspend fun fetchChatMessages(chatId: Long, recipientId: String)
+
+    val loadedChatMessages: MutableLiveData<List<ChatMessage>>
+    suspend fun loadChatMessages(chatId: Long, pageSize: Int, startChatMessageId: Int)
 
     // account
     val cards: LiveData<Resource<List<CardResponse>>>
