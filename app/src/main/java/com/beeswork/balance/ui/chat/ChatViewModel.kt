@@ -1,8 +1,8 @@
 package com.beeswork.balance.ui.chat
 
 import androidx.lifecycle.ViewModel
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.lifecycle.viewModelScope
+import androidx.paging.*
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.stomp.StompClient
 import com.beeswork.balance.internal.lazyDeferred
@@ -23,10 +23,21 @@ class ChatViewModel(
         .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
         .build()
 
+
+
     val chatMessages by lazyDeferred {
         LivePagedListBuilder(balanceRepository.getChatMessages(chatId), pagedListConfig).build()
-
     }
+
+//    val chatMessages = Pager(
+//        PagingConfig(
+//            pageSize = 30,
+//            enablePlaceholders = true,
+//            maxSize = 150
+//        )
+//    ) {
+//        balanceRepository.getChatMessages(chatId)
+//    }.flow.cachedIn(viewModelScope)
 
     val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent
 

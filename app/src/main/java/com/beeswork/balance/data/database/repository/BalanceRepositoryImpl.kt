@@ -502,26 +502,17 @@ class BalanceRepositoryImpl(
 //  ################################################################################# //
 
 
-//    private val mutableClickResponse = MutableLiveData<Resource<ClickResponse>>()
-//    override val clickResponse: LiveData<Resource<ClickResponse>>
-//        get() = mutableClickResponse
-
-    override val loadedChatMessages: MutableLiveData<List<ChatMessage>>
-        get() = MutableLiveData<List<ChatMessage>>()
-
-
-
     override suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage> {
         return withContext(Dispatchers.IO) {
             return@withContext chatMessageDAO.getChatMessages(chatId)
         }
     }
 
-    override suspend fun loadChatMessages(chatId: Long, pageSize: Int, startChatMessageId: Int) {
-
-//        loadedChatMessages.postValue()
-
-    }
+//    override fun getChatMessages(
+//        chatId: Long
+//    ): PagingSource<Int, ChatMessage> {
+//        return chatMessageDAO.getChatMessages(chatId)
+//    }
 
     //  TEST 1. when you scroll up in the paged list and insert a new message, the list does not change because the new message is
     //          out of screen.

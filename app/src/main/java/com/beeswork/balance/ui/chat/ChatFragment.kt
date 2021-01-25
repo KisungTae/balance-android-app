@@ -4,20 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
-import androidx.paging.PagedListAdapter
-import androidx.paging.PositionalDataSource
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.network.stomp.WebSocketLifeCycleEvent
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.dialog.ExceptionDialogListener
 import kotlinx.android.synthetic.main.fragment_chat.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -29,8 +28,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
-    private lateinit var chatPagedListAdapter: ChatPagedListAdapter
-    private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
+    private lateinit var chatPagingAdapter: ChatPagingAdapter
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,29 +62,30 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener {
             viewModel.sendChatMessage(etChatMessage.text.toString())
+//            layoutManager.scrollToPositionWithOffset(0, 300)
         }
+        viewModel.chatMessages.await().observe(viewLifecycleOwner, {
+            chatPagingAdapter.submitList(it)
+        })
 //        viewModel.connectChat()
     }
 
     private fun setupChatRecyclerView() {
-        chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
-        rvChat.adapter = chatRecyclerViewAdapter
-        val layoutManager = LinearLayoutManager(this@ChatFragment.context)
+        chatPagingAdapter = ChatPagingAdapter()
+        rvChat.adapter = chatPagingAdapter
+        layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         rvChat.layoutManager = layoutManager
+//        lifecycleScope.launch {
+//            viewModel.chatMessages.collectLatest {
+//                chatPagingAdapter.submitData(it)
+//            }
+//        }
 
-        rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0) {
-                    println("onScrolled: UP")
-                } else {
-                    println("onScrolled: DOWN")
-                }
-            }
-        })
     }
+
+
 
     private fun setupWebSocketLifeCycleEventObserver() {
         viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {

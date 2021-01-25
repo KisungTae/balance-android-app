@@ -2,7 +2,6 @@ package com.beeswork.balance.data.network.stomp
 
 import androidx.lifecycle.LiveData
 import com.beeswork.balance.internal.Resource
-import io.reactivex.rxjava3.subjects.PublishSubject
 
 interface StompClient {
 

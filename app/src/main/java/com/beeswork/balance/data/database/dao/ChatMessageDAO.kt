@@ -28,4 +28,6 @@ interface ChatMessageDAO {
     @Query("select id from chatMessage order by id desc limit 1")
     fun getLastId(): Long
 
+//    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
+//    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>
 }

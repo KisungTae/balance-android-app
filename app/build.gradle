@@ -99,7 +99,7 @@ dependencies {
 
     // Firebase
     implementation 'com.google.firebase:firebase-messaging:21.0.1'
-    implementation 'com.google.firebase:firebase-analytics:18.0.0'
+//    implementation 'com.google.firebase:firebase-analytics:18.0.0'
 
     // Spin kit
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
@@ -116,8 +116,8 @@ dependencies {
     implementation 'id.zelory:compressor:3.0.0'
 
     // rx-java
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
+//    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+//    implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
 
 
     // websocket
