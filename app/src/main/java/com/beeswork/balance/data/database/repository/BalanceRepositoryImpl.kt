@@ -521,17 +521,41 @@ class BalanceRepositoryImpl(
         chatId: Long,
         body: String
     ): Long {
-        return chatMessageDAO.insert(
-            ChatMessage(
-                null,
-                null,
-                chatId,
-                body,
-                ChatMessage.Status.SENDING,
-                read = true,
-                null
-            )
-        )
+//        chatMessageDAO.updateMessages()
+//
+//        for (i in 0..25) {
+//            chatMessageDAO.insert(ChatMessage(
+//                null,
+//                null,
+//                chatId,
+//                body,
+//                ChatMessage.Status.SENDING,
+//                read = true,
+//                null
+//            ))
+//        }
+//
+//        for (i in 0..15) {
+//            val id = chatMessageDAO.getLastId() + 1
+//            chatMessageDAO.insert(ChatMessage(
+//                null,
+//                id,
+//                chatId,
+//                body,
+//                ChatMessage.Status.SENDING,
+//                read = true,
+//                null
+//            ))
+//        }
+
+        val chatMessages = chatMessageDAO.getMessages(chatId)
+
+
+        return 1L
+    }
+
+    override fun getMessages(chatId: Long): List<ChatMessage> {
+        return chatMessageDAO.getMessages(chatId)
     }
 
     override suspend fun syncMessage(

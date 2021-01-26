@@ -2,9 +2,6 @@ package com.beeswork.balance.ui.chat
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedList
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.ChatMessage
@@ -12,20 +9,24 @@ import com.beeswork.balance.internal.inflate
 import kotlinx.android.synthetic.main.item_chat_message_received.view.*
 import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
 
+class ChatRecyclerViewAdapter: RecyclerView.Adapter<ChatRecyclerViewAdapter.MessageViewHolder>() {
 
-class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.MessageViewHolder>(
-    diffCallback
-) {
+    private val chatMessages = mutableListOf<ChatMessage>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return when (viewType) {
-            ChatMessage.Status.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
+            ChatMessage.Status.RECEIVED.ordinal -> MessageViewHolder(
+                parent.inflate(
+                    R.layout.item_chat_message_received
+                )
+            )
             ChatMessage.Status.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
             else -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
         }
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        getItem(position)?.let {
+        chatMessages[position].let {
             when (holder.itemViewType) {
                 ChatMessage.Status.RECEIVED.ordinal -> holder.bindMessageReceived(it)
                 ChatMessage.Status.SENT.ordinal -> holder.bindMessageSent(it)
@@ -34,27 +35,26 @@ class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.Messag
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getItem(position)?.let {
+        chatMessages[position].let {
             return if (it.status == ChatMessage.Status.RECEIVED) ChatMessage.Status.RECEIVED.ordinal else ChatMessage.Status.SENT.ordinal
-        } ?: kotlin.run {
-            return ChatMessage.Status.RECEIVED.ordinal
         }
     }
 
-    companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<ChatMessage>() {
-            override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
-//                println("areItemsTheSame: oldItemId: ${oldItem.messageId} - newItemId: ${newItem.messageId}")
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
-//                println("areContentsTheSame: oldItemId: ${oldItem.messageId} - newItemId: ${newItem.messageId}")
-                return oldItem == newItem
-            }
-
-        }
+    override fun getItemCount(): Int {
+        return chatMessages.size
     }
+
+    fun submit(newChatMessages: List<ChatMessage>) {
+        chatMessages.addAll(0, newChatMessages)
+        notifyDataSetChanged()
+    }
+
+    fun updateItem() {
+        val item = chatMessages[9]
+        item.body = "updated chat message"
+        notifyItemChanged(9)
+    }
+
 
     class MessageViewHolder(
         itemView: View

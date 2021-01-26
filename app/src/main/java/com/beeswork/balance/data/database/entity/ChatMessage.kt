@@ -14,12 +14,15 @@ import org.threeten.bp.OffsetDateTime
         indices = [Index(value = ["chatId"])])
 data class ChatMessage(
 
+//  TODO: change var to val
     @PrimaryKey(autoGenerate = true)
-    val messageId: Long? = null,
+    var messageId: Long? = null,
 
     val id: Long?,
     val chatId: Long,
-    val body: String,
+
+//  TODO: change var to val
+    var body: String,
     val status: Status,
     val read: Boolean,
     val createdAt: OffsetDateTime?

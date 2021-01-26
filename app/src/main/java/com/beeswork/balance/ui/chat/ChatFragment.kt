@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -30,6 +31,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatPagingAdapter: ChatPagingAdapter
     private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,22 +63,33 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupChatRecyclerView()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener {
-            viewModel.sendChatMessage(etChatMessage.text.toString())
+//            println("list size: ${chatPagingAdapter.currentList?.size}")
+//            viewModel.sendChatMessage(etChatMessage.text.toString())
 //            layoutManager.scrollToPositionWithOffset(0, 300)
+            chatRecyclerViewAdapter.updateItem()
         }
-        viewModel.chatMessages.await().observe(viewLifecycleOwner, {
-            chatPagingAdapter.submitList(it)
-        })
+//        viewModel.chatMessages.await().observe(viewLifecycleOwner, {
+//            chatPagingAdapter.submitList(it)
+//        })
 //        viewModel.connectChat()
     }
 
     private fun setupChatRecyclerView() {
-        chatPagingAdapter = ChatPagingAdapter()
-        rvChat.adapter = chatPagingAdapter
+//        chatPagingAdapter = ChatPagingAdapter()
+        chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
+        rvChat.adapter = chatRecyclerViewAdapter
         layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         rvChat.layoutManager = layoutManager
+        CoroutineScope(Dispatchers.IO).launch {
+            val list = viewModel.getMessages()
+            withContext(Dispatchers.Main) {
+                chatRecyclerViewAdapter.submit(list)
+            }
+
+        }
+
 //        lifecycleScope.launch {
 //            viewModel.chatMessages.collectLatest {
 //                chatPagingAdapter.submitData(it)

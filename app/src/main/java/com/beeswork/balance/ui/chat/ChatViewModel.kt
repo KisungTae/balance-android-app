@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.stomp.StompClient
 import com.beeswork.balance.internal.lazyDeferred
@@ -20,7 +21,7 @@ class ChatViewModel(
         .setMaxSize(CHAT_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
         .setPageSize(CHAT_PAGE_SIZE)
-        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
+//        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
         .build()
 
 
@@ -40,6 +41,10 @@ class ChatViewModel(
 //    }.flow.cachedIn(viewModelScope)
 
     val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent
+
+    fun getMessages(): List<ChatMessage> {
+        return balanceRepository.getMessages(chatId)
+    }
 
     fun connectChat() {
         stompClient.connectChat(chatId, matchedId)

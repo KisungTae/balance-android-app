@@ -13,7 +13,8 @@ interface ChatMessageDAO {
     @Insert
     fun insert(chatMessage: ChatMessage): Long
 
-    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
+//    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
+    @Query("select * from chatMessage where chatId = :chatId order by messageId desc")
     fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
 
     @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where chatId = :chatId and messageId = :messageId")
@@ -27,6 +28,14 @@ interface ChatMessageDAO {
 
     @Query("select id from chatMessage order by id desc limit 1")
     fun getLastId(): Long
+
+    @Query("update chatMessage set id = messageId")
+    fun updateMessages()
+
+    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
+    fun getMessages(chatId: Long): List<ChatMessage>
+
+
 
 //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
 //    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>

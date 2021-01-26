@@ -39,6 +39,7 @@ interface BalanceRepository {
     suspend fun saveChatMessage(chatId: Long, body: String): Long
     suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
     suspend fun fetchChatMessages(chatId: Long, recipientId: String)
+    fun getMessages(chatId: Long): List<ChatMessage>
 //    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>
 
     // account
