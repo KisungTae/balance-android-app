@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.stomp.WebSocketLifeCycleEvent
 import com.beeswork.balance.ui.base.ScopeFragment
@@ -67,12 +68,20 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 //            viewModel.sendChatMessage(etChatMessage.text.toString())
 //            layoutManager.scrollToPositionWithOffset(0, 300)
             chatRecyclerViewAdapter.updateItem()
+            if (etChatMessage.text.isNotEmpty()) {
+                println("rvChat.scrollBy(0, scrollDy)")
+                rvChat.scrollBy(0, scrollDy)
+            }
+
         }
 //        viewModel.chatMessages.await().observe(viewLifecycleOwner, {
 //            chatPagingAdapter.submitList(it)
 //        })
 //        viewModel.connectChat()
     }
+
+    var scrollDy = 0
+    var scrolling = false
 
     private fun setupChatRecyclerView() {
 //        chatPagingAdapter = ChatPagingAdapter()
@@ -89,6 +98,27 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
             }
 
         }
+
+        rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                println("dx: $dx - dy: $dy")
+                scrollDy = dy
+                super.onScrolled(recyclerView, dx, dy)
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        scrolling = false
+                    }
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        scrolling = true
+                    }
+
+                }
+            }
+        })
 
 //        lifecycleScope.launch {
 //            viewModel.chatMessages.collectLatest {

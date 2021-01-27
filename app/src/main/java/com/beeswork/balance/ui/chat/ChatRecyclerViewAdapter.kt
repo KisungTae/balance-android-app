@@ -8,6 +8,7 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.internal.inflate
 import kotlinx.android.synthetic.main.item_chat_message_received.view.*
 import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
+import kotlin.random.Random
 
 class ChatRecyclerViewAdapter: RecyclerView.Adapter<ChatRecyclerViewAdapter.MessageViewHolder>() {
 
@@ -27,6 +28,7 @@ class ChatRecyclerViewAdapter: RecyclerView.Adapter<ChatRecyclerViewAdapter.Mess
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         chatMessages[position].let {
+            println("onBindViewHolder: ${it.messageId}")
             when (holder.itemViewType) {
                 ChatMessage.Status.RECEIVED.ordinal -> holder.bindMessageReceived(it)
                 ChatMessage.Status.SENT.ordinal -> holder.bindMessageSent(it)
@@ -51,8 +53,9 @@ class ChatRecyclerViewAdapter: RecyclerView.Adapter<ChatRecyclerViewAdapter.Mess
 
     fun updateItem() {
         val item = chatMessages[9]
-        item.body = "updated chat message"
-        notifyItemChanged(9)
+        val random = Random(10)
+        item.body = "updated chat message ${random.nextInt()}"
+//        notifyItemChanged(9)
     }
 
 
