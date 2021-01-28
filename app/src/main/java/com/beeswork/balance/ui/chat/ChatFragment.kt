@@ -64,16 +64,20 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupChatRecyclerView()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener {
+
+//            chatRecyclerViewAdapter.updateItem()
+//            if (etChatMessage.text.isNotEmpty()) {
+//                println("rvChat.scrollBy(0, scrollDy)")
+//                rvChat.scrollBy(0, scrollDy)
+//            }
+            viewModel.sendChatMessage("")
+
+        }
+
+
 //            println("list size: ${chatPagingAdapter.currentList?.size}")
 //            viewModel.sendChatMessage(etChatMessage.text.toString())
 //            layoutManager.scrollToPositionWithOffset(0, 300)
-            chatRecyclerViewAdapter.updateItem()
-            if (etChatMessage.text.isNotEmpty()) {
-                println("rvChat.scrollBy(0, scrollDy)")
-                rvChat.scrollBy(0, scrollDy)
-            }
-
-        }
 //        viewModel.chatMessages.await().observe(viewLifecycleOwner, {
 //            chatPagingAdapter.submitList(it)
 //        })

@@ -5,6 +5,7 @@ import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
@@ -548,8 +549,27 @@ class BalanceRepositoryImpl(
 //            ))
 //        }
 
-        val chatMessages = chatMessageDAO.getMessages(chatId)
 
+        val pivotChatMessageId = 103
+        val pageSize = 30
+        val query = SimpleSQLiteQuery(
+            "select * " +
+                    "from chatMessage " +
+                    "where chatId = $chatId " +
+                    "order by case when id is null then 0 else 1 end, id desc, messageId desc " +
+                    "limit $pageSize " +
+                    "offset (" +
+                    "    select rowNum " +
+                    "    from (select messageId, " +
+                    "                 row_number() " +
+                    "                 over (order by case when id is null then 0 else 1 end, id desc, messageId desc) as rowNum " +
+                    "          from chatMessage " +
+                    "          where chat_id = $chatId) sub " +
+                    "    where sub.messageId = $pivotChatMessageId " +
+                    ")"
+        )
+
+        val chatMessages = chatMessageDAO.getChatMessagesPaged(query)
 
         return 1L
     }

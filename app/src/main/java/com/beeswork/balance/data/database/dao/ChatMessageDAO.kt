@@ -4,6 +4,8 @@ import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.beeswork.balance.data.database.entity.ChatMessage
 import org.threeten.bp.OffsetDateTime
 
@@ -13,7 +15,7 @@ interface ChatMessageDAO {
     @Insert
     fun insert(chatMessage: ChatMessage): Long
 
-//    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
+    //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
     @Query("select * from chatMessage where chatId = :chatId order by messageId desc")
     fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
 
@@ -35,6 +37,11 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
     fun getMessages(chatId: Long): List<ChatMessage>
 
+    //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc limit :pageSize offset (select row_num - :rowNumberOffset from (select messageId, row_number() over (order by case when id is null then 0 else 1 end, id desc, messageId desc) as row_num from chatMessage where chat_id = :chatId) it where it.messageId = :pivotChatMessageId")
+
+
+    @RawQuery
+    fun getChatMessagesPaged(query: SupportSQLiteQuery): List<ChatMessage>
 
 
 //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
