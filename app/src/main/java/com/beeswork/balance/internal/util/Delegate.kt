@@ -1,4 +1,4 @@
-package com.beeswork.balance.internal
+package com.beeswork.balance.internal.util
 
 import kotlinx.coroutines.*
 

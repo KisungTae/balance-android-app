@@ -5,21 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.stomp.WebSocketLifeCycleEvent
+import com.beeswork.balance.data.observable.WebSocketEvent
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.dialog.ExceptionDialogListener
 import kotlinx.android.synthetic.main.fragment_chat.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -64,71 +58,18 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupChatRecyclerView()
         setupWebSocketLifeCycleEventObserver()
         btnChatSend.setOnClickListener {
-
-//            chatRecyclerViewAdapter.updateItem()
-//            if (etChatMessage.text.isNotEmpty()) {
-//                println("rvChat.scrollBy(0, scrollDy)")
-//                rvChat.scrollBy(0, scrollDy)
-//            }
-            viewModel.sendChatMessage("")
-
+            viewModel.sendChatMessage(etChatMessageBody.text.toString())
         }
-
-
-//            println("list size: ${chatPagingAdapter.currentList?.size}")
-//            viewModel.sendChatMessage(etChatMessage.text.toString())
-//            layoutManager.scrollToPositionWithOffset(0, 300)
-//        viewModel.chatMessages.await().observe(viewLifecycleOwner, {
-//            chatPagingAdapter.submitList(it)
-//        })
 //        viewModel.connectChat()
     }
 
-    var scrollDy = 0
-    var scrolling = false
-
     private fun setupChatRecyclerView() {
-//        chatPagingAdapter = ChatPagingAdapter()
         chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
         rvChat.adapter = chatRecyclerViewAdapter
         layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         rvChat.layoutManager = layoutManager
-        CoroutineScope(Dispatchers.IO).launch {
-            val list = viewModel.getMessages()
-            withContext(Dispatchers.Main) {
-                chatRecyclerViewAdapter.submit(list)
-            }
-
-        }
-
-        rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                println("dx: $dx - dy: $dy")
-                scrollDy = dy
-                super.onScrolled(recyclerView, dx, dy)
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                when (newState) {
-                    RecyclerView.SCROLL_STATE_IDLE -> {
-                        scrolling = false
-                    }
-                    RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        scrolling = true
-                    }
-
-                }
-            }
-        })
-
-//        lifecycleScope.launch {
-//            viewModel.chatMessages.collectLatest {
-//                chatPagingAdapter.submitData(it)
-//            }
-//        }
 
     }
 
@@ -137,7 +78,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private fun setupWebSocketLifeCycleEventObserver() {
         viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
             when (it.type) {
-                WebSocketLifeCycleEvent.Type.ERROR -> {
+                WebSocketEvent.Type.ERROR -> {
                     ExceptionDialog(it.errorMessage, null).show(
                         childFragmentManager,
                         ExceptionDialog.TAG

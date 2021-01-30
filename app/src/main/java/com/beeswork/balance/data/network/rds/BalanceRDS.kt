@@ -2,14 +2,9 @@ package com.beeswork.balance.data.network.rds
 
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.data.observable.Resource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import org.threeten.bp.OffsetDateTime
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface BalanceRDS {
 

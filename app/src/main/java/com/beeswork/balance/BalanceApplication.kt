@@ -8,8 +8,8 @@ import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptorImpl
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.rds.BalanceRDSImpl
-import com.beeswork.balance.internal.provider.PreferenceProvider
-import com.beeswork.balance.internal.provider.PreferenceProviderImpl
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
 import com.beeswork.balance.data.network.stomp.StompClientImpl

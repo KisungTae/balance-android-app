@@ -1,4 +1,4 @@
-package com.beeswork.balance.service
+package com.beeswork.balance.service.firebase
 
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager

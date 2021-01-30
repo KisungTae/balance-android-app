@@ -2,13 +2,12 @@ package com.beeswork.balance.ui.chat
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.ChatMessage
-import com.beeswork.balance.internal.inflate
+import com.beeswork.balance.internal.util.inflate
 import kotlinx.android.synthetic.main.item_chat_message_received.view.*
 import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
 

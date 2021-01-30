@@ -1,4 +1,4 @@
-package com.beeswork.balance.internal.provider
+package com.beeswork.balance.internal.provider.preference
 
 
 interface PreferenceProvider {

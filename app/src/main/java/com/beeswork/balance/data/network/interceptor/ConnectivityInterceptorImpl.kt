@@ -3,7 +3,7 @@ package com.beeswork.balance.data.network.interceptor
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.beeswork.balance.internal.NoInternetConnectivityException
+import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import okhttp3.Interceptor
 import okhttp3.Response
 

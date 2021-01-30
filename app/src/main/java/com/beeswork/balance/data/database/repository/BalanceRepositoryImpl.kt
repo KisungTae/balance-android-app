@@ -5,17 +5,17 @@ import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
-import androidx.sqlite.db.SimpleSQLiteQuery
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.internal.provider.PreferenceProvider
-import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.data.observable.ChatMessageEvent
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.data.observable.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
-import com.beeswork.balance.internal.converter.Convert
+import com.beeswork.balance.internal.util.Convert
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.*
 import okhttp3.MediaType
@@ -502,6 +502,9 @@ class BalanceRepositoryImpl(
 //  ##################################### MESSAGE ##################################### //
 //  ################################################################################# //
 
+    private val mutableChatMessageEvent = MutableLiveData<ChatMessageEvent>()
+    override val chatMessageEvent: LiveData<ChatMessageEvent>
+        get() = mutableChatMessageEvent
 
     override suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage> {
         return withContext(Dispatchers.IO) {
@@ -522,60 +525,13 @@ class BalanceRepositoryImpl(
         chatId: Long,
         body: String
     ): Long {
-//        chatMessageDAO.updateMessages()
-//
-//        for (i in 0..25) {
-//            chatMessageDAO.insert(ChatMessage(
-//                null,
-//                null,
-//                chatId,
-//                body,
-//                ChatMessage.Status.SENDING,
-//                read = true,
-//                null
-//            ))
-//        }
-//
-//        for (i in 0..15) {
-//            val id = chatMessageDAO.getLastId() + 1
-//            chatMessageDAO.insert(ChatMessage(
-//                null,
-//                id,
-//                chatId,
-//                body,
-//                ChatMessage.Status.SENDING,
-//                read = true,
-//                null
-//            ))
-//        }
-
-
-        val pivotChatMessageId = 103
-        val pageSize = 30
-        val query = SimpleSQLiteQuery(
-            "select * " +
-                    "from chatMessage " +
-                    "where chatId = $chatId " +
-                    "order by case when id is null then 0 else 1 end, id desc, messageId desc " +
-                    "limit $pageSize " +
-                    "offset (" +
-                    "    select rowNum " +
-                    "    from (select messageId, " +
-                    "                 row_number() " +
-                    "                 over (order by case when id is null then 0 else 1 end, id desc, messageId desc) as rowNum " +
-                    "          from chatMessage " +
-                    "          where chat_id = $chatId) sub " +
-                    "    where sub.messageId = $pivotChatMessageId " +
-                    ")"
-        )
-
-        val chatMessages = chatMessageDAO.getChatMessagesPaged(query)
-
+        val chatMessages = chatMessageDAO.getChatMessagesAfter(chatId, 200, 100)
+        val chatMessagesPre = chatMessageDAO.getChatMessagesBefore(chatId, 200, 10000)
         return 1L
     }
 
     override fun getMessages(chatId: Long): List<ChatMessage> {
-        return chatMessageDAO.getMessages(chatId)
+        return chatMessageDAO.getChatMessagesAfter(chatId, 1, 2)
     }
 
     override suspend fun syncMessage(

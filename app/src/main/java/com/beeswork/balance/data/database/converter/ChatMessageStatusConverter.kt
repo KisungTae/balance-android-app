@@ -1,9 +1,9 @@
-package com.beeswork.balance.internal.converter
+package com.beeswork.balance.data.database.converter
 
 import androidx.room.TypeConverter
 import com.beeswork.balance.data.database.entity.ChatMessage
 
-object MessageStatusConverter {
+object ChatMessageStatusConverter {
 
     @TypeConverter
     @JvmStatic

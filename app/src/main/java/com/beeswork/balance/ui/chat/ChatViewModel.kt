@@ -1,12 +1,11 @@
 package com.beeswork.balance.ui.chat
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.stomp.StompClient
-import com.beeswork.balance.internal.lazyDeferred
+import com.beeswork.balance.internal.util.lazyDeferred
 
 
 class ChatViewModel(
@@ -40,7 +39,7 @@ class ChatViewModel(
 //        balanceRepository.getChatMessages(chatId)
 //    }.flow.cachedIn(viewModelScope)
 
-    val webSocketLifeCycleEvent = stompClient.webSocketLifeCycleEvent
+    val webSocketLifeCycleEvent = stompClient.webSocketEvent
 
     fun getMessages(): List<ChatMessage> {
         return balanceRepository.getMessages(chatId)

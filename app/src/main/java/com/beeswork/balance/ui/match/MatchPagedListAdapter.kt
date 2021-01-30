@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.internal.inflate
+import com.beeswork.balance.internal.util.inflate
 import kotlinx.android.synthetic.main.item_match.view.*
 
 class MatchPagedListAdapter(

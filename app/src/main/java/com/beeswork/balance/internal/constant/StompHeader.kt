@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network.stomp
+package com.beeswork.balance.internal.constant
 
 class StompHeader {
     companion object {

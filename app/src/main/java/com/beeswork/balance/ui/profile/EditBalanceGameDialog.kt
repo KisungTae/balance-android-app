@@ -6,11 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.response.QuestionResponse
-import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.data.observable.Resource
 import com.beeswork.balance.internal.constant.BalanceGameAnswer
 import kotlinx.android.synthetic.main.dialog_edit_balance_game.*
 import kotlinx.coroutines.CoroutineScope

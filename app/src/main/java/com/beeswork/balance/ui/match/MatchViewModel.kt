@@ -6,9 +6,8 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.internal.Resource
-import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.internal.lazyDeferred
+import com.beeswork.balance.data.observable.Resource
+import com.beeswork.balance.internal.util.lazyDeferred
 
 
 const val MATCH_PAGE_SIZE = 30

@@ -6,14 +6,11 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
-import com.beeswork.balance.internal.provider.GsonProvider
-import com.google.gson.GsonBuilder
+import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
-import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

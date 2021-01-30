@@ -1,9 +1,7 @@
-package com.beeswork.balance.internal.provider
+package com.beeswork.balance.internal.provider.preference
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.beeswork.balance.internal.*
-import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
@@ -97,13 +95,13 @@ class PreferenceProviderImpl(
     }
 
     override fun getAccountId(): String {
-//        return "0a164463-f27f-4a68-840b-4e04c0becb3c"
-        return "9f881819-638a-4098-954c-ce34b133d32a"
+        return "0a164463-f27f-4a68-840b-4e04c0becb3c"
+//        return "9f881819-638a-4098-954c-ce34b133d32a"
     }
 
     override fun getIdentityToken(): String {
-//        return "379f3f4c-ae86-4968-908a-f9f38ef13286"
-        return "96c80a98-8807-4aee-999c-ceca92e009c3"
+        return "379f3f4c-ae86-4968-908a-f9f38ef13286"
+//        return "96c80a98-8807-4aee-999c-ceca92e009c3"
     }
 
 

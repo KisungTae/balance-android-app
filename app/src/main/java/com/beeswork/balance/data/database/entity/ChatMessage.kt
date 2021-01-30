@@ -11,18 +11,15 @@ import org.threeten.bp.OffsetDateTime
             parentColumns = arrayOf("chatId"),
             childColumns = arrayOf("chatId"),
             onDelete = ForeignKey.CASCADE)],
-        indices = [Index(value = ["chatId"])])
+        indices = [Index(value = ["chatId", "id"])])
 data class ChatMessage(
 
-//  TODO: change var to val
     @PrimaryKey(autoGenerate = true)
-    var messageId: Long? = null,
+    val messageId: Long? = null,
 
     val id: Long?,
     val chatId: Long,
-
-//  TODO: change var to val
-    var body: String,
+    val body: String,
     val status: Status,
     val read: Boolean,
     val createdAt: OffsetDateTime?

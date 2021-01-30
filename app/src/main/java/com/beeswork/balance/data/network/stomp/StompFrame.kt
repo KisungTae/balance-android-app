@@ -1,7 +1,8 @@
 package com.beeswork.balance.data.network.stomp
 
-import com.beeswork.balance.internal.provider.GsonProvider
-import com.beeswork.balance.internal.safeLet
+import com.beeswork.balance.internal.constant.StompHeader
+import com.beeswork.balance.internal.provider.gson.GsonProvider
+import com.beeswork.balance.internal.util.safeLet
 import org.threeten.bp.OffsetDateTime
 import java.io.StringReader
 import java.util.*

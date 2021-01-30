@@ -9,7 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.QuestionResponse
-import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.data.observable.Resource
 import com.beeswork.balance.internal.constant.BalanceGameAnswer
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType

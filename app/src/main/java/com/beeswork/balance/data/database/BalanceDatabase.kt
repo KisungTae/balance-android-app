@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.*
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.internal.converter.MessageStatusConverter
-import com.beeswork.balance.internal.converter.OffsetDateTimeConverter
+import com.beeswork.balance.data.database.converter.ChatMessageStatusConverter
+import com.beeswork.balance.data.database.converter.OffsetDateTimeConverter
 
 
 @Database(
@@ -13,7 +13,7 @@ import com.beeswork.balance.internal.converter.OffsetDateTimeConverter
                 Clicked::class, Profile::class, Location::class, Photo::class],
     version = 1
 )
-@TypeConverters(OffsetDateTimeConverter::class, MessageStatusConverter::class)
+@TypeConverters(OffsetDateTimeConverter::class, ChatMessageStatusConverter::class)
 abstract class BalanceDatabase : RoomDatabase() {
 
     abstract fun matchDAO(): MatchDAO

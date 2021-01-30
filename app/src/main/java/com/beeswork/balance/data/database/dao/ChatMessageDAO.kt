@@ -34,16 +34,11 @@ interface ChatMessageDAO {
     @Query("update chatMessage set id = messageId")
     fun updateMessages()
 
-    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
-    fun getMessages(chatId: Long): List<ChatMessage>
+    @Query("select * from chatMessage where chatId = :chatId and id > :lastChatMessageId order by id asc limit :pageSize")
+    fun getChatMessagesAfter(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
 
-    //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc limit :pageSize offset (select row_num - :rowNumberOffset from (select messageId, row_number() over (order by case when id is null then 0 else 1 end, id desc, messageId desc) as row_num from chatMessage where chat_id = :chatId) it where it.messageId = :pivotChatMessageId")
-
-
-    @RawQuery
-    fun getChatMessagesPaged(query: SupportSQLiteQuery): List<ChatMessage>
+    @Query("select * from chatMessage where chatId = :chatId and id < :lastChatMessageId order by id desc limit :pageSize")
+    fun getChatMessagesBefore(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
 
 
-//    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
-//    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>
 }

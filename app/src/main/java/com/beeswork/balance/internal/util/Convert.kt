@@ -1,4 +1,4 @@
-package com.beeswork.balance.internal.converter
+package com.beeswork.balance.internal.util
 
 import java.util.*
 

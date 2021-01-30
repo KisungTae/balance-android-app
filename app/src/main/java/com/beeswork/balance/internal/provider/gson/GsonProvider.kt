@@ -1,8 +1,5 @@
-package com.beeswork.balance.internal.provider
+package com.beeswork.balance.internal.provider.gson
 
-import com.beeswork.balance.internal.converter.OffsetDateTimeToISOStringSerializer
-import com.beeswork.balance.internal.converter.StringToOffsetDateTimeDeserializer
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.threeten.bp.OffsetDateTime
 

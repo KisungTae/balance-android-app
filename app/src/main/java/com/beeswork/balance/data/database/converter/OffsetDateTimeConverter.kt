@@ -1,4 +1,4 @@
-package com.beeswork.balance.internal.converter
+package com.beeswork.balance.data.database.converter
 
 import androidx.room.TypeConverter
 import org.threeten.bp.OffsetDateTime

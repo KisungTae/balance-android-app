@@ -1,4 +1,4 @@
-package com.beeswork.balance.internal.converter
+package com.beeswork.balance.internal.provider.gson
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

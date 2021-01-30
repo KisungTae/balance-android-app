@@ -1,4 +1,4 @@
-package com.beeswork.balance.internal
+package com.beeswork.balance.internal.exception
 
 import java.io.IOException
 

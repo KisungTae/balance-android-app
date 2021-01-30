@@ -2,13 +2,10 @@ package com.beeswork.balance.ui.swipe
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.data.network.response.BalanceGameResponse
-import com.beeswork.balance.data.network.response.ClickResponse
-import com.beeswork.balance.internal.Resource
-import com.beeswork.balance.internal.lazyDeferred
+import com.beeswork.balance.data.observable.Resource
+import com.beeswork.balance.internal.util.lazyDeferred
 
 class SwipeViewModel(
     private val balanceRepository: BalanceRepository

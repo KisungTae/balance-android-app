@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.internal.constant.BalanceURL
-import com.beeswork.balance.internal.inflate
+import com.beeswork.balance.internal.util.inflate
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource

@@ -16,7 +16,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.internal.provider.PreferenceProvider
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
 import com.google.android.gms.location.*

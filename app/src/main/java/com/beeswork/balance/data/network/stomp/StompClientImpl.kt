@@ -4,11 +4,10 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.internal.constant.BalanceURL
+import com.beeswork.balance.data.observable.WebSocketEvent
 import com.beeswork.balance.internal.constant.HttpHeader
-import com.beeswork.balance.internal.provider.PreferenceProvider
-import com.beeswork.balance.internal.safeLet
-import com.neovisionaries.ws.client.*
+import com.beeswork.balance.internal.constant.StompHeader
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,8 +21,8 @@ class StompClientImpl(
 ) : StompClient {
 
     private val mutableWebSocketLifeCycleEvent =
-        MutableLiveData<WebSocketLifeCycleEvent>()
-    override val webSocketLifeCycleEvent: LiveData<WebSocketLifeCycleEvent>
+        MutableLiveData<WebSocketEvent>()
+    override val webSocketEvent: LiveData<WebSocketEvent>
         get() = mutableWebSocketLifeCycleEvent
 
 //    private var webSocket: WebSocket =

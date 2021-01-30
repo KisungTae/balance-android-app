@@ -1,14 +1,14 @@
 package com.beeswork.balance.data.database.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.internal.Resource
+import com.beeswork.balance.data.observable.ChatMessageEvent
+import com.beeswork.balance.data.observable.Resource
 import org.threeten.bp.OffsetDateTime
 
 interface BalanceRepository {
@@ -35,6 +35,7 @@ interface BalanceRepository {
     suspend fun getUnreadMessageCount(): LiveData<Int>
 
     // message
+    val chatMessageEvent: LiveData<ChatMessageEvent>
     suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
     suspend fun saveChatMessage(chatId: Long, body: String): Long
     suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
