@@ -71,11 +71,11 @@ class BalanceGameDialog(
                 Resource.Status.LOADING -> {
                     setBalanceGameLoading(getString(R.string.question_loading))
                 }
-                Resource.Status.EXCEPTION -> {
+                Resource.Status.ERROR -> {
 
                     var enableReloadBtn = true
 
-                    when (balanceGameResource.exceptionCode) {
+                    when (balanceGameResource.error) {
                         ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
                         ExceptionCode.ACCOUNT_SHORT_OF_POINT_EXCEPTION,
                         ExceptionCode.SWIPE_CLICKED_EXISTS_EXCEPTION,
@@ -88,7 +88,7 @@ class BalanceGameDialog(
 
                     setBalanceGameLoadError(
                         enableReloadBtn,
-                        balanceGameResource.exceptionMessage!!
+                        balanceGameResource.errorMessage!!
                     )
                 }
             }
@@ -114,11 +114,11 @@ class BalanceGameDialog(
                 Resource.Status.LOADING -> {
                     setBalanceGameLoading(getString(R.string.question_checking))
                 }
-                Resource.Status.EXCEPTION -> {
+                Resource.Status.ERROR -> {
                     var enableClickBtn = true
                     var enableRefreshBtn = false
 
-                    when (clickResponse.exceptionCode) {
+                    when (clickResponse.error) {
                         ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
                         ExceptionCode.ACCOUNT_SHORT_OF_POINT_EXCEPTION,
                         ExceptionCode.SWIPE_CLICKED_EXISTS_EXCEPTION,
@@ -135,7 +135,7 @@ class BalanceGameDialog(
                     setBalanceGameClickError(
                         enableClickBtn,
                         enableRefreshBtn,
-                        clickResponse.exceptionMessage!!
+                        clickResponse.errorMessage!!
                     )
                 }
             }

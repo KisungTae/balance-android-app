@@ -176,8 +176,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 withContext(Dispatchers.Main) {
                     if (response.isSuccess())
                         adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.OCCUPIED)
-                    else if (response.isException()) {
-                        ExceptionDialog(response.exceptionMessage, null).show(
+                    else if (response.isError()) {
+                        ExceptionDialog(response.errorMessage, null).show(
                             childFragmentManager,
                             ExceptionDialog.TAG
                         )
@@ -227,10 +227,10 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.deletePhoto(photoKey)
             withContext(Dispatchers.Main) {
-                if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
+                if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
                     adapter.deletePhoto(photoKey)
-                else if (response.isException()) {
-                    ExceptionDialog(response.exceptionMessage, null).show(
+                else if (response.isError()) {
+                    ExceptionDialog(response.errorMessage, null).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
@@ -300,8 +300,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                     withContext(Dispatchers.Main) {
                         if (response.isSuccess())
                             photoPickerRecyclerViewAdapter().reorderPhotoPickers(sequences)
-                        else if (response.isException()) {
-                            ExceptionDialog(response.exceptionMessage, null).show(
+                        else if (response.isError()) {
+                            ExceptionDialog(response.errorMessage, null).show(
                                 childFragmentManager,
                                 ExceptionDialog.TAG
                             )

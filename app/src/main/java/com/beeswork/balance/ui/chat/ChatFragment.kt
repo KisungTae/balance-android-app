@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
+import com.beeswork.balance.data.observable.ChatMessageEvent
 import com.beeswork.balance.data.observable.WebSocketEvent
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
@@ -54,14 +55,38 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         }
     }
 
-    private fun bindUI() = launch {
+    private fun bindUI() {
         setupChatRecyclerView()
         setupWebSocketLifeCycleEventObserver()
+
         btnChatSend.setOnClickListener {
             viewModel.sendChatMessage(etChatMessageBody.text.toString())
         }
+        observeChatMessageEvent()
+        viewModel.fetchChatMessages()
+
 //        viewModel.connectChat()
     }
+
+    private fun closeChat() {
+
+    }
+
+    private fun observeChatMessageEvent() {
+        viewModel.chatMessageEvent.observe(viewLifecycleOwner, {
+            when (it.type) {
+                ChatMessageEvent.Type.FETCH_ERROR -> {
+                    ExceptionDialog(it.errorMessage, this).show(
+                        childFragmentManager,
+                        ExceptionDialog.TAG
+                    )
+                    llChatLoading.visibility = View.GONE
+                }
+            }
+        })
+    }
+
+
 
     private fun setupChatRecyclerView() {
         chatRecyclerViewAdapter = ChatRecyclerViewAdapter()

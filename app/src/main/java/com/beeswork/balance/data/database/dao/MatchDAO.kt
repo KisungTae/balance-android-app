@@ -26,6 +26,9 @@ interface MatchDAO {
     @Query("select exists (select * from `match` where chatId = :chatId)")
     fun existsByChatId(chatId: Long): Boolean
 
+    @Query("select unmatched from `match` where chatId = :chatId")
+    fun isUnmatched(chatId: Long): Boolean
+
     @Query("update `match` set photoKey = :photoKey, unmatched = :unmatched where chatId = :chatId")
     fun update(chatId: Long, photoKey: String, unmatched: Boolean)
 

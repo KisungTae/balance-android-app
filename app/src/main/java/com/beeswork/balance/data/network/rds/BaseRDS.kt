@@ -21,24 +21,24 @@ abstract class BaseRDS {
             val exceptionResponse =
                 Gson().fromJson(response.errorBody()?.string(), ExceptionResponse::class.java)
 
-            return Resource.exception(
+            return Resource.error(
                 exceptionResponse.message,
                 exceptionResponse.error,
                 exceptionResponse.fieldErrorMessages
             )
 
         } catch (e: SocketTimeoutException) {
-            return Resource.exception(
+            return Resource.error(
                 e.message ?: "",
                 ExceptionCode.SOCKET_TIMEOUT_EXCEPTION
             )
         } catch (e: NoInternetConnectivityException) {
-            return Resource.exception(
+            return Resource.error(
                 e.message ?: "",
                 ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION
             )
         } catch (e: Exception) {
-            return Resource.exception(
+            return Resource.error(
                 e.message ?: "",
                 ExceptionCode.EXCEPTION
             )

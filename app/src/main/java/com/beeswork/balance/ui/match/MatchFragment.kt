@@ -57,9 +57,9 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
         viewModel.fetchMatchesResponse.observe(viewLifecycleOwner, { fetchMatchesResponse ->
 
             when (fetchMatchesResponse.status) {
-                Resource.Status.EXCEPTION -> {
+                Resource.Status.ERROR -> {
                     FetchErrorDialog(
-                        fetchMatchesResponse.exceptionMessage,
+                        fetchMatchesResponse.errorMessage,
                         this@MatchFragment
                     ).show(childFragmentManager, FetchErrorDialog.TAG)
                 }

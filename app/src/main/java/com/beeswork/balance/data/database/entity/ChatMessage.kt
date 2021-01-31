@@ -6,12 +6,16 @@ import com.google.gson.annotations.Expose
 import kotlinx.android.parcel.IgnoredOnParcel
 import org.threeten.bp.OffsetDateTime
 
-@Entity(tableName = "chatMessage",
-        foreignKeys = [ForeignKey(entity = Match::class,
-            parentColumns = arrayOf("chatId"),
-            childColumns = arrayOf("chatId"),
-            onDelete = ForeignKey.CASCADE)],
-        indices = [Index(value = ["chatId", "id"])])
+@Entity(
+    tableName = "chatMessage",
+    foreignKeys = [ForeignKey(
+        entity = Match::class,
+        parentColumns = arrayOf("chatId"),
+        childColumns = arrayOf("chatId"),
+        onDelete = ForeignKey.CASCADE
+    )],
+    indices = [Index(value = ["id", "chatId"])]
+)
 data class ChatMessage(
 
     @PrimaryKey(autoGenerate = true)
@@ -20,13 +24,18 @@ data class ChatMessage(
     val id: Long?,
     val chatId: Long,
     val body: String,
-    val status: Status,
-    val read: Boolean,
+    var status: Status,
+    var read: Boolean,
     val createdAt: OffsetDateTime?
 ) {
 
     @Ignore
     var recipientId: String? = null
+
+    fun sync() {
+        this.read = true
+        this.status = if (this.messageId == null) Status.RECEIVED else Status.SENT
+    }
 
     enum class Status {
         SENDING,

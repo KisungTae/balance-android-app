@@ -3,8 +3,8 @@ package com.beeswork.balance.data.observable
 class Resource<out T>(
     val status: Status,
     val data: T?,
-    val exceptionMessage: String?,
-    val exceptionCode: String?,
+    val errorMessage: String?,
+    val error: String?,
     val fieldErrorMessages: Map<String, String>?
 ) {
 
@@ -28,13 +28,13 @@ class Resource<out T>(
         return this.status == Status.LOADING
     }
 
-    fun isException(): Boolean {
-        return this.status == Status.EXCEPTION
+    fun isError(): Boolean {
+        return this.status == Status.ERROR
     }
 
     enum class Status {
         SUCCESS,
-        EXCEPTION,
+        ERROR,
         LOADING
     }
 
@@ -43,19 +43,19 @@ class Resource<out T>(
             return Resource(Status.SUCCESS, data, null, null, null)
         }
 
-        fun <T> exception(
-            exceptionMessage: String,
-            exceptionCode: String,
+        fun <T> error(
+            errorMessage: String,
+            error: String,
             fieldErrorMessages: Map<String, String>?
         ): Resource<T> {
-            return Resource(Status.EXCEPTION, null, exceptionMessage, exceptionCode, fieldErrorMessages)
+            return Resource(Status.ERROR, null, errorMessage, error, fieldErrorMessages)
         }
 
-        fun <T> exception(
-            exceptionMessage: String?,
-            exceptionCode: String?,
+        fun <T> error(
+            errorMessage: String?,
+            error: String?,
         ): Resource<T> {
-            return Resource(Status.EXCEPTION, null, exceptionMessage, exceptionCode, null)
+            return Resource(Status.ERROR, null, errorMessage, error, null)
         }
 
         fun <T> loading(): Resource<T> {

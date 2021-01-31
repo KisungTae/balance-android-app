@@ -124,7 +124,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
                     llCardStackLoading.visibility = View.VISIBLE
 
                 }
-                Resource.Status.EXCEPTION -> {
+                Resource.Status.ERROR -> {
                     resetCardStackLayouts()
                     llCardStackError.visibility = View.VISIBLE
                 }

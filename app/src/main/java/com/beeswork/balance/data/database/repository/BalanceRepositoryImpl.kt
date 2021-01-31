@@ -292,7 +292,7 @@ class BalanceRepositoryImpl(
 
                     if (locationUpdatedAt != null)
                         locationDAO.sync(locationUpdatedAt)
-                } else if (cardsResource.status == Resource.Status.EXCEPTION) {
+                } else if (cardsResource.status == Resource.Status.ERROR) {
                     fetchedNoCards = false
                 }
 
@@ -371,7 +371,7 @@ class BalanceRepositoryImpl(
             val identityToken = preferenceProvider.getIdentityToken()
 
             val response = balanceRDS.fetchPhotos(accountId, identityToken)
-            if (response.status == Resource.Status.EXCEPTION)
+            if (response.status == Resource.Status.ERROR)
                 return response
 
             val photos = response.data
@@ -398,7 +398,7 @@ class BalanceRepositoryImpl(
                 val photo = File(photoPath)
                 val compressedPhoto = Compressor.compress(context, photo)
                 if (compressedPhoto.length() > Photo.MAX_SIZE)
-                    return Resource.exception(
+                    return Resource.error(
                         context.resources.getString(R.string.photo_out_of_size_exception),
                         null,
                     )
@@ -435,21 +435,21 @@ class BalanceRepositoryImpl(
                             deleteFile(photo)
                         }
                         return uploadPhotoToS3Response
-                    } ?: return Resource.exception(
+                    } ?: return Resource.error(
                         context.resources.getString(R.string.presigned_url_not_found_exception),
                         null
                     )
                 }
-                return Resource.exception(
-                    fetchPreSignedUrlResponse.exceptionMessage,
-                    fetchPreSignedUrlResponse.exceptionCode
+                return Resource.error(
+                    fetchPreSignedUrlResponse.errorMessage,
+                    fetchPreSignedUrlResponse.error
                 )
-            } ?: return Resource.exception(
+            } ?: return Resource.error(
                 context.resources.getString(R.string.mime_type_not_found_exception),
                 null
             )
         } catch (e: NoSuchFileException) {
-            return Resource.exception(
+            return Resource.error(
                 context.resources.getString(R.string.photo_not_found_exception),
                 null
             )
@@ -473,7 +473,7 @@ class BalanceRepositoryImpl(
             preferenceProvider.getIdentityToken(),
             photoKey
         )
-        if (response.isSuccess() || response.exceptionCode == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
+        if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
             photoDAO.deletePhoto(photoKey)
         return response
     }
@@ -525,13 +525,13 @@ class BalanceRepositoryImpl(
         chatId: Long,
         body: String
     ): Long {
-        val chatMessages = chatMessageDAO.getChatMessagesAfter(chatId, 200, 100)
-        val chatMessagesPre = chatMessageDAO.getChatMessagesBefore(chatId, 200, 10000)
+        val chatMessages = chatMessageDAO.findAllAfter(chatId, 200, 100)
+        val chatMessagesPre = chatMessageDAO.findAllBefore(chatId, 200, 10000)
         return 1L
     }
 
     override fun getMessages(chatId: Long): List<ChatMessage> {
-        return chatMessageDAO.getChatMessagesAfter(chatId, 1, 2)
+        return chatMessageDAO.findAllAfter(chatId, 1, 2)
     }
 
     override suspend fun syncMessage(
@@ -543,29 +543,61 @@ class BalanceRepositoryImpl(
         chatMessageDAO.sync(chatId, messageId, id, createdAt, ChatMessage.Status.SENT)
     }
 
-    override suspend fun fetchChatMessages(chatId: Long, recipientId: String) {
+    override suspend fun fetchChatMessages(
+        chatId: Long,
+        recipientId: String,
+        pageSize: Int
+    ): ChatMessageEvent {
+        if (matchDAO.isUnmatched(chatId)) return ChatMessageEvent.fetch(
+            loadInitialChatMessages(
+                chatId,
+                pageSize
+            )
+        )
+
         val response = balanceRDS.fetchChatMessages(
             preferenceProvider.getAccountId(),
             preferenceProvider.getIdentityToken(),
             chatId,
             recipientId,
-            chatMessageDAO.getLastId()
+            chatMessageDAO.findLastId(chatId) ?: 0
         )
 
+        if (response.isError()) return ChatMessageEvent.fetchError(
+            response.error,
+            response.errorMessage
+        )
 
-        response.data?.let {
-            for (i in it.indices) {
-                val chatMessage = it[i]
-                chatMessage.messageId?.let {
-
-                } ?: kotlin.run {
-
-                }
+        response.data?.let { chatMessages ->
+            for (i in chatMessages.indices) {
+                chatMessages[i].sync()
             }
+            chatMessageDAO.insert(chatMessages)
         }
 
-        println(response.data)
+        return ChatMessageEvent.fetch(
+            loadInitialChatMessages(
+                chatId,
+                pageSize
+            )
+        )
     }
+
+    private fun loadInitialChatMessages(chatId: Long, pageSize: Int): List<ChatMessage> {
+        chatMessageDAO.updateStatus(chatId, ChatMessage.Status.SENDING, ChatMessage.Status.ERROR)
+        val chatMessages = chatMessageDAO.findAllRecent(chatId, pageSize)
+        chatMessages.addAll(0, chatMessageDAO.findAllUnprocessed(chatId))
+        return chatMessages
+    }
+
+    override suspend fun loadPreviousChatMessages(chatId: Long) {
+
+    }
+
+    override suspend fun loadNextChatMessages(chatId: Long) {
+
+    }
+
 
 }
 

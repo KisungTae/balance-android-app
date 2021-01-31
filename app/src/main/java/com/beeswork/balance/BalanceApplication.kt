@@ -168,6 +168,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      54. listener for message received via notification and then observer in chatFragment, if in chat then connect()
 //      55. include message and id and other stuffs to save it to databsae in app
 //      56. SocketFactory().create() already tries to connect to endpoint?
+//      57. keep click list don't delete because if match is deleted, then matchedId should be kept in somewhere, then click is a place to keep
 
 
 

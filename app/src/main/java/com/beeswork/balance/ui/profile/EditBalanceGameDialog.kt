@@ -80,9 +80,9 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
                         }
                     }
                     Resource.Status.LOADING -> {}
-                    Resource.Status.EXCEPTION -> {
+                    Resource.Status.ERROR -> {
                         showErrorLayout(
-                            response.exceptionMessage,
+                            response.errorMessage,
                             showSaveQuestionsBtn = false,
                             showFetchQuestionsBtn = true
                         )
@@ -108,8 +108,8 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
                         }
                     }
                     Resource.Status.LOADING -> {}
-                    Resource.Status.EXCEPTION -> showErrorLayout(
-                        response.exceptionMessage,
+                    Resource.Status.ERROR -> showErrorLayout(
+                        response.errorMessage,
                         showSaveQuestionsBtn = false,
                         showFetchQuestionsBtn = false
                     )
@@ -131,8 +131,8 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
                         dismiss()
                     }
                     Resource.Status.LOADING -> {}
-                    Resource.Status.EXCEPTION -> showErrorLayout(
-                        response.exceptionMessage,
+                    Resource.Status.ERROR -> showErrorLayout(
+                        response.errorMessage,
                         showSaveQuestionsBtn = true,
                         showFetchQuestionsBtn = false
                     )

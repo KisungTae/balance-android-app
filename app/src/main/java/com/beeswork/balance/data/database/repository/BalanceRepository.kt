@@ -39,8 +39,12 @@ interface BalanceRepository {
     suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
     suspend fun saveChatMessage(chatId: Long, body: String): Long
     suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
-    suspend fun fetchChatMessages(chatId: Long, recipientId: String)
+    suspend fun fetchChatMessages(chatId: Long, recipientId: String, pageSize: Int): ChatMessageEvent
     fun getMessages(chatId: Long): List<ChatMessage>
+
+
+    suspend fun loadPreviousChatMessages(chatId: Long)
+    suspend fun loadNextChatMessages(chatId: Long)
 //    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>
 
     // account

@@ -11,17 +11,23 @@ class ChatMessageEvent(
 ) {
 
     companion object {
-        fun error(error: String?, errorMessage: String?): ChatMessageEvent {
-            return ChatMessageEvent(null, null, error, errorMessage, Type.ERROR)
+        fun fetchError(error: String?, errorMessage: String?): ChatMessageEvent {
+            return ChatMessageEvent(null, null, error, errorMessage, Type.FETCH_ERROR)
+        }
+
+        fun fetch(chatMessages: List<ChatMessage>): ChatMessageEvent {
+            return ChatMessageEvent(chatMessages, null, null, null, Type.FETCH)
         }
     }
 
     enum class Type {
+        FETCH_ERROR,
         ERROR,
         FETCH,
         APPEND,
         PREPEND,
         SENT,
-        SYNCED
+        SYNCED,
+        END
     }
 }

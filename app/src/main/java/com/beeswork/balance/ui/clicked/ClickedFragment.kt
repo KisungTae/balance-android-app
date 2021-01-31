@@ -63,9 +63,9 @@ class ClickedFragment : ScopeFragment(), KodeinAware,
         viewModel.fetchClickedListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
 
             when (fetchClickedListResponse.status) {
-                Resource.Status.EXCEPTION -> {
+                Resource.Status.ERROR -> {
                     FetchErrorDialog(
-                        fetchClickedListResponse.exceptionMessage,
+                        fetchClickedListResponse.errorMessage,
                         this@ClickedFragment
                     ).show(childFragmentManager, FetchErrorDialog.TAG)
                 }

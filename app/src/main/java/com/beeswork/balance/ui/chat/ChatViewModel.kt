@@ -1,11 +1,19 @@
 package com.beeswork.balance.ui.chat
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.stomp.StompClient
+import com.beeswork.balance.data.observable.ChatMessageEvent
 import com.beeswork.balance.internal.util.lazyDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class ChatViewModel(
@@ -15,34 +23,14 @@ class ChatViewModel(
     private val stompClient: StompClient
 ) : ViewModel() {
 
-    private val pagedListConfig = PagedList.Config.Builder()
-        .setEnablePlaceholders(false)
-        .setMaxSize(CHAT_MAX_PAGE_SIZE)
-        .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
-        .setPageSize(CHAT_PAGE_SIZE)
-//        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
-        .build()
-
-
-
-    val chatMessages by lazyDeferred {
-        LivePagedListBuilder(balanceRepository.getChatMessages(chatId), pagedListConfig).build()
-    }
-
-//    val chatMessages = Pager(
-//        PagingConfig(
-//            pageSize = 30,
-//            enablePlaceholders = true,
-//            maxSize = 150
-//        )
-//    ) {
-//        balanceRepository.getChatMessages(chatId)
-//    }.flow.cachedIn(viewModelScope)
-
     val webSocketLifeCycleEvent = stompClient.webSocketEvent
 
-    fun getMessages(): List<ChatMessage> {
-        return balanceRepository.getMessages(chatId)
+    val chatMessageEvent = MutableLiveData<ChatMessageEvent>()
+
+    fun fetchChatMessages() {
+        viewModelScope.launch(Dispatchers.IO) {
+            balanceRepository.fetchChatMessages(chatId, matchedId)
+        }
     }
 
     fun connectChat() {
@@ -59,6 +47,16 @@ class ChatViewModel(
 
 
 
+
+//    val chatMessages = Pager(
+//        PagingConfig(
+//            pageSize = 30,
+//            enablePlaceholders = true,
+//            maxSize = 150
+//        )
+//    ) {
+//        balanceRepository.getChatMessages(chatId)
+//    }.flow.cachedIn(viewModelScope)
 
 //    private lateinit var stompClient2: ua.naiksoftware.stomp.StompClient
 //    private lateinit var compositeDisposables: CompositeDisposable
@@ -134,14 +132,26 @@ class ChatViewModel(
 //    }
 
 
+//    private val pagedListConfig = PagedList.Config.Builder()
+//        .setEnablePlaceholders(false)
+//        .setMaxSize(CHAT_MAX_PAGE_SIZE)
+//        .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
+//        .setPageSize(CHAT_PAGE_SIZE)
+//        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
+//        .build()
 
 
 
-    companion object {
-        const val CHAT_PAGE_SIZE = 50
-        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
-        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_SIZE + (CHAT_PAGE_PREFETCH_DISTANCE * 2)
-    }
+//    val chatMessages by lazyDeferred {
+//        LivePagedListBuilder(balanceRepository.getChatMessages(chatId), pagedListConfig).build()
+//    }
+
+
+//    companion object {
+//        const val CHAT_PAGE_SIZE = 50
+//        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
+//        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_SIZE + (CHAT_PAGE_PREFETCH_DISTANCE * 2)
+//    }
 }
 
 

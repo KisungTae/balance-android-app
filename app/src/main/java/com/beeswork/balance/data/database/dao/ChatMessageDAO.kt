@@ -1,10 +1,7 @@
 package com.beeswork.balance.data.database.dao
 
 import androidx.paging.DataSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.RawQuery
+import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.beeswork.balance.data.database.entity.ChatMessage
 import org.threeten.bp.OffsetDateTime
@@ -14,6 +11,9 @@ interface ChatMessageDAO {
 
     @Insert
     fun insert(chatMessage: ChatMessage): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(chatMessages: List<ChatMessage>)
 
     //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
     @Query("select * from chatMessage where chatId = :chatId order by messageId desc")
@@ -28,17 +28,25 @@ interface ChatMessageDAO {
         status: ChatMessage.Status
     )
 
-    @Query("select id from chatMessage order by id desc limit 1")
-    fun getLastId(): Long
-
-    @Query("update chatMessage set id = messageId")
-    fun updateMessages()
+    @Query("select id from chatMessage where chatId = :chatId order by id desc limit 1")
+    fun findLastId(chatId: Long): Long?
 
     @Query("select * from chatMessage where chatId = :chatId and id > :lastChatMessageId order by id asc limit :pageSize")
-    fun getChatMessagesAfter(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
+    fun findAllAfter(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
 
     @Query("select * from chatMessage where chatId = :chatId and id < :lastChatMessageId order by id desc limit :pageSize")
-    fun getChatMessagesBefore(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
+    fun findAllBefore(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
 
+    @Query("select * from chatMessage where chatId = :chatId and messageId = null order by messageId desc")
+    fun findAllUnprocessed(chatId: Long): List<ChatMessage>
+
+    @Query("select * from chatMessage where chatId = :chatId order by id desc limit :pageSize")
+    fun findAllRecent(chatId: Long, pageSize: Int): MutableList<ChatMessage>
+
+    @Query("select count(*) from chatMessage where chatId = :chatId and id = null")
+    fun countUnprocessed(chatId: Long): Int
+
+    @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
+    fun updateStatus(chatId: Long, fromStatus: ChatMessage.Status, toStatus: ChatMessage.Status)
 
 }
