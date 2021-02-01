@@ -8,13 +8,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
-import com.beeswork.balance.data.observable.ChatMessageEvent
 import com.beeswork.balance.data.observable.WebSocketEvent
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.dialog.ExceptionDialogListener
 import kotlinx.android.synthetic.main.fragment_chat.*
-import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -63,7 +61,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
             viewModel.sendChatMessage(etChatMessageBody.text.toString())
         }
         observeChatMessageEvent()
-        viewModel.fetchChatMessages()
+        viewModel.fetchInitialChatMessages()
 
 //        viewModel.connectChat()
     }
@@ -75,12 +73,15 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private fun observeChatMessageEvent() {
         viewModel.chatMessageEvent.observe(viewLifecycleOwner, {
             when (it.type) {
-                ChatMessageEvent.Type.FETCH_ERROR -> {
+                ChatMessageEvent.Type.FETCH_INITIAL_ERROR -> {
                     ExceptionDialog(it.errorMessage, this).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
                     llChatLoading.visibility = View.GONE
+                }
+                ChatMessageEvent.Type.FETCH_INITIAL -> {
+
                 }
             }
         })

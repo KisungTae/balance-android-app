@@ -10,7 +10,7 @@ import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.data.observable.ChatMessageEvent
+import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.observable.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
@@ -543,12 +543,12 @@ class BalanceRepositoryImpl(
         chatMessageDAO.sync(chatId, messageId, id, createdAt, ChatMessage.Status.SENT)
     }
 
-    override suspend fun fetchChatMessages(
+    override suspend fun fetchInitialChatMessages(
         chatId: Long,
         recipientId: String,
         pageSize: Int
-    ): ChatMessageEvent {
-        if (matchDAO.isUnmatched(chatId)) return ChatMessageEvent.fetch(
+    ): Resource<List<ChatMessage>> {
+        if (matchDAO.isUnmatched(chatId)) return Resource.success(
             loadInitialChatMessages(
                 chatId,
                 pageSize
@@ -563,19 +563,19 @@ class BalanceRepositoryImpl(
             chatMessageDAO.findLastId(chatId) ?: 0
         )
 
-        if (response.isError()) return ChatMessageEvent.fetchError(
-            response.error,
-            response.errorMessage
-        )
+        if (response.isError()) return response
 
         response.data?.let { chatMessages ->
             for (i in chatMessages.indices) {
-                chatMessages[i].sync()
+                val chatMessage = chatMessages[i]
+                chatMessage.read = true
+                chatMessage.status =
+                    if (chatMessage.messageId == null) ChatMessage.Status.RECEIVED else ChatMessage.Status.SENT
             }
             chatMessageDAO.insert(chatMessages)
         }
 
-        return ChatMessageEvent.fetch(
+        return Resource.success(
             loadInitialChatMessages(
                 chatId,
                 pageSize

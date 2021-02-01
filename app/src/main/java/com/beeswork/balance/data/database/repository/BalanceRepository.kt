@@ -7,7 +7,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.data.observable.ChatMessageEvent
+import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.data.observable.Resource
 import org.threeten.bp.OffsetDateTime
 
@@ -39,7 +39,7 @@ interface BalanceRepository {
     suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
     suspend fun saveChatMessage(chatId: Long, body: String): Long
     suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
-    suspend fun fetchChatMessages(chatId: Long, recipientId: String, pageSize: Int): ChatMessageEvent
+    suspend fun fetchInitialChatMessages(chatId: Long, recipientId: String, pageSize: Int): Resource<List<ChatMessage>>
     fun getMessages(chatId: Long): List<ChatMessage>
 
 

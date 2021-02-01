@@ -2,15 +2,9 @@ package com.beeswork.balance.ui.chat
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.stomp.StompClient
-import com.beeswork.balance.data.observable.ChatMessageEvent
-import com.beeswork.balance.internal.util.lazyDeferred
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,9 +21,17 @@ class ChatViewModel(
 
     val chatMessageEvent = MutableLiveData<ChatMessageEvent>()
 
-    fun fetchChatMessages() {
+
+//  TODO: null check and null check on chatMessageDAO.findAllRecent(chatId, pageSize)
+    fun fetchInitialChatMessages() {
         viewModelScope.launch(Dispatchers.IO) {
-            balanceRepository.fetchChatMessages(chatId, matchedId)
+            val result = balanceRepository.fetchInitialChatMessages(chatId, matchedId, PAGE_SIZE)
+            withContext(Dispatchers.Main) {
+                if (result.isSuccess())
+                    result.data?.let { chatMessageEvent.value = ChatMessageEvent.fetchInitial(it) }
+                else chatMessageEvent.value =
+                    ChatMessageEvent.fetchInitialError(result.error, result.errorMessage)
+            }
         }
     }
 
@@ -45,7 +47,9 @@ class ChatViewModel(
         stompClient.disconnectChat()
     }
 
-
+    companion object {
+        const val PAGE_SIZE = 100
+    }
 
 
 //    val chatMessages = Pager(
@@ -125,7 +129,6 @@ class ChatViewModel(
 //    }
 
 
-
 //    override fun onCleared() {
 //        super.onCleared()
 //        compositeDisposables.clear()
@@ -139,7 +142,6 @@ class ChatViewModel(
 //        .setPageSize(CHAT_PAGE_SIZE)
 //        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
 //        .build()
-
 
 
 //    val chatMessages by lazyDeferred {

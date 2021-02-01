@@ -32,11 +32,6 @@ data class ChatMessage(
     @Ignore
     var recipientId: String? = null
 
-    fun sync() {
-        this.read = true
-        this.status = if (this.messageId == null) Status.RECEIVED else Status.SENT
-    }
-
     enum class Status {
         SENDING,
         SENT,
