@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.observable
+package com.beeswork.balance.data.network.response
 
 class Resource<out T>(
     val status: Status,

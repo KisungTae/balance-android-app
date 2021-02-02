@@ -12,7 +12,7 @@ import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.data.observable.Resource
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.util.Convert

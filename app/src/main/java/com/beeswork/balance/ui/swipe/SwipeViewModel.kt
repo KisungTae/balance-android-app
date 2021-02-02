@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.beeswork.balance.data.network.response.CardResponse
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.data.observable.Resource
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.util.lazyDeferred
 
 class SwipeViewModel(

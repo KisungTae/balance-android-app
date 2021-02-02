@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network.stomp
+package com.beeswork.balance.service.stomp
 
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.gson.GsonProvider

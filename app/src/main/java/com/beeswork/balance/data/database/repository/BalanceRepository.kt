@@ -8,7 +8,7 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.ui.chat.ChatMessageEvent
-import com.beeswork.balance.data.observable.Resource
+import com.beeswork.balance.data.network.response.Resource
 import org.threeten.bp.OffsetDateTime
 
 interface BalanceRepository {

@@ -2,7 +2,7 @@ package com.beeswork.balance.data.network.rds
 
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.data.observable.Resource
+import com.beeswork.balance.data.network.response.Resource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 

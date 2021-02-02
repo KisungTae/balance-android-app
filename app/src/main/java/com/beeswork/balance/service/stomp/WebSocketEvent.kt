@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.observable
+package com.beeswork.balance.service.stomp
 
 class WebSocketEvent(
     val type: Type,

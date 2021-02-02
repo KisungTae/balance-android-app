@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.data.network.stomp.StompClient
+import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

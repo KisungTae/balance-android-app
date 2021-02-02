@@ -7,7 +7,7 @@ import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.data.observable.Resource
+import com.beeswork.balance.data.network.response.Resource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 

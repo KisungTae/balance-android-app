@@ -1,10 +1,9 @@
-package com.beeswork.balance.data.network.stomp
+package com.beeswork.balance.service.stomp
 
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.data.observable.WebSocketEvent
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider

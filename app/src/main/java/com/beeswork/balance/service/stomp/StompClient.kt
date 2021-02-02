@@ -1,7 +1,6 @@
-package com.beeswork.balance.data.network.stomp
+package com.beeswork.balance.service.stomp
 
 import androidx.lifecycle.LiveData
-import com.beeswork.balance.data.observable.WebSocketEvent
 
 interface StompClient {
 
