@@ -169,6 +169,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      55. include message and id and other stuffs to save it to databsae in app
 //      56. SocketFactory().create() already tries to connect to endpoint?
 //      57. keep click list don't delete because if match is deleted, then matchedId should be kept in somewhere, then click is a place to keep
+//      58. use flow in repository refer to https://shivamdhuria.medium.com/what-the-flows-build-an-android-app-using-flows-and-live-data-using-mvvm-architecture-4d3ab807b4dd
 
 
 

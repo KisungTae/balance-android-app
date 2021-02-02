@@ -543,13 +543,13 @@ class BalanceRepositoryImpl(
         chatMessageDAO.sync(chatId, messageId, id, createdAt, ChatMessage.Status.SENT)
     }
 
-    override suspend fun fetchInitialChatMessages(
+    override suspend fun fetchChatMessages(
         chatId: Long,
         recipientId: String,
         pageSize: Int
     ): Resource<List<ChatMessage>> {
         if (matchDAO.isUnmatched(chatId)) return Resource.success(
-            loadInitialChatMessages(
+            initializeChatMessages(
                 chatId,
                 pageSize
             )
@@ -576,26 +576,28 @@ class BalanceRepositoryImpl(
         }
 
         return Resource.success(
-            loadInitialChatMessages(
+            initializeChatMessages(
                 chatId,
                 pageSize
             )
         )
     }
 
-    private fun loadInitialChatMessages(chatId: Long, pageSize: Int): List<ChatMessage> {
+    private fun initializeChatMessages(chatId: Long, pageSize: Int): List<ChatMessage> {
         chatMessageDAO.updateStatus(chatId, ChatMessage.Status.SENDING, ChatMessage.Status.ERROR)
         val chatMessages = chatMessageDAO.findAllRecent(chatId, pageSize)
         chatMessages.addAll(0, chatMessageDAO.findAllUnprocessed(chatId))
         return chatMessages
     }
 
-    override suspend fun loadPreviousChatMessages(chatId: Long) {
-
+    override suspend fun appendChatMessages(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage> {
+        return chatMessageDAO.findAllBefore(chatId, lastChatMessageId, pageSize)
     }
 
-    override suspend fun loadNextChatMessages(chatId: Long) {
-
+    override suspend fun prependChatMessages(chatId: Long, firstChatMessageId: Long, pageSize: Int): List<ChatMessage> {
+        val chatMessages = chatMessageDAO.findAllAfter(chatId, firstChatMessageId, pageSize)
+        if (chatMessages.size < pageSize) chatMessages.addAll(0, chatMessageDAO.findAllUnprocessed(chatId))
+        return chatMessages
     }
 
 

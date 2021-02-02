@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.chat
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,18 +20,16 @@ class ChatViewModel(
 
     val webSocketLifeCycleEvent = stompClient.webSocketEvent
 
-    val chatMessageEvent = MutableLiveData<ChatMessageEvent>()
+    private val _chatMessageEvent = MutableLiveData<ChatMessageEvent>()
+    val chatMessageEvent: LiveData<ChatMessageEvent> get() = _chatMessageEvent
 
-
-//  TODO: null check and null check on chatMessageDAO.findAllRecent(chatId, pageSize)
     fun fetchInitialChatMessages() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = balanceRepository.fetchInitialChatMessages(chatId, matchedId, PAGE_SIZE)
+            val result = balanceRepository.fetchChatMessages(chatId, matchedId, PAGE_SIZE)
             withContext(Dispatchers.Main) {
-                if (result.isSuccess())
-                    result.data?.let { chatMessageEvent.value = ChatMessageEvent.fetchInitial(it) }
-                else chatMessageEvent.value =
-                    ChatMessageEvent.fetchInitialError(result.error, result.errorMessage)
+                if (result.isError()) _chatMessageEvent.value =
+                    ChatMessageEvent.fetchError(result.error, result.errorMessage)
+                else result.data?.let { _chatMessageEvent.value = ChatMessageEvent.fetch(it) }
             }
         }
     }

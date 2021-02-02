@@ -36,6 +36,18 @@ class ChatRecyclerViewAdapter : RecyclerView.Adapter<ChatRecyclerViewAdapter.Mes
         return chatMessages.size
     }
 
+    fun fetch() {
+
+    }
+
+    fun append() {
+
+    }
+
+    fun prepend() {
+
+    }
+
     fun submit(newChatMessages: List<ChatMessage>) {
         chatMessages.addAll(0, newChatMessages)
         notifyDataSetChanged()

@@ -39,13 +39,15 @@ interface BalanceRepository {
     suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
     suspend fun saveChatMessage(chatId: Long, body: String): Long
     suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
-    suspend fun fetchInitialChatMessages(chatId: Long, recipientId: String, pageSize: Int): Resource<List<ChatMessage>>
+    suspend fun fetchChatMessages(chatId: Long, recipientId: String, pageSize: Int): Resource<List<ChatMessage>>
+    suspend fun appendChatMessages(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
+    suspend fun prependChatMessages(chatId: Long, firstChatMessageId: Long, pageSize: Int): List<ChatMessage>
+
+    //    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>
+
     fun getMessages(chatId: Long): List<ChatMessage>
 
 
-    suspend fun loadPreviousChatMessages(chatId: Long)
-    suspend fun loadNextChatMessages(chatId: Long)
-//    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>
 
     // account
     val cards: LiveData<Resource<List<CardResponse>>>

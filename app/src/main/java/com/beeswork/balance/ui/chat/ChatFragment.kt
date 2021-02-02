@@ -73,14 +73,14 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private fun observeChatMessageEvent() {
         viewModel.chatMessageEvent.observe(viewLifecycleOwner, {
             when (it.type) {
-                ChatMessageEvent.Type.FETCH_INITIAL_ERROR -> {
+                ChatMessageEvent.Type.FETCH_ERROR -> {
                     ExceptionDialog(it.errorMessage, this).show(
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
                     llChatLoading.visibility = View.GONE
                 }
-                ChatMessageEvent.Type.FETCH_INITIAL -> {
+                ChatMessageEvent.Type.FETCH -> {
 
                 }
             }

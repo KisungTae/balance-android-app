@@ -11,19 +11,19 @@ class ChatMessageEvent(
 ) {
 
     companion object {
-        fun fetchInitialError(error: String?, errorMessage: String?): ChatMessageEvent {
-            return ChatMessageEvent(null, null, error, errorMessage, Type.FETCH_INITIAL_ERROR)
+        fun fetchError(error: String?, errorMessage: String?): ChatMessageEvent {
+            return ChatMessageEvent(null, null, error, errorMessage, Type.FETCH_ERROR)
         }
 
-        fun fetchInitial(chatMessages: List<ChatMessage>): ChatMessageEvent {
-            return ChatMessageEvent(chatMessages, null, null, null, Type.FETCH_INITIAL)
+        fun fetch(chatMessages: List<ChatMessage>): ChatMessageEvent {
+            return ChatMessageEvent(chatMessages, null, null, null, Type.FETCH)
         }
     }
 
     enum class Type {
-        FETCH_INITIAL_ERROR,
+        FETCH_ERROR,
         ERROR,
-        FETCH_INITIAL,
+        FETCH,
         APPEND,
         PREPEND,
         SENT,
