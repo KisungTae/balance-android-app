@@ -2,20 +2,21 @@ package com.beeswork.balance.data.database.converter
 
 import androidx.room.TypeConverter
 import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 
 object ChatMessageStatusConverter {
 
     @TypeConverter
     @JvmStatic
-    fun toStatus(ordinal: Int?): ChatMessage.Status? {
+    fun toStatus(ordinal: Int?): ChatMessageStatus? {
         return ordinal?.let {
-            return enumValues<ChatMessage.Status>()[ordinal]
+            return enumValues<ChatMessageStatus>()[ordinal]
         }
     }
 
     @TypeConverter
     @JvmStatic
-    fun fromStatus(status: ChatMessage.Status?): Int? {
+    fun fromStatus(status: ChatMessageStatus?): Int? {
         return status?.let {
             return status.ordinal
         }

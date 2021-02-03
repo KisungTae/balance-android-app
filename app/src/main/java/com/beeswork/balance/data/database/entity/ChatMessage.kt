@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.entity
 
 import androidx.room.*
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.google.firebase.encoders.annotations.Encodable
 import com.google.gson.annotations.Expose
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -24,18 +25,6 @@ data class ChatMessage(
     val id: Long?,
     val chatId: Long,
     val body: String,
-    var status: Status,
-    var read: Boolean,
+    var status: ChatMessageStatus,
     val createdAt: OffsetDateTime?
-) {
-
-    @Ignore
-    var recipientId: String? = null
-
-    enum class Status {
-        SENDING,
-        SENT,
-        RECEIVED,
-        ERROR
-    }
-}
+)

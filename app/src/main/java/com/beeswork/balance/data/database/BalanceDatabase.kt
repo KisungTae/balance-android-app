@@ -17,7 +17,7 @@ import com.beeswork.balance.data.database.converter.OffsetDateTimeConverter
 abstract class BalanceDatabase : RoomDatabase() {
 
     abstract fun matchDAO(): MatchDAO
-    abstract fun messageDAO(): ChatMessageDAO
+    abstract fun chatMessageDAO(): ChatMessageDAO
     abstract fun clickDAO(): ClickDAO
     abstract fun fcmTokenDAO(): FCMTokenDAO
     abstract fun clickedDAO(): ClickedDAO

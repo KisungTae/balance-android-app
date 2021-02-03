@@ -28,7 +28,7 @@ interface BalanceAPI {
         @Query(value = "chatId") chatId: Long,
         @Query(value = "recipientId") recipientId: String,
         @Query(value = "lastChatMessageId") lastChatMessageId: Long
-    ): Response<List<ChatMessage>>
+    ): Response<List<ChatMessageResponse>>
 
     @POST("photo/reorder")
     suspend fun reorderPhotos(

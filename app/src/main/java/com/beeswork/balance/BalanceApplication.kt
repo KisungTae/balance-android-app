@@ -12,6 +12,10 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import com.beeswork.balance.data.database.repository.chat.ChatRepositoryImpl
+import com.beeswork.balance.data.network.rds.chat.ChatRDS
+import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
 import com.beeswork.balance.service.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
@@ -40,7 +44,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         // DAO
         bind() from singleton { instance<BalanceDatabase>().matchDAO() }
-        bind() from singleton { instance<BalanceDatabase>().messageDAO() }
+        bind() from singleton { instance<BalanceDatabase>().chatMessageDAO() }
         bind() from singleton { instance<BalanceDatabase>().clickDAO() }
         bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
         bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
@@ -48,7 +52,17 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
 
+        // API
+        bind() from singleton { BalanceAPI(instance()) }
+
+        // RDS
+        bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
+        bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
+
         // Repository
+        bind<ChatRepository>() with singleton { ChatRepositoryImpl(instance(), instance(), instance()) }
+
+
         bind<BalanceRepository>() with singleton {
             BalanceRepositoryImpl(
                 instance(),
@@ -90,11 +104,7 @@ class BalanceApplication : Application(), KodeinAware {
                 .build()
         }
 
-        // API
-        bind() from singleton { BalanceAPI(instance()) }
 
-        // NDS
-        bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
@@ -170,6 +180,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      56. SocketFactory().create() already tries to connect to endpoint?
 //      57. keep click list don't delete because if match is deleted, then matchedId should be kept in somewhere, then click is a place to keep
 //      58. use flow in repository refer to https://shivamdhuria.medium.com/what-the-flows-build-an-android-app-using-flows-and-live-data-using-mvvm-architecture-4d3ab807b4dd
+//      59. when fetch matches, it should also have unread message count
 
 
 
