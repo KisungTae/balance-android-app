@@ -180,7 +180,13 @@ class BalanceApplication : Application(), KodeinAware {
 //      56. SocketFactory().create() already tries to connect to endpoint?
 //      57. keep click list don't delete because if match is deleted, then matchedId should be kept in somewhere, then click is a place to keep
 //      58. use flow in repository refer to https://shivamdhuria.medium.com/what-the-flows-build-an-android-app-using-flows-and-live-data-using-mvvm-architecture-4d3ab807b4dd
-//      59. when fetch matches, it should also have unread message count
+//      59. fetch matches come with last message to update recent message and message's createdAt,
+//          so that updating recentmessage compares the createdAt, and flag the match to indicate there is new message
+//          add lastFetchMatchAt account table in server, whenvery fetch match update the lastFetchMatchAt then query based on the lastFetchMatchAt
+//          and then fetchMAtch response includes the lastFetchMatchAt field to be saved in preference or account table in android so that
+//          lastFetchMAtchAt included in the next reuqest to fetch matches
+//      60. fetchChatmessges with lastFetchaedMessageAt not id of Chatmessages, and lastFetchedAt - 1hour to safely retrieve all chatMessages
+//          lastFetchChatMessatAT updated with the createdat of last fetchedChatMessages
 
 
 
