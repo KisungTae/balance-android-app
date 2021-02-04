@@ -13,6 +13,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
 import com.beeswork.balance.internal.util.Convert
@@ -540,7 +541,7 @@ class BalanceRepositoryImpl(
         id: Long,
         createdAt: OffsetDateTime
     ) {
-        chatMessageDAO.sync(chatId, messageId, id, createdAt, ChatMessage.Status.SENT)
+        chatMessageDAO.sync(chatId, messageId, id, createdAt, ChatMessageStatus.SENT)
     }
 
     override suspend fun fetchChatMessages(
@@ -568,9 +569,7 @@ class BalanceRepositoryImpl(
         response.data?.let { chatMessages ->
             for (i in chatMessages.indices) {
                 val chatMessage = chatMessages[i]
-                chatMessage.read = true
-                chatMessage.status =
-                    if (chatMessage.messageId == null) ChatMessage.Status.RECEIVED else ChatMessage.Status.SENT
+                chatMessage.status = if (chatMessage.messageId == null) ChatMessageStatus.RECEIVED else ChatMessageStatus.SENT
             }
             chatMessageDAO.insert(chatMessages)
         }
@@ -584,19 +583,30 @@ class BalanceRepositoryImpl(
     }
 
     private fun initializeChatMessages(chatId: Long, pageSize: Int): List<ChatMessage> {
-        chatMessageDAO.updateStatus(chatId, ChatMessage.Status.SENDING, ChatMessage.Status.ERROR)
+        chatMessageDAO.updateStatus(chatId, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
         val chatMessages = chatMessageDAO.findAllRecent(chatId, pageSize)
         chatMessages.addAll(0, chatMessageDAO.findAllUnprocessed(chatId))
         return chatMessages
     }
 
-    override suspend fun appendChatMessages(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage> {
+    override suspend fun appendChatMessages(
+        chatId: Long,
+        lastChatMessageId: Long,
+        pageSize: Int
+    ): List<ChatMessage> {
         return chatMessageDAO.findAllBefore(chatId, lastChatMessageId, pageSize)
     }
 
-    override suspend fun prependChatMessages(chatId: Long, firstChatMessageId: Long, pageSize: Int): List<ChatMessage> {
+    override suspend fun prependChatMessages(
+        chatId: Long,
+        firstChatMessageId: Long,
+        pageSize: Int
+    ): List<ChatMessage> {
         val chatMessages = chatMessageDAO.findAllAfter(chatId, firstChatMessageId, pageSize)
-        if (chatMessages.size < pageSize) chatMessages.addAll(0, chatMessageDAO.findAllUnprocessed(chatId))
+        if (chatMessages.size < pageSize) chatMessages.addAll(
+            0,
+            chatMessageDAO.findAllUnprocessed(chatId)
+        )
         return chatMessages
     }
 

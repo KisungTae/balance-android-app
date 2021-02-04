@@ -4,6 +4,7 @@ import androidx.paging.DataSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import org.threeten.bp.OffsetDateTime
 
 @Dao
@@ -25,11 +26,14 @@ interface ChatMessageDAO {
         messageId: Long,
         id: Long,
         createdAt: OffsetDateTime,
-        status: ChatMessage.Status
+        status: ChatMessageStatus
     )
 
     @Query("select id from chatMessage where chatId = :chatId order by id desc limit 1")
     fun findLastId(chatId: Long): Long?
+
+    @Query("select createdAt from chatMessage where chatId = :chatId and status in (:statuses) order by id desc limit 1")
+    fun findLastCreatedAt(chatId: Long, statuses: Array<ChatMessageStatus> = arrayOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED))
 
     @Query("select * from chatMessage where chatId = :chatId and id > :firstChatMessageId order by id asc limit :pageSize")
     fun findAllAfter(chatId: Long, firstChatMessageId: Long, pageSize: Int): MutableList<ChatMessage>
@@ -47,6 +51,6 @@ interface ChatMessageDAO {
     fun countUnprocessed(chatId: Long): Int
 
     @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
-    fun updateStatus(chatId: Long, fromStatus: ChatMessage.Status, toStatus: ChatMessage.Status)
+    fun updateStatus(chatId: Long, fromStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
 }

@@ -60,7 +60,14 @@ class BalanceApplication : Application(), KodeinAware {
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
         // Repository
-        bind<ChatRepository>() with singleton { ChatRepositoryImpl(instance(), instance(), instance()) }
+        bind<ChatRepository>() with singleton {
+            ChatRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
 
 
         bind<BalanceRepository>() with singleton {
@@ -87,7 +94,13 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance()) }
-        bind() from factory { param: ChatViewModelFactoryParameter -> ChatViewModelFactory(param, instance(), instance()) }
+        bind() from factory { param: ChatViewModelFactoryParameter ->
+            ChatViewModelFactory(
+                param,
+                instance(),
+                instance()
+            )
+        }
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickedViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
@@ -105,10 +118,8 @@ class BalanceApplication : Application(), KodeinAware {
         }
 
 
-
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
-
 
 
     }
@@ -187,8 +198,9 @@ class BalanceApplication : Application(), KodeinAware {
 //          lastFetchMAtchAt included in the next reuqest to fetch matches
 //      60. fetchChatmessges with lastFetchaedMessageAt not id of Chatmessages, and lastFetchedAt - 1hour to safely retrieve all chatMessages
 //          lastFetchChatMessatAT updated with the createdat of last fetchedChatMessages
-
-
+//      61. fetchMatch will retreive match with messages with body empty but last message will have the body to be displayed in the match list
+//          match livedata will be triggered when new item inserted in chatMessage because of foreighkey s make sure query will include unread message count
+//      62. match lastChatMessageId instead of lastReadAt
 
 
 
