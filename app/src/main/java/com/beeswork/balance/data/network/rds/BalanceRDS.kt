@@ -14,7 +14,7 @@ interface BalanceRDS {
         chatId: Long,
         recipientId: String,
         lastChatMessageId: Long
-    ): Resource<List<ChatMessage>>
+    ): Resource<List<ChatMessageResponse>>
 
     suspend fun reorderPhotos(
         accountId: String,
@@ -105,7 +105,9 @@ interface BalanceRDS {
     suspend fun fetchMatches(
         accountId: String,
         identityToken: String,
-        fetchedAt: String
+        lastAccountUpdatedAt: String,
+        lastMatchUpdatedAt: String,
+        lastChatMessageCreatedAt: String
     ): Resource<MutableList<Match>>
 
     suspend fun fetchClickedList(

@@ -21,7 +21,8 @@ class ChatRepositoryImpl(
         pageSize: Int
     ): Resource<List<ChatMessageDomain>> {
         // TODO: change lastReadAt to
-        val
+
+        return Resource.error("", "")
     }
 
 }

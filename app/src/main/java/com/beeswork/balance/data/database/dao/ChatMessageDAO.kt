@@ -32,8 +32,8 @@ interface ChatMessageDAO {
     @Query("select id from chatMessage where chatId = :chatId order by id desc limit 1")
     fun findLastId(chatId: Long): Long?
 
-    @Query("select createdAt from chatMessage where chatId = :chatId and status in (:statuses) order by id desc limit 1")
-    fun findLastCreatedAt(chatId: Long, statuses: Array<ChatMessageStatus> = arrayOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED))
+//    @Query("select createdAt from chatMessage where chatId = :chatId and status in (:statuses) order by id desc limit 1")
+//    fun findLastCreatedAt(chatId: Long, statuses: Array<ChatMessageStatus> = arrayOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED))
 
     @Query("select * from chatMessage where chatId = :chatId and id > :firstChatMessageId order by id asc limit :pageSize")
     fun findAllAfter(chatId: Long, firstChatMessageId: Long, pageSize: Int): MutableList<ChatMessage>

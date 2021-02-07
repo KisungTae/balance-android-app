@@ -10,6 +10,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.Query
 
 class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
@@ -21,9 +22,15 @@ class BalanceRDSImpl(
         chatId: Long,
         recipientId: String,
         lastChatMessageId: Long
-    ): Resource<List<ChatMessage>> {
+    ): Resource<List<ChatMessageResponse>> {
         return getResult {
-            balanceAPI.fetchChatMessages(accountId, identityToken, chatId, recipientId, lastChatMessageId)
+            balanceAPI.fetchChatMessages(
+                accountId,
+                identityToken,
+                chatId,
+                recipientId,
+                lastChatMessageId
+            )
         }
     }
 
@@ -203,10 +210,18 @@ class BalanceRDSImpl(
     override suspend fun fetchMatches(
         accountId: String,
         identityToken: String,
-        fetchedAt: String
+        lastAccountUpdatedAt: String,
+        lastMatchUpdatedAt: String,
+        lastChatMessageCreatedAt: String
     ): Resource<MutableList<Match>> {
         return getResult {
-            balanceAPI.fetchMatches(accountId, identityToken, fetchedAt)
+            balanceAPI.fetchMatches(
+                accountId,
+                identityToken,
+                lastAccountUpdatedAt,
+                lastMatchUpdatedAt,
+                lastChatMessageCreatedAt
+            )
         }
     }
 

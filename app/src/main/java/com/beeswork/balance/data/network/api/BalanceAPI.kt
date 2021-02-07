@@ -103,7 +103,9 @@ interface BalanceAPI {
     suspend fun fetchMatches(
         @Query(value = "accountId") accountId: String,
         @Query(value = "identityToken") identityToken: String,
-        @Query(value = "fetchedAt") fetchedAt: String
+        @Query(value = "lastAccountUpdatedAt") lastAccountUpdatedAt: String,
+        @Query(value = "lastMatchUpdatedAt") lastMatchUpdatedAt: String,
+        @Query(value = "lastChatMessageCreatedAt") lastChatMessageCreatedAt: String
     ): Response<MutableList<Match>>
 
     @GET("swipe/clicked/list")

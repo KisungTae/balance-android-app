@@ -14,6 +14,9 @@ abstract class BaseRDS {
         try {
             val response = call()
 
+            val headers = response.headers()
+
+
             if (response.isSuccessful)
                 return Resource.success(response.body())
 

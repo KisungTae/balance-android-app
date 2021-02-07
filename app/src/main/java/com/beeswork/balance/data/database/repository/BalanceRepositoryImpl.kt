@@ -171,39 +171,41 @@ class BalanceRepositoryImpl(
             val matchResource = balanceRDS.fetchMatches(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
+                fetchedAt,
+                fetchedAt,
                 fetchedAt
             )
 
-            if (matchResource.status == Resource.Status.SUCCESS) {
-                val fetchedMatches = matchResource.data!!
-
-                for (i in (fetchedMatches.size - 1) downTo 0) {
-
-                    val fetchedMatch = fetchedMatches[i]
-
-                    if (fetchedMatch.updatedAt!! > fetchedAt)
-                        fetchedAt = fetchedMatch.updatedAt
-
-                    if (matchDAO.existsByChatId(fetchedMatch.chatId)) {
-                        matchDAO.update(
-                            fetchedMatch.chatId,
-                            fetchedMatch.photoKey,
-                            fetchedMatch.unmatched
-                        )
-                        fetchedMatches.removeAt(i)
-                    } else {
-                        setNewMatch(fetchedMatch)
-                    }
-                }
-
-                if (fetchedMatches.size > 0) {
-                    matchDAO.insert(fetchedMatches)
-                    fetchedMatches.clear()
-                }
-
-                clickedDAO.deleteIfMatched()
-                preferenceProvider.putMatchFetchedAt(fetchedAt)
-            }
+//            if (matchResource.status == Resource.Status.SUCCESS) {
+//                val fetchedMatches = matchResource.data!!
+//
+//                for (i in (fetchedMatches.size - 1) downTo 0) {
+//
+//                    val fetchedMatch = fetchedMatches[i]
+//
+//                    if (fetchedMatch.updatedAt!! > fetchedAt)
+//                        fetchedAt = fetchedMatch.updatedAt
+//
+//                    if (matchDAO.existsByChatId(fetchedMatch.chatId)) {
+//                        matchDAO.update(
+//                            fetchedMatch.chatId,
+//                            fetchedMatch.photoKey,
+//                            fetchedMatch.unmatched
+//                        )
+//                        fetchedMatches.removeAt(i)
+//                    } else {
+//                        setNewMatch(fetchedMatch)
+//                    }
+//                }
+//
+//                if (fetchedMatches.size > 0) {
+//                    matchDAO.insert(fetchedMatches)
+//                    fetchedMatches.clear()
+//                }
+//
+//                clickedDAO.deleteIfMatched()
+//                preferenceProvider.putMatchFetchedAt(fetchedAt)
+//            }
             mutableFetchMatchesResource.postValue(matchResource)
         }
     }
@@ -526,8 +528,17 @@ class BalanceRepositoryImpl(
         chatId: Long,
         body: String
     ): Long {
-        val chatMessages = chatMessageDAO.findAllAfter(chatId, 200, 100)
-        val chatMessagesPre = chatMessageDAO.findAllBefore(chatId, 200, 10000)
+//        val chatMessages = chatMessageDAO.findAllAfter(chatId, 200, 100)
+//        val chatMessagesPre = chatMessageDAO.findAllBefore(chatId, 200, 10000)
+
+        val matches = balanceRDS.fetchMatches(
+            preferenceProvider.getAccountId(),
+            preferenceProvider.getIdentityToken(),
+            preferenceProvider.getMatchFetchedAt(),
+            preferenceProvider.getMatchFetchedAt(),
+            preferenceProvider.getMatchFetchedAt()
+        )
+
         return 1L
     }
 
@@ -564,15 +575,15 @@ class BalanceRepositoryImpl(
             chatMessageDAO.findLastId(chatId) ?: 0
         )
 
-        if (response.isError()) return response
-
-        response.data?.let { chatMessages ->
-            for (i in chatMessages.indices) {
-                val chatMessage = chatMessages[i]
-                chatMessage.status = if (chatMessage.messageId == null) ChatMessageStatus.RECEIVED else ChatMessageStatus.SENT
-            }
-            chatMessageDAO.insert(chatMessages)
-        }
+//        if (response.isError()) return response
+//
+//        response.data?.let { chatMessages ->
+//            for (i in chatMessages.indices) {
+//                val chatMessage = chatMessages[i]
+//                chatMessage.status = if (chatMessage.messageId == null) ChatMessageStatus.RECEIVED else ChatMessageStatus.SENT
+//            }
+//            chatMessageDAO.insert(chatMessages)
+//        }
 
         return Resource.success(
             initializeChatMessages(

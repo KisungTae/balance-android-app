@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.inflate
 import kotlinx.android.synthetic.main.item_chat_message_received.view.*
 import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
@@ -17,8 +18,8 @@ class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.Messag
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return when (viewType) {
-            ChatMessage.Status.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
-            ChatMessage.Status.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
+            ChatMessageStatus.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
+            ChatMessageStatus.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
             else -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
         }
     }
@@ -26,17 +27,17 @@ class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.Messag
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         getItem(position)?.let {
             when (holder.itemViewType) {
-                ChatMessage.Status.RECEIVED.ordinal -> holder.bindMessageReceived(it)
-                ChatMessage.Status.SENT.ordinal -> holder.bindMessageSent(it)
+                ChatMessageStatus.RECEIVED.ordinal -> holder.bindMessageReceived(it)
+                ChatMessageStatus.SENT.ordinal -> holder.bindMessageSent(it)
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position)?.let {
-            return if (it.status == ChatMessage.Status.RECEIVED) ChatMessage.Status.RECEIVED.ordinal else ChatMessage.Status.SENT.ordinal
+            return if (it.status == ChatMessageStatus.RECEIVED) ChatMessageStatus.RECEIVED.ordinal else ChatMessageStatus.SENT.ordinal
         } ?: kotlin.run {
-            return ChatMessage.Status.RECEIVED.ordinal
+            return ChatMessageStatus.RECEIVED.ordinal
         }
     }
 
@@ -63,17 +64,17 @@ class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.Messag
                 "messageId: ${chatMessage.messageId} | ${chatMessage.body} | id: ${chatMessage.id}"
 
             when (chatMessage.status) {
-                ChatMessage.Status.SENT -> {
+                ChatMessageStatus.SENT -> {
                     itemView.tvChatMessageSentCreatedAt.text = chatMessage.createdAt.toString()
                     showLayout(itemView, View.VISIBLE, View.GONE, View.GONE)
                 }
-                ChatMessage.Status.SENDING -> showLayout(
+                ChatMessageStatus.SENDING -> showLayout(
                     itemView,
                     View.GONE,
                     View.VISIBLE,
                     View.GONE
                 )
-                ChatMessage.Status.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
+                ChatMessageStatus.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
             }
         }
 
