@@ -9,7 +9,7 @@ import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "match",
         indices = [Index(value = ["matchedId"], unique = true)])
-data class Match @JvmOverloads constructor (
+data class Match (
 
     @PrimaryKey
     val chatId: Long,
@@ -21,8 +21,5 @@ data class Match @JvmOverloads constructor (
     var recentMessage: String,
     var unreadMessageCount: Int,
     var lastReadAt: OffsetDateTime,
-    var lastReceivedAt: OffsetDateTime,
-
-    @Ignore
-    val updatedAt: String? = null
+    val updatedAt: String
 )

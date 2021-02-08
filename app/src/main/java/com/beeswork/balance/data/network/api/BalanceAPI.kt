@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
+import com.beeswork.balance.data.network.response.match.ListMatchResponse
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
@@ -20,6 +21,15 @@ import retrofit2.http.*
 //const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 interface BalanceAPI {
+
+    @GET("match/list")
+    suspend fun listMatches(
+        @Query(value = "accountId") accountId: String,
+        @Query(value = "identityToken") identityToken: String,
+        @Query(value = "lastAccountUpdatedAt") lastAccountUpdatedAt: String,
+        @Query(value = "lastMatchUpdatedAt") lastMatchUpdatedAt: String,
+        @Query(value = "lastChatMessageCreatedAt") lastChatMessageCreatedAt: String
+    ): Response<ListMatchResponse>
 
     @GET("chat/message/list")
     suspend fun fetchChatMessages(

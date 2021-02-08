@@ -14,8 +14,12 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepositoryImpl
+import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
+import com.beeswork.balance.data.network.rds.match.MatchRDS
+import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
 import com.beeswork.balance.service.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
@@ -57,11 +61,22 @@ class BalanceApplication : Application(), KodeinAware {
 
         // RDS
         bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
+        bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
+
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
         // Repository
         bind<ChatRepository>() with singleton {
             ChatRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
+
+        bind<MatchRepository>() with singleton {
+            MatchRepositoryImpl(
                 instance(),
                 instance(),
                 instance(),
@@ -93,7 +108,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
-        bind() from provider { MatchViewModelFactory(instance()) }
+        bind() from provider { MatchViewModelFactory(instance(), instance()) }
         bind() from factory { param: ChatViewModelFactoryParameter ->
             ChatViewModelFactory(
                 param,
