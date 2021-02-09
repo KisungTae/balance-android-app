@@ -17,7 +17,7 @@ interface MatchDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(match: Match)
 
-    @Query("select * from `match` where unmatched != 1 order by lastReceivedAt desc")
+    @Query("select * from `match` where unmatched != 1 order by updatedAt desc")
     fun getMatches(): DataSource.Factory<Int, Match>
 
     @Query("update `match` set unmatched = 1 where matchedId = :matchedId")
@@ -35,7 +35,7 @@ interface MatchDAO {
     @Query("select matchedId from `match`")
     fun getMatchedIds(): List<String>
 
-    @Query("select count(unreadMessageCount) from `match` where unmatched != 1")
+    @Query("select count(name) from `match` where unmatched != 1")
     fun countUnreadMessageCount(): LiveData<Int>
 
 //  TODO: removeme

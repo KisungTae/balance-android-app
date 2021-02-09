@@ -212,10 +212,10 @@ class BalanceRepositoryImpl(
 
     private fun setNewMatch(match: Match) {
         val currentOffsetDateTime = OffsetDateTime.now()
-        match.unreadMessageCount = 1
-        match.recentMessage = context.getString(R.string.default_recent_message)
+//        match.unreadMessageCount = 1
+//        match.recentMessage = context.getString(R.string.default_recent_message)
         match.lastReadAt = currentOffsetDateTime
-        match.lastReceivedAt = currentOffsetDateTime
+//        match.lastReceivedAt = currentOffsetDateTime
     }
 
 //  ################################################################################# //

@@ -216,6 +216,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      61. fetchMatch will retreive match with messages with body empty but last message will have the body to be displayed in the match list
 //          match livedata will be triggered when new item inserted in chatMessage because of foreighkey s make sure query will include unread message count
 //      62. match lastChatMessageId instead of lastReadAt
+//      63. encrypt identity token in sharedpreference
+//      64. sharedpreference uuid convert throw errors then go back to login page and then re authorize? then authrozie should sync id and identitytoken
+//      65. when deleted and reinstalled, then fetch matches, clicked, click, chatmessages (2weeks)
 
 
 

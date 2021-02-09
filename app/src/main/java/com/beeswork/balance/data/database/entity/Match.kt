@@ -18,8 +18,6 @@ data class Match (
     var photoKey: String,
     val name: String,
     var unmatched: Boolean,
-    var recentMessage: String,
-    var unreadMessageCount: Int,
     var lastReadAt: OffsetDateTime,
     val updatedAt: String
 )

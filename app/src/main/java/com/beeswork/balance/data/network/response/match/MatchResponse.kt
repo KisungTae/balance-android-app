@@ -10,5 +10,6 @@ data class MatchResponse(
     val name: String?,
     val repPhotoKey: String?,
     val blocked: Boolean?,
-    val deleted: Boolean?
+    val deleted: Boolean?,
+    val accountUpdatedAt: OffsetDateTime?
 )

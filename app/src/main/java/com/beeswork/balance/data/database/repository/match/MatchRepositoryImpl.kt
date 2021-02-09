@@ -4,6 +4,8 @@ import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
 
 class MatchRepositoryImpl(
     private val matchRDS: MatchRDS,
@@ -12,7 +14,13 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ): MatchRepository {
     override suspend fun fetchMatches() {
-        val listMatchResponse = matchRDS.listMatches()
+//        val listMatchResponse = matchRDS.listMatches(preferenceProvider.getAccountId(), preferenceProvider.getIdentityToken(), )
+
+        
+        val date = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse("value", OffsetDateTime::from)
+        println(date)
+
+
 
 
 

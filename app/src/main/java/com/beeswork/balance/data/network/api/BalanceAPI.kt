@@ -12,10 +12,12 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
+import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import java.util.*
 
 //const val NETWORK_READ_TIMEOUT = 100L
 //const val NETWORK_CONNECTION_TIMEOUT = 100L
@@ -24,11 +26,11 @@ interface BalanceAPI {
 
     @GET("match/list")
     suspend fun listMatches(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String,
-        @Query(value = "lastAccountUpdatedAt") lastAccountUpdatedAt: String,
-        @Query(value = "lastMatchUpdatedAt") lastMatchUpdatedAt: String,
-        @Query(value = "lastChatMessageCreatedAt") lastChatMessageCreatedAt: String
+        @Query(value = "accountId") accountId: UUID,
+        @Query(value = "identityToken") identityToken: UUID,
+        @Query(value = "lastAccountUpdatedAt") lastAccountUpdatedAt: OffsetDateTime,
+        @Query(value = "lastMatchUpdatedAt") lastMatchUpdatedAt: OffsetDateTime,
+        @Query(value = "lastChatMessageCreatedAt") lastChatMessageCreatedAt: OffsetDateTime
     ): Response<ListMatchResponse>
 
     @GET("chat/message/list")

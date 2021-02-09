@@ -6,7 +6,7 @@ import org.threeten.bp.format.DateTimeFormatter
 
 object OffsetDateTimeConverter {
 
-    private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    private val formatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
     @TypeConverter
     @JvmStatic
@@ -21,4 +21,16 @@ object OffsetDateTimeConverter {
     fun fromOffsetDateTime(date: OffsetDateTime?): String? {
         return date?.format(formatter)
     }
+
+    fun toOffsetDateTimeNonNull(value: String): OffsetDateTime {
+        return formatter.parse(value, OffsetDateTime::from)
+    }
+
+    fun fromOffsetDateTimeNonNull(date: OffsetDateTime): String {
+        return date.format(formatter)
+    }
+
+
+
+
 }
