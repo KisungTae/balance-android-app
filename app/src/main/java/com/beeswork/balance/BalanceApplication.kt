@@ -219,6 +219,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      63. encrypt identity token in sharedpreference
 //      64. sharedpreference uuid convert throw errors then go back to login page and then re authorize? then authrozie should sync id and identitytoken
 //      65. when deleted and reinstalled, then fetch matches, clicked, click, chatmessages (2weeks)
+//      66. create table to save current insertion offsetdatetime, and then insert chatmesages with additional updatedAt column,
+//          so query chatmessage.updatedat > current insertiondatetime, so then you can retrieve only the rows that have been udpated
+//
 
 
 

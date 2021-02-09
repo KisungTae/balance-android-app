@@ -136,23 +136,25 @@ class PreferenceProviderImpl(
     }
 
     override fun getAccountId(): String {
-        return "6be75d61-b60a-44f9-916b-9703a9063cf5"
-//        return "9f881819-638a-4098-954c-ce34b133d32a"
+//        return "6be75d61-b60a-44f9-916b-9703a9063cf5"
+        return "01ac40b1-cc3f-4a96-9663-df0ad79acee0"
     }
 
     override fun getIdentityToken(): String {
-        return "669a4e60-93f9-4f9f-8652-9328f792e3dd"
-//        return "96c80a98-8807-4aee-999c-ceca92e009c3"
+//        return "669a4e60-93f9-4f9f-8652-9328f792e3dd"
+        return "e6deee15-9c06-4065-bb0d-e89e7c2f26e8"
     }
 
     override fun getAccountUUID(): UUID {
-        preferences.getString(ACCOUNT_ID, null)?.let {
+//      TODO: change getAccountId to null
+        preferences.getString(ACCOUNT_ID, getAccountId())?.let {
             return UUID.fromString(it)
         } ?: throw AccountIdNotFoundException()
     }
 
     override fun getIdentityTokenUUID(): UUID {
-        preferences.getString(IDENTITY_TOKEN, null)?.let {
+//      TODO: change getIdentityToken to null
+        preferences.getString(IDENTITY_TOKEN, getIdentityToken())?.let {
             return UUID.fromString(it)
         } ?: throw IdentityTokenNotFoundException()
     }

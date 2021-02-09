@@ -28,8 +28,8 @@ interface BalanceAPI {
     suspend fun listMatches(
         @Query(value = "accountId") accountId: UUID,
         @Query(value = "identityToken") identityToken: UUID,
-        @Query(value = "lastAccountUpdatedAt") lastAccountUpdatedAt: OffsetDateTime,
         @Query(value = "lastMatchUpdatedAt") lastMatchUpdatedAt: OffsetDateTime,
+        @Query(value = "lastAccountUpdatedAt") lastAccountUpdatedAt: OffsetDateTime,
         @Query(value = "lastChatMessageCreatedAt") lastChatMessageCreatedAt: OffsetDateTime
     ): Response<ListMatchResponse>
 

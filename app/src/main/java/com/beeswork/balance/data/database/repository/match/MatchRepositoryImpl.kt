@@ -12,17 +12,18 @@ class MatchRepositoryImpl(
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val preferenceProvider: PreferenceProvider
-): MatchRepository {
+) : MatchRepository {
     override suspend fun fetchMatches() {
-//        val listMatchResponse = matchRDS.listMatches(preferenceProvider.getAccountId(), preferenceProvider.getIdentityToken(), )
+        val listMatchResponse = matchRDS.listMatches(
+            preferenceProvider.getAccountUUID(),
+            preferenceProvider.getIdentityTokenUUID(),
+            preferenceProvider.getLastFetchedMatchUpdatedAt(),
+            preferenceProvider.getLastFetchedAccountUpdatedAt(),
+            preferenceProvider.getLastFetchedChatMessageCreatedAt()
+        )
 
-        
-        val date = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse("value", OffsetDateTime::from)
-        println(date)
 
-
-
-
+        println(listMatchResponse.errorMessage)
 
     }
 }
