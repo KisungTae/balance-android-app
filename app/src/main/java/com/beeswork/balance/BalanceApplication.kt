@@ -221,7 +221,10 @@ class BalanceApplication : Application(), KodeinAware {
 //      65. when deleted and reinstalled, then fetch matches, clicked, click, chatmessages (2weeks)
 //      66. create table to save current insertion offsetdatetime, and then insert chatmesages with additional updatedAt column,
 //          so query chatmessage.updatedat > current insertiondatetime, so then you can retrieve only the rows that have been udpated
-//
+//      67. when app deleted, then save the each match's lastreadchatmessagecreatedat or id
+//      68. when sending reuqwest to list matches, lastchatmessagecreatedat = lastcyced(has id) message's createdat
+//      69, match not deleted, not blocked, not unmatched, accountupdatedat > last account view at, then flash the pircture orsomething
+
 
 
 

@@ -15,9 +15,13 @@ data class Match (
     val chatId: Long,
 
     val matchedId: String,
-    var photoKey: String,
+    val unmatched: Boolean,
+    val updatedAt: OffsetDateTime,
     val name: String,
-    var unmatched: Boolean,
-    var lastReadAt: OffsetDateTime,
-    val updatedAt: String
+    val repPhotoKey: String,
+    val blocked: Boolean,
+    val deleted: Boolean,
+    val accountUpdatedAt: OffsetDateTime,
+    val lastReadAt: OffsetDateTime,
+    val lastAccountViewedAt: OffsetDateTime
 )

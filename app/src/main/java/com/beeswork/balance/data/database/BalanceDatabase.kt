@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.converter.ChatMessageStatusConverter
 import com.beeswork.balance.data.database.converter.OffsetDateTimeConverter
+import com.beeswork.balance.data.database.converter.UUIDConverter
 
 
 @Database(
@@ -13,7 +14,7 @@ import com.beeswork.balance.data.database.converter.OffsetDateTimeConverter
                 Clicked::class, Profile::class, Location::class, Photo::class],
     version = 1
 )
-@TypeConverters(OffsetDateTimeConverter::class, ChatMessageStatusConverter::class)
+@TypeConverters(OffsetDateTimeConverter::class, ChatMessageStatusConverter::class, UUIDConverter::class)
 abstract class BalanceDatabase : RoomDatabase() {
 
     abstract fun matchDAO(): MatchDAO
