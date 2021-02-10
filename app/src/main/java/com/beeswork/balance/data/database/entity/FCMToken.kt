@@ -12,5 +12,5 @@ data class FCMToken(
     val posted: Boolean,
 
     @PrimaryKey
-    val id: Int = FCM_TOKEN_ID
+    val id: Int = 0
 )

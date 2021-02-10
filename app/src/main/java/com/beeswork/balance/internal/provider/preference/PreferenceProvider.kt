@@ -12,12 +12,12 @@ interface PreferenceProvider {
     fun putClickedFetchedAt(clickedFetchedAt: String)
     fun putAccountUUID(accountId: UUID)
     fun putIdentityTokenUUID(identityToken: UUID)
-    fun putLastFetchedMatchUpdatedAt(updatedAt: OffsetDateTime)
-    fun putLastFetchedAccountUpdatedAt(updatedAt: OffsetDateTime)
-    fun putLastFetchedChatMessageCreatedAt(createdAt: OffsetDateTime)
+    fun putMatchFetchedAt(updatedAt: OffsetDateTime)
+    fun putAccountFetchedAt(updatedAt: OffsetDateTime)
+    fun putChatMessageFetchedAt(createdAt: OffsetDateTime)
 
     fun getClickedFetchedAt(): String
-    fun getMatchFetchedAt(): String
+    fun getMatchFetchedAt1(): String
     fun getGender(): Boolean
     fun getMinAgeBirthYear(): Int
     fun getMaxAgeBirthYear(): Int
@@ -25,11 +25,11 @@ interface PreferenceProvider {
     fun getMaxAge(): Float
     fun getDistanceInMeters(): Int
     fun getDistance(): Float
-    fun getAccountId(): String
-    fun getIdentityToken(): String
-    fun getAccountUUID(): UUID
-    fun getIdentityTokenUUID(): UUID
-    fun getLastFetchedMatchUpdatedAt(): OffsetDateTime
-    fun getLastFetchedAccountUpdatedAt(): OffsetDateTime
-    fun getLastFetchedChatMessageCreatedAt(): OffsetDateTime
+    fun getAccountId1(): String
+    fun getIdentityToken1(): String
+    fun getAccountId(): UUID
+    fun getIdentityToken(): UUID
+    fun getMatchFetchedAt(): OffsetDateTime
+    fun getAccountFetchedAt(): OffsetDateTime
+    fun getChatMessageFetchedAt(): OffsetDateTime
 }

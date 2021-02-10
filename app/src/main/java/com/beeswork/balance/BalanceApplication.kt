@@ -224,6 +224,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      67. when app deleted, then save the each match's lastreadchatmessagecreatedat or id
 //      68. when sending reuqwest to list matches, lastchatmessagecreatedat = lastcyced(has id) message's createdat
 //      69, match not deleted, not blocked, not unmatched, accountupdatedat > last account view at, then flash the pircture orsomething
+//      70. put dummy chatmmessage start and end of chatmessage table so that I can know if it is begining or end
+//      71. when click on profile in chat, udpate accountViewedAt on match and compare with accoutnUpdatedAT then flash profile picture if accountviewdat < accountupdatdAt
 
 
 

@@ -10,8 +10,8 @@ interface MatchRDS {
     suspend fun listMatches(
         accountId: UUID,
         identityToken: UUID,
-        lastMatchUpdatedAt: OffsetDateTime,
-        lastAccountUpdatedAt: OffsetDateTime,
-        lastChatMessageCreatedAt: OffsetDateTime
+        matchFetchedAt: OffsetDateTime,
+        accountFetchedAt: OffsetDateTime,
+        chatMessageFetchedAt: OffsetDateTime
     ): Resource<ListMatchResponse>
 }

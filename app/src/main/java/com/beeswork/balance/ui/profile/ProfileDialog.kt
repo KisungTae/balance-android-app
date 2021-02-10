@@ -79,7 +79,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
             requireContext(),
             this,
-            preferenceProvider.getAccountId()
+            preferenceProvider.getAccountId1()
         )
 
         rvPhotoPicker.layoutManager =

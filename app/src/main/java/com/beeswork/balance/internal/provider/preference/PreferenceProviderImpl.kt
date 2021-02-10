@@ -6,8 +6,6 @@ import com.beeswork.balance.data.database.converter.OffsetDateTimeConverter
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import java.lang.Exception
 import java.util.*
 
 
@@ -75,21 +73,21 @@ class PreferenceProviderImpl(
         editor.putString(IDENTITY_TOKEN, identityToken.toString())
     }
 
-    override fun putLastFetchedMatchUpdatedAt(updatedAt: OffsetDateTime) {
+    override fun putMatchFetchedAt(updatedAt: OffsetDateTime) {
         editor.putString(
             LAST_FETCHED_MATCH_UPDATED_AT,
             OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt)
         )
     }
 
-    override fun putLastFetchedAccountUpdatedAt(updatedAt: OffsetDateTime) {
+    override fun putAccountFetchedAt(updatedAt: OffsetDateTime) {
         editor.putString(
             LAST_FETCHED_ACCOUNT_UPDATED_AT,
             OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt)
         )
     }
 
-    override fun putLastFetchedChatMessageCreatedAt(createdAt: OffsetDateTime) {
+    override fun putChatMessageFetchedAt(createdAt: OffsetDateTime) {
         editor.putString(
             LAST_FETCHED_CHAT_MESSAGE_CREATED_AT,
             OffsetDateTimeConverter.fromOffsetDateTimeNonNull(createdAt)
@@ -101,7 +99,7 @@ class PreferenceProviderImpl(
     }
 
 
-    override fun getMatchFetchedAt(): String {
+    override fun getMatchFetchedAt1(): String {
         return preferences.getString(MATCH_FETCHED_AT, "2020-01-01T10:06:26.032Z")!!
     }
 
@@ -135,32 +133,32 @@ class PreferenceProviderImpl(
         return preferences.getFloat(DISTANCE, DEFAULT_DISTANCE)
     }
 
-    override fun getAccountId(): String {
+    override fun getAccountId1(): String {
 //        return "6be75d61-b60a-44f9-916b-9703a9063cf5"
         return "01ac40b1-cc3f-4a96-9663-df0ad79acee0"
     }
 
-    override fun getIdentityToken(): String {
+    override fun getIdentityToken1(): String {
 //        return "669a4e60-93f9-4f9f-8652-9328f792e3dd"
         return "e6deee15-9c06-4065-bb0d-e89e7c2f26e8"
     }
 
-    override fun getAccountUUID(): UUID {
+    override fun getAccountId(): UUID {
 //      TODO: change getAccountId to null
-        preferences.getString(ACCOUNT_ID, getAccountId())?.let {
+        preferences.getString(ACCOUNT_ID, getAccountId1())?.let {
             return UUID.fromString(it)
         } ?: throw AccountIdNotFoundException()
     }
 
-    override fun getIdentityTokenUUID(): UUID {
+    override fun getIdentityToken(): UUID {
 //      TODO: change getIdentityToken to null
-        preferences.getString(IDENTITY_TOKEN, getIdentityToken())?.let {
+        preferences.getString(IDENTITY_TOKEN, getIdentityToken1())?.let {
             return UUID.fromString(it)
         } ?: throw IdentityTokenNotFoundException()
     }
 
 
-    override fun getLastFetchedMatchUpdatedAt(): OffsetDateTime {
+    override fun getMatchFetchedAt(): OffsetDateTime {
         return OffsetDateTimeConverter.toOffsetDateTimeNonNull(
             preferences.getString(
                 LAST_FETCHED_MATCH_UPDATED_AT,
@@ -169,7 +167,7 @@ class PreferenceProviderImpl(
         )
     }
 
-    override fun getLastFetchedAccountUpdatedAt(): OffsetDateTime {
+    override fun getAccountFetchedAt(): OffsetDateTime {
         return OffsetDateTimeConverter.toOffsetDateTimeNonNull(
             preferences.getString(
                 LAST_FETCHED_ACCOUNT_UPDATED_AT,
@@ -178,7 +176,7 @@ class PreferenceProviderImpl(
         )
     }
 
-    override fun getLastFetchedChatMessageCreatedAt(): OffsetDateTime {
+    override fun getChatMessageFetchedAt(): OffsetDateTime {
         return OffsetDateTimeConverter.toOffsetDateTimeNonNull(
             preferences.getString(
                 LAST_FETCHED_CHAT_MESSAGE_CREATED_AT,

@@ -103,11 +103,11 @@ class BalanceGameDialog(
                     val match = clickResponse.data!!.match
 
                     when (clickResponse.data.result) {
-                        NotificationType.CLICKED -> setBalanceGameClicked(match.photoKey)
+                        NotificationType.CLICKED -> setBalanceGameClicked(match.repPhotoKey)
                         NotificationType.NOT_CLICKED -> setBalanceGameNotClicked()
                         NotificationType.MATCH -> {
                             dismiss()
-                            balanceGameListener.onBalanceGameMatch(match.photoKey)
+                            balanceGameListener.onBalanceGameMatch(match.repPhotoKey)
                         }
                     }
                 }

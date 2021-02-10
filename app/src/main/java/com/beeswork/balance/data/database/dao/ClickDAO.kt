@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.dao
 
 import androidx.room.*
 import com.beeswork.balance.data.database.entity.Click
+import java.util.*
 
 @Dao
 interface ClickDAO {
@@ -11,7 +12,7 @@ interface ClickDAO {
     fun insert(click: Click)
 
     @Query("select swipedId from click")
-    fun getSwipedIds(): List<String>
+    fun getSwipedIds(): List<UUID>
 
 //  TODO: remove me
     @Query("select * from click")

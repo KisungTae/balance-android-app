@@ -70,9 +70,10 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
     }
 
     override fun onMatchClick(view: View, position: Int) {
+//      TODO: it.matchedId to UUID
         matchPagedListAdapter.getMatchByPosition(position)?.let {
             Navigation.findNavController(view)
-                .navigate(MatchFragmentDirections.matchToChatAction(it.chatId, it.matchedId))
+                .navigate(MatchFragmentDirections.matchToChatAction(it.chatId, "it.matchedId"))
         }
     }
 

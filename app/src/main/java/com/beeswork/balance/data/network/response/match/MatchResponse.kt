@@ -1,15 +1,16 @@
 package com.beeswork.balance.data.network.response.match
 
 import org.threeten.bp.OffsetDateTime
+import java.util.*
 
 data class MatchResponse(
-    val chatId: Long?,
-    val matchedId: String?,
-    val updatedAt: OffsetDateTime?,
-    val unmatched: Boolean?,
-    val name: String?,
-    val repPhotoKey: String?,
-    val blocked: Boolean?,
-    val deleted: Boolean?,
-    val accountUpdatedAt: OffsetDateTime?
+    val chatId: Long,
+    val matchedId: UUID,
+    val unmatched: Boolean,
+    val updatedAt: OffsetDateTime,
+    val name: String,
+    val repPhotoKey: String,
+    val blocked: Boolean,
+    val deleted: Boolean,
+    val accountUpdatedAt: OffsetDateTime,
 )

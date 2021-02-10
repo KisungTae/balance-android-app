@@ -11,7 +11,7 @@ import com.beeswork.balance.data.database.converter.UUIDConverter
 
 @Database(
     entities = [Match::class, ChatMessage::class, Click::class, FCMToken::class,
-                Clicked::class, Profile::class, Location::class, Photo::class],
+                Clicked::class, Profile::class, Location::class, Photo::class, ChatProfile::class],
     version = 1
 )
 @TypeConverters(OffsetDateTimeConverter::class, ChatMessageStatusConverter::class, UUIDConverter::class)

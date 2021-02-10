@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Match
+import java.util.*
 
 @Dao
 interface MatchDAO {
@@ -29,11 +30,11 @@ interface MatchDAO {
     @Query("select unmatched from `match` where chatId = :chatId")
     fun isUnmatched(chatId: Long): Boolean
 
-    @Query("update `match` set photoKey = :photoKey, unmatched = :unmatched where chatId = :chatId")
-    fun update(chatId: Long, photoKey: String, unmatched: Boolean)
+    @Query("update `match` set repPhotoKey = :repPhotoKey, unmatched = :unmatched where chatId = :chatId")
+    fun update(chatId: Long, repPhotoKey: String, unmatched: Boolean)
 
     @Query("select matchedId from `match`")
-    fun getMatchedIds(): List<String>
+    fun getMatchedIds(): List<UUID>
 
     @Query("select count(name) from `match` where unmatched != 1")
     fun countUnreadMessageCount(): LiveData<Int>

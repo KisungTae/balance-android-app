@@ -54,8 +54,8 @@ class BalanceRepositoryImpl(
         CoroutineScope(Dispatchers.IO).launch {
 
             val clickedResource = balanceRDS.fetchClickedList(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
+                preferenceProvider.getAccountId1(),
+                preferenceProvider.getIdentityToken1(),
                 preferenceProvider.getClickedFetchedAt()
             )
 
@@ -92,8 +92,8 @@ class BalanceRepositoryImpl(
     override fun swipe(swipeId: Long?, swipedId: String) {
 
         CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId()
-            val identityToken = preferenceProvider.getIdentityToken()
+            val accountId = preferenceProvider.getAccountId1()
+            val identityToken = preferenceProvider.getIdentityToken1()
 
             mutableBalanceGameResponse.postValue(Resource.loading())
             val questionResource = balanceRDS.swipe(accountId, identityToken, swipeId, swipedId)
@@ -110,8 +110,8 @@ class BalanceRepositoryImpl(
     override fun click(swipedId: String, swipeId: Long, answers: Map<Int, Boolean>) {
 
         CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId()
-            val identityToken = preferenceProvider.getIdentityToken()
+            val accountId = preferenceProvider.getAccountId1()
+            val identityToken = preferenceProvider.getIdentityToken1()
 
             val clickResource =
                 balanceRDS.click(accountId, identityToken, swipedId, swipeId, answers)
@@ -167,10 +167,10 @@ class BalanceRepositoryImpl(
 
         CoroutineScope(Dispatchers.IO).launch {
 
-            var fetchedAt = preferenceProvider.getMatchFetchedAt()
+            var fetchedAt = preferenceProvider.getMatchFetchedAt1()
             val matchResource = balanceRDS.fetchMatches(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
+                preferenceProvider.getAccountId1(),
+                preferenceProvider.getIdentityToken1(),
                 fetchedAt,
                 fetchedAt,
                 fetchedAt
@@ -214,7 +214,7 @@ class BalanceRepositoryImpl(
         val currentOffsetDateTime = OffsetDateTime.now()
 //        match.unreadMessageCount = 1
 //        match.recentMessage = context.getString(R.string.default_recent_message)
-        match.lastReadAt = currentOffsetDateTime
+//        match.lastReadAt = currentOffsetDateTime
 //        match.lastReceivedAt = currentOffsetDateTime
     }
 
@@ -237,8 +237,8 @@ class BalanceRepositoryImpl(
             mutableCards.postValue(Resource.loading())
 
             CoroutineScope(Dispatchers.IO).launch {
-                val accountId = preferenceProvider.getAccountId()
-                val identityToken = preferenceProvider.getIdentityToken()
+                val accountId = preferenceProvider.getAccountId1()
+                val identityToken = preferenceProvider.getIdentityToken1()
                 val minAge = preferenceProvider.getMinAgeBirthYear()
                 val maxAge = preferenceProvider.getMaxAgeBirthYear()
                 val gender = preferenceProvider.getGender()
@@ -307,8 +307,8 @@ class BalanceRepositoryImpl(
 
     override fun insertFCMToken(token: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId()
-            val identityToken = preferenceProvider.getIdentityToken()
+            val accountId = preferenceProvider.getAccountId1()
+            val identityToken = preferenceProvider.getIdentityToken1()
 
             fcmTokenDAO.insert(FCMToken(token, false))
 
@@ -323,8 +323,8 @@ class BalanceRepositoryImpl(
 
         CoroutineScope(Dispatchers.IO).launch {
 
-            val accountId = preferenceProvider.getAccountId()
-            val identityToken = preferenceProvider.getIdentityToken()
+            val accountId = preferenceProvider.getAccountId1()
+            val identityToken = preferenceProvider.getIdentityToken1()
             val updatedAt = OffsetDateTime.now()
 
             val currentLocation = Location(latitude, longitude, false, updatedAt)
@@ -346,16 +346,16 @@ class BalanceRepositoryImpl(
 
     override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyJsonResponse> {
         return balanceRDS.saveAnswers(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
+            preferenceProvider.getAccountId1(),
+            preferenceProvider.getIdentityToken1(),
             answers
         )
     }
 
     override suspend fun fetchQuestions(): Resource<List<QuestionResponse>> {
         return balanceRDS.fetchQuestions(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken()
+            preferenceProvider.getAccountId1(),
+            preferenceProvider.getIdentityToken1()
         )
     }
 
@@ -370,8 +370,8 @@ class BalanceRepositoryImpl(
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
         if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
-            val accountId = preferenceProvider.getAccountId()
-            val identityToken = preferenceProvider.getIdentityToken()
+            val accountId = preferenceProvider.getAccountId1()
+            val identityToken = preferenceProvider.getIdentityToken1()
 
             val response = balanceRDS.fetchPhotos(accountId, identityToken)
             if (response.status == Resource.Status.ERROR)
@@ -409,8 +409,8 @@ class BalanceRepositoryImpl(
                 photoDAO.insert(Photo(photoKey, photoSequence, false))
 
                 val fetchPreSignedUrlResponse = balanceRDS.addPhoto(
-                    preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken(),
+                    preferenceProvider.getAccountId1(),
+                    preferenceProvider.getIdentityToken1(),
                     photoKey,
                     photoSequence
                 )
@@ -472,8 +472,8 @@ class BalanceRepositoryImpl(
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyJsonResponse> {
         photoDAO.sync(photoKey, false)
         val response = balanceRDS.deletePhoto(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
+            preferenceProvider.getAccountId1(),
+            preferenceProvider.getIdentityToken1(),
             photoKey
         )
         if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
@@ -487,8 +487,8 @@ class BalanceRepositoryImpl(
         }
 
         val response = balanceRDS.reorderPhotos(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
+            preferenceProvider.getAccountId1(),
+            preferenceProvider.getIdentityToken1(),
             photoOrders
         )
 
@@ -532,11 +532,11 @@ class BalanceRepositoryImpl(
 //        val chatMessagesPre = chatMessageDAO.findAllBefore(chatId, 200, 10000)
 
         val matches = balanceRDS.fetchMatches(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
-            preferenceProvider.getMatchFetchedAt(),
-            preferenceProvider.getMatchFetchedAt(),
-            preferenceProvider.getMatchFetchedAt()
+            preferenceProvider.getAccountId1(),
+            preferenceProvider.getIdentityToken1(),
+            preferenceProvider.getMatchFetchedAt1(),
+            preferenceProvider.getMatchFetchedAt1(),
+            preferenceProvider.getMatchFetchedAt1()
         )
 
         return 1L
@@ -568,8 +568,8 @@ class BalanceRepositoryImpl(
         )
 
         val response = balanceRDS.fetchChatMessages(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
+            preferenceProvider.getAccountId1(),
+            preferenceProvider.getIdentityToken1(),
             chatId,
             recipientId,
             chatMessageDAO.findLastId(chatId) ?: 0
