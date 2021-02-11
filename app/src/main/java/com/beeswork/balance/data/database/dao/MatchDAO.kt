@@ -18,7 +18,7 @@ interface MatchDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(match: Match)
 
-    @Query("select * from `match` where unmatched != 1 order by updatedAt desc")
+    @Query("select * from `match` order by lastChatMessageId desc")
     fun getMatches(): DataSource.Factory<Int, Match>
 
     @Query("update `match` set unmatched = 1 where matchedId = :matchedId")

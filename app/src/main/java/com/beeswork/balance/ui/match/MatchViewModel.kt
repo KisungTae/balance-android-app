@@ -1,6 +1,7 @@
 package com.beeswork.balance.ui.match
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -14,9 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-const val MATCH_PAGE_SIZE = 30
-const val MATCH_PAGE_PREFETCH_DISTANCE = MATCH_PAGE_SIZE * 2
-const val MATCH_MAX_PAGE_SIZE = MATCH_PAGE_PREFETCH_DISTANCE * 2 + MATCH_PAGE_SIZE
 
 class MatchViewModel (
     private val balanceRepository: BalanceRepository,
@@ -33,15 +31,26 @@ class MatchViewModel (
 //        .setPrefetchDistance(MATCH_PAGE_PREFETCH_DISTANCE)
         .build()
 
+//    val matches by lazyDeferred {
+//        LivePagedListBuilder(balanceRepository.getMatches(), pagedListConfig).build()
+//    }
+
     val matches by lazyDeferred {
-        LivePagedListBuilder(balanceRepository.getMatches(), pagedListConfig).build()
+        LivePagedListBuilder(balanceRepository.getMatches().map {
+            MatchDomain(it.chatId)
+        }, pagedListConfig).build()
     }
 
     fun fetchMatches() {
         CoroutineScope(Dispatchers.IO).launch {
             matchRepository.fetchMatches()
         }
+    }
 
+    companion object {
+        private const val MATCH_PAGE_SIZE = 30
+        private const val MATCH_PAGE_PREFETCH_DISTANCE = MATCH_PAGE_SIZE * 2
+        private const val MATCH_MAX_PAGE_SIZE = MATCH_PAGE_PREFETCH_DISTANCE * 2 + MATCH_PAGE_SIZE
     }
 
 

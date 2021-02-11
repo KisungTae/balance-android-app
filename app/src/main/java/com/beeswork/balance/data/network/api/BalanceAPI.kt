@@ -1,12 +1,11 @@
 package com.beeswork.balance.data.network.api
 
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.data.network.response.match.ListMatchResponse
+import com.beeswork.balance.data.network.response.match.ListMatchDTO
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
@@ -31,7 +30,7 @@ interface BalanceAPI {
         @Query(value = "matchFetchedAt") matchFetchedAt: OffsetDateTime,
         @Query(value = "accountFetchedAt") accountFetchedAt: OffsetDateTime,
         @Query(value = "chatMessageFetchedAt") chatMessageFetchedAt: OffsetDateTime
-    ): Response<ListMatchResponse>
+    ): Response<ListMatchDTO>
 
     @GET("chat/message/list")
     suspend fun fetchChatMessages(

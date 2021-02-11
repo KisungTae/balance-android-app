@@ -1,19 +1,22 @@
 package com.beeswork.balance.data.database.repository.match
 
-import androidx.room.RoomDatabase
+import androidx.paging.DataSource
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
+import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.rds.match.MatchRDS
+import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 
 class MatchRepositoryImpl(
     private val matchRDS: MatchRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
-    private val preferenceProvider: PreferenceProvider
+    private val preferenceProvider: PreferenceProvider,
+    private val matchMapper: MatchMapper
 ) : MatchRepository {
     override suspend fun fetchMatches() {
-        val listMatchResponse = matchRDS.listMatches(
+        val listMatchDTO = matchRDS.listMatches(
             preferenceProvider.getAccountId(),
             preferenceProvider.getIdentityToken(),
             preferenceProvider.getMatchFetchedAt(),
@@ -21,7 +24,27 @@ class MatchRepositoryImpl(
             preferenceProvider.getChatMessageFetchedAt()
         )
 
+        val matches = listMatchDTO.data?.matchDTOs?.map { matchMapper.fromDTOToEntity(it) }
 
+        println("match size: ${matches?.size}")
+        listMatchDTO.data?.let {
+            val abc = it.matchDTOs.map { matchResponse ->
+                Match(
+                    matchResponse.chatId,
+                    matchResponse.matchedId,
+                    matchResponse.unmatched,
+                    matchResponse.updatedAt,
+                    matchResponse.name,
+                    matchResponse.repPhotoKey,
+                    matchResponse.blocked,
+                    matchResponse.deleted,
+                    matchResponse.accountUpdatedAt
+                )
+            }
+
+
+            println("abc size: ${abc.size}")
+        }
 
 
 
@@ -32,7 +55,11 @@ class MatchRepositoryImpl(
         // TODO: decide chatprofile or matchprofile
         // TODO: transaction save chatfetchedat and chatmessageinserted at then save chatmessages with updatedAt
 
-        println(listMatchResponse.errorMessage)
+        println(listMatchDTO.errorMessage)
 
+    }
+
+    override suspend fun getMatches(): DataSource.Factory<Int, Match> {
+        return matchDAO.getMatches()
     }
 }

@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.network.rds.match
 
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.match.ListMatchResponse
+import com.beeswork.balance.data.network.response.match.ListMatchDTO
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
@@ -13,5 +13,5 @@ interface MatchRDS {
         matchFetchedAt: OffsetDateTime,
         accountFetchedAt: OffsetDateTime,
         chatMessageFetchedAt: OffsetDateTime
-    ): Resource<ListMatchResponse>
+    ): Resource<ListMatchDTO>
 }

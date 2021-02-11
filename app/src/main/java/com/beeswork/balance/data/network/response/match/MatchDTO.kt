@@ -3,7 +3,7 @@ package com.beeswork.balance.data.network.response.match
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
-data class MatchResponse(
+data class MatchDTO(
     val chatId: Long,
     val matchedId: UUID,
     val unmatched: Boolean,

@@ -20,6 +20,8 @@ import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
+import com.beeswork.balance.internal.mapper.match.MatchMapper
+import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.service.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
@@ -42,6 +44,9 @@ const val NETWORK_CONNECTION_TIMEOUT = 100L
 class BalanceApplication : Application(), KodeinAware {
     override val kodein = Kodein.lazy {
         import(androidXModule(this@BalanceApplication))
+
+        // Mapper
+        bind<MatchMapper>() with singleton { MatchMapperImpl() }
 
         // Database
         bind() from singleton { BalanceDatabase(instance()) }
@@ -77,6 +82,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -135,6 +141,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
+
 
 
     }

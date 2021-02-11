@@ -50,7 +50,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
 
         matches.observe(viewLifecycleOwner, Observer { pagedMatchList ->
             pagedMatchList?.apply {
-                matchPagedListAdapter.submitList(pagedMatchList)
+//                matchPagedListAdapter.submitList(pagedMatchList)
             }
         })
 
