@@ -9,12 +9,12 @@ import org.threeten.bp.OffsetDateTime
 
 @Entity(
     tableName = "chatMessage",
-    foreignKeys = [ForeignKey(
-        entity = Match::class,
-        parentColumns = arrayOf("chatId"),
-        childColumns = arrayOf("chatId"),
-        onDelete = ForeignKey.CASCADE
-    )],
+//    foreignKeys = [ForeignKey(
+//        entity = Match::class,
+//        parentColumns = arrayOf("chatId"),
+//        childColumns = arrayOf("chatId"),
+//        onDelete = ForeignKey.CASCADE
+//    )],
     indices = [Index(value = ["id", "chatId"])]
 )
 data class ChatMessage(

@@ -25,6 +25,8 @@ data class Match(
     val blocked: Boolean,
     val deleted: Boolean,
     val accountUpdatedAt: OffsetDateTime,
-    val chatMessageReadAt: OffsetDateTime,
-    val accountViewedAt: OffsetDateTime
+    val unreadMessageCount: Int = 0,
+    val recentMessage: String = "",
+    var lastChatMessageId: Int = 0,
+    var accountViewedAt: OffsetDateTime = OffsetDateTime.now()
 )
