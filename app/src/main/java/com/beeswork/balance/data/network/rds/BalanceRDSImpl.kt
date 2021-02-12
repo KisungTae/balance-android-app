@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.network.rds
 
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Clicked
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
@@ -8,9 +7,9 @@ import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.http.Query
 
 class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
@@ -38,7 +37,7 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String,
         photoOrders: Map<String, Int>
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.reorderPhotos(
                 ReorderPhotosRequest(
@@ -54,7 +53,7 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String,
         photoKey: String
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.deletePhoto(
                 DeletePhotoRequest(
@@ -70,7 +69,7 @@ class BalanceRDSImpl(
         url: String,
         formData: Map<String, RequestBody>,
         multipartBody: MultipartBody.Part
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         return getResult { balanceAPI.uploadPhotoToS3(url, formData, multipartBody) }
     }
 
@@ -103,7 +102,7 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String,
         answers: Map<Int, Boolean>
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.saveAnswers(
                 SaveAnswersRequest(
@@ -132,7 +131,7 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String,
         answers: Map<Int, Boolean>
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postAnswers(
                 PostAnswersRequest(
@@ -201,7 +200,7 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String,
         token: String
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postFCMToken(FCMTokenRequest(accountId, identityToken, token))
         }
@@ -241,7 +240,7 @@ class BalanceRDSImpl(
         latitude: Double,
         longitude: Double,
         updatedAt: String
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postLocation(
                 LocationRequest(

@@ -13,6 +13,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
@@ -344,7 +345,7 @@ class BalanceRepositoryImpl(
         }
     }
 
-    override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyJsonResponse> {
+    override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return balanceRDS.saveAnswers(
             preferenceProvider.getAccountId1(),
             preferenceProvider.getIdentityToken1(),
@@ -395,7 +396,7 @@ class BalanceRepositoryImpl(
         photoExtension: String,
         photoPath: String,
         photoSequence: Int
-    ): Resource<EmptyJsonResponse> {
+    ): Resource<EmptyResponse> {
         try {
             MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)?.let { mimeType ->
                 val photo = File(photoPath)
@@ -469,7 +470,7 @@ class BalanceRepositoryImpl(
         }
     }
 
-    override suspend fun deletePhoto(photoKey: String): Resource<EmptyJsonResponse> {
+    override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
         photoDAO.sync(photoKey, false)
         val response = balanceRDS.deletePhoto(
             preferenceProvider.getAccountId1(),
@@ -481,7 +482,7 @@ class BalanceRepositoryImpl(
         return response
     }
 
-    override suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyJsonResponse> {
+    override suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyResponse> {
         for ((k, v) in photoOrders) {
             photoDAO.sync(k, false)
         }

@@ -9,6 +9,7 @@ import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import org.threeten.bp.OffsetDateTime
 
 interface BalanceRepository {
@@ -56,7 +57,7 @@ interface BalanceRepository {
     fun insertFCMToken(token: String)
 
 
-    suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyJsonResponse>
+    suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionResponse>
     suspend fun fetchQuestions(): Resource<List<QuestionResponse>>
 
@@ -70,8 +71,8 @@ interface BalanceRepository {
         photoExtension: String,
         photoPath: String,
         photoSequence: Int
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 
-    suspend fun deletePhoto(photoKey: String): Resource<EmptyJsonResponse>
-    suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyJsonResponse>
+    suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse>
+    suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyResponse>
 }

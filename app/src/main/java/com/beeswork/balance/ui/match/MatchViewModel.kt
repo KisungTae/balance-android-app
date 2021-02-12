@@ -1,27 +1,29 @@
 package com.beeswork.balance.ui.match
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.util.lazyDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-
-class MatchViewModel (
+class MatchViewModel(
     private val balanceRepository: BalanceRepository,
     private val matchRepository: MatchRepository
-): ViewModel() {
+) : ViewModel() {
 
-    val fetchMatchesResponse: LiveData<Resource<List<Match>>> = balanceRepository.fetchMatchesResponse
+    val fetchMatchesResponse: LiveData<Resource<List<Match>>> =
+        balanceRepository.fetchMatchesResponse
+
+    private val _fetchMatches = MutableLiveData<Resource<EmptyResponse>>()
+    val fetchMatches: LiveData<Resource<EmptyResponse>> get() = _fetchMatches
 
     private val pagedListConfig = PagedList.Config.Builder()
         .setEnablePlaceholders(false)
@@ -43,7 +45,7 @@ class MatchViewModel (
 
     fun fetchMatches() {
         CoroutineScope(Dispatchers.IO).launch {
-            matchRepository.fetchMatches()
+            _fetchMatches.postValue(matchRepository.fetchMatches())
         }
     }
 

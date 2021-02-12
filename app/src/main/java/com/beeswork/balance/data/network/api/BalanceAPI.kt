@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchDTO
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -44,12 +45,12 @@ interface BalanceAPI {
     @POST("photo/reorder")
     suspend fun reorderPhotos(
         @Body reorderPhotosRequest: ReorderPhotosRequest
-    ): Response<EmptyJsonResponse>
+    ): Response<EmptyResponse>
 
     @POST("photo/delete")
     suspend fun deletePhoto(
         @Body deletePhotoRequest: DeletePhotoRequest
-    ): Response<EmptyJsonResponse>
+    ): Response<EmptyResponse>
 
     @POST
     @Multipart
@@ -57,7 +58,7 @@ interface BalanceAPI {
         @Url url: String,
         @PartMap formData: Map<String, @JvmSuppressWildcards RequestBody>,
         @Part multipartBody: MultipartBody.Part
-    ): Response<EmptyJsonResponse>
+    ): Response<EmptyResponse>
 
     @POST("photo/add")
     suspend fun addPhoto(
@@ -71,7 +72,7 @@ interface BalanceAPI {
     ): Response<List<Photo>>
 
     @POST("/account/answers")
-    suspend fun saveAnswers(@Body saveAnswersRequest: SaveAnswersRequest): Response<EmptyJsonResponse>
+    suspend fun saveAnswers(@Body saveAnswersRequest: SaveAnswersRequest): Response<EmptyResponse>
 
     @GET("/question/list")
     suspend fun fetchQuestions(
@@ -85,7 +86,7 @@ interface BalanceAPI {
     ): Response<QuestionResponse>
 
     @POST("/account/answers")
-    suspend fun postAnswers(@Body postAnswersRequest: PostAnswersRequest): Response<EmptyJsonResponse>
+    suspend fun postAnswers(@Body postAnswersRequest: PostAnswersRequest): Response<EmptyResponse>
 
     @GET("account/recommend")
     suspend fun fetchCards(
@@ -108,7 +109,7 @@ interface BalanceAPI {
     suspend fun click(@Body clickRequest: ClickRequest): Response<ClickResponse>
 
     @POST("account/fcm/token")
-    suspend fun postFCMToken(@Body fcmTokenRequest: FCMTokenRequest): Response<EmptyJsonResponse>
+    suspend fun postFCMToken(@Body fcmTokenRequest: FCMTokenRequest): Response<EmptyResponse>
 
     @GET("match/list")
     suspend fun fetchMatches(
@@ -129,7 +130,7 @@ interface BalanceAPI {
     @POST("account/location")
     suspend fun postLocation(
         @Body locationRequest: LocationRequest
-    ): Response<EmptyJsonResponse>
+    ): Response<EmptyResponse>
 
     companion object {
         operator fun invoke(

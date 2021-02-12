@@ -3,6 +3,7 @@ package com.beeswork.balance.data.network.rds
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -20,19 +21,19 @@ interface BalanceRDS {
         accountId: String,
         identityToken: String,
         photoOrders: Map<String, Int>
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 
     suspend fun deletePhoto(
         accountId: String,
         identityToken: String,
         photoKey: String
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 
     suspend fun uploadPhotoToS3(
         url: String,
         formData: Map<String, RequestBody>,
         multipartBody: MultipartBody.Part
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 
     suspend fun addPhoto(
         accountId: String,
@@ -50,7 +51,7 @@ interface BalanceRDS {
         accountId: String,
         identityToken: String,
         answers: Map<Int, Boolean>
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 
     suspend fun fetchQuestions(
         accountId: String,
@@ -66,7 +67,7 @@ interface BalanceRDS {
         accountId: String,
         identityToken: String,
         answers: Map<Int, Boolean>
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 
     suspend fun fetchCards(
         accountId: String,
@@ -100,7 +101,7 @@ interface BalanceRDS {
         accountId: String,
         identityToken: String,
         token: String
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 
     suspend fun fetchMatches(
         accountId: String,
@@ -122,5 +123,5 @@ interface BalanceRDS {
         latitude: Double,
         longitude: Double,
         updatedAt: String
-    ): Resource<EmptyJsonResponse>
+    ): Resource<EmptyResponse>
 }

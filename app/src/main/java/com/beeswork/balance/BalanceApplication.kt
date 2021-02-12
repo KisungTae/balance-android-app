@@ -86,6 +86,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 instance()
             )
         }
@@ -233,6 +234,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      69, match not deleted, not blocked, not unmatched, accountupdatedat > last account view at, then flash the pircture orsomething
 //      70. put dummy chatmmessage start and end of chatmessage table so that I can know if it is begining or end
 //      71. when click on profile in chat, udpate accountViewedAt on match and compare with accoutnUpdatedAT then flash profile picture if accountviewdat < accountupdatdAt
+//      72. when exception or error from websocket, then make sending in chatmessage to error
 
 
 

@@ -10,6 +10,5 @@ data class ChatProfile(
     @PrimaryKey
     val id: Int = 0,
 
-    val chatMessageFetchedAt: OffsetDateTime,
     val chatMessagesInsertedAt: OffsetDateTime
 )

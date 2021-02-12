@@ -41,33 +41,38 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
     }
 
     private fun bindUI() = launch {
+        setupMatchRecyclerView()
+        setupFetchMatchesObserver()
+        setupMatchesObserver()
+        viewModel.fetchMatches()
+    }
 
-        matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
-        rvMatch.adapter = matchPagedListAdapter
-        rvMatch.layoutManager = LinearLayoutManager(this@MatchFragment.context)
-
-        val matches = viewModel.matches.await()
-
-        matches.observe(viewLifecycleOwner, Observer { pagedMatchList ->
-            pagedMatchList?.apply {
-//                matchPagedListAdapter.submitList(pagedMatchList)
-            }
-        })
-
-        viewModel.fetchMatchesResponse.observe(viewLifecycleOwner, { fetchMatchesResponse ->
-
-            when (fetchMatchesResponse.status) {
+    private fun setupFetchMatchesObserver() {
+        viewModel.fetchMatches.observe(viewLifecycleOwner, {
+            when (it.status) {
                 Resource.Status.ERROR -> {
                     FetchErrorDialog(
-                        fetchMatchesResponse.errorMessage,
+                        it.errorMessage,
                         this@MatchFragment
                     ).show(childFragmentManager, FetchErrorDialog.TAG)
                 }
             }
         })
-
-        viewModel.fetchMatches()
     }
+
+    private suspend fun setupMatchesObserver() {
+        viewModel.matches.await().observe(viewLifecycleOwner, {
+//            matchPagedListAdapter.submitList(it)
+        })
+    }
+
+    private fun setupMatchRecyclerView() {
+        matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
+        rvMatch.adapter = matchPagedListAdapter
+        rvMatch.layoutManager = LinearLayoutManager(this@MatchFragment.context)
+    }
+
+
 
     override fun onMatchClick(view: View, position: Int) {
 //      TODO: it.matchedId to UUID

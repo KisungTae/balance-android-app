@@ -13,7 +13,7 @@ import java.util.*
 interface MatchDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(matches: List<Match>)
+    fun insertAll(matches: List<Match>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(match: Match)

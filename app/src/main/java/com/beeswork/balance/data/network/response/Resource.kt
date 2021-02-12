@@ -1,5 +1,7 @@
 package com.beeswork.balance.data.network.response
 
+import com.beeswork.balance.data.network.response.common.EmptyResponse
+
 class Resource<out T>(
     val status: Status,
     val data: T?,
@@ -61,5 +63,16 @@ class Resource<out T>(
         fun <T> loading(): Resource<T> {
             return Resource(Status.LOADING, null, null, null, null)
         }
+
+        fun <T> toEmptyResponse(resource: Resource<T>): Resource<EmptyResponse> {
+            return Resource(
+                resource.status,
+                EmptyResponse(),
+                resource.errorMessage,
+                resource.error,
+                resource.fieldErrorMessages
+            )
+        }
+
     }
 }
