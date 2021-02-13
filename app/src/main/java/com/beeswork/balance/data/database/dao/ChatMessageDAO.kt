@@ -14,7 +14,7 @@ interface ChatMessageDAO {
     fun insert(chatMessage: ChatMessage): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(chatMessages: List<ChatMessage>)
+    fun insertAll(chatMessages: List<ChatMessage>)
 
     //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
     @Query("select * from chatMessage where chatId = :chatId order by messageId desc")
@@ -36,7 +36,11 @@ interface ChatMessageDAO {
 //    fun findLastCreatedAt(chatId: Long, statuses: Array<ChatMessageStatus> = arrayOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED))
 
     @Query("select * from chatMessage where chatId = :chatId and id > :firstChatMessageId order by id asc limit :pageSize")
-    fun findAllAfter(chatId: Long, firstChatMessageId: Long, pageSize: Int): MutableList<ChatMessage>
+    fun findAllAfter(
+        chatId: Long,
+        firstChatMessageId: Long,
+        pageSize: Int
+    ): MutableList<ChatMessage>
 
     @Query("select * from chatMessage where chatId = :chatId and id < :lastChatMessageId order by id desc limit :pageSize")
     fun findAllBefore(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
@@ -53,6 +57,13 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
     fun updateStatus(chatId: Long, fromStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
+    @Query("update chatMessage set id = :id and createdAt = :createdAt and updatedAt = :updatedAt where messageId = :messageId")
+    fun updateSentMessage(
+        messageId: Long,
+        id: Long?,
+        createdAt: OffsetDateTime?,
+        updatedAt: OffsetDateTime
+    )
 
 
 }

@@ -4,6 +4,7 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import org.threeten.bp.OffsetDateTime
 
 data class ChatMessageDomain(
+    val messageId: Long,
     val id: Long?,
     val body: String,
     var status: ChatMessageStatus,

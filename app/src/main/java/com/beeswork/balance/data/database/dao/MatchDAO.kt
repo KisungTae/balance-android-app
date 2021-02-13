@@ -7,6 +7,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.internal.constant.ChatMessageStatus
+import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 @Dao
@@ -39,8 +41,47 @@ interface MatchDAO {
     @Query("select count(name) from `match` where unmatched != 1")
     fun countUnreadMessageCount(): LiveData<Int>
 
-//  TODO: removeme
+    //  TODO: removeme
     @Query("select * from `match`")
     fun get(): List<Match>
+
+    @Query(
+        """
+        update `match` 
+        set unmatched = :unmatched 
+        and updatedAt = :updatedAt 
+        and name = :name 
+        and repPhotoKey = :repPhotoKey 
+        and blocked = :blocked 
+        and deleted = :deleted 
+        and accountUpdatedAt = :accountUpdatedAt 
+        where chatId = :chatId"""
+    )
+    fun updateMatch(
+        chatId: Long,
+        unmatched: Boolean,
+        updatedAt: OffsetDateTime,
+        name: String,
+        repPhotoKey: String,
+        blocked: Boolean,
+        deleted: Boolean,
+        accountUpdatedAt: OffsetDateTime
+    )
+
+    @Query(
+        """
+        update `match`
+        set unreadMessageCount = (select count(cm.id) 
+                                    from chatMessage cm
+                                    where cm.chatId = :chatId 
+                                    and cm.id > lastChatMessageId 
+                                    and cm.status = :chatMessageStatus)
+    """
+    )
+    fun updateUnreadMessageCount(
+        chatId: Long,
+        lastChatMessageId: Long,
+        chatMessageStatus: ChatMessageStatus = ChatMessageStatus.RECEIVED
+    )
 
 }

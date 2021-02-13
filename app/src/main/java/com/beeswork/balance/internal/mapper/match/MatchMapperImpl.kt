@@ -5,31 +5,31 @@ import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.match.MatchDomain
 
 class MatchMapperImpl : MatchMapper {
-    override fun fromDTOToEntity(input: MatchDTO): Match {
+    override fun fromDTOToEntity(dto: MatchDTO): Match {
         return Match(
-            input.chatId,
-            input.matchedId,
-            input.unmatched,
-            input.updatedAt,
-            input.name,
-            input.repPhotoKey,
-            input.blocked,
-            input.deleted,
-            input.accountUpdatedAt
+            dto.chatId,
+            dto.matchedId,
+            dto.unmatched,
+            dto.updatedAt,
+            dto.name,
+            dto.repPhotoKey,
+            dto.blocked,
+            dto.deleted,
+            dto.accountUpdatedAt
         )
     }
 
-    override fun fromEntityToDomain(input: Match): MatchDomain {
+    override fun fromEntityToDomain(entity: Match): MatchDomain {
         return MatchDomain(
-            input.chatId,
-//            input.matchedId,
-//            input.unmatched,
-//            input.updatedAt,
-//            input.name,
-//            input.repPhotoKey,
-//            input.blocked,
-//            input.deleted,
-//            input.accountUpdatedAt,
+            entity.chatId,
+//            entity.matchedId,
+//            entity.unmatched,
+//            entity.updatedAt,
+//            entity.name,
+//            entity.repPhotoKey,
+//            entity.blocked,
+//            entity.deleted,
+//            entity.accountUpdatedAt,
 //            OffsetDateTime.now(),
 //            OffsetDateTime.now()
         )

@@ -5,5 +5,7 @@ enum class ChatMessageStatus {
     SENT,
     RECEIVED,
     ERROR,
-    TEMP
+    TEMP,
+    START,
+    END
 }

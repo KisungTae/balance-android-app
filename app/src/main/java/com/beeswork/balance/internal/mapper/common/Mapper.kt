@@ -1,6 +1,6 @@
 package com.beeswork.balance.internal.mapper.common
 
-interface Mapper<RI, EO, EI, DO> {
-    fun fromDTOToEntity(input: RI): EO
-    fun fromEntityToDomain(input: EI): DO
+interface Mapper<DTO, ENTITY, DOMAIN> {
+    fun fromDTOToEntity(dto: DTO): ENTITY
+    fun fromEntityToDomain(entity: ENTITY): DOMAIN
 }

@@ -5,4 +5,4 @@ import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.mapper.common.Mapper
 import com.beeswork.balance.ui.match.MatchDomain
 
-interface MatchMapper: Mapper<MatchDTO, Match, Match, MatchDomain>
+interface MatchMapper: Mapper<MatchDTO, Match, MatchDomain>

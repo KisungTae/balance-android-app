@@ -20,12 +20,38 @@ import org.threeten.bp.OffsetDateTime
 data class ChatMessage(
 
     @PrimaryKey(autoGenerate = true)
-    val messageId: Long? = null,
+    val messageId: Long = 0,
 
     val id: Long?,
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
     val createdAt: OffsetDateTime?,
-    val updatedAt: OffsetDateTime?
-)
+    val updatedAt: OffsetDateTime
+) {
+    companion object {
+        fun getStartChatMessage(chatId: Long): ChatMessage {
+            return ChatMessage(
+                0,
+                null,
+                chatId,
+                "",
+                ChatMessageStatus.START,
+                OffsetDateTime.now(),
+                OffsetDateTime.now()
+            )
+        }
+
+        fun getEndChatMessage(chatId: Long): ChatMessage {
+            return ChatMessage(
+                0,
+                0,
+                chatId,
+                "",
+                ChatMessageStatus.END,
+                OffsetDateTime.now(),
+                OffsetDateTime.now()
+            )
+        }
+    }
+}
