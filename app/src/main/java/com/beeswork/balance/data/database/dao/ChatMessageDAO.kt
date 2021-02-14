@@ -65,5 +65,8 @@ interface ChatMessageDAO {
         updatedAt: OffsetDateTime
     )
 
+    @Query("select * from chatMessage where chatId = :chatId order by id desc limit 1")
+    fun findLastByChatId(chatId: Long): ChatMessage?
+
 
 }

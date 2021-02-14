@@ -25,6 +25,7 @@ abstract class BalanceDatabase : RoomDatabase() {
     abstract fun profileDAO(): ProfileDAO
     abstract fun locationDAO(): LocationDAO
     abstract fun photoDAO(): PhotoDAO
+    abstract fun matchProfileDAO(): MatchProfileDAO
 
     companion object {
 
@@ -44,3 +45,8 @@ abstract class BalanceDatabase : RoomDatabase() {
 
     }
 }
+
+
+
+// list all indexes
+// SELECT name, tbl_name  FROM sqlite_master  WHERE type = 'index';

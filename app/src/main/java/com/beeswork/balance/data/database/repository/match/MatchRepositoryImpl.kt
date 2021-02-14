@@ -14,6 +14,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import kotlinx.coroutines.delay
 import org.threeten.bp.OffsetDateTime
 
 
@@ -41,109 +42,144 @@ class MatchRepositoryImpl(
 
         listMatches.data?.let { data ->
 
-            val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
-            matchProfile.chatMessagesInsertedAt = OffsetDateTime.now()
-            matchProfileDAO.insert(matchProfile)
-
+            val chatMessagesInsertedAt = OffsetDateTime.now()
             val matches = data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }
-
-            for (i in matches.indices) {
-                val match = matches[i]
-                if (matchDAO.existsByChatId(match.chatId))
-                    matchDAO.updateMatch(
-                        match.chatId,
-                        match.unmatched,
-                        match.updatedAt,
-                        match.name,
-                        match.repPhotoKey,
-                        match.blocked,
-                        match.deleted,
-                        match.accountUpdatedAt
-                    )
-                else {
-                    chatMessageDAO.insert(ChatMessage.getEndChatMessage(match.chatId))
-                    chatMessageDAO.insert(ChatMessage.getStartChatMessage(match.chatId))
-                    matchDAO.insert(match)
-                }
-            }
-
-
-            val sentChatMessages =
-                data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
-
-            for (i in sentChatMessages.indices) {
-                val chatMessage = sentChatMessages[i]
-
-                chatMessage.createdAt?.let {
-                    it.isAfter(matchProfile.chatMessagesFetchedAt)
-                    matchProfile.chatMessagesFetchedAt = it
-                }
-
-                chatMessageDAO.updateSentMessage(
-                    chatMessage.messageId,
-                    chatMessage.id,
-                    chatMessage.createdAt,
-                    OffsetDateTime.now()
-                )
-            }
-
-            chatMessageDAO.insertAll(data.receivedChatMessageDTOs.map {
+            val sentChatMessages = data.sentChatMessageDTOs.map {
                 chatMessageMapper.fromDTOToEntity(it)
-            })
+            }
+            val receivedChatMessages = data.receivedChatMessageDTOs.map {
+                chatMessageMapper.fromDTOToEntity(it)
+            }
+
+            balanceDatabase.runInTransaction {
+
+                val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
+                matchProfile.chatMessagesInsertedAt = chatMessagesInsertedAt
+                matchProfileDAO.insert(matchProfile)
 
 
 
+                for (i in sentChatMessages.indices) {
+                    val chatMessage = sentChatMessages[i]
+
+                    chatMessage.createdAt?.let {
+                        if (it.isAfter(matchProfile.chatMessagesFetchedAt))
+                            matchProfile.chatMessagesFetchedAt = it
+                    }
+
+                    chatMessageDAO.updateSentMessage(
+                        chatMessage.messageId,
+                        chatMessage.id,
+                        chatMessage.createdAt,
+                        chatMessage.updatedAt
+                    )
+
+                }
+
+                chatMessageDAO.insertAll(receivedChatMessages)
+
+                for (i in matches.indices) {
+                    val match = matches[i]
+
+                    if (match.updatedAt.isAfter(matchProfile.matchFetchedAt))
+                        matchProfile.matchFetchedAt = match.updatedAt
+
+                    if (match.accountUpdatedAt.isAfter(matchProfile.accountFetchedAt))
+                        matchProfile.accountFetchedAt = match.accountUpdatedAt
+
+                    if (matchDAO.existsByChatId(match.chatId))
+                        matchDAO.updateMatch(
+                            match.chatId,
+                            match.unmatched,
+                            match.updatedAt,
+                            match.name,
+                            match.repPhotoKey,
+                            match.blocked,
+                            match.deleted,
+                            match.accountUpdatedAt
+                        )
+                    else {
+                        chatMessageDAO.insert(
+                            ChatMessage.getTailChatMessage(
+                                match.chatId,
+                                match.updatedAt
+                            )
+                        )
+                        chatMessageDAO.insert(
+                            ChatMessage.getHeadChatMessage(
+                                match.chatId,
+                                match.updatedAt
+                            )
+                        )
+                        matchDAO.insert(match)
+                    }
 
 
 
-        }
+                }
 
+                matchProfileDAO.insert(matchProfile)
 
-        val matches = listMatches.data?.matchDTOs?.map { matchMapper.fromDTOToEntity(it) }
-
-        println("match size: ${matches?.size}")
-        listMatches.data?.let {
-            val abc = it.matchDTOs.map { matchResponse ->
-                Match(
-                    matchResponse.chatId,
-                    matchResponse.matchedId,
-                    matchResponse.unmatched,
-                    matchResponse.updatedAt,
-                    matchResponse.name,
-                    matchResponse.repPhotoKey,
-                    matchResponse.blocked,
-                    matchResponse.deleted,
-                    matchResponse.accountUpdatedAt
-                )
             }
 
 
-            println("abc size: ${abc.size}")
         }
-
-
-
-
-
-        balanceDatabase.runInTransaction {
-
-        }
-
-
-        //TODO: error
 
         // TODO: need to send receivedChatMessages to make them read = true on server
         // TODO: decide chatprofile or matchprofile
         // TODO: transaction save chatfetchedat and chatmessageinserted at then save chatmessages with updatedAt
+        // TODO: findallunprocsssed order by case when ChatMessageStatus = HEAD then 0
 
-        println(listMatches.errorMessage)
+//        return Resource.toEmptyResponse(listMatches)
 
-        return Resource.toEmptyResponse(listMatches)
+
+        balanceDatabase.runInTransaction {
+            val matches = matchDAO.findAll()
+            for (i in matches.indices) {
+                val match = matches[i]
+                println("match.lastReadChatMessageId = 999984")
+
+                for (j in 1..10000000) {
+                    match.lastReadChatMessageId = 999984
+                }
+            }
+            matchDAO.insertAll(matches)
+        }
+
+        return Resource.success(EmptyResponse())
+    }
+
+
+    private fun saveMatches() {
 
     }
 
     override suspend fun getMatches(): DataSource.Factory<Int, Match> {
         // TODO: reset the unread count
         return matchDAO.getMatches()
+    }
+
+    override suspend fun change() {
+
+//        val matches = matchDAO.findAll()
+//        for (i in matches.indices) {
+//            val match = matches[i]
+//            println("match.lastReadChatMessageId = 999")
+//            match.lastReadChatMessageId = 123456
+//        }
+//        println("matchDAO.insertAll(matches)")
+//        matchDAO.insertAll(matches)
+
+//        balanceDatabase.runInTransaction {
+//            val match = matchDAO.existsByChatId(1)
+//            println("matchDAO.existsByChatId(1): $match")
+//            val matches = matchDAO.findAll()
+//            for (i in matches.indices) {
+//                val match = matches[i]
+//                println("match.lastReadChatMessageId = 999")
+//                match.lastReadChatMessageId = 777
+//            }
+//            matchDAO.insertAll(matches)
+//        }
     }
 }

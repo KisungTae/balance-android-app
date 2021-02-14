@@ -20,7 +20,7 @@ interface MatchDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(match: Match)
 
-    @Query("select * from `match` order by lastChatMessageId desc")
+    @Query("select * from `match` order by lastReadChatMessageId desc")
     fun getMatches(): DataSource.Factory<Int, Match>
 
     @Query("update `match` set unmatched = 1 where matchedId = :matchedId")
@@ -71,17 +71,36 @@ interface MatchDAO {
     @Query(
         """
         update `match`
-        set unreadMessageCount = (select count(cm.id) 
+        set unreadMessageCount = (select count(cm.id)
                                     from chatMessage cm
-                                    where cm.chatId = :chatId 
-                                    and cm.id > lastChatMessageId 
+                                    left join `match` m on cm.chatId = m.chatId
+                                    where cm.chatId = :chatId
+                                    and cm.id > m.lastReadChatMessageId
                                     and cm.status = :chatMessageStatus)
     """
     )
     fun updateUnreadMessageCount(
         chatId: Long,
-        lastChatMessageId: Long,
         chatMessageStatus: ChatMessageStatus = ChatMessageStatus.RECEIVED
     )
+
+    @Query(
+        """
+            update `match`
+            set recentMessage = :recentMessage
+            and updatedAt = :updatedAt
+            where chatId = :chatId
+        """
+    )
+    fun updateRecentMessage(
+        chatId: Long,
+        recentMessage: String,
+        updatedAt: OffsetDateTime
+    )
+
+
+//  TODO: remove me
+    @Query("select * from `match`")
+    fun findAll(): List<Match>
 
 }

@@ -39,7 +39,8 @@ class MatchViewModel(
 
     val matches by lazyDeferred {
         LivePagedListBuilder(balanceRepository.getMatches().map {
-            MatchDomain(it.chatId)
+            return@map MatchDomain(it.chatId)
+//            MatchDomain(it.chatId)
         }, pagedListConfig).build()
     }
 
@@ -47,6 +48,14 @@ class MatchViewModel(
         CoroutineScope(Dispatchers.IO).launch {
             _fetchMatches.postValue(matchRepository.fetchMatches())
         }
+    }
+
+//  TODO: remove me
+    fun change() {
+        CoroutineScope(Dispatchers.IO).launch {
+            matchRepository.change()
+        }
+
     }
 
     companion object {

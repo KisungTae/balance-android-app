@@ -45,6 +45,11 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
         setupFetchMatchesObserver()
         setupMatchesObserver()
         viewModel.fetchMatches()
+
+//      TODO: remove me
+        changeButton.setOnClickListener {
+            viewModel.change()
+        }
     }
 
     private fun setupFetchMatchesObserver() {

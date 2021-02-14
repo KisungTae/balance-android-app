@@ -2,9 +2,6 @@ package com.beeswork.balance.data.database.entity
 
 import androidx.room.*
 import com.beeswork.balance.internal.constant.ChatMessageStatus
-import com.google.firebase.encoders.annotations.Encodable
-import com.google.gson.annotations.Expose
-import kotlinx.android.parcel.IgnoredOnParcel
 import org.threeten.bp.OffsetDateTime
 
 @Entity(
@@ -15,7 +12,7 @@ import org.threeten.bp.OffsetDateTime
 //        childColumns = arrayOf("chatId"),
 //        onDelete = ForeignKey.CASCADE
 //    )],
-    indices = [Index(value = ["id", "chatId"])]
+    indices = [Index(value = ["chatId", "id"])]
 )
 data class ChatMessage(
 
@@ -30,28 +27,35 @@ data class ChatMessage(
     val updatedAt: OffsetDateTime
 ) {
     companion object {
-        fun getStartChatMessage(chatId: Long): ChatMessage {
+
+        const val TAIL_ID = 0L
+
+        fun getHeadChatMessage(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
             return ChatMessage(
                 0,
                 null,
                 chatId,
                 "",
-                ChatMessageStatus.START,
-                OffsetDateTime.now(),
-                OffsetDateTime.now()
+                ChatMessageStatus.HEAD,
+                createdAt,
+                createdAt
             )
         }
 
-        fun getEndChatMessage(chatId: Long): ChatMessage {
+        fun getTailChatMessage(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
             return ChatMessage(
                 0,
-                0,
+                TAIL_ID,
                 chatId,
                 "",
-                ChatMessageStatus.END,
-                OffsetDateTime.now(),
-                OffsetDateTime.now()
+                ChatMessageStatus.TAIL,
+                createdAt,
+                createdAt
             )
         }
     }
 }
+
+
+// explain query plan select count(cm.id) from chatMessage cm left join `match` m on cm.chatId = m.chatId where cm.chatId = 1 and cm.id > m.lastReadChatMessageId and cm.status = 1
+//1	0	0	0	SEARCH TABLE chatMessage AS cm USING INDEX index_chatMessage_chatId_id (chatId=? AND id>?)

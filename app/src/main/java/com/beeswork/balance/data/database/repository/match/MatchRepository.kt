@@ -8,4 +8,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 interface MatchRepository {
     suspend fun fetchMatches(): Resource<EmptyResponse>
     suspend fun getMatches(): DataSource.Factory<Int, Match>
+
+//  TODO: remove me
+    suspend fun change()
 }
