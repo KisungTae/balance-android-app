@@ -5,17 +5,14 @@ import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.dao.MatchProfileDAO
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.database.entity.MatchProfile
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import kotlinx.coroutines.delay
-import org.threeten.bp.OffsetDateTime
 
 
 class MatchRepositoryImpl(
@@ -29,101 +26,124 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
-        val listMatches = matchRDS.listMatches(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
-            preferenceProvider.getMatchFetchedAt(),
-            preferenceProvider.getAccountFetchedAt(),
-            preferenceProvider.getChatMessageFetchedAt()
-        )
 
-        if (listMatches.isError())
-            return Resource.toEmptyResponse(listMatches)
 
-        listMatches.data?.let { data ->
+        val lastReadChatMessageId = matchDAO.findLastReadChatMessageId(100)
+        val lastChatMessage = chatMessageDAO.findLastProcessed(3)
 
-            val chatMessagesInsertedAt = OffsetDateTime.now()
-            val matches = data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }
-            val sentChatMessages = data.sentChatMessageDTOs.map {
-                chatMessageMapper.fromDTOToEntity(it)
-            }
-            val receivedChatMessages = data.receivedChatMessageDTOs.map {
-                chatMessageMapper.fromDTOToEntity(it)
-            }
-
-            balanceDatabase.runInTransaction {
-
-                val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
-                matchProfile.chatMessagesInsertedAt = chatMessagesInsertedAt
-                matchProfileDAO.insert(matchProfile)
+        println("sav: $lastReadChatMessageId")
 
 
 
-                for (i in sentChatMessages.indices) {
-                    val chatMessage = sentChatMessages[i]
-
-                    chatMessage.createdAt?.let {
-                        if (it.isAfter(matchProfile.chatMessagesFetchedAt))
-                            matchProfile.chatMessagesFetchedAt = it
-                    }
-
-                    chatMessageDAO.updateSentMessage(
-                        chatMessage.messageId,
-                        chatMessage.id,
-                        chatMessage.createdAt,
-                        chatMessage.updatedAt
-                    )
-
-                }
-
-                chatMessageDAO.insertAll(receivedChatMessages)
-
-                for (i in matches.indices) {
-                    val match = matches[i]
-
-                    if (match.updatedAt.isAfter(matchProfile.matchFetchedAt))
-                        matchProfile.matchFetchedAt = match.updatedAt
-
-                    if (match.accountUpdatedAt.isAfter(matchProfile.accountFetchedAt))
-                        matchProfile.accountFetchedAt = match.accountUpdatedAt
-
-                    if (matchDAO.existsByChatId(match.chatId))
-                        matchDAO.updateMatch(
-                            match.chatId,
-                            match.unmatched,
-                            match.updatedAt,
-                            match.name,
-                            match.repPhotoKey,
-                            match.blocked,
-                            match.deleted,
-                            match.accountUpdatedAt
-                        )
-                    else {
-                        chatMessageDAO.insert(
-                            ChatMessage.getTailChatMessage(
-                                match.chatId,
-                                match.updatedAt
-                            )
-                        )
-                        chatMessageDAO.insert(
-                            ChatMessage.getHeadChatMessage(
-                                match.chatId,
-                                match.updatedAt
-                            )
-                        )
-                        matchDAO.insert(match)
-                    }
-
-
-
-                }
-
-                matchProfileDAO.insert(matchProfile)
-
-            }
-
-
-        }
+//        val listMatches = matchRDS.listMatches(
+//            preferenceProvider.getAccountId(),
+//            preferenceProvider.getIdentityToken(),
+//            preferenceProvider.getMatchFetchedAt(),
+//            preferenceProvider.getAccountFetchedAt(),
+//            preferenceProvider.getChatMessageFetchedAt()
+//        )
+//
+//        if (listMatches.isError())
+//            return Resource.toEmptyResponse(listMatches)
+//
+//        listMatches.data?.let { data ->
+//
+//            val chatMessagesInsertedAt = OffsetDateTime.now()
+//            val matches = data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }
+//            val sentChatMessages = data.sentChatMessageDTOs.map {
+//                chatMessageMapper.fromDTOToEntity(it)
+//            }
+//            val receivedChatMessages = data.receivedChatMessageDTOs.map {
+//                chatMessageMapper.fromDTOToEntity(it)
+//            }
+//
+//            balanceDatabase.runInTransaction {
+//
+//                val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
+//                matchProfile.chatMessagesInsertedAt = chatMessagesInsertedAt
+//                matchProfileDAO.insert(matchProfile)
+//
+//
+//
+//                for (i in sentChatMessages.indices) {
+//                    val chatMessage = sentChatMessages[i]
+//
+//                    chatMessage.createdAt?.let {
+//                        if (it.isAfter(matchProfile.chatMessagesFetchedAt))
+//                            matchProfile.chatMessagesFetchedAt = it
+//                    }
+//
+//                    chatMessageDAO.updateSentMessage(
+//                        chatMessage.messageId,
+//                        chatMessage.id,
+//                        chatMessage.createdAt,
+//                        chatMessage.updatedAt
+//                    )
+//
+//                }
+//
+//                chatMessageDAO.insertAll(receivedChatMessages)
+//
+//                for (i in matches.indices) {
+//                    val match = matches[i]
+//
+//                    if (match.updatedAt.isAfter(matchProfile.matchFetchedAt))
+//                        matchProfile.matchFetchedAt = match.updatedAt
+//
+//                    if (match.accountUpdatedAt.isAfter(matchProfile.accountFetchedAt))
+//                        matchProfile.accountFetchedAt = match.accountUpdatedAt
+//
+//                    val lastReadChatMessageId = matchDAO.findLastReadChatMessageId(match.chatId) ?: 0
+//                    val unreadMessageCount = chatMessageDAO.countAllAfter(match.chatId, lastReadChatMessageId)
+//                    val lastChatMessage = chatMessageDAO.findLastByChatId(match.chatId)
+//
+//                    matchDAO.findLastReadChatMessageId(match.chatId)?.let {
+//
+//
+//
+//                    } ?: {
+//
+//                    }
+//
+//
+//                    if (matchDAO.existsByChatId(match.chatId))
+//
+//
+//                        matchDAO.updateMatch(
+//                            match.chatId,
+//                            match.unmatched,
+//                            match.updatedAt,
+//                            match.name,
+//                            match.repPhotoKey,
+//                            match.blocked,
+//                            match.deleted,
+//                            match.accountUpdatedAt
+//                        )
+//                    else {
+//                        chatMessageDAO.insert(
+//                            ChatMessage.getTailChatMessage(
+//                                match.chatId,
+//                                match.updatedAt
+//                            )
+//                        )
+//                        chatMessageDAO.insert(
+//                            ChatMessage.getHeadChatMessage(
+//                                match.chatId,
+//                                match.updatedAt
+//                            )
+//                        )
+//                        matchDAO.insert(match)
+//                    }
+//
+//
+//                }
+//
+//                matchProfileDAO.insert(matchProfile)
+//
+//            }
+//
+//
+//        }
 
         // TODO: need to send receivedChatMessages to make them read = true on server
         // TODO: decide chatprofile or matchprofile

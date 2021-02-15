@@ -98,6 +98,9 @@ interface MatchDAO {
         updatedAt: OffsetDateTime
     )
 
+    @Query("select lastReadChatMessageId from `match` where chatId = :chatId")
+    fun findLastReadChatMessageId(chatId: Long): Long
+
 
 //  TODO: remove me
     @Query("select * from `match`")

@@ -29,6 +29,6 @@ data class Match(
     val recentMessage: String = "",
 
     //TODO: change it to Long
-    var lastReadChatMessageId: Int = 0,
+    var lastReadChatMessageId: Long = 0,
     var accountViewedAt: OffsetDateTime = OffsetDateTime.now()
 )
