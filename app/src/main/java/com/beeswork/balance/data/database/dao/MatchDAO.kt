@@ -65,7 +65,9 @@ interface MatchDAO {
         repPhotoKey: String,
         blocked: Boolean,
         deleted: Boolean,
-        accountUpdatedAt: OffsetDateTime
+        accountUpdatedAt: OffsetDateTime,
+        unreadMessageCount: Int,
+        recentMessage: String
     )
 
     @Query(
