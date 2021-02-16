@@ -30,6 +30,8 @@ class ChatMessageMapperImpl: ChatMessageMapper {
     }
 
     private fun toChatMessageStatusFromMessageId(messageId: Long?): ChatMessageStatus {
-        return if (messageId == null) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+        return messageId?.let {
+            ChatMessageStatus.SENT
+        } ?: ChatMessageStatus.RECEIVED
     }
 }

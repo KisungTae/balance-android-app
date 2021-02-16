@@ -16,7 +16,10 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
+import java.lang.RuntimeException
+import java.util.*
 
 
 class MatchRepositoryImpl(
@@ -38,9 +41,21 @@ class MatchRepositoryImpl(
             preferenceProvider.getAccountFetchedAt(),
             preferenceProvider.getChatMessageFetchedAt()
         )
-        if (listMatches.isError()) return Resource.toEmptyResponse(listMatches)
-        listMatches.data?.let { saveMatches(it) }
+//        if (listMatches.isError()) return Resource.toEmptyResponse(listMatches)
+//        listMatches.data?.let { saveMatches(it) }
+        doWorkAsync("dd")
+
+
+
         return Resource.toEmptyResponse(listMatches)
+    }
+
+    suspend fun doWorkAsync(msg: String): Deferred<Int> = coroutineScope {
+        async {
+            delay(500)
+            println("$msg - Work done")
+            return@async 42
+        }
     }
 
     private fun saveMatches(data: ListMatchesDTO) {
@@ -53,12 +68,32 @@ class MatchRepositoryImpl(
             chatMessageMapper.fromDTOToEntity(it)
         }
 
+        // TODO: remove me
+        val random = Random()
+        for (i in sentChatMessages.indices) {
+            val msg = sentChatMessages[i]
+            val body = "message-${random.nextFloat()}"
+            chatMessageDAO.insert(
+                ChatMessage(
+                    msg.messageId,
+                    null,
+                    msg.chatId,
+                    body,
+                    ChatMessageStatus.SENDING,
+                    null,
+                    OffsetDateTime.now()
+                )
+            )
+        }
+
+
         balanceDatabase.runInTransaction {
             val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
             matchProfile.chatMessagesInsertedAt = chatMessagesInsertedAt
             matchProfileDAO.insert(matchProfile)
 
             chatMessageDAO.insertAll(receivedChatMessages)
+
             for (i in sentChatMessages.indices) {
                 val chatMessage = sentChatMessages[i]
 
@@ -70,8 +105,9 @@ class MatchRepositoryImpl(
                 chatMessageDAO.updateSentMessage(
                     chatMessage.messageId,
                     chatMessage.id,
+                    chatMessage.status,
                     chatMessage.createdAt,
-                    chatMessage.updatedAt
+                    chatMessage.updatedAt,
                 )
             }
 
@@ -85,13 +121,13 @@ class MatchRepositoryImpl(
                     matchProfile.accountFetchedAt = match.accountUpdatedAt
 
                 val lastReadChatMessageId = matchDAO.findLastReadChatMessageId(match.chatId)
-                if (lastReadChatMessageId > ChatMessage.TAIL_ID) {
-                    match.unreadMessageCount =
-                        chatMessageDAO.countAllAfter(match.chatId, lastReadChatMessageId)
-                    chatMessageDAO.findLastProcessed(match.chatId)?.let {
-                        match.updatedAt = it.createdAt
-                        match.recentMessage = it.body
-                    }
+                match.unreadMessageCount = chatMessageDAO.countAllAfter(
+                    match.chatId,
+                    lastReadChatMessageId
+                )
+                chatMessageDAO.findLastProcessed(match.chatId)?.let {
+                    match.updatedAt = it.createdAt
+                    match.recentMessage = it.body
                 }
 
                 if (matchDAO.existsByChatId(match.chatId))
@@ -124,6 +160,13 @@ class MatchRepositoryImpl(
                 }
             }
             matchProfileDAO.insert(matchProfile)
+        }
+    }
+
+    private fun saveChatMessages() {
+
+        CoroutineScope(Dispatchers.IO).launch {
+
         }
     }
 
@@ -163,3 +206,12 @@ class MatchRepositoryImpl(
 // TODO: decide chatprofile or matchprofile
 // TODO: transaction save chatfetchedat and chatmessageinserted at then save chatmessages with updatedAt
 // TODO: findallunprocsssed order by case when ChatMessageStatus = HEAD then 0
+
+
+// Query
+// select * from chatMessage where chatId = 12 and id is not null and id > 0
+// select * from `match`
+// select * from chatMessage where chatId = 12 and id is not null order by id desc limit 1
+// message-0.88725746
+// delete from chatMessage
+// delete from chatMessage where status not in (5,6)

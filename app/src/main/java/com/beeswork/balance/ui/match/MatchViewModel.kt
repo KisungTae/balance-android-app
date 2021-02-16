@@ -19,8 +19,7 @@ class MatchViewModel(
     private val matchRepository: MatchRepository
 ) : ViewModel() {
 
-    val fetchMatchesResponse: LiveData<Resource<List<Match>>> =
-        balanceRepository.fetchMatchesResponse
+    val fetchMatchesResponse: LiveData<Resource<List<Match>>> = balanceRepository.fetchMatchesResponse
 
     private val _fetchMatches = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatches: LiveData<Resource<EmptyResponse>> get() = _fetchMatches

@@ -54,7 +54,9 @@ interface MatchDAO {
         and repPhotoKey = :repPhotoKey 
         and blocked = :blocked 
         and deleted = :deleted 
-        and accountUpdatedAt = :accountUpdatedAt 
+        and accountUpdatedAt = :accountUpdatedAt
+        and unreadMessageCount = :unreadMessageCount
+        and recentMessage = :recentMessage
         where chatId = :chatId"""
     )
     fun updateMatch(

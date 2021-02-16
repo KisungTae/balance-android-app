@@ -58,18 +58,20 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
     fun updateStatus(chatId: Long, fromStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
-    @Query("update chatMessage set id = :id and createdAt = :createdAt and updatedAt = :updatedAt where messageId = :messageId")
+    @Query("update chatMessage set id = :id, createdAt = :createdAt, updatedAt = :updatedAt, status = :status where messageId = :messageId")
     fun updateSentMessage(
         messageId: Long,
         id: Long?,
+        status: ChatMessageStatus,
         createdAt: OffsetDateTime?,
         updatedAt: OffsetDateTime
+
     )
 
     @Query("select body, createdAt from chatMessage where chatId = :chatId and id is not null order by id desc limit 1")
     fun findLastProcessed(chatId: Long): ChatMessageBodyTuple?
 
-    @Query("select count(id) from chatMessage where chatId = :chatId and id > :lastReadChatMessageId")
+    @Query("select count(id) from chatMessage where chatId = :chatId and id is not null and id > :lastReadChatMessageId")
     fun countAllAfter(chatId: Long, lastReadChatMessageId: Long): Int
 
 
