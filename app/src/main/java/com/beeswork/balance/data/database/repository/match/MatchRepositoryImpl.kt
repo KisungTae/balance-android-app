@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.database.repository.match
 
+import android.icu.util.TimeZone
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
@@ -17,7 +18,10 @@ import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
+import okhttp3.Dispatcher
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+import java.lang.Exception
 import java.lang.RuntimeException
 import java.util.*
 
@@ -34,6 +38,13 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
+
+
+        val time = OffsetDateTime.now(ZoneOffset.UTC)
+        val time2 = OffsetDateTime.now()
+
+        println("time: $time | time2: $time2")
+
         val listMatches = matchRDS.listMatches(
             preferenceProvider.getAccountId(),
             preferenceProvider.getIdentityToken(),
@@ -41,24 +52,105 @@ class MatchRepositoryImpl(
             preferenceProvider.getAccountFetchedAt(),
             preferenceProvider.getChatMessageFetchedAt()
         )
-//        if (listMatches.isError()) return Resource.toEmptyResponse(listMatches)
-//        listMatches.data?.let { saveMatches(it) }
-        doWorkAsync("dd")
-
-
-
+        if (listMatches.isError()) return Resource.toEmptyResponse(listMatches)
+        listMatches.data?.let { data ->
+            saveChatMessages(
+                data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
+                data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
+            )
+            CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
+                val list = data.receivedChatMessageDTOs.map { it.id }
+                // post the received messages to the server
+            }
+            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
+        }
         return Resource.toEmptyResponse(listMatches)
     }
 
-    suspend fun doWorkAsync(msg: String): Deferred<Int> = coroutineScope {
-        async {
-            delay(500)
-            println("$msg - Work done")
-            return@async 42
+    private fun saveChatMessages(
+        sentChatMessages: List<ChatMessage>,
+        receivedChatMessages: List<ChatMessage>
+    ) {
+        balanceDatabase.runInTransaction {
+            val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
+            matchProfile.chatMessagesInsertedAt = OffsetDateTime.now()
+
+            chatMessageDAO.insertAll(receivedChatMessages)
+
+            for (sentChatMessage in sentChatMessages) {
+                chatMessageDAO.updateSentMessage(
+                    sentChatMessage.messageId,
+                    sentChatMessage.id,
+                    sentChatMessage.status,
+                    sentChatMessage.createdAt,
+                    sentChatMessage.updatedAt,
+                )
+
+                sentChatMessage.createdAt?.let {
+                    if (it.isAfter(matchProfile.chatMessagesFetchedAt))
+                        matchProfile.chatMessagesFetchedAt = it
+                }
+            }
+            matchProfileDAO.insert(matchProfile)
         }
     }
 
-    private fun saveMatches(data: ListMatchesDTO) {
+    private fun saveMatches(matches: List<Match>) {
+        balanceDatabase.runInTransaction {
+            val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
+            for (match in matches) {
+                if (match.updatedAt.isAfter(matchProfile.matchFetchedAt))
+                    matchProfile.matchFetchedAt = match.updatedAt
+
+                if (match.accountUpdatedAt.isAfter(matchProfile.accountFetchedAt))
+                    matchProfile.accountFetchedAt = match.accountUpdatedAt
+
+                val lastReadChatMessageId = matchDAO.findLastReadChatMessageId(match.chatId)
+
+                match.unreadMessageCount = chatMessageDAO.countAllAfter(
+                    match.chatId,
+                    lastReadChatMessageId
+                )
+
+                chatMessageDAO.findLastProcessed(match.chatId)?.let {
+                    match.updatedAt = it.createdAt
+                    match.recentMessage = it.body
+                }
+
+                if (matchDAO.existsByChatId(match.chatId))
+                    matchDAO.updateMatch(
+                        match.chatId,
+                        match.unmatched,
+                        match.updatedAt,
+                        match.name,
+                        match.repPhotoKey,
+                        match.blocked,
+                        match.deleted,
+                        match.accountUpdatedAt,
+                        match.unreadMessageCount,
+                        match.recentMessage
+                    )
+                else {
+                    chatMessageDAO.insert(
+                        ChatMessage.getTailChatMessage(
+                            match.chatId,
+                            match.updatedAt
+                        )
+                    )
+                    chatMessageDAO.insert(
+                        ChatMessage.getHeadChatMessage(
+                            match.chatId,
+                            match.updatedAt
+                        )
+                    )
+                    matchDAO.insert(match)
+                }
+            }
+        }
+    }
+
+
+    private fun saveMatchess(data: ListMatchesDTO) {
         val chatMessagesInsertedAt = OffsetDateTime.now()
         val matches = data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }
         val sentChatMessages = data.sentChatMessageDTOs.map {
@@ -160,13 +252,6 @@ class MatchRepositoryImpl(
                 }
             }
             matchProfileDAO.insert(matchProfile)
-        }
-    }
-
-    private fun saveChatMessages() {
-
-        CoroutineScope(Dispatchers.IO).launch {
-
         }
     }
 
