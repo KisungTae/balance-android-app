@@ -126,14 +126,14 @@ class MatchRepositoryImpl(
                     match.updatedAt = it.createdAt
                     match.recentMessage = it.body
                 } ?: {
-                    
+                    match.recentMessage = null
                 }
 
                 if (matchDAO.existsByChatId(match.chatId))
                     matchDAO.updateMatch(
                         match.chatId,
                         match.unmatched,
-                        match.updatedAt,
+//                        match.updatedAt,
                         match.name,
                         match.repPhotoKey,
                         match.blocked,

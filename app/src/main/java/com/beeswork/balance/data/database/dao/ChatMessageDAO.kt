@@ -68,7 +68,7 @@ interface ChatMessageDAO {
 
     )
 
-    @Query("select body, createdAt from chatMessage where chatId = :chatId and id is not null order by id desc limit 1")
+    @Query("select body, createdAt from chatMessage where chatId = :chatId and id > ${ChatMessage.TAIL_ID} order by id desc limit 1")
     fun findLastProcessed(chatId: Long): ChatMessageBodyTuple?
 
     @Query("select count(id) from chatMessage where chatId = :chatId and id is not null and id > :lastReadChatMessageId")

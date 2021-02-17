@@ -125,6 +125,7 @@ class BalanceRepositoryImpl(
                 if (result == NotificationType.MATCH) {
                     setNewMatch(match)
                     matchDAO.insert(match)
+                    clickDAO.insert(Click(match.matchedId))
                     clickedDAO.deleteIfMatched()
                 } else if (result == NotificationType.CLICKED) {
 //                    TODO: check if clicked is in match table if so not inserting

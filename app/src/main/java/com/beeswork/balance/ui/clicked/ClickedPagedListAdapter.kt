@@ -53,7 +53,7 @@ class ClickedPagedListAdapter(
 
         fun bind(clicked: Clicked) {
             itemView.tag = clicked.swiperId
-            itemView.tvClicked.text = clicked.swiperId
+            itemView.tvClicked.text = clicked.swiperId.toString()
             itemView.ivClicked.setImageResource(R.drawable.person1)
         }
 

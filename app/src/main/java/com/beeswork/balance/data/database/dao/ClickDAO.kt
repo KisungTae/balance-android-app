@@ -11,6 +11,7 @@ interface ClickDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(click: Click)
 
+
     @Query("select swipedId from click")
     fun getSwipedIds(): List<UUID>
 

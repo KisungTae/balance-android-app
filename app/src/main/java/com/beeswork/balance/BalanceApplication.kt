@@ -251,6 +251,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      76. make item_tail and item_head that take up no space, so that easily scroll to the item because they are in the list without space taken up, Item_tail should have text message saying let's talk or date
 //      77. when delete match, post it to server so that when app deleted and reinstalled, sync matches
 //      78. consider saving fitler information to the server for when app deleted and reinstalled
+//      79. if click throws exception of MatchExsits or ClickExitst then remove clicked card
+//      80. clickedlist only returns valid accounts, so remoe clicked if not found in the returned clicked list
 
 
 
