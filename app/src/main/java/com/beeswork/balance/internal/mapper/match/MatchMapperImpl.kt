@@ -22,16 +22,18 @@ class MatchMapperImpl : MatchMapper {
     override fun fromEntityToDomain(entity: Match): MatchDomain {
         return MatchDomain(
             entity.chatId,
-//            entity.matchedId,
-//            entity.unmatched,
-//            entity.updatedAt,
-//            entity.name,
-//            entity.repPhotoKey,
-//            entity.blocked,
-//            entity.deleted,
-//            entity.accountUpdatedAt,
-//            OffsetDateTime.now(),
-//            OffsetDateTime.now()
+            entity.matchedId,
+            entity.unmatched,
+            entity.updatedAt,
+            entity.name,
+            entity.repPhotoKey,
+            entity.blocked,
+            entity.deleted,
+            entity.accountUpdatedAt,
+            entity.unreadMessageCount,
+            entity.recentMessage,
+            entity.lastReadChatMessageId,
+            entity.accountViewedAt
         )
     }
 }

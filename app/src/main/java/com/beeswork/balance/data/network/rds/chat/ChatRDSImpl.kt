@@ -4,10 +4,19 @@ import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.response.ChatMessageResponse
 import com.beeswork.balance.data.network.response.Resource
+import java.util.*
 
 class ChatRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ChatRDS {
+    override suspend fun receivedChatMessages(
+        accountId: UUID,
+        identityToken: UUID,
+        chatMessageIds: List<Long>
+    ) {
+        balanceAPI.receivedChatMessages(accountId, identityToken, chatMessageIds)
+    }
+
     override suspend fun fetchChatMessages(
         accountId: String,
         identityToken: String,

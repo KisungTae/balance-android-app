@@ -24,6 +24,13 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("chat/message/received")
+    suspend fun receivedChatMessages(
+        @Query(value = "accountId") accountId: UUID,
+        @Query(value = "identityToken") identityToken: UUID,
+        @Query(value = "chatMessageIds") chatMessageIds: List<Long>,
+    )
+
     @GET("match/list")
     suspend fun listMatches(
         @Query(value = "accountId") accountId: UUID,

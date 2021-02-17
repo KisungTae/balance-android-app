@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Clicked
+import java.util.*
 
 
 @Dao
@@ -19,7 +20,7 @@ interface ClickedDAO {
     fun getClickedList(): DataSource.Factory<Int, Clicked>
 
     @Query("delete from clicked where swiperId = :swiperId")
-    fun deleteBySwiperId(swiperId: String)
+    fun deleteById(swiperId: UUID)
 
     @Query("delete from clicked where swiperId in (select matchedId from `match`)")
     fun deleteIfMatched()

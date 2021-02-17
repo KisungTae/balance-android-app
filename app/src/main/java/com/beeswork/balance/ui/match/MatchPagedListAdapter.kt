@@ -64,3 +64,7 @@ class MatchPagedListAdapter(
     }
 
 }
+
+
+// TODO
+//  1. if lastChatMessageId <= 0 then circle the profile picture when not deleted, blocked, unmatched

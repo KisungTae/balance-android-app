@@ -280,7 +280,7 @@ class BalanceRepositoryImpl(
                         fetchedNoCards = false
 
                         val clickIds = clickDAO.getSwipedIds().toHashSet()
-                        clickIds.addAll(matchDAO.getMatchedIds())
+//                        clickIds.addAll(matchDAO.getMatchedIds())
 
                         val endIndex = fetchedCards.size - 1
 

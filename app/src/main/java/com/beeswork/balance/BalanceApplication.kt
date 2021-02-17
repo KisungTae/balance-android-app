@@ -93,6 +93,9 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
+                instance(),
+                instance(),
                 instance()
             )
         }
@@ -241,6 +244,15 @@ class BalanceApplication : Application(), KodeinAware {
 //      70. put dummy chatmmessage start and end of chatmessage table so that I can know if it is begining or end
 //      71. when click on profile in chat, udpate accountViewedAt on match and compare with accoutnUpdatedAT then flash profile picture if accountviewdat < accountupdatdAt
 //      72. when exception or error from websocket, then make sending in chatmessage to error
+//      73. when delete match, delete chatmessages, and match itself but in transaction, add matchedId in click so that cards that I already liked never be shown
+//          --> just keep swipedId in clicked no swap around between matches and clicked
+//      74. clickd, and match notification save them to database even if it retreives when clicked on each tab like match tab or licked tab, so that cards tab get notified and display numbers of liked or match or messages
+//      75. when retrieve chatmessages in chatroom, update lastchatmessageid of match to the most recent message Id and previous lastchatmessageId to scroll to should be passed through action arg from match, but when save chatmessag throuh web socket then lastchatmssageid = the saved chatmessage's id
+//      76. make item_tail and item_head that take up no space, so that easily scroll to the item because they are in the list without space taken up, Item_tail should have text message saying let's talk or date
+//      77. when delete match, post it to server so that when app deleted and reinstalled, sync matches
+//      78. consider saving fitler information to the server for when app deleted and reinstalled
+
+
 
 
 
