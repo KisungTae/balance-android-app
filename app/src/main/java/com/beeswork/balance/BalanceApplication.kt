@@ -253,7 +253,10 @@ class BalanceApplication : Application(), KodeinAware {
 //      78. consider saving fitler information to the server for when app deleted and reinstalled
 //      79. if click throws exception of MatchExsits or ClickExitst then remove clicked card
 //      80. clickedlist only returns valid accounts, so remoe clicked if not found in the returned clicked list
-
+//      81. create table for fetchMatches profile to update status of fetchMatches, observer from chatViewMode, so that if fetchMatches fails, then chatviewmodel fetch ChatMessages
+//      82. when ack to websocket, update lastchatmessageread
+//      83. reinstall creates new preference with default values,
+//      84. enter a chat and if there are chatmessages with sending status then resend it and then the server will check duplicates and then just erutnr as like it is a new mssgae
 
 
 
