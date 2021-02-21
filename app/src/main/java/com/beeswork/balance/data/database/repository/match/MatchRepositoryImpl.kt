@@ -126,22 +126,22 @@ class MatchRepositoryImpl(
                     match.updatedAt = it.createdAt
                     match.recentMessage = it.body
                 } ?: {
-                    match.recentMessage = null
+//                    match.recentMessage = null
                 }
 
                 if (matchDAO.existsByChatId(match.chatId))
-                    matchDAO.updateMatch(
-                        match.chatId,
-                        match.unmatched,
+//                    matchDAO.updateMatch(
+//                        match.chatId,
+//                        match.unmatched,
 //                        match.updatedAt,
-                        match.name,
-                        match.repPhotoKey,
-                        match.blocked,
-                        match.deleted,
-                        match.accountUpdatedAt,
-                        match.unreadMessageCount,
-                        match.recentMessage
-                    )
+//                        match.name,
+//                        match.repPhotoKey,
+//                        match.blocked,
+//                        match.deleted,
+//                        match.accountUpdatedAt,
+//                        match.unreadMessageCount,
+//                        match.recentMessage
+//                    )
                 else {
                     chatMessageDAO.insert(
                         ChatMessage.getTailChatMessage(
