@@ -257,6 +257,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      82. when ack to websocket, update lastchatmessageread
 //      83. reinstall creates new preference with default values,
 //      84. enter a chat and if there are chatmessages with sending status then resend it and then the server will check duplicates and then just erutnr as like it is a new mssgae
+//      85. when ge SwipeAlreadyClicked exception, then call listSwipes(clicked=false), if it's siwpeAlreadtMatchedException then call listMatches
 
 
 
