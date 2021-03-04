@@ -2,6 +2,7 @@ package com.beeswork.balance
 
 import android.app.Application
 import android.content.Context
+import android.content.res.Resources
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
@@ -44,6 +45,7 @@ const val NETWORK_READ_TIMEOUT = 100L
 const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 class BalanceApplication : Application(), KodeinAware {
+
     override val kodein = Kodein.lazy {
         import(androidXModule(this@BalanceApplication))
 
@@ -159,7 +161,8 @@ class BalanceApplication : Application(), KodeinAware {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidThreeTen.init(this);
+        AndroidThreeTen.init(this)
+
     }
 }
 
@@ -259,6 +262,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      83. reinstall creates new preference with default values,
 //      84. enter a chat and if there are chatmessages with sending status then resend it and then the server will check duplicates and then just erutnr as like it is a new mssgae
 //      85. when ge SwipeAlreadyClicked exception, then call listSwipes(clicked=false), if it's siwpeAlreadtMatchedException then call listMatches
+//      86. fetchClickers should remove deleted
 
 
 

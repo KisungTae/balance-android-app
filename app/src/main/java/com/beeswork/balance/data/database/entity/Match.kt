@@ -18,13 +18,20 @@ data class Match(
     val chatId: Long,
 
     val matchedId: UUID,
-    val active: Boolean,
-    val unmatched: Boolean,
+    var active: Boolean,
+    var unmatched: Boolean,
     val name: String,
-    val repPhotoKey: String,
-    val deleted: Boolean,
+    var repPhotoKey: String,
+    var deleted: Boolean,
     var updatedAt: OffsetDateTime,
     var unread: Boolean = false,
     var recentMessage: String = "",
     var lastReadChatMessageId: Long = 0
-)
+) {
+    fun updateOnUnreadChatMessage(body: String, createdAt: OffsetDateTime) {
+        this.recentMessage = body
+        this.updatedAt = createdAt
+        this.active = true
+        this.unread = true
+    }
+}

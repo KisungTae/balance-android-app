@@ -15,5 +15,6 @@
     <string name="mime_type_not_found_exception">해당이미지는 지원되지않는 파일입니다</string>
     <string name="chat_id_not_found_exception">해당 채팅은 유효하지 않습니다</string>
     <string name="chat_message_out_of_size_exception">채팅메세지가 맥스를 초과했습니다</string>
+    <string name="chat_default_recent_message">새로운 매치! 상대방에게 메세지를 보내보세요</string>
 
 </resources>

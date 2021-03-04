@@ -23,7 +23,7 @@ data class ChatMessage(
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
-    val createdAt: OffsetDateTime?,
+    val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime
 ) {
     companion object {

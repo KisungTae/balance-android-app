@@ -6,6 +6,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.ChatMessageBodyTuple
 import com.beeswork.balance.internal.constant.ChatMessageStatus
+import com.beeswork.balance.ui.chat.ChatMessageEvent
 import org.threeten.bp.OffsetDateTime
 
 @Dao
@@ -16,6 +17,16 @@ interface ChatMessageDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(chatMessages: List<ChatMessage>)
+
+    @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId order by id desc limit 1")
+    fun findMostRecentAfter(chatId: Long, lastReadChatMessageId: Long): ChatMessage?
+
+
+
+
+
+
+
 
     //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
     @Query("select * from chatMessage where chatId = :chatId order by messageId desc")

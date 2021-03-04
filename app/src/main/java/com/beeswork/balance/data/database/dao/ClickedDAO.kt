@@ -1,33 +1,20 @@
 package com.beeswork.balance.data.database.dao
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.beeswork.balance.data.database.entity.Clicked
 import java.util.*
-
 
 @Dao
 interface ClickedDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(clickedList: List<Clicked>)
+    fun insert(clicked: Clicked)
 
-    @Query("select * from clicked order by updatedAt desc")
-    fun getClickedList(): DataSource.Factory<Int, Clicked>
+    @Query("select id from clicked")
+    fun getClickedIds(): List<UUID>
 
-    @Query("delete from clicked where swiperId = :swiperId")
-    fun deleteById(swiperId: UUID)
-
-    @Query("delete from clicked where swiperId in (select matchedId from `match`)")
-    fun deleteIfMatched()
-
-    @Query("select count(*) from clicked")
-    fun count(): LiveData<Int>
-
+//  TODO: remove me
     @Query("select * from clicked")
     fun get(): List<Clicked>
+
 }

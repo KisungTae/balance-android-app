@@ -32,9 +32,9 @@ class BalanceRepositoryImpl(
     private val context: Context,
     private val matchDAO: MatchDAO,
     private val chatMessageDAO: ChatMessageDAO,
-    private val clickDAO: ClickDAO,
-    private val fcmTokenDAO: FCMTokenDAO,
     private val clickedDAO: ClickedDAO,
+    private val fcmTokenDAO: FCMTokenDAO,
+    private val clickerDAO: ClickerDAO,
     private val profileDAO: ProfileDAO,
     private val photoDAO: PhotoDAO,
     private val locationDAO: LocationDAO,
@@ -46,8 +46,8 @@ class BalanceRepositoryImpl(
 //  ##################################### SWIPE ##################################### //
 //  ################################################################################# //
 
-    private val mutableFetchClickedListResponse = MutableLiveData<Resource<List<Clicked>>>()
-    override val fetchClickedListResponse: LiveData<Resource<List<Clicked>>>
+    private val mutableFetchClickedListResponse = MutableLiveData<Resource<List<Clicker>>>()
+    override val fetchClickerListResponse: LiveData<Resource<List<Clicker>>>
         get() = mutableFetchClickedListResponse
 
     override fun fetchClickedList() {
@@ -63,26 +63,26 @@ class BalanceRepositoryImpl(
             if (clickedResource.status == Resource.Status.SUCCESS) {
                 val clickedList = clickedResource.data!!
                 if (clickedList.size > 0) {
-                    clickedDAO.insert(clickedList)
+                    clickerDAO.insert(clickedList)
                     clickedResource.data.sortByDescending { c -> c.updatedAt }
                     preferenceProvider.putClickedFetchedAt(clickedList[0].updatedAt.toString())
                     clickedList.clear()
                 }
             }
-            clickedDAO.deleteIfMatched()
+            clickerDAO.deleteIfMatched()
             mutableFetchClickedListResponse.postValue(clickedResource)
         }
     }
 
     override suspend fun getClickedCount(): LiveData<Int> {
         return withContext(Dispatchers.IO) {
-            return@withContext clickedDAO.count()
+            return@withContext clickerDAO.count()
         }
     }
 
-    override suspend fun getClickedList(): DataSource.Factory<Int, Clicked> {
+    override suspend fun getClickedList(): DataSource.Factory<Int, Clicker> {
         return withContext(Dispatchers.IO) {
-            return@withContext clickedDAO.getClickedList()
+            return@withContext clickerDAO.getClickers()
         }
     }
 
@@ -125,11 +125,11 @@ class BalanceRepositoryImpl(
                 if (result == NotificationType.MATCH) {
                     setNewMatch(match)
                     matchDAO.insert(match)
-                    clickDAO.insert(Click(match.matchedId))
-                    clickedDAO.deleteIfMatched()
+                    clickedDAO.insert(Clicked(match.matchedId))
+                    clickerDAO.deleteIfMatched()
                 } else if (result == NotificationType.CLICKED) {
 //                    TODO: check if clicked is in match table if so not inserting
-                    clickDAO.insert(Click(match.matchedId))
+                    clickedDAO.insert(Clicked(match.matchedId))
                 }
             }
             mutableClickResponse.postValue(clickResource)
@@ -280,7 +280,7 @@ class BalanceRepositoryImpl(
 
                         fetchedNoCards = false
 
-                        val clickIds = clickDAO.getSwipedIds().toHashSet()
+                        val clickIds = clickedDAO.getClickedIds().toHashSet()
 //                        clickIds.addAll(matchDAO.getMatchedIds())
 
                         val endIndex = fetchedCards.size - 1

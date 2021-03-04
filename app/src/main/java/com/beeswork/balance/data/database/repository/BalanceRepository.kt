@@ -2,7 +2,7 @@ package com.beeswork.balance.data.database.repository
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
-import com.beeswork.balance.data.database.entity.Clicked
+import com.beeswork.balance.data.database.entity.Clicker
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Photo
@@ -15,11 +15,11 @@ import org.threeten.bp.OffsetDateTime
 interface BalanceRepository {
 
     // swipe
-    val fetchClickedListResponse: LiveData<Resource<List<Clicked>>>
+    val fetchClickerListResponse: LiveData<Resource<List<Clicker>>>
     val balanceGame: LiveData<Resource<BalanceGameResponse>>
     val clickResponse: LiveData<Resource<ClickResponse>>
 
-    suspend fun getClickedList(): DataSource.Factory<Int, Clicked>
+    suspend fun getClickedList(): DataSource.Factory<Int, Clicker>
     suspend fun getClickedCount(): LiveData<Int>
 
     fun fetchClickedList()

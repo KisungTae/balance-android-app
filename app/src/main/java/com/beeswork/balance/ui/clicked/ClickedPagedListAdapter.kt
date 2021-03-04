@@ -6,7 +6,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.Clicked
+import com.beeswork.balance.data.database.entity.Clicker
 import com.beeswork.balance.internal.util.inflate
 
 import kotlinx.android.synthetic.main.item_clicked.view.*
@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.item_clicked.view.*
 
 class ClickedPagedListAdapter(
     private val onClickedListener: OnClickedListener
-): PagedListAdapter<Clicked, ClickedPagedListAdapter.ClickedHolder>(diffCallback) {
+): PagedListAdapter<Clicker, ClickedPagedListAdapter.ClickedHolder>(diffCallback) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClickedHolder {
@@ -29,11 +29,11 @@ class ClickedPagedListAdapter(
 
     companion object {
 
-        private val diffCallback = object : DiffUtil.ItemCallback<Clicked>() {
-            override fun areItemsTheSame(oldItem: Clicked, newItem: Clicked): Boolean =
-                oldItem.swiperId == newItem.swiperId
+        private val diffCallback = object : DiffUtil.ItemCallback<Clicker>() {
+            override fun areItemsTheSame(oldItem: Clicker, newItem: Clicker): Boolean =
+                oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: Clicked, newItem: Clicked): Boolean =
+            override fun areContentsTheSame(oldItem: Clicker, newItem: Clicker): Boolean =
                 oldItem == newItem
         }
     }
@@ -51,9 +51,9 @@ class ClickedPagedListAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(clicked: Clicked) {
-            itemView.tag = clicked.swiperId
-            itemView.tvClicked.text = clicked.swiperId.toString()
+        fun bind(clicker: Clicker) {
+            itemView.tag = clicker.id
+            itemView.tvClicked.text = clicker.id.toString()
             itemView.ivClicked.setImageResource(R.drawable.person1)
         }
 
