@@ -30,7 +30,7 @@ data class ChatMessage(
 
         const val TAIL_ID = 0L
 
-        fun getHeadChatMessage(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
+        fun getHead(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
             return ChatMessage(
                 0,
                 null,
@@ -42,7 +42,7 @@ data class ChatMessage(
             )
         }
 
-        fun getTailChatMessage(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
+        fun getTail(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
             return ChatMessage(
                 0,
                 TAIL_ID,

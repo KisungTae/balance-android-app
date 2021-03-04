@@ -14,6 +14,9 @@ import java.util.*
 @Dao
 interface MatchDAO {
 
+    @Query("select * from `match` where chatId = :chatId")
+    fun findById(chatId: Long): Match?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(matches: List<Match>)
 
@@ -103,7 +106,7 @@ interface MatchDAO {
     )
 
     @Query("select lastReadChatMessageId from `match` where chatId = :chatId")
-    fun findLastReadChatMessageId(chatId: Long): Long
+    fun findLastReadChatMessageId(chatId: Long): Long?
 
 
 //  TODO: remove me

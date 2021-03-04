@@ -7,7 +7,7 @@ import java.util.*
 
 interface ChatRDS {
 
-    suspend fun receivedChatMessages(
+    suspend fun syncChatMessages(
         accountId: UUID,
         identityToken: UUID,
         chatMessageIds: List<Long>

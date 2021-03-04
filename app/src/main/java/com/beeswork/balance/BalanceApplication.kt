@@ -65,6 +65,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
         bind() from singleton { instance<BalanceDatabase>().matchProfileDAO() }
 
+
         // API
         bind() from singleton { BalanceAPI(instance()) }
 

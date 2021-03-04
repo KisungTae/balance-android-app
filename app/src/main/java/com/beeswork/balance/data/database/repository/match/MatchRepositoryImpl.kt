@@ -3,21 +3,17 @@ package com.beeswork.balance.data.database.repository.match
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
-import com.beeswork.balance.data.database.entity.ChatMessage
-import com.beeswork.balance.data.database.entity.Click
-import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.database.entity.MatchProfile
+import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
-import java.util.*
 
 
 class MatchRepositoryImpl(
@@ -25,7 +21,7 @@ class MatchRepositoryImpl(
     private val chatRDS: ChatRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
-    private val matchProfileDAO: MatchProfileDAO,
+    private val fetchMatchesResultDAO: FetchMatchesResultDAO,
     private val clickedDAO: ClickedDAO,
     private val clickDAO: ClickDAO,
     private val matchMapper: MatchMapper,
@@ -35,58 +31,45 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
+        updateFetchMatchesResultStatus(Resource.Status.LOADING)
         val listMatches = matchRDS.listMatches(
             preferenceProvider.getAccountId(),
             preferenceProvider.getIdentityToken(),
-            preferenceProvider.getMatchFetchedAt(),
-            preferenceProvider.getAccountFetchedAt(),
-            preferenceProvider.getChatMessageFetchedAt()
+            preferenceProvider.getMatchFetchedAt()
         )
-        if (listMatches.isError()) return Resource.toEmptyResponse(listMatches)
+
+        if (listMatches.isError()) {
+            updateFetchMatchesResultStatus(listMatches.status)
+            return Resource.toEmptyResponse(listMatches)
+        }
 
         listMatches.data?.let { data ->
             saveChatMessages(
                 data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
                 data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
             )
-            CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
-                chatRDS.receivedChatMessages(
-                    preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken(),
-                    data.receivedChatMessageDTOs.map { it.id }
-                )
-            }
+            syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
             saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
+            updateFetchMatchesResultStatus(listMatches.status)
         }
         return Resource.toEmptyResponse(listMatches)
+    }
+
+    private fun updateFetchMatchesResultStatus(status: Resource.Status) {
+        val fetchMatchesResult = fetchMatchesResultDAO.findById() ?: FetchMatchesResult()
+        fetchMatchesResult.status = status
+        fetchMatchesResultDAO.insert(fetchMatchesResult)
     }
 
     private fun saveChatMessages(
         sentChatMessages: List<ChatMessage>,
         receivedChatMessages: List<ChatMessage>
     ) {
-        // TODO: remove me
-        val random = Random()
-        for (msg in sentChatMessages) {
-            chatMessageDAO.insert(
-                ChatMessage(
-                    msg.messageId,
-                    msg.id,
-                    msg.chatId,
-                    "message-${random.nextFloat()}",
-                    ChatMessageStatus.SENDING,
-                    null,
-                    OffsetDateTime.now()
-                )
-            )
-        }
-
         balanceDatabase.runInTransaction {
-            val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
-            matchProfile.chatMessagesInsertedAt = OffsetDateTime.now()
+            val fetchMatchesResult = fetchMatchesResultDAO.findById() ?: FetchMatchesResult()
+            fetchMatchesResult.chatMessagesInsertedAt = OffsetDateTime.now()
 
             chatMessageDAO.insertAll(receivedChatMessages)
-
             for (sentChatMessage in sentChatMessages) {
                 chatMessageDAO.updateSentMessage(
                     sentChatMessage.messageId,
@@ -95,27 +78,61 @@ class MatchRepositoryImpl(
                     sentChatMessage.createdAt,
                     sentChatMessage.updatedAt,
                 )
-
-                sentChatMessage.createdAt?.let {
-                    if (it.isAfter(matchProfile.chatMessagesFetchedAt))
-                        matchProfile.chatMessagesFetchedAt = it
-                }
             }
-            matchProfileDAO.insert(matchProfile)
+            fetchMatchesResultDAO.insert(fetchMatchesResult)
         }
+    }
+
+    private fun syncChatMessages(
+        sentChatMessages: List<ChatMessageDTO>,
+        receivedChatMessages: List<ChatMessageDTO>
+    ) {
+        if (sentChatMessages.isEmpty() && receivedChatMessages.isEmpty()) return
+
+        CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
+            val chatMessageIds = mutableListOf<Long>()
+            chatMessageIds.addAll(sentChatMessages.map { it.id })
+            chatMessageIds.addAll(receivedChatMessages.map { it.id })
+
+            chatRDS.syncChatMessages(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                chatMessageIds
+            )
+        }
+    }
+
+
+    //  TODO: remove me
+    private fun testSaveSentChatMessages() {
+//        val random = Random()
+//        for (msg in sentChatMessages) {
+//            chatMessageDAO.insert(
+//                ChatMessage(
+//                    msg.messageId,
+//                    msg.id,
+//                    msg.chatId,
+//                    "message-${random.nextFloat()}",
+//                    ChatMessageStatus.SENDING,
+//                    null,
+//                    OffsetDateTime.now()
+//                )
+//            )
+//        }
     }
 
     private fun saveMatches(matches: List<Match>) {
         balanceDatabase.runInTransaction {
-            val matchProfile = matchProfileDAO.findById() ?: MatchProfile()
             for (match in matches) {
-                if (match.updatedAt.isAfter(matchProfile.matchFetchedAt))
-                    matchProfile.matchFetchedAt = match.updatedAt
-
-                if (match.accountUpdatedAt.isAfter(matchProfile.accountFetchedAt))
-                    matchProfile.accountFetchedAt = match.accountUpdatedAt
-
                 val lastReadChatMessageId = matchDAO.findLastReadChatMessageId(match.chatId)
+                lastReadChatMessageId?.let {
+
+                } ?: kotlin.run {
+                    chatMessageDAO.insert(ChatMessage.getTail(match.chatId, match.updatedAt))
+                    chatMessageDAO.insert(ChatMessage.getHead(match.chatId, match.updatedAt))
+                    matchDAO.insert(match)
+
+                }
 
                 match.unreadMessageCount = chatMessageDAO.countAllAfter(
                     match.chatId,
@@ -126,44 +143,40 @@ class MatchRepositoryImpl(
                     match.updatedAt = it.createdAt
                     match.recentMessage = it.body
                 } ?: {
-//                    match.recentMessage = null
+                    match.recentMessage = null
                 }
 
                 if (matchDAO.existsByChatId(match.chatId))
-//                    matchDAO.updateMatch(
-//                        match.chatId,
-//                        match.unmatched,
-//                        match.updatedAt,
-//                        match.name,
-//                        match.repPhotoKey,
-//                        match.blocked,
-//                        match.deleted,
-//                        match.accountUpdatedAt,
-//                        match.unreadMessageCount,
-//                        match.recentMessage
-//                    )
+                    matchDAO.updateMatch(
+                        match.chatId,
+                        match.unmatched,
+                        match.updatedAt,
+                        match.name,
+                        match.repPhotoKey,
+                        match.blocked,
+                        match.deleted,
+                        match.accountUpdatedAt,
+                        match.unreadMessageCount,
+                        match.recentMessage
+                    )
                 else {
                     chatMessageDAO.insert(
-                        ChatMessage.getTailChatMessage(
+                        ChatMessage.getTail(
                             match.chatId,
                             match.updatedAt
                         )
                     )
                     chatMessageDAO.insert(
-                        ChatMessage.getHeadChatMessage(
+                        ChatMessage.getHead(
                             match.chatId,
                             match.updatedAt
                         )
                     )
                     clickDAO.insert(Click(match.matchedId))
                     clickedDAO.deleteById(match.matchedId)
-                    matchDAO.insert(match)
                 }
 
             }
-
-            matchProfileDAO.insert(matchProfile)
-
         }
     }
 

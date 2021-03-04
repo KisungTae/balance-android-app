@@ -24,8 +24,8 @@ import java.util.*
 
 interface BalanceAPI {
 
-    @POST("chat/message/received")
-    suspend fun receivedChatMessages(
+    @POST("chat/message/sync")
+    suspend fun syncChatMessages(
         @Query(value = "accountId") accountId: UUID,
         @Query(value = "identityToken") identityToken: UUID,
         @Query(value = "chatMessageIds") chatMessageIds: List<Long>,
@@ -35,9 +35,7 @@ interface BalanceAPI {
     suspend fun listMatches(
         @Query(value = "accountId") accountId: UUID,
         @Query(value = "identityToken") identityToken: UUID,
-        @Query(value = "matchFetchedAt") matchFetchedAt: OffsetDateTime,
-        @Query(value = "accountFetchedAt") accountFetchedAt: OffsetDateTime,
-        @Query(value = "chatMessageFetchedAt") chatMessageFetchedAt: OffsetDateTime
+        @Query(value = "fetchedAt") matchFetchedAt: OffsetDateTime
     ): Response<ListMatchesDTO>
 
     @GET("chat/message/list")

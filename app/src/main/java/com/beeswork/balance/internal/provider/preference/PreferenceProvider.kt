@@ -13,8 +13,6 @@ interface PreferenceProvider {
     fun putAccountUUID(accountId: UUID)
     fun putIdentityTokenUUID(identityToken: UUID)
     fun putMatchFetchedAt(updatedAt: OffsetDateTime)
-    fun putAccountFetchedAt(updatedAt: OffsetDateTime)
-    fun putChatMessageFetchedAt(createdAt: OffsetDateTime)
 
     fun getClickedFetchedAt(): String
     fun getMatchFetchedAt1(): String
@@ -30,6 +28,4 @@ interface PreferenceProvider {
     fun getAccountId(): UUID
     fun getIdentityToken(): UUID
     fun getMatchFetchedAt(): OffsetDateTime
-    fun getAccountFetchedAt(): OffsetDateTime
-    fun getChatMessageFetchedAt(): OffsetDateTime
 }

@@ -18,15 +18,13 @@ data class Match(
     val chatId: Long,
 
     val matchedId: UUID,
+    val active: Boolean,
     val unmatched: Boolean,
-    var updatedAt: OffsetDateTime,
     val name: String,
     val repPhotoKey: String,
-    val blocked: Boolean,
     val deleted: Boolean,
-    val accountUpdatedAt: OffsetDateTime,
-    var unreadMessageCount: Int = 0,
+    var updatedAt: OffsetDateTime,
+    var unread: Boolean = false,
     var recentMessage: String = "",
-    var lastReadChatMessageId: Long = 0,
-    var accountViewedAt: OffsetDateTime = OffsetDateTime.now()
+    var lastReadChatMessageId: Long = 0
 )

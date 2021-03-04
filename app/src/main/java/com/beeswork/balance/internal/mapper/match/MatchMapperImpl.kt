@@ -9,13 +9,12 @@ class MatchMapperImpl : MatchMapper {
         return Match(
             dto.chatId,
             dto.matchedId,
+            dto.active,
             dto.unmatched,
-            dto.updatedAt,
             dto.name,
             dto.repPhotoKey,
-            dto.blocked,
             dto.deleted,
-            dto.accountUpdatedAt
+            dto.createdAt
         )
     }
 

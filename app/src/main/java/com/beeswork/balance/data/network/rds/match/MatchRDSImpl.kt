@@ -14,17 +14,13 @@ class MatchRDSImpl(
     override suspend fun listMatches(
         accountId: UUID,
         identityToken: UUID,
-        matchFetchedAt: OffsetDateTime,
-        accountFetchedAt: OffsetDateTime,
-        chatMessageFetchedAt: OffsetDateTime
+        matchFetchedAt: OffsetDateTime
     ): Resource<ListMatchesDTO> {
         return getResult {
             balanceAPI.listMatches(
                 accountId,
                 identityToken,
-                accountFetchedAt,
                 matchFetchedAt,
-                chatMessageFetchedAt
             )
         }
     }

@@ -80,19 +80,6 @@ class PreferenceProviderImpl(
         )
     }
 
-    override fun putAccountFetchedAt(updatedAt: OffsetDateTime) {
-        editor.putString(
-            LAST_FETCHED_ACCOUNT_UPDATED_AT,
-            OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt)
-        )
-    }
-
-    override fun putChatMessageFetchedAt(createdAt: OffsetDateTime) {
-        editor.putString(
-            LAST_FETCHED_CHAT_MESSAGE_CREATED_AT,
-            OffsetDateTimeConverter.fromOffsetDateTimeNonNull(createdAt)
-        )
-    }
 
     override fun getClickedFetchedAt(): String {
         return preferences.getString(CLICKED_FETCHED_AT, "2020-01-01T10:06:26.032Z")!!
@@ -166,24 +153,5 @@ class PreferenceProviderImpl(
             )!!
         )
     }
-
-    override fun getAccountFetchedAt(): OffsetDateTime {
-        return OffsetDateTimeConverter.toOffsetDateTimeNonNull(
-            preferences.getString(
-                LAST_FETCHED_ACCOUNT_UPDATED_AT,
-                DEFAULT_FETCHED_AT
-            )!!
-        )
-    }
-
-    override fun getChatMessageFetchedAt(): OffsetDateTime {
-        return OffsetDateTimeConverter.toOffsetDateTimeNonNull(
-            preferences.getString(
-                LAST_FETCHED_CHAT_MESSAGE_CREATED_AT,
-                DEFAULT_FETCHED_AT
-            )!!
-        )
-    }
-
 
 }

@@ -6,11 +6,10 @@ import java.util.*
 data class MatchDTO(
     val chatId: Long,
     val matchedId: UUID,
+    val active: Boolean,
     val unmatched: Boolean,
-    val updatedAt: OffsetDateTime,
     val name: String,
     val repPhotoKey: String,
-    val blocked: Boolean,
     val deleted: Boolean,
-    val accountUpdatedAt: OffsetDateTime,
+    val createdAt: OffsetDateTime
 )
