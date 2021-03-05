@@ -9,7 +9,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
-import com.beeswork.balance.internal.constant.BalanceURL
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.inflate
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
@@ -100,7 +100,7 @@ class PhotoPickerRecyclerViewAdapter(
 
     private fun loadPhotoFromUrl(holder: ViewHolder, photoPicker: PhotoPicker) {
         photoPicker.key?.let {
-            val photoUrl = "${BalanceURL.PHOTO_BUCKET}/$accountId/${it}"
+            val photoUrl = "${EndPoint.PHOTO_BUCKET}/$accountId/${it}"
             showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
             Glide.with(context).load(photoUrl)
                 .apply(glideRequestOptions())

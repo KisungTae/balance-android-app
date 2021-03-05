@@ -1,36 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="10dp">
 
     <ImageView
-        android:id="@+id/ivMatch"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:src="@drawable/person2"/>
+        android:id="@+id/ivMatchProfilePicture"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/ic_baseline_account_circle" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvMatchName"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Michael Tae"/>
+            android:gravity="center"
+            android:orientation="horizontal">
 
-<!--        <TextView-->
-<!--            android:id="@+id/tvMatchRecentMessage"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="I recently moved to New York, and it is nice"/>-->
+            <TextView
+                android:id="@+id/tvMatchName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".8"
+                android:text="Michael" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/tvMatchUnmatch"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"/>-->
+            <TextView
+                android:id="@+id/tvMatchUnreadIndicator"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/sh_solid_circle" />
 
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvMatchRecentChatMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_weight=".5"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="I recently moved to New York, and it is nice" />
+
+            <TextView
+                android:id="@+id/tvMatchUpdatedAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="20/20/2020" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

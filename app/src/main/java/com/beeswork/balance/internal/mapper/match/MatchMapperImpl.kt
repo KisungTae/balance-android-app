@@ -12,7 +12,7 @@ class MatchMapperImpl : MatchMapper {
             dto.matchedId,
             dto.active,
             dto.unmatched,
-            dto.name ?: "",
+            dto.name,
             dto.repPhotoKey ?: "",
             dto.deleted,
             dto.createdAt ?: OffsetDateTime.MIN
@@ -21,19 +21,17 @@ class MatchMapperImpl : MatchMapper {
 
     override fun fromEntityToDomain(entity: Match): MatchDomain {
         return MatchDomain(
-            entity.chatId
-//            entity.matchedId,
-//            entity.unmatched,
-//            entity.updatedAt,
-//            entity.name,
-//            entity.repPhotoKey,
-//            entity.blocked,
-//            entity.deleted,
-//            entity.accountUpdatedAt,
-//            entity.unreadMessageCount,
-//            entity.recentMessage,
-//            entity.lastReadChatMessageId,
-//            entity.accountViewedAt
+            entity.chatId,
+            entity.matchedId,
+            entity.active,
+            entity.unmatched,
+            entity.name,
+            entity.repPhotoKey,
+            entity.deleted,
+            entity.updatedAt,
+            entity.unread,
+            entity.recentChatMessage,
+            entity.lastReadChatMessageId
         )
     }
 }

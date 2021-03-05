@@ -25,10 +25,10 @@ data class Match(
     var deleted: Boolean,
     var updatedAt: OffsetDateTime,
     var unread: Boolean = false,
-    var recentMessage: String = "",
+    var recentChatMessage: String = "",
     var lastReadChatMessageId: Long = 0
 ) {
-    fun valid(): Boolean {
+    fun isValid(): Boolean {
         return (!unmatched && !deleted)
     }
 }

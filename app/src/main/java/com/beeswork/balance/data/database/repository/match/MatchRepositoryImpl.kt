@@ -131,7 +131,6 @@ class MatchRepositoryImpl(
             match.deleted = newMatch.deleted
             match.active = newMatch.active
             match.repPhotoKey = newMatch.repPhotoKey
-            match.name = newMatch.name
         } ?: kotlin.run {
             chatMessageDAO.insert(ChatMessage.getTail(newMatch.chatId, newMatch.updatedAt))
             chatMessageDAO.insert(ChatMessage.getHead(newMatch.chatId, newMatch.updatedAt))
@@ -140,12 +139,12 @@ class MatchRepositoryImpl(
     }
 
     private fun updateRecentChatMessage(match: Match) {
-        if (!match.valid()) return
+        if (!match.isValid()) return
         chatMessageDAO.findMostRecentAfter(
             match.chatId,
             match.lastReadChatMessageId
         )?.let { chatMessage ->
-            match.recentMessage = chatMessage.body
+            match.recentChatMessage = chatMessage.body
             match.updatedAt = chatMessage.createdAt
             match.active = true
             match.unread = true

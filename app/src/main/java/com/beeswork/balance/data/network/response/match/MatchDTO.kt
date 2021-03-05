@@ -8,7 +8,7 @@ data class MatchDTO(
     val matchedId: UUID,
     val active: Boolean,
     val unmatched: Boolean,
-    val name: String?,
+    val name: String,
     val repPhotoKey: String?,
     val deleted: Boolean,
     val createdAt: OffsetDateTime?

@@ -4,17 +4,15 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 data class MatchDomain(
-    val chatId: Long
-//    val matchedId: UUID?,
-//    val unmatched: Boolean,
-//    val updatedAt: OffsetDateTime,
-//    val name: String,
-//    val repPhotoKey: String?,
-//    val blocked: Boolean,
-//    val deleted: Boolean,
-//    val accountUpdatedAt: OffsetDateTime,
-//    val unreadMessageCount: Int = 0,
-//    val recentMessage: String = "",
-//    var lastReadChatMessageId: Long = 0,
-//    var accountViewedAt: OffsetDateTime
+    val chatId: Long,
+    val matchedId: UUID,
+    val active: Boolean,
+    val unmatched: Boolean,
+    val name: String,
+    val repPhotoKey: String,
+    val deleted: Boolean,
+    val updatedAt: OffsetDateTime,
+    val unread: Boolean,
+    val recentChatMessage: String,
+    val lastReadChatMessageId: Long
 )

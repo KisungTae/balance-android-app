@@ -45,11 +45,6 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
         setupFetchMatchesObserver()
         setupMatchesObserver()
         viewModel.fetchMatches()
-
-//      TODO: remove me
-        changeButton.setOnClickListener {
-            viewModel.change()
-        }
     }
 
     private fun setupFetchMatchesObserver() {
@@ -67,7 +62,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
 
     private suspend fun setupMatchesObserver() {
         viewModel.matches.await().observe(viewLifecycleOwner, {
-//            matchPagedListAdapter.submitList(it)
+            matchPagedListAdapter.submitList(it)
         })
     }
 
