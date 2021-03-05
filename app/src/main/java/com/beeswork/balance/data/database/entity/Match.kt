@@ -20,7 +20,7 @@ data class Match(
     val matchedId: UUID,
     var active: Boolean,
     var unmatched: Boolean,
-    val name: String,
+    var name: String,
     var repPhotoKey: String,
     var deleted: Boolean,
     var updatedAt: OffsetDateTime,
@@ -28,10 +28,7 @@ data class Match(
     var recentMessage: String = "",
     var lastReadChatMessageId: Long = 0
 ) {
-    fun updateOnUnreadChatMessage(body: String, createdAt: OffsetDateTime) {
-        this.recentMessage = body
-        this.updatedAt = createdAt
-        this.active = true
-        this.unread = true
+    fun valid(): Boolean {
+        return (!unmatched && !deleted)
     }
 }

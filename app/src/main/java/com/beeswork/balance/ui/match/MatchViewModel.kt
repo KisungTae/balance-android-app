@@ -8,6 +8,7 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +17,9 @@ import kotlinx.coroutines.launch
 
 class MatchViewModel(
     private val balanceRepository: BalanceRepository,
-    private val matchRepository: MatchRepository
+    private val matchRepository: MatchRepository,
+    private val matchMapper: MatchMapper
 ) : ViewModel() {
-
-    val fetchMatchesResponse: LiveData<Resource<List<Match>>> = balanceRepository.fetchMatchesResponse
 
     private val _fetchMatches = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatches: LiveData<Resource<EmptyResponse>> get() = _fetchMatches
@@ -29,17 +29,12 @@ class MatchViewModel(
         .setMaxSize(MATCH_MAX_PAGE_SIZE)
         .setInitialLoadSizeHint(MATCH_PAGE_SIZE)
         .setPageSize(MATCH_PAGE_SIZE)
-//        .setPrefetchDistance(MATCH_PAGE_PREFETCH_DISTANCE)
+        .setPrefetchDistance(MATCH_PREFETCH_DISTANCE)
         .build()
-
-//    val matches by lazyDeferred {
-//        LivePagedListBuilder(balanceRepository.getMatches(), pagedListConfig).build()
-//    }
 
     val matches by lazyDeferred {
         LivePagedListBuilder(balanceRepository.getMatches().map {
-            return@map MatchDomain(it.chatId)
-//            MatchDomain(it.chatId)
+            matchMapper.fromEntityToDomain(it)
         }, pagedListConfig).build()
     }
 
@@ -49,18 +44,10 @@ class MatchViewModel(
         }
     }
 
-//  TODO: remove me
-    fun change() {
-        CoroutineScope(Dispatchers.IO).launch {
-            matchRepository.change()
-        }
-
-    }
-
     companion object {
         private const val MATCH_PAGE_SIZE = 30
-        private const val MATCH_PAGE_PREFETCH_DISTANCE = MATCH_PAGE_SIZE * 2
-        private const val MATCH_MAX_PAGE_SIZE = MATCH_PAGE_PREFETCH_DISTANCE * 2 + MATCH_PAGE_SIZE
+        private const val MATCH_PREFETCH_DISTANCE = 0
+        private const val MATCH_MAX_PAGE_SIZE = MATCH_PAGE_SIZE * 4 + MATCH_PAGE_SIZE
     }
 
 

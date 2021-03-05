@@ -12,7 +12,7 @@ import org.threeten.bp.OffsetDateTime
 @Dao
 interface ChatMessageDAO {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(chatMessage: ChatMessage): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

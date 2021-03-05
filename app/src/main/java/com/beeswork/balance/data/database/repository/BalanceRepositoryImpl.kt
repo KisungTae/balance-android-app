@@ -148,7 +148,7 @@ class BalanceRepositoryImpl(
 
     override suspend fun getMatches(): DataSource.Factory<Int, Match> {
         return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.getMatches()
+            return@withContext matchDAO.findAllPaged()
         }
     }
 

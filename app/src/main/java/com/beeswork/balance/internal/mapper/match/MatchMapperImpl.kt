@@ -3,6 +3,7 @@ package com.beeswork.balance.internal.mapper.match
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.match.MatchDomain
+import org.threeten.bp.OffsetDateTime
 
 class MatchMapperImpl : MatchMapper {
     override fun fromDTOToEntity(dto: MatchDTO): Match {
@@ -11,10 +12,10 @@ class MatchMapperImpl : MatchMapper {
             dto.matchedId,
             dto.active,
             dto.unmatched,
-            dto.name,
-            dto.repPhotoKey,
+            dto.name ?: "",
+            dto.repPhotoKey ?: "",
             dto.deleted,
-            dto.createdAt
+            dto.createdAt ?: OffsetDateTime.MIN
         )
     }
 

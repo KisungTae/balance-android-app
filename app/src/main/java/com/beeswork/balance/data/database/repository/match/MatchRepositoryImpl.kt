@@ -9,11 +9,13 @@ import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
+import kotlin.random.Random
 
 
 class MatchRepositoryImpl(
@@ -30,6 +32,12 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
+    override suspend fun listMatches(): DataSource.Factory<Int, Match> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findAllPaged()
+        }
+    }
+
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         updateFetchMatchesResultStatus(Resource.Status.LOADING)
         val listMatches = matchRDS.listMatches(
@@ -44,6 +52,9 @@ class MatchRepositoryImpl(
         }
 
         listMatches.data?.let { data ->
+            //      TODO: remove me
+            saveSentChatMessages(data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) })
+
             saveChatMessages(
                 OffsetDateTime.now(),
                 data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
@@ -103,131 +114,60 @@ class MatchRepositoryImpl(
         }
     }
 
-
     private fun saveMatches(matches: List<Match>) {
         balanceDatabase.runInTransaction {
             for (newMatch in matches) {
-                saveMatch(newMatch)
-
-                match.unreadMessageCount = chatMessageDAO.countAllAfter(
-                    match.chatId,
-                    lastReadChatMessageId
-                )
-
-                chatMessageDAO.findLastProcessed(match.chatId)?.let {
-                    match.updatedAt = it.createdAt
-                    match.recentMessage = it.body
-                } ?: {
-                    match.recentMessage = null
-                }
-
-                if (matchDAO.existsByChatId(match.chatId))
-                    matchDAO.updateMatch(
-                        match.chatId,
-                        match.unmatched,
-                        match.updatedAt,
-                        match.name,
-                        match.repPhotoKey,
-                        match.blocked,
-                        match.deleted,
-                        match.accountUpdatedAt,
-                        match.unreadMessageCount,
-                        match.recentMessage
-                    )
-                else {
-                    chatMessageDAO.insert(
-                        ChatMessage.getTail(
-                            match.chatId,
-                            match.updatedAt
-                        )
-                    )
-                    chatMessageDAO.insert(
-                        ChatMessage.getHead(
-                            match.chatId,
-                            match.updatedAt
-                        )
-                    )
-                    clickedDAO.insert(Clicked(match.matchedId))
-                    clickerDAO.deleteById(match.matchedId)
-                }
-
+                updateMatch(newMatch)
+                clickerDAO.deleteById(newMatch.matchedId)
+                clickedDAO.insert(Clicked(newMatch.matchedId))
+                matchDAO.insert(newMatch)
             }
         }
     }
 
-    private fun saveMatch(newMatch: Match) {
+    private fun updateMatch(newMatch: Match) {
         matchDAO.findById(newMatch.chatId)?.let { match ->
             match.unmatched = newMatch.unmatched
+            match.deleted = newMatch.deleted
             match.active = newMatch.active
             match.repPhotoKey = newMatch.repPhotoKey
-            match.deleted = newMatch.deleted
-            chatMessageDAO.findMostRecentAfter(
-                match.chatId,
-                match.lastReadChatMessageId
-            )?.let { chatMessage ->
-                match.updateOnUnreadChatMessage(chatMessage.body, chatMessage.createdAt)
-            }
-            matchDAO.insert(match)
+            match.name = newMatch.name
         } ?: kotlin.run {
             chatMessageDAO.insert(ChatMessage.getTail(newMatch.chatId, newMatch.updatedAt))
             chatMessageDAO.insert(ChatMessage.getHead(newMatch.chatId, newMatch.updatedAt))
-            clickerDAO.deleteById(newMatch.matchedId)
-            clickedDAO.insert(Clicked(newMatch.matchedId))
-            chatMessageDAO.findMostRecentAfter(
-                newMatch.chatId,
-                newMatch.lastReadChatMessageId
-            )?.let { chatMessage ->
-                newMatch.updateOnUnreadChatMessage(chatMessage.body, chatMessage.createdAt)
-            }
-            matchDAO.insert(newMatch)
+        }
+        updateRecentChatMessage(newMatch)
+    }
+
+    private fun updateRecentChatMessage(match: Match) {
+        if (!match.valid()) return
+        chatMessageDAO.findMostRecentAfter(
+            match.chatId,
+            match.lastReadChatMessageId
+        )?.let { chatMessage ->
+            match.recentMessage = chatMessage.body
+            match.updatedAt = chatMessage.createdAt
+            match.active = true
+            match.unread = true
         }
     }
 
     //  TODO: remove me
-    private fun testSaveSentChatMessages() {
-//        val random = Random()
-//        for (msg in sentChatMessages) {
-//            chatMessageDAO.insert(
-//                ChatMessage(
-//                    msg.messageId,
-//                    msg.id,
-//                    msg.chatId,
-//                    "message-${random.nextFloat()}",
-//                    ChatMessageStatus.SENDING,
-//                    null,
-//                    OffsetDateTime.now()
-//                )
-//            )
-//        }
-    }
-
-
-    override suspend fun getMatches(): DataSource.Factory<Int, Match> {
-        return matchDAO.getMatches()
-    }
-
-    override suspend fun change() {
-
-//        val matches = matchDAO.findAll()
-//        for (i in matches.indices) {
-//            val match = matches[i]
-//            println("match.lastReadChatMessageId = 999")
-//            match.lastReadChatMessageId = 123456
-//        }
-//        println("matchDAO.insertAll(matches)")
-//        matchDAO.insertAll(matches)
-
-//        balanceDatabase.runInTransaction {
-//            val match = matchDAO.existsByChatId(1)
-//            println("matchDAO.existsByChatId(1): $match")
-//            val matches = matchDAO.findAll()
-//            for (i in matches.indices) {
-//                val match = matches[i]
-//                println("match.lastReadChatMessageId = 999")
-//                match.lastReadChatMessageId = 777
-//            }
-//            matchDAO.insertAll(matches)
-//        }
+    private fun saveSentChatMessages(sentChatMessages: List<ChatMessage>) {
+        val random = Random(100)
+        for (msg in sentChatMessages) {
+            chatMessageDAO.insert(
+                ChatMessage(
+                    msg.messageId,
+                    msg.id,
+                    msg.chatId,
+                    "message-${random.nextFloat()}",
+                    ChatMessageStatus.SENDING,
+                    OffsetDateTime.now(),
+                    OffsetDateTime.now()
+                )
+            )
+        }
     }
 }
 
