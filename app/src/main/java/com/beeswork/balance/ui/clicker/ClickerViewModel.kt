@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.clicked
+package com.beeswork.balance.ui.clicker
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

@@ -1,60 +1,33 @@
 package com.beeswork.balance.ui.match
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.internal.util.inflate
+import com.beeswork.balance.databinding.ItemMatchBinding
+import com.beeswork.balance.internal.constant.EndPoint
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_match.view.*
+import com.bumptech.glide.request.RequestOptions
 
 class MatchPagedListAdapter(
-    private val onMatchListener: OnMatchListener,
-    private val context: Context
-) : PagedListAdapter<MatchDomain, MatchPagedListAdapter.MatchHolder>(diffCallback) {
+    private val onMatchListener: OnMatchListener
+) : PagedListAdapter<MatchDomain, MatchPagedListAdapter.ViewHolder>(diffCallback) {
 
-    private val colorTextGrey: Int = ContextCompat.getColor(context, R.color.textGrey)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchHolder {
-        return MatchHolder(parent.inflate(R.layout.item_match), onMatchListener)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(
+            ItemMatchBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onMatchListener,
+            parent.context
+        )
     }
 
-    override fun onBindViewHolder(holder: MatchHolder, position: Int) {
-        getItem(position)?.let {
-            val itemView = holder.itemView
-            itemView.tvMatchName.text = it.name
-            itemView.tvMatchUnreadIndicator.visibility = if (it.unread) View.VISIBLE else View.GONE
-            itemView.tvMatchRecentChatMessage.text = getRecentChatMessage(it)
-            itemView.tvMatchUpdatedAt.text = it.updatedAt.toLocalDate().toString()
-
-            if (it.unmatched || it.deleted) {
-                itemView.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
-                itemView.tvMatchName.setTextColor(colorTextGrey)
-                itemView.tvMatchRecentChatMessage.setTextColor(colorTextGrey)
-                itemView.tvMatchUpdatedAt.setTextColor(colorTextGrey)
-            } else if (!it.active) {
-                Glide.with(context).load(it.repPhotoKey)
-            } else {
-
-            }
-
-        }
-    }
-
-
-
-
-
-    private fun getRecentChatMessage(matchDomain: MatchDomain): String {
-        return if (matchDomain.deleted) context.getString(R.string.match_deleted_recent_chat_message)
-        else if (matchDomain.unmatched) context.getString(R.string.match_unmatched_recent_chat_message)
-        else if (!matchDomain.active) context.getString(R.string.match_new_recent_chat_message)
-        else matchDomain.recentChatMessage
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        getItem(position)?.let { holder.bind(it) }
     }
 
     companion object {
@@ -67,17 +40,58 @@ class MatchPagedListAdapter(
         }
     }
 
-    class MatchHolder(
-        itemView: View,
-        private val onMatchListener: OnMatchListener
-    ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    class ViewHolder(
+        private val binding: ItemMatchBinding,
+        private val onMatchListener: OnMatchListener,
+        private val context: Context
+    ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
             itemView.setOnClickListener(this)
         }
 
+        fun bind(matchDomain: MatchDomain) {
+            binding.tvMatchName.text = matchDomain.name
+            binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
+            binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
+            binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
+
+            if (matchDomain.unmatched || matchDomain.deleted) {
+                val colorTextGrey = context.getColor(R.color.textGrey)
+                binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
+                binding.tvMatchName.setTextColor(colorTextGrey)
+                binding.tvMatchRecentChatMessage.setTextColor(colorTextGrey)
+                binding.tvMatchUpdatedAt.setTextColor(colorTextGrey)
+            } else {
+//                TODO: uncomment this
+//                val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
+                val photoEndPoint = ""
+                Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
+
+                if (!matchDomain.active) {
+                    // TODO: put circle border to imageview
+                }
+
+            }
+        }
+
         override fun onClick(view: View) {
             onMatchListener.onMatchClick(view, layoutPosition)
+        }
+
+        companion object {
+            private fun getRecentChatMessage(matchDomain: MatchDomain, context: Context): String {
+                return if (matchDomain.deleted) context.getString(R.string.match_deleted_recent_chat_message)
+                else if (matchDomain.unmatched) context.getString(R.string.match_unmatched_recent_chat_message)
+                else if (!matchDomain.active) context.getString(R.string.match_new_recent_chat_message)
+                else matchDomain.recentChatMessage
+            }
+
+            private fun glideRequestOptions(): RequestOptions {
+                return RequestOptions().placeholder(R.drawable.ic_baseline_account_circle)
+                    .error(R.drawable.ic_baseline_account_circle)
+                    .centerCrop()
+            }
         }
     }
 

@@ -10,9 +10,9 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
-import kotlinx.android.synthetic.main.fragment_match.*
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -26,12 +26,14 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
     private val viewModelFactory: MatchViewModelFactory by instance()
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagedListAdapter: MatchPagedListAdapter
+    private lateinit var binding: FragmentMatchBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_match, container, false)
+    ): View {
+        binding = FragmentMatchBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,19 +46,15 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
         setupMatchRecyclerView()
         setupFetchMatchesObserver()
         setupMatchesObserver()
-        viewModel.fetchMatches()
+//        viewModel.fetchMatches()
     }
 
     private fun setupFetchMatchesObserver() {
         viewModel.fetchMatches.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.ERROR -> {
-                    FetchErrorDialog(
-                        it.errorMessage,
-                        this@MatchFragment
-                    ).show(childFragmentManager, FetchErrorDialog.TAG)
-                }
-            }
+            if (it.isError()) FetchErrorDialog(it.errorMessage, this@MatchFragment).show(
+                childFragmentManager,
+                FetchErrorDialog.TAG
+            )
         })
     }
 
@@ -68,18 +66,17 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
 
     private fun setupMatchRecyclerView() {
         matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
-        rvMatch.adapter = matchPagedListAdapter
-        rvMatch.layoutManager = LinearLayoutManager(this@MatchFragment.context)
+        binding.rvMatch.adapter = matchPagedListAdapter
+        binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
     }
-
 
 
     override fun onMatchClick(view: View, position: Int) {
 //      TODO: it.matchedId to UUID
-        matchPagedListAdapter.getMatchByPosition(position)?.let {
-            Navigation.findNavController(view)
-                .navigate(MatchFragmentDirections.matchToChatAction(it.chatId, "it.matchedId"))
-        }
+//        matchPagedListAdapter.getMatchByPosition(position)?.let {
+//            Navigation.findNavController(view)
+//                .navigate(MatchFragmentDirections.matchToChatAction(it.chatId, "it.matchedId"))
+//        }
     }
 
     override fun onRefetch() {

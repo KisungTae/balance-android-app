@@ -5,21 +5,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.databinding.ItemCardImageBinding
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_card_image.view.*
 
 class CardImageViewPagerAdapter(
     private val images: List<Int>,
     private val cardImageListener: CardImageListener
-): RecyclerView.Adapter<CardImageViewPagerAdapter.ViewHolder>() {
-
+) : RecyclerView.Adapter<CardImageViewPagerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(inflater.inflate(R.layout.item_card_image, parent, false), cardImageListener)
+        return ViewHolder(
+            ItemCardImageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            cardImageListener
+        )
     }
 
     override fun getItemCount(): Int {
@@ -27,7 +29,7 @@ class CardImageViewPagerAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemView.imageView.setImageResource(images[position])
+//        holder.itemView.imageView.setImageResource(images[position])
     }
 
     interface CardImageListener {
@@ -36,22 +38,23 @@ class CardImageViewPagerAdapter(
     }
 
     class ViewHolder(
-        itemView: View,
+        private val binding: ItemCardImageBinding,
         private val cardImageListener: CardImageListener
-    ): RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            itemView.btnCardImageLeft.setOnClickListener {
+            binding.btnCardImageLeft.setOnClickListener {
                 println("btnCardImageLeft.setOnClickListener")
                 cardImageListener.onLeftButtonClick(adapterPosition)
 //                viewPager2.currentItem = adapterPosition - 1
             }
 
-            itemView.btnCardImageRight.setOnClickListener {
+            binding.btnCardImageRight.setOnClickListener {
                 println("btnCardImageRight.setOnClickListener")
                 cardImageListener.onRightButtonClick(adapterPosition)
 //                viewPager2.currentItem = adapterPosition + 1
             }
         }
+
     }
 }

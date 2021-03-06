@@ -10,10 +10,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.databinding.DialogBalanceGameBinding
 import com.beeswork.balance.internal.constant.BalanceGameAnswer
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.NotificationType
-import kotlinx.android.synthetic.main.dialog_balance_game.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -27,6 +27,7 @@ class BalanceGameDialog(
     override val kodein by closestKodein()
     private val viewModelFactory: BalanceGameDialogViewModelFactory by instance()
     private lateinit var viewModel: BalanceGameDialogViewModel
+    private lateinit var binding: DialogBalanceGameBinding
 
     private lateinit var questions: List<QuestionResponse>
     private var swipeId: Long? = null
@@ -37,6 +38,7 @@ class BalanceGameDialog(
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
         viewModel = ViewModelProvider(this, viewModelFactory).get(BalanceGameDialogViewModel::class.java)
+        binding = DialogBalanceGameBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
@@ -152,7 +154,7 @@ class BalanceGameDialog(
         currentIndex = -1
         answers.clear()
         hideLayouts()
-        llBalanceGame.visibility = LinearLayout.VISIBLE
+        binding.llBalanceGame.visibility = LinearLayout.VISIBLE
 
         swipeId = newSwipeId
         questions = newQuestionResponses
@@ -169,9 +171,9 @@ class BalanceGameDialog(
         currentIndex++
         if (currentIndex < questions.size) {
             val question = questions[currentIndex]
-            tvQuestionDescription.text = question.description
-            btnTopOption.text = question.topOption
-            btnBottomOption.text = question.bottomOption
+            binding.tvQuestionDescription.text = question.description
+            binding.btnTopOption.text = question.topOption
+            binding.btnBottomOption.text = question.bottomOption
         } else {
             viewModel.click(swipedId, swipeId!!, answers)
             setBalanceGameLoading(getString(R.string.question_checking))
@@ -180,62 +182,60 @@ class BalanceGameDialog(
 
     private fun setBalanceGameLoadError(enableReloadBtn: Boolean, exceptionMessage: String) {
         hideLayouts()
-        llBalanceGameLoadError.visibility = LinearLayout.VISIBLE
-        btnBalanceGameReload.isEnabled = enableReloadBtn
-        btnBalanceGameReload.visibility = if (enableReloadBtn) View.GONE else View.VISIBLE
-        tvBalanceGameLoadErrorMessage.text = exceptionMessage
+        binding.llBalanceGameLoadError.visibility = LinearLayout.VISIBLE
+        binding.btnBalanceGameReload.isEnabled = enableReloadBtn
+        binding.btnBalanceGameReload.visibility = if (enableReloadBtn) View.GONE else View.VISIBLE
+        binding.tvBalanceGameLoadErrorMessage.text = exceptionMessage
     }
 
     private fun setBalanceGameClickError(enableClickBtn: Boolean, enableRefreshBtn: Boolean, exceptionMessage: String) {
         hideLayouts()
-        llBalanceGameClickError.visibility = LinearLayout.VISIBLE
-
-        btnBalanceGameClick.visibility = if (enableClickBtn) View.VISIBLE else View.GONE
-        btnBalanceGameRefresh.visibility = if (enableRefreshBtn) View.VISIBLE else View.GONE
-
-        tvBalanceGameClickErrorMessage.text =exceptionMessage
+        binding.llBalanceGameClickError.visibility = LinearLayout.VISIBLE
+        binding.btnBalanceGameClick.visibility = if (enableClickBtn) View.VISIBLE else View.GONE
+        binding.btnBalanceGameRefresh.visibility = if (enableRefreshBtn) View.VISIBLE else View.GONE
+        binding.tvBalanceGameClickErrorMessage.text =exceptionMessage
     }
 
     private fun setBalanceGameNotClicked() {
         hideLayouts()
-        llBalanceGameNotClick.visibility = LinearLayout.VISIBLE
+        binding.llBalanceGameNotClick.visibility = LinearLayout.VISIBLE
     }
 
     private fun setBalanceGameClicked(swipedPhotoKey: String) {
         hideLayouts()
-        llBalanceGameClicked.visibility = LinearLayout.VISIBLE
+        binding.llBalanceGameClicked.visibility = LinearLayout.VISIBLE
     }
 
     private fun setBalanceGameLoading(message: String) {
         hideLayouts()
-        llBalanceGameLoading.visibility = LinearLayout.VISIBLE
-        tvBalanceGameLoadingMessage.text = message
+        binding.llBalanceGameLoading.visibility = LinearLayout.VISIBLE
+        binding.tvBalanceGameLoadingMessage.text = message
     }
 
     private fun hideLayouts() {
-        llBalanceGameLoading.visibility = LinearLayout.GONE
-        llBalanceGame.visibility = LinearLayout.GONE
-        llBalanceGameLoadError.visibility = LinearLayout.GONE
-        llBalanceGameClicked.visibility = LinearLayout.GONE
-        llBalanceGameClickError.visibility = LinearLayout.GONE
-        llBalanceGameNotClick.visibility = LinearLayout.GONE
+        binding.llBalanceGameLoading.visibility = LinearLayout.GONE
+        binding.llBalanceGame.visibility = LinearLayout.GONE
+        binding.llBalanceGameLoadError.visibility = LinearLayout.GONE
+        binding.llBalanceGameClicked.visibility = LinearLayout.GONE
+        binding.llBalanceGameClickError.visibility = LinearLayout.GONE
+        binding.llBalanceGameNotClick.visibility = LinearLayout.GONE
     }
 
     private fun setupListeners() {
-        btnTopOption.setOnClickListener { selectAnswer(BalanceGameAnswer.TOP) }
-        btnBottomOption.setOnClickListener { selectAnswer(BalanceGameAnswer.BOTTOM) }
+        binding.btnTopOption.setOnClickListener { selectAnswer(BalanceGameAnswer.TOP) }
+        binding.btnBottomOption.setOnClickListener { selectAnswer(BalanceGameAnswer.BOTTOM) }
 
-        btnBalanceGameReload.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
-        btnBalanceGameLoadErrorClose.setOnClickListener { dismiss() }
+        binding.btnBalanceGameReload.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
+        binding.btnBalanceGameLoadErrorClose.setOnClickListener { dismiss() }
 
-        btnBalanceGameClick.setOnClickListener { viewModel.click(swipedId, swipeId!!, answers) }
-        btnBalanceGameClickErrorCloseBtn.setOnClickListener { dismiss() }
-        btnBalanceGameRefresh.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
+        binding.btnBalanceGameClick.setOnClickListener { viewModel.click(swipedId, swipeId!!, answers) }
+        binding.btnBalanceGameClickErrorCloseBtn.setOnClickListener { dismiss() }
+        binding.btnBalanceGameRefresh.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
 
-        btnBalanceGameRetry.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
-        btnBalanceGameNotClickClose.setOnClickListener { dismiss() }
+        binding.btnBalanceGameRetry.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
+        binding.btnBalanceGameNotClickClose.setOnClickListener { dismiss() }
 
-        btnBalanceGameClickedClose.setOnClickListener { dismiss() }
+        binding.btnBalanceGameClickedClose.setOnClickListener { dismiss() }
     }
 
     companion object {

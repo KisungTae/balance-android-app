@@ -7,8 +7,6 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.inflate
-import kotlinx.android.synthetic.main.item_chat_message_received.view.*
-import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
 
 class ChatRecyclerViewAdapter : RecyclerView.Adapter<ChatRecyclerViewAdapter.MessageViewHolder>() {
 
@@ -23,7 +21,7 @@ class ChatRecyclerViewAdapter : RecyclerView.Adapter<ChatRecyclerViewAdapter.Mes
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        chatMessages[position].let { holder.bind(it) }
+//        chatMessages[position].let { holder.bind(it) }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -38,7 +36,7 @@ class ChatRecyclerViewAdapter : RecyclerView.Adapter<ChatRecyclerViewAdapter.Mes
     }
 
     fun fetchInitial(chatMessages: List<ChatMessage>) {
-        
+
     }
 
     fun append() {
@@ -58,35 +56,35 @@ class ChatRecyclerViewAdapter : RecyclerView.Adapter<ChatRecyclerViewAdapter.Mes
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(chatMessage: ChatMessage) {
-            when (chatMessage.status) {
-                ChatMessageStatus.SENT -> {
-                    itemView.tvChatMessageSentBody.text =
-                        "messageId: ${chatMessage.messageId} | ${chatMessage.body} | id: ${chatMessage.id}"
-                    itemView.tvChatMessageSentCreatedAt.text = chatMessage.createdAt.toString()
-                    showLayout(itemView, View.VISIBLE, View.GONE, View.GONE)
-                }
-                ChatMessageStatus.SENDING -> {
-                    itemView.tvChatMessageSentBody.text =
-                        "messageId: ${chatMessage.messageId} | ${chatMessage.body} | id: ${chatMessage.id}"
-                    showLayout(itemView, View.GONE, View.VISIBLE, View.GONE)
-                }
-                ChatMessageStatus.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
-                ChatMessageStatus.RECEIVED -> {
-                    itemView.tvChatMessageReceivedBody.text = chatMessage.body
-                    itemView.tvChatMessageReceivedCreatedAt.text = chatMessage.createdAt.toString()
-                }
-            }
-        }
-
-
-        companion object {
-            fun showLayout(itemView: View, createdAt: Int, loading: Int, errorOptions: Int) {
-                itemView.tvChatMessageSentCreatedAt.visibility = createdAt
-                itemView.skvChatMessageSentLoading.visibility = loading
-                itemView.llChatMessageSentErrorOptions.visibility = errorOptions
-            }
-        }
+//        fun bind(chatMessage: ChatMessage) {
+//            when (chatMessage.status) {
+//                ChatMessageStatus.SENT -> {
+//                    itemView.tvChatMessageSentBody.text =
+//                        "messageId: ${chatMessage.messageId} | ${chatMessage.body} | id: ${chatMessage.id}"
+//                    itemView.tvChatMessageSentCreatedAt.text = chatMessage.createdAt.toString()
+//                    showLayout(itemView, View.VISIBLE, View.GONE, View.GONE)
+//                }
+//                ChatMessageStatus.SENDING -> {
+//                    itemView.tvChatMessageSentBody.text =
+//                        "messageId: ${chatMessage.messageId} | ${chatMessage.body} | id: ${chatMessage.id}"
+//                    showLayout(itemView, View.GONE, View.VISIBLE, View.GONE)
+//                }
+//                ChatMessageStatus.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
+//                ChatMessageStatus.RECEIVED -> {
+//                    itemView.tvChatMessageReceivedBody.text = chatMessage.body
+//                    itemView.tvChatMessageReceivedCreatedAt.text = chatMessage.createdAt.toString()
+//                }
+//            }
+//        }
+//
+//
+//        companion object {
+//            fun showLayout(itemView: View, createdAt: Int, loading: Int, errorOptions: Int) {
+//                itemView.tvChatMessageSentCreatedAt.visibility = createdAt
+//                itemView.skvChatMessageSentLoading.visibility = loading
+//                itemView.llChatMessageSentErrorOptions.visibility = errorOptions
+//            }
+//        }
     }
 
 

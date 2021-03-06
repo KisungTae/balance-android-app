@@ -2,7 +2,6 @@ package com.beeswork.balance
 
 import android.app.Application
 import android.content.Context
-import android.content.res.Resources
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
@@ -29,7 +28,7 @@ import com.beeswork.balance.service.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
-import com.beeswork.balance.ui.clicked.ClickedViewModelFactory
+import com.beeswork.balance.ui.clicker.ClickerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
@@ -136,7 +135,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { SwipeViewModelFactory(instance()) }
-        bind() from provider { ClickedViewModelFactory(instance()) }
+        bind() from provider { ClickerViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
 
 

@@ -13,6 +13,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
@@ -22,7 +23,6 @@ import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.SwipeableMethod
-import kotlinx.android.synthetic.main.fragment_swipe.*
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -40,10 +40,13 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     private lateinit var viewModel: SwipeViewModel
     private lateinit var cardStackAdapter: CardStackAdapter
     private lateinit var broadcastReceiver: BroadcastReceiver
+    private lateinit var binding: FragmentSwipeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = FragmentSwipeBinding.inflate(layoutInflater)
         setupBroadcastReceiver()
+
     }
 
     private fun setupBroadcastReceiver() {
@@ -80,25 +83,25 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         setupCardsObserver()
 
         viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
-            tvClickedCount.text = clickedCount.toString()
+            binding.tvClickedCount.text = clickedCount.toString()
         })
 
         viewModel.unreadMessageCount.await().observe(viewLifecycleOwner, { unreadMessageCount ->
-            tvUnreadMessageCount.text = unreadMessageCount.toString()
+            binding.tvUnreadMessageCount.text = unreadMessageCount.toString()
         })
 
-        btnSwipeFilter.setOnClickListener {
+        binding.btnSwipeFilter.setOnClickListener {
             SwipeFilterDialog(preferenceProvider).show(
                 childFragmentManager,
                 SwipeFilterDialog.TAG
             )
         }
 
-        btnCardStackReload.setOnClickListener {
+        binding.btnCardStackReload.setOnClickListener {
             viewModel.fetchCards(false)
         }
 
-        btnCardStackReset.setOnClickListener {
+        binding.btnCardStackReset.setOnClickListener {
             viewModel.fetchCards(true)
         }
     }
@@ -112,21 +115,21 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
                     if (cards == null || cards.isEmpty()) {
                         resetCardStackLayouts()
-                        llCardStackReset.visibility = View.VISIBLE
+                        binding.llCardStackReset.visibility = View.VISIBLE
                     } else {
                         cardStackAdapter.addCards(cardResource.data)
-                        csvSwipe.visibility = View.VISIBLE
+                        binding.csvSwipe.visibility = View.VISIBLE
                     }
 
                 }
                 Resource.Status.LOADING -> {
                     resetCardStackLayouts()
-                    llCardStackLoading.visibility = View.VISIBLE
+                    binding.llCardStackLoading.visibility = View.VISIBLE
 
                 }
                 Resource.Status.ERROR -> {
                     resetCardStackLayouts()
-                    llCardStackError.visibility = View.VISIBLE
+                    binding.llCardStackError.visibility = View.VISIBLE
                 }
             }
         })
@@ -134,11 +137,11 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
     private fun resetCardStackLayouts() {
         if (cardStackAdapter.itemCount == 0)
-            csvSwipe.visibility = View.GONE
+            binding.csvSwipe.visibility = View.GONE
 
-        llCardStackLoading.visibility = View.GONE
-        llCardStackError.visibility = View.GONE
-        llCardStackReset.visibility = View.GONE
+        binding.llCardStackLoading.visibility = View.GONE
+        binding.llCardStackError.visibility = View.GONE
+        binding.llCardStackReset.visibility = View.GONE
     }
 
     private fun setupSwipeCardStackView() {
@@ -148,9 +151,9 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         cardStackLayoutManager.setCanScrollVertical(false)
         cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
 
-        csvSwipe.layoutManager = cardStackLayoutManager
-        csvSwipe.adapter = cardStackAdapter
-        csvSwipe.itemAnimator = DefaultItemAnimator()
+        binding.csvSwipe.layoutManager = cardStackLayoutManager
+        binding.csvSwipe.adapter = cardStackAdapter
+        binding.csvSwipe.itemAnimator = DefaultItemAnimator()
     }
 
     override fun onResume() {
@@ -178,7 +181,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         val removedCard = cardStackAdapter.removeCard()
 
         if (cardStackAdapter.itemCount == 0)
-            csvSwipe.visibility = View.GONE
+            binding.csvSwipe.visibility = View.GONE
 
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE)
             viewModel.fetchCards(false)

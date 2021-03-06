@@ -39,7 +39,7 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
-        updateFetchMatchesResultStatus(Resource.Status.LOADING)
+        updateFetchMatchesResult(Resource.Status.LOADING)
         val listMatches = matchRDS.listMatches(
             preferenceProvider.getAccountId(),
             preferenceProvider.getIdentityToken(),
@@ -47,7 +47,7 @@ class MatchRepositoryImpl(
         )
 
         if (listMatches.isError()) {
-            updateFetchMatchesResultStatus(listMatches.status)
+            updateFetchMatchesResult(listMatches.status)
             return Resource.toEmptyResponse(listMatches)
         }
 
@@ -61,15 +61,15 @@ class MatchRepositoryImpl(
                 data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
             )
             syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
-            updateFetchMatchesResultStatus(listMatches.status)
+            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }, listMatches.status, data.fetchedAt)
         }
         return Resource.toEmptyResponse(listMatches)
     }
 
-    private fun updateFetchMatchesResultStatus(status: Resource.Status) {
+    private fun updateFetchMatchesResult(status: Resource.Status, fetchedAt: OffsetDateTime? = null) {
         val fetchMatchesResult = fetchMatchesResultDAO.findById() ?: FetchMatchesResult()
         fetchMatchesResult.status = status
+        fetchedAt?.let { fetchMatchesResult.fetchedAt = it }
         fetchMatchesResultDAO.insert(fetchMatchesResult)
     }
 
@@ -114,7 +114,7 @@ class MatchRepositoryImpl(
         }
     }
 
-    private fun saveMatches(matches: List<Match>) {
+    private fun saveMatches(matches: List<Match>, status: Resource.Status, fetchedAt: OffsetDateTime) {
         balanceDatabase.runInTransaction {
             for (newMatch in matches) {
                 updateMatch(newMatch)
@@ -122,6 +122,7 @@ class MatchRepositoryImpl(
                 clickedDAO.insert(Clicked(newMatch.matchedId))
                 matchDAO.insert(newMatch)
             }
+            updateFetchMatchesResult(status, fetchedAt)
         }
     }
 

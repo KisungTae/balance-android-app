@@ -15,13 +15,13 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
 import com.google.android.gms.location.*
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
-import kotlinx.android.synthetic.main.activity_main.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
@@ -33,16 +33,18 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private lateinit var broadcastReceiver: BroadcastReceiver
     private val preferenceProvider: PreferenceProvider by instance()
     private val balanceRepository: BalanceRepository by instance()
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fcvHost) as NavHostFragment
 
-        nvBottom.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
-        nvBottom.setupWithNavController(navHostFragment.navController)
+        binding.nvBottom.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
+        binding.nvBottom.setupWithNavController(navHostFragment.navController)
 
         setupBroadcastReceiver()
 

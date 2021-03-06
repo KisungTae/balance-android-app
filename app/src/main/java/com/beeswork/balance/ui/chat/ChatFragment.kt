@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
+import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.service.stomp.WebSocketEvent
 import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.dialog.ExceptionDialogListener
-import kotlinx.android.synthetic.main.fragment_chat.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -26,6 +26,12 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private lateinit var chatPagingAdapter: ChatPagingAdapter
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
+    private lateinit var binding: FragmentChatBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = FragmentChatBinding.inflate(layoutInflater)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,8 +63,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         setupChatRecyclerView()
         setupWebSocketLifeCycleEventObserver()
 
-        btnChatSend.setOnClickListener {
-            viewModel.sendChatMessage(etChatMessageBody.text.toString())
+        binding.btnChatSend.setOnClickListener {
+            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
         }
         observeChatMessageEvent()
         viewModel.fetchInitialChatMessages()
@@ -78,7 +84,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
-                    llChatLoading.visibility = View.GONE
+                    binding.llChatLoading.visibility = View.GONE
                 }
                 ChatMessageEvent.Type.FETCH -> {
 
@@ -91,11 +97,11 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     private fun setupChatRecyclerView() {
         chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
-        rvChat.adapter = chatRecyclerViewAdapter
+        binding.rvChat.adapter = chatRecyclerViewAdapter
         layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
-        rvChat.layoutManager = layoutManager
+        binding.rvChat.layoutManager = layoutManager
 
     }
 

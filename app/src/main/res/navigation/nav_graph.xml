@@ -44,9 +44,9 @@
 
     <fragment
         android:id="@+id/clickedFragment"
-        android:name="com.beeswork.balance.ui.clicked.ClickedFragment"
+        android:name="com.beeswork.balance.ui.clicker.ClickerFragment"
         android:label="ClickedFragment"
-        tools:layout="@layout/fragment_clicked" />
+        tools:layout="@layout/fragment_clicker" />
 
 
     <fragment

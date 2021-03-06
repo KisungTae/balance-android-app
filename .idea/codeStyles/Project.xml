@@ -158,6 +158,7 @@
     <codeStyleSettings language="kotlin">
       <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
       <option name="RIGHT_MARGIN" value="120" />
+      <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
     </codeStyleSettings>
   </code_scheme>
 </component>

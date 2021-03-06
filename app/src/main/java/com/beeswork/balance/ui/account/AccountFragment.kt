@@ -6,9 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.beeswork.balance.R
-import com.beeswork.balance.ui.base.ScopeFragment
 import com.beeswork.balance.ui.profile.ProfileDialog
-import kotlinx.android.synthetic.main.fragment_account.*
 
 class AccountFragment: Fragment() {
 
@@ -26,8 +24,8 @@ class AccountFragment: Fragment() {
     }
 
     private fun bindUI() {
-        llProfile.setOnClickListener {
-            ProfileDialog().show(childFragmentManager, ProfileDialog.TAG)
-        }
+//        llProfile.setOnClickListener {
+//            ProfileDialog().show(childFragmentManager, ProfileDialog.TAG)
+//        }
     }
 }

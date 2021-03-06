@@ -6,16 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
-import kotlinx.android.synthetic.main.dialog_clicked.*
-import kotlinx.android.synthetic.main.dialog_match.*
+import com.beeswork.balance.databinding.DialogClickedBinding
 
 class ClickedDialog(
     private val clickerPhotoKey: String?
 ): DialogFragment() {
 
+    private lateinit var binding: DialogClickedBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
+        binding = DialogClickedBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
@@ -28,8 +30,8 @@ class ClickedDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btnClickedDialogClose.setOnClickListener { dismiss() }
-        btnClickedDialogGoToClicked.setOnClickListener {
+        binding.btnClickedDialogClose.setOnClickListener { dismiss() }
+        binding.btnClickedDialogGoToClicked.setOnClickListener {
             dismiss()
         }
     }

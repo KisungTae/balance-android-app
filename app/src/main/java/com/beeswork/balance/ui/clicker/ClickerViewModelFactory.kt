@@ -1,10 +1,10 @@
-package com.beeswork.balance.ui.clicked
+package com.beeswork.balance.ui.clicker
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.BalanceRepository
 
-class ClickedViewModelFactory(
+class ClickerViewModelFactory(
     private val balanceRepository: BalanceRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 

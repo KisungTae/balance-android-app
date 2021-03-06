@@ -3,12 +3,14 @@ package com.beeswork.balance.ui.profile
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
+import com.beeswork.balance.databinding.ItemPhotoPickerBinding
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.inflate
 import com.bumptech.glide.Glide
@@ -20,7 +22,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.github.ybq.android.spinkit.SpinKitView
-import kotlinx.android.synthetic.main.item_photo_picker.view.*
 
 class PhotoPickerRecyclerViewAdapter(
     private val context: Context,
@@ -41,14 +42,19 @@ class PhotoPickerRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = parent.inflate(R.layout.item_photo_picker)
-        view.setOnClickListener {
-            photoPickers.find { p ->
-                p.key == it.tag?.let { tag -> return@let tag.toString() }
-            }?.let { p ->
-                photoPickerListener.onClickPhotoPicker(p.key, p.status, p.uri)
-            }
-        }
-        return ViewHolder(view)
+        val binding = ItemPhotoPickerBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+//        view.setOnClickListener {
+//            photoPickers.find { p ->
+//                p.key == it.tag?.let { tag -> return@let tag.toString() }
+//            }?.let { p ->
+//                photoPickerListener.onClickPhotoPicker(p.key, p.status, p.uri)
+//            }
+//        }
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
@@ -60,7 +66,7 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     private fun updateViewHolder(holder: ViewHolder, photoPicker: PhotoPicker) {
-        holder.itemView.tvSequence.text = photoPicker.sequence.toString()
+//        holder.itemView.tvSequence.text = photoPicker.sequence.toString()
 
         holder.itemView.tag = photoPicker.key
         when (photoPicker.status) {
@@ -134,7 +140,6 @@ class PhotoPickerRecyclerViewAdapter(
     // NOTE 1. DiskCacheStrategy.NONE, then image is not stored in cache directory
     private fun glideRequestOptions(): RequestOptions {
         return RequestOptions()
-            .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .priority(Priority.HIGH)
             .centerCrop()
@@ -308,7 +313,7 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     class ViewHolder(
-        view: View
-    ) : RecyclerView.ViewHolder(view)
+        private val binding: ItemPhotoPickerBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
 }

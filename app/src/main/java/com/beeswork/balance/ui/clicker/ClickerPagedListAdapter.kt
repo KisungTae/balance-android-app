@@ -1,5 +1,6 @@
-package com.beeswork.balance.ui.clicked
+package com.beeswork.balance.ui.clicker
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
@@ -7,22 +8,24 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Clicker
+import com.beeswork.balance.databinding.ItemClickerBinding
 import com.beeswork.balance.internal.util.inflate
 
-import kotlinx.android.synthetic.main.item_clicked.view.*
 
-
-class ClickedPagedListAdapter(
+class ClickerPagedListAdapter(
     private val onClickedListener: OnClickedListener
-): PagedListAdapter<Clicker, ClickedPagedListAdapter.ClickedHolder>(diffCallback) {
+) : PagedListAdapter<Clicker, ClickerPagedListAdapter.ViewHolder>(diffCallback) {
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClickedHolder {
-        val view = parent.inflate(R.layout.item_clicked)
-        return ClickedHolder(view, onClickedListener)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = parent.inflate(R.layout.item_clicker)
+        return ViewHolder(
+            ItemClickerBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onClickedListener
+        )
     }
 
-    override fun onBindViewHolder(holder: ClickedHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position)!!)
 
     }
@@ -42,19 +45,19 @@ class ClickedPagedListAdapter(
         fun onClickedClick(swipedId: String)
     }
 
-    class ClickedHolder(
-        itemView: View,
+    class ViewHolder(
+        private val binding: ItemClickerBinding,
         private val onClickedListener: OnClickedListener
-    ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
             itemView.setOnClickListener(this)
         }
 
         fun bind(clicker: Clicker) {
-            itemView.tag = clicker.id
-            itemView.tvClicked.text = clicker.id.toString()
-            itemView.ivClicked.setImageResource(R.drawable.person1)
+//            itemView.tag = clicker.id
+//            itemView.tvClicked.text = clicker.id.toString()
+//            itemView.ivClicked.setImageResource(R.drawable.person1)
         }
 
         override fun onClick(v: View?) {

@@ -1,30 +1,48 @@
 package com.beeswork.balance.ui.chat
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.databinding.ItemChatMessageReceivedBinding
+import com.beeswork.balance.databinding.ItemChatMessageSentBinding
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.inflate
-import kotlinx.android.synthetic.main.item_chat_message_received.view.*
-import kotlinx.android.synthetic.main.item_chat_message_sent.view.*
 
 
-class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.MessageViewHolder>(
-    diffCallback
-) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.ChatMessageViewHolder>(diffCallback) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {
         return when (viewType) {
-            ChatMessageStatus.RECEIVED.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
-            ChatMessageStatus.SENT.ordinal -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_sent))
-            else -> MessageViewHolder(parent.inflate(R.layout.item_chat_message_received))
+            ChatMessageStatus.RECEIVED.ordinal -> ChatMessageViewHolder(
+                ItemChatMessageReceivedBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            ChatMessageStatus.SENT.ordinal -> ChatMessageViewHolder(
+                ItemChatMessageSentBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            else -> ChatMessageViewHolder(
+                ItemChatMessageReceivedBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
         }
     }
 
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
         getItem(position)?.let {
             when (holder.itemViewType) {
                 ChatMessageStatus.RECEIVED.ordinal -> holder.bindMessageReceived(it)
@@ -35,7 +53,8 @@ class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.Messag
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position)?.let {
-            return if (it.status == ChatMessageStatus.RECEIVED) ChatMessageStatus.RECEIVED.ordinal else ChatMessageStatus.SENT.ordinal
+            return if (it.status == ChatMessageStatus.RECEIVED) ChatMessageStatus.RECEIVED.ordinal
+            else ChatMessageStatus.SENT.ordinal
         } ?: kotlin.run {
             return ChatMessageStatus.RECEIVED.ordinal
         }
@@ -56,38 +75,36 @@ class ChatPagingAdapter : PagedListAdapter<ChatMessage, ChatPagingAdapter.Messag
         }
     }
 
-    class MessageViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+    class ChatMessageViewHolder(
+        private val binding: ViewBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
         fun bindMessageSent(chatMessage: ChatMessage) {
-            itemView.tvChatMessageSentBody.text =
+            val sentBinding = binding as ItemChatMessageSentBinding
+            sentBinding.tvChatMessageSentBody.text =
                 "messageId: ${chatMessage.messageId} | ${chatMessage.body} | id: ${chatMessage.id}"
 
             when (chatMessage.status) {
                 ChatMessageStatus.SENT -> {
-                    itemView.tvChatMessageSentCreatedAt.text = chatMessage.createdAt.toString()
-                    showLayout(itemView, View.VISIBLE, View.GONE, View.GONE)
+                    sentBinding.tvChatMessageSentCreatedAt.text = chatMessage.createdAt.toString()
+                    showLayout(sentBinding, View.VISIBLE, View.GONE, View.GONE)
                 }
-                ChatMessageStatus.SENDING -> showLayout(
-                    itemView,
-                    View.GONE,
-                    View.VISIBLE,
-                    View.GONE
-                )
-                ChatMessageStatus.ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE)
+                ChatMessageStatus.SENDING -> showLayout(sentBinding, View.GONE, View.VISIBLE, View.GONE)
+                ChatMessageStatus.ERROR -> showLayout(sentBinding, View.GONE, View.GONE, View.VISIBLE)
             }
         }
 
         fun bindMessageReceived(chatMessage: ChatMessage) {
-            itemView.tvChatMessageReceivedBody.text = chatMessage.body
-            itemView.tvChatMessageReceivedCreatedAt.text = chatMessage.createdAt.toString()
+            val receivedBinding = binding as ItemChatMessageReceivedBinding
+            receivedBinding.tvChatMessageReceivedBody.text = chatMessage.body
+            receivedBinding.tvChatMessageReceivedCreatedAt.text = chatMessage.createdAt.toString()
         }
 
         companion object {
-            fun showLayout(itemView: View, createdAt: Int, loading: Int, errorOptions: Int) {
-                itemView.tvChatMessageSentCreatedAt.visibility = createdAt
-                itemView.skvChatMessageSentLoading.visibility = loading
-                itemView.llChatMessageSentErrorOptions.visibility = errorOptions
+            fun showLayout(sentBinding: ItemChatMessageSentBinding, createdAt: Int, loading: Int, errorOptions: Int) {
+                sentBinding.tvChatMessageSentCreatedAt.visibility = createdAt
+                sentBinding.skvChatMessageSentLoading.visibility = loading
+                sentBinding.llChatMessageSentErrorOptions.visibility = errorOptions
             }
         }
     }

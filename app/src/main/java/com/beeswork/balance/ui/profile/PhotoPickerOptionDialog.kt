@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.beeswork.balance.R
+import com.beeswork.balance.databinding.DialogPhotoPickerOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.dialog_photo_picker_option.*
 
 class PhotoPickerOptionDialog(
     private val photoPickerOptionListener: PhotoPickerOptionListener,
@@ -15,6 +15,13 @@ class PhotoPickerOptionDialog(
     private val photoPickerStatus: PhotoPicker.Status,
     private val photoUri: Uri?
 ) : BottomSheetDialogFragment() {
+
+    private lateinit var binding: DialogPhotoPickerOptionBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DialogPhotoPickerOptionBinding.inflate(layoutInflater)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,38 +36,38 @@ class PhotoPickerOptionDialog(
 
         when (photoPickerStatus) {
             PhotoPicker.Status.EMPTY -> {
-                btnUploadPhotoFromCapture.visibility = View.VISIBLE
-                btnUploadPhotoFromCapture.setOnClickListener {
+                binding.btnUploadPhotoFromCapture.visibility = View.VISIBLE
+                binding.btnUploadPhotoFromCapture.setOnClickListener {
                     dismiss()
                     photoPickerOptionListener.onUploadPhotoFromCapture()
                 }
 
-                btnUploadPhotoFromGallery.visibility = View.VISIBLE
-                btnUploadPhotoFromGallery.setOnClickListener {
+                binding.btnUploadPhotoFromGallery.visibility = View.VISIBLE
+                binding.btnUploadPhotoFromGallery.setOnClickListener {
                     dismiss()
                     photoPickerOptionListener.onUploadPhotoFromGallery()
                 }
             }
             PhotoPicker.Status.UPLOAD_ERROR -> {
-                btnPhotoErrorDelete.visibility = View.VISIBLE
-                btnPhotoErrorUpload.visibility = View.VISIBLE
-                btnPhotoErrorUpload.setOnClickListener {
+                binding.btnPhotoErrorDelete.visibility = View.VISIBLE
+                binding.btnPhotoErrorUpload.visibility = View.VISIBLE
+                binding.btnPhotoErrorUpload.setOnClickListener {
                     dismiss()
                     photoKey?.let { photoPickerOptionListener.onReuploadPhoto(it, photoUri) }
                 }
                 setDeleteBtnListener()
             }
             PhotoPicker.Status.DOWNLOAD_ERROR -> {
-                btnPhotoErrorDelete.visibility = View.VISIBLE
-                btnPhotoErrorDownload.visibility = View.VISIBLE
-                btnPhotoErrorDownload.setOnClickListener {
+                binding.btnPhotoErrorDelete.visibility = View.VISIBLE
+                binding.btnPhotoErrorDownload.visibility = View.VISIBLE
+                binding.btnPhotoErrorDownload.setOnClickListener {
                     dismiss()
                     photoKey?.let { photoPickerOptionListener.onRedownloadPhoto(it) }
                 }
                 setDeleteBtnListener()
             }
             PhotoPicker.Status.OCCUPIED -> {
-                btnPhotoErrorDelete.visibility = View.VISIBLE
+                binding.btnPhotoErrorDelete.visibility = View.VISIBLE
                 setDeleteBtnListener()
             }
             else -> dismiss()
@@ -68,7 +75,7 @@ class PhotoPickerOptionDialog(
     }
 
     private fun setDeleteBtnListener() {
-        btnPhotoErrorDelete.setOnClickListener {
+        binding.btnPhotoErrorDelete.setOnClickListener {
             dismiss()
             photoKey?.let { photoPickerOptionListener.onDeletePhoto(it, photoPickerStatus) }
         }

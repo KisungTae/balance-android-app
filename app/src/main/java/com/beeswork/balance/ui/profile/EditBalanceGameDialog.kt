@@ -10,8 +10,8 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.databinding.DialogEditBalanceGameBinding
 import com.beeswork.balance.internal.constant.BalanceGameAnswer
-import kotlinx.android.synthetic.main.dialog_edit_balance_game.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,10 +28,12 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
     private lateinit var questions: MutableList<QuestionResponse>
     private var currentQuestionIndex = -1
+    private lateinit var binding: DialogEditBalanceGameBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
+        binding = DialogEditBalanceGameBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
@@ -49,16 +51,16 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
     private fun bindUI() {
 
-        btnEditBalanceGameTopOption.setOnClickListener { answer(BalanceGameAnswer.TOP) }
-        btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
-        btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
-        btnEditBalanceGameClose.setOnClickListener { dismiss() }
-        btnEditBalanceGameRandomQuestion.setOnClickListener { fetchRandomQuestion() }
+        binding.btnEditBalanceGameTopOption.setOnClickListener { answer(BalanceGameAnswer.TOP) }
+        binding.btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
+        binding.btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
+        binding.btnEditBalanceGameClose.setOnClickListener { dismiss() }
+        binding.btnEditBalanceGameRandomQuestion.setOnClickListener { fetchRandomQuestion() }
 
-        btnEditBalanceGameErrorFetchQuestions.setOnClickListener { fetchQuestions() }
-        btnEditBalanceGameErrorSaveAnswers.setOnClickListener { saveAnswers() }
-        btnEditBalanceGameErrorClose.setOnClickListener {
-            if (btnEditBalanceGameErrorFetchQuestions.visibility == View.VISIBLE)
+        binding.btnEditBalanceGameErrorFetchQuestions.setOnClickListener { fetchQuestions() }
+        binding.btnEditBalanceGameErrorSaveAnswers.setOnClickListener { saveAnswers() }
+        binding.btnEditBalanceGameErrorClose.setOnClickListener {
+            if (binding.btnEditBalanceGameErrorFetchQuestions.visibility == View.VISIBLE)
                 dismiss()
             else showLayout(loading = false, error = false)
         }
@@ -164,7 +166,7 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
         if (currentQuestionIndex < questions.size)
             currentQuestionIndex++
 
-        btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
+        binding.btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
 
         if (currentQuestionIndex == questions.size)
             saveAnswers()
@@ -185,30 +187,30 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
         else if (currentQuestionIndex > 0)
             currentQuestionIndex--
 
-        btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
+        binding.btnEditBalanceGameBack.isEnabled = currentQuestionIndex != 0
         setupQuestion(questions[currentQuestionIndex])
     }
 
     private fun setupQuestion(question: QuestionResponse) {
 
-        tvEditBalanceGameDescription.text = question.description
-        btnEditBalanceGameTopOption.text = question.topOption
-        btnEditBalanceGameBottomOption.text = question.bottomOption
+        binding.tvEditBalanceGameDescription.text = question.description
+        binding.btnEditBalanceGameTopOption.text = question.topOption
+        binding.btnEditBalanceGameBottomOption.text = question.bottomOption
 
         if (question.answer != null) highlightAnswer(question.answer)
         else resetAnswer()
     }
 
     private fun resetAnswer() {
-        btnEditBalanceGameTopOption.setBackgroundColor(Color.GRAY)
-        btnEditBalanceGameBottomOption.setBackgroundColor(Color.GRAY)
+        binding.btnEditBalanceGameTopOption.setBackgroundColor(Color.GRAY)
+        binding.btnEditBalanceGameBottomOption.setBackgroundColor(Color.GRAY)
     }
 
     private fun highlightAnswer(answer: Boolean?) {
         resetAnswer()
         if (answer == BalanceGameAnswer.TOP)
-            btnEditBalanceGameTopOption.setBackgroundColor(Color.GREEN)
-        else btnEditBalanceGameBottomOption.setBackgroundColor(Color.GREEN)
+            binding.btnEditBalanceGameTopOption.setBackgroundColor(Color.GREEN)
+        else binding.btnEditBalanceGameBottomOption.setBackgroundColor(Color.GREEN)
     }
 
     private fun showErrorLayout(
@@ -216,16 +218,15 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
         showSaveQuestionsBtn: Boolean,
         showFetchQuestionsBtn: Boolean
     ) {
-        tvEditBalanceGameErrorMessage.text = exceptionMessage
-        btnEditBalanceGameErrorSaveAnswers.visibility = if (showSaveQuestionsBtn) View.VISIBLE else View.GONE
-        btnEditBalanceGameErrorFetchQuestions.visibility = if (showFetchQuestionsBtn) View.VISIBLE else View.GONE
+        binding.tvEditBalanceGameErrorMessage.text = exceptionMessage
+        binding.btnEditBalanceGameErrorSaveAnswers.visibility = if (showSaveQuestionsBtn) View.VISIBLE else View.GONE
+        binding.btnEditBalanceGameErrorFetchQuestions.visibility = if (showFetchQuestionsBtn) View.VISIBLE else View.GONE
         showLayout(loading = false, error = true)
     }
 
     private fun showLayout(loading: Boolean, error: Boolean) {
-
-        llEditBalanceGameLoading.visibility = if (loading) View.VISIBLE else View.GONE
-        llEditBalanceGameError.visibility = if (error) View.VISIBLE else View.GONE
+        binding.llEditBalanceGameLoading.visibility = if (loading) View.VISIBLE else View.GONE
+        binding.llEditBalanceGameError.visibility = if (error) View.VISIBLE else View.GONE
     }
 
     companion object {

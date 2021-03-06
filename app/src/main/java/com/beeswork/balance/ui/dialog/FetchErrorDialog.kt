@@ -6,16 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
-import kotlinx.android.synthetic.main.dialog_fetch_error.*
+import com.beeswork.balance.databinding.DialogFetchErrorBinding
 
 class FetchErrorDialog(
     private val exceptionMessage: String?,
     private val fetchErrorListener: FetchErrorListener
 ): DialogFragment() {
 
+    private lateinit var binding: DialogFetchErrorBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
+        binding = DialogFetchErrorBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
@@ -28,12 +31,12 @@ class FetchErrorDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btnFetchErrorClose.setOnClickListener { dismiss() }
-        btnRefetch.setOnClickListener {
+        binding.btnFetchErrorClose.setOnClickListener { dismiss() }
+        binding.btnRefetch.setOnClickListener {
             dismiss()
             fetchErrorListener.onRefetch()
         }
-        tvFetchErrorMessage.text = exceptionMessage
+        binding.tvFetchErrorMessage.text = exceptionMessage
     }
 
     companion object {

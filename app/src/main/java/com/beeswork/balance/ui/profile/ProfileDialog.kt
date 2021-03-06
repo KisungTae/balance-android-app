@@ -19,13 +19,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.databinding.DialogProfileBinding
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import kotlinx.android.synthetic.main.dialog_profile.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,10 +45,12 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     override val kodein by closestKodein()
     private val balanceRepository: BalanceRepository by instance()
     private val preferenceProvider: PreferenceProvider by instance()
+    private lateinit var binding: DialogProfileBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
+        binding = DialogProfileBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
@@ -66,23 +68,23 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     private fun bindUI() {
-        btnProfileDialogClose.setOnClickListener { dismiss() }
-        btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
+        binding.btnProfileDialogClose.setOnClickListener { dismiss() }
+        binding.btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
         setupPhotoPickerRecyclerView()
-        tvEditBalanceGame.setOnClickListener {
+        binding.tvEditBalanceGame.setOnClickListener {
                     EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
         }
 
     }
 
     private fun setupPhotoPickerRecyclerView() {
-        rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
+        binding.rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
             requireContext(),
             this,
             preferenceProvider.getAccountId1()
         )
 
-        rvPhotoPicker.layoutManager =
+        binding.rvPhotoPicker.layoutManager =
             object : GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM) {
                 override fun canScrollVertically(): Boolean {
                     return false
@@ -98,15 +100,15 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 
     private fun fetchPhotos() {
         val adapter = photoPickerRecyclerViewAdapter()
-        llPhotoPickerGalleryError.visibility = View.GONE
+        binding.llPhotoPickerGalleryError.visibility = View.GONE
         CoroutineScope(Dispatchers.IO).launch {
             val response = balanceRepository.fetchPhotos()
             withContext(Dispatchers.Main) {
                 response.data?.let {
-                    llPhotoPickerGalleryError.visibility = View.GONE
+                    binding.llPhotoPickerGalleryError.visibility = View.GONE
                     adapter.initializePhotoPickers(it)
                 } ?: kotlin.run {
-                    llPhotoPickerGalleryError.visibility = View.VISIBLE
+                    binding.llPhotoPickerGalleryError.visibility = View.VISIBLE
                 }
             }
         }
@@ -262,7 +264,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     private fun photoPickerRecyclerViewAdapter(): PhotoPickerRecyclerViewAdapter {
-        return rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
+        return binding.rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
     }
 
 
@@ -348,7 +350,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         }
 
         val itemTouchHelper = ItemTouchHelper(simpleCallback)
-        itemTouchHelper.attachToRecyclerView(rvPhotoPicker)
+        itemTouchHelper.attachToRecyclerView(binding.rvPhotoPicker)
     }
 
     companion object {

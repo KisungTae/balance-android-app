@@ -8,31 +8,34 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.CardResponse
+import com.beeswork.balance.databinding.ItemCardStackBinding
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.item_card_stack.view.*
 
 
-class CardStackAdapter: RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
+class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     private lateinit var cardImageViewPager: ViewPager2
     private val cardResponses: MutableList<CardResponse> = arrayListOf()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(inflater.inflate(R.layout.item_card_stack, parent, false))
+        return ViewHolder(ItemCardStackBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        cardImageViewPager = holder.itemView.vpCardImage
-
-        // TODO: change to photos
-        holder.itemView.vpCardImage.adapter =
-            CardImageViewPagerAdapter(arrayListOf(R.drawable.person3,
-                                                  R.drawable.person2,
-                                                  R.drawable.person1), holder)
-
-        TabLayoutMediator(holder.itemView.tlCardImage, holder.itemView.vpCardImage) { tab, pos -> }.attach()
+//        cardImageViewPager = holder.itemView.vpCardImage
+//
+//        // TODO: change to photos
+//        holder.itemView.vpCardImage.adapter =
+//            CardImageViewPagerAdapter(
+//                arrayListOf(
+//                    R.drawable.person3,
+//                    R.drawable.person2,
+//                    R.drawable.person1
+//                ), holder
+//            )
+//
+//        TabLayoutMediator(holder.itemView.tlCardImage, holder.itemView.vpCardImage) { tab, pos -> }.attach()
     }
 
     fun addCards(newCardResponses: List<CardResponse>) {
@@ -51,17 +54,17 @@ class CardStackAdapter: RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
         return null
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+    class ViewHolder(private val binding: ItemCardStackBinding) : RecyclerView.ViewHolder(binding.root),
         CardImageViewPagerAdapter.CardImageListener {
 
         override fun onLeftButtonClick(position: Int) {
             println("onLeftButtonClick position: $position")
-            itemView.vpCardImage.currentItem = position - 1
+            binding.vpCardImage.currentItem = position - 1
         }
 
         override fun onRightButtonClick(position: Int) {
             println("onRightButtonClick position: $position")
-            itemView.vpCardImage.currentItem = position + 1
+            binding.vpCardImage.currentItem = position + 1
         }
     }
 
