@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedList
+import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +40,10 @@ class MatchPagedListAdapter(
         }
     }
 
+    interface OnMatchListener {
+        fun onMatchClick(view: View, position: Int)
+    }
+
     class ViewHolder(
         private val binding: ItemMatchBinding,
         private val onMatchListener: OnMatchListener,
@@ -54,24 +58,19 @@ class MatchPagedListAdapter(
             binding.tvMatchName.text = matchDomain.name
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
-            binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
 
             if (matchDomain.unmatched || matchDomain.deleted) {
-                val colorTextGrey = context.getColor(R.color.textGrey)
+                val colorTextLightGrey = context.getColor(R.color.textLightGrey)
                 binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
-                binding.tvMatchName.setTextColor(colorTextGrey)
-                binding.tvMatchRecentChatMessage.setTextColor(colorTextGrey)
-                binding.tvMatchUpdatedAt.setTextColor(colorTextGrey)
+                binding.tvMatchName.setTextColor(colorTextLightGrey)
+                binding.tvMatchRecentChatMessage.setTextColor(colorTextLightGrey)
+                binding.tvMatchUpdatedAt.text = ""
             } else {
-//                TODO: uncomment this
-//                val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
-                val photoEndPoint = ""
+                val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
                 Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
-
-                if (!matchDomain.active) {
-                    // TODO: put circle border to imageview
-                }
-
+                val circleBorderShape = ContextCompat.getDrawable(context, R.drawable.sh_circle_border)
+                if (!matchDomain.active) binding.flMatchProfilePictureWrapper.background = circleBorderShape
+                binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
             }
         }
 
@@ -90,18 +89,9 @@ class MatchPagedListAdapter(
             private fun glideRequestOptions(): RequestOptions {
                 return RequestOptions().placeholder(R.drawable.ic_baseline_account_circle)
                     .error(R.drawable.ic_baseline_account_circle)
-                    .centerCrop()
+                    .circleCrop()
             }
         }
     }
-
-    interface OnMatchListener {
-        fun onMatchClick(view: View, position: Int)
-    }
-
-
 }
 
-
-// TODO
-//  1. if lastChatMessageId <= 0 then circle the profile picture when not deleted, blocked, unmatched

@@ -17,7 +17,7 @@ import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
-import com.beeswork.balance.ui.base.ScopeFragment
+import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.MatchDialog
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener

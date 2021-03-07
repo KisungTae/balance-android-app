@@ -2,6 +2,7 @@ package com.beeswork.balance.data.network.rds.chat
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
+import com.beeswork.balance.data.network.request.SyncChatMessagesBody
 import com.beeswork.balance.data.network.response.ChatMessageResponse
 import com.beeswork.balance.data.network.response.Resource
 import java.util.*
@@ -14,7 +15,7 @@ class ChatRDSImpl(
         identityToken: UUID,
         chatMessageIds: List<Long>
     ) {
-        balanceAPI.syncChatMessages(accountId, identityToken, chatMessageIds)
+        balanceAPI.syncChatMessages(SyncChatMessagesBody(accountId, identityToken, chatMessageIds))
     }
 
     override suspend fun fetchChatMessages(

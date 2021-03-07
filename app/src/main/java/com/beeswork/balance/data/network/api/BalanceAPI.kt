@@ -26,9 +26,7 @@ interface BalanceAPI {
 
     @POST("chat/message/sync")
     suspend fun syncChatMessages(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "identityToken") identityToken: UUID,
-        @Query(value = "chatMessageIds") chatMessageIds: List<Long>,
+        @Body syncChatMessagesBody: SyncChatMessagesBody
     )
 
     @GET("match/list")
@@ -49,12 +47,12 @@ interface BalanceAPI {
 
     @POST("photo/reorder")
     suspend fun reorderPhotos(
-        @Body reorderPhotosRequest: ReorderPhotosRequest
+        @Body reorderPhotosBody: ReorderPhotosBody
     ): Response<EmptyResponse>
 
     @POST("photo/delete")
     suspend fun deletePhoto(
-        @Body deletePhotoRequest: DeletePhotoRequest
+        @Body deletePhotoBody: DeletePhotoBody
     ): Response<EmptyResponse>
 
     @POST
@@ -67,7 +65,7 @@ interface BalanceAPI {
 
     @POST("photo/add")
     suspend fun addPhoto(
-        @Body addPhotoRequest: AddPhotoRequest
+        @Body addPhotoBody: AddPhotoBody
     ): Response<PreSignedUrlResponse>
 
     @GET("/photo/list")
@@ -77,7 +75,7 @@ interface BalanceAPI {
     ): Response<List<Photo>>
 
     @POST("/account/answers")
-    suspend fun saveAnswers(@Body saveAnswersRequest: SaveAnswersRequest): Response<EmptyResponse>
+    suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
 
     @GET("/question/list")
     suspend fun fetchQuestions(
@@ -91,7 +89,7 @@ interface BalanceAPI {
     ): Response<QuestionResponse>
 
     @POST("/account/answers")
-    suspend fun postAnswers(@Body postAnswersRequest: PostAnswersRequest): Response<EmptyResponse>
+    suspend fun postAnswers(@Body postAnswersBody: PostAnswersBody): Response<EmptyResponse>
 
     @GET("account/recommend")
     suspend fun fetchCards(
@@ -108,13 +106,13 @@ interface BalanceAPI {
     ): Response<MutableList<CardResponse>>
 
     @POST("swipe")
-    suspend fun swipe(@Body swipeRequest: SwipeRequest): Response<BalanceGameResponse>
+    suspend fun swipe(@Body swipeBody: SwipeBody): Response<BalanceGameResponse>
 
     @POST("swipe/click")
-    suspend fun click(@Body clickRequest: ClickRequest): Response<ClickResponse>
+    suspend fun click(@Body clickBody: ClickBody): Response<ClickResponse>
 
     @POST("account/fcm/token")
-    suspend fun postFCMToken(@Body fcmTokenRequest: FCMTokenRequest): Response<EmptyResponse>
+    suspend fun postFCMToken(@Body fcmTokenBody: FCMTokenBody): Response<EmptyResponse>
 
     @GET("match/list")
     suspend fun fetchMatches(
@@ -134,7 +132,7 @@ interface BalanceAPI {
 
     @POST("account/location")
     suspend fun postLocation(
-        @Body locationRequest: LocationRequest
+        @Body locationBody: LocationBody
     ): Response<EmptyResponse>
 
     companion object {

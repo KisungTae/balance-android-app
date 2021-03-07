@@ -61,15 +61,16 @@ class MatchRepositoryImpl(
                 data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
             )
             syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }, listMatches.status, data.fetchedAt)
+            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
+            updateFetchMatchesResult(listMatches.status)
+            preferenceProvider.putMatchFetchedAt(data.fetchedAt)
         }
         return Resource.toEmptyResponse(listMatches)
     }
 
-    private fun updateFetchMatchesResult(status: Resource.Status, fetchedAt: OffsetDateTime? = null) {
+    private fun updateFetchMatchesResult(status: Resource.Status) {
         val fetchMatchesResult = fetchMatchesResultDAO.findById() ?: FetchMatchesResult()
         fetchMatchesResult.status = status
-        fetchedAt?.let { fetchMatchesResult.fetchedAt = it }
         fetchMatchesResultDAO.insert(fetchMatchesResult)
     }
 
@@ -114,7 +115,7 @@ class MatchRepositoryImpl(
         }
     }
 
-    private fun saveMatches(matches: List<Match>, status: Resource.Status, fetchedAt: OffsetDateTime) {
+    private fun saveMatches(matches: List<Match>) {
         balanceDatabase.runInTransaction {
             for (newMatch in matches) {
                 updateMatch(newMatch)
@@ -122,7 +123,6 @@ class MatchRepositoryImpl(
                 clickedDAO.insert(Clicked(newMatch.matchedId))
                 matchDAO.insert(newMatch)
             }
-            updateFetchMatchesResult(status, fetchedAt)
         }
     }
 

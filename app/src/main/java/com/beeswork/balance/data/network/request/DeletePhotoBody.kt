@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.network.request
 
-data class ReorderPhotosRequest(
+data class DeletePhotoBody(
     val accountId: String,
     val identityToken: String,
-    val photoOrders: Map<String, Int>
+    val photoKey: String
 )

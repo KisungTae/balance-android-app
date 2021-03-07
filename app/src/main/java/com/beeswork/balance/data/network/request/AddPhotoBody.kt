@@ -1,7 +1,10 @@
 package com.beeswork.balance.data.network.request
 
-data class DeletePhotoRequest(
+import retrofit2.http.Query
+
+data class AddPhotoBody(
     val accountId: String,
     val identityToken: String,
-    val photoKey: String
+    val photoKey: String,
+    val sequence: Int
 )

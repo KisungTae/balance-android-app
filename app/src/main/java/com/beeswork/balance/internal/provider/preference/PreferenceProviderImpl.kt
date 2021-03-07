@@ -14,12 +14,8 @@ const val MIN_AGE = "minAge"
 const val MAX_AGE = "maxAge"
 const val DISTANCE = "distance"
 const val MATCH_FETCHED_AT = "matchFetchedAt"
-const val CLICKED_FETCHED_AT = "clickedFetchedAt"
-const val LAST_FETCHED_MATCH_UPDATED_AT = "lastFetchedMatchUpdatedAt"
-const val LAST_FETCHED_ACCOUNT_UPDATED_AT = "lastFetchedAccountUpdatedAt"
-const val LAST_FETCHED_CHAT_MESSAGE_CREATED_AT = "lastFetchedChatMessageCreatedAt"
-const val ACCOUNT_ID =  "accountId"
-const val IDENTITY_TOKEN =  "identityToken"
+const val ACCOUNT_ID = "accountId"
+const val IDENTITY_TOKEN = "identityToken"
 
 
 const val DEFAULT_DISTANCE = 10f
@@ -50,45 +46,32 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
-    override fun putAccountId(accountId: String) {
+    override fun putAccountId(accountId: UUID?) {
+        accountId?.let {
+            editor.putString(ACCOUNT_ID, accountId.toString())
+        }
+        editor.apply()
     }
 
-    override fun putIdentityToken() {
-
+    override fun putIdentityTokenId(identityToken: UUID?) {
+        identityToken?.let {
+            editor.putString(ACCOUNT_ID, identityToken.toString())
+        }
+        editor.apply()
     }
 
-    override fun putMatchFetchedAt(matchFetchedAt: String) {
-        editor.putString(MATCH_FETCHED_AT, matchFetchedAt)
-    }
-
-    override fun putClickedFetchedAt(clickedFetchedAt: String) {
-        editor.putString(CLICKED_FETCHED_AT, clickedFetchedAt)
-    }
-
-    override fun putAccountUUID(accountId: UUID) {
-        editor.putString(ACCOUNT_ID, accountId.toString())
-    }
-
-    override fun putIdentityTokenUUID(identityToken: UUID) {
-        editor.putString(IDENTITY_TOKEN, identityToken.toString())
-    }
-
-    override fun putMatchFetchedAt(updatedAt: OffsetDateTime) {
-        editor.putString(
-            LAST_FETCHED_MATCH_UPDATED_AT,
-            OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt)
-        )
+    override fun putMatchFetchedAt(updatedAt: OffsetDateTime?) {
+        updatedAt?.let {
+            editor.putString(
+                MATCH_FETCHED_AT,
+                OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt)
+            )
+        }
+        editor.apply()
     }
 
 
-    override fun getClickedFetchedAt(): String {
-        return preferences.getString(CLICKED_FETCHED_AT, "2020-01-01T10:06:26.032Z")!!
-    }
 
-
-    override fun getMatchFetchedAt1(): String {
-        return preferences.getString(MATCH_FETCHED_AT, "2020-01-01T10:06:26.032Z")!!
-    }
 
     override fun getGender(): Boolean {
         return preferences.getBoolean(GENDER, DEFAULT_GENDER)
@@ -120,38 +103,28 @@ class PreferenceProviderImpl(
         return preferences.getFloat(DISTANCE, DEFAULT_DISTANCE)
     }
 
-    override fun getAccountId1(): String {
-        return "69161188-1ba5-484c-860b-00faf97fa962"
-//        return "01ac40b1-cc3f-4a96-9663-df0ad79acee0"
-    }
-
-    override fun getIdentityToken1(): String {
-        return "bb3c422f-3db3-4a40-a690-458a71ddb98b"
-//        return "e6deee15-9c06-4065-bb0d-e89e7c2f26e8"
-    }
-
     override fun getAccountId(): UUID {
-//      TODO: change getAccountId to null
-        preferences.getString(ACCOUNT_ID, getAccountId1())?.let {
+//      TODO: remove accountId and put null for default value
+        val accountId = "69161188-1ba5-484c-860b-00faf97fa962"
+        preferences.getString(ACCOUNT_ID, accountId)?.let {
             return UUID.fromString(it)
         } ?: throw AccountIdNotFoundException()
     }
 
     override fun getIdentityToken(): UUID {
-//      TODO: change getIdentityToken to null
-        preferences.getString(IDENTITY_TOKEN, getIdentityToken1())?.let {
+//      TODO: remove identityToken and put null for default value
+        val identityToken = "bb3c422f-3db3-4a40-a690-458a71ddb98b"
+        preferences.getString(IDENTITY_TOKEN, identityToken)?.let {
             return UUID.fromString(it)
         } ?: throw IdentityTokenNotFoundException()
     }
 
-
     override fun getMatchFetchedAt(): OffsetDateTime {
-        return OffsetDateTimeConverter.toOffsetDateTimeNonNull(
-            preferences.getString(
-                LAST_FETCHED_MATCH_UPDATED_AT,
-                DEFAULT_FETCHED_AT
-            )!!
-        )
+        preferences.getString(MATCH_FETCHED_AT, DEFAULT_FETCHED_AT)?.let {
+            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(it)
+        } ?: kotlin.run {
+            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(DEFAULT_FETCHED_AT)
+        }
     }
 
 }

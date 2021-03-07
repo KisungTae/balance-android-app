@@ -4,14 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentMatchBinding
-import com.beeswork.balance.ui.base.ScopeFragment
+import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -46,7 +42,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
         setupMatchRecyclerView()
         setupFetchMatchesObserver()
         setupMatchesObserver()
-//        viewModel.fetchMatches()
+        viewModel.fetchMatches()
     }
 
     private fun setupFetchMatchesObserver() {

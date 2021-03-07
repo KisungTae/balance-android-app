@@ -1,7 +1,8 @@
 package com.beeswork.balance.data.network.request
 
-data class PostAnswersRequest(
+data class SwipeBody(
     val accountId: String,
     val identityToken: String,
-    val answers: Map<Int, Boolean>
+    val swipeId: Long?,
+    val swipedId: String
 )

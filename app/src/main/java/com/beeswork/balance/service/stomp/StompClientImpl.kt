@@ -158,8 +158,8 @@ class StompClientImpl(
     ): MutableMap<String, String> {
         val headers = mutableMapOf<String, String>()
         headers[StompHeader.DESTINATION] = destination
-        headers[StompHeader.ACCOUNT_ID] = preferenceProvider.getAccountId1()
-        headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken1()
+//        headers[StompHeader.ACCOUNT_ID] = preferenceProvider.getAccountId1()
+//        headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken1()
         headers[StompHeader.RECIPIENT_ID] = matchedId
         headers[StompHeader.CHAT_ID] = chatId.toString()
         headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
@@ -219,7 +219,8 @@ class StompClientImpl(
     }
 
     private fun queueName(chatId: Long): String {
-        return "/queue/${preferenceProvider.getAccountId1()}-$chatId"
+//        return "/queue/${preferenceProvider.getAccountId1()}-$chatId"
+        return ""
     }
 
     companion object {

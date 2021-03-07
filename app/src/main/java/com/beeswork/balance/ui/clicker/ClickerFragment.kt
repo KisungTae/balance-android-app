@@ -10,7 +10,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentClickerBinding
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
-import com.beeswork.balance.ui.base.ScopeFragment
+import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
 import kotlinx.coroutines.launch

@@ -1,10 +1,7 @@
 package com.beeswork.balance.data.network.request
 
-import retrofit2.http.Query
-
-data class AddPhotoRequest(
+data class FCMTokenBody(
     val accountId: String,
     val identityToken: String,
-    val photoKey: String,
-    val sequence: Int
+    val token: String
 )

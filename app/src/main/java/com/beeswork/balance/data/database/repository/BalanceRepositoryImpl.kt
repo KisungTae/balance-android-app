@@ -52,26 +52,26 @@ class BalanceRepositoryImpl(
 
     override fun fetchClickedList() {
 
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val clickedResource = balanceRDS.fetchClickedList(
-                preferenceProvider.getAccountId1(),
-                preferenceProvider.getIdentityToken1(),
-                preferenceProvider.getClickedFetchedAt()
-            )
-
-            if (clickedResource.status == Resource.Status.SUCCESS) {
-                val clickedList = clickedResource.data!!
-                if (clickedList.size > 0) {
-                    clickerDAO.insert(clickedList)
-                    clickedResource.data.sortByDescending { c -> c.updatedAt }
-                    preferenceProvider.putClickedFetchedAt(clickedList[0].updatedAt.toString())
-                    clickedList.clear()
-                }
-            }
-            clickerDAO.deleteIfMatched()
-            mutableFetchClickedListResponse.postValue(clickedResource)
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//
+//            val clickedResource = balanceRDS.fetchClickedList(
+//                preferenceProvider.getAccountId1(),
+//                preferenceProvider.getIdentityToken1(),
+//                preferenceProvider.getClickedFetchedAt()
+//            )
+//
+//            if (clickedResource.status == Resource.Status.SUCCESS) {
+//                val clickedList = clickedResource.data!!
+//                if (clickedList.size > 0) {
+//                    clickerDAO.insert(clickedList)
+//                    clickedResource.data.sortByDescending { c -> c.updatedAt }
+//                    preferenceProvider.putClickedFetchedAt(clickedList[0].updatedAt.toString())
+//                    clickedList.clear()
+//                }
+//            }
+//            clickerDAO.deleteIfMatched()
+//            mutableFetchClickedListResponse.postValue(clickedResource)
+//        }
     }
 
     override suspend fun getClickedCount(): LiveData<Int> {
@@ -92,14 +92,14 @@ class BalanceRepositoryImpl(
 
     override fun swipe(swipeId: Long?, swipedId: String) {
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId1()
-            val identityToken = preferenceProvider.getIdentityToken1()
-
-            mutableBalanceGameResponse.postValue(Resource.loading())
-            val questionResource = balanceRDS.swipe(accountId, identityToken, swipeId, swipedId)
-            mutableBalanceGameResponse.postValue(questionResource)
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val accountId = preferenceProvider.getAccountId1()
+//            val identityToken = preferenceProvider.getIdentityToken1()
+//
+//            mutableBalanceGameResponse.postValue(Resource.loading())
+//            val questionResource = balanceRDS.swipe(accountId, identityToken, swipeId, swipedId)
+//            mutableBalanceGameResponse.postValue(questionResource)
+//        }
     }
 
     private val mutableClickResponse = MutableLiveData<Resource<ClickResponse>>()
@@ -110,30 +110,30 @@ class BalanceRepositoryImpl(
     //          you will get the response. The response is received in the background
     override fun click(swipedId: String, swipeId: Long, answers: Map<Int, Boolean>) {
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId1()
-            val identityToken = preferenceProvider.getIdentityToken1()
-
-            val clickResource =
-                balanceRDS.click(accountId, identityToken, swipedId, swipeId, answers)
-
-            if (clickResource.status == Resource.Status.SUCCESS) {
-                val data = clickResource.data!!
-                val result = data.result
-                val match = data.match
-
-                if (result == NotificationType.MATCH) {
-                    setNewMatch(match)
-                    matchDAO.insert(match)
-                    clickedDAO.insert(Clicked(match.matchedId))
-                    clickerDAO.deleteIfMatched()
-                } else if (result == NotificationType.CLICKED) {
-//                    TODO: check if clicked is in match table if so not inserting
-                    clickedDAO.insert(Clicked(match.matchedId))
-                }
-            }
-            mutableClickResponse.postValue(clickResource)
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val accountId = preferenceProvider.getAccountId1()
+//            val identityToken = preferenceProvider.getIdentityToken1()
+//
+//            val clickResource =
+//                balanceRDS.click(accountId, identityToken, swipedId, swipeId, answers)
+//
+//            if (clickResource.status == Resource.Status.SUCCESS) {
+//                val data = clickResource.data!!
+//                val result = data.result
+//                val match = data.match
+//
+//                if (result == NotificationType.MATCH) {
+//                    setNewMatch(match)
+//                    matchDAO.insert(match)
+//                    clickedDAO.insert(Clicked(match.matchedId))
+//                    clickerDAO.deleteIfMatched()
+//                } else if (result == NotificationType.CLICKED) {
+////                    TODO: check if clicked is in match table if so not inserting
+//                    clickedDAO.insert(Clicked(match.matchedId))
+//                }
+//            }
+//            mutableClickResponse.postValue(clickResource)
+//        }
     }
 
 
@@ -169,14 +169,14 @@ class BalanceRepositoryImpl(
 
         CoroutineScope(Dispatchers.IO).launch {
 
-            var fetchedAt = preferenceProvider.getMatchFetchedAt1()
-            val matchResource = balanceRDS.fetchMatches(
-                preferenceProvider.getAccountId1(),
-                preferenceProvider.getIdentityToken1(),
-                fetchedAt,
-                fetchedAt,
-                fetchedAt
-            )
+//            var fetchedAt = preferenceProvider.getMatchFetchedAt1()
+//            val matchResource = balanceRDS.fetchMatches(
+//                preferenceProvider.getAccountId1(),
+//                preferenceProvider.getIdentityToken1(),
+//                fetchedAt,
+//                fetchedAt,
+//                fetchedAt
+//            )
 
 //            if (matchResource.status == Resource.Status.SUCCESS) {
 //                val fetchedMatches = matchResource.data!!
@@ -208,7 +208,7 @@ class BalanceRepositoryImpl(
 //                clickedDAO.deleteIfMatched()
 //                preferenceProvider.putMatchFetchedAt(fetchedAt)
 //            }
-            mutableFetchMatchesResource.postValue(matchResource)
+//            mutableFetchMatchesResource.postValue(matchResource)
         }
     }
 
@@ -233,131 +233,131 @@ class BalanceRepositoryImpl(
 
     override fun fetchCards(reset: Boolean) {
 
-        if (!fetchingCards && (reset || !fetchedNoCards)) {
-            fetchingCards = true
-
-            mutableCards.postValue(Resource.loading())
-
-            CoroutineScope(Dispatchers.IO).launch {
-                val accountId = preferenceProvider.getAccountId1()
-                val identityToken = preferenceProvider.getIdentityToken1()
-                val minAge = preferenceProvider.getMinAgeBirthYear()
-                val maxAge = preferenceProvider.getMaxAgeBirthYear()
-                val gender = preferenceProvider.getGender()
-                val distance = preferenceProvider.getDistanceInMeters()
-                var latitude: Double? = null
-                var longitude: Double? = null
-                var locationUpdatedAt: OffsetDateTime? = null
-
-                val location: Location? = locationDAO.get()
-                if (location != null && !location.synced) {
-                    latitude = location.latitude
-                    longitude = location.longitude
-                    locationUpdatedAt = location.updatedAt
-                }
-
-                val cardsResource =
-                    balanceRDS.fetchCards(
-                        accountId,
-                        identityToken,
-                        minAge,
-                        maxAge,
-                        gender,
-                        distance,
-                        latitude,
-                        longitude,
-                        locationUpdatedAt?.toString(),
-                        reset
-                    )
-
-                if (cardsResource.status == Resource.Status.SUCCESS) {
-
-                    val fetchedCards = cardsResource.data
-
-                    if (fetchedCards == null || fetchedCards.size == 0) {
-                        fetchedNoCards = true
-                    } else {
-
-                        fetchedNoCards = false
-
-                        val clickIds = clickedDAO.getClickedIds().toHashSet()
-//                        clickIds.addAll(matchDAO.getMatchedIds())
-
-                        val endIndex = fetchedCards.size - 1
-
-                        for (i in endIndex downTo 0) {
-                            if (clickIds.contains(fetchedCards[i].accountId)) {
-                                fetchedCards.removeAt(i)
-                                continue
-                            }
-                            fetchedCards[i].birthYear =
-                                Convert.birthYearToAge(fetchedCards[i].birthYear)
-                        }
-                    }
-
-                    if (locationUpdatedAt != null)
-                        locationDAO.sync(locationUpdatedAt)
-                } else if (cardsResource.status == Resource.Status.ERROR) {
-                    fetchedNoCards = false
-                }
-
-                mutableCards.postValue(cardsResource)
-                fetchingCards = false
-            }
-        }
+//        if (!fetchingCards && (reset || !fetchedNoCards)) {
+//            fetchingCards = true
+//
+//            mutableCards.postValue(Resource.loading())
+//
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val accountId = preferenceProvider.getAccountId1()
+//                val identityToken = preferenceProvider.getIdentityToken1()
+//                val minAge = preferenceProvider.getMinAgeBirthYear()
+//                val maxAge = preferenceProvider.getMaxAgeBirthYear()
+//                val gender = preferenceProvider.getGender()
+//                val distance = preferenceProvider.getDistanceInMeters()
+//                var latitude: Double? = null
+//                var longitude: Double? = null
+//                var locationUpdatedAt: OffsetDateTime? = null
+//
+//                val location: Location? = locationDAO.get()
+//                if (location != null && !location.synced) {
+//                    latitude = location.latitude
+//                    longitude = location.longitude
+//                    locationUpdatedAt = location.updatedAt
+//                }
+//
+//                val cardsResource =
+//                    balanceRDS.fetchCards(
+//                        accountId,
+//                        identityToken,
+//                        minAge,
+//                        maxAge,
+//                        gender,
+//                        distance,
+//                        latitude,
+//                        longitude,
+//                        locationUpdatedAt?.toString(),
+//                        reset
+//                    )
+//
+//                if (cardsResource.status == Resource.Status.SUCCESS) {
+//
+//                    val fetchedCards = cardsResource.data
+//
+//                    if (fetchedCards == null || fetchedCards.size == 0) {
+//                        fetchedNoCards = true
+//                    } else {
+//
+//                        fetchedNoCards = false
+//
+//                        val clickIds = clickedDAO.getClickedIds().toHashSet()
+////                        clickIds.addAll(matchDAO.getMatchedIds())
+//
+//                        val endIndex = fetchedCards.size - 1
+//
+//                        for (i in endIndex downTo 0) {
+//                            if (clickIds.contains(fetchedCards[i].accountId)) {
+//                                fetchedCards.removeAt(i)
+//                                continue
+//                            }
+//                            fetchedCards[i].birthYear =
+//                                Convert.birthYearToAge(fetchedCards[i].birthYear)
+//                        }
+//                    }
+//
+//                    if (locationUpdatedAt != null)
+//                        locationDAO.sync(locationUpdatedAt)
+//                } else if (cardsResource.status == Resource.Status.ERROR) {
+//                    fetchedNoCards = false
+//                }
+//
+//                mutableCards.postValue(cardsResource)
+//                fetchingCards = false
+//            }
+//        }
     }
 
     override fun insertFCMToken(token: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val accountId = preferenceProvider.getAccountId1()
-            val identityToken = preferenceProvider.getIdentityToken1()
-
-            fcmTokenDAO.insert(FCMToken(token, false))
-
-            val tokenResource = balanceRDS.postFCMToken(accountId, identityToken, token)
-            if (tokenResource.status == Resource.Status.SUCCESS)
-                fcmTokenDAO.sync()
-
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val accountId = preferenceProvider.getAccountId1()
+//            val identityToken = preferenceProvider.getIdentityToken1()
+//
+//            fcmTokenDAO.insert(FCMToken(token, false))
+//
+//            val tokenResource = balanceRDS.postFCMToken(accountId, identityToken, token)
+//            if (tokenResource.status == Resource.Status.SUCCESS)
+//                fcmTokenDAO.sync()
+//
+//        }
     }
 
     override fun saveLocation(latitude: Double, longitude: Double) {
 
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val accountId = preferenceProvider.getAccountId1()
-            val identityToken = preferenceProvider.getIdentityToken1()
-            val updatedAt = OffsetDateTime.now()
-
-            val currentLocation = Location(latitude, longitude, false, updatedAt)
-            locationDAO.insert(currentLocation)
-
-            val response =
-                balanceRDS.postLocation(
-                    accountId,
-                    identityToken,
-                    latitude,
-                    longitude,
-                    updatedAt.toString()
-                )
-
-            if (response.status == Resource.Status.SUCCESS)
-                locationDAO.sync(updatedAt)
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//
+//            val accountId = preferenceProvider.getAccountId1()
+//            val identityToken = preferenceProvider.getIdentityToken1()
+//            val updatedAt = OffsetDateTime.now()
+//
+//            val currentLocation = Location(latitude, longitude, false, updatedAt)
+//            locationDAO.insert(currentLocation)
+//
+//            val response =
+//                balanceRDS.postLocation(
+//                    accountId,
+//                    identityToken,
+//                    latitude,
+//                    longitude,
+//                    updatedAt.toString()
+//                )
+//
+//            if (response.status == Resource.Status.SUCCESS)
+//                locationDAO.sync(updatedAt)
+//        }
     }
 
     override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return balanceRDS.saveAnswers(
-            preferenceProvider.getAccountId1(),
-            preferenceProvider.getIdentityToken1(),
+            preferenceProvider.getAccountId().toString(),
+            preferenceProvider.getIdentityToken().toString(),
             answers
         )
     }
 
     override suspend fun fetchQuestions(): Resource<List<QuestionResponse>> {
         return balanceRDS.fetchQuestions(
-            preferenceProvider.getAccountId1(),
-            preferenceProvider.getIdentityToken1()
+            preferenceProvider.getAccountId().toString(),
+            preferenceProvider.getIdentityToken().toString()
         )
     }
 
@@ -372,8 +372,8 @@ class BalanceRepositoryImpl(
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
         if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
-            val accountId = preferenceProvider.getAccountId1()
-            val identityToken = preferenceProvider.getIdentityToken1()
+            val accountId = preferenceProvider.getAccountId().toString()
+            val identityToken = preferenceProvider.getAccountId().toString()
 
             val response = balanceRDS.fetchPhotos(accountId, identityToken)
             if (response.status == Resource.Status.ERROR)
@@ -411,8 +411,8 @@ class BalanceRepositoryImpl(
                 photoDAO.insert(Photo(photoKey, photoSequence, false))
 
                 val fetchPreSignedUrlResponse = balanceRDS.addPhoto(
-                    preferenceProvider.getAccountId1(),
-                    preferenceProvider.getIdentityToken1(),
+                    preferenceProvider.getAccountId().toString(),
+                    preferenceProvider.getIdentityToken().toString(),
                     photoKey,
                     photoSequence
                 )
@@ -474,8 +474,8 @@ class BalanceRepositoryImpl(
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
         photoDAO.sync(photoKey, false)
         val response = balanceRDS.deletePhoto(
-            preferenceProvider.getAccountId1(),
-            preferenceProvider.getIdentityToken1(),
+            preferenceProvider.getAccountId().toString(),
+            preferenceProvider.getIdentityToken().toString(),
             photoKey
         )
         if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
@@ -489,8 +489,8 @@ class BalanceRepositoryImpl(
         }
 
         val response = balanceRDS.reorderPhotos(
-            preferenceProvider.getAccountId1(),
-            preferenceProvider.getIdentityToken1(),
+            preferenceProvider.getAccountId().toString(),
+            preferenceProvider.getIdentityToken().toString(),
             photoOrders
         )
 
@@ -533,13 +533,13 @@ class BalanceRepositoryImpl(
 //        val chatMessages = chatMessageDAO.findAllAfter(chatId, 200, 100)
 //        val chatMessagesPre = chatMessageDAO.findAllBefore(chatId, 200, 10000)
 
-        val matches = balanceRDS.fetchMatches(
-            preferenceProvider.getAccountId1(),
-            preferenceProvider.getIdentityToken1(),
-            preferenceProvider.getMatchFetchedAt1(),
-            preferenceProvider.getMatchFetchedAt1(),
-            preferenceProvider.getMatchFetchedAt1()
-        )
+//        val matches = balanceRDS.fetchMatches(
+//            preferenceProvider.getAccountId1(),
+//            preferenceProvider.getIdentityToken1(),
+//            preferenceProvider.getMatchFetchedAt1(),
+//            preferenceProvider.getMatchFetchedAt1(),
+//            preferenceProvider.getMatchFetchedAt1()
+//        )
 
         return 1L
     }
@@ -569,13 +569,13 @@ class BalanceRepositoryImpl(
             )
         )
 
-        val response = balanceRDS.fetchChatMessages(
-            preferenceProvider.getAccountId1(),
-            preferenceProvider.getIdentityToken1(),
-            chatId,
-            recipientId,
-            chatMessageDAO.findLastId(chatId) ?: 0
-        )
+//        val response = balanceRDS.fetchChatMessages(
+//            preferenceProvider.getAccountId1(),
+//            preferenceProvider.getIdentityToken1(),
+//            chatId,
+//            recipientId,
+//            chatMessageDAO.findLastId(chatId) ?: 0
+//        )
 
 //        if (response.isError()) return response
 //

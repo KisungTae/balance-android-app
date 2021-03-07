@@ -78,11 +78,11 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     private fun setupPhotoPickerRecyclerView() {
-        binding.rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
-            requireContext(),
-            this,
-            preferenceProvider.getAccountId1()
-        )
+//        binding.rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
+//            requireContext(),
+//            this,
+//            preferenceProvider.getAccountId1()
+//        )
 
         binding.rvPhotoPicker.layoutManager =
             object : GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM) {

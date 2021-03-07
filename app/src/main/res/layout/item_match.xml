@@ -4,12 +4,21 @@
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-    <ImageView
-        android:id="@+id/ivMatchProfilePicture"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="10dp"
-        android:src="@drawable/ic_baseline_account_circle" />
+    <FrameLayout
+        android:id="@+id/flMatchProfilePictureWrapper"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginEnd="10dp">
+
+        <ImageView
+            android:id="@+id/ivMatchProfilePicture"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_baseline_account_circle" />
+
+    </FrameLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"

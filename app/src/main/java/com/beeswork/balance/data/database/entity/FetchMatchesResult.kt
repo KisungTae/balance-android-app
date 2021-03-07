@@ -12,10 +12,7 @@ data class FetchMatchesResult(
     val id: Int = ID,
 
     var status: Resource.Status = Resource.Status.SUCCESS,
-    var fetchedAt: OffsetDateTime = OffsetDateTime.MIN,
     var chatMessagesInsertedAt: OffsetDateTime = OffsetDateTime.now(),
-
-
 ) {
     companion object {
         const val ID = 0

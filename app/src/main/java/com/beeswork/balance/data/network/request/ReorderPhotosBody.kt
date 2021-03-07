@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.network.request
 
-data class SaveAnswersRequest(
+data class ReorderPhotosBody(
     val accountId: String,
     val identityToken: String,
-    val answers: Map<Int, Boolean>
+    val photoOrders: Map<String, Int>
 )

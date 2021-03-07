@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.network.request
 
-data class FCMTokenRequest(
+data class PostAnswersBody(
     val accountId: String,
     val identityToken: String,
-    val token: String
+    val answers: Map<Int, Boolean>
 )

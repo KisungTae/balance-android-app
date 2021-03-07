@@ -40,7 +40,7 @@ class BalanceRDSImpl(
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.reorderPhotos(
-                ReorderPhotosRequest(
+                ReorderPhotosBody(
                     accountId,
                     identityToken,
                     photoOrders
@@ -56,7 +56,7 @@ class BalanceRDSImpl(
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.deletePhoto(
-                DeletePhotoRequest(
+                DeletePhotoBody(
                     accountId,
                     identityToken,
                     photoKey
@@ -81,7 +81,7 @@ class BalanceRDSImpl(
     ): Resource<PreSignedUrlResponse> {
         return getResult {
             balanceAPI.addPhoto(
-                AddPhotoRequest(
+                AddPhotoBody(
                     accountId,
                     identityToken,
                     photoKey,
@@ -105,7 +105,7 @@ class BalanceRDSImpl(
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.saveAnswers(
-                SaveAnswersRequest(
+                SaveAnswersBody(
                     accountId,
                     identityToken,
                     answers
@@ -134,7 +134,7 @@ class BalanceRDSImpl(
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postAnswers(
-                PostAnswersRequest(
+                PostAnswersBody(
                     accountId,
                     identityToken,
                     answers
@@ -180,7 +180,7 @@ class BalanceRDSImpl(
         swipedId: String
     ): Resource<BalanceGameResponse> {
         return getResult {
-            balanceAPI.swipe(SwipeRequest(accountId, identityToken, swipeId, swipedId))
+            balanceAPI.swipe(SwipeBody(accountId, identityToken, swipeId, swipedId))
         }
     }
 
@@ -192,7 +192,7 @@ class BalanceRDSImpl(
         answers: Map<Int, Boolean>
     ): Resource<ClickResponse> {
         return getResult {
-            balanceAPI.click(ClickRequest(accountId, identityToken, swipedId, swipeId, answers))
+            balanceAPI.click(ClickBody(accountId, identityToken, swipedId, swipeId, answers))
         }
     }
 
@@ -202,7 +202,7 @@ class BalanceRDSImpl(
         token: String
     ): Resource<EmptyResponse> {
         return getResult {
-            balanceAPI.postFCMToken(FCMTokenRequest(accountId, identityToken, token))
+            balanceAPI.postFCMToken(FCMTokenBody(accountId, identityToken, token))
         }
     }
 
@@ -243,7 +243,7 @@ class BalanceRDSImpl(
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postLocation(
-                LocationRequest(
+                LocationBody(
                     accountId,
                     identityToken,
                     latitude,
