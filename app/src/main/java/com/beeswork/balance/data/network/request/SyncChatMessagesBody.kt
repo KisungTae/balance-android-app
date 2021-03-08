@@ -5,5 +5,6 @@ import java.util.*
 data class SyncChatMessagesBody(
     val accountId: UUID,
     val identityToken: UUID,
-    val chatMessageIds: List<Long>,
+    val sentChatMessageIds: List<Long>,
+    val receivedChatMessageIds: List<Long>
 )

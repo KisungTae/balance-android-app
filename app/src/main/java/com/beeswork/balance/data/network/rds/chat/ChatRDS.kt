@@ -10,7 +10,8 @@ interface ChatRDS {
     suspend fun syncChatMessages(
         accountId: UUID,
         identityToken: UUID,
-        chatMessageIds: List<Long>
+        sentChatMessageIds: List<Long>,
+        receivedChatMessageIds: List<Long>
     )
 
     suspend fun fetchChatMessages(

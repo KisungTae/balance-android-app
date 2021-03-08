@@ -54,6 +54,6 @@ interface MatchDAO {
 
     //  TODO: removeme
     @Query("select * from `match`")
-    fun get(): List<Match>
+    fun findAll(): List<Match>
 
 }

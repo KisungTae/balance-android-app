@@ -18,7 +18,6 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
     FetchErrorDialog.FetchErrorListener {
 
     override val kodein by closestKodein()
-
     private val viewModelFactory: MatchViewModelFactory by instance()
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagedListAdapter: MatchPagedListAdapter

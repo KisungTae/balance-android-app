@@ -13,9 +13,17 @@ class ChatRDSImpl(
     override suspend fun syncChatMessages(
         accountId: UUID,
         identityToken: UUID,
-        chatMessageIds: List<Long>
+        sentChatMessageIds: List<Long>,
+        receivedChatMessageIds: List<Long>
     ) {
-        balanceAPI.syncChatMessages(SyncChatMessagesBody(accountId, identityToken, chatMessageIds))
+        balanceAPI.syncChatMessages(
+            SyncChatMessagesBody(
+                accountId,
+                identityToken,
+                sentChatMessageIds,
+                receivedChatMessageIds
+            )
+        )
     }
 
     override suspend fun fetchChatMessages(

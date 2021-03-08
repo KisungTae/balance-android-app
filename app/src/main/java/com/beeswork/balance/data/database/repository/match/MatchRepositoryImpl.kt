@@ -52,9 +52,6 @@ class MatchRepositoryImpl(
         }
 
         listMatches.data?.let { data ->
-            //      TODO: remove me
-            saveSentChatMessages(data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) })
-
             saveChatMessages(
                 OffsetDateTime.now(),
                 data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
@@ -64,6 +61,10 @@ class MatchRepositoryImpl(
             saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
             updateFetchMatchesResult(listMatches.status)
             preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+
+            //      TODO: remove me
+            saveSentChatMessages(data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) })
+
         }
         return Resource.toEmptyResponse(listMatches)
     }
@@ -103,14 +104,11 @@ class MatchRepositoryImpl(
     ) {
         if (sentChatMessages.isEmpty() && receivedChatMessages.isEmpty()) return
         CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
-            val chatMessageIds = mutableListOf<Long>()
-            chatMessageIds.addAll(sentChatMessages.map { it.id })
-            chatMessageIds.addAll(receivedChatMessages.map { it.id })
-
             chatRDS.syncChatMessages(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
-                chatMessageIds
+                sentChatMessages.map { it.id },
+                receivedChatMessages.map { it.id }
             )
         }
     }
@@ -154,14 +152,16 @@ class MatchRepositoryImpl(
 
     //  TODO: remove me
     private fun saveSentChatMessages(sentChatMessages: List<ChatMessage>) {
-        val random = Random(100)
+        val matches = matchDAO.findAll()
+        val chatIds = matches.map { it.chatId }
         for (msg in sentChatMessages) {
+            val randomIndex = Random.nextInt(0, chatIds.size - 1)
             chatMessageDAO.insert(
                 ChatMessage(
                     msg.messageId,
                     msg.id,
-                    msg.chatId,
-                    "message-${random.nextFloat()}",
+                    chatIds.get(randomIndex),
+                    "message-${Random.nextFloat()}",
                     ChatMessageStatus.SENDING,
                     OffsetDateTime.now(),
                     OffsetDateTime.now()
