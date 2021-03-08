@@ -15,13 +15,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
 class MatchPagedListAdapter(
-    private val onMatchListener: OnMatchListener
+//    private val onMatchListener: OnMatchListener
 ) : PagedListAdapter<MatchDomain, MatchPagedListAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemMatchBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onMatchListener,
+//            onMatchListener,
             parent.context
         )
     }
@@ -46,7 +46,7 @@ class MatchPagedListAdapter(
 
     class ViewHolder(
         private val binding: ItemMatchBinding,
-        private val onMatchListener: OnMatchListener,
+//        private val onMatchListener: OnMatchListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
@@ -75,7 +75,7 @@ class MatchPagedListAdapter(
         }
 
         override fun onClick(view: View) {
-            onMatchListener.onMatchClick(view, layoutPosition)
+//            onMatchListener.onMatchClick(view, layoutPosition)
         }
 
         companion object {
