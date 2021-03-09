@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="1"
-            android:background="@drawable/sh_round_border_box"
+            android:background="@drawable/sh_rectangle_border"
             android:padding="10dp"
             android:text="this is message here" />
 

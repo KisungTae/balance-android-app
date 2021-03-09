@@ -61,7 +61,7 @@ class MatchPagedListAdapter(
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
 
             if (matchDomain.unmatched || matchDomain.deleted) {
-                val colorTextLightGrey = context.getColor(R.color.textLightGrey)
+                val colorTextLightGrey = context.getColor(R.color.lightGrey)
                 binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
                 binding.tvMatchName.setTextColor(colorTextLightGrey)
                 binding.tvMatchRecentChatMessage.setTextColor(colorTextLightGrey)

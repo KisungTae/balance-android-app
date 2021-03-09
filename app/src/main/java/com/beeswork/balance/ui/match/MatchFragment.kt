@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.match
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,8 +42,37 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         setupMatchRecyclerView()
         setupFetchMatchesObserver()
         setupMatchesObserver()
-        binding.tbMatch.inflateMenu(R.menu.menu_match_action_bar)
+        setupToolBar()
         viewModel.fetchMatches()
+    }
+
+    private fun setupToolBar() {
+        binding.tbMatch.inflateMenu(R.menu.match_action_bar)
+        binding.tbMatch.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.miMatchActionBarRefresh -> {
+                    println("miMatchActionBarRefresh")
+                    true
+                }
+                R.id.miMatchActionBarSearch -> {
+                    binding.tbMatch.visibility = View.GONE
+                    binding.tbMatchSearch.visibility = View.VISIBLE
+                    true
+                }
+                else -> false
+            }
+        }
+
+        binding.btnMatchSearchBarClose.setOnClickListener {
+            binding.tbMatchSearch.visibility = View.GONE
+            binding.tbMatch.visibility = View.VISIBLE
+        }
+
+        binding.etMatchSearch.addTextChangedListener {
+            println("entered: ${it.toString()}")
+
+        }
+
     }
 
     private fun setupFetchMatchesObserver() {

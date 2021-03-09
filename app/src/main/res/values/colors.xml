@@ -5,7 +5,10 @@
     <color name="Accent">#03DAC5</color>
     <color name="transparent">@android:color/transparent</color>
     <color name="textBlack">#000000</color>
-    <color name="textLightGrey">#dbdbdb</color>
+
+    <!-- search bar background, unselected icon,    -->
+    <color name="lightGrey">#ededef</color>
+
     <color name="PrimaryGradientStart">@color/Primary</color>
     <color name="PrimaryGradientEnd">@color/Accent</color>
     <color name="BackgroundWhite">#FFFFFF</color>
