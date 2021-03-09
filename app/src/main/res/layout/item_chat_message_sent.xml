@@ -25,7 +25,7 @@
                 android:alpha="1"
                 android:background="@color/transparent"
                 android:clickable="true"
-                app:SpinKit_Color="@color/colorAccent"
+                app:SpinKit_Color="@color/Accent"
                 android:focusable="true"
                 android:tag="photoPickerLoading"
                 android:visibility="gone" />

@@ -11,7 +11,7 @@
         android:label="MatchFragment"
         tools:layout="@layout/fragment_match">
         <action
-            android:id="@+id/matchToChatAction"
+            android:id="@+id/action_matchFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
     </fragment>
 
@@ -32,9 +32,6 @@
         <action
             android:id="@+id/action_chatFragment_to_matchFragment"
             app:destination="@id/matchFragment" />
-        <argument
-            android:name="matchedId"
-            app:argType="string" />
     </fragment>
 
     <fragment

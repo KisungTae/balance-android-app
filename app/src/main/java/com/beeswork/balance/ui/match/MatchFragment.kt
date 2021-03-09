@@ -1,27 +1,20 @@
 package com.beeswork.balance.ui.match
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.view.*
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.ui.common.ScopeFragment
-import com.beeswork.balance.ui.common.SwipeButton
-import com.beeswork.balance.ui.common.SwipeButtonClickListener
-import com.beeswork.balance.ui.common.SwipeButtonHelper
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatchListener,
+class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClickMatchListener,
     FetchErrorDialog.FetchErrorListener {
 
     override val kodein by closestKodein()
@@ -48,6 +41,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
         setupMatchRecyclerView()
         setupFetchMatchesObserver()
         setupMatchesObserver()
+        binding.tbMatch.inflateMenu(R.menu.menu_match_action_bar)
         viewModel.fetchMatches()
     }
 
@@ -67,40 +61,16 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnMatc
     }
 
     private fun setupMatchRecyclerView() {
-        val swipe = object : SwipeButtonHelper(requireContext(), binding.rvMatch, 200) {
-            override fun initiateSwipeButton(viewHolder: RecyclerView.ViewHolder, buffer: MutableList<SwipeButton>) {
-                buffer.add(
-                    SwipeButton(
-                        requireContext(),
-                        "delete",
-                        10,
-                        Color.parseColor("#000000"),
-                        Color.parseColor("#000000"),
-                        object : SwipeButtonClickListener {
-                            override fun onClick(pos: Int) {
-                                println("onclick: $pos")
-                            }
-
-                        }
-                    )
-                )
-            }
-
-        }
-
-        matchPagedListAdapter = MatchPagedListAdapter()
+        matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
         binding.rvMatch.adapter = matchPagedListAdapter
         binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
     }
 
-
-    override fun onMatchClick(view: View, position: Int) {
-//      TODO: it.matchedId to UUID
-//        matchPagedListAdapter.getMatchByPosition(position)?.let {
-//            Navigation.findNavController(view)
-//                .navigate(MatchFragmentDirections.matchToChatAction(it.chatId, "it.matchedId"))
-//        }
+    override fun onClick(view: View) {
+        Navigation.findNavController(view)
+            .navigate(MatchFragmentDirections.actionMatchFragmentToChatFragment(view.tag.toString().toLong()))
     }
+
 
     override fun onRefetch() {
         viewModel.fetchMatches()

@@ -39,7 +39,7 @@
             android:focusable="true"
             android:tag="photoPickerLoading"
             android:visibility="gone"
-            app:SpinKit_Color="@color/colorAccent" />
+            app:SpinKit_Color="@color/Accent" />
 
         <ImageView
             android:layout_width="match_parent"

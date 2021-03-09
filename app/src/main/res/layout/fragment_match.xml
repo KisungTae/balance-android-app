@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/BackgroundWhite"
     android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tbMatch"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/BackgroundWhite"
+        app:contentInsetStart="96dp">
+
+        <com.beeswork.balance.ui.common.GradientTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/match_tool_bar_title"
+            android:textAlignment="center"
+            android:textSize="@dimen/tool_bar_title_text_size"
+            android:textStyle="bold"
+            app:endColor="@color/PrimaryGradientStart"
+            app:startColor="@color/PrimaryGradientEnd" />
+    </androidx.appcompat.widget.Toolbar>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMatch"

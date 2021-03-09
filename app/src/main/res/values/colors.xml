@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="Primary">#6200EE</color>
+    <color name="PrimaryDark">#3700B3</color>
+    <color name="Accent">#03DAC5</color>
     <color name="transparent">@android:color/transparent</color>
     <color name="textBlack">#000000</color>
     <color name="textLightGrey">#dbdbdb</color>
+    <color name="PrimaryGradientStart">@color/Primary</color>
+    <color name="PrimaryGradientEnd">@color/Accent</color>
+    <color name="BackgroundWhite">#FFFFFF</color>
+
 </resources>

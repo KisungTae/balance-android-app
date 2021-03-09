@@ -105,6 +105,7 @@ class PreferenceProviderImpl(
 
     override fun getAccountId(): UUID {
 //      TODO: remove accountId and put null for default value
+
 //        val accountId = "69161188-1ba5-484c-860b-00faf97fa962"
         val accountId = "93ad368a-80ce-4f9e-922d-4e7c230edd5a"
         preferences.getString(ACCOUNT_ID, accountId)?.let {
@@ -114,6 +115,7 @@ class PreferenceProviderImpl(
 
     override fun getIdentityToken(): UUID {
 //      TODO: remove identityToken and put null for default value
+
 //        val identityToken = "bb3c422f-3db3-4a40-a690-458a71ddb98b"
         val identityToken = "50263aa1-1b0f-4d2f-a5d6-24b9043ead59"
         preferences.getString(IDENTITY_TOKEN, identityToken)?.let {

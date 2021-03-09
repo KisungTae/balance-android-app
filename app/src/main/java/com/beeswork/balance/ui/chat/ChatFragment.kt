@@ -21,7 +21,7 @@ import org.kodein.di.generic.factory
 class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
+    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatPagingAdapter: ChatPagingAdapter
     private lateinit var layoutManager: LinearLayoutManager
@@ -48,7 +48,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         }?.let {
             viewModel = ViewModelProvider(
                 this,
-                viewModelFactory(ChatViewModelFactoryParameter(it.chatId, it.matchedId))
+                viewModelFactory(it.chatId)
             ).get(ChatViewModel::class.java)
             bindUI()
         } ?: kotlin.run {
@@ -60,14 +60,15 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     }
 
     private fun bindUI() {
-        setupChatRecyclerView()
-        setupWebSocketLifeCycleEventObserver()
 
-        binding.btnChatSend.setOnClickListener {
-            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
-        }
-        observeChatMessageEvent()
-        viewModel.fetchInitialChatMessages()
+//        setupChatRecyclerView()
+//        setupWebSocketLifeCycleEventObserver()
+//
+//        binding.btnChatSend.setOnClickListener {
+//            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
+//        }
+//        observeChatMessageEvent()
+//        viewModel.fetchInitialChatMessages()
 
 //        viewModel.connectChat()
     }
@@ -84,7 +85,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
                         childFragmentManager,
                         ExceptionDialog.TAG
                     )
-                    binding.llChatLoading.visibility = View.GONE
+//                    binding.llChatLoading.visibility = View.GONE
                 }
                 ChatMessageEvent.Type.FETCH -> {
 

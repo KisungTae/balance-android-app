@@ -15,13 +15,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
 class MatchPagedListAdapter(
-//    private val onMatchListener: OnMatchListener
+    private val onClickMatchListener: OnClickMatchListener
 ) : PagedListAdapter<MatchDomain, MatchPagedListAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemMatchBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-//            onMatchListener,
+            onClickMatchListener,
             parent.context
         )
     }
@@ -40,13 +40,13 @@ class MatchPagedListAdapter(
         }
     }
 
-    interface OnMatchListener {
-        fun onMatchClick(view: View, position: Int)
+    interface OnClickMatchListener {
+        fun onClick(view: View)
     }
 
     class ViewHolder(
         private val binding: ItemMatchBinding,
-//        private val onMatchListener: OnMatchListener,
+        private val onClickMatchListener: OnClickMatchListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
@@ -55,6 +55,7 @@ class MatchPagedListAdapter(
         }
 
         fun bind(matchDomain: MatchDomain) {
+            binding.root.tag = matchDomain.chatId
             binding.tvMatchName.text = matchDomain.name
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
@@ -69,13 +70,14 @@ class MatchPagedListAdapter(
                 val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
                 Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
                 val circleBorderShape = ContextCompat.getDrawable(context, R.drawable.sh_circle_border)
-                if (!matchDomain.active) binding.flMatchProfilePictureWrapper.background = circleBorderShape
+                if (!matchDomain.active)
+                    binding.flMatchProfilePictureWrapper.background = circleBorderShape
                 binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
             }
         }
 
         override fun onClick(view: View) {
-//            onMatchListener.onMatchClick(view, layoutPosition)
+            onClickMatchListener.onClick(view)
         }
 
         companion object {

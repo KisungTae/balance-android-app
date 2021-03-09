@@ -13,7 +13,6 @@ import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val chatId: Long,
-    private val matchedId: String,
     private val balanceRepository: BalanceRepository,
     private val stompClient: StompClient
 ) : ViewModel() {
@@ -25,21 +24,21 @@ class ChatViewModel(
 
     fun fetchInitialChatMessages() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = balanceRepository.fetchChatMessages(chatId, matchedId, PAGE_SIZE)
-            withContext(Dispatchers.Main) {
-                if (result.isError()) _chatMessageEvent.value =
-                    ChatMessageEvent.fetchError(result.error, result.errorMessage)
-                else result.data?.let { _chatMessageEvent.value = ChatMessageEvent.fetch(it) }
-            }
+//            val result = balanceRepository.fetchChatMessages(chatId, PAGE_SIZE)
+//            withContext(Dispatchers.Main) {
+//                if (result.isError()) _chatMessageEvent.value =
+//                    ChatMessageEvent.fetchError(result.error, result.errorMessage)
+//                else result.data?.let { _chatMessageEvent.value = ChatMessageEvent.fetch(it) }
+//            }
         }
     }
 
     fun connectChat() {
-        stompClient.connectChat(chatId, matchedId)
+//        stompClient.connectChat(chatId, matchedId)
     }
 
     fun sendChatMessage(body: String) {
-        stompClient.send(chatId, matchedId, body)
+//        stompClient.send(chatId, matchedId, body)
     }
 
     fun disconnectChat() {

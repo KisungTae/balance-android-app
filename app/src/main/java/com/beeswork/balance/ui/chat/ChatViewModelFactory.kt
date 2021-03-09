@@ -6,7 +6,7 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.service.stomp.StompClient
 
 class ChatViewModelFactory(
-    private val chatViewModelFactoryParameter: ChatViewModelFactoryParameter,
+    private val chatId: Long,
     private val balanceRepository: BalanceRepository,
     private val stompClient: StompClient
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -14,8 +14,7 @@ class ChatViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return ChatViewModel(
-            chatViewModelFactoryParameter.chatId,
-            chatViewModelFactoryParameter.matchedId,
+            chatId,
             balanceRepository,
             stompClient
         ) as T
