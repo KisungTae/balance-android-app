@@ -146,11 +146,6 @@ class BalanceRepositoryImpl(
     override val fetchMatchesResponse: LiveData<Resource<List<Match>>>
         get() = mutableFetchMatchesResource
 
-    override suspend fun getMatches(): DataSource.Factory<Int, Match> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged()
-        }
-    }
 
     override suspend fun getUnreadMessageCount(): LiveData<Int> {
         return withContext(Dispatchers.IO) {

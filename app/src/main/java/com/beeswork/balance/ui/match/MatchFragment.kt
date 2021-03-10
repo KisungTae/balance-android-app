@@ -66,17 +66,17 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         binding.btnMatchSearchBarClose.setOnClickListener {
             binding.tbMatchSearch.visibility = View.GONE
             binding.tbMatch.visibility = View.VISIBLE
+            viewModel.changeMatchSearchKeyword("")
         }
 
         binding.etMatchSearch.addTextChangedListener {
-            println("entered: ${it.toString()}")
-
+            viewModel.changeMatchSearchKeyword(it.toString())
         }
 
     }
 
     private fun setupFetchMatchesObserver() {
-        viewModel.fetchMatches.observe(viewLifecycleOwner, {
+        viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
 //            if (it.isError()) FetchErrorDialog(it.errorMessage, this@MatchFragment).show(
 //                childFragmentManager,
 //                FetchErrorDialog.TAG
@@ -85,7 +85,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
     }
 
     private suspend fun setupMatchesObserver() {
-        viewModel.matches.await().observe(viewLifecycleOwner, {
+        viewModel.matchPagedListLiveData.await().observe(viewLifecycleOwner, {
             matchPagedListAdapter.submitList(it)
         })
     }

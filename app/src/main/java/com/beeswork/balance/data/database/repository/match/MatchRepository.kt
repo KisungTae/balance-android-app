@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 
 interface MatchRepository {
-    suspend fun listMatches(): DataSource.Factory<Int, Match>
+    suspend fun loadMatches(loadSize: Int, startPosition: Int, keyword: String): List<Match>?
+    suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>?
     suspend fun fetchMatches(): Resource<EmptyResponse>
 }

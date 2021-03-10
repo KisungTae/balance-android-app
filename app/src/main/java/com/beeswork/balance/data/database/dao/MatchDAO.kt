@@ -21,11 +21,11 @@ interface MatchDAO {
     @Query("select * from `match` where chatId = :chatId")
     fun findById(chatId: Long): Match?
 
-    @Query("select * from `match` order by updatedAt desc")
-    fun findAllPaged(): DataSource.Factory<Int, Match>
+    @Query("select * from `match` where name like :keyword order by updatedAt desc limit :loadSize offset :startPosition")
+    fun findAllPaged(loadSize: Int, startPosition: Int, keyword: String): List<Match>?
 
-
-
+    @Query("select * from `match` order by updatedAt desc limit :loadSize offset :startPosition")
+    fun findAllPaged(loadSize: Int, startPosition: Int): List<Match>?
 
 
 

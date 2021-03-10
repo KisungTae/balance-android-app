@@ -32,7 +32,6 @@ interface BalanceRepository {
     fun fetchMatches()
     fun unmatch()
 
-    suspend fun getMatches(): DataSource.Factory<Int, Match>
     suspend fun getUnreadMessageCount(): LiveData<Int>
 
     // message

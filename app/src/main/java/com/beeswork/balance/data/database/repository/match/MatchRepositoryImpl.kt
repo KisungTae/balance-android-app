@@ -33,9 +33,15 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
-    override suspend fun listMatches(): DataSource.Factory<Int, Match> {
+    override suspend fun loadMatches(loadSize: Int, startPosition: Int, keyword: String): List<Match>? {
         return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged()
+            return@withContext matchDAO.findAllPaged(loadSize, startPosition, keyword)
+        }
+    }
+
+    override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>? {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findAllPaged(loadSize, startPosition)
         }
     }
 
