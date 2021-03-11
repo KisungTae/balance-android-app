@@ -33,9 +33,9 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
-    override suspend fun loadMatches(loadSize: Int, startPosition: Int, keyword: String): List<Match>? {
+    override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>? {
         return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition, keyword)
+            return@withContext matchDAO.findAllPaged(loadSize, startPosition, searchKeyword)
         }
     }
 
@@ -74,6 +74,39 @@ class MatchRepositoryImpl(
 
         }
         return Resource.toEmptyResponse(listMatches)
+    }
+
+    //  TODO: remove me
+    override suspend fun loadMatchesAsFactory(): DataSource.Factory<Int, Match> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findAllAsFactory()
+        }
+    }
+
+    override fun testFunction() {
+
+        CoroutineScope(Dispatchers.IO).launch {
+//            matchDAO.insert(
+//                Match(
+//                    239020392L + Random.nextInt(1000) ,
+//                    UUID.randomUUID(),
+//                    false,
+//                    false,
+//                    "user-test",
+//                    "",
+//                    false,
+//                    OffsetDateTime.now()
+//                )
+//            )
+
+
+            matchDAO.findById(3844)?.let {
+                it.updatedAt = OffsetDateTime.now()
+                it.name = "this is updated user"
+                matchDAO.insert(it)
+            }
+        }
+
     }
 
     private fun updateFetchMatchesResult(status: Resource.Status) {

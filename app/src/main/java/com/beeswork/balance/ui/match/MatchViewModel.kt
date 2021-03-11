@@ -58,22 +58,36 @@ class MatchViewModel(
         return LivePagedListBuilder(dataSource.map { matchMapper.fromEntityToDomain(it) }, pagedListConfig).build()
     }
 
-
-//    val matches by lazyDeferred {
-//        LivePagedListBuilder(balanceRepository.getMatches().map {
-//            matchMapper.fromEntityToDomain(it)
-//        }, pagedListConfig).build()
-//    }
-
     fun changeMatchSearchKeyword(input: String) {
-        val keyword = if (input.isNotEmpty()) "%$input%" else input
-        matchSearchKeywordChannel.offer(keyword)
+        val searchKeyword = if (input.isNotEmpty()) "%$input%" else input
+        matchSearchKeywordChannel.offer(searchKeyword)
+
     }
 
     fun fetchMatches() {
         CoroutineScope(Dispatchers.IO).launch {
             _fetchMatchesLiveData.postValue(matchRepository.fetchMatches())
         }
+    }
+
+
+//  TODO: remove me
+    val matches by lazyDeferred {
+        LivePagedListBuilder(
+            matchRepository.loadMatchesAsFactory().map {
+                matchMapper.fromEntityToDomain(it)
+            }, PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setMaxSize(MATCH_MAX_PAGE_SIZE)
+                .setInitialLoadSizeHint(MATCH_PAGE_SIZE)
+                .setPageSize(MATCH_PAGE_SIZE)
+                .setPrefetchDistance(MATCH_PREFETCH_DISTANCE)
+                .build()
+        ).build()
+    }
+
+    fun testFunction() {
+        matchRepository.testFunction()
     }
 
     companion object {
@@ -84,4 +98,13 @@ class MatchViewModel(
     }
 
 
+//    val matches by lazyDeferred {
+//        LivePagedListBuilder(balanceRepository.getMatches().map {
+//            matchMapper.fromEntityToDomain(it)
+//        }, pagedListConfig).build()
+//    }
+
 }
+
+
+// TODO: when back button to match page, should keep the position

@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/miMatchActionBarRefresh"
-        android:icon="@drawable/ic_refresh"
-        android:title=""
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/miMatchActionBarSearch"
         android:icon="@drawable/ic_baseline_search"
         android:title=""

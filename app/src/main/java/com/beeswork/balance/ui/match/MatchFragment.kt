@@ -40,42 +40,47 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
 
     private fun bindUI() = launch {
         setupMatchRecyclerView()
-        setupFetchMatchesObserver()
-        setupMatchesObserver()
-        setupToolBar()
-        viewModel.fetchMatches()
+        setupFetchMatchesLiveDataObserver()
+        setupMatchPagedListLiveDataObserver()
+        setupToolBars()
+//        viewModel.fetchMatches()
     }
 
-    private fun setupToolBar() {
-        binding.tbMatch.inflateMenu(R.menu.match_action_bar)
+    private fun setupToolBars() {
+        binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchActionBarRefresh -> {
-                    println("miMatchActionBarRefresh")
-                    true
-                }
                 R.id.miMatchActionBarSearch -> {
-                    binding.tbMatch.visibility = View.GONE
-                    binding.tbMatchSearch.visibility = View.VISIBLE
+
+//                    showSearchToolBar()
+                    viewModel.testFunction()
                     true
                 }
                 else -> false
             }
         }
 
-        binding.btnMatchSearchBarClose.setOnClickListener {
-            binding.tbMatchSearch.visibility = View.GONE
-            binding.tbMatch.visibility = View.VISIBLE
-            viewModel.changeMatchSearchKeyword("")
+        binding.btnMatchSearchToolBarClose.setOnClickListener {
+            hideSearchToolBar()
         }
 
         binding.etMatchSearch.addTextChangedListener {
             viewModel.changeMatchSearchKeyword(it.toString())
         }
-
     }
 
-    private fun setupFetchMatchesObserver() {
+    private fun hideSearchToolBar() {
+        binding.tbMatchSearch.visibility = View.GONE
+        binding.tbMatch.visibility = View.VISIBLE
+        viewModel.changeMatchSearchKeyword("")
+    }
+
+    private fun showSearchToolBar() {
+        binding.tbMatch.visibility = View.GONE
+        binding.tbMatchSearch.visibility = View.VISIBLE
+    }
+
+    private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
 //            if (it.isError()) FetchErrorDialog(it.errorMessage, this@MatchFragment).show(
 //                childFragmentManager,
@@ -84,8 +89,13 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         })
     }
 
-    private suspend fun setupMatchesObserver() {
-        viewModel.matchPagedListLiveData.await().observe(viewLifecycleOwner, {
+    private suspend fun setupMatchPagedListLiveDataObserver() {
+//        viewModel.matchPagedListLiveData.await().observe(viewLifecycleOwner, {
+//            matchPagedListAdapter.submitList(it)
+//        })
+
+//      TODO: remove me
+        viewModel.matches.await().observe(viewLifecycleOwner, {
             matchPagedListAdapter.submitList(it)
         })
     }

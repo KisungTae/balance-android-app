@@ -56,25 +56,41 @@ class MatchPagedListAdapter(
 
         fun bind(matchDomain: MatchDomain) {
             binding.root.tag = matchDomain.chatId
-            binding.tvMatchName.text = matchDomain.name
+
+//            binding.tvMatchName.text = matchDomain.name
+//            TODO: remove me
+            binding.tvMatchName.text = "${matchDomain.name} in chat: ${matchDomain.chatId}"
+
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
 
             if (matchDomain.unmatched || matchDomain.deleted) {
-                val colorTextLightGrey = context.getColor(R.color.lightGrey)
                 binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
-                binding.tvMatchName.setTextColor(colorTextLightGrey)
-                binding.tvMatchRecentChatMessage.setTextColor(colorTextLightGrey)
                 binding.tvMatchUpdatedAt.text = ""
+                changeTextColor(context.getColor(R.color.lightGrey))
+                resetProfilePictureCircleBorder(false)
+
             } else {
                 val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
-                Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
-                val circleBorderShape = ContextCompat.getDrawable(context, R.drawable.sh_circle_border)
-                if (!matchDomain.active)
-                    binding.flMatchProfilePictureWrapper.background = circleBorderShape
+//                Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
                 binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
+                changeTextColor(context.getColor(R.color.textBlack))
+                resetProfilePictureCircleBorder(matchDomain.active)
             }
         }
+
+        private fun resetProfilePictureCircleBorder(active: Boolean) {
+            if (!active) binding.flMatchProfilePictureWrapper.background = ContextCompat.getDrawable(
+                context,
+                R.drawable.sh_circle_border
+            ) else binding.flMatchProfilePictureWrapper.background = null
+        }
+
+        private fun changeTextColor(textColor: Int) {
+            binding.tvMatchName.setTextColor(textColor)
+            binding.tvMatchRecentChatMessage.setTextColor(textColor)
+        }
+
 
         override fun onClick(view: View) {
             onClickMatchListener.onClick(view)

@@ -36,7 +36,7 @@
             android:paddingEnd="0dp" />
 
         <ImageButton
-            android:id="@+id/btnMatchSearchBarClose"
+            android:id="@+id/btnMatchSearchToolBarClose"
             android:layout_width="@dimen/tool_bar_menu_item_btn_size"
             android:layout_height="@dimen/tool_bar_menu_item_btn_size"
             android:background="@color/transparent"
@@ -51,7 +51,12 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/BackgroundWhite"
-        app:contentInsetStart="96dp">
+        app:contentInsetStart="0dp">
+
+        <Button
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:visibility="invisible"/>
 
         <com.beeswork.balance.ui.common.GradientTextView
             android:layout_width="match_parent"

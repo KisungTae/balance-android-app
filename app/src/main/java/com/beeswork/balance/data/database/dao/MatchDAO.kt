@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.ui.match.MatchDataSource
 import java.util.*
 
 @Dao
@@ -21,11 +22,15 @@ interface MatchDAO {
     @Query("select * from `match` where chatId = :chatId")
     fun findById(chatId: Long): Match?
 
-    @Query("select * from `match` where name like :keyword order by updatedAt desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int, keyword: String): List<Match>?
+    @Query("select * from `match` where name like :searchKeyword order by updatedAt desc limit :loadSize offset :startPosition")
+    fun findAllPaged(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>?
 
     @Query("select * from `match` order by updatedAt desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int): List<Match>?
+
+//  TODO: remove me
+    @Query("select * from `match` order by updatedAt desc")
+    fun findAllAsFactory(): DataSource.Factory<Int, Match>
 
 
 
