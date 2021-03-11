@@ -107,6 +107,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
     }
 
     override fun onClick(view: View) {
+
         Navigation.findNavController(view)
             .navigate(MatchFragmentDirections.actionMatchFragmentToChatFragment(view.tag.toString().toLong()))
     }

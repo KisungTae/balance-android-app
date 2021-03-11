@@ -55,6 +55,7 @@ class MatchViewModel(
                 ).also { matchDataSource = it }
             }
         }
+
         return LivePagedListBuilder(dataSource.map { matchMapper.fromEntityToDomain(it) }, pagedListConfig).build()
     }
 
@@ -91,7 +92,7 @@ class MatchViewModel(
     }
 
     companion object {
-        private const val MATCH_PAGE_SIZE = 30
+        private const val MATCH_PAGE_SIZE = 100
         private const val MATCH_PREFETCH_DISTANCE = MATCH_PAGE_SIZE
         private const val MATCH_MAX_PAGE_SIZE = MATCH_PREFETCH_DISTANCE * 3 + MATCH_PAGE_SIZE
         private const val QUERY_DEBOUNCE = 500L

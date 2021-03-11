@@ -85,26 +85,34 @@ class MatchRepositoryImpl(
 
     override fun testFunction() {
 
+        val dummyMatches = mutableListOf<Match>()
+
+
+        for (i in 0..50) {
+            dummyMatches.add(
+                Match(
+                    239020392L + Random.nextInt(1000),
+                    UUID.randomUUID(),
+                    false,
+                    false,
+                    "user-test new inserted",
+                    "",
+                    false,
+                    OffsetDateTime.now()
+                )
+            )
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
-//            matchDAO.insert(
-//                Match(
-//                    239020392L + Random.nextInt(1000) ,
-//                    UUID.randomUUID(),
-//                    false,
-//                    false,
-//                    "user-test",
-//                    "",
-//                    false,
-//                    OffsetDateTime.now()
-//                )
-//            )
+            matchDAO.insertAll(dummyMatches)
+//            matchDAO.insert(dummyMatches[0])
 
 
-            matchDAO.findById(3844)?.let {
-                it.updatedAt = OffsetDateTime.now()
-                it.name = "this is updated user"
-                matchDAO.insert(it)
-            }
+//            matchDAO.findById(3844)?.let {
+//                it.updatedAt = OffsetDateTime.now()
+//                it.name = "this is updated user"
+//                matchDAO.insert(it)
+//            }
         }
 
     }

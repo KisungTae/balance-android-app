@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import androidx.paging.PagedList
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -32,6 +33,8 @@ interface MatchDAO {
     @Query("select * from `match` order by updatedAt desc")
     fun findAllAsFactory(): DataSource.Factory<Int, Match>
 
+//  TODO: remove me
+    fun findAllAsPagedList(): PagedList<Match>
 
 
 
