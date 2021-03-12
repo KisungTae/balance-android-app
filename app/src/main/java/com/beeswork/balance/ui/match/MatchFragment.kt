@@ -5,6 +5,7 @@ import android.view.*
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
@@ -30,6 +31,11 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
     ): View {
         binding = FragmentMatchBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun onResume() {
+        println("match onResume!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        super.onResume()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,9 +113,11 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
     }
 
     override fun onClick(view: View) {
-
-        Navigation.findNavController(view)
-            .navigate(MatchFragmentDirections.actionMatchFragmentToChatFragment(view.tag.toString().toLong()))
+        findNavController().navigate(
+            MatchFragmentDirections.actionMatchFragmentToChatFragment(
+                view.tag.toString().toLong()
+            )
+        )
     }
 
 

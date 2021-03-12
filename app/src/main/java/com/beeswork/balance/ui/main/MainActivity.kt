@@ -12,6 +12,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.beeswork.balance.R
@@ -23,6 +24,8 @@ import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
 import com.google.android.gms.location.*
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
@@ -41,17 +44,49 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fcvHost) as NavHostFragment
-
-        binding.nvBottom.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
-        binding.nvBottom.setupWithNavController(navHostFragment.navController)
-
+//        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcvHost) as NavHostFragment
+//        binding.nvBottom.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
+//        binding.nvBottom.setupWithNavController(navHostFragment.navController)
+        setupViewPager()
         setupBroadcastReceiver()
 
         if (hasLocationPermission()) bindLocationManager()
         else requestLocationPermission()
     }
+
+    private fun setupNavHost() {
+
+    }
+
+    private fun setupViewPager() {
+        binding.vpMain.adapter = MainViewPagerAdapter(this)
+
+        val tabLayoutMediator = TabLayoutMediator(
+            binding.tlMain,
+            binding.vpMain
+        ) { tab, position ->
+            when (position) {
+                MainViewPagerAdapter.FragmentPosition.ACCOUNT.ordinal -> {
+                    tab.setIcon(R.drawable.ic_baseline_account_circle)
+                }
+                MainViewPagerAdapter.FragmentPosition.SWIPE.ordinal -> {
+                    tab.setIcon(R.drawable.ic_baseline_favorite)
+                }
+                MainViewPagerAdapter.FragmentPosition.CLICKER.ordinal -> {
+                    tab.setIcon(R.drawable.ic_baseline_thumb_up)
+                }
+                MainViewPagerAdapter.FragmentPosition.MATCH.ordinal -> {
+                    tab.setIcon(R.drawable.ic_baseline_chat_bubble)
+                    val badge = tab.orCreateBadge
+                    badge.backgroundColor = ContextCompat.getColor(applicationContext, R.color.Primary)
+                    badge.isVisible = true
+//                    badge.number = 10
+                }
+            }
+        }
+        tabLayoutMediator.attach()
+    }
+
 
     override fun onResume() {
         super.onResume()

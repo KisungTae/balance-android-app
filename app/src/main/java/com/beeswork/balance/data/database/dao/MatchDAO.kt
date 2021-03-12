@@ -33,8 +33,6 @@ interface MatchDAO {
     @Query("select * from `match` order by updatedAt desc")
     fun findAllAsFactory(): DataSource.Factory<Int, Match>
 
-//  TODO: remove me
-    fun findAllAsPagedList(): PagedList<Match>
 
 
 

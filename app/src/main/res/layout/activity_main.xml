@@ -7,21 +7,37 @@
     android:orientation="vertical"
     tools:context=".ui.main.MainActivity">
 
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpMain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    </androidx.viewpager2.widget.ViewPager2>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tlMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/BackgroundWhite"
+        app:tabMode="fixed" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fcvHost"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:visibility="gone"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
 
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/nvBottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        app:menu="@menu/nav_bottom" />
+    <!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
+    <!--        android:id="@+id/nvBottom"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:background="@android:color/white"-->
+    <!--        app:menu="@menu/nav_bottom" />-->
 
 </LinearLayout>
