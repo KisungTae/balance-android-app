@@ -16,6 +16,7 @@ import com.beeswork.balance.ui.dialog.ExceptionDialogListener
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
+import java.sql.SQLOutput
 
 
 class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
@@ -28,35 +29,38 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
     private lateinit var binding: FragmentChatBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = FragmentChatBinding.inflate(layoutInflater)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_chat, container, false)
+    ): View {
+        println("chat onCreateView()")
+        binding = FragmentChatBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("chat onViewCreated")
         super.onViewCreated(view, savedInstanceState)
-        arguments?.let {
-            ChatFragmentArgs.fromBundle(it)
-        }?.let {
-            viewModel = ViewModelProvider(
-                this,
-                viewModelFactory(it.chatId)
-            ).get(ChatViewModel::class.java)
-            bindUI()
-        } ?: kotlin.run {
-            ExceptionDialog(getString(R.string.chat_id_not_found_exception), this).show(
-                childFragmentManager,
-                ExceptionDialog.TAG
-            )
-        }
+        viewModel = ViewModelProvider(
+            this,
+            viewModelFactory(1)
+        ).get(ChatViewModel::class.java)
+//        arguments?.let {
+//            ChatFragmentArgs.fromBundle(it)
+//        }?.let {
+//            viewModel = ViewModelProvider(
+//                this,
+//                viewModelFactory(it.chatId)
+//            ).get(ChatViewModel::class.java)
+//            bindUI()
+//        } ?: kotlin.run {
+//            ExceptionDialog(getString(R.string.chat_id_not_found_exception), this).show(
+//                childFragmentManager,
+//                ExceptionDialog.TAG
+//            )
+//        }
     }
 
     private fun bindUI() {
@@ -75,6 +79,10 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     private fun closeChat() {
 
+    }
+
+    fun setup(chatId: Long) {
+        println("setup(chatId: Long): $chatId")
     }
 
     private fun observeChatMessageEvent() {
@@ -122,8 +130,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     }
 
     override fun onClickExceptionDialogCloseBtn() {
-        Navigation.findNavController(requireView())
-            .navigate(R.id.action_chatFragment_to_matchFragment)
+//        Navigation.findNavController(requireView())
+//            .navigate(R.id.action_chatFragment_to_matchFragment)
     }
 
     override fun onResume() {

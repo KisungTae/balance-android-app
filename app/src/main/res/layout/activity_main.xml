@@ -22,15 +22,6 @@
         android:background="@color/BackgroundWhite"
         app:tabMode="fixed" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fcvHost"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph" />
 
 
     <!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->

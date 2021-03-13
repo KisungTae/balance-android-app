@@ -3,14 +3,18 @@ package com.beeswork.balance.ui.match
 import android.os.Bundle
 import android.view.*
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
+import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
+import com.beeswork.balance.ui.main.MainActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -34,7 +38,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
     }
 
     override fun onResume() {
-        println("match onResume!!!!!!!!!!!!!!!!!!!!!!!!!!")
+//        println("match onResume!!!!!!!!!!!!!!!!!!!!!!!!!!")
         super.onResume()
     }
 
@@ -113,11 +117,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
     }
 
     override fun onClick(view: View) {
-        findNavController().navigate(
-            MatchFragmentDirections.actionMatchFragmentToChatFragment(
-                view.tag.toString().toLong()
-            )
-        )
+        (activity as MainActivity).moveToChat(view.tag.toString().toLong())
     }
 
 

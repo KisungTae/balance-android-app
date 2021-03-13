@@ -15,11 +15,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
 import com.google.android.gms.location.*
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private val preferenceProvider: PreferenceProvider by instance()
     private val balanceRepository: BalanceRepository by instance()
     private lateinit var binding: ActivityMainBinding
+    private lateinit var mainViewPagerAdapter: MainViewPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +61,15 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     }
 
+    fun moveToChat(chatId: Long) {
+        mainViewPagerAdapter.chatFragment.setup(chatId)
+        binding.vpMain.setCurrentItem(MainViewPagerAdapter.FragmentPosition.CHAT.ordinal, true)
+
+    }
+
     private fun setupViewPager() {
-        binding.vpMain.adapter = MainViewPagerAdapter(this)
+        mainViewPagerAdapter = MainViewPagerAdapter(this)
+        binding.vpMain.adapter = mainViewPagerAdapter
 
         val tabLayoutMediator = TabLayoutMediator(
             binding.tlMain,
@@ -85,6 +95,16 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             }
         }
         tabLayoutMediator.attach()
+
+        binding.tlMain.removeTabAt(MainViewPagerAdapter.FragmentPosition.CHAT.ordinal)
+
+        binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                binding.vpMain.isUserInputEnabled = position == MainViewPagerAdapter.FragmentPosition.CHAT.ordinal
+                super.onPageSelected(position)
+            }
+        })
+
     }
 
 

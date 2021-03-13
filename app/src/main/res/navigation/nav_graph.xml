@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/swipeFragment">
+    app:startDestination="@id/matchFragment">
 
     <fragment
         android:id="@+id/matchFragment"
@@ -14,12 +14,6 @@
             android:id="@+id/action_matchFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/swipeFragment"
-        android:name="com.beeswork.balance.ui.swipe.SwipeFragment"
-        android:label="SwipeFragment"
-        tools:layout="@layout/fragment_swipe"/>
 
     <fragment
         android:id="@+id/chatFragment"
@@ -33,23 +27,9 @@
             android:id="@+id/action_chatFragment_to_matchFragment"
             app:destination="@id/matchFragment" />
     </fragment>
+    <action
+        android:id="@+id/action_global_chatFragment"
+        app:destination="@id/chatFragment" />
 
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.beeswork.balance.ui.settings.SettingsFragment"
-        android:label="SettingsFragment"/>
-
-    <fragment
-        android:id="@+id/clickedFragment"
-        android:name="com.beeswork.balance.ui.clicker.ClickerFragment"
-        android:label="ClickedFragment"
-        tools:layout="@layout/fragment_clicker" />
-
-
-    <fragment
-        android:id="@+id/accountFragment"
-        android:name="com.beeswork.balance.ui.account.AccountFragment"
-        android:label="AccountFragment"
-        tools:layout="@layout/fragment_account"/>
 
 </navigation>
