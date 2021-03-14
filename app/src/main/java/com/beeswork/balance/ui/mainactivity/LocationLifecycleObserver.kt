@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.main
+package com.beeswork.balance.ui.mainactivity
 
 import android.Manifest
 import android.content.Context

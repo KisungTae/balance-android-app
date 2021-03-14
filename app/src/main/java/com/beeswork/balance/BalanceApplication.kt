@@ -262,7 +262,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      85. when ge SwipeAlreadyClicked exception, then call listSwipes(clicked=false), if it's siwpeAlreadtMatchedException then call listMatches
 //      86. fetchClickers should remove deleted
 //      87. match profilePicture make it circle
-
+//      88. refactor notification and intent in mainActivity
+//      89. put viewmodel for dialogFragment
 
 
 

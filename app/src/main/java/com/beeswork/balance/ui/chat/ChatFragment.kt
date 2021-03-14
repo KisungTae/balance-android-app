@@ -22,11 +22,11 @@ import java.sql.SQLOutput
 class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
-    private lateinit var viewModel: ChatViewModel
-    private lateinit var chatPagingAdapter: ChatPagingAdapter
-    private lateinit var layoutManager: LinearLayoutManager
-    private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
+//    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
+    private var viewModel: ChatViewModel? = null
+//    private lateinit var chatPagingAdapter: ChatPagingAdapter
+//    private lateinit var layoutManager: LinearLayoutManager
+//    private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
     private lateinit var binding: FragmentChatBinding
 
 
@@ -35,18 +35,22 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        println("chat onCreateView()")
+        println("chat fragment: onCreateView")
         binding = FragmentChatBinding.inflate(inflater)
         return binding.root
     }
 
+    override fun onDestroy() {
+        println("chat fragment: onDestroy")
+        super.onDestroy()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        println("chat onViewCreated")
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(
-            this,
-            viewModelFactory(1)
-        ).get(ChatViewModel::class.java)
+//        viewModel = ViewModelProvider(
+//            this,
+//            viewModelFactory(1)
+//        ).get(ChatViewModel::class.java)
 //        arguments?.let {
 //            ChatFragmentArgs.fromBundle(it)
 //        }?.let {
@@ -82,51 +86,62 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
     }
 
     fun setup(chatId: Long) {
-        println("setup(chatId: Long): $chatId")
+
+        println("chat setup: $chatId")
+
+//        val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
+//        viewModel = ViewModelProvider(
+//            this,
+//            viewModelFactory(chatId)
+//        ).get(ChatViewModel::class.java)
+
+    }
+
+    fun reset() {
+        println("chat reset")
+//        viewModel = null
     }
 
     private fun observeChatMessageEvent() {
-        viewModel.chatMessageEvent.observe(viewLifecycleOwner, {
-            when (it.type) {
-                ChatMessageEvent.Type.FETCH_ERROR -> {
-                    ExceptionDialog(it.errorMessage, this).show(
-                        childFragmentManager,
-                        ExceptionDialog.TAG
-                    )
+//        viewModel.chatMessageEvent.observe(viewLifecycleOwner, {
+//            when (it.type) {
+//                ChatMessageEvent.Type.FETCH_ERROR -> {
+//                    ExceptionDialog(it.errorMessage, this).show(
+//                        childFragmentManager,
+//                        ExceptionDialog.TAG
+//                    )
 //                    binding.llChatLoading.visibility = View.GONE
-                }
-                ChatMessageEvent.Type.FETCH -> {
-
-                }
-            }
-        })
+//                }
+//                ChatMessageEvent.Type.FETCH -> {
+//
+//                }
+//            }
+//        })
     }
-
 
 
     private fun setupChatRecyclerView() {
-        chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
-        binding.rvChat.adapter = chatRecyclerViewAdapter
-        layoutManager = LinearLayoutManager(this@ChatFragment.context)
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
-        layoutManager.reverseLayout = true
-        binding.rvChat.layoutManager = layoutManager
+//        chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
+//        binding.rvChat.adapter = chatRecyclerViewAdapter
+//        layoutManager = LinearLayoutManager(this@ChatFragment.context)
+//        layoutManager.orientation = LinearLayoutManager.VERTICAL
+//        layoutManager.reverseLayout = true
+//        binding.rvChat.layoutManager = layoutManager
 
     }
 
 
-
     private fun setupWebSocketLifeCycleEventObserver() {
-        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
-            when (it.type) {
-                WebSocketEvent.Type.ERROR -> {
-                    ExceptionDialog(it.errorMessage, null).show(
-                        childFragmentManager,
-                        ExceptionDialog.TAG
-                    )
-                }
-            }
-        })
+//        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
+//            when (it.type) {
+//                WebSocketEvent.Type.ERROR -> {
+//                    ExceptionDialog(it.errorMessage, null).show(
+//                        childFragmentManager,
+//                        ExceptionDialog.TAG
+//                    )
+//                }
+//            }
+//        })
     }
 
     override fun onClickExceptionDialogCloseBtn() {
@@ -136,12 +151,12 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override fun onResume() {
         super.onResume()
-        viewModel.connectChat()
+//        viewModel.connectChat()
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.disconnectChat()
+//        viewModel.disconnectChat()
     }
 
 

@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.main
+package com.beeswork.balance.ui.mainactivity
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -8,26 +8,17 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.appcompat.app.ActionBar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import androidx.viewpager2.widget.ViewPager2
-import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.MatchDialog
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerAdapter
 import com.google.android.gms.location.*
-import com.google.android.material.bottomnavigation.LabelVisibilityMode
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
@@ -46,67 +37,9 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-//        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcvHost) as NavHostFragment
-//        binding.nvBottom.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
-//        binding.nvBottom.setupWithNavController(navHostFragment.navController)
-        setupViewPager()
         setupBroadcastReceiver()
-
-        if (hasLocationPermission()) bindLocationManager()
-        else requestLocationPermission()
+        setupLocationManager()
     }
-
-    private fun setupNavHost() {
-
-    }
-
-    fun moveToChat(chatId: Long) {
-        mainViewPagerAdapter.chatFragment.setup(chatId)
-        binding.vpMain.setCurrentItem(MainViewPagerAdapter.FragmentPosition.CHAT.ordinal, true)
-
-    }
-
-    private fun setupViewPager() {
-        mainViewPagerAdapter = MainViewPagerAdapter(this)
-        binding.vpMain.adapter = mainViewPagerAdapter
-
-        val tabLayoutMediator = TabLayoutMediator(
-            binding.tlMain,
-            binding.vpMain
-        ) { tab, position ->
-            when (position) {
-                MainViewPagerAdapter.FragmentPosition.ACCOUNT.ordinal -> {
-                    tab.setIcon(R.drawable.ic_baseline_account_circle)
-                }
-                MainViewPagerAdapter.FragmentPosition.SWIPE.ordinal -> {
-                    tab.setIcon(R.drawable.ic_baseline_favorite)
-                }
-                MainViewPagerAdapter.FragmentPosition.CLICKER.ordinal -> {
-                    tab.setIcon(R.drawable.ic_baseline_thumb_up)
-                }
-                MainViewPagerAdapter.FragmentPosition.MATCH.ordinal -> {
-                    tab.setIcon(R.drawable.ic_baseline_chat_bubble)
-                    val badge = tab.orCreateBadge
-                    badge.backgroundColor = ContextCompat.getColor(applicationContext, R.color.Primary)
-                    badge.isVisible = true
-//                    badge.number = 10
-                }
-            }
-        }
-        tabLayoutMediator.attach()
-
-        binding.tlMain.removeTabAt(MainViewPagerAdapter.FragmentPosition.CHAT.ordinal)
-
-        binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                binding.vpMain.isUserInputEnabled = position == MainViewPagerAdapter.FragmentPosition.CHAT.ordinal
-                super.onPageSelected(position)
-            }
-        })
-
-    }
-
 
     override fun onResume() {
         super.onResume()
@@ -123,6 +56,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         super.onPause()
     }
 
+
+
+    fun moveToChat(chatId: Long) {
+
+    }
+
     private fun setupBroadcastReceiver() {
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -134,7 +73,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun onReceiveFCMNotification(intent: Intent?) {
-
         val notificationType = intent!!.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
         val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
 
@@ -150,6 +88,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+
+    private fun setupLocationManager() {
+        if (hasLocationPermission()) bindLocationManager()
+        else requestLocationPermission()
+    }
+
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             this,
@@ -158,7 +102,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private val locationCallback = object : LocationCallback() {
-
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
             val location = locationResult?.lastLocation
@@ -190,5 +133,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 bindLocationManager()
         }
     }
+
 
 }

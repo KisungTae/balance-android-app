@@ -3,33 +3,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/matchFragment">
-
+    app:startDestination="@id/splashFragment">
     <fragment
-        android:id="@+id/matchFragment"
-        android:name="com.beeswork.balance.ui.match.MatchFragment"
-        android:label="MatchFragment"
-        tools:layout="@layout/fragment_match">
+        android:id="@+id/splashFragment"
+        android:name="com.beeswork.balance.ui.splash.SplashFragment"
+        android:label="fragment_splash"
+        tools:layout="@layout/fragment_splash" >
         <action
-            android:id="@+id/action_matchFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
+            android:id="@+id/action_splashFragment_to_mainViewPagerFragment"
+            app:destination="@id/mainViewPagerFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_profileViewPagerFragment"
+            app:destination="@id/profileViewPagerFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
-
     <fragment
-        android:id="@+id/chatFragment"
-        android:name="com.beeswork.balance.ui.chat.ChatFragment"
-        android:label="ChatFragment"
-        tools:layout="@layout/fragment_chat">
-        <argument
-            android:name="chatId"
-            app:argType="long" />
+        android:id="@+id/loginFragment"
+        android:name="com.beeswork.balance.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
         <action
-            android:id="@+id/action_chatFragment_to_matchFragment"
-            app:destination="@id/matchFragment" />
+            android:id="@+id/action_loginFragment_to_profileViewPagerFragment"
+            app:destination="@id/profileViewPagerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_mainViewPagerFragment"
+            app:destination="@id/mainViewPagerFragment" />
     </fragment>
-    <action
-        android:id="@+id/action_global_chatFragment"
-        app:destination="@id/chatFragment" />
-
-
+    <fragment
+        android:id="@+id/mainViewPagerFragment"
+        android:name="com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment"
+        android:label="fragment_main_view_pager"
+        tools:layout="@layout/fragment_main_view_pager" />
+    <fragment
+        android:id="@+id/profileViewPagerFragment"
+        android:name="com.beeswork.balance.ui.profileviewpager.ProfileViewPagerFragment"
+        android:label="fragment_profile_view_pager"
+        tools:layout="@layout/fragment_profile_view_pager" >
+        <action
+            android:id="@+id/action_profileViewPagerFragment_to_mainViewPagerFragment"
+            app:destination="@id/mainViewPagerFragment" />
+    </fragment>
 </navigation>

@@ -23,8 +23,14 @@ class AccountFragment: ScopeFragment(), KodeinAware {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        println("account: onCreateView")
         binding = FragmentAccountBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun onDestroy() {
+        println("account: onDestroy")
+        super.onDestroy()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
