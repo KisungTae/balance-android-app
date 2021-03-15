@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.threeten.bp.OffsetDateTime
 
 
 class MatchViewModel(
@@ -89,6 +90,20 @@ class MatchViewModel(
 
     fun testFunction() {
         matchRepository.testFunction()
+    }
+
+    fun loadMoreMatches(pageSize: Int, lastUpdatedAt: OffsetDateTime) {
+
+    }
+
+    fun prependMatches(pageSize: Int, headUpdatedAt: OffsetDateTime): List<MatchDomain> {
+        CoroutineScope(Dispatchers.IO).launch {
+            return matchRepository.prependMatches(pageSize, headUpdatedAt).map { matchMapper.fromEntityToDomain(it) }
+        }
+    }
+
+    fun appendMatches(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<MatchDomain> {
+
     }
 
     companion object {

@@ -2,9 +2,11 @@ package com.beeswork.balance.ui.match
 
 import android.os.Bundle
 import android.view.*
+import android.widget.AbsListView
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.ui.chat.ChatFragment
@@ -16,13 +18,15 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClickMatchListener,
+class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnClickMatchListener,
     FetchErrorDialog.FetchErrorListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
     private lateinit var viewModel: MatchViewModel
-    private lateinit var matchPagedListAdapter: MatchPagedListAdapter
+//    private lateinit var matchPagedListAdapter: MatchPagedListAdapter
+    private lateinit var matchRecyclerViewAdapter: MatchRecyclerViewAdapter
+    private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var binding: FragmentMatchBinding
 
     override fun onCreateView(
@@ -61,14 +65,14 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
 
         binding.btnMatchSearchClose.setOnClickListener { hideSearchToolBar() }
         binding.etMatchSearch.addTextChangedListener {
-            viewModel.changeMatchSearchKeyword(it.toString())
+//            viewModel.changeMatchSearchKeyword(it.toString())
         }
     }
 
     private fun hideSearchToolBar() {
         binding.tbMatchSearch.visibility = View.GONE
         binding.tbMatch.visibility = View.VISIBLE
-        viewModel.changeMatchSearchKeyword("")
+//        viewModel.changeMatchSearchKeyword("")
     }
 
     private fun showSearchToolBar() {
@@ -90,17 +94,50 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
 //            matchPagedListAdapter.submitList(it)
 //        })
 
-//      TODO: remove me
-        viewModel.matches.await().observe(viewLifecycleOwner, {
-            matchPagedListAdapter.submitList(it)
+////      TODO: remove me
+//        viewModel.matches.await().observe(viewLifecycleOwner, {
+//            matchPagedListAdapter.submitList(it)
+//        })
+    }
+
+    private var isLoading: Boolean = false
+    private var isScrolling: Boolean = false
+
+    private fun setupMatchRecyclerView() {
+        matchRecyclerViewAdapter = MatchRecyclerViewAdapter(this@MatchFragment)
+        linearLayoutManager = LinearLayoutManager(requireContext())
+        binding.rvMatch.adapter = matchRecyclerViewAdapter
+        binding.rvMatch.layoutManager = linearLayoutManager
+        binding.rvMatch.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
+                    isScrolling = true
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val currentItems = linearLayoutManager.childCount
+                val totalItems = linearLayoutManager.itemCount
+                val scrollOutItems = linearLayoutManager.findFirstVisibleItemPosition()
+
+                if (isScrolling && ((currentItems + scrollOutItems) == totalItems))
+                    loadMoreMatches()
+            }
         })
     }
 
-    private fun setupMatchRecyclerView() {
-        matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
-        binding.rvMatch.adapter = matchPagedListAdapter
-        binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
+    private fun loadMoreMatches() {
+        println("loadMoreMatches")
     }
+
+
+
+//    private fun setupMatchRecyclerView() {
+//        matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
+//        binding.rvMatch.adapter = matchPagedListAdapter
+//        binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
+//    }
 
     override fun onClick(view: View) {
         val chatFragment = ChatFragment()

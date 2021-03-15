@@ -76,6 +76,18 @@ class MatchRepositoryImpl(
         return Resource.toEmptyResponse(listMatches)
     }
 
+    override suspend fun prependMatches(pageSize: Int, headUpdatedAt: OffsetDateTime): List<Match> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findAllAfter(pageSize, headUpdatedAt)
+        }
+    }
+
+    override suspend fun appendMatches(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<Match> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findAllBefore(pageSize, tailUpdatedAt)
+        }
+    }
+
     //  TODO: remove me
     override suspend fun loadMatchesAsFactory(): DataSource.Factory<Int, Match> {
         return withContext(Dispatchers.IO) {
