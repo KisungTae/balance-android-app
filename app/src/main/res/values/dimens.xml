@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="tool_bar_title_text_size">24sp</dimen>
+    <dimen name="tool_bar_title_large_text_size">24sp</dimen>
+    <dimen name="tool_bar_title_medium_text_size">16sp</dimen>
     <dimen name="tool_bar_menu_item_btn_size">48dp</dimen>
+
 </resources>

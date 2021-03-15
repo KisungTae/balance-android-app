@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private val preferenceProvider: PreferenceProvider by instance()
     private val balanceRepository: BalanceRepository by instance()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mainViewPagerAdapter: MainViewPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,12 +53,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override fun onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
         super.onPause()
-    }
-
-
-
-    fun moveToChat(chatId: Long) {
-
     }
 
     private fun setupBroadcastReceiver() {
@@ -87,7 +80,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             )
         }
     }
-
 
     private fun setupLocationManager() {
         if (hasLocationPermission()) bindLocationManager()

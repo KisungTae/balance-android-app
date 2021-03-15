@@ -29,21 +29,19 @@
             android:drawableStart="@drawable/ic_baseline_search"
             android:drawablePadding="10dp"
             android:focusable="true"
-            android:hint="@string/match_search_bar_hint"
+            android:hint="@string/match_search_hint"
             android:importantForAutofill="no"
             android:inputType="text"
             android:paddingStart="10dp"
             android:paddingEnd="0dp" />
 
         <ImageButton
-            android:id="@+id/btnMatchSearchToolBarClose"
+            android:id="@+id/btnMatchSearchClose"
             android:layout_width="@dimen/tool_bar_menu_item_btn_size"
             android:layout_height="@dimen/tool_bar_menu_item_btn_size"
             android:background="@color/transparent"
             android:contentDescription="@string/search_bar_close_btn_description"
             android:src="@drawable/ic_baseline_close" />
-
-
     </LinearLayout>
 
     <androidx.appcompat.widget.Toolbar
@@ -63,7 +61,7 @@
             android:layout_height="wrap_content"
             android:text="@string/match_tool_bar_title"
             android:textAlignment="center"
-            android:textSize="@dimen/tool_bar_title_text_size"
+            android:textSize="@dimen/tool_bar_title_large_text_size"
             android:textStyle="bold"
             app:endColor="@color/PrimaryGradientStart"
             app:startColor="@color/PrimaryGradientEnd" />

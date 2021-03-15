@@ -264,6 +264,11 @@ class BalanceApplication : Application(), KodeinAware {
 //      87. match profilePicture make it circle
 //      88. refactor notification and intent in mainActivity
 //      89. put viewmodel for dialogFragment
+//      90. put the photo upload logic in super class, and profileDialog, and photoFragment in profileViewPager extend the photoSuperClass to prevent code duplication
+//          refer to https://www.youtube.com/watch?v=pwZQRw08mP0
+//      91. when moved to mainviewpager, pressed on back button, then it recreates the mainviewpager fragment
+//      92. when moved to chatFragment, back button, recreates the mainviewpager fragment and the chat ui stays in the screen
+//      93. overflow menu in tool bar animation is not smooth
 
 
 

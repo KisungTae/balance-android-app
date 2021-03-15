@@ -9,6 +9,7 @@
         <item name="android:textSize">15sp</item>
         <item name="android:statusBarColor">@color/BackgroundWhite</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
     </style>
 
 
@@ -16,6 +17,12 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/white</item>
         <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:overlapAnchor">false</item>
+        <item name="android:dropDownVerticalOffset">3.0dip</item>
+
     </style>
 
 </resources>

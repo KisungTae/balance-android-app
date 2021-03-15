@@ -7,9 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
+import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
-import com.beeswork.balance.ui.mainactivity.MainActivity
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -28,19 +29,8 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        println("match: onCreateView")
         binding = FragmentMatchBinding.inflate(layoutInflater)
         return binding.root
-    }
-
-    override fun onDestroy() {
-        println("match: onDestroy")
-        super.onDestroy()
-    }
-
-    override fun onResume() {
-//        println("match onResume!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        super.onResume()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,20 +51,15 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchActionBarSearch -> {
-
-//                    showSearchToolBar()
-                    viewModel.testFunction()
+                R.id.miMatchSearch -> {
+                    showSearchToolBar()
                     true
                 }
                 else -> false
             }
         }
 
-        binding.btnMatchSearchToolBarClose.setOnClickListener {
-            hideSearchToolBar()
-        }
-
+        binding.btnMatchSearchClose.setOnClickListener { hideSearchToolBar() }
         binding.etMatchSearch.addTextChangedListener {
             viewModel.changeMatchSearchKeyword(it.toString())
         }
@@ -118,9 +103,13 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
     }
 
     override fun onClick(view: View) {
-        (activity as MainActivity).moveToChat(view.tag.toString().toLong())
+        val chatFragment = ChatFragment()
+        val fragmentManager = activity?.supportFragmentManager
+        val fragmentTransaction = fragmentManager?.beginTransaction()
+        fragmentTransaction?.add(R.id.fcvMain, chatFragment)
+        fragmentTransaction?.addToBackStack(MainViewPagerFragment.TAG)
+        fragmentTransaction?.commit()
     }
-
 
     override fun onRefetch() {
         viewModel.fetchMatches()

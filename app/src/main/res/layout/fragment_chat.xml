@@ -1,10 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/llChatFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/BackgroundWhite"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/tbChatSearch"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/BackgroundWhite"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/etChatSearch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/sh_search_box_border"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_baseline_search"
+            android:drawablePadding="10dp"
+            android:focusable="true"
+            android:hint="@string/chat_search_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:paddingStart="10dp"
+            android:paddingEnd="0dp" />
+
+        <ImageButton
+            android:id="@+id/btnChatSearchClose"
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:background="@color/transparent"
+            android:clickable="true"
+            android:contentDescription="@string/search_bar_close_btn_description"
+            android:focusable="true"
+            android:src="@drawable/ic_baseline_close" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tbChat"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/BackgroundWhite"
+        app:contentInsetStart="0dp">
+
+        <ImageButton
+            android:id="@+id/btnChatBack"
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:background="@color/BackgroundWhite"
+            android:contentDescription="@string/chat_back_button_description"
+            android:src="@drawable/ic_baseline_arrow_back_ios" />
+
+        <Button
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/tvChatMatchedName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="태기성"
+            android:textAlignment="center"
+            android:textSize="@dimen/tool_bar_title_medium_text_size"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
 
     <FrameLayout
         android:layout_width="match_parent"

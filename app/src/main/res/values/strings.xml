@@ -20,8 +20,13 @@
     <string name="match_deleted_recent_chat_message">상대방계정이 삭제됐습니다</string>
     <string name="match_unmatched_recent_chat_message">상대방이 채팅방을 떠났습니다</string>
     <string name="match_tool_bar_title">MATCH</string>
-    <string name="match_search_bar_hint">이름을 입력해주세요</string>
+    <string name="match_search_hint">이름을 입력해주세요</string>
     <string name="search_bar_close_btn_description">서치 닫기</string>
+    <string name="chat_tool_bar_title">CHAT</string>
+    <string name="chat_leave_menu_title">채팅룸 나가기</string>
+    <string name="chat_report_menu_title">신고하기</string>
+    <string name="chat_back_button_description">chat back button</string>
+    <string name="chat_search_hint">Search</string>
 
 
 </resources>

@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +16,8 @@ import com.beeswork.balance.service.stomp.WebSocketEvent
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.dialog.ExceptionDialogListener
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import com.google.android.datatransport.runtime.scheduling.jobscheduling.SchedulerConfig
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -22,13 +27,21 @@ import java.sql.SQLOutput
 class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override val kodein by closestKodein()
-//    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
+
+    //    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
     private var viewModel: ChatViewModel? = null
-//    private lateinit var chatPagingAdapter: ChatPagingAdapter
+
+    //    private lateinit var chatPagingAdapter: ChatPagingAdapter
 //    private lateinit var layoutManager: LinearLayoutManager
 //    private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
     private lateinit var binding: FragmentChatBinding
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() { popBackToMatch() }
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +60,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolBar()
 //        viewModel = ViewModelProvider(
 //            this,
 //            viewModelFactory(1)
@@ -66,6 +80,43 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 //            )
 //        }
     }
+
+    private fun setupToolBar() {
+        binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
+        binding.tbChat.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.miChatLeave -> {
+                    true
+                }
+                R.id.miChatReport -> {
+                    true
+                }
+                R.id.miChatSearch -> {
+                    showSearchToolBar()
+                    true
+                }
+                else -> false
+            }
+        }
+        binding.btnChatSearchClose.setOnClickListener { hideSearchToolBar() }
+        binding.btnChatBack.setOnClickListener { popBackToMatch() }
+    }
+
+    private fun popBackToMatch() {
+        requireActivity().supportFragmentManager.popBackStack(MainViewPagerFragment.TAG, POP_BACK_STACK_INCLUSIVE)
+    }
+
+    private fun hideSearchToolBar() {
+        binding.tbChatSearch.visibility = View.GONE
+        binding.tbChat.visibility = View.VISIBLE
+//        viewModel.changeChatSearchKeyword("")
+    }
+
+    private fun showSearchToolBar() {
+        binding.tbChat.visibility = View.GONE
+        binding.tbChatSearch.visibility = View.VISIBLE
+    }
+
 
     private fun bindUI() {
 

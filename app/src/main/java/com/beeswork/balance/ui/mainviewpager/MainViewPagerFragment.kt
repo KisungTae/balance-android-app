@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.internal.constant.FragmentTabPosition
@@ -16,6 +18,13 @@ class MainViewPagerFragment : Fragment() {
 
     private lateinit var binding: FragmentMainViewPagerBinding
     private lateinit var mainViewPagerAdapter: MainViewPagerAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() { }
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,19 +41,19 @@ class MainViewPagerFragment : Fragment() {
     }
 
     private fun setupViewPager() {
-        mainViewPagerAdapter = MainViewPagerAdapter(requireActivity().supportFragmentManager, lifecycle)
+        mainViewPagerAdapter = MainViewPagerAdapter(childFragmentManager, lifecycle)
         binding.vpMain.adapter = mainViewPagerAdapter
+        binding.vpMain.offscreenPageLimit = FragmentTabPosition.values().size
+        binding.vpMain.setPageTransformer(null)
+        binding.vpMain.setCurrentItem(FragmentTabPosition.SWIPE.ordinal, false)
+        binding.vpMain.isUserInputEnabled = false
 //        binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 //            override fun onPageSelected(position: Int) {
-//                if (position == FragmentTabPosition.MATCH.ordinal)
-//                    mainViewPagerAdapter.removeChat()
-//
 //                binding.vpMain.isUserInputEnabled = position == FragmentTabPosition.CHAT.ordinal
 //                super.onPageSelected(position)
 //            }
 //        })
-        binding.vpMain.offscreenPageLimit = FragmentTabPosition.values().size
-        binding.vpMain.setPageTransformer(null)
+
     }
 
     private fun setupViewPagerTab() {
@@ -70,5 +79,9 @@ class MainViewPagerFragment : Fragment() {
 //            if (visible) badge.backgroundColor = ContextCompat.getColor(applicationContext, R.color.Primary)
 //            badge.isVisible = visible
 //        }
+    }
+
+    companion object {
+        const val TAG = "mainViewPagerFragment"
     }
 }
