@@ -8,8 +8,10 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.LoadType
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.PageSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
@@ -27,11 +29,16 @@ class MatchViewModel(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
+    private val _loadMoreMatchesLiveData = MutableLiveData<PageSource<MatchDomain>>()
+    val loadMoreMatchesLiveData: LiveData<PageSource<MatchDomain>> get() = _loadMoreMatchesLiveData
+
+
     private val matchSearchKeywordChannel = ConflatedBroadcastChannel<String>()
     private var matchDataSource: MatchDataSource? = null
     val matchPagedListLiveData by lazyDeferred { initializeMatchPagedListLiveData() }
 
     init {
+
         matchSearchKeywordChannel.asFlow()
             .debounce(QUERY_DEBOUNCE)
             .onEach { matchDataSource?.invalidate() }
@@ -73,38 +80,15 @@ class MatchViewModel(
     }
 
 
-//  TODO: remove me
-    val matches by lazyDeferred {
-        LivePagedListBuilder(
-            matchRepository.loadMatchesAsFactory().map {
-                matchMapper.fromEntityToDomain(it)
-            }, PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setMaxSize(MATCH_MAX_PAGE_SIZE)
-                .setInitialLoadSizeHint(MATCH_PAGE_SIZE)
-                .setPageSize(MATCH_PAGE_SIZE)
-                .setPrefetchDistance(MATCH_PREFETCH_DISTANCE)
-                .build()
-        ).build()
-    }
 
     fun testFunction() {
         matchRepository.testFunction()
     }
 
-    fun loadMoreMatches(pageSize: Int, lastUpdatedAt: OffsetDateTime) {
+    fun loadMoreMatches(pageSize: Int, pivotChatId: Long, loadType: LoadType) {
 
     }
 
-    fun prependMatches(pageSize: Int, headUpdatedAt: OffsetDateTime): List<MatchDomain> {
-        CoroutineScope(Dispatchers.IO).launch {
-            return matchRepository.prependMatches(pageSize, headUpdatedAt).map { matchMapper.fromEntityToDomain(it) }
-        }
-    }
-
-    fun appendMatches(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<MatchDomain> {
-
-    }
 
     companion object {
         private const val MATCH_PAGE_SIZE = 100

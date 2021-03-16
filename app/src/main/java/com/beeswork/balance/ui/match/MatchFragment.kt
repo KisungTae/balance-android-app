@@ -18,13 +18,13 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnClickMatchListener,
+class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClickMatchListener,
     FetchErrorDialog.FetchErrorListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
     private lateinit var viewModel: MatchViewModel
-//    private lateinit var matchPagedListAdapter: MatchPagedListAdapter
+    private lateinit var matchPagedListAdapter: MatchPagedListAdapter
     private lateinit var matchRecyclerViewAdapter: MatchRecyclerViewAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var binding: FragmentMatchBinding
@@ -104,9 +104,10 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnC
     private var isScrolling: Boolean = false
 
     private fun setupMatchRecyclerView() {
-        matchRecyclerViewAdapter = MatchRecyclerViewAdapter(this@MatchFragment)
+//        matchRecyclerViewAdapter = MatchRecyclerViewAdapter(this@MatchFragment)
+        matchPagedListAdapter = MatchPagedListAdapter(this@MatchFragment)
         linearLayoutManager = LinearLayoutManager(requireContext())
-        binding.rvMatch.adapter = matchRecyclerViewAdapter
+        binding.rvMatch.adapter = matchPagedListAdapter
         binding.rvMatch.layoutManager = linearLayoutManager
         binding.rvMatch.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -126,7 +127,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchRecyclerViewAdapter.OnC
             }
         })
     }
-
+    
     private fun loadMoreMatches() {
         println("loadMoreMatches")
     }

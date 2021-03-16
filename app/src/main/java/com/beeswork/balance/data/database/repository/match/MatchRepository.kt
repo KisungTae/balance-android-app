@@ -4,16 +4,13 @@ import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.LoadType
 import org.threeten.bp.OffsetDateTime
 
 interface MatchRepository {
-    suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>?
-    suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>?
     suspend fun fetchMatches(): Resource<EmptyResponse>
-    suspend fun prependMatches(pageSize: Int, headUpdatedAt: OffsetDateTime): List<Match>
-    suspend fun appendMatches(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<Match>
+    suspend fun loadMoreMatches(pageSize: Int, pivotChatId: Long, loadType: LoadType)
 
-//  TODO: remove me
-    suspend fun loadMatchesAsFactory(): DataSource.Factory<Int, Match>
+
     fun testFunction()
 }

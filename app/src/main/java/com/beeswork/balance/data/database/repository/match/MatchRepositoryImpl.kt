@@ -10,6 +10,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
+import com.beeswork.balance.internal.constant.LoadType
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -33,17 +34,11 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
-    override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>? {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition, searchKeyword)
-        }
+
+    override suspend fun loadMoreMatches(pageSize: Int, pivotChatId: Long, loadType: LoadType) {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>? {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition)
-        }
-    }
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         updateFetchMatchesResult(Resource.Status.LOADING)
@@ -76,24 +71,6 @@ class MatchRepositoryImpl(
         return Resource.toEmptyResponse(listMatches)
     }
 
-    override suspend fun prependMatches(pageSize: Int, headUpdatedAt: OffsetDateTime): List<Match> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllAfter(pageSize, headUpdatedAt)
-        }
-    }
-
-    override suspend fun appendMatches(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<Match> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllBefore(pageSize, tailUpdatedAt)
-        }
-    }
-
-    //  TODO: remove me
-    override suspend fun loadMatchesAsFactory(): DataSource.Factory<Int, Match> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllAsFactory()
-        }
-    }
 
     override fun testFunction() {
 
