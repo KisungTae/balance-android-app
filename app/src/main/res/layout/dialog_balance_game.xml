@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="this is question textview"
-            android:textColor="@color/textBlack" />
+            android:textColor="@color/TextBlack" />
 
         <Button
             android:id="@+id/btnTopOption"
@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="this is Error page"
-            android:textColor="@color/textBlack"/>
+            android:textColor="@color/TextBlack"/>
 
         <Button
             android:id="@+id/btnBalanceGameReload"
@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="this is loading page"
-            android:textColor="@color/textBlack"/>
+            android:textColor="@color/TextBlack"/>
     </LinearLayout>
 
     <LinearLayout
@@ -85,7 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="This is balance game click error message"
-            android:textColor="@color/textBlack"/>
+            android:textColor="@color/TextBlack"/>
 
         <Button
             android:id="@+id/btnBalanceGameClickErrorCloseBtn"
@@ -117,7 +117,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="상대방 밸런스에 클릭하지 못했습니다"
-            android:textColor="@color/textBlack"/>
+            android:textColor="@color/TextBlack"/>
 
         <Button
             android:id="@+id/btnBalanceGameRetry"
@@ -148,7 +148,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="상대방 밸러스에 클릭했어요!! 상대방도 내 밸런스에 클릭할때까지 스와이프를 계속 즐겨주세요"
-            android:textColor="@color/textBlack"/>
+            android:textColor="@color/TextBlack"/>
 
         <Button
             android:id="@+id/btnBalanceGameClickedClose"

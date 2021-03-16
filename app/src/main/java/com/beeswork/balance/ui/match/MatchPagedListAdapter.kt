@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemMatchBinding
 import com.beeswork.balance.internal.constant.EndPoint
-import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
 class MatchPagedListAdapter(
@@ -67,14 +66,14 @@ class MatchPagedListAdapter(
             if (matchDomain.unmatched || matchDomain.deleted) {
                 binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
                 binding.tvMatchUpdatedAt.text = ""
-                changeTextColor(context.getColor(R.color.lightGrey))
+                changeTextColor(context.getColor(R.color.LightGrey))
                 resetProfilePictureCircleBorder(false)
 
             } else {
                 val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
 //                Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
                 binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
-                changeTextColor(context.getColor(R.color.textBlack))
+                changeTextColor(context.getColor(R.color.TextBlack))
                 resetProfilePictureCircleBorder(matchDomain.active)
             }
         }

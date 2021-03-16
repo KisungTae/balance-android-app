@@ -8,8 +8,9 @@ import com.beeswork.balance.internal.constant.LoadType
 import org.threeten.bp.OffsetDateTime
 
 interface MatchRepository {
+    suspend fun prependMatches(pageSize: Int, chatId: Long): List<Match>
+    suspend fun appendMatches(pageSize: Int, chatId: Long): List<Match>
     suspend fun fetchMatches(): Resource<EmptyResponse>
-    suspend fun loadMoreMatches(pageSize: Int, pivotChatId: Long, loadType: LoadType)
 
 
     fun testFunction()

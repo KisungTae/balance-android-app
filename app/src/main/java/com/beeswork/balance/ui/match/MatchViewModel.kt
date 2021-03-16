@@ -85,7 +85,14 @@ class MatchViewModel(
         matchRepository.testFunction()
     }
 
-    fun loadMoreMatches(pageSize: Int, pivotChatId: Long, loadType: LoadType) {
+    fun loadMoreMatches(pageSize: Int, chatId: Long, loadType: LoadType) {
+//        when (loadType) {
+//
+//        }
+//      TODO: remove me
+        CoroutineScope(Dispatchers.IO).launch {
+            matchRepository.appendMatches(1, 2)
+        }
 
     }
 

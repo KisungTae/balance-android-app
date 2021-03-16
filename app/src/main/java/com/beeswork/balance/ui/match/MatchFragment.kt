@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
+import com.beeswork.balance.internal.constant.LoadType
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
@@ -56,7 +57,9 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miMatchSearch -> {
-                    showSearchToolBar()
+//                    showSearchToolBar()
+//                    TODO: remove me
+                    viewModel.loadMoreMatches(0, 0, LoadType.APPEND)
                     true
                 }
                 else -> false

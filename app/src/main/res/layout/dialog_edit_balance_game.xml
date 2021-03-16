@@ -74,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="error page"
-            android:textColor="@color/textBlack" />
+            android:textColor="@color/TextBlack" />
 
         <Button
             android:id="@+id/btnEditBalanceGameErrorSaveAnswers"
@@ -107,7 +107,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="loading......"
-            android:textColor="@color/textBlack" />
+            android:textColor="@color/TextBlack" />
 
 
     </LinearLayout>

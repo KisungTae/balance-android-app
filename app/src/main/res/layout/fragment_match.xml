@@ -54,7 +54,7 @@
         <Button
             android:layout_width="@dimen/tool_bar_menu_item_btn_size"
             android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
 
         <com.beeswork.balance.ui.common.GradientTextView
             android:layout_width="match_parent"
@@ -63,8 +63,8 @@
             android:textAlignment="center"
             android:textSize="@dimen/tool_bar_title_large_text_size"
             android:textStyle="bold"
-            app:endColor="@color/PrimaryGradientStart"
-            app:startColor="@color/PrimaryGradientEnd" />
+            app:endColor="@color/TextWhite"
+            app:startColor="@color/Primary" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView

@@ -34,9 +34,17 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
+    override suspend fun prependMatches(pageSize: Int, chatId: Long): List<Match> {
 
-    override suspend fun loadMoreMatches(pageSize: Int, pivotChatId: Long, loadType: LoadType) {
-        TODO("Not yet implemented")
+
+        return listOf()
+    }
+
+    override suspend fun appendMatches(pageSize: Int, chatId: Long): List<Match> {
+
+
+
+        return listOf()
     }
 
 
@@ -72,39 +80,7 @@ class MatchRepositoryImpl(
     }
 
 
-    override fun testFunction() {
 
-        val dummyMatches = mutableListOf<Match>()
-
-
-        for (i in 0..50) {
-            dummyMatches.add(
-                Match(
-                    239020392L + Random.nextInt(1000),
-                    UUID.randomUUID(),
-                    false,
-                    false,
-                    "user-test new inserted",
-                    "",
-                    false,
-                    OffsetDateTime.now()
-                )
-            )
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            matchDAO.insertAll(dummyMatches)
-//            matchDAO.insert(dummyMatches[0])
-
-
-//            matchDAO.findById(3844)?.let {
-//                it.updatedAt = OffsetDateTime.now()
-//                it.name = "this is updated user"
-//                matchDAO.insert(it)
-//            }
-        }
-
-    }
 
     private fun updateFetchMatchesResult(status: Resource.Status) {
         val fetchMatchesResult = fetchMatchesResultDAO.findById() ?: FetchMatchesResult()
@@ -206,13 +182,42 @@ class MatchRepositoryImpl(
             )
         }
     }
+
+//  TODO: remove me
+    override fun testFunction() {
+
+        val dummyMatches = mutableListOf<Match>()
+
+
+        for (i in 0..50) {
+            dummyMatches.add(
+                Match(
+                    239020392L + Random.nextInt(1000),
+                    UUID.randomUUID(),
+                    false,
+                    false,
+                    "user-test new inserted",
+                    "",
+                    false,
+                    OffsetDateTime.now()
+                )
+            )
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            matchDAO.insertAll(dummyMatches)
+//            matchDAO.insert(dummyMatches[0])
+
+
+//            matchDAO.findById(3844)?.let {
+//                it.updatedAt = OffsetDateTime.now()
+//                it.name = "this is updated user"
+//                matchDAO.insert(it)
+//            }
+        }
+
+    }
 }
-
-
-// TODO: need to send receivedChatMessages to make them read = true on server
-// TODO: decide chatprofile or matchprofile
-// TODO: transaction save chatfetchedat and chatmessageinserted at then save chatmessages with updatedAt
-// TODO: findallunprocsssed order by case when ChatMessageStatus = HEAD then 0
 
 
 // Query
