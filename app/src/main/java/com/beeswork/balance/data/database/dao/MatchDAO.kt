@@ -24,11 +24,11 @@ interface MatchDAO {
     @Query("select * from `match` where chatId = :chatId")
     fun findById(chatId: Long): Match?
 
-    @Query("select * from `match` where updatedAt <= :tailUpdatedAt order by updatedAt desc limit :pageSize")
+    @Query("select * from `match` where updatedAt <= :tailUpdatedAt order by updatedAt desc, chatId desc limit :pageSize")
     fun findAllBefore(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<Match>
 
-    @Query("select * from `match` where updatedAt >= :headUpdatedAt order by updatedAt asc limit :pageSize")
-    fun findAllAfter(pageSize: Int, headUpdatedAt: OffsetDateTime): List<Match>
+    @Query("select * from `match` where updatedAt >= :headUpdatedAt order by updatedAt asc, chatId desc limit :pageSize")
+    fun findAllAfter(pageSize: Int, headChatId: Long): List<Match>
 
 
 

@@ -35,14 +35,18 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     override suspend fun prependMatches(pageSize: Int, chatId: Long): List<Match> {
-
-
+//        return withContext(Dispatchers.IO) {
+//            val matches = matchDAO.findAllAfter(pageSize, updatedAt)
+//
+//            return@withContext matchDAO.findAllAfter(pageSize, updatedAt)
+//        }
         return listOf()
     }
 
     override suspend fun appendMatches(pageSize: Int, chatId: Long): List<Match> {
-
-
+//        return withContext(Dispatchers.IO) {
+//            return@withContext matchDAO.findAllBefore(pageSize, updatedAt)
+//        }
 
         return listOf()
     }
@@ -78,8 +82,6 @@ class MatchRepositoryImpl(
         }
         return Resource.toEmptyResponse(listMatches)
     }
-
-
 
 
     private fun updateFetchMatchesResult(status: Resource.Status) {
@@ -183,7 +185,7 @@ class MatchRepositoryImpl(
         }
     }
 
-//  TODO: remove me
+    //  TODO: remove me
     override fun testFunction() {
 
         val dummyMatches = mutableListOf<Match>()

@@ -10,10 +10,9 @@ import java.util.*
 
 @Entity(
     tableName = "match",
-    indices = [Index(value = ["matchedId"], unique = true)]
+    indices = [Index(value = ["chatId"], unique = true)]
 )
 data class Match(
-
     @PrimaryKey
     val chatId: Long,
 
