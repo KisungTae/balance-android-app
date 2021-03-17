@@ -57,7 +57,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miMatchSearch -> {
-//                    showSearchToolBar()
+                    showSearchToolBar()
 //                    TODO: remove me
                     viewModel.loadMoreMatches(0, 0, LoadType.APPEND)
                     true
@@ -66,7 +66,10 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
             }
         }
 
-        binding.btnMatchSearchClose.setOnClickListener { hideSearchToolBar() }
+        binding.btnMatchSearchClose.setOnClickListener {
+            viewModel.testFunction()
+            hideSearchToolBar()
+        }
         binding.etMatchSearch.addTextChangedListener {
 //            viewModel.changeMatchSearchKeyword(it.toString())
         }

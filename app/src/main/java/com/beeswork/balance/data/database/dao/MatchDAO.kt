@@ -28,7 +28,7 @@ interface MatchDAO {
     fun findAllBefore(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<Match>
 
     @Query("select * from `match` where updatedAt >= :headUpdatedAt order by updatedAt asc, chatId desc limit :pageSize")
-    fun findAllAfter(pageSize: Int, headChatId: Long): List<Match>
+    fun findAllAfter(pageSize: Int, headUpdatedAt: OffsetDateTime): List<Match>
 
 
 

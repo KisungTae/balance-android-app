@@ -63,7 +63,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
-        bind() from singleton { instance<BalanceDatabase>().matchProfileDAO() }
+        bind() from singleton { instance<BalanceDatabase>().fetchMatchesResultDAO() }
+        bind() from singleton { instance<BalanceDatabase>().matchProfile() }
 
 
         // API
@@ -87,6 +88,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

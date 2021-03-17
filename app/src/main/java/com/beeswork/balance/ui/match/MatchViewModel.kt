@@ -82,6 +82,10 @@ class MatchViewModel(
 
 
     fun testFunction() {
+//      TODO: remove me
+        CoroutineScope(Dispatchers.IO).launch {
+            matchRepository.prependMatches(1, 2)
+        }
         matchRepository.testFunction()
     }
 
