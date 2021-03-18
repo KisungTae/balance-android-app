@@ -49,7 +49,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagedListAdapter.OnClic
         setupFetchMatchesLiveDataObserver()
         setupMatchPagedListLiveDataObserver()
         setupToolBars()
-//        viewModel.fetchMatches()
+        viewModel.fetchMatches()
     }
 
     private fun setupToolBars() {

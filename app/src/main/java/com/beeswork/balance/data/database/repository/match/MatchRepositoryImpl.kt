@@ -34,54 +34,11 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     override suspend fun prependMatches(pageSize: Int, chatId: Long): List<Match> {
-//        return withContext(Dispatchers.IO) {
-//            val matches = matchDAO.findAllAfter(pageSize, updatedAt)
-//
-//            return@withContext matchDAO.findAllAfter(pageSize, updatedAt)
-//        }
-
-
-        matchProfileDAO.insert(MatchProfile(1))
-        println("after prependMatches runInTransaction")
 
         return listOf()
     }
 
     override suspend fun appendMatches(pageSize: Int, chatId: Long): List<Match> {
-        balanceDatabase.runInTransaction {
-            for (i in 0..10000) {
-                val match = Match(i.toLong(), UUID.randomUUID(), false, false, "", "", false, OffsetDateTime.now())
-                matchDAO.insert(match)
-            }
-        }
-        println("after appendMatches runInTransaction")
-
-
-//        val matches = mutableListOf<Match>()
-//
-//        var now = OffsetDateTime.now()
-//        for (i in 10..30) {
-//            if ((i % 3) == 0) now = now.plusHours(-1)
-//            matches.add(Match(i.toLong(), UUID.randomUUID(), false, false, "", "", false, now))
-//        }
-//
-//        matches.shuffle()
-//
-//        for (match in matches) {
-//            println("${match.chatId} - ${match.updatedAt}")
-//        }
-//
-//        matches.sortWith(compareBy({it.updatedAt}, {it.chatId}))
-//
-//        println("sorted matches ==================================")
-//
-//        for (match in matches) {
-//            println("${match.chatId} - ${match.updatedAt}")
-//        }
-
-//        return withContext(Dispatchers.IO) {
-//            return@withContext matchDAO.findAllBefore(pageSize, updatedAt)
-//        }
 
         return listOf()
     }
@@ -106,9 +63,9 @@ class MatchRepositoryImpl(
                 data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
             )
             syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
+            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }.toMutableList())
             updateMatchProfileStatus(listMatches.status)
-            preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+//            preferenceProvider.putMatchFetchedAt(data.fetchedAt)
 
             //      TODO: remove me
             saveSentChatMessages(data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) })
@@ -161,12 +118,12 @@ class MatchRepositoryImpl(
         }
     }
 
-    private fun saveMatches(matches: List<Match>) {
+    private fun saveMatches(matches: MutableList<Match>) {
         balanceDatabase.runInTransaction {
             for (match in matches) {
                 updateMatch(match)
             }
-            matches.sortedWith(compareBy({ it.updatedAt }, { it.chatId }))
+            matches.sortWith(compareBy({ it.updatedAt }, { it.chatId }))
             val matchProfile = getMatchProfile()
             for (match in matches) {
                 updateRowId(match, matchProfile)
@@ -274,3 +231,4 @@ class MatchRepositoryImpl(
 // message-0.88725746
 // delete from chatMessage
 // delete from chatMessage where status not in (5,6)
+
