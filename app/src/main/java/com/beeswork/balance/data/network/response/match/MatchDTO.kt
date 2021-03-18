@@ -11,5 +11,5 @@ data class MatchDTO(
     val name: String,
     val repPhotoKey: String?,
     val deleted: Boolean,
-    val createdAt: OffsetDateTime?
+    val createdAt: OffsetDateTime
 )

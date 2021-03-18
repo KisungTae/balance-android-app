@@ -14,6 +14,7 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 import java.util.*
 import kotlin.random.Random
 
@@ -58,17 +59,21 @@ class MatchRepositoryImpl(
         }
 
         listMatches.data?.let { data ->
+            //      TODO: remove me
+            saveSentChatMessages(
+                data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
+                data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }
+            )
+
             saveChatMessages(
                 data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
                 data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
             )
-            syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+//            syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
             saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }.toMutableList())
             updateMatchProfileStatus(listMatches.status)
-//            preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+            preferenceProvider.putMatchFetchedAt(data.fetchedAt)
 
-            //      TODO: remove me
-            saveSentChatMessages(data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) })
 
         }
         return Resource.toEmptyResponse(listMatches)
@@ -96,8 +101,7 @@ class MatchRepositoryImpl(
                     sentChatMessage.messageId,
                     sentChatMessage.id,
                     sentChatMessage.status,
-                    sentChatMessage.createdAt,
-                    sentChatMessage.updatedAt,
+                    sentChatMessage.createdAt
                 )
             }
         }
@@ -124,6 +128,7 @@ class MatchRepositoryImpl(
                 updateMatch(match)
             }
             matches.sortWith(compareBy({ it.updatedAt }, { it.chatId }))
+
             val matchProfile = getMatchProfile()
             for (match in matches) {
                 updateRowId(match, matchProfile)
@@ -168,8 +173,7 @@ class MatchRepositoryImpl(
     }
 
     //  TODO: remove me
-    private fun saveSentChatMessages(sentChatMessages: List<ChatMessage>) {
-        val matches = matchDAO.findAll()
+    private fun saveSentChatMessages(sentChatMessages: List<ChatMessage>, matches: List<Match>) {
         val chatIds = matches.map { it.chatId }
         for (msg in sentChatMessages) {
             val randomIndex = Random.nextInt(0, chatIds.size - 1)
@@ -177,11 +181,10 @@ class MatchRepositoryImpl(
                 ChatMessage(
                     msg.messageId,
                     msg.id,
-                    chatIds.get(randomIndex),
+                    chatIds[randomIndex],
                     "message-${Random.nextFloat()}",
                     ChatMessageStatus.SENDING,
-                    OffsetDateTime.now(),
-                    OffsetDateTime.now()
+                    OffsetDateTime.now(ZoneOffset.UTC)
                 )
             )
         }

@@ -23,36 +23,10 @@ data class ChatMessage(
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
-    val createdAt: OffsetDateTime,
-    val updatedAt: OffsetDateTime
+    val createdAt: OffsetDateTime
 ) {
     companion object {
-
         const val TAIL_ID = 0L
-
-        fun getHead(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
-            return ChatMessage(
-                0,
-                null,
-                chatId,
-                "",
-                ChatMessageStatus.HEAD,
-                createdAt,
-                createdAt
-            )
-        }
-
-        fun getTail(chatId: Long, createdAt: OffsetDateTime): ChatMessage {
-            return ChatMessage(
-                0,
-                TAIL_ID,
-                chatId,
-                "",
-                ChatMessageStatus.TAIL,
-                createdAt,
-                createdAt
-            )
-        }
     }
 }
 

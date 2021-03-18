@@ -27,7 +27,6 @@ interface ChatMessageDAO {
 
 
 
-
     //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
     @Query("select * from chatMessage where chatId = :chatId order by messageId desc")
     fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
@@ -69,14 +68,12 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
     fun updateStatus(chatId: Long, fromStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
-    @Query("update chatMessage set id = :id, createdAt = :createdAt, updatedAt = :updatedAt, status = :status where messageId = :messageId")
+    @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where messageId = :messageId")
     fun updateSentMessage(
         messageId: Long,
         id: Long?,
         status: ChatMessageStatus,
-        createdAt: OffsetDateTime?,
-        updatedAt: OffsetDateTime
-
+        createdAt: OffsetDateTime?
     )
 
     @Query("select body, createdAt from chatMessage where chatId = :chatId and id > ${ChatMessage.TAIL_ID} order by id desc limit 1")
@@ -85,5 +82,9 @@ interface ChatMessageDAO {
     @Query("select count(id) from chatMessage where chatId = :chatId and id is not null and id > :lastReadChatMessageId")
     fun countAllAfter(chatId: Long, lastReadChatMessageId: Long): Int
 
+
+//  TODO: remove me
+    @Query("update chatMessage set chatId = :chatId where messageId = :messageId")
+    fun updateSentChatMessage(chatId: Long, messageId: Long)
 
 }

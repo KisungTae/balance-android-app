@@ -19,6 +19,7 @@ object OffsetDateTimeConverter {
     @TypeConverter
     @JvmStatic
     fun fromOffsetDateTime(date: OffsetDateTime?): String? {
+
         return date?.format(formatter)
     }
 

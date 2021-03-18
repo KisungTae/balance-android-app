@@ -14,8 +14,7 @@ class ChatMessageMapperImpl: ChatMessageMapper {
             dto.chatId ?: 0,
             dto.body ?: "",
             toChatMessageStatusFromMessageId(dto.messageId),
-            dto.createdAt,
-            OffsetDateTime.now()
+            dto.createdAt
         )
     }
 

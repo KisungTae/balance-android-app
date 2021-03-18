@@ -15,7 +15,7 @@ class MatchMapperImpl : MatchMapper {
             dto.name,
             dto.repPhotoKey ?: "",
             dto.deleted,
-            dto.createdAt ?: OffsetDateTime.MIN
+            dto.createdAt
         )
     }
 
