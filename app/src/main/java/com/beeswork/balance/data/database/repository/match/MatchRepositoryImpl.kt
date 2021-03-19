@@ -69,12 +69,10 @@ class MatchRepositoryImpl(
                 data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
                 data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
             )
-//            syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+            syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
             saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }.toMutableList())
             updateMatchProfileStatus(listMatches.status)
             preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-
-
         }
         return Resource.toEmptyResponse(listMatches)
     }
@@ -95,7 +93,7 @@ class MatchRepositoryImpl(
         receivedChatMessages: List<ChatMessage>
     ) {
         balanceDatabase.runInTransaction {
-            chatMessageDAO.insertAll(receivedChatMessages)
+            chatMessageDAO.insert(receivedChatMessages)
             for (sentChatMessage in sentChatMessages) {
                 chatMessageDAO.updateSentMessage(
                     sentChatMessage.messageId,
@@ -212,7 +210,7 @@ class MatchRepositoryImpl(
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            matchDAO.insertAll(dummyMatches)
+            matchDAO.insert(dummyMatches)
 //            matchDAO.insert(dummyMatches[0])
 
 
@@ -227,11 +225,4 @@ class MatchRepositoryImpl(
 }
 
 
-// Query
-// select * from chatMessage where chatId = 12 and id is not null and id > 0
-// select * from `match`
-// select * from chatMessage where chatId = 12 and id is not null order by id desc limit 1
-// message-0.88725746
-// delete from chatMessage
-// delete from chatMessage where status not in (5,6)
-
+// TODO: when append and prepend, check if rowId is the same on chatId if different then refresh whole list so pass the first match's chatId and wholePageSize

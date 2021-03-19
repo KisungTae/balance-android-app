@@ -16,7 +16,7 @@ interface ChatMessageDAO {
     fun insert(chatMessage: ChatMessage): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(chatMessages: List<ChatMessage>)
+    fun insert(chatMessages: List<ChatMessage>)
 
     @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId order by id desc limit 1")
     fun findMostRecentAfter(chatId: Long, lastReadChatMessageId: Long): ChatMessage?

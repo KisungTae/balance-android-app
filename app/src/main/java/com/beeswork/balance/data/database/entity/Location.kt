@@ -4,8 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.threeten.bp.OffsetDateTime
 
-const val LOCATION_ID = 0
-
 @Entity(tableName = "location")
 data class Location(
 
@@ -15,5 +13,9 @@ data class Location(
     val updatedAt: OffsetDateTime,
 
     @PrimaryKey
-    val id: Int = LOCATION_ID
-)
+    val id: Int = ID
+) {
+    companion object {
+        const val ID = 0
+    }
+}

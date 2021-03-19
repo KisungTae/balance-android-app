@@ -19,7 +19,7 @@ interface MatchDAO {
     fun insert(match: Match)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(matches: List<Match>)
+    fun insert(matches: List<Match>)
 
     @Query("select * from `match` where chatId = :chatId")
     fun findById(chatId: Long): Match?
