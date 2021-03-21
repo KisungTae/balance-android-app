@@ -16,6 +16,10 @@ interface ClickerDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(clickers: List<Clicker>)
 
+    @Query("delete from clicker where id in (:clickerIds)")
+    fun deleteInIds(clickerIds: List<UUID>)
+
+
     @Query("select * from clicker order by updatedAt desc")
     fun getClickers(): DataSource.Factory<Int, Clicker>
 

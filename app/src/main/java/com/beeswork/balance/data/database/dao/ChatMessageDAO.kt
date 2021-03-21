@@ -2,11 +2,8 @@ package com.beeswork.balance.data.database.dao
 
 import androidx.paging.DataSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.beeswork.balance.data.database.entity.ChatMessage
-import com.beeswork.balance.data.database.entity.ChatMessageBodyTuple
 import com.beeswork.balance.internal.constant.ChatMessageStatus
-import com.beeswork.balance.ui.chat.ChatMessageEvent
 import org.threeten.bp.OffsetDateTime
 
 @Dao
@@ -20,6 +17,8 @@ interface ChatMessageDAO {
 
     @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId order by id desc limit 1")
     fun findMostRecentAfter(chatId: Long, lastReadChatMessageId: Long): ChatMessage?
+
+
 
 
 
@@ -75,9 +74,6 @@ interface ChatMessageDAO {
         status: ChatMessageStatus,
         createdAt: OffsetDateTime?
     )
-
-    @Query("select body, createdAt from chatMessage where chatId = :chatId and id > ${ChatMessage.TAIL_ID} order by id desc limit 1")
-    fun findLastProcessed(chatId: Long): ChatMessageBodyTuple?
 
     @Query("select count(id) from chatMessage where chatId = :chatId and id is not null and id > :lastReadChatMessageId")
     fun countAllAfter(chatId: Long, lastReadChatMessageId: Long): Int

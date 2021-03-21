@@ -10,6 +10,9 @@ interface ClickedDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(clicked: Clicked)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(clickedList: List<Clicked>)
+
     @Query("select id from clicked")
     fun getClickedIds(): List<UUID>
 

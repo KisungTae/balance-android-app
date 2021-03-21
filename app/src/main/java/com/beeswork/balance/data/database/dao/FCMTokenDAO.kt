@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.FCMToken
-import com.beeswork.balance.data.database.entity.FCM_TOKEN_ID
 
 @Dao
 interface FCMTokenDAO {

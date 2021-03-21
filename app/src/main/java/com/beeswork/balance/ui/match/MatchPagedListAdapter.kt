@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -15,7 +17,7 @@ import com.bumptech.glide.request.RequestOptions
 
 class MatchPagedListAdapter(
     private val onClickMatchListener: OnClickMatchListener
-) : PagedListAdapter<MatchDomain, MatchPagedListAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MatchDomain, MatchPagedListAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -55,11 +57,7 @@ class MatchPagedListAdapter(
 
         fun bind(matchDomain: MatchDomain) {
             binding.root.tag = matchDomain.chatId
-
-//            binding.tvMatchName.text = matchDomain.name
-//            TODO: remove me
-            binding.tvMatchName.text = "${matchDomain.name} in chat: ${matchDomain.chatId}"
-
+            binding.tvMatchName.text = matchDomain.name
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
 
