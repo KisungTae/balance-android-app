@@ -27,6 +27,9 @@
     <string name="chat_report_menu_title">신고하기</string>
     <string name="chat_back_button_description">chat back button</string>
     <string name="chat_search_hint">Search</string>
+    <string name="dialog_retry_btn_text">다시 시도하기</string>
+    <string name="dialog_close_btn_text">닫기</string>
+    <string name="dialog_error_icon_description">errorIcon</string>
 
 
 </resources>

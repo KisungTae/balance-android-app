@@ -9,6 +9,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.ScopeFragment
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import kotlinx.coroutines.Job
@@ -19,7 +20,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnClickMatchListener,
-    FetchErrorDialog.FetchErrorListener {
+    FetchErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
@@ -47,7 +48,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnCli
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
         search("")
-//        viewModel.fetchMatches()
+        viewModel.fetchMatches()
     }
 
     private fun setupMatchRecyclerView() {
@@ -84,6 +85,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnCli
     private fun hideSearchToolBar() {
         binding.tbMatchSearch.visibility = View.GONE
         binding.tbMatch.visibility = View.VISIBLE
+        search("")
     }
 
     private fun showSearchToolBar() {
@@ -93,7 +95,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnCli
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            if (it.isError()) FetchErrorDialog(it.errorMessage, this@MatchFragment).show(
+            if (it.isError()) ErrorDialog(it.error, it.errorMessage, this@MatchFragment).show(
                 childFragmentManager,
                 FetchErrorDialog.TAG
             )
@@ -109,7 +111,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnCli
         fragmentTransaction?.commit()
     }
 
-    override fun onRefetch() {
+    override fun onRetry() {
         viewModel.fetchMatches()
     }
 }

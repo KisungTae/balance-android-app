@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <ImageView
+        android:layout_gravity="center"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:contentDescription="@string/dialog_error_icon_description"
+        android:src="@drawable/ic_baseline_error_outline" />
 
     <TextView
+        android:id="@+id/tvErrorDialogMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="This is error dialog"/>
+        android:textColor="@android:color/black" />
 
-    <TextView
-        android:id="@+id/tvErrorMessage"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:text="error message here"/>
+        android:gravity="center"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnErrorClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="닫기"/>
+        <Button
+            android:id="@+id/btnErrorDialogClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_close_btn_text" />
+
+        <Button
+            android:id="@+id/btnErrorDialogRetry"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_retry_btn_text" />
+
+    </LinearLayout>
+
 
 </LinearLayout>

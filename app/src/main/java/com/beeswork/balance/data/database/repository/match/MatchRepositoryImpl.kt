@@ -38,6 +38,18 @@ class MatchRepositoryImpl(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     override val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
+    override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findAllPaged(loadSize, startPosition) ?: listOf()
+        }
+    }
+
+    override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findAllPaged(loadSize, startPosition, "%${searchKeyword}%") ?: listOf()
+        }
+    }
+
     override suspend fun fetchMatches() {
         val listMatches = matchRDS.listMatches(
             preferenceProvider.getAccountId(),
@@ -66,26 +78,6 @@ class MatchRepositoryImpl(
             preferenceProvider.putMatchFetchedAt(data.fetchedAt)
         }
         _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
-    }
-
-    override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition) ?: listOf()
-        }
-    }
-
-    override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition, "%${searchKeyword}%") ?: listOf()
-        }
-    }
-
-    override fun loadMatchesAsPagingSource(query: String): PagingSource<Int, Match> {
-//        return withContext(Dispatchers.IO) {
-//            return@withContext matchDAO.findAllAsPagingSource()
-//        }
-
-        return matchDAO.findAllAsPagingSource(query)
     }
 
     private fun saveChatMessages(

@@ -21,7 +21,7 @@ import org.kodein.di.generic.instance
 
 class ClickerFragment : ScopeFragment(), KodeinAware,
     ClickerPagedListAdapter.OnClickedListener, BalanceGameDialog.BalanceGameListener,
-    FetchErrorDialog.FetchErrorListener {
+    FetchErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ClickerViewModelFactory by instance()
@@ -94,7 +94,7 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
         )
     }
 
-    override fun onRefetch() {
+    override fun onRetry() {
         viewModel.fetchClickedList()
     }
 

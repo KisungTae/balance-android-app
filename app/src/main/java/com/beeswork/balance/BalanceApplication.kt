@@ -152,7 +152,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
 
 
-
     }
 
     override fun onCreate() {

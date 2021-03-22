@@ -19,15 +19,15 @@ class MatchViewModel(
 
     val fetchMatchesLiveData = matchRepository.fetchMatchesLiveData
 
-    fun initializeMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
-        val pagingConfig = PagingConfig(
-            MATCH_PAGE_SIZE,
-            MATCH_PREFETCH_DISTANCE,
-            false,
-            MATCH_PAGE_SIZE,
-            MATCH_MAX_PAGE_SIZE
-        )
+    private val pagingConfig = PagingConfig(
+        MATCH_PAGE_SIZE,
+        MATCH_PREFETCH_DISTANCE,
+        false,
+        MATCH_PAGE_SIZE,
+        MATCH_MAX_PAGE_SIZE
+    )
 
+    fun initializeMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
         return Pager(
             pagingConfig,
             null,
@@ -52,5 +52,3 @@ class MatchViewModel(
     }
 }
 
-
-// TODO: when back button to match page, should keep the position

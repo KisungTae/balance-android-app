@@ -13,11 +13,10 @@ interface MatchRepository {
 
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>>
 
-    suspend fun fetchMatches()
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
+    suspend fun fetchMatches()
 
-    fun loadMatchesAsPagingSource(query: String): PagingSource<Int, Match>
 
     fun testFunction()
 }

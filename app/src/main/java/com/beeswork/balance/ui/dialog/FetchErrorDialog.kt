@@ -4,29 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogFetchErrorBinding
 
 class FetchErrorDialog(
-    private val exceptionMessage: String?,
-    private val fetchErrorListener: FetchErrorListener
-): DialogFragment() {
+    private val errorMessage: String?,
+    private val onRetryListener: OnRetryListener
+): BaseErrorDialog() {
 
     private lateinit var binding: DialogFetchErrorBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
-        binding = DialogFetchErrorBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_fetch_error, container, false)
+    ): View {
+        binding = DialogFetchErrorBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,16 +33,16 @@ class FetchErrorDialog(
         binding.btnFetchErrorClose.setOnClickListener { dismiss() }
         binding.btnRefetch.setOnClickListener {
             dismiss()
-            fetchErrorListener.onRefetch()
+            onRetryListener.onRetry()
         }
-        binding.tvFetchErrorMessage.text = exceptionMessage
+        binding.tvFetchErrorMessage.text = errorMessage
     }
 
     companion object {
         const val TAG = "fetchErrorDialog"
     }
 
-    interface FetchErrorListener {
-        fun onRefetch()
+    interface OnRetryListener {
+        fun onRetry()
     }
 }
