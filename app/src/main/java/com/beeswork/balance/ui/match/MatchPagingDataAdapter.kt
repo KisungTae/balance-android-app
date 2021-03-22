@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.paging.PagedList
-import androidx.paging.PagedListAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -15,9 +13,9 @@ import com.beeswork.balance.databinding.ItemMatchBinding
 import com.beeswork.balance.internal.constant.EndPoint
 import com.bumptech.glide.request.RequestOptions
 
-class MatchPagedListAdapter(
+class MatchPagingDataAdapter(
     private val onClickMatchListener: OnClickMatchListener
-) : PagingDataAdapter<MatchDomain, MatchPagedListAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(

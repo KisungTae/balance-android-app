@@ -76,7 +76,7 @@ class MatchRepositoryImpl(
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match> {
         return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition, searchKeyword) ?: listOf()
+            return@withContext matchDAO.findAllPaged(loadSize, startPosition, "%${searchKeyword}%") ?: listOf()
         }
     }
 
