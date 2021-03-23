@@ -10,30 +10,51 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogErrorBinding
 import com.beeswork.balance.databinding.DialogExceptionBinding
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.util.safeLet
 
 class ErrorDialog(
     private val error: String?,
     private val errorMessage: String?,
     private val onRetryListener: FetchErrorDialog.OnRetryListener?
-): DialogFragment() {
+) : DialogFragment() {
 
     private lateinit var binding: DialogErrorBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DialogErrorBinding.inflate(layoutInflater)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_exception, container, false)
+    ): View {
+        binding = DialogErrorBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindUI()
+    }
+
+    private fun bindUI() {
+        setupRetryListener()
+        setupErrorMessage()
+        binding.btnErrorDialogClose.setOnClickListener { dismiss() }
+    }
+
+    private fun setupErrorMessage() {
+        errorMessage?.let { message ->
+            binding.tvErrorDialogMessage.text = message
+        } ?: kotlin.run {
+            safeLet(error, context) {e, c ->
+                val resourceId = resources.getIdentifier(e, "string", c.packageName)
+                if (resourceId > 0) binding.tvErrorDialogMessage.text = resources.getString(resourceId)
+                else binding.tvErrorDialogMessage.text = resources.getString(R.string.exception)
+            } ?: kotlin.run {
+                binding.tvErrorDialogMessage.text = resources.getString(R.string.exception)
+            }
+        }
+    }
+
+    private fun setupRetryListener() {
         onRetryListener?.let {
             binding.btnErrorDialogRetry.setOnClickListener {
                 dismiss()
@@ -41,18 +62,6 @@ class ErrorDialog(
             }
         } ?: kotlin.run {
             binding.btnErrorDialogRetry.visibility = View.GONE
-        }
-
-        error?.let {
-
-        }
-
-        binding.tvExceptionDialogMessage.text = exceptionMessage
-    }
-
-    private fun getLocalizedErrorMessage(): String {
-        error?.let {
-            context?.getString(error)
         }
     }
 

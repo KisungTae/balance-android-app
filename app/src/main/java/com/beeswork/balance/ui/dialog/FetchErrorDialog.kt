@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogFetchErrorBinding
 
 class FetchErrorDialog(
     private val errorMessage: String?,
     private val onRetryListener: OnRetryListener
-): BaseErrorDialog() {
+): DialogFragment() {
 
     private lateinit var binding: DialogFetchErrorBinding
 

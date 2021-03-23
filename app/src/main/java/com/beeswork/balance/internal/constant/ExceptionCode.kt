@@ -7,7 +7,7 @@ class ExceptionCode {
 
         const val NO_INTERNET_CONNECTIVITY_EXCEPTION = "no.internet.connectivity.exception"
         const val SOCKET_TIMEOUT_EXCEPTION = "socket.timeout.exception"
-        const val CONNECT_EXCEPTION = "connect.exception"
+        const val CONNECT_EXCEPTION = "connect_exception"
         const val NETWORK_EXCEPTION = "network.exception"
 
         const val BAD_REQUEST_EXCEPTION = "bad.request.exception"

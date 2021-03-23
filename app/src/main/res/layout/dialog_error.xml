@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp">
 
     <ImageView
-        android:layout_gravity="center"
+        android:id="@+id/ivErrorDialogIcon"
         android:layout_width="72dp"
         android:layout_height="72dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:contentDescription="@string/dialog_error_icon_description"
         android:src="@drawable/ic_baseline_error_outline" />
 
@@ -16,11 +18,18 @@
         android:id="@+id/tvErrorDialogMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/ivErrorDialogIcon"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:textAlignment="center"
         android:textColor="@android:color/black" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tvErrorDialogMessage"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -32,12 +41,12 @@
 
         <Button
             android:id="@+id/btnErrorDialogRetry"
-            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:text="@string/dialog_retry_btn_text" />
 
     </LinearLayout>
 
 
-</LinearLayout>
+</RelativeLayout>
