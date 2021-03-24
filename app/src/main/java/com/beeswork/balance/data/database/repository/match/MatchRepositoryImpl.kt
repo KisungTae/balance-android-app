@@ -128,6 +128,7 @@ class MatchRepositoryImpl(
         matchDAO.findById(match.chatId)?.let {
             match.updatedAt = it.updatedAt
             match.unread = it.unread
+            match.active = it.active
             match.recentChatMessage = it.recentChatMessage
             match.lastReadChatMessageId = it.lastReadChatMessageId
         }
@@ -171,7 +172,7 @@ class MatchRepositoryImpl(
         val dummyMatches = mutableListOf<Match>()
 
 
-        for (i in 300..400) {
+        for (i in 101..103) {
             dummyMatches.add(
                 Match(
                     i.toLong(),
@@ -188,6 +189,7 @@ class MatchRepositoryImpl(
 
         CoroutineScope(Dispatchers.IO).launch {
             matchDAO.insert(dummyMatches)
+            _fetchMatchesLiveData.postValue(Resource.success(EmptyResponse()))
 //            matchDAO.insert(dummyMatches[0])
 
 

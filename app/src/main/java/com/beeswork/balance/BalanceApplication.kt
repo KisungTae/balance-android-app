@@ -269,6 +269,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      94. matchRepository has flow of newly added match, so socket pass new match to match repository and it saves the new match and then postValue on the flow of newly added match observable
 //      95. chatRepository has flow of newly added chatMessage (sent fetched, received) so that we don't need chatInsertedAt in matchProfile
 //      96. Offsetdatetime.now() should habve timezone.UTC
+//      97. setImageResource and glide should be done in background thread
 
 
 

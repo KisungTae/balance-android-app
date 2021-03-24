@@ -56,19 +56,17 @@ class MatchPagingDataAdapter(
         fun bind(matchDomain: MatchDomain) {
             binding.root.tag = matchDomain.chatId
             binding.tvMatchName.text = matchDomain.name
+            binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
 
             if (matchDomain.unmatched || matchDomain.deleted) {
                 binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
-                binding.tvMatchUpdatedAt.text = ""
                 changeTextColor(context.getColor(R.color.LightGrey))
                 resetProfilePictureCircleBorder(false)
-
             } else {
                 val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
 //                Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
-                binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
                 changeTextColor(context.getColor(R.color.TextBlack))
                 resetProfilePictureCircleBorder(matchDomain.active)
             }

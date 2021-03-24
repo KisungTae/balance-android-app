@@ -39,10 +39,8 @@ class MatchViewModel(
         CoroutineScope(Dispatchers.IO).launch { matchRepository.fetchMatches() }
     }
 
-
     fun testFunction() {
         matchRepository.testFunction()
-//        matchDataSource.invalidate()
     }
 
     companion object {
