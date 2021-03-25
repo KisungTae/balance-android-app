@@ -19,12 +19,12 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
 
 
-class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
+class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener {
 
     override val kodein by closestKodein()
 
     private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
-    private var viewModel: ChatViewModel? = null
+    private lateinit var viewModel: ChatViewModel
 
     //    private lateinit var chatPagingAdapter: ChatPagingAdapter
 //    private lateinit var layoutManager: LinearLayoutManager
@@ -48,7 +48,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
             viewModel = ViewModelProvider(this, viewModelFactory(chatId)).get(ChatViewModel::class.java)
             bindUI()
         } ?: kotlin.run {
-            ErrorDialog(null, getString(R.string.chat_id_not_found_exception), null).show(
+            ErrorDialog(null, getString(R.string.chat_id_not_found_exception), null, this).show(
                 childFragmentManager,
                 ErrorDialog.TAG
             )
@@ -67,6 +67,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 
 //        viewModel.connectChat()
         setupBackPressedDispatcherCallback()
+        setupToolBar()
     }
 
     private fun setupBackPressedDispatcherCallback() {
@@ -89,6 +90,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
                     true
                 }
                 R.id.miChatSearch -> {
+                    viewModel.test()
                     showSearchToolBar()
                     true
                 }
@@ -182,19 +184,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ExceptionDialogListener {
 //        })
     }
 
-    override fun onClickExceptionDialogCloseBtn() {
-//        Navigation.findNavController(requireView())
-//            .navigate(R.id.action_chatFragment_to_matchFragment)
-    }
-
-    override fun onResume() {
-        super.onResume()
-//        viewModel.connectChat()
-    }
-
-    override fun onPause() {
-        super.onPause()
-//        viewModel.disconnectChat()
+    override fun onDismiss() {
+        popBackToMatch()
     }
 
 

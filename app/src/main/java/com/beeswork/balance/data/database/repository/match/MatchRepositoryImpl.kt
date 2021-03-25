@@ -155,12 +155,12 @@ class MatchRepositoryImpl(
             val randomIndex = Random.nextInt(0, chatIds.size - 1)
             chatMessageDAO.insert(
                 ChatMessage(
-                    msg.messageId,
                     msg.id,
                     chatIds[randomIndex],
                     "message-${Random.nextFloat()}",
                     ChatMessageStatus.SENDING,
-                    OffsetDateTime.now(ZoneOffset.UTC)
+                    OffsetDateTime.now(ZoneOffset.UTC),
+                    msg.messageId,
                 )
             )
         }

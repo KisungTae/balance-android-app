@@ -6,15 +6,15 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.ui.chat.ChatMessageDomain
 import org.threeten.bp.OffsetDateTime
 
-class ChatMessageMapperImpl: ChatMessageMapper {
+class ChatMessageMapperImpl : ChatMessageMapper {
     override fun fromDTOToEntity(dto: ChatMessageDTO): ChatMessage {
         return ChatMessage(
-            dto.messageId ?: 0,
             dto.id,
             dto.chatId ?: 0,
             dto.body ?: "",
             toChatMessageStatusFromMessageId(dto.messageId),
-            dto.createdAt
+            dto.createdAt,
+            dto.messageId ?: 0,
         )
     }
 

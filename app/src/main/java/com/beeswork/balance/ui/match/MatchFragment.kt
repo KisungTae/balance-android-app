@@ -22,8 +22,10 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnClickMatchListener,
-    FetchErrorDialog.OnRetryListener {
+class MatchFragment : ScopeFragment(),
+    KodeinAware,
+    MatchPagingDataAdapter.OnClickMatchListener,
+    ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
@@ -113,10 +115,13 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnCli
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            if (it.isError()) ErrorDialog(it.error, it.errorMessage, this@MatchFragment).show(
-                childFragmentManager,
-                FetchErrorDialog.TAG
-            ) else if (it.isSuccess()) updateRefresh()
+            if (it.isError()) ErrorDialog(
+                it.error,
+                it.errorMessage,
+                this@MatchFragment,
+                null
+            ).show(childFragmentManager, FetchErrorDialog.TAG)
+            else if (it.isSuccess()) updateRefresh()
         })
     }
 
@@ -133,7 +138,7 @@ class MatchFragment : ScopeFragment(), KodeinAware, MatchPagingDataAdapter.OnCli
         val chatFragment = ChatFragment()
         val arguments = Bundle()
         arguments.putString(BundleKey.CHAT_ID, view.tag.toString())
-//        chatFragment.arguments = arguments
+        chatFragment.arguments = arguments
 
         val fragmentManager = activity?.supportFragmentManager
         val fragmentTransaction = fragmentManager?.beginTransaction()

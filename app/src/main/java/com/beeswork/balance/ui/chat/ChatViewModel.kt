@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.service.stomp.StompClient
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -13,7 +16,8 @@ import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val chatId: Long,
-    private val balanceRepository: BalanceRepository,
+    private val chatRepository: ChatRepository,
+    private val chatMessageMapper: ChatMessageMapper,
     private val stompClient: StompClient
 ) : ViewModel() {
 
@@ -43,6 +47,10 @@ class ChatViewModel(
 
     fun disconnectChat() {
         stompClient.disconnectChat()
+    }
+
+    fun test() {
+        CoroutineScope(Dispatchers.IO).launch { chatRepository.test() }
     }
 
     companion object {

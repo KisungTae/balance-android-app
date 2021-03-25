@@ -59,29 +59,32 @@ class MatchPagingDataAdapter(
             binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain, context)
+            resetProfilePictureCircleBorder(matchDomain.active)
 
             if (matchDomain.unmatched || matchDomain.deleted) {
                 binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
                 changeTextColor(context.getColor(R.color.LightGrey))
-                resetProfilePictureCircleBorder(false)
             } else {
                 val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
 //                Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
                 changeTextColor(context.getColor(R.color.TextBlack))
-                resetProfilePictureCircleBorder(matchDomain.active)
             }
         }
 
         private fun resetProfilePictureCircleBorder(active: Boolean) {
-            if (!active) binding.flMatchProfilePictureWrapper.background = ContextCompat.getDrawable(
-                context,
-                R.drawable.sh_circle_border
-            ) else binding.flMatchProfilePictureWrapper.background = null
+            if (active) binding.flMatchProfilePictureWrapper.background = null
+            else {
+                binding.flMatchProfilePictureWrapper.background = ContextCompat.getDrawable(
+                    context,
+                    R.drawable.sh_circle_border
+                )
+            }
         }
 
         private fun changeTextColor(textColor: Int) {
             binding.tvMatchName.setTextColor(textColor)
             binding.tvMatchRecentChatMessage.setTextColor(textColor)
+            binding.tvMatchUpdatedAt.setTextColor(textColor)
         }
 
 

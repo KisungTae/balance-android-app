@@ -16,14 +16,14 @@ import org.threeten.bp.OffsetDateTime
 )
 data class ChatMessage(
 
-    @PrimaryKey(autoGenerate = true)
-    val messageId: Long = 0,
-
     val id: Long?,
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
-    val createdAt: OffsetDateTime
+    val createdAt: OffsetDateTime,
+
+    @PrimaryKey(autoGenerate = true)
+    val messageId: Long = 0
 ) {
     companion object {
         const val TAIL_ID = 0L

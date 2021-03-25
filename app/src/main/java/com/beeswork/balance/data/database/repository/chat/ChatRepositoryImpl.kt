@@ -8,6 +8,8 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.chat.ChatMessageDomain
+import org.threeten.bp.OffsetDateTime
+import kotlin.random.Random
 
 class ChatRepositoryImpl(
     private val chatRDS: ChatRDS,
@@ -15,20 +17,38 @@ class ChatRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val preferenceProvider: PreferenceProvider
 ): ChatRepository {
-    override suspend fun fetchChatMessages(
-        chatId: Long,
-        recipientId: String,
-        pageSize: Int
-    ): Resource<List<ChatMessageDomain>> {
-        // TODO: change lastReadAt to
 
-        return Resource.error("", "")
+    override suspend fun test() {
+        val messages = mutableListOf<ChatMessage>()
+        var count = 0L
+        for (i in 1..20) {
+            count++
+            val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+            messages.add(ChatMessage(count, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
+        }
+
+        for (i in 0..8) {
+            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
+            messages.add(ChatMessage(null, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
+        }
+
+        for (i in 1..20) {
+            count++
+            val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+            messages.add(ChatMessage(count, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
+        }
+        chatMessageDAO.insert(messages)
+
+        println("test!!!!!!!!!from chatrepositroy")
     }
 
 }
 
 
-
-
-
-// TODO: when
+// insert into chatMessage values (null, 1, "d", 1, "d", 1)
+// UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'chatMessage'
+// select * from chatMessage
+// delete from chatMessage
+// select * from chatMessage where id < 21 or id is null order by id desc, messageId desc
+// select * from chatMessage order by case when id is null then 0 else 1 end, id desc
+// select id, messageId from chatMessage order by case when id is null then 0 else 1 end, id desc

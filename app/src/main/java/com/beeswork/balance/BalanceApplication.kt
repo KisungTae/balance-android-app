@@ -128,6 +128,7 @@ class BalanceApplication : Application(), KodeinAware {
             ChatViewModelFactory(
                 chatId,
                 instance(),
+                instance(),
                 instance()
             )
         }

@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.dialog
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +16,8 @@ import com.beeswork.balance.internal.util.safeLet
 class ErrorDialog(
     private val error: String?,
     private val errorMessage: String?,
-    private val onRetryListener: FetchErrorDialog.OnRetryListener?
+    private val onRetryListener: OnRetryListener?,
+    private val onDismissListener: OnDismissListener?
 ) : DialogFragment() {
 
     private lateinit var binding: DialogErrorBinding
@@ -65,8 +67,21 @@ class ErrorDialog(
         }
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        onDismissListener?.onDismiss()
+    }
+
     companion object {
         const val TAG = "errorDialog"
+    }
+
+    interface OnRetryListener {
+        fun onRetry()
+    }
+
+    interface OnDismissListener {
+        fun onDismiss()
     }
 
 }
