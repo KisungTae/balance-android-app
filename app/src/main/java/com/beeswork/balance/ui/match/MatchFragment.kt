@@ -2,7 +2,6 @@ package com.beeswork.balance.ui.match
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,7 +23,7 @@ import org.kodein.di.generic.instance
 
 class MatchFragment : ScopeFragment(),
     KodeinAware,
-    MatchPagingDataAdapter.OnClickMatchListener,
+    MatchPagingDataAdapter.OnMatchClickListener,
     ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()

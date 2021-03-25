@@ -2,7 +2,6 @@ package com.beeswork.balance.data.database.repository.match
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagingSource
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
@@ -87,7 +86,7 @@ class MatchRepositoryImpl(
         balanceDatabase.runInTransaction {
             chatMessageDAO.insert(receivedChatMessages)
             sentChatMessages.forEach {
-                chatMessageDAO.updateSentMessage(it.messageId, it.id, it.status, it.createdAt)
+                chatMessageDAO.updateSentMessage(it.key, it.id, it.status, it.createdAt)
             }
         }
     }
@@ -160,7 +159,7 @@ class MatchRepositoryImpl(
                     "message-${Random.nextFloat()}",
                     ChatMessageStatus.SENDING,
                     OffsetDateTime.now(ZoneOffset.UTC),
-                    msg.messageId,
+                    msg.key,
                 )
             )
         }

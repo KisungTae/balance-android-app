@@ -27,10 +27,10 @@ interface ChatMessageDAO {
 
 
     //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
-    @Query("select * from chatMessage where chatId = :chatId order by messageId desc")
+    @Query("select * from chatMessage where chatId = :chatId order by `key` desc")
     fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
 
-    @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where chatId = :chatId and messageId = :messageId")
+    @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where chatId = :chatId and `key` = :messageId")
     fun sync(
         chatId: Long,
         messageId: Long,
@@ -55,7 +55,7 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where chatId = :chatId and id < :lastChatMessageId order by id desc limit :pageSize")
     fun findAllBefore(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
 
-    @Query("select * from chatMessage where chatId = :chatId and messageId = null order by messageId desc")
+    @Query("select * from chatMessage where chatId = :chatId and `key` = null order by `key` desc")
     fun findAllUnprocessed(chatId: Long): List<ChatMessage>
 
     @Query("select * from chatMessage where chatId = :chatId order by id desc limit :pageSize")
@@ -67,7 +67,7 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
     fun updateStatus(chatId: Long, fromStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
-    @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where messageId = :messageId")
+    @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where `key` = :messageId")
     fun updateSentMessage(
         messageId: Long,
         id: Long?,
@@ -80,7 +80,7 @@ interface ChatMessageDAO {
 
 
 //  TODO: remove me
-    @Query("update chatMessage set chatId = :chatId where messageId = :messageId")
+    @Query("update chatMessage set chatId = :chatId where `key` = :messageId")
     fun updateSentChatMessage(chatId: Long, messageId: Long)
 
 }

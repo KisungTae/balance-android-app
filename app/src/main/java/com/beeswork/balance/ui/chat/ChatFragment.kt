@@ -7,13 +7,16 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.dialog.ExceptionDialogListener
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -22,14 +25,11 @@ import org.kodein.di.generic.factory
 class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener {
 
     override val kodein by closestKodein()
-
     private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
-
-    //    private lateinit var chatPagingAdapter: ChatPagingAdapter
-//    private lateinit var layoutManager: LinearLayoutManager
-//    private lateinit var chatRecyclerViewAdapter: ChatRecyclerViewAdapter
+    private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var binding: FragmentChatBinding
+    private var searchJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,26 +48,20 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
             viewModel = ViewModelProvider(this, viewModelFactory(chatId)).get(ChatViewModel::class.java)
             bindUI()
         } ?: kotlin.run {
-            ErrorDialog(null, getString(R.string.chat_id_not_found_exception), null, this).show(
-                childFragmentManager,
-                ErrorDialog.TAG
-            )
+            ErrorDialog(
+                null,
+                getString(R.string.chat_id_not_found_exception),
+                null,
+                this
+            ).show(childFragmentManager, ErrorDialog.TAG)
         }
     }
 
     private fun bindUI() {
-//        setupChatRecyclerView()
-//        setupWebSocketLifeCycleEventObserver()
-//
-//        binding.btnChatSend.setOnClickListener {
-//            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
-//        }
-//        observeChatMessageEvent()
-//        viewModel.fetchInitialChatMessages()
-
-//        viewModel.connectChat()
         setupBackPressedDispatcherCallback()
         setupToolBar()
+        setupChatRecyclerView()
+        search("")
     }
 
     private fun setupBackPressedDispatcherCallback() {
@@ -77,7 +71,6 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
             }
         })
     }
-
 
     private fun setupToolBar() {
         binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
@@ -101,18 +94,28 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.btnChatBack.setOnClickListener { popBackToMatch() }
     }
 
-    private fun getChatIdFromBundle() {
-
+    private fun setupChatRecyclerView() {
+        chatMessagePagingAdapter = ChatMessagePagingAdapter()
+        binding.rvChat.adapter = chatMessagePagingAdapter
+        val layoutManager = LinearLayoutManager(this@ChatFragment.context)
+        layoutManager.orientation = LinearLayoutManager.VERTICAL
+        layoutManager.reverseLayout = true
+        binding.rvChat.layoutManager = layoutManager
     }
 
-    private fun popBackToMatch() {
-        requireActivity().supportFragmentManager.popBackStack(MainViewPagerFragment.TAG, POP_BACK_STACK_INCLUSIVE)
+    private fun search(keyword: String) {
+        searchJob?.cancel()
+        searchJob = launch {
+            viewModel.initializeChatPagingData(keyword.trim()).collectLatest {
+                chatMessagePagingAdapter.submitData(it)
+            }
+        }
     }
 
     private fun hideSearchToolBar() {
         binding.tbChatSearch.visibility = View.GONE
         binding.tbChat.visibility = View.VISIBLE
-//        viewModel.changeChatSearchKeyword("")
+        binding.etChatSearch.setText("")
     }
 
     private fun showSearchToolBar() {
@@ -120,73 +123,11 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.tbChatSearch.visibility = View.VISIBLE
     }
 
-
-    private fun closeChat() {
-
-    }
-
-    fun setup(chatId: Long) {
-
-        println("chat setup: $chatId")
-
-//        val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
-//        viewModel = ViewModelProvider(
-//            this,
-//            viewModelFactory(chatId)
-//        ).get(ChatViewModel::class.java)
-
-    }
-
-    fun reset() {
-        println("chat reset")
-//        viewModel = null
-    }
-
-    private fun observeChatMessageEvent() {
-//        viewModel.chatMessageEvent.observe(viewLifecycleOwner, {
-//            when (it.type) {
-//                ChatMessageEvent.Type.FETCH_ERROR -> {
-//                    ExceptionDialog(it.errorMessage, this).show(
-//                        childFragmentManager,
-//                        ExceptionDialog.TAG
-//                    )
-//                    binding.llChatLoading.visibility = View.GONE
-//                }
-//                ChatMessageEvent.Type.FETCH -> {
-//
-//                }
-//            }
-//        })
-    }
-
-
-    private fun setupChatRecyclerView() {
-//        chatRecyclerViewAdapter = ChatRecyclerViewAdapter()
-//        binding.rvChat.adapter = chatRecyclerViewAdapter
-//        layoutManager = LinearLayoutManager(this@ChatFragment.context)
-//        layoutManager.orientation = LinearLayoutManager.VERTICAL
-//        layoutManager.reverseLayout = true
-//        binding.rvChat.layoutManager = layoutManager
-
-    }
-
-
-    private fun setupWebSocketLifeCycleEventObserver() {
-//        viewModel.webSocketLifeCycleEvent.observe(viewLifecycleOwner, {
-//            when (it.type) {
-//                WebSocketEvent.Type.ERROR -> {
-//                    ExceptionDialog(it.errorMessage, null).show(
-//                        childFragmentManager,
-//                        ExceptionDialog.TAG
-//                    )
-//                }
-//            }
-//        })
+    private fun popBackToMatch() {
+        requireActivity().supportFragmentManager.popBackStack(MainViewPagerFragment.TAG, POP_BACK_STACK_INCLUSIVE)
     }
 
     override fun onDismiss() {
         popBackToMatch()
     }
-
-
 }

@@ -18,28 +18,26 @@ class ChatRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ): ChatRepository {
 
+    override suspend fun loadChatMessages(loadSize: Int, startKey: Long): List<ChatMessage> {
+
+    }
+
+
     override suspend fun test() {
         val messages = mutableListOf<ChatMessage>()
         var count = 0L
-        for (i in 1..20) {
+        for (i in 1..40) {
             count++
             val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
             messages.add(ChatMessage(count, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
         }
 
-        for (i in 0..8) {
-            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
-            messages.add(ChatMessage(null, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
-        }
-
-        for (i in 1..20) {
+        for (i in 1..10) {
             count++
-            val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
             messages.add(ChatMessage(count, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
         }
         chatMessageDAO.insert(messages)
-
-        println("test!!!!!!!!!from chatrepositroy")
     }
 
 }

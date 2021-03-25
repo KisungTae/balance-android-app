@@ -4,12 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.*
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.service.stomp.StompClient
+import com.beeswork.balance.ui.match.MatchPagingSource
+import com.beeswork.balance.ui.match.MatchViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -21,145 +26,34 @@ class ChatViewModel(
     private val stompClient: StompClient
 ) : ViewModel() {
 
-    val webSocketLifeCycleEvent = stompClient.webSocketEvent
+    private val pagingConfig = PagingConfig(
+        CHAT_PAGE_SIZE,
+        CHAT_PREFETCH_DISTANCE,
+        false,
+        CHAT_PAGE_SIZE,
+        CHAT_MAX_PAGE_SIZE
+    )
 
-    private val _chatMessageEvent = MutableLiveData<ChatMessageEvent>()
-    val chatMessageEvent: LiveData<ChatMessageEvent> get() = _chatMessageEvent
-
-    fun fetchInitialChatMessages() {
-        viewModelScope.launch(Dispatchers.IO) {
-//            val result = balanceRepository.fetchChatMessages(chatId, PAGE_SIZE)
-//            withContext(Dispatchers.Main) {
-//                if (result.isError()) _chatMessageEvent.value =
-//                    ChatMessageEvent.fetchError(result.error, result.errorMessage)
-//                else result.data?.let { _chatMessageEvent.value = ChatMessageEvent.fetch(it) }
-//            }
+    fun initializeChatPagingData(searchKeyword: String): Flow<PagingData<ChatMessageDomain>> {
+        return Pager(
+            pagingConfig,
+            null,
+            { ChatMessagePagingSource(chatRepository, "", null) }
+        ).flow.cachedIn(viewModelScope).map { pagingData ->
+            pagingData.map { chatMessageMapper.fromEntityToDomain(it) }
         }
     }
 
-    fun connectChat() {
-//        stompClient.connectChat(chatId, matchedId)
-    }
-
-    fun sendChatMessage(body: String) {
-//        stompClient.send(chatId, matchedId, body)
-    }
-
-    fun disconnectChat() {
-        stompClient.disconnectChat()
-    }
 
     fun test() {
         CoroutineScope(Dispatchers.IO).launch { chatRepository.test() }
     }
 
     companion object {
-        const val PAGE_SIZE = 100
+        private const val CHAT_PAGE_SIZE = 60
+        private const val CHAT_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
+        private const val CHAT_MAX_PAGE_SIZE = CHAT_PREFETCH_DISTANCE * 3 + CHAT_PAGE_SIZE
     }
-
-
-//    val chatMessages = Pager(
-//        PagingConfig(
-//            pageSize = 30,
-//            enablePlaceholders = true,
-//            maxSize = 150
-//        )
-//    ) {
-//        balanceRepository.getChatMessages(chatId)
-//    }.flow.cachedIn(viewModelScope)
-
-//    private lateinit var stompClient2: ua.naiksoftware.stomp.StompClient
-//    private lateinit var compositeDisposables: CompositeDisposable
-//
-//    init {
-//
-//        setupStompClient()
-//    }
-//
-//    private fun setupStompClient() {
-//        stompClient2 = Stomp.over(Stomp.ConnectionProvider.OKHTTP, BalanceURL.WEB_SOCKET_ENDPOINT)
-//        compositeDisposables = CompositeDisposable()
-//        compositeDisposables.add(setupStompClientLifeCycle())
-//        setupSubscription()
-//        stompClient2.connect()
-//    }
-//
-//    private fun getStompConnectionHeaders(): MutableList<StompHeader> {
-//        val headers = mutableListOf<StompHeader>()
-//        headers.add(StompHeader("LOGIN", "guest"))
-//        headers.add(StompHeader("PASSCODE", "guest"))
-//        return headers
-//    }
-//
-//    private fun setupSubscription() {
-//        compositeDisposables.add(stompClient2.topic("/queue/test-1", subscriptionHeaders())
-//            .doOnError {
-//                println("setupSubscription doOnError: ${it.message}")
-//            }
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe({ topicMessage ->
-//                println("stompCommand: " + topicMessage.stompCommand)
-//                println("Received " + topicMessage.payload)
-//            }) { throwable -> println("Error on subscribe topic: $throwable") })
-//    }
-//
-//    private fun subscriptionHeaders(): MutableList<StompHeader> {
-//        val headers = mutableListOf<StompHeader>()
-//        headers.add(StompHeader("accountId", preferenceProvider.getAccountId()))
-//        headers.add(StompHeader("identityToken", preferenceProvider.getIdentityToken()))
-//        headers.add(StompHeader("chatId", chatId.toString()))
-//        headers.add(StompHeader("accept-language", "kr"))
-//        return headers
-//    }
-//
-//    private fun setupStompClientLifeCycle(): Disposable {
-//        return stompClient2.lifecycle()
-//            .doOnError {
-//                println("setupStompClientLifeCycle doOnError")
-//            }
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe({ lifecycleEvent ->
-//                when (lifecycleEvent.type) {
-//                    LifecycleEvent.Type.OPENED -> println("Stomp connection opened")
-//                    LifecycleEvent.Type.ERROR -> println("Stomp connection error: ${lifecycleEvent.exception}")
-//                    LifecycleEvent.Type.CLOSED -> {
-//                        println("Stomp connection closed!!!!!!123")
-//                        compositeDisposables.clear()
-//                    }
-//                    LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> println("Stomp failed server heartbeat")
-//                    else -> println("dddd")
-//                }
-//            }) { throwable -> println("lifecycle error!!!!!!!!!: $throwable") }
-//    }
-
-
-//    override fun onCleared() {
-//        super.onCleared()
-//        compositeDisposables.clear()
-//    }
-
-
-//    private val pagedListConfig = PagedList.Config.Builder()
-//        .setEnablePlaceholders(false)
-//        .setMaxSize(CHAT_MAX_PAGE_SIZE)
-//        .setInitialLoadSizeHint(CHAT_PAGE_SIZE)
-//        .setPageSize(CHAT_PAGE_SIZE)
-//        .setPrefetchDistance(CHAT_PAGE_PREFETCH_DISTANCE)
-//        .build()
-
-
-//    val chatMessages by lazyDeferred {
-//        LivePagedListBuilder(balanceRepository.getChatMessages(chatId), pagedListConfig).build()
-//    }
-
-
-//    companion object {
-//        const val CHAT_PAGE_SIZE = 50
-//        const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
-//        const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_SIZE + (CHAT_PAGE_PREFETCH_DISTANCE * 2)
-//    }
 }
 
 

@@ -14,13 +14,13 @@ import com.beeswork.balance.internal.constant.EndPoint
 import com.bumptech.glide.request.RequestOptions
 
 class MatchPagingDataAdapter(
-    private val onClickMatchListener: OnClickMatchListener
+    private val onMatchClickListener: OnMatchClickListener
 ) : PagingDataAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemMatchBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onClickMatchListener,
+            onMatchClickListener,
             parent.context
         )
     }
@@ -39,13 +39,13 @@ class MatchPagingDataAdapter(
         }
     }
 
-    interface OnClickMatchListener {
+    interface OnMatchClickListener {
         fun onClick(view: View)
     }
 
     class ViewHolder(
         private val binding: ItemMatchBinding,
-        private val onClickMatchListener: OnClickMatchListener,
+        private val onMatchClickListener: OnMatchClickListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
@@ -89,7 +89,7 @@ class MatchPagingDataAdapter(
 
 
         override fun onClick(view: View) {
-            onClickMatchListener.onClick(view)
+            onMatchClickListener.onClick(view)
         }
 
         companion object {
