@@ -1,37 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="270dp"
+    android:layout_width="300dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:padding="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:layout_width="@dimen/profile_image_medium_size"
+        android:layout_height="@dimen/profile_image_medium_size"
+        android:layout_gravity="top"
+        android:contentDescription="@string/profile_image_description"
+        android:src="@drawable/ic_baseline_account_circle" />
+
+    <TextView
+        android:id="@+id/tvChatMessageReceivedBody"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="start">
+        android:layout_gravity="bottom"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/sh_chat_message_received_box"
+        android:elevation="5dp"
+        android:padding="10dp"
+        android:text="this is messagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessage" />
 
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
-
-        <TextView
-            android:id="@+id/tvChatMessageReceivedBody"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"
-            android:background="@drawable/sh_rectangle_border"
-            android:padding="10dp"
-            android:text="this is message here" />
-
-        <TextView
-            android:id="@+id/tvChatMessageReceivedCreatedAt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:text="createdAt" />
-
-    </LinearLayout>
-
-
+    <TextView
+        android:id="@+id/tvChatMessageReceivedCreatedAt"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:layout_marginStart="10dp"
+        android:text="2:54 pm" />
 </LinearLayout>

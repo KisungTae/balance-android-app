@@ -3,7 +3,7 @@
     <color name="Primary">#FF7F8E</color>
     <color name="PrimaryDark">#3700B3</color>
     <color name="Accent">#03DAC5</color>
-    <color name="transparent">@android:color/transparent</color>
+    <color name="Transparent">@android:color/transparent</color>
     <color name="TextBlack">#000000</color>
     <color name="TextWhite">#FFFFFF</color>
     <color name="TextGrey">#D5D5D5</color>
@@ -12,5 +12,4 @@
     <!-- search bar background, unselected icon,    -->
     <color name="LightGrey">#ededef</color>
     <color name="BackgroundWhite">#FFFFFF</color>
-
 </resources>

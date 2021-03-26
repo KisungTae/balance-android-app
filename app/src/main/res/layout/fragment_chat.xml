@@ -40,7 +40,7 @@
             android:id="@+id/btnChatSearchClose"
             android:layout_width="@dimen/tool_bar_menu_item_btn_size"
             android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:background="@color/transparent"
+            android:background="@color/Transparent"
             android:clickable="true"
             android:contentDescription="@string/search_bar_close_btn_description"
             android:focusable="true"

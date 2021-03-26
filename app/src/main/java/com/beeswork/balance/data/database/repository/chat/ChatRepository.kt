@@ -6,7 +6,7 @@ import com.beeswork.balance.ui.chat.ChatMessageDomain
 
 interface ChatRepository {
 
-    suspend fun loadChatMessages(loadSize: Int, startKey: Long): List<ChatMessage>
+    suspend fun loadChatMessages(loadSize: Int, startPosition: Int): List<ChatMessage>
 
     suspend fun test()
 }

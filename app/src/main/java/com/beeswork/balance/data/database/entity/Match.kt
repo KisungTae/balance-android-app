@@ -16,7 +16,6 @@ data class Match(
     @PrimaryKey
     val chatId: Long,
 
-
     val matchedId: UUID,
     var active: Boolean,
     var unmatched: Boolean,
@@ -24,7 +23,6 @@ data class Match(
     var repPhotoKey: String,
     var deleted: Boolean,
     var updatedAt: OffsetDateTime,
-    var rowId: Int = 0,
     var unread: Boolean = false,
     var recentChatMessage: String = "",
     var lastReadChatMessageId: Long = 0

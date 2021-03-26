@@ -8,6 +8,8 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.chat.ChatMessageDomain
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.threeten.bp.OffsetDateTime
 import kotlin.random.Random
 
@@ -18,15 +20,17 @@ class ChatRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ): ChatRepository {
 
-    override suspend fun loadChatMessages(loadSize: Int, startKey: Long): List<ChatMessage> {
-
+    override suspend fun loadChatMessages(loadSize: Int, startPosition: Int): List<ChatMessage> {
+        return withContext(Dispatchers.IO) {
+            return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition)
+        }
     }
 
 
     override suspend fun test() {
         val messages = mutableListOf<ChatMessage>()
         var count = 0L
-        for (i in 1..40) {
+        for (i in 1..800) {
             count++
             val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
             messages.add(ChatMessage(count, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))

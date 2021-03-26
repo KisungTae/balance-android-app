@@ -34,7 +34,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:alpha="0.5"
-            android:background="@color/transparent"
+            android:background="@color/Transparent"
             android:clickable="true"
             android:focusable="true"
             android:tag="photoPickerLoading"

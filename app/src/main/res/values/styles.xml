@@ -5,7 +5,7 @@
         <item name="colorPrimary">@color/Primary</item>
         <item name="colorPrimaryDark">@color/PrimaryDark</item>
         <item name="colorAccent">@color/Accent</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/TextBlack</item>
         <item name="android:textSize">15sp</item>
         <item name="android:statusBarColor">@color/BackgroundWhite</item>
         <item name="android:windowLightStatusBar">true</item>

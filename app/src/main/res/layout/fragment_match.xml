@@ -39,7 +39,7 @@
             android:id="@+id/btnMatchSearchClose"
             android:layout_width="@dimen/tool_bar_menu_item_btn_size"
             android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:background="@color/transparent"
+            android:background="@color/Transparent"
             android:contentDescription="@string/search_bar_close_btn_description"
             android:src="@drawable/ic_baseline_close" />
     </LinearLayout>
