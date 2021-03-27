@@ -20,7 +20,7 @@ data class ChatMessage(
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
-    val createdAt: OffsetDateTime,
+    val createdAt: OffsetDateTime?,
 
     @PrimaryKey(autoGenerate = true)
     val key: Long = 0

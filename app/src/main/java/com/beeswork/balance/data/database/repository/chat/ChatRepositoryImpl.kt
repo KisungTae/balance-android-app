@@ -18,7 +18,7 @@ class ChatRepositoryImpl(
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val preferenceProvider: PreferenceProvider
-): ChatRepository {
+) : ChatRepository {
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int): List<ChatMessage> {
         return withContext(Dispatchers.IO) {
@@ -30,18 +30,32 @@ class ChatRepositoryImpl(
     override suspend fun test() {
         val messages = mutableListOf<ChatMessage>()
         var count = 0L
-        for (i in 1..800) {
-            count++
-            val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
-            messages.add(ChatMessage(count, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
+
+        var now = OffsetDateTime.now()
+
+        for (i in 0..9) {
+            var createdAt = now.minusSeconds(Random.nextInt(10).toLong())
+            for (j in 0..Random.nextInt(50)) {
+                if ((Random.nextInt(4) + 1) % 4 == 0) createdAt = now.minusMinutes(Random.nextInt(10).toLong())
+                val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+                messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, createdAt))
+            }
+            now = now.minusDays(1)
         }
 
-        for (i in 1..10) {
-            count++
-            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
-            messages.add(ChatMessage(count, 280L, Random.nextLong().toString(), status, OffsetDateTime.now()))
-        }
-        chatMessageDAO.insert(messages)
+
+//        for (i in 1..200) {
+//            count++
+//            val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+//            messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, OffsetDateTime.now()))
+//        }
+//
+//        for (i in 1..10) {
+//            count++
+//            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
+//            messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, OffsetDateTime.now()))
+//        }
+//        chatMessageDAO.insert(messages)
     }
 
 }

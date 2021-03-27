@@ -140,7 +140,7 @@ class MatchRepositoryImpl(
             match.lastReadChatMessageId
         )?.let { chatMessage ->
             match.recentChatMessage = chatMessage.body
-            match.updatedAt = chatMessage.createdAt
+            chatMessage.createdAt?.let { match.updatedAt = it }
             match.active = true
             match.unread = true
         }
