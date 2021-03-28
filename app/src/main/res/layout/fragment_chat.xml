@@ -25,7 +25,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_weight="1"
-            android:background="@drawable/sh_search_box_border"
+            android:background="@drawable/sh_search_box"
             android:clickable="true"
             android:drawableStart="@drawable/ic_baseline_search"
             android:drawablePadding="10dp"
@@ -88,28 +88,45 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvChat"
-                android:paddingHorizontal="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingHorizontal="10dp"
+                android:paddingBottom="15dp"
                 tools:listitem="@layout/item_chat_message_sent" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="15dp">
 
                 <EditText
                     android:id="@+id/etChatMessageBody"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:background="@drawable/sh_chat_input_box"
+                    android:focusable="true"
+                    android:layout_marginEnd="10dp"
+                    android:hint="message.."
+                    android:importantForAutofill="no"
+                    android:drawableEnd="@drawable/ic_baseline_insert_emoticon"
+                    android:inputType="text"
+                    android:padding="10dp" />
 
-                <Button
-                    android:id="@+id/btnChatSend"
+                <ImageButton
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:padding="15dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Send" />
+                    android:src="@drawable/ic_baseline_send_12"
+                    android:background="@drawable/sh_solid_circle_primary"/>
+
             </LinearLayout>
         </LinearLayout>
 

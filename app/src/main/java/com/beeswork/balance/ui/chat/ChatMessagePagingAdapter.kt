@@ -8,24 +8,33 @@ import android.widget.LinearLayout
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemChatMessageReceivedBinding
 import com.beeswork.balance.databinding.ItemChatMessageSentBinding
+import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
 import com.beeswork.balance.internal.constant.ChatMessageStatus
+import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.util.safeLet
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
+import java.util.*
 
 
 class ChatMessagePagingAdapter : PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
-            ChatMessageStatus.RECEIVED.ordinal -> ViewHolder(
+            ChatMessageStatus.SEPARATOR.ordinal -> SeparatorViewHolder(
+                ItemChatMessageSeparatorBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                ),
+                parent.context
+            )
+            ChatMessageStatus.RECEIVED.ordinal -> ReceivedViewHolder(
                 ItemChatMessageReceivedBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -33,7 +42,7 @@ class ChatMessagePagingAdapter : PagingDataAdapter<ChatMessageDomain, ChatMessag
                 ),
                 parent.context
             )
-            else -> ViewHolder(
+            else -> SentViewHolder(
                 ItemChatMessageSentBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -46,29 +55,33 @@ class ChatMessagePagingAdapter : PagingDataAdapter<ChatMessageDomain, ChatMessag
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let {
-            println("position: $position - key: ${it.key} - size: $itemCount - viewType: ${holder.itemViewType}")
-            when (holder.itemViewType) {
-                ChatMessageStatus.RECEIVED.ordinal -> holder.bindMessageReceived(
-                    it,
-                    isSameAsPrev(it, position, false),
-                    isSameAsNext(it, position),
-                    marginTop(position)
-                )
-                ChatMessageStatus.SENT.ordinal -> holder.bindMessageSent(
-                    it,
-                    isSameAsPrev(it, position, true),
-                    isSameAsNext(it, position),
-                    marginTop(position)
-                )
+            val isSent = holder.itemViewType == ChatMessageStatus.SENT.ordinal
+            holder.bind(it, isSameAsPrev(it, position, isSent), isSameAsNext(it, position), marginTop(position))
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return getItem(position)?.let {
+            return when (it.status) {
+                ChatMessageStatus.SEPARATOR -> ChatMessageStatus.SEPARATOR.ordinal
+                ChatMessageStatus.RECEIVED -> ChatMessageStatus.RECEIVED.ordinal
+                else -> ChatMessageStatus.SENT.ordinal
             }
+        } ?: kotlin.run {
+            return ChatMessageStatus.SENT.ordinal
         }
     }
 
     private fun marginTop(position: Int): Int {
+        if (position == (itemCount - 1)) return MARGIN_LONG
+        val currentViewType = getItemViewType(position)
+        val nextViewType = getItemViewType(position + 1)
+
         return when {
-            position == (itemCount - 1) -> MARGIN_LONG
-            getItemViewType(position) == getItemViewType(position + 1) -> MARGIN_SHORT
-            else -> MARGIN_LONG
+            currentViewType == ChatMessageStatus.SEPARATOR.ordinal -> MARGIN_LONG
+            nextViewType == ChatMessageStatus.SEPARATOR.ordinal -> MARGIN_LONG
+            currentViewType == nextViewType -> MARGIN_SHORT
+            else -> MARGIN_MEDIUM
         }
     }
 
@@ -104,80 +117,93 @@ class ChatMessagePagingAdapter : PagingDataAdapter<ChatMessageDomain, ChatMessag
         return onSameTime
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return getItem(position)?.let {
-            return if (it.status == ChatMessageStatus.RECEIVED) ChatMessageStatus.RECEIVED.ordinal
-            else ChatMessageStatus.SENT.ordinal
-        } ?: kotlin.run {
-            return ChatMessageStatus.SENT.ordinal
-        }
-    }
 
     companion object {
-
         private const val MARGIN_SHORT = 5
-        private const val MARGIN_LONG = 50
+        private const val MARGIN_MEDIUM = 15
+        private const val MARGIN_LONG = 30
 
         private val diffCallback = object : DiffUtil.ItemCallback<ChatMessageDomain>() {
             override fun areItemsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean {
-//                println("areItemsTheSame: oldItemId: ${oldItem.messageId} - newItemId: ${newItem.messageId}")
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean {
-//                println("areContentsTheSame: oldItemId: ${oldItem.messageId} - newItemId: ${newItem.messageId}")
                 return oldItem == newItem
             }
 
         }
     }
 
-    class ViewHolder(
-        private val binding: ViewBinding,
-        private val context: Context
-    ) : RecyclerView.ViewHolder(binding.root) {
+    abstract class ViewHolder(
+        val root: LinearLayout
+    ) : RecyclerView.ViewHolder(root) {
 
-        fun bindMessageSent(chatMessage: ChatMessageDomain, sameAsPrev: Boolean, sameAsNext: Boolean, marginTop: Int) {
-            val sentBinding = binding as ItemChatMessageSentBinding
-            sentBinding.tvChatMessageSentBody.text = "${chatMessage.key} - ${chatMessage.status} - ${chatMessage.body}"
-            setMarginTop(binding.root, sameAsNext, context)
-
-            when (chatMessage.status) {
-                ChatMessageStatus.SENT -> {
-                    binding.tvChatMessageSentCreatedAt.text = truncateToMinute(chatMessage.createdAt, sameAsPrev)
-                    showLayout(sentBinding, View.VISIBLE, View.GONE, View.GONE)
-                }
-                ChatMessageStatus.SENDING -> showLayout(sentBinding, View.GONE, View.VISIBLE, View.GONE)
-                ChatMessageStatus.ERROR -> showLayout(sentBinding, View.GONE, View.GONE, View.VISIBLE)
-            }
-        }
-
-        fun bindMessageReceived(
+        abstract fun bind(
             chatMessage: ChatMessageDomain,
             sameAsPrev: Boolean,
             sameAsNext: Boolean,
             marginTop: Int
-        ) {
-            val receivedBinding = binding as ItemChatMessageReceivedBinding
-            receivedBinding.tvChatMessageReceivedBody.text = "${chatMessage.key} - ${chatMessage.status} - ${chatMessage.body}"
-//            receivedBinding.tvChatMessageReceivedBody.text = chatMessageDomain.body
+        )
 
-            if (sameAsNext) binding.ivChatMessageReceivedProfile.visibility = View.INVISIBLE
-            else binding.ivChatMessageReceivedProfile.visibility = View.VISIBLE
+        companion object {
 
+            fun glideRequestOptions(): RequestOptions {
+                return RequestOptions().placeholder(R.drawable.ic_baseline_account_circle)
+                    .error(R.drawable.ic_baseline_account_circle)
+                    .circleCrop()
+            }
+
+            fun setMarginTop(root: LinearLayout, marginTop: Int, context: Context) {
+                val marginLayoutParams = root.layoutParams as ViewGroup.MarginLayoutParams
+                marginLayoutParams.topMargin = (marginTop * context.resources.displayMetrics.density).toInt()
+                root.layoutParams = marginLayoutParams
+            }
+
+            fun truncateToMinute(createdAt: OffsetDateTime?, onSameTime: Boolean): String {
+                return if (onSameTime) ""
+                else createdAt?.toLocalTime()?.format(DateTimePattern.ofTimeWithMeridiem(Locale.getDefault())) ?: ""
+            }
+        }
+    }
+
+    class ReceivedViewHolder(
+        private val binding: ItemChatMessageReceivedBinding,
+        private val context: Context
+    ) : ViewHolder(binding.root) {
+
+        override fun bind(chatMessage: ChatMessageDomain, sameAsPrev: Boolean, sameAsNext: Boolean, marginTop: Int) {
+            binding.tvChatMessageReceivedBody.text = chatMessage.body
+            binding.ivChatMessageReceivedProfile.visibility = if (sameAsNext) View.INVISIBLE else View.VISIBLE
             binding.tvChatMessageReceivedCreatedAt.text = truncateToMinute(chatMessage.createdAt, sameAsPrev)
-            setMarginTop(binding.root, sameAsNext, context)
+            setMarginTop(binding.root, marginTop, context)
             Glide.with(context)
                 .load(R.drawable.person3)
                 .apply(glideRequestOptions())
                 .into(binding.ivChatMessageReceivedProfile)
         }
+    }
+
+    class SentViewHolder(
+        private val binding: ItemChatMessageSentBinding,
+        private val context: Context
+    ) : ViewHolder(binding.root) {
+
+        override fun bind(chatMessage: ChatMessageDomain, sameAsPrev: Boolean, sameAsNext: Boolean, marginTop: Int) {
+            binding.tvChatMessageSentBody.text = chatMessage.body
+            setMarginTop(binding.root, marginTop, context)
+
+            when (chatMessage.status) {
+                ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
+                ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
+                else -> {
+                    binding.tvChatMessageSentCreatedAt.text = truncateToMinute(chatMessage.createdAt, sameAsPrev)
+                    showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
+                }
+            }
+        }
 
         companion object {
-
-            private const val MARGIN_SHORT = 5
-            private const val MARGIN_LONG = 50
-
             private fun showLayout(
                 sentBinding: ItemChatMessageSentBinding,
                 createdAt: Int,
@@ -188,27 +214,16 @@ class ChatMessagePagingAdapter : PagingDataAdapter<ChatMessageDomain, ChatMessag
                 sentBinding.skvChatMessageSentLoading.visibility = loading
                 sentBinding.llChatMessageSentErrorOptions.visibility = errorOptions
             }
-
-            private fun glideRequestOptions(): RequestOptions {
-                return RequestOptions().placeholder(R.drawable.ic_baseline_account_circle)
-                    .error(R.drawable.ic_baseline_account_circle)
-                    .circleCrop()
-            }
-
-            private fun truncateToMinute(createdAt: OffsetDateTime?, onSameTime: Boolean): String {
-                return if (onSameTime) ""
-                else createdAt?.toLocalTime()?.format(DateTimeFormatter.ofPattern("h:mm a")) ?: ""
-            }
-
-            private fun setMarginTop(root: LinearLayout, sameAsNext: Boolean, context: Context) {
-                val marginLayoutParams = root.layoutParams as ViewGroup.MarginLayoutParams
-                val margin = if (sameAsNext) MARGIN_SHORT else MARGIN_LONG
-                val marginBottom = margin * context.resources.displayMetrics.density
-                marginLayoutParams.topMargin = marginBottom.toInt()
-                root.layoutParams = marginLayoutParams
-            }
         }
     }
 
-
+    class SeparatorViewHolder(
+        private val binding: ItemChatMessageSeparatorBinding,
+        private val context: Context
+    ) : ViewHolder(binding.root) {
+        override fun bind(chatMessage: ChatMessageDomain, sameAsPrev: Boolean, sameAsNext: Boolean, marginTop: Int) {
+            binding.tvChatSeparatorTitle.text = chatMessage.body
+            setMarginTop(binding.root, marginTop, context)
+        }
+    }
 }

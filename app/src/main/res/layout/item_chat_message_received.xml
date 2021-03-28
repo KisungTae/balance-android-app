@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingBottom="1dp">
 
     <ImageView
         android:id="@+id/ivChatMessageReceivedProfile"
@@ -23,7 +24,7 @@
         android:elevation="1dp"
         android:maxWidth="@dimen/chat_message_text_view_max_width"
         android:padding="10dp"
-        android:text="this is fdfsdffsdffdfsdffsdffdfsdffsdffdfsdffsdf" />
+        android:text="this is " />
 
     <TextView
         android:id="@+id/tvChatMessageReceivedCreatedAt"
@@ -32,5 +33,6 @@
         android:layout_marginStart="5dp"
         android:gravity="bottom"
         android:text="12:54 pm"
+        android:textColor="@color/TextGrey"
         android:textSize="@dimen/text_small_size" />
 </LinearLayout>

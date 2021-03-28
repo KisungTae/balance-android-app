@@ -29,7 +29,7 @@ class ChatRepositoryImpl(
 
     override suspend fun test() {
         val messages = mutableListOf<ChatMessage>()
-        var count = 0L
+        var count = 1L
 
         var now = OffsetDateTime.now()
 
@@ -41,6 +41,7 @@ class ChatRepositoryImpl(
                 messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, createdAt))
             }
             now = now.minusDays(1)
+            count++
         }
 
 
@@ -55,7 +56,7 @@ class ChatRepositoryImpl(
 //            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
 //            messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, OffsetDateTime.now()))
 //        }
-//        chatMessageDAO.insert(messages)
+        chatMessageDAO.insert(messages)
     }
 
 }

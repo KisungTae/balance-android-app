@@ -9,6 +9,7 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.internal.constant.ChatMessageStatus
+import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.service.stomp.StompClient
@@ -22,6 +23,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.ChronoUnit
+import java.util.*
 
 
 class ChatViewModel(
@@ -48,12 +52,18 @@ class ChatViewModel(
             pagingData.map { chatMessageMapper.fromEntityToDomain(it) }
         }.map {
             it.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
-//                println("${before?.key} - ${after?.key}")
-//
-//                safeLet(before, after) { b, a ->
-//                    if (b.createdAt?.)
-//                }
-                null
+                var separator: ChatMessageDomain? = null
+                before?.createdAt?.let { b ->
+                    if (after == null) separator = ChatMessageDomain.toSeparator(
+                        b.toLocalDateTime().format(DateTimePattern.ofDateWithDayOfWeek(Locale.getDefault()))
+                    ) else after.createdAt?.let { a ->
+                        if (!b.truncatedTo(ChronoUnit.DAYS).equals(a.truncatedTo(ChronoUnit.DAYS)))
+                            separator = ChatMessageDomain.toSeparator(
+                                b.toLocalDateTime().format(DateTimePattern.ofDateWithDayOfWeek(Locale.getDefault()))
+                            )
+                    }
+                }
+                separator
             }
         }
     }

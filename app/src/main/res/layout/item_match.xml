@@ -43,7 +43,7 @@
                 android:id="@+id/tvMatchUnreadIndicator"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                android:background="@drawable/sh_solid_circle" />
+                android:background="@drawable/sh_solid_circle_primary" />
 
         </LinearLayout>
 

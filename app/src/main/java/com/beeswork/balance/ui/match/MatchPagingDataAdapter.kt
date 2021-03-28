@@ -63,7 +63,7 @@ class MatchPagingDataAdapter(
 
             if (matchDomain.unmatched || matchDomain.deleted) {
                 binding.ivMatchProfilePicture.setImageResource(R.drawable.ic_baseline_account_circle)
-                changeTextColor(context.getColor(R.color.LightGrey))
+                changeTextColor(context.getColor(R.color.TextGrey))
             } else {
                 val photoEndPoint = EndPoint.ofPhotoBucket(matchDomain.matchedId, matchDomain.repPhotoKey)
 //                Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)

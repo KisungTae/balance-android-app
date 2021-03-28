@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
@@ -20,6 +21,11 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.TextStyle
+import java.util.*
 
 
 class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener {
@@ -83,7 +89,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
                     true
                 }
                 R.id.miChatSearch -> {
-                    viewModel.test()
+//                    viewModel.test()
                     showSearchToolBar()
                     true
                 }

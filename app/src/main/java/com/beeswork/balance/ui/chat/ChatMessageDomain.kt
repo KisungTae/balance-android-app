@@ -9,4 +9,10 @@ data class ChatMessageDomain(
     val body: String,
     var status: ChatMessageStatus,
     val createdAt: OffsetDateTime?
-)
+) {
+    companion object {
+        fun toSeparator(body: String): ChatMessageDomain {
+            return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, null)
+        }
+    }
+}

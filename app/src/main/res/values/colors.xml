@@ -6,7 +6,7 @@
     <color name="Transparent">@android:color/transparent</color>
     <color name="TextBlack">#282828</color>
     <color name="TextWhite">#FFFFFF</color>
-    <color name="TextGrey">#D5D5D5</color>
+    <color name="TextGrey">#9E9E9E</color>
 
 
     <!-- search bar background, unselected icon,    -->
