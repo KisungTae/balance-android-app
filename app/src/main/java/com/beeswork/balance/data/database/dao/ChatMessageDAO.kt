@@ -18,8 +18,8 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId order by id desc limit 1")
     fun findMostRecentAfter(chatId: Long, lastReadChatMessageId: Long): ChatMessage?
 
-    @Query("select * from chatMessage order by id desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int): List<ChatMessage>
+    @Query("select * from chatMessage where chatId = :chatId order by id desc, `key` desc limit :loadSize offset :startPosition")
+    fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
 
 
 

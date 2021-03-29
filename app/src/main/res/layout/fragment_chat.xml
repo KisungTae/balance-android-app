@@ -58,19 +58,29 @@
             android:paddingVertical="7dp">
 
             <EditText
-                android:paddingHorizontal="20dp"
-                android:drawablePadding="10dp"
                 android:id="@+id/etChatMessageBody"
                 android:layout_width="0dp"
-                android:maxHeight="110dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:drawableEnd="@drawable/ic_baseline_insert_emoticon"
                 android:focusable="true"
                 android:hint="@string/chat_message_input_description"
                 android:importantForAutofill="no"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                android:maxHeight="110dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="0dp" />
+
+            <ImageButton
+                android:id="@+id/btnChatEmoticon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/ic_baseline_insert_emoticon"
+                android:clickable="true"
+                android:contentDescription="@string/chat_emoticon_button_description"
+                android:focusable="true" />
 
             <ImageButton
                 android:id="@+id/btnChatMessageSend"
@@ -79,10 +89,10 @@
                 android:layout_marginEnd="10dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/sh_solid_round_rectagle_primary"
+                android:contentDescription="@string/chat_message_send_button_description"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_baseline_send_12"
-                android:contentDescription="@string/chat_message_send_button_description" />
+                android:src="@drawable/ic_baseline_send_12" />
 
         </LinearLayout>
     </LinearLayout>

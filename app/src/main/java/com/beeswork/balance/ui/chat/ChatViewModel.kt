@@ -49,7 +49,7 @@ class ChatViewModel(
         return Pager(
             pagingConfig,
             null,
-            { ChatMessagePagingSource(chatRepository) }
+            { ChatMessagePagingSource(chatRepository, chatId) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
             pagingData.map { chatMessageMapper.fromEntityToDomain(it) }
         }.map {
@@ -71,7 +71,9 @@ class ChatViewModel(
     }
 
     fun sendChatMessage(body: String) {
-
+        CoroutineScope(Dispatchers.IO).launch {
+            chatRepository.sendChatMessage(chatId, body)
+        }
     }
 
 

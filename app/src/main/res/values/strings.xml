@@ -44,6 +44,7 @@
     <string name="profile_image_description">profile image</string>
     <string name="chat_message_input_description">message..</string>
     <string name="chat_message_send_button_description">send chat message</string>
+    <string name="chat_emoticon_button_description">emoticon input button</string>
 
 
 </resources>

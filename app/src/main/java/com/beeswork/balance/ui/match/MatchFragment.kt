@@ -54,7 +54,7 @@ class MatchFragment : ScopeFragment(),
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
         search("")
-        viewModel.fetchMatches()
+//        viewModel.fetchMatches()
     }
 
     private fun setupMatchRecyclerView() {

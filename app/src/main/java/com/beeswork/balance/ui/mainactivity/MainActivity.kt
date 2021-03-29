@@ -133,30 +133,30 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
 
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        val v: View? = currentFocus
-        if (v != null && (ev.action == MotionEvent.ACTION_UP || ev.action == MotionEvent.ACTION_MOVE) && v is EditText &&
-            !v.javaClass.name.startsWith("android.webkit.")
-        ) {
-            val sourceCoordinates = IntArray(2)
-            v.getLocationOnScreen(sourceCoordinates)
-            val x: Float = ev.rawX + v.getLeft() - sourceCoordinates[0]
-            val y: Float = ev.rawY + v.getTop() - sourceCoordinates[1]
-            if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
-                hideKeyboard(this)
-            }
-        }
-        return super.dispatchTouchEvent(ev)
-    }
-
-    private fun hideKeyboard(activity: Activity?) {
-        safeLet(activity, activity?.window) { a, w ->
-            (a.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-                a.window.decorView.windowToken,
-                0
-            )
-        }
-    }
+//    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+//        val v: View? = currentFocus
+//        if (v != null && (ev.action == MotionEvent.ACTION_UP || ev.action == MotionEvent.ACTION_MOVE) && v is EditText &&
+//            !v.javaClass.name.startsWith("android.webkit.")
+//        ) {
+//            val sourceCoordinates = IntArray(2)
+//            v.getLocationOnScreen(sourceCoordinates)
+//            val x: Float = ev.rawX + v.getLeft() - sourceCoordinates[0]
+//            val y: Float = ev.rawY + v.getTop() - sourceCoordinates[1]
+//            if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
+//                hideKeyboard(this)
+//            }
+//        }
+//        return super.dispatchTouchEvent(ev)
+//    }
+//
+//    private fun hideKeyboard(activity: Activity?) {
+//        safeLet(activity, activity?.window) { a, w ->
+//            (a.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+//                a.window.decorView.windowToken,
+//                0
+//            )
+//        }
+//    }
 
     fun hideKeyboard(view: View?) {
         if (view != null) {

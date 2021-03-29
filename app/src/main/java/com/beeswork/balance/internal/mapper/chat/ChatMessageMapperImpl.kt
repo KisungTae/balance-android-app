@@ -8,11 +8,11 @@ import com.beeswork.balance.ui.chat.ChatMessageDomain
 class ChatMessageMapperImpl : ChatMessageMapper {
     override fun fromDTOToEntity(dto: ChatMessageDTO): ChatMessage {
         return ChatMessage(
-            dto.id,
             dto.chatId ?: 0,
             dto.body ?: "",
             toChatMessageStatusFromMessageId(dto.key),
             dto.createdAt,
+            dto.id,
             dto.key ?: 0,
         )
     }

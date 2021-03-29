@@ -37,8 +37,6 @@ class MatchRepositoryImpl(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     override val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
-
-
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
         return withContext(Dispatchers.IO) {
             return@withContext matchDAO.findAllPaged(loadSize, startPosition) ?: listOf()
@@ -156,12 +154,12 @@ class MatchRepositoryImpl(
             val randomIndex = Random.nextInt(0, chatIds.size - 1)
             chatMessageDAO.insert(
                 ChatMessage(
-                    msg.id,
                     chatIds[randomIndex],
                     "message-${Random.nextFloat()}",
                     ChatMessageStatus.SENDING,
                     OffsetDateTime.now(ZoneOffset.UTC),
                     msg.key,
+                    msg.id,
                 )
             )
         }

@@ -1,11 +1,14 @@
 package com.beeswork.balance.ui.chat
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,20 +68,30 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         setupBackPressedDispatcherCallback()
         setupToolBar()
         setupChatRecyclerView()
-        setupChatMessagePagingData()
-        setupMatchedName(matchedName)
         setupSendBtnListener()
+        setupEmoticonBtnListener()
+        setupMatchedName(matchedName)
+        setupChatMessagePagingData()
+
+    }
+
+    private fun setupEmoticonBtnListener() {
+        binding.btnChatEmoticon.setOnClickListener {
+//            val view = activity?.currentFocus
+//            val methodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//            methodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
             if (matchValid) {
                 viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
-                
+                println("binding.etChatMessageBody.text.toString(): ${binding.etChatMessageBody.text}")
+                binding.etChatMessageBody.setText("")
             }
         }
     }
-
 
     private fun setupMatchedName(matchedName: String) {
         if (!matchValid) binding.tvChatMatchedName.setTextColor(
@@ -138,3 +151,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         popBackToMatch()
     }
 }
+
+
+
+// select * from chatMessage where chatId = 1 order by case when id is null then 1 else 0 end desc, id desc, `key` desc

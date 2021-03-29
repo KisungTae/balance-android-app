@@ -20,11 +20,19 @@ class ChatRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : ChatRepository {
 
-    override suspend fun loadChatMessages(loadSize: Int, startPosition: Int): List<ChatMessage> {
+    override suspend fun sendChatMessage(chatId: Long, body: String) {
+        chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
+    }
+
+    override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
         return withContext(Dispatchers.IO) {
-            return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition)
+            return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
         }
     }
+
+
+
+
 
 
     override suspend fun test() {
@@ -33,15 +41,21 @@ class ChatRepositoryImpl(
 
         var now = OffsetDateTime.now()
 
+//        for (i in 1..10) {
+//            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
+//            messages.add(ChatMessage(1L, "$count - ${Random.nextLong()}" , status, OffsetDateTime.now()))
+//            count++
+//        }
+
         for (i in 0..9) {
             var createdAt = now.minusSeconds(Random.nextInt(10).toLong())
             for (j in 0..Random.nextInt(50)) {
                 if ((Random.nextInt(4) + 1) % 4 == 0) createdAt = now.minusMinutes(Random.nextInt(10).toLong())
                 val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
-                messages.add(ChatMessage(count, 1L, Random.nextLong().toString(), status, createdAt))
+                messages.add(ChatMessage(1L, "$count - ${Random.nextLong()}", status, createdAt, count))
+                count++
             }
             now = now.minusDays(1)
-            count++
         }
 
 

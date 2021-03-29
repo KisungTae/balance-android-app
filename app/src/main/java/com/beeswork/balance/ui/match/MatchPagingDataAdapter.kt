@@ -77,11 +77,11 @@ class MatchPagingDataAdapter(
         }
 
         private fun setupProfilePicture(matchValid: Boolean, matchedId: UUID, repPhotoKey: String) {
-            val photoEndPoint = if (matchValid) EndPoint.ofPhotoBucket(
-                matchedId,
-                repPhotoKey
-            ) else R.drawable.ic_baseline_account_circle
-            Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
+//            val photoEndPoint = if (matchValid) EndPoint.ofPhotoBucket(
+//                matchedId,
+//                repPhotoKey
+//            ) else R.drawable.ic_baseline_account_circle
+//            Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
         }
 
         private fun setupTextColor(matchValid: Boolean) {
