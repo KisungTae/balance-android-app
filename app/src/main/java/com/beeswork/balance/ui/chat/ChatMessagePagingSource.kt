@@ -6,13 +6,14 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 
 class ChatMessagePagingSource(
-    private val chatRepository: ChatRepository,
-    private val searchKeyword: String,
-    private val lastSearchedChatMessageKey: Long?
+    private val chatRepository: ChatRepository
 ): PagingSource<Int, ChatMessage>() {
 
     override fun getRefreshKey(state: PagingState<Int, ChatMessage>): Int? {
-        TODO("Not yet implemented")
+        return state.anchorPosition?.let { anchorPosition ->
+            val anchorPage = state.closestPageToPosition(anchorPosition)
+            anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
+        }
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ChatMessage> {

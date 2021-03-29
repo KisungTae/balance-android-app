@@ -38,7 +38,7 @@ class ChatRepositoryImpl(
             for (j in 0..Random.nextInt(50)) {
                 if ((Random.nextInt(4) + 1) % 4 == 0) createdAt = now.minusMinutes(Random.nextInt(10).toLong())
                 val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
-                messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, createdAt))
+                messages.add(ChatMessage(count, 1L, Random.nextLong().toString(), status, createdAt))
             }
             now = now.minusDays(1)
             count++
@@ -69,3 +69,4 @@ class ChatRepositoryImpl(
 // select * from chatMessage where id < 21 or id is null order by id desc, messageId desc
 // select * from chatMessage order by case when id is null then 0 else 1 end, id desc
 // select id, messageId from chatMessage order by case when id is null then 0 else 1 end, id desc
+// insert into `match` values (1, '9319abfc-91d2-4296-8ead-7a7ec516fecf ', 0, 0, 'Lisa', 'rep photo key', 0, '2020-12-20T11:00:00.000Z', 1, 'recen message', 0)

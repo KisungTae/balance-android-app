@@ -38,6 +38,7 @@ interface MatchDAO {
 
 
 
+
     @Query("select * from `match` where updatedAt <= :tailUpdatedAt order by updatedAt desc, chatId desc limit :pageSize")
     fun findAllBefore(pageSize: Int, tailUpdatedAt: OffsetDateTime): List<Match>
 

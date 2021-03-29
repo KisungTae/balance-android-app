@@ -8,45 +8,6 @@
     android:background="@color/BackgroundWhite"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/tbChatSearch"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/BackgroundWhite"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <EditText
-            android:id="@+id/etChatSearch"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/sh_search_box"
-            android:clickable="true"
-            android:drawableStart="@drawable/ic_baseline_search"
-            android:drawablePadding="10dp"
-            android:focusable="true"
-            android:hint="@string/chat_search_hint"
-            android:importantForAutofill="no"
-            android:inputType="text"
-            android:paddingStart="10dp"
-            android:paddingEnd="0dp" />
-
-        <ImageButton
-            android:id="@+id/btnChatSearchClose"
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:background="@color/Transparent"
-            android:clickable="true"
-            android:contentDescription="@string/search_bar_close_btn_description"
-            android:focusable="true"
-            android:src="@drawable/ic_baseline_close" />
-    </LinearLayout>
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbChat"
         android:layout_width="match_parent"
@@ -62,11 +23,6 @@
             android:contentDescription="@string/chat_back_button_description"
             android:src="@drawable/ic_baseline_arrow_back_ios" />
 
-        <Button
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:visibility="invisible" />
-
         <TextView
             android:id="@+id/tvChatMatchedName"
             android:layout_width="match_parent"
@@ -77,60 +33,58 @@
             android:textStyle="bold" />
     </androidx.appcompat.widget.Toolbar>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChat"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingHorizontal="10dp"
+            android:paddingBottom="15dp"
+            tools:listitem="@layout/item_chat_message_sent" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/sh_search_box"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingVertical="7dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvChat"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:clipToPadding="false"
-                android:paddingHorizontal="10dp"
-                android:paddingBottom="15dp"
-                tools:listitem="@layout/item_chat_message_sent" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <EditText
+                android:paddingHorizontal="20dp"
+                android:drawablePadding="10dp"
+                android:id="@+id/etChatMessageBody"
+                android:layout_width="0dp"
+                android:maxHeight="110dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="15dp">
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:drawableEnd="@drawable/ic_baseline_insert_emoticon"
+                android:focusable="true"
+                android:hint="@string/chat_message_input_description"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine" />
 
-                <EditText
-                    android:id="@+id/etChatMessageBody"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/sh_chat_input_box"
-                    android:focusable="true"
-                    android:layout_marginEnd="10dp"
-                    android:hint="message.."
-                    android:importantForAutofill="no"
-                    android:drawableEnd="@drawable/ic_baseline_insert_emoticon"
-                    android:inputType="text"
-                    android:padding="10dp" />
+            <ImageButton
+                android:id="@+id/btnChatMessageSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/sh_solid_round_rectagle_primary"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_baseline_send_12"
+                android:contentDescription="@string/chat_message_send_button_description" />
 
-                <ImageButton
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"
-                    android:padding="15dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_baseline_send_12"
-                    android:background="@drawable/sh_solid_circle_primary"/>
-
-            </LinearLayout>
         </LinearLayout>
-
-    </FrameLayout>
-
+    </LinearLayout>
 
 </LinearLayout>

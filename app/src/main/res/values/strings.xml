@@ -42,6 +42,8 @@
     <string name="chat_message_resend_description">resend chat message</string>
     <string name="delete_chat_message_description">delete chat message</string>
     <string name="profile_image_description">profile image</string>
+    <string name="chat_message_input_description">message..</string>
+    <string name="chat_message_send_button_description">send chat message</string>
 
 
 </resources>

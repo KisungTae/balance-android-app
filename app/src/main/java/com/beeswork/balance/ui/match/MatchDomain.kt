@@ -14,5 +14,6 @@ data class MatchDomain(
     val updatedAt: OffsetDateTime,
     val unread: Boolean,
     val recentChatMessage: String,
-    val lastReadChatMessageId: Long
+    val lastReadChatMessageId: Long,
+    val valid: Boolean
 )

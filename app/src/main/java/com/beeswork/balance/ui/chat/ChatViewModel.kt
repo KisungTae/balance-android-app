@@ -8,6 +8,7 @@ import androidx.paging.*
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -31,6 +32,7 @@ import java.util.*
 class ChatViewModel(
     private val chatId: Long,
     private val chatRepository: ChatRepository,
+    private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
     private val stompClient: StompClient
 ) : ViewModel() {
@@ -43,11 +45,11 @@ class ChatViewModel(
         CHAT_MAX_PAGE_SIZE
     )
 
-    fun initializeChatPagingData(searchKeyword: String): Flow<PagingData<ChatMessageDomain>> {
+    fun initializeChatMessagePagingData(): Flow<PagingData<ChatMessageDomain>> {
         return Pager(
             pagingConfig,
             null,
-            { ChatMessagePagingSource(chatRepository, "", null) }
+            { ChatMessagePagingSource(chatRepository) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
             pagingData.map { chatMessageMapper.fromEntityToDomain(it) }
         }.map {
@@ -57,7 +59,7 @@ class ChatViewModel(
                     if (after == null) separator = ChatMessageDomain.toSeparator(
                         b.toLocalDateTime().format(DateTimePattern.ofDateWithDayOfWeek(Locale.getDefault()))
                     ) else after.createdAt?.let { a ->
-                        if (!b.truncatedTo(ChronoUnit.DAYS).equals(a.truncatedTo(ChronoUnit.DAYS)))
+                        if (b.truncatedTo(ChronoUnit.DAYS) != a.truncatedTo(ChronoUnit.DAYS))
                             separator = ChatMessageDomain.toSeparator(
                                 b.toLocalDateTime().format(DateTimePattern.ofDateWithDayOfWeek(Locale.getDefault()))
                             )
@@ -66,6 +68,10 @@ class ChatViewModel(
                 separator
             }
         }
+    }
+
+    fun sendChatMessage(body: String) {
+
     }
 
 

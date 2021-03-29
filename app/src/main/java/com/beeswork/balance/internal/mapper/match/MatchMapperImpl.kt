@@ -31,7 +31,8 @@ class MatchMapperImpl : MatchMapper {
             entity.updatedAt,
             entity.unread,
             entity.recentChatMessage,
-            entity.lastReadChatMessageId
+            entity.lastReadChatMessageId,
+            entity.isValid()
         )
     }
 }

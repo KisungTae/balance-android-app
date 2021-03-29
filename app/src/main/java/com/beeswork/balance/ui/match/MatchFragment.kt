@@ -23,7 +23,7 @@ import org.kodein.di.generic.instance
 
 class MatchFragment : ScopeFragment(),
     KodeinAware,
-    MatchPagingDataAdapter.OnMatchClickListener,
+    MatchPagingDataAdapter.MatchListener,
     ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
@@ -133,11 +133,16 @@ class MatchFragment : ScopeFragment(),
         if (!scrolling && refresh) matchPagingDataAdapter.refresh()
     }
 
-    override fun onClick(view: View) {
+    override fun onClick(position: Int) {
         val chatFragment = ChatFragment()
         val arguments = Bundle()
-        arguments.putString(BundleKey.CHAT_ID, view.tag.toString())
-        chatFragment.arguments = arguments
+
+        matchPagingDataAdapter.getMatch(position)?.let {
+            arguments.putLong(BundleKey.CHAT_ID, it.chatId)
+            arguments.putString(BundleKey.MATCHED_NAME, it.name)
+            arguments.putBoolean(BundleKey.MATCH_VALID, it.valid)
+            chatFragment.arguments = arguments
+        }
 
         val fragmentManager = activity?.supportFragmentManager
         val fragmentTransaction = fragmentManager?.beginTransaction()

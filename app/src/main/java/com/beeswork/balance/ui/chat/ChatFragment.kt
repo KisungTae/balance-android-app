@@ -5,26 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
-import org.threeten.bp.DayOfWeek
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.TextStyle
 import java.util.*
 
 
@@ -35,7 +30,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var binding: FragmentChatBinding
-    private var searchJob: Job? = null
+    private var matchValid: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,11 +43,14 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.let { bundle ->
-            bundle.getString(BundleKey.CHAT_ID)?.toLongOrNull()
-        }?.let { chatId ->
-            viewModel = ViewModelProvider(this, viewModelFactory(chatId)).get(ChatViewModel::class.java)
-            bindUI()
+
+        arguments?.let { arguments ->
+            viewModel = ViewModelProvider(
+                this,
+                viewModelFactory(arguments.getLong(BundleKey.CHAT_ID))
+            ).get(ChatViewModel::class.java)
+            matchValid = arguments.getBoolean(BundleKey.MATCH_VALID)
+            bindUI(arguments.getString(BundleKey.MATCHED_NAME) ?: "")
         } ?: kotlin.run {
             ErrorDialog(
                 null,
@@ -63,11 +61,40 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         }
     }
 
-    private fun bindUI() {
+    private fun bindUI(matchedName: String) = launch {
         setupBackPressedDispatcherCallback()
         setupToolBar()
         setupChatRecyclerView()
-        search("")
+        setupChatMessagePagingData()
+        setupMatchedName(matchedName)
+        setupSendBtnListener()
+    }
+
+    private fun setupSendBtnListener() {
+        binding.btnChatMessageSend.setOnClickListener {
+            if (matchValid) {
+                viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
+                
+            }
+        }
+    }
+
+
+    private fun setupMatchedName(matchedName: String) {
+        if (!matchValid) binding.tvChatMatchedName.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.TextGrey
+            )
+        )
+        binding.tvChatMatchedName.text = matchedName
+    }
+
+
+    private suspend fun setupChatMessagePagingData() {
+        viewModel.initializeChatMessagePagingData().collectLatest {
+            chatMessagePagingAdapter.submitData(it)
+        }
     }
 
     private fun setupBackPressedDispatcherCallback() {
@@ -88,15 +115,9 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
                 R.id.miChatReport -> {
                     true
                 }
-                R.id.miChatSearch -> {
-//                    viewModel.test()
-                    showSearchToolBar()
-                    true
-                }
                 else -> false
             }
         }
-        binding.btnChatSearchClose.setOnClickListener { hideSearchToolBar() }
         binding.btnChatBack.setOnClickListener { popBackToMatch() }
     }
 
@@ -107,26 +128,6 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         binding.rvChat.layoutManager = layoutManager
-    }
-
-    private fun search(keyword: String) {
-        searchJob?.cancel()
-        searchJob = launch {
-            viewModel.initializeChatPagingData(keyword.trim()).collectLatest {
-                chatMessagePagingAdapter.submitData(it)
-            }
-        }
-    }
-
-    private fun hideSearchToolBar() {
-        binding.tbChatSearch.visibility = View.GONE
-        binding.tbChat.visibility = View.VISIBLE
-        binding.etChatSearch.setText("")
-    }
-
-    private fun showSearchToolBar() {
-        binding.tbChat.visibility = View.GONE
-        binding.tbChatSearch.visibility = View.VISIBLE
     }
 
     private fun popBackToMatch() {

@@ -124,14 +124,11 @@ class ChatMessagePagingAdapter : PagingDataAdapter<ChatMessageDomain, ChatMessag
         private const val MARGIN_LONG = 30
 
         private val diffCallback = object : DiffUtil.ItemCallback<ChatMessageDomain>() {
-            override fun areItemsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean {
-                return oldItem.id == newItem.id
-            }
+            override fun areItemsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean =
+                oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean {
-                return oldItem == newItem
-            }
-
+            override fun areContentsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean =
+                oldItem == newItem
         }
     }
 
@@ -147,7 +144,6 @@ class ChatMessagePagingAdapter : PagingDataAdapter<ChatMessageDomain, ChatMessag
         )
 
         companion object {
-
             fun glideRequestOptions(): RequestOptions {
                 return RequestOptions().placeholder(R.drawable.ic_baseline_account_circle)
                     .error(R.drawable.ic_baseline_account_circle)

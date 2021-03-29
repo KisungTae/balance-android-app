@@ -129,6 +129,7 @@ class BalanceApplication : Application(), KodeinAware {
                 chatId,
                 instance(),
                 instance(),
+                instance(),
                 instance()
             )
         }
@@ -271,7 +272,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      95. chatRepository has flow of newly added chatMessage (sent fetched, received) so that we don't need chatInsertedAt in matchProfile
 //      96. Offsetdatetime.now() should habve timezone.UTC
 //      97. setImageResource and glide should be done in background thread
-
+//      98. match should have flow for new match
 
 
 

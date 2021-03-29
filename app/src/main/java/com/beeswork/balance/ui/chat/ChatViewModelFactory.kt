@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.service.stomp.StompClient
 
 class ChatViewModelFactory(
     private val chatId: Long,
     private val chatRepository: ChatRepository,
+    private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
     private val stompClient: StompClient
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -19,6 +21,7 @@ class ChatViewModelFactory(
         return ChatViewModel(
             chatId,
             chatRepository,
+            matchRepository,
             chatMessageMapper,
             stompClient
         ) as T
