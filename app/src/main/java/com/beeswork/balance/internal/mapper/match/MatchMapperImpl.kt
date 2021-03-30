@@ -3,6 +3,7 @@ package com.beeswork.balance.internal.mapper.match
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.match.MatchDomain
+import com.beeswork.balance.ui.match.MatchProfileDomain
 import org.threeten.bp.OffsetDateTime
 
 class MatchMapperImpl : MatchMapper {
@@ -13,7 +14,7 @@ class MatchMapperImpl : MatchMapper {
             dto.active,
             dto.unmatched,
             dto.name,
-            dto.repPhotoKey ?: "",
+            dto.repPhotoKey,
             dto.deleted,
             dto.createdAt
         )
@@ -34,5 +35,11 @@ class MatchMapperImpl : MatchMapper {
             entity.lastReadChatMessageId,
             entity.isValid()
         )
+    }
+
+    override fun fromEntityToProfileDomain(entity: Match?): MatchProfileDomain? {
+        entity?.let {
+            return MatchProfileDomain(it.matchedId, it.name, it.repPhotoKey)
+        } ?: return null
     }
 }

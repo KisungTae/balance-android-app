@@ -18,6 +18,8 @@ import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -33,7 +35,6 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var binding: FragmentChatBinding
-    private var matchValid: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,8 +53,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
                 this,
                 viewModelFactory(arguments.getLong(BundleKey.CHAT_ID))
             ).get(ChatViewModel::class.java)
-            matchValid = arguments.getBoolean(BundleKey.MATCH_VALID)
-            bindUI(arguments.getString(BundleKey.MATCHED_NAME) ?: "")
+            bindUI()
         } ?: kotlin.run {
             ErrorDialog(
                 null,
@@ -64,15 +64,25 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         }
     }
 
-    private fun bindUI(matchedName: String) = launch {
+    private fun bindUI() = launch {
         setupBackPressedDispatcherCallback()
         setupToolBar()
-        setupChatRecyclerView()
         setupSendBtnListener()
         setupEmoticonBtnListener()
-        setupMatchedName(matchedName)
+
+        setupChatRecyclerView()
         setupChatMessagePagingData()
 
+    }
+
+    private fun populateMatchProfile() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val
+        }
+    }
+
+    private fun setupAsUnmatched() {
+        binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
     }
 
     private fun setupEmoticonBtnListener() {
@@ -85,24 +95,9 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
 
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
-            if (matchValid) {
-                viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
-                println("binding.etChatMessageBody.text.toString(): ${binding.etChatMessageBody.text}")
-                binding.etChatMessageBody.setText("")
-            }
+            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
         }
     }
-
-    private fun setupMatchedName(matchedName: String) {
-        if (!matchValid) binding.tvChatMatchedName.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.TextGrey
-            )
-        )
-        binding.tvChatMatchedName.text = matchedName
-    }
-
 
     private suspend fun setupChatMessagePagingData() {
         viewModel.initializeChatMessagePagingData().collectLatest {
@@ -153,5 +148,3 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
 }
 
 
-
-// select * from chatMessage where chatId = 1 order by case when id is null then 1 else 0 end desc, id desc, `key` desc

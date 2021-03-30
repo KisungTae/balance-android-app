@@ -9,7 +9,7 @@ data class MatchDomain(
     val active: Boolean,
     val unmatched: Boolean,
     val name: String,
-    val repPhotoKey: String,
+    val repPhotoKey: String?,
     val deleted: Boolean,
     val updatedAt: OffsetDateTime,
     val unread: Boolean,

@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
+import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.service.stomp.StompClient
 
 class ChatViewModelFactory(
@@ -13,6 +14,7 @@ class ChatViewModelFactory(
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
+    private val matchMapper: MatchMapper,
     private val stompClient: StompClient
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -23,6 +25,7 @@ class ChatViewModelFactory(
             chatRepository,
             matchRepository,
             chatMessageMapper,
+            matchMapper,
             stompClient
         ) as T
     }

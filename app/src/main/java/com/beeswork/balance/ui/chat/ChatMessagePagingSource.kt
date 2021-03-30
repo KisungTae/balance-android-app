@@ -19,9 +19,9 @@ class ChatMessagePagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ChatMessage> {
         val currentPage = params.key ?: 0
-        val matches = chatRepository.loadChatMessages(params.loadSize, (currentPage * params.loadSize), chatId)
+        val chatMessages = chatRepository.loadChatMessages(params.loadSize, (currentPage * params.loadSize), chatId)
         val prevPage = if (currentPage >= 1) currentPage - 1 else null
-        val nextPage = if (matches.isEmpty()) null else currentPage + 1
-        return LoadResult.Page(matches, prevPage, nextPage)
+        val nextPage = if (chatMessages.isEmpty()) null else currentPage + 1
+        return LoadResult.Page(chatMessages, prevPage, nextPage)
     }
 }

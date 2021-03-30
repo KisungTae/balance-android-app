@@ -24,13 +24,14 @@ interface MatchDAO {
     fun findById(chatId: Long): Match?
 
     @Query("select * from `match` where name like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>?
+    fun findAllPaged(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
 
     @Query("select * from `match` order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int): List<Match>?
+    fun findAllPaged(loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select * from `match` where name like :query order by updatedAt desc, chatId desc")
     fun findAllAsPagingSource(query: String): PagingSource<Int, Match>
+
 
 
 

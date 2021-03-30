@@ -130,6 +130,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 instance()
             )
         }
@@ -273,7 +274,10 @@ class BalanceApplication : Application(), KodeinAware {
 //      96. Offsetdatetime.now() should habve timezone.UTC
 //      97. setImageResource and glide should be done in background thread
 //      98. match should have flow for new match
-
+//      99. custom emoji
+//          https://github.com/hani-momanii/SuperNova-Emoji/blob/master/supernova-emoji-library/src/main/java/hani/momanii/supernova_emoji_library/emoji/Cars.java
+//          https://developer.android.com/guide/topics/ui/look-and-feel/emoji-compat#using-emojicompat-with-custom-widgets
+//
 
 
 

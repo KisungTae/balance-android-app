@@ -6,16 +6,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
+import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.service.stomp.StompClient
 import com.beeswork.balance.ui.match.MatchDomain
 import com.beeswork.balance.ui.match.MatchPagingSource
+import com.beeswork.balance.ui.match.MatchProfileDomain
 import com.beeswork.balance.ui.match.MatchViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +37,7 @@ class ChatViewModel(
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
+    private val matchMapper: MatchMapper,
     private val stompClient: StompClient
 ) : ViewModel() {
 
@@ -68,6 +72,10 @@ class ChatViewModel(
                 separator
             }
         }
+    }
+
+    suspend fun getMatchProfile(): MatchProfileDomain? {
+        return matchMapper.fromEntityToProfileDomain(matchRepository.getMatch(chatId))
     }
 
     fun sendChatMessage(body: String) {

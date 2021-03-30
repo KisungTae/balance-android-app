@@ -139,16 +139,14 @@ class MatchFragment : ScopeFragment(),
 
         matchPagingDataAdapter.getMatch(position)?.let {
             arguments.putLong(BundleKey.CHAT_ID, it.chatId)
-            arguments.putString(BundleKey.MATCHED_NAME, it.name)
-            arguments.putBoolean(BundleKey.MATCH_VALID, it.valid)
             chatFragment.arguments = arguments
         }
 
-        val fragmentManager = activity?.supportFragmentManager
-        val fragmentTransaction = fragmentManager?.beginTransaction()
-        fragmentTransaction?.add(R.id.fcvMain, chatFragment)
-        fragmentTransaction?.addToBackStack(MainViewPagerFragment.TAG)
-        fragmentTransaction?.commit()
+        activity?.supportFragmentManager?.beginTransaction()?.let {
+            it.add(R.id.fcvMain, chatFragment)
+            it.addToBackStack(MainViewPagerFragment.TAG)
+            it.commit()
+        }
     }
 
     override fun onRetry() {
