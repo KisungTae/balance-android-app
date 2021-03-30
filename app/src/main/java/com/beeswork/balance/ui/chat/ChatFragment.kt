@@ -1,25 +1,22 @@
 package com.beeswork.balance.ui.chat
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -31,7 +28,7 @@ import java.util.*
 class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((Long) -> ChatViewModelFactory) by factory()
+    private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var binding: FragmentChatBinding
@@ -47,42 +44,39 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        safeLet(arguments, arguments?.getString(BundleKey.MATCHED_ID)) { arguments, matchedIdString ->
+            val matchedId = UUID.fromString(matchedIdString)
+            val chatViewModelFactoryParameter = ChatViewModelFactoryParameter(
+                arguments.getLong(BundleKey.CHAT_ID),
+                matchedId
+            )
 
-        arguments?.let { arguments ->
             viewModel = ViewModelProvider(
                 this,
-                viewModelFactory(arguments.getLong(BundleKey.CHAT_ID))
+                viewModelFactory(chatViewModelFactoryParameter)
             ).get(ChatViewModel::class.java)
-            bindUI()
-        } ?: kotlin.run {
-            ErrorDialog(
-                null,
-                getString(R.string.chat_id_not_found_exception),
-                null,
-                this
-            ).show(childFragmentManager, ErrorDialog.TAG)
-        }
+
+            bindUI(
+                matchedId,
+                arguments.getString(BundleKey.MATCHED_NAME),
+                arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY)
+            )
+        } ?: showErrorDialog()
     }
 
-    private fun bindUI() = launch {
+    private fun bindUI(matchedId: UUID, matchedName: String?, matchedRepPhotoKey: String?) = launch {
         setupBackPressedDispatcherCallback()
-        setupToolBar()
+        setupToolBar(matchedName)
         setupSendBtnListener()
         setupEmoticonBtnListener()
-
-        setupChatRecyclerView()
+        setupChatRecyclerView(matchedId, matchedRepPhotoKey)
+        if (matchedRepPhotoKey == null) setupAsUnmatched()
         setupChatMessagePagingData()
-
-    }
-
-    private fun populateMatchProfile() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val
-        }
     }
 
     private fun setupAsUnmatched() {
         binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
+        binding.llChatInputWrapper.visibility = View.GONE
     }
 
     private fun setupEmoticonBtnListener() {
@@ -100,7 +94,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
     }
 
     private suspend fun setupChatMessagePagingData() {
-        viewModel.initializeChatMessagePagingData().collectLatest {
+        viewModel.initChatMessagePagingData().collectLatest {
             chatMessagePagingAdapter.submitData(it)
         }
     }
@@ -113,7 +107,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         })
     }
 
-    private fun setupToolBar() {
+    private fun setupToolBar(matchedName: String?) {
+        binding.tvChatMatchedName.text = matchedName ?: ""
         binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -129,13 +124,22 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.btnChatBack.setOnClickListener { popBackToMatch() }
     }
 
-    private fun setupChatRecyclerView() {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter()
+    private fun setupChatRecyclerView(matchedId: UUID, repPhotoKey: String?) {
+        chatMessagePagingAdapter = ChatMessagePagingAdapter(matchedId, repPhotoKey)
         binding.rvChat.adapter = chatMessagePagingAdapter
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         binding.rvChat.layoutManager = layoutManager
+    }
+
+    private fun showErrorDialog() {
+        ErrorDialog(
+            null,
+            getString(R.string.chat_id_not_found_exception),
+            null,
+            this
+        ).show(childFragmentManager, ErrorDialog.TAG)
     }
 
     private fun popBackToMatch() {

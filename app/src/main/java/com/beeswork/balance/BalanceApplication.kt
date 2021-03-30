@@ -27,6 +27,7 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.service.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
+import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.clicker.ClickerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
@@ -124,9 +125,9 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance(), instance()) }
-        bind() from factory { chatId: Long ->
+        bind() from factory { param: ChatViewModelFactoryParameter ->
             ChatViewModelFactory(
-                chatId,
+                param,
                 instance(),
                 instance(),
                 instance(),

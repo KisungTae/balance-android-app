@@ -10,7 +10,7 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.service.stomp.StompClient
 
 class ChatViewModelFactory(
-    private val chatId: Long,
+    private val chatViewModelFactoryParameter: ChatViewModelFactoryParameter,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -21,7 +21,8 @@ class ChatViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return ChatViewModel(
-            chatId,
+            chatViewModelFactoryParameter.chatId,
+            chatViewModelFactoryParameter.matchedId,
             chatRepository,
             matchRepository,
             chatMessageMapper,

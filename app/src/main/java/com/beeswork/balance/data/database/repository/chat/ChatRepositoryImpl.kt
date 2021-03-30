@@ -41,11 +41,11 @@ class ChatRepositoryImpl(
 
         var now = OffsetDateTime.now()
 
-//        for (i in 1..10) {
-//            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
-//            messages.add(ChatMessage(1L, "$count - ${Random.nextLong()}" , status, OffsetDateTime.now()))
-//            count++
-//        }
+        for (i in 1..10) {
+            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
+            messages.add(ChatMessage(1L, "$count - ${Random.nextLong()}" , status, OffsetDateTime.now()))
+            count++
+        }
 
         for (i in 0..9) {
             var createdAt = now.minusSeconds(Random.nextInt(10).toLong())

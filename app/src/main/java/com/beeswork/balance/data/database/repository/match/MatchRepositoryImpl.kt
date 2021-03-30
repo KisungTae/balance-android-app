@@ -37,12 +37,6 @@ class MatchRepositoryImpl(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     override val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
-    override suspend fun getMatch(chatId: Long): Match? {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.findById(chatId)
-        }
-    }
-
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
         return withContext(Dispatchers.IO) {
             return@withContext matchDAO.findAllPaged(loadSize, startPosition)

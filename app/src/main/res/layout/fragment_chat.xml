@@ -27,7 +27,6 @@
             android:id="@+id/tvChatMatchedName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="태기성"
             android:textAlignment="center"
             android:textSize="@dimen/tool_bar_title_medium_text_size"
             android:textStyle="bold" />
@@ -49,6 +48,7 @@
             tools:listitem="@layout/item_chat_message_sent" />
 
         <LinearLayout
+            android:id="@+id/llChatInputWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"

@@ -3,5 +3,8 @@ package com.beeswork.balance.internal.constant
 class BundleKey {
     companion object {
         const val CHAT_ID = "chatId"
+        const val MATCHED_ID = "matchedId"
+        const val MATCHED_NAME = "matchedName"
+        const val MATCHED_REP_PHOTO_KEY = "matchedRepPhotoKey"
     }
 }

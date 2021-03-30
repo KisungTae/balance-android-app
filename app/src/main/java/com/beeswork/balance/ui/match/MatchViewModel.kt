@@ -27,7 +27,7 @@ class MatchViewModel(
         MATCH_MAX_PAGE_SIZE
     )
 
-    fun initializeMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
+    fun initMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
         return Pager(
             pagingConfig,
             null,
