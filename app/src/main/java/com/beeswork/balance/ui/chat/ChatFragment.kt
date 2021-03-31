@@ -113,6 +113,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
+                    viewModel.test()
                     true
                 }
                 R.id.miChatReport -> {
@@ -125,7 +126,10 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
     }
 
     private fun setupChatRecyclerView(matchedId: UUID, repPhotoKey: String?) {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter(matchedId, repPhotoKey)
+        chatMessagePagingAdapter = ChatMessagePagingAdapter(
+            repPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, repPhotoKey) },
+            requireContext()
+        )
         binding.rvChat.adapter = chatMessagePagingAdapter
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL

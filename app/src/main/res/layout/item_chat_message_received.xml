@@ -23,8 +23,7 @@
         android:background="@drawable/sh_chat_message_received_box"
         android:elevation="1dp"
         android:maxWidth="@dimen/chat_message_text_view_max_width"
-        android:padding="10dp"
-        android:text="this is " />
+        android:padding="10dp"/>
 
     <TextView
         android:id="@+id/tvChatMessageReceivedCreatedAt"
@@ -32,7 +31,6 @@
         android:layout_height="match_parent"
         android:layout_marginStart="5dp"
         android:gravity="bottom"
-        android:text="12:54 pm"
         android:textColor="@color/TextGrey"
         android:textSize="@dimen/text_small_size" />
 </LinearLayout>
