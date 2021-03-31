@@ -1,5 +1,7 @@
 package com.beeswork.balance.ui.chat
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +19,16 @@ import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -69,9 +81,48 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         setupToolBar(matchedName)
         setupSendBtnListener()
         setupEmoticonBtnListener()
-        setupChatRecyclerView(matchedId, matchedRepPhotoKey)
+        val repPhotoEndPoint = matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, matchedRepPhotoKey) }
+        setupChatRecyclerView(repPhotoEndPoint)
+        setupRepPhoto(repPhotoEndPoint)
         if (matchedRepPhotoKey == null) setupAsUnmatched()
         setupChatMessagePagingData()
+    }
+
+    private fun setupRepPhoto(repPhotoEndPoint: String?) {
+        repPhotoEndPoint?.let {
+            Glide.with(requireContext())
+                .asBitmap()
+                .load(it)
+//                .apply(RequestOptions()
+//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                    .priority(Priority.HIGH)
+//                )
+                .listener(object : RequestListener<Bitmap> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Bitmap>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Bitmap?,
+                        model: Any?,
+                        target: Target<Bitmap>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        chatMessagePagingAdapter.onRepPhotoLoaded()
+                        return false
+                    }
+                })
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {}
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+        }
     }
 
     private fun setupAsUnmatched() {
@@ -125,11 +176,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.btnChatBack.setOnClickListener { popBackToMatch() }
     }
 
-    private fun setupChatRecyclerView(matchedId: UUID, repPhotoKey: String?) {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter(
-            repPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, repPhotoKey) },
-            requireContext()
-        )
+    private fun setupChatRecyclerView(repPhotoEndPoint: String?) {
+        chatMessagePagingAdapter = ChatMessagePagingAdapter(repPhotoEndPoint)
         binding.rvChat.adapter = chatMessagePagingAdapter
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL

@@ -30,5 +30,7 @@ class GlideConfig: AppGlideModule() {
                 .priority(Priority.HIGH)
                 .centerCrop()
         }
+
+
     }
 }
