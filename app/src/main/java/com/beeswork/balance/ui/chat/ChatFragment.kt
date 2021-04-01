@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
@@ -33,6 +35,7 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var binding: FragmentChatBinding
+    private var itemRangeInserted = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,7 +80,6 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
     }
 
 
-
     private fun setupAsUnmatched() {
         binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
         binding.llChatInputWrapper.visibility = View.GONE
@@ -98,11 +100,20 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
     }
 
     private suspend fun setupChatMessagePagingData(lastReadChatMessageId: Int) {
-        chatMessagePagingAdapter.addLoadStateListener {
-            println("$it")
-        }
-        viewModel.initChatMessagePagingData().collectLatest {
-            chatMessagePagingAdapter.submitData(it)
+        chatMessagePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+//                if (!itemRangeInserted) binding.rvChat.scrollToPosition(0)
+//                itemRangeInserted = true
+            }
+        })
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            withContext(Dispatchers.Main) {
+                viewModel.initChatMessagePagingData().collectLatest {
+                    chatMessagePagingAdapter.submitData(it)
+                }
+            }
         }
     }
 

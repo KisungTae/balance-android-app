@@ -142,6 +142,7 @@ class MatchFragment : ScopeFragment(),
             arguments.putString(BundleKey.MATCHED_ID, it.matchedId.toString())
             arguments.putString(BundleKey.MATCHED_NAME, it.name)
             arguments.putString(BundleKey.MATCHED_REP_PHOTO_KEY, it.repPhotoKey)
+            arguments.putLong(BundleKey.LAST_READ_CHAT_MESSAGE_ID, it.lastReadChatMessageId)
             chatFragment.arguments = arguments
         }
 

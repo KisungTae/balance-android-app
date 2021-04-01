@@ -6,5 +6,6 @@ class BundleKey {
         const val MATCHED_ID = "matchedId"
         const val MATCHED_NAME = "matchedName"
         const val MATCHED_REP_PHOTO_KEY = "matchedRepPhotoKey"
+        const val LAST_READ_CHAT_MESSAGE_ID = "lastReadChatMessageId"
     }
 }

@@ -39,10 +39,14 @@ class ChatViewModel(
         CHAT_MAX_PAGE_SIZE
     )
 
+    fun getInitialKeyAndPosition() {
+
+    }
+
     fun initChatMessagePagingData(): Flow<PagingData<ChatMessageDomain>> {
         return Pager(
             pagingConfig,
-            null,
+            2,
             { ChatMessagePagingSource(chatRepository, chatId) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
             pagingData.map { chatMessageMapper.fromEntityToDomain(it) }
