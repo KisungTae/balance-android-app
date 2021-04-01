@@ -279,6 +279,6 @@ class BalanceApplication : Application(), KodeinAware {
 //          https://github.com/hani-momanii/SuperNova-Emoji/blob/master/supernova-emoji-library/src/main/java/hani/momanii/supernova_emoji_library/emoji/Cars.java
 //          https://developer.android.com/guide/topics/ui/look-and-feel/emoji-compat#using-emojicompat-with-custom-widgets
 //     100. account circle icon should have circle so that I don't need to circlecrop
-
+//     101. lstmatches error on chat and match fragments
 
 

@@ -26,10 +26,9 @@ import java.util.*
 
 
 class ChatMessagePagingAdapter(
-    private val repPhotoEndPoint: String?
 ) : PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
 
-    private var repPhotoLoaded: Boolean = false
+    private var repPhotoEndPoint: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
@@ -64,7 +63,10 @@ class ChatMessagePagingAdapter(
         getItem(position)?.let {
             when (holder.itemViewType) {
                 ChatMessageStatus.SEPARATOR.ordinal -> {
-                    (holder as SeparatorViewHolder).bind(it, marginTop(holder.itemViewType, position))
+                    (holder as SeparatorViewHolder).bind(
+                        it,
+                        marginTop(holder.itemViewType, position)
+                    )
                 }
                 ChatMessageStatus.RECEIVED.ordinal -> {
                     (holder as ReceivedViewHolder).bind(
@@ -72,7 +74,7 @@ class ChatMessagePagingAdapter(
                         isSameAsPrev(it, position),
                         isSameAsNext(it, position),
                         marginTop(holder.itemViewType, position),
-                        if (repPhotoLoaded) repPhotoEndPoint else null
+                        repPhotoEndPoint
                     )
                 }
                 else -> {
@@ -96,8 +98,8 @@ class ChatMessagePagingAdapter(
         } ?: return ChatMessageStatus.SENT.ordinal
     }
 
-    fun onRepPhotoLoaded() {
-        repPhotoLoaded = true
+    fun onRepPhotoLoaded(repPhotoEndPoint: String?) {
+        this.repPhotoEndPoint = repPhotoEndPoint
         notifyDataSetChanged()
     }
 
@@ -190,9 +192,7 @@ class ChatMessagePagingAdapter(
             binding.tvChatMessageReceivedCreatedAt.text = truncateToMinute(chatMessage.createdAt, sameAsPrev)
             setMarginTop(binding.root, marginTop, context)
             repPhotoEndPoint?.let {
-                Glide.with(context).load(repPhotoEndPoint)
-                    .apply(glideRequestOptions())
-                    .into(binding.ivChatMessageReceivedRepPhoto)
+                Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedRepPhoto)
             }
         }
 

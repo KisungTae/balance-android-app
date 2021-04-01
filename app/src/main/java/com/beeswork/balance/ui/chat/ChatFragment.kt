@@ -1,7 +1,5 @@
 package com.beeswork.balance.ui.chat
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,17 +18,8 @@ import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -81,49 +70,13 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         setupToolBar(matchedName)
         setupSendBtnListener()
         setupEmoticonBtnListener()
-        val repPhotoEndPoint = matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, matchedRepPhotoKey) }
-        setupChatRecyclerView(repPhotoEndPoint)
-        setupRepPhoto(repPhotoEndPoint)
+        setupChatRecyclerView()
+//        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
         if (matchedRepPhotoKey == null) setupAsUnmatched()
-        setupChatMessagePagingData()
+        setupChatMessagePagingData(123432)
     }
 
-    private fun setupRepPhoto(repPhotoEndPoint: String?) {
-        repPhotoEndPoint?.let {
-            Glide.with(requireContext())
-                .asBitmap()
-                .load(it)
-//                .apply(RequestOptions()
-//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                    .priority(Priority.HIGH)
-//                )
-                .listener(object : RequestListener<Bitmap> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
 
-                    override fun onResourceReady(
-                        resource: Bitmap?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        chatMessagePagingAdapter.onRepPhotoLoaded()
-                        return false
-                    }
-                })
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {}
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-        }
-    }
 
     private fun setupAsUnmatched() {
         binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
@@ -144,7 +97,10 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         }
     }
 
-    private suspend fun setupChatMessagePagingData() {
+    private suspend fun setupChatMessagePagingData(lastReadChatMessageId: Int) {
+        chatMessagePagingAdapter.addLoadStateListener {
+            println("$it")
+        }
         viewModel.initChatMessagePagingData().collectLatest {
             chatMessagePagingAdapter.submitData(it)
         }
@@ -164,7 +120,8 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
-                    viewModel.test()
+                    chatMessagePagingAdapter.refresh()
+//                    viewModel.test()
                     true
                 }
                 R.id.miChatReport -> {
@@ -176,13 +133,24 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.btnChatBack.setOnClickListener { popBackToMatch() }
     }
 
-    private fun setupChatRecyclerView(repPhotoEndPoint: String?) {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter(repPhotoEndPoint)
+    private fun setupChatRecyclerView() {
+        chatMessagePagingAdapter = ChatMessagePagingAdapter()
         binding.rvChat.adapter = chatMessagePagingAdapter
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         binding.rvChat.layoutManager = layoutManager
+    }
+
+    private suspend fun setupRepPhoto(repPhotoEndPoint: String?) = withContext(Dispatchers.IO) {
+        repPhotoEndPoint?.let { repPhotoEndPoint ->
+            runCatching {
+                val file = Glide.with(requireContext()).downloadOnly().load(repPhotoEndPoint).submit().get()
+                if (file.exists()) withContext(Dispatchers.Main) {
+                    chatMessagePagingAdapter.onRepPhotoLoaded(repPhotoEndPoint)
+                }
+            }.getOrNull()
+        }
     }
 
     private fun showErrorDialog() {
