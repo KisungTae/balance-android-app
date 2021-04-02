@@ -10,6 +10,7 @@ import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -62,51 +63,89 @@ class MatchRepositoryImpl(
         }
 
         listMatches.data?.let { data ->
-            //      TODO: remove me
-            saveSentChatMessages(
-                data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
-                data.matchDTOs.map { matchMapper.fromDTOToEntity(it) }
-            )
-
-            saveChatMessages(
-                data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
-                data.receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
-            )
-            syncChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-            saveMatches(data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
+            saveMatches(data.matchDTOs)
+            saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
             preferenceProvider.putMatchFetchedAt(data.fetchedAt)
         }
         _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
     }
 
     private fun saveChatMessages(
-        sentChatMessages: List<ChatMessage>,
-        receivedChatMessages: List<ChatMessage>
+        sentChatMessageDTOs: List<ChatMessageDTO>,
+        receivedChatMessageDTOs: List<ChatMessageDTO>
     ) {
+        val receivedChatMessages = receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
+
+        val chatIds = mutableSetOf<Long>()
+        val sentChatMessageIds = mutableListOf<Long>()
+        val receivedChatMessageIds = mutableListOf<Long>()
+
         balanceDatabase.runInTransaction {
-            chatMessageDAO.insert(receivedChatMessages)
-            sentChatMessages.forEach {
-                chatMessageDAO.updateSentMessage(it.key, it.id, it.status, it.createdAt)
+            receivedChatMessages.forEach {
+                if (!chatMessageDAO.existsById(it.id))
+                    chatMessageDAO.insert(it)
+                chatIds.add(it.chatId)
+                receivedChatMessageIds.add(it.id)
+            }
+
+            sentChatMessageDTOs.forEach { chatMessageDTO ->
+                chatMessageDTO.key?.let { key ->
+                    chatMessageDAO.findByKey(key)?.let { chatMessage ->
+                        chatMessage.id = chatMessageDTO.id
+                        chatMessage.status = ChatMessageStatus.SENT
+                        chatMessage.createdAt = chatMessageDTO.createdAt
+                        chatMessageDAO.insert(chatMessage)
+                        chatIds.add(chatMessage.chatId)
+                    }
+                }
+                sentChatMessageIds.add(chatMessageDTO.id)
+            }
+        }
+        syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
+        updateRecentChatMessages(chatIds)
+    }
+
+    private fun updateRecentChatMessages(chatIds: Set<Long>) {
+        balanceDatabase.runInTransaction {
+            chatIds.forEach { chatId ->
+                matchDAO.findById(chatId)?.let { match ->
+                    updateRecentChatMessage(match)
+                    matchDAO.insert(match)
+                }
             }
         }
     }
 
+    private fun updateRecentChatMessage(match: Match) {
+        chatMessageDAO.findMostRecentAfter(
+            match.chatId,
+            match.lastReadChatMessageId
+        )?.let { chatMessage ->
+            match.recentChatMessage = chatMessage.body
+            chatMessage.createdAt?.let { match.updatedAt = it }
+            match.active = true
+        }
+        match.unread = chatMessageDAO.unreadExists(match.chatId, match.lastReadChatMessageId)
+    }
+
+
     private fun syncChatMessages(
-        sentChatMessages: List<ChatMessageDTO>,
-        receivedChatMessages: List<ChatMessageDTO>
+        sentChatMessageIds: List<Long>,
+        receivedChatMessageIds: List<Long>
     ) {
-        if (sentChatMessages.isEmpty() && receivedChatMessages.isEmpty()) return
+        if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
         CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
             chatRDS.syncChatMessages(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
-                sentChatMessages.map { it.id },
-                receivedChatMessages.map { it.id }
+                sentChatMessageIds,
+                receivedChatMessageIds
             )
         }
     }
 
-    private fun saveMatches(matches: List<Match>) {
+    private fun saveMatches(matchDTOs: List<MatchDTO>) {
+        val matches = matchDTOs.map { matchMapper.fromDTOToEntity(it) }
         val matchedIds = mutableListOf<UUID>()
         val clickedList = mutableListOf<Clicked>()
 
@@ -131,19 +170,6 @@ class MatchRepositoryImpl(
             match.recentChatMessage = it.recentChatMessage
             match.lastReadChatMessageId = it.lastReadChatMessageId
         }
-        updateRecentChatMessage(match)
-    }
-
-    private fun updateRecentChatMessage(match: Match) {
-        chatMessageDAO.findMostRecentAfter(
-            match.chatId,
-            match.lastReadChatMessageId
-        )?.let { chatMessage ->
-            match.recentChatMessage = chatMessage.body
-            chatMessage.createdAt?.let { match.updatedAt = it }
-            match.active = true
-            match.unread = true
-        }
     }
 
 
@@ -167,37 +193,64 @@ class MatchRepositoryImpl(
 
     //  TODO: remove me
     override fun testFunction() {
-
-        val dummyMatches = mutableListOf<Match>()
-
-
-        for (i in 101..103) {
-            dummyMatches.add(
-                Match(
-                    i.toLong(),
-                    UUID.randomUUID(),
-                    false,
-                    false,
-                    "user-$i test",
-                    "",
-                    false,
-                    OffsetDateTime.now()
-                )
+        val chatMessages = mutableListOf<ChatMessage>()
+        chatMessages.add(
+            ChatMessage(
+                353,
+                "message-0.55419207",
+                ChatMessageStatus.SENDING,
+                null,
+                Long.MAX_VALUE,
+                3
             )
-        }
+        )
+
+        chatMessages.add(
+            ChatMessage(
+                353,
+                "message-0.9818386",
+                ChatMessageStatus.SENDING,
+                null,
+                Long.MAX_VALUE,
+                4
+            )
+        )
 
         CoroutineScope(Dispatchers.IO).launch {
-            matchDAO.insert(dummyMatches)
-            _fetchMatchesLiveData.postValue(Resource.success(EmptyResponse()))
-//            matchDAO.insert(dummyMatches[0])
-
-
-//            matchDAO.findById(3844)?.let {
-//                it.updatedAt = OffsetDateTime.now()
-//                it.name = "this is updated user"
-//                matchDAO.insert(it)
-//            }
+            chatMessageDAO.insert(chatMessages)
         }
+
+
+//        val dummyMatches = mutableListOf<Match>()
+//
+//
+//        for (i in 101..103) {
+//            dummyMatches.add(
+//                Match(
+//                    i.toLong(),
+//                    UUID.randomUUID(),
+//                    false,
+//                    false,
+//                    "user-$i test",
+//                    "",
+//                    false,
+//                    OffsetDateTime.now()
+//                )
+//            )
+//        }
+//
+//        CoroutineScope(Dispatchers.IO).launch {
+//            matchDAO.insert(dummyMatches)
+//            _fetchMatchesLiveData.postValue(Resource.success(EmptyResponse()))
+////            matchDAO.insert(dummyMatches[0])
+//
+//
+////            matchDAO.findById(3844)?.let {
+////                it.updatedAt = OffsetDateTime.now()
+////                it.name = "this is updated user"
+////                matchDAO.insert(it)
+////            }
+//        }
 
     }
 }

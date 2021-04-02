@@ -87,3 +87,4 @@ class ChatViewModel(
 }
 
 
+// TODO: change to unread message count then you can simply count initialkey and initialPosition

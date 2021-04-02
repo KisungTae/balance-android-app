@@ -60,7 +60,9 @@ class MatchPagingDataAdapter(
         }
 
         fun bind(matchDomain: MatchDomain) {
-            binding.tvMatchName.text = matchDomain.name
+//            TODO: remove me
+            binding.tvMatchName.text = "${matchDomain.chatId}"
+//            binding.tvMatchName.text = matchDomain.name
             binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.EndPoint
@@ -26,6 +27,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
 import java.util.*
+import kotlin.random.Random
 
 
 class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener {

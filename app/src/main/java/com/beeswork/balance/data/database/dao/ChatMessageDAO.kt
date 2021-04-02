@@ -15,11 +15,37 @@ interface ChatMessageDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(chatMessages: List<ChatMessage>)
 
-    @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId order by id desc limit 1")
-    fun findMostRecentAfter(chatId: Long, lastReadChatMessageId: Long): ChatMessage?
+    @Query("select count(*) > 0 from chatMessage where id = :id")
+    fun existsById(id: Long): Boolean
+
+    @Query("select * from chatMessage where `key` = :key")
+    fun findByKey(key: Long): ChatMessage?
+
+    @Query("""
+        select * 
+        from chatMessage 
+        where chatId = :chatId 
+        and id > :lastReadChatMessageId 
+        and status in (:statuses) 
+        order by id desc 
+        limit 1
+    """)
+    fun findMostRecentAfter(
+        chatId: Long,
+        lastReadChatMessageId: Long,
+        statuses: List<ChatMessageStatus> = listOf(
+            ChatMessageStatus.SENT,
+            ChatMessageStatus.RECEIVED
+        )
+    ): ChatMessage?
+
+    @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and id > :lastReadChatMessageId limit 1")
+    fun unreadExists(chatId: Long, lastReadChatMessageId: Long, status: ChatMessageStatus = ChatMessageStatus.RECEIVED): Boolean
 
     @Query("select * from chatMessage where chatId = :chatId order by id desc, `key` desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
+
+
 
 
 
@@ -69,19 +95,12 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
     fun updateStatus(chatId: Long, fromStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
-    @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where `key` = :messageId")
-    fun updateSentMessage(
-        messageId: Long,
-        id: Long?,
-        status: ChatMessageStatus,
-        createdAt: OffsetDateTime?
-    )
 
     @Query("select count(id) from chatMessage where chatId = :chatId and id is not null and id > :lastReadChatMessageId")
     fun countAllAfter(chatId: Long, lastReadChatMessageId: Long): Int
 
 
-//  TODO: remove me
+    //  TODO: remove me
     @Query("update chatMessage set chatId = :chatId where `key` = :messageId")
     fun updateSentChatMessage(chatId: Long, messageId: Long)
 

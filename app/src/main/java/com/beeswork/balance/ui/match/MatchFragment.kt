@@ -54,7 +54,8 @@ class MatchFragment : ScopeFragment(),
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
         search("")
-//        viewModel.fetchMatches()
+//        viewModel.testFunction()
+        viewModel.fetchMatches()
     }
 
     private fun setupMatchRecyclerView() {
@@ -82,7 +83,11 @@ class MatchFragment : ScopeFragment(),
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchSearch -> showSearchToolBar()
+                R.id.miMatchSearch -> {
+                    showSearchToolBar()
+//                    viewModel.testFunction()
+                    true
+                }
                 else -> false
             }
         }
