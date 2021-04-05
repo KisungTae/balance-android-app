@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.chat
 
+import android.database.DataSetObserver
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,10 +16,12 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
@@ -26,18 +29,21 @@ import kotlinx.coroutines.flow.collectLatest
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
+import java.time.OffsetDateTime
 import java.util.*
 import kotlin.random.Random
 
 
-class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener {
+class ChatFragment : ScopeFragment(),
+    KodeinAware,
+    ErrorDialog.OnDismissListener,
+    ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var binding: FragmentChatBinding
-    private var itemRangeInserted = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,7 +84,13 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         setupChatRecyclerView()
 //        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
         if (matchedRepPhotoKey == null) setupAsUnmatched()
-        setupChatMessagePagingData(123432)
+        setupChatMessagePagingData()
+    }
+
+
+
+    private fun updateRefresh() {
+
     }
 
 
@@ -101,23 +113,21 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         }
     }
 
-    private suspend fun setupChatMessagePagingData(lastReadChatMessageId: Int) {
-        chatMessagePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-//                if (!itemRangeInserted) binding.rvChat.scrollToPosition(0)
-//                itemRangeInserted = true
-            }
-        })
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            withContext(Dispatchers.Main) {
-                viewModel.initChatMessagePagingData().collectLatest {
-                    chatMessagePagingAdapter.submitData(it)
-                }
-            }
+    private suspend fun setupChatMessagePagingData() {
+        viewModel.initChatMessagePagingData().collectLatest {
+            chatMessagePagingAdapter.submitData(it)
         }
     }
+
+    private fun registerAdapterDataObserver() {
+        chatMessagePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                chatMessagePagingAdapter.unregisterAdapterDataObserver(this)
+            }
+        })
+    }
+
 
     private fun setupBackPressedDispatcherCallback() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -133,7 +143,10 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
-                    chatMessagePagingAdapter.refresh()
+
+                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.firstOrNull()}")
+                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.lastOrNull()}")
+//                    chatMessagePagingAdapter.refresh()
 //                    viewModel.test()
                     true
                 }
@@ -181,6 +194,10 @@ class ChatFragment : ScopeFragment(), KodeinAware, ErrorDialog.OnDismissListener
 
     override fun onDismiss() {
         popBackToMatch()
+    }
+
+    override fun onRetry() {
+        viewModel.fetchMatches()
     }
 }
 

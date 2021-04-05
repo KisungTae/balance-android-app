@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MatchViewModel(
@@ -18,14 +19,6 @@ class MatchViewModel(
 ) : ViewModel() {
 
     val fetchMatchesLiveData = matchRepository.fetchMatchesLiveData
-
-    private val pagingConfig = PagingConfig(
-        MATCH_PAGE_SIZE,
-        MATCH_PREFETCH_DISTANCE,
-        false,
-        MATCH_PAGE_SIZE,
-        MATCH_MAX_PAGE_SIZE
-    )
 
     fun initMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
         return Pager(
@@ -36,7 +29,7 @@ class MatchViewModel(
     }
 
     fun fetchMatches() {
-        CoroutineScope(Dispatchers.IO).launch { matchRepository.fetchMatches() }
+        viewModelScope.launch { matchRepository.fetchMatches() }
     }
 
     fun testFunction() {
@@ -44,9 +37,16 @@ class MatchViewModel(
     }
 
     companion object {
-        private const val MATCH_PAGE_SIZE = 60
+        private const val MATCH_PAGE_SIZE = 80
         private const val MATCH_PREFETCH_DISTANCE = MATCH_PAGE_SIZE
         private const val MATCH_MAX_PAGE_SIZE = MATCH_PREFETCH_DISTANCE * 3 + MATCH_PAGE_SIZE
+        private val pagingConfig = PagingConfig(
+            MATCH_PAGE_SIZE,
+            MATCH_PREFETCH_DISTANCE,
+            false,
+            MATCH_PAGE_SIZE,
+            MATCH_MAX_PAGE_SIZE
+        )
     }
 }
 

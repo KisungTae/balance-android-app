@@ -17,9 +17,6 @@ class SwipeViewModel(
         balanceRepository.getClickedCount()
     }
 
-    val unreadMessageCount by lazyDeferred {
-        balanceRepository.getUnreadMessageCount()
-    }
 
     fun fetchCards(reset: Boolean) {
         balanceRepository.fetchCards(reset)

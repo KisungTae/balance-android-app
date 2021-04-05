@@ -184,7 +184,7 @@ class StompClientImpl(
 //            return
 //        }
         CoroutineScope(Dispatchers.IO).launch {
-            balanceRepository.saveChatMessage(chatId, body)
+//            balanceRepository.saveChatMessage(chatId, body)
         }
 
 

@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.ui.chat.ChatMessageDomain
+import org.threeten.bp.temporal.ChronoUnit
 
 class ChatMessageMapperImpl : ChatMessageMapper {
     override fun fromDTOToEntity(dto: ChatMessageDTO): ChatMessage {
@@ -23,7 +24,8 @@ class ChatMessageMapperImpl : ChatMessageMapper {
             entity.id,
             entity.body,
             entity.status,
-            entity.createdAt
+            entity.createdAt?.toLocalDate(),
+            entity.createdAt?.toLocalTime()?.truncatedTo(ChronoUnit.MINUTES)
         )
     }
 

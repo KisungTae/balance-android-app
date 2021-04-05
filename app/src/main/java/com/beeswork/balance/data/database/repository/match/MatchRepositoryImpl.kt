@@ -2,9 +2,13 @@ package com.beeswork.balance.data.database.repository.match
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
+import com.beeswork.balance.data.database.response.NewChatMessage
+import com.beeswork.balance.data.database.response.NewMatch
+import com.beeswork.balance.data.database.response.PagingRefresh
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -35,6 +39,13 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
+    private val _matchPagingRefreshLiveData = MutableLiveData<PagingRefresh<NewMatch>>()
+    override val matchPagingRefreshLiveData: LiveData<PagingRefresh<NewMatch>> get() = _matchPagingRefreshLiveData
+
+    private val _chatMessagePagingRefreshLiveData = MutableLiveData<PagingRefresh<NewChatMessage>>()
+    override val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<NewChatMessage>> get() = _chatMessagePagingRefreshLiveData
+
+
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     override val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
@@ -51,23 +62,24 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun fetchMatches() {
-        val listMatches = matchRDS.listMatches(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
-            preferenceProvider.getMatchFetchedAt()
-        )
+        withContext(Dispatchers.IO) {
+            val listMatches = matchRDS.listMatches(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                preferenceProvider.getMatchFetchedAt()
+            )
 
-        if (listMatches.isError()) {
-            _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
-            return
+            if (listMatches.isError())
+                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
+            else {
+                listMatches.data?.let { data ->
+                    saveMatches(data.matchDTOs)
+                    saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+                    preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+                }
+                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
+            }
         }
-
-        listMatches.data?.let { data ->
-            saveMatches(data.matchDTOs)
-            saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-            preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-        }
-        _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
     }
 
     private fun saveChatMessages(
@@ -75,7 +87,6 @@ class MatchRepositoryImpl(
         receivedChatMessageDTOs: List<ChatMessageDTO>
     ) {
         val receivedChatMessages = receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
-
         val chatIds = mutableSetOf<Long>()
         val sentChatMessageIds = mutableListOf<Long>()
         val receivedChatMessageIds = mutableListOf<Long>()
@@ -102,6 +113,7 @@ class MatchRepositoryImpl(
             }
         }
         syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
+
         updateRecentChatMessages(chatIds)
     }
 
@@ -149,13 +161,13 @@ class MatchRepositoryImpl(
         val matchedIds = mutableListOf<UUID>()
         val clickedList = mutableListOf<Clicked>()
 
-        matches.forEach {
-            updateMatch(it)
-            matchedIds.add(it.matchedId)
-            clickedList.add(Clicked(it.matchedId))
-        }
-
         balanceDatabase.runInTransaction {
+            matches.forEach {
+                updateMatch(it)
+                matchedIds.add(it.matchedId)
+                clickedList.add(Clicked(it.matchedId))
+            }
+
             matchDAO.insert(matches)
             clickerDAO.deleteInIds(matchedIds)
             clickedDAO.insert(clickedList)
@@ -170,6 +182,49 @@ class MatchRepositoryImpl(
             match.recentChatMessage = it.recentChatMessage
             match.lastReadChatMessageId = it.lastReadChatMessageId
         }
+    }
+
+    override suspend fun sendChatMessage(chatId: Long, body: String) {
+        chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
+    }
+
+    override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
+        return withContext(Dispatchers.IO) {
+            return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
+        }
+    }
+
+    override suspend fun updateRecentChatMessage(chatId: Long, chatMessageId: Long) {
+        chatMessageDAO.findBodyById(chatMessageId)?.let { body ->
+
+        }
+    }
+
+
+    override fun createDummyChatMessage() {
+        val messages = mutableListOf<ChatMessage>()
+        var count = 1L
+
+        var now = OffsetDateTime.now()
+        val chatId = 354L
+
+        for (i in 1..10) {
+            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
+            messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, null))
+            count++
+        }
+
+        for (i in 0..100) {
+            var createdAt = now.plusMinutes(Random.nextInt(10).toLong())
+            for (j in 0..Random.nextInt(10)) {
+                if ((Random.nextInt(3) + 1) % 3 == 0) createdAt = createdAt.plusMinutes(Random.nextInt(10).toLong())
+                val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+                messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, createdAt, count))
+                count++
+            }
+            now = now.plusDays(1)
+        }
+        chatMessageDAO.insert(messages)
     }
 
 

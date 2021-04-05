@@ -47,12 +47,11 @@ class MainViewPagerFragment : Fragment() {
         binding.vpMain.setPageTransformer(null)
         binding.vpMain.setCurrentItem(FragmentTabPosition.SWIPE.ordinal, false)
         binding.vpMain.isUserInputEnabled = false
-//        binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-//            override fun onPageSelected(position: Int) {
-//                binding.vpMain.isUserInputEnabled = position == FragmentTabPosition.CHAT.ordinal
-//                super.onPageSelected(position)
-//            }
-//        })
+        binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+            }
+        })
 
     }
 

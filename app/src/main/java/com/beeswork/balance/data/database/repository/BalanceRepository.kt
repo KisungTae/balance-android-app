@@ -30,22 +30,7 @@ interface BalanceRepository {
     val fetchMatchesResponse: LiveData<Resource<List<Match>>>
 
     fun fetchMatches()
-    fun unmatch()
 
-    suspend fun getUnreadMessageCount(): LiveData<Int>
-
-    // message
-    val chatMessageEvent: LiveData<ChatMessageEvent>
-    suspend fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
-    suspend fun saveChatMessage(chatId: Long, body: String): Long
-    suspend fun syncMessage(chatId: Long, messageId: Long, id: Long, createdAt: OffsetDateTime)
-    suspend fun fetchChatMessages(chatId: Long, recipientId: String, pageSize: Int): Resource<List<ChatMessage>>
-    suspend fun appendChatMessages(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
-    suspend fun prependChatMessages(chatId: Long, firstChatMessageId: Long, pageSize: Int): List<ChatMessage>
-
-    //    fun getChatMessages(chatId: Long): PagingSource<Int, ChatMessage>
-
-    fun getMessages(chatId: Long): List<ChatMessage>
 
 
 

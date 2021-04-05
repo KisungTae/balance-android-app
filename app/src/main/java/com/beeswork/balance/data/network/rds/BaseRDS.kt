@@ -37,7 +37,7 @@ abstract class BaseRDS {
         } catch (e: ConnectException) {
             return Resource.error(ExceptionCode.CONNECT_EXCEPTION)
         } catch (e: Exception) {
-            return Resource.error(ExceptionCode.NETWORK_EXCEPTION)
+            return Resource.error(ExceptionCode.EXCEPTION)
         }
     }
 }

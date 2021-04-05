@@ -280,5 +280,6 @@ class BalanceApplication : Application(), KodeinAware {
 //          https://developer.android.com/guide/topics/ui/look-and-feel/emoji-compat#using-emojicompat-with-custom-widgets
 //     100. account circle icon should have circle so that I don't need to circlecrop
 //     101. lstmatches error on chat and match fragments
+//     102. hide keyboard when touch outside
 
 

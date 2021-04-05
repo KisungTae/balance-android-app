@@ -54,7 +54,6 @@ class MatchFragment : ScopeFragment(),
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
         search("")
-//        viewModel.testFunction()
         viewModel.fetchMatches()
     }
 
@@ -83,11 +82,7 @@ class MatchFragment : ScopeFragment(),
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchSearch -> {
-                    showSearchToolBar()
-//                    viewModel.testFunction()
-                    true
-                }
+                R.id.miMatchSearch -> showSearchToolBar()
                 else -> false
             }
         }
@@ -119,9 +114,10 @@ class MatchFragment : ScopeFragment(),
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            if (it.isError()) ErrorDialog(
+            val currentFragment = activity?.supportFragmentManager?.fragments?.lastOrNull()?.javaClass
+            if (it.isError() && currentFragment != ChatFragment::class.java) ErrorDialog(
                 it.error,
-                it.errorMessage,
+                context?.getString(R.string.list_matches_exception),
                 this@MatchFragment,
                 null
             ).show(childFragmentManager, FetchErrorDialog.TAG)
@@ -147,7 +143,6 @@ class MatchFragment : ScopeFragment(),
             arguments.putString(BundleKey.MATCHED_ID, it.matchedId.toString())
             arguments.putString(BundleKey.MATCHED_NAME, it.name)
             arguments.putString(BundleKey.MATCHED_REP_PHOTO_KEY, it.repPhotoKey)
-            arguments.putLong(BundleKey.LAST_READ_CHAT_MESSAGE_ID, it.lastReadChatMessageId)
             chatFragment.arguments = arguments
         }
 

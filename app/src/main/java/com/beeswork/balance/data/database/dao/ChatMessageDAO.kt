@@ -21,7 +21,8 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where `key` = :key")
     fun findByKey(key: Long): ChatMessage?
 
-    @Query("""
+    @Query(
+        """
         select * 
         from chatMessage 
         where chatId = :chatId 
@@ -29,79 +30,25 @@ interface ChatMessageDAO {
         and status in (:statuses) 
         order by id desc 
         limit 1
-    """)
+    """
+    )
     fun findMostRecentAfter(
         chatId: Long,
         lastReadChatMessageId: Long,
-        statuses: List<ChatMessageStatus> = listOf(
-            ChatMessageStatus.SENT,
-            ChatMessageStatus.RECEIVED
-        )
+        statuses: List<ChatMessageStatus> = listOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED)
     ): ChatMessage?
 
     @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and id > :lastReadChatMessageId limit 1")
-    fun unreadExists(chatId: Long, lastReadChatMessageId: Long, status: ChatMessageStatus = ChatMessageStatus.RECEIVED): Boolean
+    fun unreadExists(
+        chatId: Long,
+        lastReadChatMessageId: Long,
+        status: ChatMessageStatus = ChatMessageStatus.RECEIVED
+    ): Boolean
 
     @Query("select * from chatMessage where chatId = :chatId order by id desc, `key` desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
 
-
-
-
-
-
-
-
-
-
-    //    @Query("select * from chatMessage where chatId = :chatId order by case when id is null then 0 else 1 end, id desc, messageId desc")
-    @Query("select * from chatMessage where chatId = :chatId order by `key` desc")
-    fun getChatMessages(chatId: Long): DataSource.Factory<Int, ChatMessage>
-
-    @Query("update chatMessage set id = :id, createdAt = :createdAt, status = :status where chatId = :chatId and `key` = :messageId")
-    fun sync(
-        chatId: Long,
-        messageId: Long,
-        id: Long,
-        createdAt: OffsetDateTime,
-        status: ChatMessageStatus
-    )
-
-    @Query("select id from chatMessage where chatId = :chatId order by id desc limit 1")
-    fun findLastId(chatId: Long): Long?
-
-//    @Query("select createdAt from chatMessage where chatId = :chatId and status in (:statuses) order by id desc limit 1")
-//    fun findLastCreatedAt(chatId: Long, statuses: Array<ChatMessageStatus> = arrayOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED))
-
-    @Query("select * from chatMessage where chatId = :chatId and id > :firstChatMessageId order by id asc limit :pageSize")
-    fun findAllAfter(
-        chatId: Long,
-        firstChatMessageId: Long,
-        pageSize: Int
-    ): MutableList<ChatMessage>
-
-    @Query("select * from chatMessage where chatId = :chatId and id < :lastChatMessageId order by id desc limit :pageSize")
-    fun findAllBefore(chatId: Long, lastChatMessageId: Long, pageSize: Int): List<ChatMessage>
-
-    @Query("select * from chatMessage where chatId = :chatId and `key` = null order by `key` desc")
-    fun findAllUnprocessed(chatId: Long): List<ChatMessage>
-
-    @Query("select * from chatMessage where chatId = :chatId order by id desc limit :pageSize")
-    fun findAllRecent(chatId: Long, pageSize: Int): MutableList<ChatMessage>
-
-    @Query("select count(*) from chatMessage where chatId = :chatId and id = null")
-    fun countUnprocessed(chatId: Long): Int
-
-    @Query("update chatMessage set status = :toStatus where chatId = :chatId and status = :fromStatus")
-    fun updateStatus(chatId: Long, fromStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
-
-
-    @Query("select count(id) from chatMessage where chatId = :chatId and id is not null and id > :lastReadChatMessageId")
-    fun countAllAfter(chatId: Long, lastReadChatMessageId: Long): Int
-
-
-    //  TODO: remove me
-    @Query("update chatMessage set chatId = :chatId where `key` = :messageId")
-    fun updateSentChatMessage(chatId: Long, messageId: Long)
+    @Query("select body from chatMessage where id = :chatMessageId")
+    fun findBodyById(chatMessageId: Long): String?
 
 }

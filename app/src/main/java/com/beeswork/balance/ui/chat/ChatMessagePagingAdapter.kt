@@ -1,7 +1,6 @@
 package com.beeswork.balance.ui.chat
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,15 +19,16 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
 import java.util.*
 
 
-class ChatMessagePagingAdapter(
-) : PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
+class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
 
     private var repPhotoEndPoint: String? = null
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
@@ -136,9 +136,8 @@ class ChatMessagePagingAdapter(
         var onSameTime = false
         getItem(targetPosition)?.let { targetChatMessage ->
             if (currentChatMessage.status == targetChatMessage.status) {
-                safeLet(currentChatMessage.createdAt, targetChatMessage.createdAt) { c, t ->
-                    if (c.truncatedTo(ChronoUnit.MINUTES) == t.truncatedTo(ChronoUnit.MINUTES))
-                        onSameTime = true
+                safeLet(currentChatMessage.timeCreatedAt, targetChatMessage.timeCreatedAt) { c, t ->
+                    onSameTime = (c == t)
                 }
             }
         }
@@ -169,9 +168,9 @@ class ChatMessagePagingAdapter(
             root.layoutParams = marginLayoutParams
         }
 
-        protected fun truncateToMinute(createdAt: OffsetDateTime?, onSameTime: Boolean): String {
-            return if (onSameTime) ""
-            else createdAt?.toLocalTime()?.format(DateTimePattern.ofTimeWithMeridiem(Locale.getDefault())) ?: ""
+        protected fun formatTimeCreatedAt(timeCreatedAt: LocalTime?, onSameTime: Boolean): String {
+            if (onSameTime) return ""
+            return timeCreatedAt?.format(DateTimePattern.ofTimeWithMeridiem()) ?: ""
         }
     }
 
@@ -189,7 +188,7 @@ class ChatMessagePagingAdapter(
         ) {
             binding.tvChatMessageReceivedBody.text = chatMessage.body
             binding.ivChatMessageReceivedRepPhoto.visibility = if (sameAsNext) View.INVISIBLE else View.VISIBLE
-            binding.tvChatMessageReceivedCreatedAt.text = truncateToMinute(chatMessage.createdAt, sameAsPrev)
+            binding.tvChatMessageReceivedCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt, sameAsPrev)
             setMarginTop(binding.root, marginTop, context)
             repPhotoEndPoint?.let {
                 Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedRepPhoto)
@@ -223,7 +222,7 @@ class ChatMessagePagingAdapter(
                 ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
                 ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
                 else -> {
-                    binding.tvChatMessageSentCreatedAt.text = truncateToMinute(chatMessage.createdAt, sameAsPrev)
+                    binding.tvChatMessageSentCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt, sameAsPrev)
                     showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
                 }
             }

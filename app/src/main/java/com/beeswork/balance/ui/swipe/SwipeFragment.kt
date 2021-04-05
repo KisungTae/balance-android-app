@@ -89,9 +89,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
             binding.tvClickedCount.text = clickedCount.toString()
         })
 
-        viewModel.unreadMessageCount.await().observe(viewLifecycleOwner, { unreadMessageCount ->
-            binding.tvUnreadMessageCount.text = unreadMessageCount.toString()
-        })
+
 
         binding.btnSwipeFilter.setOnClickListener {
             SwipeFilterDialog(preferenceProvider).show(

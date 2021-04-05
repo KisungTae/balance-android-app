@@ -57,19 +57,6 @@ class ChatRepositoryImpl(
             }
             now = now.minusDays(1)
         }
-
-
-//        for (i in 1..200) {
-//            count++
-//            val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
-//            messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, OffsetDateTime.now()))
-//        }
-//
-//        for (i in 1..10) {
-//            count++
-//            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
-//            messages.add(ChatMessage(count, 276L, Random.nextLong().toString(), status, OffsetDateTime.now()))
-//        }
         chatMessageDAO.insert(messages)
     }
 
