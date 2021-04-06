@@ -4,12 +4,16 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.ui.chat.ChatFragment
+import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
@@ -21,7 +25,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : ScopeFragment(),
+class MatchFragment : BaseFragment(),
     KodeinAware,
     MatchPagingDataAdapter.MatchListener,
     ErrorDialog.OnRetryListener {
@@ -49,7 +53,7 @@ class MatchFragment : ScopeFragment(),
         bindUI()
     }
 
-    private fun bindUI() = launch {
+    private fun bindUI() = lifecycleScope.launch {
         setupMatchRecyclerView()
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
@@ -92,7 +96,7 @@ class MatchFragment : ScopeFragment(),
 
     private fun search(keyword: String) {
         searchJob?.cancel()
-        searchJob = launch {
+        searchJob = lifecycleScope.launch {
             viewModel.initMatchPagingData(keyword.trim()).collectLatest {
                 refresh = false
                 matchPagingDataAdapter.submitData(it)

@@ -76,6 +76,8 @@ class MatchRepositoryImpl(
                     saveMatches(data.matchDTOs)
                     saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
                     preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+                    _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
+                    _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
                 }
                 _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
             }
@@ -113,7 +115,6 @@ class MatchRepositoryImpl(
             }
         }
         syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
-
         updateRecentChatMessages(chatIds)
     }
 

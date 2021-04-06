@@ -13,8 +13,9 @@ class ExceptionCode {
         const val BAD_REQUEST_EXCEPTION = "bad.request.exception"
 
         const val ACCOUNT_NOT_FOUND_EXCEPTION = "account.not.found.exception"
-        const val ACCOUNT_SHORT_OF_POINT_EXCEPTION = "account.short.of.point.exception"
         const val ACCOUNT_BLOCKED_EXCEPTION = "account.blocked.exception"
+        const val ACCOUNT_DELETED_EXCEPTION = "account.deleted.exception"
+        const val ACCOUNT_SHORT_OF_POINT_EXCEPTION = "account.short.of.point.exception"
 
         const val QUESTION_NOT_FOUND_EXCEPTION = "question.not.found.exception"
         const val QUESTION_SET_CHANGED_EXCEPTION = "question.set.changed.exception"

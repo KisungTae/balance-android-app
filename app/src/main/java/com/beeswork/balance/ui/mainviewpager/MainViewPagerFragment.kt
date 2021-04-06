@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.internal.constant.FragmentTabPosition
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.launch
 
 
 class MainViewPagerFragment : Fragment() {
@@ -21,9 +23,9 @@ class MainViewPagerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { }
-        })
+//        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() { }
+//        })
     }
 
     override fun onCreateView(
@@ -36,6 +38,10 @@ class MainViewPagerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        bindUI()
+    }
+
+    private fun bindUI() = lifecycleScope.launch {
         setupViewPager()
         setupViewPagerTab()
     }

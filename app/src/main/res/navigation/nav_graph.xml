@@ -10,14 +10,20 @@
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" >
         <action
-            android:id="@+id/action_splashFragment_to_mainViewPagerFragment"
-            app:destination="@id/mainViewPagerFragment" />
-        <action
             android:id="@+id/action_splashFragment_to_profileViewPagerFragment"
-            app:destination="@id/profileViewPagerFragment" />
+            app:destination="@id/profileViewPagerFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_mainViewPagerFragment"
+            app:destination="@id/mainViewPagerFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -26,10 +32,14 @@
         tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_loginFragment_to_profileViewPagerFragment"
-            app:destination="@id/profileViewPagerFragment" />
+            app:destination="@id/profileViewPagerFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_loginFragment_to_mainViewPagerFragment"
-            app:destination="@id/mainViewPagerFragment" />
+            app:destination="@id/mainViewPagerFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/mainViewPagerFragment"
@@ -43,6 +53,8 @@
         tools:layout="@layout/fragment_profile_view_pager" >
         <action
             android:id="@+id/action_profileViewPagerFragment_to_mainViewPagerFragment"
-            app:destination="@id/mainViewPagerFragment" />
+            app:destination="@id/mainViewPagerFragment"
+            app:popUpTo="@id/profileViewPagerFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

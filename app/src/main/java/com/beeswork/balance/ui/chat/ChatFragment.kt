@@ -10,6 +10,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -18,7 +21,9 @@ import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.util.safeLet
+import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
@@ -34,7 +39,7 @@ import java.util.*
 import kotlin.random.Random
 
 
-class ChatFragment : ScopeFragment(),
+class ChatFragment : BaseFragment(),
     KodeinAware,
     ErrorDialog.OnDismissListener,
     ErrorDialog.OnRetryListener {
@@ -56,6 +61,7 @@ class ChatFragment : ScopeFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupBackPressedDispatcherCallback()
         safeLet(arguments, arguments?.getString(BundleKey.MATCHED_ID)) { arguments, matchedIdString ->
             val matchedId = UUID.fromString(matchedIdString)
             val chatViewModelFactoryParameter = ChatViewModelFactoryParameter(
@@ -76,7 +82,7 @@ class ChatFragment : ScopeFragment(),
         } ?: showErrorDialog()
     }
 
-    private fun bindUI(matchedId: UUID, matchedName: String?, matchedRepPhotoKey: String?) = launch {
+    private fun bindUI(matchedId: UUID, matchedName: String?, matchedRepPhotoKey: String?) = lifecycleScope.launch {
         setupBackPressedDispatcherCallback()
         setupToolBar(matchedName)
         setupSendBtnListener()
@@ -143,9 +149,8 @@ class ChatFragment : ScopeFragment(),
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
-
-                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.firstOrNull()}")
-                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.lastOrNull()}")
+//                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.firstOrNull()}")
+//                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.lastOrNull()}")
 //                    chatMessagePagingAdapter.refresh()
 //                    viewModel.test()
                     true
