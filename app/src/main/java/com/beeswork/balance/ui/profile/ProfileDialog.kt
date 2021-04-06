@@ -50,39 +50,41 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
-        binding = DialogProfileBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_profile, container, false)
+    ): View {
+        binding = DialogProfileBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindUI()
-        fetchPhotos()
+//        fetchPhotos()
     }
 
     private fun bindUI() {
-        binding.btnProfileDialogClose.setOnClickListener { dismiss() }
-        binding.btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
-        setupPhotoPickerRecyclerView()
-        binding.tvEditBalanceGame.setOnClickListener {
-                    EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
+        binding.btnProfileDialogClose.setOnClickListener {
+            dismiss()
         }
+//        binding.btnProfileDialogReloadPhotos.setOnClickListener { fetchPhotos() }
+//        setupPhotoPickerRecyclerView()
+//        binding.tvEditBalanceGame.setOnClickListener {
+//            EditBalanceGameDialog().show(childFragmentManager, EditBalanceGameDialog.TAG)
+//        }
 
     }
 
     private fun setupPhotoPickerRecyclerView() {
-//        binding.rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
-//            requireContext(),
-//            this,
-//            preferenceProvider.getAccountId1()
-//        )
+        binding.rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
+            requireContext(),
+            this,
+            preferenceProvider.getAccountId().toString()
+        )
 
         binding.rvPhotoPicker.layoutManager =
             object : GridLayoutManager(requireContext(), PHOTO_PICKER_GALLERY_COLUMN_NUM) {

@@ -12,8 +12,6 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
-import com.beeswork.balance.data.database.repository.chat.ChatRepository
-import com.beeswork.balance.data.database.repository.chat.ChatRepositoryImpl
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
@@ -76,14 +74,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
         // Repository
-        bind<ChatRepository>() with singleton {
-            ChatRepositoryImpl(
-                instance(),
-                instance(),
-                instance(),
-                instance()
-            )
-        }
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
@@ -128,7 +118,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from factory { param: ChatViewModelFactoryParameter ->
             ChatViewModelFactory(
                 param,
-                instance(),
                 instance(),
                 instance(),
                 instance(),

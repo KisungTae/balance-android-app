@@ -7,6 +7,6 @@ data class LocationBody(
     val accountId: String,
     val identityToken: String,
     val latitude: Double,
-    val longitude: Double,
+    val longitude: String,
     val updatedAt: String
 )

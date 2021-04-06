@@ -12,32 +12,50 @@ import java.net.SocketTimeoutException
 abstract class BaseRDS {
 
     protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
-        try {
-            val response = call()
-            val headers = response.headers()
+        val response = call()
+        val headers = response.headers()
 
-            if (response.isSuccessful)
-                return Resource.success(response.body())
+        if (response.isSuccessful)
+            return Resource.success(response.body())
 
-            val errorResponse = Gson().fromJson(
-                response.errorBody()?.charStream(),
-                ErrorResponse::class.java
-            )
+        val errorResponse = Gson().fromJson(
+            response.errorBody()?.charStream(),
+            ErrorResponse::class.java
+        )
 
-            return Resource.error(
-                errorResponse.message,
-                errorResponse.error,
-                errorResponse.fieldErrorMessages
-            )
-
-        } catch (e: SocketTimeoutException) {
-            return Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION)
-        } catch (e: NoInternetConnectivityException) {
-            return Resource.error(ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION)
-        } catch (e: ConnectException) {
-            return Resource.error(ExceptionCode.CONNECT_EXCEPTION)
-        } catch (e: Exception) {
-            return Resource.error(ExceptionCode.EXCEPTION)
-        }
+        return Resource.error(
+            errorResponse.message,
+            errorResponse.error,
+            errorResponse.fieldErrorMessages
+        )
+//        try {
+//            val response = call()
+//            val headers = response.headers()
+//
+//            if (response.isSuccessful)
+//                return Resource.success(response.body())
+//
+//            val errorResponse = Gson().fromJson(
+//                response.errorBody()?.charStream(),
+//                ErrorResponse::class.java
+//            )
+//
+//            return Resource.error(
+//                errorResponse.message,
+//                errorResponse.error,
+//                errorResponse.fieldErrorMessages
+//            )
+//
+//        } catch (e: SocketTimeoutException) {
+//            return Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION)
+//        } catch (e: NoInternetConnectivityException) {
+//            return Resource.error(ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION)
+//        } catch (e: ConnectException) {
+//            return Resource.error(ExceptionCode.CONNECT_EXCEPTION)
+//        } catch (e: Exception) {
+//
+//            println("${e.message}")
+//            return Resource.error(ExceptionCode.EXCEPTION)
+//        }
     }
 }

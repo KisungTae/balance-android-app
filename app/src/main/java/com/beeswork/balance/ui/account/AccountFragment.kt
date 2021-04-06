@@ -37,8 +37,8 @@ class AccountFragment: ScopeFragment(), KodeinAware {
     }
 
     private fun bindUI() {
-//        llProfile.setOnClickListener {
-//            ProfileDialog().show(childFragmentManager, ProfileDialog.TAG)
-//        }
+        binding.llProfile.setOnClickListener {
+            ProfileDialog().show(childFragmentManager, ProfileDialog.TAG)
+        }
     }
 }

@@ -61,8 +61,8 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun fetchMatches() {
-        withContext(Dispatchers.IO) {
+    override suspend fun fetchMatches(): Resource<EmptyResponse> {
+        return withContext(Dispatchers.IO) {
             val listMatches = matchRDS.listMatches(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -70,7 +70,7 @@ class MatchRepositoryImpl(
             )
 
             if (listMatches.isError())
-                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
+//                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
             else {
                 listMatches.data?.let { data ->
                     saveMatches(data.matchDTOs)
@@ -79,8 +79,10 @@ class MatchRepositoryImpl(
                     _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
                     _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
                 }
-                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
+//                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
             }
+
+            return@withContext Resource.error("")
         }
     }
 

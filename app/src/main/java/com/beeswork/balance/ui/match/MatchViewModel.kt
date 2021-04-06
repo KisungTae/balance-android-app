@@ -6,11 +6,8 @@ import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.bumptech.glide.load.engine.Resource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class MatchViewModel(
@@ -29,7 +26,14 @@ class MatchViewModel(
     }
 
     fun fetchMatches() {
-        viewModelScope.launch { matchRepository.fetchMatches() }
+        val h = CoroutineExceptionHandler { _, exception ->
+            println("fetch matches exception handler")
+            println("${exception.localizedMessage}")
+        }
+        viewModelScope.launch(h) {
+            val result = matchRepository.fetchMatches()
+            println("result: ${result}")
+        }
     }
 
     fun testFunction() {

@@ -20,7 +20,8 @@ class SplashFragment : Fragment() {
         activity?.window?.statusBarColor = ContextCompat.getColor(requireContext(), R.color.Primary)
         //TODO: check login
 
-        Handler().postDelayed({findNavController().navigate(R.id.action_splashFragment_to_mainViewPagerFragment)}, 3000)
+//        Handler().postDelayed({findNavController().navigate(R.id.action_splashFragment_to_mainViewPagerFragment)}, 3000)
+        findNavController().navigate(R.id.action_splashFragment_to_mainViewPagerFragment)
         return inflater.inflate(R.layout.fragment_splash, container, false)
     }
 }

@@ -304,28 +304,27 @@ class BalanceRepositoryImpl(
     }
 
     override fun saveLocation(latitude: Double, longitude: Double) {
+        CoroutineScope(Dispatchers.IO).launch {
 
-//        CoroutineScope(Dispatchers.IO).launch {
-//
-//            val accountId = preferenceProvider.getAccountId1()
-//            val identityToken = preferenceProvider.getIdentityToken1()
-//            val updatedAt = OffsetDateTime.now()
-//
-//            val currentLocation = Location(latitude, longitude, false, updatedAt)
-//            locationDAO.insert(currentLocation)
-//
-//            val response =
-//                balanceRDS.postLocation(
-//                    accountId,
-//                    identityToken,
-//                    latitude,
-//                    longitude,
-//                    updatedAt.toString()
-//                )
-//
-//            if (response.status == Resource.Status.SUCCESS)
-//                locationDAO.sync(updatedAt)
-//        }
+            val accountId = preferenceProvider.getAccountId().toString()
+            val identityToken = preferenceProvider.getIdentityToken().toString()
+            val updatedAt = OffsetDateTime.now()
+
+            val currentLocation = Location(latitude, longitude, false, updatedAt)
+            locationDAO.insert(currentLocation)
+
+            val response =
+                balanceRDS.postLocation(
+                    accountId,
+                    identityToken,
+                    latitude,
+                    longitude,
+                    updatedAt.toString()
+                )
+
+            if (response.status == Resource.Status.SUCCESS)
+                locationDAO.sync(updatedAt)
+        }
     }
 
     override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {

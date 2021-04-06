@@ -21,7 +21,7 @@ interface MatchRepository {
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
-    suspend fun fetchMatches()
+    suspend fun fetchMatches(): Resource<EmptyResponse>
 
     suspend fun sendChatMessage(chatId: Long, body: String)
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>

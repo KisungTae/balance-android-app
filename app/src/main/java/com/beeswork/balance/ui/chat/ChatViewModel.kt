@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -26,7 +25,6 @@ import java.util.*
 class ChatViewModel(
     private val chatId: Long,
     private val matchedId: UUID,
-    private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
     private val matchMapper: MatchMapper,
@@ -99,3 +97,5 @@ class ChatViewModel(
 
 
 // TODO: websocket receives dto, pass it from viewmodel to repository, map to entity and save
+// TODO: viewmodel listmatches exception to what exception? or just keep network exception?
+// TODO: fetchMatches observer check validate of parent

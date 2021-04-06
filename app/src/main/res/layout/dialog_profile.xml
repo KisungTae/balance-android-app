@@ -19,6 +19,8 @@
             android:id="@+id/btnProfileDialogClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:text="close" />
 
         <FrameLayout
@@ -104,12 +106,12 @@
         <!--            android:layout_height="wrap_content"-->
         <!--            android:text="question" />-->
 
-                <TextView
-                    android:id="@+id/tvEditBalanceGame"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="balance game question" />
+        <TextView
+            android:id="@+id/tvEditBalanceGame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="balance game question" />
 
     </LinearLayout>
 

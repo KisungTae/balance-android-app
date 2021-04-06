@@ -246,8 +246,8 @@ class BalanceRDSImpl(
                 LocationBody(
                     accountId,
                     identityToken,
-                    latitude,
-                    longitude,
+                    80.0,
+                    "longitude",
                     updatedAt
                 )
             )
