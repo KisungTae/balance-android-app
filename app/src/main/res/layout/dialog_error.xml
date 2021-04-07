@@ -15,7 +15,7 @@
         android:src="@drawable/ic_baseline_error_outline" />
 
     <TextView
-        android:id="@+id/tvErrorDialogMessage"
+        android:id="@+id/tvErrorDialogTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ivErrorDialogIcon"
@@ -25,6 +25,18 @@
         android:paddingEnd="10dp"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/tvErrorDialogMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvErrorDialogTitle"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:textAlignment="center"
+        android:textColor="@color/TextGrey" />
 
     <LinearLayout
         android:layout_width="match_parent"

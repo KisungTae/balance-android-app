@@ -3,9 +3,10 @@ package com.beeswork.balance.ui.match
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
-import com.bumptech.glide.load.engine.Resource
+import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -15,7 +16,8 @@ class MatchViewModel(
     private val matchMapper: MatchMapper
 ) : ViewModel() {
 
-    val fetchMatchesLiveData = matchRepository.fetchMatchesLiveData
+    private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
     fun initMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
         return Pager(
@@ -26,13 +28,8 @@ class MatchViewModel(
     }
 
     fun fetchMatches() {
-        val h = CoroutineExceptionHandler { _, exception ->
-            println("fetch matches exception handler")
-            println("${exception.localizedMessage}")
-        }
-        viewModelScope.launch(h) {
-            val result = matchRepository.fetchMatches()
-            println("result: ${result}")
+        viewModelScope.safeLaunch(_fetchMatchesLiveData) {
+            _fetchMatchesLiveData.postValue(matchRepository.fetchMatches())
         }
     }
 

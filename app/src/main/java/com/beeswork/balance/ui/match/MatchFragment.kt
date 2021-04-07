@@ -118,11 +118,17 @@ class MatchFragment : BaseFragment(),
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-
             val currentFragment = activity?.supportFragmentManager?.fragments?.lastOrNull()?.javaClass
+
+            val errorTitleResourceId = if (currentFragment == ChatFragment::class.java) R.string.fetch_chat_messages_exception
+            else R.string.fetch_matches_exception
+
+            val errorTitle = context?.getString(errorTitleResourceId)
+
             if (it.isError() && currentFragment != ChatFragment::class.java) ErrorDialog(
                 it.error,
-                context?.getString(R.string.list_matches_exception),
+                errorTitle,
+                it.errorMessage,
                 this@MatchFragment,
                 null
             ).show(childFragmentManager, FetchErrorDialog.TAG)

@@ -18,7 +18,7 @@ class BalanceFirebaseMessagingService : FirebaseMessagingService(), KodeinAware 
 
     override fun onNewToken(token: String) {
 
-        balanceRepository.insertFCMToken(token)
+//        balanceRepository.insertFCMToken(token)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {

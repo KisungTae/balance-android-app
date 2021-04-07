@@ -103,8 +103,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         override fun onLocationResult(locationResult: LocationResult?) {
             super.onLocationResult(locationResult)
             val location = locationResult?.lastLocation
-            if (location != null)
-                balanceRepository.saveLocation(location.latitude, location.longitude)
+//            if (location != null) balanceRepository.saveLocation(location.latitude, location.longitude)
         }
     }
 

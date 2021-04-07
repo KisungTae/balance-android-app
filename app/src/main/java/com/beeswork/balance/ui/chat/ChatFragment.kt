@@ -187,6 +187,7 @@ class ChatFragment : BaseFragment(),
     private fun showErrorDialog() {
         ErrorDialog(
             null,
+            null,
             getString(R.string.chat_id_not_found_exception),
             null,
             this

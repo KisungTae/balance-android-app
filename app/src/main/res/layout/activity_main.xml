@@ -17,6 +17,7 @@
     <!--        android:background="@android:color/white"-->
     <!--        app:menu="@menu/nav_bottom" />-->
 
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fcvMain"
         android:name="androidx.navigation.fragment.NavHostFragment"

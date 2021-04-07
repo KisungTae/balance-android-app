@@ -5,16 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogErrorBinding
-import com.beeswork.balance.databinding.DialogExceptionBinding
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.util.safeLet
 
 class ErrorDialog(
     private val error: String?,
+    private val errorTitle: String?,
     private val errorMessage: String?,
     private val onRetryListener: OnRetryListener?,
     private val onDismissListener: OnDismissListener?
@@ -38,8 +36,13 @@ class ErrorDialog(
 
     private fun bindUI() {
         setupRetryListener()
+        setupErrorTitle()
         setupErrorMessage()
         binding.btnErrorDialogClose.setOnClickListener { dismiss() }
+    }
+
+    private fun setupErrorTitle() {
+        binding.tvErrorDialogTitle.text = errorTitle ?: resources.getString(R.string.generic_error_title)
     }
 
     private fun setupErrorMessage() {
@@ -49,9 +52,9 @@ class ErrorDialog(
             safeLet(error, context) {e, c ->
                 val resourceId = resources.getIdentifier(e, "string", c.packageName)
                 if (resourceId > 0) binding.tvErrorDialogMessage.text = resources.getString(resourceId)
-                else binding.tvErrorDialogMessage.text = resources.getString(R.string.exception)
+                else binding.tvErrorDialogMessage.text = resources.getString(R.string.generic_error_message)
             } ?: kotlin.run {
-                binding.tvErrorDialogMessage.text = resources.getString(R.string.exception)
+                binding.tvErrorDialogMessage.text = resources.getString(R.string.generic_error_message)
             }
         }
     }

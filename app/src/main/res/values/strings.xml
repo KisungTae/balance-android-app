@@ -10,7 +10,10 @@
     <string name="question_loading">질문을 가져오고있습니다</string>
     <string name="question_checking">질문을 체크하고있습니다</string>
 
-    <string name="exception">에러가 발생했습니다</string>
+    <string name="generic_error_message">에러가 발생했습니다</string>
+    <string name="generic_error_title">에러</string>
+
+
     <string name="photo_out_of_size_exception">포토사이즈는 %1$d MB 이하만 가능</string>
     <string name="photo_not_orderable_exception">에러나 로딩중인 사진이 없을때 다시 시도해주세여</string>
     <string name="photo_not_found_exception">사진을 찾을수가 없습니다 사진을 다시 선택하시거나 삭제 해주세요</string>
@@ -19,8 +22,8 @@
     <string name="chat_id_not_found_exception">해당 채팅은 유효하지 않습니다</string>
     <string name="chat_message_out_of_size_exception">채팅메세지가 맥스를 초과했습니다</string>
     <string name="connect_exception">서버에 연결할수가 없습니다.</string>
-    <string name="list_matches_exception">매치정보를 가져오는데 실패했습니다</string>
-    <string name="list_chat_messages_exception">채팅 메세지를 가져오는데 실패했습니다</string>
+    <string name="fetch_matches_exception">매치정보를 가져오는데 실패했습니다</string>
+    <string name="fetch_chat_messages_exception">채팅 메세지를 가져오는데 실패했습니다</string>
 
 
     <string name="match_new_recent_chat_message">새로운 매치! 상대방에게 메세지를 보내보세요</string>

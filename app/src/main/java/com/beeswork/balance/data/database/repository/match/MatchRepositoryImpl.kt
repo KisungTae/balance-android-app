@@ -22,6 +22,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
+import java.lang.Exception
+import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.random.Random
 
@@ -46,9 +48,6 @@ class MatchRepositoryImpl(
     override val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<NewChatMessage>> get() = _chatMessagePagingRefreshLiveData
 
 
-    private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    override val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
-
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
         return withContext(Dispatchers.IO) {
             return@withContext matchDAO.findAllPaged(loadSize, startPosition)
@@ -63,26 +62,36 @@ class MatchRepositoryImpl(
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(Dispatchers.IO) {
-            val listMatches = matchRDS.listMatches(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                preferenceProvider.getMatchFetchedAt()
-            )
+            throw SocketTimeoutException()
+//            val listMatches = matchRDS.listMatches(
+//                preferenceProvider.getAccountId(),
+//                preferenceProvider.getIdentityToken(),
+//                preferenceProvider.getMatchFetchedAt()
+//            )
+//
+//            listMatches.data?.let { data ->
+//                saveMatches(data.matchDTOs)
+//                saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+//                preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+//                _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
+//                _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
+//            }
+//            return@withContext Resource.toEmptyResponse(listMatches)
 
-            if (listMatches.isError())
+//            if (listMatches.isError())
 //                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
-            else {
-                listMatches.data?.let { data ->
-                    saveMatches(data.matchDTOs)
-                    saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-                    preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-                    _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
-                    _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
-                }
+//            else {
+//                listMatches.data?.let { data ->
+//                    saveMatches(data.matchDTOs)
+//                    saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+//                    preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+//                    _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
+//                    _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
+//                }
 //                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
-            }
-
-            return@withContext Resource.error("")
+//            }
+//
+//            return@withContext Resource.error("")
         }
     }
 
