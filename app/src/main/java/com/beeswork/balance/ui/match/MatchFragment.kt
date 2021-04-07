@@ -17,6 +17,7 @@ import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
+import com.beeswork.balance.ui.login.LoginFragment
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -118,22 +119,23 @@ class MatchFragment : BaseFragment(),
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            val currentFragment = activity?.supportFragmentManager?.fragments?.lastOrNull()?.javaClass
-
-            val errorTitleResourceId = if (currentFragment == ChatFragment::class.java) R.string.fetch_chat_messages_exception
-            else R.string.fetch_matches_exception
-
-            val errorTitle = context?.getString(errorTitleResourceId)
-
-            if (it.isError() && currentFragment != ChatFragment::class.java) ErrorDialog(
-                it.error,
-                errorTitle,
-                it.errorMessage,
-                this@MatchFragment,
-                null
-            ).show(childFragmentManager, FetchErrorDialog.TAG)
-            else if (it.isSuccess()) updateRefresh()
+            if (it.isError()) {
+                if (validateAccount(it.error, it.errorMessage)) ErrorDialog(
+                    it.error,
+                    errorTitle(),
+                    it.errorMessage,
+                    this@MatchFragment,
+                    null
+                ).show(childFragmentManager, FetchErrorDialog.TAG)
+            } else if (it.isSuccess()) updateRefresh()
         })
+    }
+
+    private fun errorTitle(): String {
+        val currentFragment = activity?.supportFragmentManager?.fragments?.lastOrNull()?.javaClass
+        val resourceId = if (currentFragment == ChatFragment::class.java) R.string.error_title_fetch_chat_messages
+        else R.string.error_title_fetch_matches
+        return getString(resourceId)
     }
 
     private fun updateRefresh() {
@@ -158,8 +160,8 @@ class MatchFragment : BaseFragment(),
         }
 
         activity?.supportFragmentManager?.beginTransaction()?.let {
-            it.add(R.id.fcvMain, chatFragment)
             it.addToBackStack(MainViewPagerFragment.TAG)
+            it.add(R.id.fcvMain, chatFragment)
             it.commit()
         }
     }

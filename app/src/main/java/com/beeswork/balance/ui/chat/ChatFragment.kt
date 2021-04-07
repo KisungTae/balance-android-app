@@ -41,8 +41,7 @@ import kotlin.random.Random
 
 class ChatFragment : BaseFragment(),
     KodeinAware,
-    ErrorDialog.OnDismissListener,
-    ErrorDialog.OnRetryListener {
+    ErrorDialog.OnDismissListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
@@ -79,7 +78,10 @@ class ChatFragment : BaseFragment(),
                 arguments.getString(BundleKey.MATCHED_NAME),
                 arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY)
             )
-        } ?: showErrorDialog()
+        } ?: ErrorDialog(null, getString(R.string.error_title_chat_id_not_found), "", null, this).show(
+            childFragmentManager,
+            ErrorDialog.TAG
+        )
     }
 
     private fun bindUI(matchedId: UUID, matchedName: String?, matchedRepPhotoKey: String?) = lifecycleScope.launch {
@@ -92,7 +94,6 @@ class ChatFragment : BaseFragment(),
         if (matchedRepPhotoKey == null) setupAsUnmatched()
         setupChatMessagePagingData()
     }
-
 
 
     private fun updateRefresh() {
@@ -153,6 +154,7 @@ class ChatFragment : BaseFragment(),
 //                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.lastOrNull()}")
 //                    chatMessagePagingAdapter.refresh()
 //                    viewModel.test()
+                    validateAccount(ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION, "")
                     true
                 }
                 R.id.miChatReport -> {
@@ -184,26 +186,12 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private fun showErrorDialog() {
-        ErrorDialog(
-            null,
-            null,
-            getString(R.string.chat_id_not_found_exception),
-            null,
-            this
-        ).show(childFragmentManager, ErrorDialog.TAG)
-    }
-
     private fun popBackToMatch() {
         requireActivity().supportFragmentManager.popBackStack(MainViewPagerFragment.TAG, POP_BACK_STACK_INCLUSIVE)
     }
 
     override fun onDismiss() {
         popBackToMatch()
-    }
-
-    override fun onRetry() {
-        viewModel.fetchMatches()
     }
 }
 

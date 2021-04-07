@@ -58,11 +58,6 @@ class ChatViewModel(
         }
     }
 
-    fun fetchMatches() {
-        CoroutineScope(Dispatchers.IO).launch {
-            matchRepository.fetchMatches()
-        }
-    }
 
     fun updateRecentChatMessage(chatMessageId: Long) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -97,5 +92,4 @@ class ChatViewModel(
 
 
 // TODO: websocket receives dto, pass it from viewmodel to repository, map to entity and save
-// TODO: viewmodel listmatches exception to what exception? or just keep network exception?
 // TODO: fetchMatches observer check validate of parent

@@ -62,36 +62,19 @@ class MatchRepositoryImpl(
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(Dispatchers.IO) {
-            throw SocketTimeoutException()
-//            val listMatches = matchRDS.listMatches(
-//                preferenceProvider.getAccountId(),
-//                preferenceProvider.getIdentityToken(),
-//                preferenceProvider.getMatchFetchedAt()
-//            )
-//
-//            listMatches.data?.let { data ->
-//                saveMatches(data.matchDTOs)
-//                saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-//                preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-//                _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
-//                _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
-//            }
-//            return@withContext Resource.toEmptyResponse(listMatches)
-
-//            if (listMatches.isError())
-//                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
-//            else {
-//                listMatches.data?.let { data ->
-//                    saveMatches(data.matchDTOs)
-//                    saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-//                    preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-//                    _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
-//                    _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
-//                }
-//                _fetchMatchesLiveData.postValue(Resource.toEmptyResponse(listMatches))
-//            }
-//
-//            return@withContext Resource.error("")
+            val listMatches = matchRDS.listMatches(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                preferenceProvider.getMatchFetchedAt()
+            )
+            listMatches.data?.let { data ->
+                saveMatches(data.matchDTOs)
+                saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+                preferenceProvider.putMatchFetchedAt(data.fetchedAt)
+                _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
+                _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
+            }
+            return@withContext Resource.toEmptyResponse(listMatches)
         }
     }
 
@@ -212,7 +195,7 @@ class MatchRepositoryImpl(
         }
     }
 
-
+//  TODO: remove me
     override fun createDummyChatMessage() {
         val messages = mutableListOf<ChatMessage>()
         var count = 1L
