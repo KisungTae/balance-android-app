@@ -14,6 +14,7 @@ import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
@@ -35,10 +36,9 @@ class MatchFragment : BaseFragment(),
     private val viewModelFactory: MatchViewModelFactory by instance()
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagingDataAdapter: MatchPagingDataAdapter
+    private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>
     private lateinit var binding: FragmentMatchBinding
     private var searchJob: Job? = null
-    private var scrolling = false
-    private var refresh = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,8 +66,7 @@ class MatchFragment : BaseFragment(),
     private fun setupMatchPagingRefreshLiveData() {
         viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, {
 //          TODO: check if there is new match, if so then pop up new match dialog
-            println("matchPagingRefreshLiveData")
-            matchPagingDataAdapter.refresh()
+            matchPagingRefreshAdapter.refresh()
         })
     }
 
@@ -76,20 +75,7 @@ class MatchFragment : BaseFragment(),
         binding.rvMatch.adapter = matchPagingDataAdapter
         binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMatch.itemAnimator = null
-        binding.rvMatch.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                when (newState) {
-                    RecyclerView.SCROLL_STATE_IDLE -> {
-                        scrolling = false
-                        refreshAdapter()
-                    }
-                    RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        scrolling = true
-                    }
-                }
-            }
-        })
+        matchPagingRefreshAdapter = PagingRefreshAdapter(binding.rvMatch, matchPagingDataAdapter)
     }
 
     private fun setupToolBars() {
@@ -97,7 +83,7 @@ class MatchFragment : BaseFragment(),
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miMatchSearch -> {
-                    viewModel.fetchMatches()
+                    viewModel.testFunction()
                     showSearchToolBar()
                 }
                 else -> false
@@ -111,7 +97,7 @@ class MatchFragment : BaseFragment(),
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
             viewModel.initMatchPagingData(keyword.trim()).collectLatest {
-                refresh = false
+                matchPagingRefreshAdapter.reset()
                 matchPagingDataAdapter.submitData(it)
             }
         }
@@ -146,15 +132,6 @@ class MatchFragment : BaseFragment(),
         val resourceId = if (currentFragment == ChatFragment::class.java) R.string.error_title_fetch_chat_messages
         else R.string.error_title_fetch_matches
         return getString(resourceId)
-    }
-
-    private fun updateRefresh() {
-        refresh = true
-        refreshAdapter()
-    }
-
-    private fun refreshAdapter() {
-        if (!scrolling && refresh) matchPagingDataAdapter.refresh()
     }
 
     override fun onClick(position: Int) {

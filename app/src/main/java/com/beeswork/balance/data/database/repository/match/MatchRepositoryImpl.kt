@@ -18,7 +18,6 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -206,9 +205,6 @@ class MatchRepositoryImpl(
     }
 
 
-
-
-
     override suspend fun sendChatMessage(chatId: Long, body: String) {
         chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
     }
@@ -219,13 +215,12 @@ class MatchRepositoryImpl(
         }
     }
 
-//  TODO: remove me
-    override fun createDummyChatMessage() {
+    //  TODO: remove me
+    private fun createDummyChatMessages() {
         val messages = mutableListOf<ChatMessage>()
         var count = 1L
-
         var now = OffsetDateTime.now()
-        val chatId = 354L
+        val chatId = matchDAO.findAllPaged(100, 0)[0].chatId
 
         for (i in 1..10) {
             val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
@@ -266,65 +261,29 @@ class MatchRepositoryImpl(
     }
 
     //  TODO: remove me
-    override fun testFunction() {
-        val chatMessages = mutableListOf<ChatMessage>()
-        chatMessages.add(
-            ChatMessage(
-                353,
-                "message-0.55419207",
-                ChatMessageStatus.SENDING,
-                null,
-                Long.MAX_VALUE,
-                3
+    private fun createDummyMatch() {
+        for ((count, i) in (1..10).withIndex()) {
+            matchDAO.insert(
+                Match(
+                    chatId = count.toLong(),
+                    matchedId = UUID.randomUUID(),
+                    active = false,
+                    unmatched = false,
+                    name = "user-$count",
+                    repPhotoKey = "",
+                    deleted = false,
+                    updatedAt = OffsetDateTime.now()
+                )
             )
-        )
-
-        chatMessages.add(
-            ChatMessage(
-                353,
-                "message-0.9818386",
-                ChatMessageStatus.SENDING,
-                null,
-                Long.MAX_VALUE,
-                4
-            )
-        )
-
-        CoroutineScope(Dispatchers.IO).launch {
-            chatMessageDAO.insert(chatMessages)
         }
+    }
 
 
-//        val dummyMatches = mutableListOf<Match>()
-//
-//
-//        for (i in 101..103) {
-//            dummyMatches.add(
-//                Match(
-//                    i.toLong(),
-//                    UUID.randomUUID(),
-//                    false,
-//                    false,
-//                    "user-$i test",
-//                    "",
-//                    false,
-//                    OffsetDateTime.now()
-//                )
-//            )
-//        }
-//
-//        CoroutineScope(Dispatchers.IO).launch {
-//            matchDAO.insert(dummyMatches)
-//            _fetchMatchesLiveData.postValue(Resource.success(EmptyResponse()))
-////            matchDAO.insert(dummyMatches[0])
-//
-//
-////            matchDAO.findById(3844)?.let {
-////                it.updatedAt = OffsetDateTime.now()
-////                it.name = "this is updated user"
-////                matchDAO.insert(it)
-////            }
-//        }
-
+    //  TODO: remove me
+    override fun testFunction() {
+        CoroutineScope(Dispatchers.IO).launch {
+            createDummyMatch()
+            createDummyChatMessages()
+        }
     }
 }

@@ -28,8 +28,6 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
 
     private var repPhotoEndPoint: String? = null
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
             ChatMessageStatus.SEPARATOR.ordinal -> SeparatorViewHolder(

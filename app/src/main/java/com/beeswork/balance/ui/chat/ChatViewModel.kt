@@ -25,6 +25,7 @@ class ChatViewModel(
     private val stompClient: StompClient
 ) : ViewModel() {
 
+    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshLiveData
 
     fun initChatMessagePagingData(): Flow<PagingData<ChatMessageDomain>> {
         return Pager(
@@ -65,10 +66,6 @@ class ChatViewModel(
         }
     }
 
-
-    fun test() {
-        CoroutineScope(Dispatchers.IO).launch { matchRepository.createDummyChatMessage() }
-    }
 
     companion object {
         private const val CHAT_PAGE_SIZE = 80

@@ -16,6 +16,7 @@ import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
@@ -35,7 +36,9 @@ class ChatFragment : BaseFragment(),
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
+    private lateinit var chatMessagePagingRefreshAdapter: PagingRefreshAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>
     private lateinit var binding: FragmentChatBinding
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,27 +83,21 @@ class ChatFragment : BaseFragment(),
         setupChatRecyclerView()
 //        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
         if (matchedRepPhotoKey == null) setupAsUnmatched()
+        setupChatMessagePagingRefreshObserver()
         setupChatMessagePagingData()
     }
 
-
-    private fun updateRefresh() {
-
+    private fun setupChatMessagePagingRefreshObserver() {
+        viewModel.chatMessagePagingRefreshLiveData.observe(viewLifecycleOwner, {
+            chatMessagePagingRefreshAdapter.refresh()
+        })
     }
-
 
     private fun setupAsUnmatched() {
         binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
         binding.llChatInputWrapper.visibility = View.GONE
     }
 
-    private fun setupEmoticonBtnListener() {
-        binding.btnChatEmoticon.setOnClickListener {
-//            val view = activity?.currentFocus
-//            val methodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//            methodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }
-    }
 
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
@@ -125,7 +122,6 @@ class ChatFragment : BaseFragment(),
         })
     }
 
-
     private fun setupBackPressedDispatcherCallback() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -140,6 +136,7 @@ class ChatFragment : BaseFragment(),
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
+                    chatMessagePagingRefreshAdapter.refresh()
                     true
                 }
                 R.id.miChatReport -> {
@@ -158,6 +155,16 @@ class ChatFragment : BaseFragment(),
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         binding.rvChat.layoutManager = layoutManager
+        binding.rvChat.itemAnimator = null
+        chatMessagePagingRefreshAdapter = PagingRefreshAdapter(binding.rvChat, chatMessagePagingAdapter)
+    }
+
+    private fun setupEmoticonBtnListener() {
+        binding.btnChatEmoticon.setOnClickListener {
+//            val view = activity?.currentFocus
+//            val methodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//            methodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 
     private suspend fun setupRepPhoto(repPhotoEndPoint: String?) = withContext(Dispatchers.IO) {
