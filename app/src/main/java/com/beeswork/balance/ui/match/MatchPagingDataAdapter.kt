@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemMatchBinding
-import com.beeswork.balance.internal.constant.EndPoint
-import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import java.util.*
 
@@ -63,7 +61,7 @@ class MatchPagingDataAdapter(
 //            TODO: remove me
             binding.tvMatchName.text = "${matchDomain.chatId}"
 //            binding.tvMatchName.text = matchDomain.name
-            binding.tvMatchUpdatedAt.text = matchDomain.updatedAt.toLocalDate().toString()
+            binding.tvMatchUpdatedAt.text = matchDomain.updatedAt?.toLocalDate()?.toString() ?: ""
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
@@ -94,9 +92,8 @@ class MatchPagingDataAdapter(
         }
 
         private fun getRecentChatMessage(matchDomain: MatchDomain): String {
-            return if (matchDomain.deleted) context.getString(R.string.match_deleted_recent_chat_message)
-            else if (matchDomain.unmatched) context.getString(R.string.match_unmatched_recent_chat_message)
-            else if (!matchDomain.active) context.getString(R.string.match_new_recent_chat_message)
+            return if (!matchDomain.valid) context.getString(R.string.recent_chat_message_invalid_match)
+            else if (!matchDomain.active) context.getString(R.string.recent_chat_message_new_match)
             else matchDomain.recentChatMessage
         }
 

@@ -16,7 +16,7 @@ interface ChatMessageDAO {
     fun insert(chatMessages: List<ChatMessage>)
 
     @Query("select count(*) > 0 from chatMessage where id = :id")
-    fun existsById(id: Long): Boolean
+    fun existById(id: Long): Boolean
 
     @Query("select * from chatMessage where `key` = :key")
     fun findByKey(key: Long): ChatMessage?
@@ -39,7 +39,7 @@ interface ChatMessageDAO {
     ): ChatMessage?
 
     @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and id > :lastReadChatMessageId limit 1")
-    fun unreadExists(
+    fun existByIdGreaterThan(
         chatId: Long,
         lastReadChatMessageId: Long,
         status: ChatMessageStatus = ChatMessageStatus.RECEIVED

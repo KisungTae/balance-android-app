@@ -3,6 +3,8 @@ package com.beeswork.balance.ui.match
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.data.database.response.NewMatch
+import com.beeswork.balance.data.database.response.PagingRefresh
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -18,6 +20,9 @@ class MatchViewModel(
 
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
+
+    val matchPagingRefreshLiveData = matchRepository.matchPagingRefreshLiveData
+
 
     fun initMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
         return Pager(

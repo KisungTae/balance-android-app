@@ -1,7 +1,5 @@
 package com.beeswork.balance.ui.chat
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
@@ -10,15 +8,11 @@ import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.service.stomp.StompClient
-import com.beeswork.balance.ui.match.MatchProfileDomain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.threeten.bp.temporal.ChronoUnit
 import java.util.*
 
 
@@ -59,9 +53,9 @@ class ChatViewModel(
     }
 
 
-    fun updateRecentChatMessage(chatMessageId: Long) {
-        CoroutineScope(Dispatchers.IO).launch {
-
+    fun synchronizeMatch() {
+        viewModelScope.launch {
+            matchRepository.synchronizeMatch(chatId)
         }
     }
 

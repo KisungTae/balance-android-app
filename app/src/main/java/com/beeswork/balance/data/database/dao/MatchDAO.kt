@@ -23,6 +23,9 @@ interface MatchDAO {
     @Query("select * from `match` where chatId = :chatId")
     fun findById(chatId: Long): Match?
 
+    @Query("select * from `match` where chatId = :chatId and deleted = 0 and unmatched = 0")
+    fun findValidById(chatId: Long): Match?
+
     @Query("select * from `match` where name like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
 

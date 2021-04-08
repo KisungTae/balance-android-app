@@ -58,8 +58,17 @@ class MatchFragment : BaseFragment(),
         setupMatchRecyclerView()
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
+        setupMatchPagingRefreshLiveData()
         search("")
         viewModel.fetchMatches()
+    }
+
+    private fun setupMatchPagingRefreshLiveData() {
+        viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, {
+//          TODO: check if there is new match, if so then pop up new match dialog
+            println("matchPagingRefreshLiveData")
+            matchPagingDataAdapter.refresh()
+        })
     }
 
     private fun setupMatchRecyclerView() {
@@ -87,7 +96,10 @@ class MatchFragment : BaseFragment(),
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchSearch -> showSearchToolBar()
+                R.id.miMatchSearch -> {
+                    viewModel.fetchMatches()
+                    showSearchToolBar()
+                }
                 else -> false
             }
         }
@@ -119,15 +131,13 @@ class MatchFragment : BaseFragment(),
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            if (it.isError()) {
-                if (validateAccount(it.error, it.errorMessage)) ErrorDialog(
-                    it.error,
-                    errorTitle(),
-                    it.errorMessage,
-                    this@MatchFragment,
-                    null
-                ).show(childFragmentManager, FetchErrorDialog.TAG)
-            } else if (it.isSuccess()) updateRefresh()
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) ErrorDialog(
+                it.error,
+                errorTitle(),
+                it.errorMessage,
+                this@MatchFragment,
+                null
+            ).show(childFragmentManager, FetchErrorDialog.TAG)
         })
     }
 

@@ -1,32 +1,22 @@
 package com.beeswork.balance.ui.chat
 
-import android.database.DataSetObserver
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.constant.ChatMessageStatus
-import com.beeswork.balance.internal.constant.EndPoint
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
-import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
@@ -34,9 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
-import java.time.OffsetDateTime
 import java.util.*
-import kotlin.random.Random
 
 
 class ChatFragment : BaseFragment(),
@@ -121,6 +109,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private suspend fun setupChatMessagePagingData() {
+        registerAdapterDataObserver()
         viewModel.initChatMessagePagingData().collectLatest {
             chatMessagePagingAdapter.submitData(it)
         }
@@ -130,6 +119,7 @@ class ChatFragment : BaseFragment(),
         chatMessagePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
+                viewModel.synchronizeMatch()
                 chatMessagePagingAdapter.unregisterAdapterDataObserver(this)
             }
         })
@@ -150,11 +140,6 @@ class ChatFragment : BaseFragment(),
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
-//                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.firstOrNull()}")
-//                    println("current fragment: ${activity?.supportFragmentManager?.fragments?.lastOrNull()}")
-//                    chatMessagePagingAdapter.refresh()
-//                    viewModel.test()
-                    validateAccount(ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION, "")
                     true
                 }
                 R.id.miChatReport -> {

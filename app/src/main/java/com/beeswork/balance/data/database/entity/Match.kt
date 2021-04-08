@@ -22,12 +22,12 @@ data class Match(
     var name: String,
     var repPhotoKey: String?,
     var deleted: Boolean,
-    var updatedAt: OffsetDateTime,
+    var updatedAt: OffsetDateTime?,
     var unread: Boolean = false,
     var recentChatMessage: String = "",
     var lastReadChatMessageId: Long = 0
 ) {
     fun isValid(): Boolean {
-        return (!unmatched && !deleted)
+        return (!deleted && !unmatched)
     }
 }

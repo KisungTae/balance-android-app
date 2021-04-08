@@ -23,7 +23,7 @@ interface MatchRepository {
 
     suspend fun sendChatMessage(chatId: Long, body: String)
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
-    suspend fun updateRecentChatMessage(chatId: Long, chatMessageId: Long)
+    suspend fun synchronizeMatch(chatId: Long)
 
 
     fun createDummyChatMessage()

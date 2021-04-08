@@ -14,17 +14,17 @@ import java.lang.Exception
 abstract class BaseFragment : Fragment() {
 
     protected fun validateAccount(error: String?, errorMessage: String?): Boolean {
-        error?.let {
-            return if (it == ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION ||
-                it == ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION ||
-                it == ExceptionCode.ACCOUNT_DELETED_EXCEPTION) {
-                popToLoginFragment(errorMessage)
-                false
-            } else true
-        } ?: return true
+        return error?.let {
+            return when (it) {
+                ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION,
+                ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
+                ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> popToLoginFragment(errorMessage)
+                else -> true
+            }
+        } ?: true
     }
 
-    private fun popToLoginFragment(errorMessage: String?) {
+    private fun popToLoginFragment(errorMessage: String?): Boolean {
         val loginFragment = LoginFragment()
         val arguments = Bundle()
         errorMessage?.let { arguments.putString(BundleKey.ERROR_MESSAGE, it) }
@@ -34,6 +34,7 @@ abstract class BaseFragment : Fragment() {
                 it.popBackStack(it.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
             it.beginTransaction().replace(R.id.fcvMain, loginFragment).commit()
         }
+        return false
     }
 }
 

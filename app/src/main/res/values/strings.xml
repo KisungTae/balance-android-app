@@ -1,14 +1,6 @@
 <resources>
     <string name="app_name">Balance</string>
     <string name="app_name_capital">WECLICK</string>
-    <string name="lipsum">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.  Why do we use it? It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for \'lorem ipsum\' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).   Where does it come from? Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.  The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="default_recent_message">대화를 시작해보세요!</string>
-
-    <string name="question_loading">질문을 가져오고있습니다</string>
-    <string name="question_checking">질문을 체크하고있습니다</string>
 
     <string name="error_message_generic">에러가 발생했습니다</string>
     <string name="error_title_generic">에러</string>
@@ -19,6 +11,17 @@
     <string name="socket_timeout_exception">서버에 연결할수 없습니다</string>
     <string name="no_internet_connectivity_exception">인터넷이 연결되지 않았습니다</string>
     <string name="connect_exception">서버에 연결할수 없습니다.</string>
+
+    <string name="recent_chat_message_new_match">새로운 매치! 상대방에게 메세지를 보내보세요</string>
+    <string name="recent_chat_message_invalid_match">상대방이 채팅방을 나갔습니다</string>
+
+
+
+
+
+
+    <string name="question_loading">질문을 가져오고있습니다</string>
+    <string name="question_checking">질문을 체크하고있습니다</string>
 
     <string name="photo_out_of_size_exception">포토사이즈는 %1$d MB 이하만 가능</string>
     <string name="photo_not_orderable_exception">에러나 로딩중인 사진이 없을때 다시 시도해주세여</string>
@@ -31,9 +34,6 @@
     <string name="fetch_chat_messages_exception">채팅 메세지를 가져오는데 실패했습니다</string>
 
 
-    <string name="match_new_recent_chat_message">새로운 매치! 상대방에게 메세지를 보내보세요</string>
-    <string name="match_deleted_recent_chat_message">상대방계정이 삭제됐습니다</string>
-    <string name="match_unmatched_recent_chat_message">상대방이 채팅방을 떠났습니다</string>
 
     <string name="match_tool_bar_title">MATCH</string>
     <string name="chat_tool_bar_title">CHAT</string>

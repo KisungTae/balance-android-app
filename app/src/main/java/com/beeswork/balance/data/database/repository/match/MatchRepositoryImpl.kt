@@ -2,7 +2,6 @@ package com.beeswork.balance.data.database.repository.match
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
@@ -19,11 +18,10 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
-import java.lang.Exception
-import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.random.Random
 
@@ -89,7 +87,7 @@ class MatchRepositoryImpl(
 
         balanceDatabase.runInTransaction {
             receivedChatMessages.forEach {
-                if (!chatMessageDAO.existsById(it.id))
+                if (!chatMessageDAO.existById(it.id))
                     chatMessageDAO.insert(it)
                 chatIds.add(it.chatId)
                 receivedChatMessageIds.add(it.id)
@@ -115,8 +113,9 @@ class MatchRepositoryImpl(
     private fun updateRecentChatMessages(chatIds: Set<Long>) {
         balanceDatabase.runInTransaction {
             chatIds.forEach { chatId ->
-                matchDAO.findById(chatId)?.let { match ->
+                matchDAO.findValidById(chatId)?.let { match ->
                     updateRecentChatMessage(match)
+                    updateUnread(match)
                     matchDAO.insert(match)
                 }
             }
@@ -128,11 +127,18 @@ class MatchRepositoryImpl(
             match.chatId,
             match.lastReadChatMessageId
         )?.let { chatMessage ->
-            match.recentChatMessage = chatMessage.body
-            chatMessage.createdAt?.let { match.updatedAt = it }
-            match.active = true
+            updateRecentChatMessage(match, chatMessage)
         }
-        match.unread = chatMessageDAO.unreadExists(match.chatId, match.lastReadChatMessageId)
+    }
+
+    private fun updateRecentChatMessage(match: Match, chatMessage: ChatMessage) {
+        match.recentChatMessage = chatMessage.body
+        chatMessage.createdAt?.let { match.updatedAt = it }
+        match.active = true
+    }
+
+    private fun updateUnread(match: Match) {
+        match.unread = chatMessageDAO.existByIdGreaterThan(match.chatId, match.lastReadChatMessageId)
     }
 
 
@@ -171,13 +177,37 @@ class MatchRepositoryImpl(
 
     private fun updateMatch(match: Match) {
         matchDAO.findById(match.chatId)?.let {
-            match.updatedAt = it.updatedAt
-            match.unread = it.unread
-            match.active = it.active
-            match.recentChatMessage = it.recentChatMessage
+            if (match.isValid()) {
+                match.updatedAt = it.updatedAt
+                match.recentChatMessage = it.recentChatMessage
+                match.unread = it.unread
+                match.active = it.active
+            }
             match.lastReadChatMessageId = it.lastReadChatMessageId
         }
     }
+
+    override suspend fun synchronizeMatch(chatId: Long) {
+        withContext(Dispatchers.IO) {
+            balanceDatabase.runInTransaction {
+                matchDAO.findById(chatId)?.let { match ->
+                    chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageId)?.let { chatMessage ->
+                        match.lastReadChatMessageId = chatMessage.id
+                        if (match.isValid()) {
+                            updateRecentChatMessage(match, chatMessage)
+                            updateUnread(match)
+                        }
+                        matchDAO.insert(match)
+                    }
+                }
+            }
+            _matchPagingRefreshLiveData.postValue(PagingRefresh(null))
+        }
+    }
+
+
+
+
 
     override suspend fun sendChatMessage(chatId: Long, body: String) {
         chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
@@ -186,12 +216,6 @@ class MatchRepositoryImpl(
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
         return withContext(Dispatchers.IO) {
             return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
-        }
-    }
-
-    override suspend fun updateRecentChatMessage(chatId: Long, chatMessageId: Long) {
-        chatMessageDAO.findBodyById(chatMessageId)?.let { body ->
-
         }
     }
 
