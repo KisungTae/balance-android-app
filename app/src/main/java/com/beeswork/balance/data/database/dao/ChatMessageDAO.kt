@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
 import com.beeswork.balance.data.database.entity.ChatMessage
@@ -21,17 +22,7 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where `key` = :key")
     fun findByKey(key: Long): ChatMessage?
 
-    @Query(
-        """
-        select * 
-        from chatMessage 
-        where chatId = :chatId 
-        and id > :lastReadChatMessageId 
-        and status in (:statuses) 
-        order by id desc 
-        limit 1
-    """
-    )
+    @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId and status in (:statuses) order by id desc limit 1")
     fun findMostRecentAfter(
         chatId: Long,
         lastReadChatMessageId: Long,
@@ -51,4 +42,6 @@ interface ChatMessageDAO {
     @Query("select body from chatMessage where id = :chatMessageId")
     fun findBodyById(chatMessageId: Long): String?
 
+    @Query("select (unmatched = 0 or deleted = 0) from `match` where chatId = :chatId")
+    fun findUnmatchedById(chatId: Long): LiveData<Boolean>
 }

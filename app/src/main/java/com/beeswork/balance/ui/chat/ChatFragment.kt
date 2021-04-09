@@ -67,7 +67,8 @@ class ChatFragment : BaseFragment(),
             bindUI(
                 matchedId,
                 arguments.getString(BundleKey.MATCHED_NAME),
-                arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY)
+                arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY),
+                arguments.getBoolean(BundleKey.MATCH_VALID)
             )
         } ?: ErrorDialog(null, getString(R.string.error_title_chat_id_not_found), "", null, this).show(
             childFragmentManager,
@@ -75,17 +76,22 @@ class ChatFragment : BaseFragment(),
         )
     }
 
-    private fun bindUI(matchedId: UUID, matchedName: String?, matchedRepPhotoKey: String?) = lifecycleScope.launch {
-        setupBackPressedDispatcherCallback()
-        setupToolBar(matchedName)
-        setupSendBtnListener()
-        setupEmoticonBtnListener()
-        setupChatRecyclerView()
+    private fun bindUI(
+        matchedId: UUID,
+        matchedName: String?,
+        matchedRepPhotoKey: String?,
+        matchValid: Boolean
+    ) = lifecycleScope.launch {
+            setupBackPressedDispatcherCallback()
+            setupToolBar(matchedName)
+            setupSendBtnListener()
+            setupEmoticonBtnListener()
+            setupChatRecyclerView()
 //        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
-        if (matchedRepPhotoKey == null) setupAsUnmatched()
-        setupChatMessagePagingRefreshObserver()
-        setupChatMessagePagingData()
-    }
+            if (!matchValid) setupAsUnmatched()
+            setupChatMessagePagingRefreshObserver()
+            setupChatMessagePagingData()
+        }
 
     private fun setupChatMessagePagingRefreshObserver() {
         viewModel.chatMessagePagingRefreshLiveData.observe(viewLifecycleOwner, {

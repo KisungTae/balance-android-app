@@ -32,4 +32,5 @@ interface MatchDAO {
     @Query("select * from `match` order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int): List<Match>
 
+
 }
