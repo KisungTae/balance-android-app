@@ -3,8 +3,13 @@ package com.beeswork.balance.internal.mapper.match
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.match.MatchDomain
+import com.beeswork.balance.ui.match.NewMatchDomain
 
 class MatchMapperImpl : MatchMapper {
+    override fun fromEntityToNewMatchDomain(entity: Match?): NewMatchDomain? {
+        return entity?.let { NewMatchDomain(entity.matchedId, entity.name, entity.repPhotoKey ?: "") }
+    }
+
     override fun fromDTOToEntity(dto: MatchDTO): Match {
         return Match(
             dto.chatId,

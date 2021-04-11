@@ -1,17 +1,14 @@
 package com.beeswork.balance.ui.mainactivity
 
 import android.Manifest
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,9 +17,8 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.dialog.ClickedDialog
-import com.beeswork.balance.ui.dialog.MatchDialog
+import com.beeswork.balance.ui.dialog.NewMatchDialog
 import com.google.android.gms.location.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -76,9 +72,9 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
 
         when (notificationType) {
-            NotificationType.MATCH -> MatchDialog("", photoKey).show(
+            NotificationType.MATCH -> NewMatchDialog("", photoKey).show(
                 supportFragmentManager,
-                MatchDialog.TAG
+                NewMatchDialog.TAG
             )
             NotificationType.CLICKED -> ClickedDialog(photoKey).show(
                 supportFragmentManager,

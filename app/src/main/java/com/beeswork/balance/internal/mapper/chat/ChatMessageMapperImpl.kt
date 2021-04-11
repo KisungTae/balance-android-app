@@ -4,9 +4,15 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.ui.chat.ChatMessageDomain
+import com.beeswork.balance.ui.chat.NewChatMessageDomain
 import org.threeten.bp.temporal.ChronoUnit
 
 class ChatMessageMapperImpl : ChatMessageMapper {
+
+    override fun fromEntityToNewChatMessageDomain(entity: ChatMessage?): NewChatMessageDomain? {
+        return entity?.let { NewChatMessageDomain(it.body) }
+    }
+
     override fun fromDTOToEntity(dto: ChatMessageDTO): ChatMessage {
         return ChatMessage(
             dto.chatId ?: 0,

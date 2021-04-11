@@ -3,14 +3,12 @@ package com.beeswork.balance.ui.match
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.database.response.NewMatch
-import com.beeswork.balance.data.database.response.PagingRefresh
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.safeLaunch
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 
 class MatchViewModel(
@@ -21,16 +19,20 @@ class MatchViewModel(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
-    val matchPagingRefreshLiveData = matchRepository.matchPagingRefreshLiveData
+    val matchPagingRefreshLiveData = matchRepository.matchPagingRefreshLiveData.map { pagingRefresh ->
+        pagingRefresh.map { data -> matchMapper.fromEntityToNewMatchDomain(data) }
+    }
 
-
-    fun initMatchPagingData(searchKeyword: String): Flow<PagingData<MatchDomain>> {
+    fun initMatchPagingData(searchKeyword: String): LiveData<PagingData<MatchDomain>> {
         return Pager(
             pagingConfig,
             null,
             { MatchPagingSource(matchRepository, searchKeyword) }
-        ).flow.cachedIn(viewModelScope).map { pagingData -> pagingData.map { matchMapper.fromEntityToDomain(it) } }
+        ).flow.cachedIn(viewModelScope)
+            .map { pagingData -> pagingData.map { matchMapper.fromEntityToDomain(it) } }
+            .asLiveData(viewModelScope.coroutineContext)
     }
+
 
     fun fetchMatches() {
         viewModelScope.safeLaunch(_fetchMatchesLiveData) {

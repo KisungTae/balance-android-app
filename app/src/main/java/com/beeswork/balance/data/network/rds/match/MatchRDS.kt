@@ -8,8 +8,8 @@ import java.util.*
 
 interface MatchRDS {
     suspend fun listMatches(
-        accountId: UUID,
-        identityToken: UUID,
+        accountId: UUID?,
+        identityToken: UUID?,
         matchFetchedAt: OffsetDateTime
     ): Resource<ListMatchesDTO>
 }

@@ -4,5 +4,8 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.mapper.common.Mapper
 import com.beeswork.balance.ui.chat.ChatMessageDomain
+import com.beeswork.balance.ui.chat.NewChatMessageDomain
 
-interface ChatMessageMapper: Mapper<ChatMessageDTO, ChatMessage, ChatMessageDomain>
+interface ChatMessageMapper: Mapper<ChatMessageDTO, ChatMessage, ChatMessageDomain> {
+    fun fromEntityToNewChatMessageDomain(entity: ChatMessage?): NewChatMessageDomain?
+}

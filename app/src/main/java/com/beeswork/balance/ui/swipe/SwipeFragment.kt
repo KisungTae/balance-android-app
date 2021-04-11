@@ -16,7 +16,7 @@ import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.ScopeFragment
-import com.beeswork.balance.ui.dialog.MatchDialog
+import com.beeswork.balance.ui.dialog.NewMatchDialog
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -171,9 +171,9 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     }
 
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
-        MatchDialog("", matchedPhotoKey).show(
+        NewMatchDialog("", matchedPhotoKey).show(
             childFragmentManager,
-            MatchDialog.TAG
+            NewMatchDialog.TAG
         )
     }
 

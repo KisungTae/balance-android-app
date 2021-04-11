@@ -5,23 +5,19 @@ import android.view.*
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
-import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
-import com.beeswork.balance.ui.login.LoginFragment
+import com.beeswork.balance.ui.dialog.NewMatchDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -34,11 +30,13 @@ class MatchFragment : BaseFragment(),
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
+    private val preferenceProvider: PreferenceProviderImpl by instance()
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagingDataAdapter: MatchPagingDataAdapter
     private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>
     private lateinit var binding: FragmentMatchBinding
     private var searchJob: Job? = null
+    private var repPhotoKey: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,17 +53,30 @@ class MatchFragment : BaseFragment(),
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        setupRepPhotoObserver()
         setupMatchRecyclerView()
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
         setupMatchPagingRefreshLiveData()
         search("")
-        viewModel.fetchMatches()
+//        viewModel.fetchMatches()
+    }
+
+    private fun setupRepPhotoObserver() {
+//        TODO: "Not yet implemented"
     }
 
     private fun setupMatchPagingRefreshLiveData() {
-        viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, {
-//          TODO: check if there is new match, if so then pop up new match dialog
+        viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, { pagingRefresh ->
+            pagingRefresh.data?.let { newMatchDomain ->
+                NewMatchDialog(
+                    newMatchDomain.matchedId,
+                    newMatchDomain.name,
+                    newMatchDomain.repPhotoKey,
+                    preferenceProvider.getAccountId(),
+                    repPhotoKey
+                ).show(childFragmentManager, NewMatchDialog.TAG)
+            }
             matchPagingRefreshAdapter.refresh()
         })
     }
@@ -96,10 +107,10 @@ class MatchFragment : BaseFragment(),
     private fun search(keyword: String) {
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
-            viewModel.initMatchPagingData(keyword.trim()).collectLatest {
+            viewModel.initMatchPagingData(keyword.trim()).observe(viewLifecycleOwner, {
                 matchPagingRefreshAdapter.reset()
-                matchPagingDataAdapter.submitData(it)
-            }
+                lifecycleScope.launch { matchPagingDataAdapter.submitData(it) }
+            })
         }
     }
 

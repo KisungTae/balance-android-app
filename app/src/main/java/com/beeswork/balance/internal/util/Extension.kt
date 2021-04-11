@@ -7,6 +7,8 @@ import androidx.annotation.LayoutRes
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
 import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -33,12 +35,12 @@ fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any, R : Any> safeLet(
     return if (p1 != null && p2 != null && p3 != null && p4 != null) block(p1, p2, p3, p4) else null
 }
 
-fun <T> CoroutineScope.safeLaunch(callBack: MutableLiveData<Resource<T>>, launchBody: suspend () -> Unit): Job {
+fun <T> CoroutineScope.safeLaunch(callBack: MutableLiveData<Resource<T>>?, launchBody: suspend () -> Unit): Job {
     val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         when (throwable) {
-            is SocketTimeoutException -> callBack.postValue(Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION))
-            is NoInternetConnectivityException -> callBack.postValue(Resource.error(ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION))
-            is ConnectException -> callBack.postValue(Resource.error(ExceptionCode.CONNECT_EXCEPTION))
+            is SocketTimeoutException -> callBack?.postValue(Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION))
+            is NoInternetConnectivityException -> callBack?.postValue(Resource.error(ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION))
+            is ConnectException -> callBack?.postValue(Resource.error(ExceptionCode.CONNECT_EXCEPTION))
             else -> throw throwable
         }
     }

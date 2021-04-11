@@ -30,8 +30,10 @@ class PagingRefreshAdapter<T: Any, VH: RecyclerView.ViewHolder>(
 
     private fun refreshAdapter() {
         if (!scrolling && refresh) {
+            val scrollToBottom = !recyclerView.canScrollVertically(1)
             pagingDataAdapter.refresh()
             refresh = false
+            if (scrollToBottom) recyclerView.scrollToPosition(0)
         }
     }
 

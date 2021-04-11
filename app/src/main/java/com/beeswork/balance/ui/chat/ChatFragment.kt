@@ -82,19 +82,35 @@ class ChatFragment : BaseFragment(),
         matchedRepPhotoKey: String?,
         matchValid: Boolean
     ) = lifecycleScope.launch {
-            setupBackPressedDispatcherCallback()
-            setupToolBar(matchedName)
-            setupSendBtnListener()
-            setupEmoticonBtnListener()
-            setupChatRecyclerView()
+        setupBackPressedDispatcherCallback()
+        setupToolBar(matchedName)
+        setupSendBtnListener()
+        setupEmoticonBtnListener()
+        setupSendChatMessageObserver()
+        setupChatRecyclerView()
 //        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
-            if (!matchValid) setupAsUnmatched()
-            setupChatMessagePagingRefreshObserver()
-            setupChatMessagePagingData()
-        }
+        if (!matchValid) setupAsUnmatched()
+        setupChatMessagePagingRefreshObserver()
+        setupChatMessagePagingData()
+    }
+
+    private fun setupSendChatMessageObserver() {
+        viewModel.sendChatMessageLiveData.observe(viewLifecycleOwner, {
+            println("sendChatMessageLiveData.observe")
+            if (it.isError()) ErrorDialog(
+                it.error,
+                getString(R.string.error_title_send_chat_message),
+                it.errorMessage,
+                null,
+                null
+            ).show(childFragmentManager, ErrorDialog.TAG)
+        })
+    }
 
     private fun setupChatMessagePagingRefreshObserver() {
         viewModel.chatMessagePagingRefreshLiveData.observe(viewLifecycleOwner, {
+            //TODO: if data is not null, then check if scroll is bottom if not then new message alert in chat
+
             chatMessagePagingRefreshAdapter.refresh()
         })
     }
@@ -107,14 +123,14 @@ class ChatFragment : BaseFragment(),
 
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
-            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
+            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString().trim())
         }
     }
 
     private suspend fun setupChatMessagePagingData() {
         registerAdapterDataObserver()
-        viewModel.initChatMessagePagingData().collectLatest {
-            chatMessagePagingAdapter.submitData(it)
+        viewModel.initChatMessagePagingData().observe(viewLifecycleOwner) {
+            lifecycleScope.launch { chatMessagePagingAdapter.submitData(it) }
         }
     }
 

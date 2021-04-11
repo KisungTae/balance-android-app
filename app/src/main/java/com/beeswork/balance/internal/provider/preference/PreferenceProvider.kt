@@ -17,7 +17,7 @@ interface PreferenceProvider {
     fun getMaxAge(): Float
     fun getDistanceInMeters(): Int
     fun getDistance(): Float
-    fun getAccountId(): UUID
-    fun getIdentityToken(): UUID
+    fun getAccountId(): UUID?
+    fun getIdentityToken(): UUID?
     fun getMatchFetchedAt(): OffsetDateTime
 }

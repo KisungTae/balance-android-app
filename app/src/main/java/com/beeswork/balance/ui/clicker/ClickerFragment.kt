@@ -12,7 +12,7 @@ import com.beeswork.balance.databinding.FragmentClickerBinding
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
-import com.beeswork.balance.ui.dialog.MatchDialog
+import com.beeswork.balance.ui.dialog.NewMatchDialog
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -88,9 +88,9 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
     }
 
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
-        MatchDialog("", matchedPhotoKey).show(
+        NewMatchDialog("", matchedPhotoKey).show(
             childFragmentManager,
-            MatchDialog.TAG
+            NewMatchDialog.TAG
         )
     }
 

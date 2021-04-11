@@ -3,10 +3,16 @@
     <string name="app_name_capital">WECLICK</string>
 
     <string name="error_message_generic">에러가 발생했습니다</string>
+
+
     <string name="error_title_generic">에러</string>
     <string name="error_title_chat_id_not_found">유효하지 않은 채팅입니다.</string>
     <string name="error_title_fetch_matches">매치정보를 가져오는데 실패했습니다</string>
     <string name="error_title_fetch_chat_messages">채팅 메세지를 가져오는데 실패했습니다</string>
+    <string name="error_title_send_chat_message">채팅 메세지를 전송하지 못했습니다</string>
+
+    <string name="chat_message_over_sized_exception">채팅메세지가 너무 깁니다 줄여주세요</string>
+    <string name="chat_message_empty_exception">채팅메세지를 입력해주세요</string>
 
     <string name="socket_timeout_exception">서버에 연결할수 없습니다</string>
     <string name="no_internet_connectivity_exception">인터넷이 연결되지 않았습니다</string>

@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.response.NewChatMessage
-import com.beeswork.balance.data.database.response.NewMatch
 import com.beeswork.balance.data.database.response.PagingRefresh
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
@@ -38,11 +36,11 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
-    private val _matchPagingRefreshLiveData = MutableLiveData<PagingRefresh<NewMatch>>()
-    override val matchPagingRefreshLiveData: LiveData<PagingRefresh<NewMatch>> get() = _matchPagingRefreshLiveData
+    private val _matchPagingRefreshLiveData = MutableLiveData<PagingRefresh<Match>>()
+    override val matchPagingRefreshLiveData: LiveData<PagingRefresh<Match>> get() = _matchPagingRefreshLiveData
 
-    private val _chatMessagePagingRefreshLiveData = MutableLiveData<PagingRefresh<NewChatMessage>>()
-    override val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<NewChatMessage>> get() = _chatMessagePagingRefreshLiveData
+    private val _chatMessagePagingRefreshLiveData = MutableLiveData<PagingRefresh<ChatMessage>>()
+    override val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<ChatMessage>> get() = _chatMessagePagingRefreshLiveData
 
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
@@ -204,9 +202,13 @@ class MatchRepositoryImpl(
         }
     }
 
-
     override suspend fun sendChatMessage(chatId: Long, body: String) {
-        chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
+        withContext(Dispatchers.IO) {
+            chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
+            _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
+        }
+
+
     }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {

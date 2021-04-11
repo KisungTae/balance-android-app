@@ -8,17 +8,9 @@ import java.util.*
 interface ChatRDS {
 
     suspend fun syncChatMessages(
-        accountId: UUID,
-        identityToken: UUID,
+        accountId: UUID?,
+        identityToken: UUID?,
         sentChatMessageIds: List<Long>,
         receivedChatMessageIds: List<Long>
     )
-
-    suspend fun fetchChatMessages(
-        accountId: String,
-        identityToken: String,
-        chatId: Long,
-        recipientId: String,
-        lastChatMessageId: Long
-    ): Resource<List<ChatMessageResponse>>
 }

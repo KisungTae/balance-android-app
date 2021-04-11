@@ -12,8 +12,8 @@ class MatchRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), MatchRDS {
     override suspend fun listMatches(
-        accountId: UUID,
-        identityToken: UUID,
+        accountId: UUID?,
+        identityToken: UUID?,
         matchFetchedAt: OffsetDateTime
     ): Resource<ListMatchesDTO> {
         return getResult {

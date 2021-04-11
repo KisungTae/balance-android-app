@@ -14,6 +14,10 @@ class EndPoint {
 //            return "$PHOTO_BUCKET/$accountId/$photoKey"
             return "$PHOTO_BUCKET/$photoKey"
         }
+
+        fun ofAccountRepPhoto() {
+
+        }
     }
 
 

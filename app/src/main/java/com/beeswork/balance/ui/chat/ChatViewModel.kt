@@ -1,16 +1,21 @@
 package com.beeswork.balance.ui.chat
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.data.database.response.PagingRefresh
+import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.*
@@ -25,9 +30,14 @@ class ChatViewModel(
     private val stompClient: StompClient
 ) : ViewModel() {
 
-    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshLiveData
+    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshLiveData.map { pagingRefresh ->
+        pagingRefresh.map { data -> chatMessageMapper.fromEntityToNewChatMessageDomain(data) }
+    }
 
-    fun initChatMessagePagingData(): Flow<PagingData<ChatMessageDomain>> {
+    private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
+
+    fun initChatMessagePagingData(): LiveData<PagingData<ChatMessageDomain>> {
         return Pager(
             pagingConfig,
             null,
@@ -50,7 +60,7 @@ class ChatViewModel(
                 }
                 separator
             }
-        }
+        }.asLiveData(viewModelScope.coroutineContext)
     }
 
 
@@ -60,14 +70,34 @@ class ChatViewModel(
         }
     }
 
+    val latestNews: Flow<Boolean> = flow {
+        while(true) {
+//            val latestNews = newsApi.fetchLatestNews()
+            emit(true) // Emits the result of the request to the flow
+
+        }
+    }
+
     fun sendChatMessage(body: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-//            chatRepository.sendChatMessage(chatId, body)
+
+
+        viewModelScope.launch {
+            val bodySize = body.toByteArray().size
+            when {
+                bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
+                    Resource.error(ExceptionCode.CHAT_MESSAGE_OVER_SIZED_EXCEPTION)
+                )
+                bodySize <= 0 -> _sendChatMessageLiveData.postValue(
+                    Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
+                )
+                else -> matchRepository.sendChatMessage(chatId, body)
+            }
         }
     }
 
 
     companion object {
+        private const val MAX_CHAT_MESSAGE_BODY_SIZE = 500
         private const val CHAT_PAGE_SIZE = 80
         private const val CHAT_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
         private const val CHAT_MAX_PAGE_SIZE = CHAT_PREFETCH_DISTANCE * 3 + CHAT_PAGE_SIZE

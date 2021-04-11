@@ -27,10 +27,6 @@ class AccountFragment: ScopeFragment(), KodeinAware {
         return binding.root
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindUI()

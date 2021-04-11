@@ -31,10 +31,14 @@ interface BalanceAPI {
 
     @GET("match/list")
     suspend fun listMatches(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "identityToken") identityToken: UUID,
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?,
         @Query(value = "fetchedAt") matchFetchedAt: OffsetDateTime
     ): Response<ListMatchesDTO>
+
+
+
+
 
     @GET("chat/message/list")
     suspend fun fetchChatMessages(

@@ -9,6 +9,8 @@ import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -35,8 +37,15 @@ class StompClientImpl(
         setupWebSocketListener()
     }
 
+    val latestNews: Flow<Boolean> = flow {
+        while(true) {
+            emit(true) // Emits the result of the request to the flow
+        }
+    }
+
 
     private fun setupWebSocketListener() {
+
 //        webSocket.addListener(object : WebSocketAdapter() {
 //            override fun onConnected(
 //                websocket: WebSocket?,
