@@ -27,6 +27,8 @@ import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.clicker.ClickerViewModelFactory
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModel
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
@@ -127,6 +129,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickerViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
+        bind() from provider { MainViewPagerViewModelFactory(instance(), instance()) }
 
 
         // Interceptor

@@ -4,14 +4,19 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import okhttp3.*
+import okio.ByteString
 import java.util.*
 
 
@@ -20,6 +25,12 @@ class StompClientImpl(
     private val preferenceProvider: PreferenceProvider,
     private val context: Context
 ) : StompClient {
+
+    private lateinit var socket: WebSocket
+    private val incoming = Channel<String>()
+    private val outgoing = Channel<String>()
+    private val incomingFlow: Flow<String> = incoming.consumeAsFlow()
+
 
     private val mutableWebSocketLifeCycleEvent =
         MutableLiveData<WebSocketEvent>()
@@ -35,16 +46,65 @@ class StompClientImpl(
 
     init {
         setupWebSocketListener()
-    }
 
-    val latestNews: Flow<Boolean> = flow {
-        while(true) {
-            emit(true) // Emits the result of the request to the flow
+        val okHttpClient = OkHttpClient.Builder()
+            .build()
+
+        val request = Request.Builder()
+            .url(EndPoint.WEB_SOCKET_ENDPOINT)
+            .build()
+
+        socket = okHttpClient.newWebSocket(request, WebSocketChannelListener(incoming, outgoing))
+
+        // Trigger shutdown of the dispatcher's executor so this process can exit cleanly.
+        okHttpClient.dispatcher().executorService().shutdown()
+
+        // Everything that goes into the outgoing channel is sent to the web socket.
+        // Everything that gets into the incoming channel is sent to incomingFlow.
+        scope.launch(Dispatchers.IO) {
+            try {
+                outgoing.consumeEach {
+                    socket.send(it.json)
+                }
+            } finally {
+                close()
+            }
         }
     }
 
+    inner class WebSocketChannelListener(
+        private val incoming: Channel<String>,
+        private val outgoing: Channel<String>
+    ) : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {}
+
+        override fun onMessage(webSocket: WebSocket, text: String) {
+//            scope.launch(Dispatchers.IO) {
+//                incoming.send(RawData(text))
+//            }
+        }
+
+        override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+//            scope.launch(Dispatchers.IO) {
+//                incoming.send(RawData(bytes.toString()))
+//            }
+        }
+
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {}
+
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            incoming.close()
+            outgoing.close()
+        }
+
+        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            incoming.close(t)
+            outgoing.close(t)
+        }
+    }
 
     private fun setupWebSocketListener() {
+
 
 //        webSocket.addListener(object : WebSocketAdapter() {
 //            override fun onConnected(

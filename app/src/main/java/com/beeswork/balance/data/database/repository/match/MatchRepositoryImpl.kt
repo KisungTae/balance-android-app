@@ -16,6 +16,8 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.data.database.response.NewChatMessage
+import com.beeswork.balance.data.database.response.NewMatch
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -36,11 +38,11 @@ class MatchRepositoryImpl(
     private val preferenceProvider: PreferenceProvider
 ) : MatchRepository {
 
-    private val _matchPagingRefreshLiveData = MutableLiveData<PagingRefresh<Match>>()
-    override val matchPagingRefreshLiveData: LiveData<PagingRefresh<Match>> get() = _matchPagingRefreshLiveData
+    private val _matchPagingRefreshLiveData = MutableLiveData<PagingRefresh<NewMatch>>()
+    override val matchPagingRefreshLiveData: LiveData<PagingRefresh<NewMatch>> get() = _matchPagingRefreshLiveData
 
-    private val _chatMessagePagingRefreshLiveData = MutableLiveData<PagingRefresh<ChatMessage>>()
-    override val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<ChatMessage>> get() = _chatMessagePagingRefreshLiveData
+    private val _chatMessagePagingRefreshLiveData = MutableLiveData<PagingRefresh<NewChatMessage>>()
+    override val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<NewChatMessage>> get() = _chatMessagePagingRefreshLiveData
 
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {

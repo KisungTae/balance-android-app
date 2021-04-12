@@ -96,7 +96,6 @@ class ChatFragment : BaseFragment(),
 
     private fun setupSendChatMessageObserver() {
         viewModel.sendChatMessageLiveData.observe(viewLifecycleOwner, {
-            println("sendChatMessageLiveData.observe")
             if (it.isError()) ErrorDialog(
                 it.error,
                 getString(R.string.error_title_send_chat_message),

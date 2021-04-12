@@ -7,19 +7,30 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.internal.constant.FragmentTabPosition
+import com.beeswork.balance.ui.match.MatchViewModel
+import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
+import okhttp3.internal.Internal.instance
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.closestKodein
+import org.kodein.di.generic.instance
 
 
-class MainViewPagerFragment : Fragment() {
+class MainViewPagerFragment : Fragment(), KodeinAware {
 
+    override val kodein by closestKodein()
+    private val viewModelFactory: MainViewPagerViewModelFactory by instance()
     private lateinit var binding: FragmentMainViewPagerBinding
     private lateinit var mainViewPagerAdapter: MainViewPagerAdapter
+    private lateinit var viewModel: MainViewPagerViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +49,8 @@ class MainViewPagerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewPagerViewModel::class.java)
         bindUI()
     }
 

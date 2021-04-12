@@ -171,10 +171,10 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     }
 
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
-        NewMatchDialog("", matchedPhotoKey).show(
-            childFragmentManager,
-            NewMatchDialog.TAG
-        )
+//        NewMatchDialog("", matchedPhotoKey).show(
+//            childFragmentManager,
+//            NewMatchDialog.TAG
+//        )
     }
 
     override fun onCardSwiped(direction: Direction?) {

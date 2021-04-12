@@ -7,8 +7,10 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MatchViewModel(
@@ -19,9 +21,7 @@ class MatchViewModel(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
-    val matchPagingRefreshLiveData = matchRepository.matchPagingRefreshLiveData.map { pagingRefresh ->
-        pagingRefresh.map { data -> matchMapper.fromEntityToNewMatchDomain(data) }
-    }
+    val matchPagingRefreshLiveData = matchRepository.matchPagingRefreshLiveData
 
     fun initMatchPagingData(searchKeyword: String): LiveData<PagingData<MatchDomain>> {
         return Pager(
@@ -32,7 +32,6 @@ class MatchViewModel(
             .map { pagingData -> pagingData.map { matchMapper.fromEntityToDomain(it) } }
             .asLiveData(viewModelScope.coroutineContext)
     }
-
 
     fun fetchMatches() {
         viewModelScope.safeLaunch(_fetchMatchesLiveData) {

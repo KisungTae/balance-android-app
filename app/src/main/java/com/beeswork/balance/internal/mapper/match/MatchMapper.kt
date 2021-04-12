@@ -4,10 +4,10 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.mapper.common.Mapper
 import com.beeswork.balance.ui.match.MatchDomain
-import com.beeswork.balance.ui.match.NewMatchDomain
+import com.beeswork.balance.data.database.response.NewMatch
 import java.util.*
 
 interface MatchMapper: Mapper<MatchDTO, Match, MatchDomain> {
 
-    fun fromEntityToNewMatchDomain(entity: Match?): NewMatchDomain?
+    fun fromEntityToNewMatchDomain(entity: Match, accountId: UUID?, repPhotoKey: String?): NewMatch
 }

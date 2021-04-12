@@ -30,9 +30,7 @@ class ChatViewModel(
     private val stompClient: StompClient
 ) : ViewModel() {
 
-    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshLiveData.map { pagingRefresh ->
-        pagingRefresh.map { data -> chatMessageMapper.fromEntityToNewChatMessageDomain(data) }
-    }
+    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshLiveData
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
@@ -79,8 +77,6 @@ class ChatViewModel(
     }
 
     fun sendChatMessage(body: String) {
-
-
         viewModelScope.launch {
             val bodySize = body.toByteArray().size
             when {

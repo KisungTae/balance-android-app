@@ -88,10 +88,10 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
     }
 
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
-        NewMatchDialog("", matchedPhotoKey).show(
-            childFragmentManager,
-            NewMatchDialog.TAG
-        )
+//        NewMatchDialog("", matchedPhotoKey).show(
+//            childFragmentManager,
+//            NewMatchDialog.TAG
+//        )
     }
 
     override fun onRetry() {

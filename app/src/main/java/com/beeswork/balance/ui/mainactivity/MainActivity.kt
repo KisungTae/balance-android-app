@@ -72,10 +72,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
 
         when (notificationType) {
-            NotificationType.MATCH -> NewMatchDialog("", photoKey).show(
-                supportFragmentManager,
-                NewMatchDialog.TAG
-            )
+//            NotificationType.MATCH -> NewMatchDialog("", photoKey).show(
+//                supportFragmentManager,
+//                NewMatchDialog.TAG
+//            )
             NotificationType.CLICKED -> ClickedDialog(photoKey).show(
                 supportFragmentManager,
                 ClickedDialog.TAG

@@ -30,13 +30,11 @@ class MatchFragment : BaseFragment(),
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
-    private val preferenceProvider: PreferenceProviderImpl by instance()
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagingDataAdapter: MatchPagingDataAdapter
     private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>
     private lateinit var binding: FragmentMatchBinding
     private var searchJob: Job? = null
-    private var repPhotoKey: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +51,6 @@ class MatchFragment : BaseFragment(),
     }
 
     private fun bindUI() = lifecycleScope.launch {
-        setupRepPhotoObserver()
         setupMatchRecyclerView()
         setupToolBars()
         setupFetchMatchesLiveDataObserver()
@@ -62,19 +59,15 @@ class MatchFragment : BaseFragment(),
 //        viewModel.fetchMatches()
     }
 
-    private fun setupRepPhotoObserver() {
-//        TODO: "Not yet implemented"
-    }
-
     private fun setupMatchPagingRefreshLiveData() {
         viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, { pagingRefresh ->
-            pagingRefresh.data?.let { newMatchDomain ->
+            pagingRefresh.data?.let { newMatch ->
                 NewMatchDialog(
-                    newMatchDomain.matchedId,
-                    newMatchDomain.name,
-                    newMatchDomain.repPhotoKey,
-                    preferenceProvider.getAccountId(),
-                    repPhotoKey
+                    newMatch.matchedId,
+                    newMatch.matchedName,
+                    newMatch.matchedRepPhotoKey,
+                    newMatch.accountId,
+                    newMatch.repPhotoKey
                 ).show(childFragmentManager, NewMatchDialog.TAG)
             }
             matchPagingRefreshAdapter.refresh()

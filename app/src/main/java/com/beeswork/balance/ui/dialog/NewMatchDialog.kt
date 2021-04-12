@@ -13,8 +13,8 @@ class NewMatchDialog(
     private val matchedId: UUID,
     private val matchedName: String,
     private val matchedRepPhotoKey: String?,
-    private val matcherId: UUID?,
-    private val matcherRepPhotoKey: String?
+    private val accountId: UUID?,
+    private val repPhotoKey: String?
 ): DialogFragment() {
 
     private lateinit var binding: DialogNewMatchBinding
