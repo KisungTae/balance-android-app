@@ -15,12 +15,10 @@ import org.threeten.bp.OffsetDateTime
     indices = [Index(value = ["chatId", "id"])]
 )
 data class ChatMessage(
-
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
     var createdAt: OffsetDateTime?,
-
     var id: Long = Long.MAX_VALUE,
 
     @PrimaryKey(autoGenerate = true)

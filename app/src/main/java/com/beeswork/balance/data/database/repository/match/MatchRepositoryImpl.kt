@@ -93,14 +93,12 @@ class MatchRepositoryImpl(
             }
 
             sentChatMessageDTOs.forEach { chatMessageDTO ->
-                chatMessageDTO.key?.let { key ->
-                    chatMessageDAO.findByKey(key)?.let { chatMessage ->
-                        chatMessage.id = chatMessageDTO.id
-                        chatMessage.status = ChatMessageStatus.SENT
-                        chatMessage.createdAt = chatMessageDTO.createdAt
-                        chatMessageDAO.insert(chatMessage)
-                        chatIds.add(chatMessage.chatId)
-                    }
+                chatMessageDAO.findByKey(chatMessageDTO.key)?.let { chatMessage ->
+                    chatMessage.id = chatMessageDTO.id
+                    chatMessage.status = ChatMessageStatus.SENT
+                    chatMessage.createdAt = chatMessageDTO.createdAt
+                    chatMessageDAO.insert(chatMessage)
+                    chatIds.add(chatMessage.chatId)
                 }
                 sentChatMessageIds.add(chatMessageDTO.id)
             }

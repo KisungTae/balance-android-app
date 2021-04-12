@@ -11,6 +11,7 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
@@ -21,15 +22,13 @@ import java.util.*
 
 
 class StompClientImpl(
-    private val balanceRepository: BalanceRepository,
-    private val preferenceProvider: PreferenceProvider,
-    private val context: Context
+    private val scope: CoroutineScope
 ) : StompClient {
 
     private lateinit var socket: WebSocket
-    private val incoming = Channel<String>()
-    private val outgoing = Channel<String>()
-    private val incomingFlow: Flow<String> = incoming.consumeAsFlow()
+    private val incoming = Channel<StompFrame>()
+    private val outgoing = Channel<StompFrame>()
+    private val incomingFlow: Flow<StompFrame> = incoming.consumeAsFlow()
 
 
     private val mutableWebSocketLifeCycleEvent =

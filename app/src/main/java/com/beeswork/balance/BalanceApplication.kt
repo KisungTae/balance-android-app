@@ -33,6 +33,7 @@ import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -44,6 +45,9 @@ const val NETWORK_READ_TIMEOUT = 100L
 const val NETWORK_CONNECTION_TIMEOUT = 100L
 
 class BalanceApplication : Application(), KodeinAware {
+
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
 
     override val kodein = Kodein.lazy {
         import(androidXModule(this@BalanceApplication))
@@ -110,7 +114,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
 
         // StompClient
-        bind() from singleton { StompClientImpl(instance(), instance(), instance()) }
+        bind() from singleton { StompClientImpl(applicationScope) }
 
         // Provider
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
