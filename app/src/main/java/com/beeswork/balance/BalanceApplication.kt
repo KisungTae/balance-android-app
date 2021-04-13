@@ -133,7 +133,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickerViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
-        bind() from provider { MainViewPagerViewModelFactory(instance(), instance()) }
+        bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
 
 
         // Interceptor

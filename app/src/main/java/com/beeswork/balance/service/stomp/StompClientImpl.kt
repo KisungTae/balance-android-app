@@ -26,9 +26,9 @@ class StompClientImpl(
 ) : StompClient {
 
     private lateinit var socket: WebSocket
-    private val incoming = Channel<StompFrame>()
-    private val outgoing = Channel<StompFrame>()
-    private val incomingFlow: Flow<StompFrame> = incoming.consumeAsFlow()
+    private val incoming = Channel<String>()
+    private val outgoing = Channel<String>()
+    private val incomingFlow: Flow<String> = incoming.consumeAsFlow()
 
 
     private val mutableWebSocketLifeCycleEvent =
@@ -46,13 +46,8 @@ class StompClientImpl(
     init {
         setupWebSocketListener()
 
-        val okHttpClient = OkHttpClient.Builder()
-            .build()
-
-        val request = Request.Builder()
-            .url(EndPoint.WEB_SOCKET_ENDPOINT)
-            .build()
-
+        val okHttpClient = OkHttpClient.Builder().build()
+        val request = Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build()
         socket = okHttpClient.newWebSocket(request, WebSocketChannelListener(incoming, outgoing))
 
         // Trigger shutdown of the dispatcher's executor so this process can exit cleanly.
@@ -61,13 +56,13 @@ class StompClientImpl(
         // Everything that goes into the outgoing channel is sent to the web socket.
         // Everything that gets into the incoming channel is sent to incomingFlow.
         scope.launch(Dispatchers.IO) {
-            try {
-                outgoing.consumeEach {
-                    socket.send(it.json)
-                }
-            } finally {
-                close()
-            }
+//            try {
+//                outgoing.consumeEach {
+//                    socket.send(it.json)
+//                }
+//            } finally {
+//                close()
+//            }
         }
     }
 
@@ -75,28 +70,37 @@ class StompClientImpl(
         private val incoming: Channel<String>,
         private val outgoing: Channel<String>
     ) : WebSocketListener() {
-        override fun onOpen(webSocket: WebSocket, response: Response) {}
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+            println("onOpen")
+        }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
+            println("onMessage text")
 //            scope.launch(Dispatchers.IO) {
 //                incoming.send(RawData(text))
 //            }
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+            println("onMessage bytes")
 //            scope.launch(Dispatchers.IO) {
 //                incoming.send(RawData(bytes.toString()))
 //            }
         }
 
-        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {}
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            println("onClosing")
+        }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            println("onClosed")
             incoming.close()
             outgoing.close()
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            println("onFailure")
+            println("response: $response")
             incoming.close(t)
             outgoing.close(t)
         }

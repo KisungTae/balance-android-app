@@ -4,15 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.match.MatchMapper
+import com.beeswork.balance.service.stomp.StompClient
 import com.beeswork.balance.ui.match.MatchViewModel
 
 class MainViewPagerViewModelFactory(
     private val matchRepository: MatchRepository,
-    private val matchMapper: MatchMapper
+    private val matchMapper: MatchMapper,
+    private val stompClient: StompClient
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return MainViewPagerViewModel(matchRepository, matchMapper) as T
+        return MainViewPagerViewModel(matchRepository, matchMapper, stompClient) as T
     }
 }
