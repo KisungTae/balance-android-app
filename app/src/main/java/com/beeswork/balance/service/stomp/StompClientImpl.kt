@@ -44,6 +44,7 @@ class StompClientImpl(
     private var matchedId: String? = null
 
     init {
+
         setupWebSocketListener()
 
         val okHttpClient = OkHttpClient.Builder().build()
@@ -70,6 +71,7 @@ class StompClientImpl(
         private val incoming: Channel<String>,
         private val outgoing: Channel<String>
     ) : WebSocketListener() {
+
         override fun onOpen(webSocket: WebSocket, response: Response) {
             println("onOpen")
         }
@@ -101,14 +103,14 @@ class StompClientImpl(
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             println("onFailure")
             println("response: $response")
+            println("websocket: $webSocket")
+            println("throwable: $t")
             incoming.close(t)
             outgoing.close(t)
         }
     }
 
     private fun setupWebSocketListener() {
-
-
 //        webSocket.addListener(object : WebSocketAdapter() {
 //            override fun onConnected(
 //                websocket: WebSocket?,
