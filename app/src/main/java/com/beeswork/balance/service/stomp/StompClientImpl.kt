@@ -66,13 +66,12 @@ class StompClientImpl(
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         println("onOpen")
-        subscribe()
+        connectStomp()
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-
-
         println("onMessage text")
+        subscribe()
 //            scope.launch(Dispatchers.IO) {
 //                incoming.send(RawData(text))
 //            }
@@ -191,21 +190,25 @@ class StompClientImpl(
     }
 
     private fun connectStomp() {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val headers = mutableMapOf<String, String>()
-//            headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
-//            headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
-//            webSocket.sendText(StompFrame(StompFrame.Command.CONNECT, headers).compile())
-//        }
+        CoroutineScope(Dispatchers.IO).launch {
+            val headers = mutableMapOf<String, String>()
+            headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
+            headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
+            socket?.send(StompFrame(StompFrame.Command.CONNECT, headers).compile())
+        }
     }
 
     private fun subscribe() {
-        val headers = stompIdentityHeaders()
-//        headers[StompHeader.ACK] = DEFAULT_ACK
-//        headers[StompHeader.EXCLUSIVE] = false.toString()
-//        headers[StompHeader.AUTO_DELETE] = true.toString()
-//        headers[StompHeader.DURABLE] = true.toString()
+        val headers = mutableMapOf<String, String>()
+        headers[StompHeader.DESTINATION] = "/queue/${preferenceProvider.getAccountId()?.toString()}"
+        headers[StompHeader.ID] = "${UUID.randomUUID()}"
+        headers[StompHeader.ACK] = DEFAULT_ACK
+        headers[StompHeader.EXCLUSIVE] = false.toString()
+        headers[StompHeader.AUTO_DELETE] = true.toString()
+        headers[StompHeader.DURABLE] = true.toString()
         scope.launch {
+//            println("stomp subscribe frame: ")
+            println("${StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile()}")
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
         }
 
@@ -227,6 +230,7 @@ class StompClientImpl(
     private fun stompIdentityHeaders(): MutableMap<String, String> {
         val headers = mutableMapOf<String, String>()
         headers[StompHeader.DESTINATION] = "/queue/${preferenceProvider.getAccountId()?.toString()}"
+        headers[StompHeader.ID] = "${UUID.randomUUID()}"
 //        headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
 //        headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
         return headers
