@@ -10,4 +10,11 @@ class MainViewPagerViewModel(
     private val matchMapper: MatchMapper,
     private val stompClient: StompClient
 ) : ViewModel() {
+
+    val webSocketEventLiveData = stompClient.webSocketEventLiveData
+
+
+    fun connectToStomp() {
+        stompClient.connect()
+    }
 }

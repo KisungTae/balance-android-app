@@ -68,6 +68,7 @@ data class StompFrame(
         const val TERMINATE_MESSAGE_SYMBOL = "\u0000"
         private const val HEADER_PATTERN = "([^:\\s]+)\\s*:\\s*([^\\n]+)"
 
+
         fun from(data: String?): StompFrame {
             if (data == null || data.trim().isEmpty())
                 return StompFrame(Command.UNKNOWN, null)

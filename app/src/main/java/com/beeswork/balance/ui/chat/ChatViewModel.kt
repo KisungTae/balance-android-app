@@ -61,34 +61,26 @@ class ChatViewModel(
         }.asLiveData(viewModelScope.coroutineContext)
     }
 
-
     fun synchronizeMatch() {
         viewModelScope.launch {
             matchRepository.synchronizeMatch(chatId)
         }
     }
 
-    val latestNews: Flow<Boolean> = flow {
-        while(true) {
-//            val latestNews = newsApi.fetchLatestNews()
-            emit(true) // Emits the result of the request to the flow
-
-        }
-    }
-
     fun sendChatMessage(body: String) {
-        viewModelScope.launch {
-            val bodySize = body.toByteArray().size
-            when {
-                bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
-                    Resource.error(ExceptionCode.CHAT_MESSAGE_OVER_SIZED_EXCEPTION)
-                )
-                bodySize <= 0 -> _sendChatMessageLiveData.postValue(
-                    Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
-                )
-                else -> matchRepository.sendChatMessage(chatId, body)
-            }
-        }
+        stompClient.connect()
+//        viewModelScope.launch {
+//            val bodySize = body.toByteArray().size
+//            when {
+//                bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
+//                    Resource.error(ExceptionCode.CHAT_MESSAGE_OVER_SIZED_EXCEPTION)
+//                )
+//                bodySize <= 0 -> _sendChatMessageLiveData.postValue(
+//                    Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
+//                )
+//                else -> matchRepository.sendChatMessage(chatId, body)
+//            }
+//        }
     }
 
 

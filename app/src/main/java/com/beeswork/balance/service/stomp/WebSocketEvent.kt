@@ -12,14 +12,14 @@ class WebSocketEvent(
         }
 
         fun disconnect(): WebSocketEvent {
-            return WebSocketEvent(Type.DISCONNECTED, null, null)
+            return WebSocketEvent(Type.CLOSED, null, null)
         }
     }
 
 
     enum class Type {
-        CONNECTED,
+        OPENED,
         ERROR,
-        DISCONNECTED
+        CLOSED
     }
 }

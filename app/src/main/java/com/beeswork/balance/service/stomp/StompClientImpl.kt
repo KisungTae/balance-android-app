@@ -1,9 +1,7 @@
 package com.beeswork.balance.service.stomp
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.HttpHeader
 import com.beeswork.balance.internal.constant.StompHeader
@@ -11,10 +9,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
@@ -22,37 +18,31 @@ import java.util.*
 
 
 class StompClientImpl(
-    private val scope: CoroutineScope
-) : StompClient {
+    private val scope: CoroutineScope,
+    private val okHttpClient: OkHttpClient,
+    private val preferenceProvider: PreferenceProvider
+) : StompClient, WebSocketListener() {
 
-    private lateinit var socket: WebSocket
-    private val incoming = Channel<String>()
-    private val outgoing = Channel<String>()
-    private val incomingFlow: Flow<String> = incoming.consumeAsFlow()
+    private var socket: WebSocket? = null
+    private var incoming = Channel<String>()
+    private var outgoing = Channel<String>()
+    private val incomingFlow = incoming.consumeAsFlow()
+    private var isOpen: Boolean = false
 
-
-    private val mutableWebSocketLifeCycleEvent =
-        MutableLiveData<WebSocketEvent>()
-    override val webSocketEvent: LiveData<WebSocketEvent>
-        get() = mutableWebSocketLifeCycleEvent
+    private val _webSocketEventLiveData = MutableLiveData<WebSocketEvent>()
+    override val webSocketEventLiveData: LiveData<WebSocketEvent> get() = _webSocketEventLiveData
 
 //    private var webSocket: WebSocket =
 //        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
-
-    private var chatId: Long? = null
-    private var matchedId: String? = null
-
     init {
 
-        setupWebSocketListener()
-
-        val okHttpClient = OkHttpClient.Builder().build()
-        val request = Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build()
-        socket = okHttpClient.newWebSocket(request, WebSocketChannelListener(incoming, outgoing))
+//        val okHttpClient = OkHttpClient.Builder().build()
+//        val request = Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build()
+//        socket = okHttpClient.newWebSocket(request, this)
 
         // Trigger shutdown of the dispatcher's executor so this process can exit cleanly.
-        okHttpClient.dispatcher().executorService().shutdown()
+//        okHttpClient.dispatcher().executorService().shutdown()
 
         // Everything that goes into the outgoing channel is sent to the web socket.
         // Everything that gets into the incoming channel is sent to incomingFlow.
@@ -67,47 +57,52 @@ class StompClientImpl(
         }
     }
 
-    inner class WebSocketChannelListener(
-        private val incoming: Channel<String>,
-        private val outgoing: Channel<String>
-    ) : WebSocketListener() {
+    override fun connect() {
+        if (!isOpen) socket = okHttpClient.newWebSocket(
+            Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build(),
+            this
+        )
+    }
 
-        override fun onOpen(webSocket: WebSocket, response: Response) {
-            println("onOpen")
-        }
+    override fun onOpen(webSocket: WebSocket, response: Response) {
+        println("onOpen")
+        subscribe()
+    }
 
-        override fun onMessage(webSocket: WebSocket, text: String) {
-            println("onMessage text")
+    override fun onMessage(webSocket: WebSocket, text: String) {
+
+
+        println("onMessage text")
 //            scope.launch(Dispatchers.IO) {
 //                incoming.send(RawData(text))
 //            }
-        }
+    }
 
-        override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            println("onMessage bytes")
+    override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+        println("onMessage bytes")
 //            scope.launch(Dispatchers.IO) {
 //                incoming.send(RawData(bytes.toString()))
 //            }
-        }
+    }
 
-        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            println("onClosing")
-        }
+    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+        isOpen = false
+        println("onClosing")
+    }
 
-        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            println("onClosed")
-            incoming.close()
-            outgoing.close()
-        }
+    override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        isOpen = false
+        println("onClosed")
+    }
 
-        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            println("onFailure")
-            println("response: $response")
-            println("websocket: $webSocket")
-            println("throwable: $t")
-            incoming.close(t)
-            outgoing.close(t)
-        }
+    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        isOpen = false
+
+        // TODO: decide how present exception
+        println("onFailure")
+        println("response: $response")
+        println("websocket: $webSocket")
+        println("throwable: $t")
     }
 
     private fun setupWebSocketListener() {
@@ -205,6 +200,15 @@ class StompClientImpl(
     }
 
     private fun subscribe() {
+        val headers = stompIdentityHeaders()
+//        headers[StompHeader.ACK] = DEFAULT_ACK
+//        headers[StompHeader.EXCLUSIVE] = false.toString()
+//        headers[StompHeader.AUTO_DELETE] = true.toString()
+//        headers[StompHeader.DURABLE] = true.toString()
+        scope.launch {
+            socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
+        }
+
 //        safeLet(chatId, matchedId) { chatId, matchedId ->
 //            CoroutineScope(Dispatchers.IO).launch {
 //                val headers = stompIdentityHeaders(queueName(chatId), matchedId, chatId)
@@ -219,29 +223,16 @@ class StompClientImpl(
 //        }
     }
 
-    override fun connectChat(chatId: Long, matchedId: String) {
-        this.chatId = chatId
-        this.matchedId = matchedId
-        connectWebSocket()
-    }
 
-    private fun stompIdentityHeaders(
-        destination: String,
-        matchedId: String,
-        chatId: Long
-    ): MutableMap<String, String> {
+    private fun stompIdentityHeaders(): MutableMap<String, String> {
         val headers = mutableMapOf<String, String>()
-        headers[StompHeader.DESTINATION] = destination
-//        headers[StompHeader.ACCOUNT_ID] = preferenceProvider.getAccountId1()
-//        headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken1()
-        headers[StompHeader.RECIPIENT_ID] = matchedId
-        headers[StompHeader.CHAT_ID] = chatId.toString()
-        headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+        headers[StompHeader.DESTINATION] = "/queue/${preferenceProvider.getAccountId()?.toString()}"
+//        headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
+//        headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
         return headers
     }
 
     override fun send(chatId: Long, matchedId: String, body: String) {
-
 
 
 //        CoroutineScope(Dispatchers.IO).launch {
@@ -288,7 +279,7 @@ class StompClientImpl(
 //        }
     }
 
-    override fun disconnectChat() {
+    override fun disconnect() {
 //        webSocket.disconnect()
     }
 

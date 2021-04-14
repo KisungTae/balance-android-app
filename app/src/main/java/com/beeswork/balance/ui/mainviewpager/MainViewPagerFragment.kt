@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -13,11 +12,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.internal.constant.FragmentTabPosition
-import com.beeswork.balance.ui.match.MatchViewModel
-import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
-import okhttp3.internal.Internal.instance
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -30,14 +26,6 @@ class MainViewPagerFragment : Fragment(), KodeinAware {
     private lateinit var binding: FragmentMainViewPagerBinding
     private lateinit var mainViewPagerAdapter: MainViewPagerAdapter
     private lateinit var viewModel: MainViewPagerViewModel
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
-//            override fun handleOnBackPressed() { }
-//        })
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,6 +45,13 @@ class MainViewPagerFragment : Fragment(), KodeinAware {
     private fun bindUI() = lifecycleScope.launch {
         setupViewPager()
         setupViewPagerTab()
+        setupWebSocketEventObserver()
+    }
+
+    private fun setupWebSocketEventObserver() {
+        viewModel.webSocketEventLiveData.observe(viewLifecycleOwner) {
+
+        }
     }
 
     private fun setupViewPager() {

@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 
 interface StompClient {
 
-    val webSocketEvent: LiveData<WebSocketEvent>
-    fun connectChat(chatId: Long, matchedId: String)
+    val webSocketEventLiveData: LiveData<WebSocketEvent>
+    fun connect()
     fun send(chatId: Long, matchedId: String, body: String)
-    fun disconnectChat()
+    fun disconnect()
 }

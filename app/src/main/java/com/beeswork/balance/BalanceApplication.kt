@@ -41,8 +41,10 @@ import org.kodein.di.android.x.androidXModule
 import org.kodein.di.generic.*
 import java.util.concurrent.TimeUnit
 
-const val NETWORK_READ_TIMEOUT = 100L
-const val NETWORK_CONNECTION_TIMEOUT = 100L
+//TODO: decide timeout duration
+const val NETWORK_READ_TIMEOUT = 10L
+const val NETWORK_CONNECTION_TIMEOUT = 10L
+const val NETWORK_WRITE_TIMEOUT = 10L
 
 class BalanceApplication : Application(), KodeinAware {
 
@@ -114,7 +116,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
 
         // StompClient
-        bind() from singleton { StompClientImpl(applicationScope) }
+        bind() from singleton { StompClientImpl(applicationScope, instance(), instance()) }
 
         // Provider
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
@@ -143,9 +145,12 @@ class BalanceApplication : Application(), KodeinAware {
             OkHttpClient.Builder()
                 .addInterceptor(instance())
                 .readTimeout(NETWORK_READ_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(NETWORK_WRITE_TIMEOUT, TimeUnit.SECONDS)
                 .connectTimeout(NETWORK_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                 .build()
         }
+
+
 
 
         // FusedLocationProvider
