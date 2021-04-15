@@ -6,6 +6,10 @@ class WebSocketEvent(
     val errorMessage: String?
 ) {
 
+    fun isError(): Boolean {
+        return type == Type.ERROR
+    }
+
     companion object {
         fun error(error: String?, errorMessage: String?): WebSocketEvent {
             return WebSocketEvent(Type.ERROR, error, errorMessage)

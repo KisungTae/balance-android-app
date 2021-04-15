@@ -14,6 +14,7 @@ class ErrorDialog(
     private val error: String?,
     private val errorTitle: String?,
     private val errorMessage: String?,
+    private val requestCode: Int?,
     private val onRetryListener: OnRetryListener?,
     private val onDismissListener: OnDismissListener?
 ) : DialogFragment() {
@@ -63,7 +64,7 @@ class ErrorDialog(
         onRetryListener?.let {
             binding.btnErrorDialogRetry.setOnClickListener {
                 dismiss()
-                onRetryListener.onRetry()
+                onRetryListener.onRetry(requestCode)
             }
         } ?: kotlin.run {
             binding.btnErrorDialogRetry.visibility = View.GONE
@@ -80,7 +81,7 @@ class ErrorDialog(
     }
 
     interface OnRetryListener {
-        fun onRetry()
+        fun onRetry(requestCode: Int?)
     }
 
     interface OnDismissListener {

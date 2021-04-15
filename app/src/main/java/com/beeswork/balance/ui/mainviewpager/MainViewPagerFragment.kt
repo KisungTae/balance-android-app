@@ -12,6 +12,10 @@ import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.internal.constant.FragmentTabPosition
+import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -19,7 +23,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 
-class MainViewPagerFragment : Fragment(), KodeinAware {
+class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MainViewPagerViewModelFactory by instance()
@@ -50,6 +54,14 @@ class MainViewPagerFragment : Fragment(), KodeinAware {
 
     private fun setupWebSocketEventObserver() {
         viewModel.webSocketEventLiveData.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) ErrorDialog(
+                it.error,
+                null,
+                it.errorMessage,
+                RequestCode.CONNECT_TO_WEB_SOCKET,
+                this@MainViewPagerFragment,
+                null
+            ).show(childFragmentManager, FetchErrorDialog.TAG)
 
         }
     }
@@ -96,5 +108,13 @@ class MainViewPagerFragment : Fragment(), KodeinAware {
 
     companion object {
         const val TAG = "mainViewPagerFragment"
+    }
+
+    override fun onRetry(requestCode: Int?) {
+        requestCode?.let {
+            when (it) {
+                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectToStomp()
+            }
+        }
     }
 }

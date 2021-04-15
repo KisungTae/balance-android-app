@@ -10,6 +10,7 @@
     <string name="error_title_fetch_matches">매치정보를 가져오는데 실패했습니다</string>
     <string name="error_title_fetch_chat_messages">채팅 메세지를 가져오는데 실패했습니다</string>
     <string name="error_title_send_chat_message">채팅 메세지를 전송하지 못했습니다</string>
+    <string name="error_title_web_socket_disconnected">서버에 연결할수없습니다</string>
 
     <string name="chat_message_over_sized_exception">채팅메세지가 너무 깁니다 줄여주세요</string>
     <string name="chat_message_empty_exception">채팅메세지를 입력해주세요</string>

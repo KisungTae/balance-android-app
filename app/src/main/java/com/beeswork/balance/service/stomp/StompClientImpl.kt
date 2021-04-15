@@ -72,7 +72,9 @@ class StompClientImpl(
         println(text)
         val stompFrame = StompFrame.from(text)
         when (stompFrame.command) {
-            StompFrame.Command.CONNECTED -> { subscribeToQueue() }
+            StompFrame.Command.CONNECTED -> {
+                subscribeToQueue()
+            }
             StompFrame.Command.MESSAGE -> {
 
             }
@@ -89,13 +91,12 @@ class StompClientImpl(
 //                }
             }
             StompFrame.Command.ERROR -> {
-//                mutableWebSocketLifeCycleEvent.postValue(
-//                    WebSocketLifeCycleEvent(
-//                        WebSocketLifeCycleEvent.Type.ERROR,
-//                        stompFrame.getError(),
-//                        stompFrame.getErrorMessage()
-//                    )
-//                )
+                _webSocketEventLiveData.postValue(
+                    WebSocketEvent.error(
+                        stompFrame.getError(),
+                        stompFrame.getErrorMessage()
+                    )
+                )
             }
             else -> println("stompframe.command when else here")
         }
@@ -148,19 +149,6 @@ class StompClientImpl(
         headers[StompHeader.AUTO_DELETE] = true.toString()
         headers[StompHeader.DURABLE] = true.toString()
         scope.launch { socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile()) }
-
-//        safeLet(chatId, matchedId) { chatId, matchedId ->
-//            CoroutineScope(Dispatchers.IO).launch {
-//                val headers = stompIdentityHeaders(queueName(chatId), matchedId, chatId)
-//                headers[StompHeader.ID] = UUID.randomUUID().toString()
-//                headers[StompHeader.ACK] = DEFAULT_ACK
-//                headers[StompHeader.AUTO_DELETE] = true.toString()
-//                headers[StompHeader.EXCLUSIVE] = false.toString()
-//                headers[StompHeader.DURABLE] = true.toString()
-//                webSocket.sendText(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
-//            }
-//        } ?: kotlin.run {
-//        }
     }
 
     private fun setupWebSocketListener() {

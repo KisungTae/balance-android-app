@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.BaseFragment
@@ -125,6 +126,7 @@ class MatchFragment : BaseFragment(),
                 it.error,
                 errorTitle(),
                 it.errorMessage,
+                RequestCode.FETCH_MATCHES,
                 this@MatchFragment,
                 null
             ).show(childFragmentManager, FetchErrorDialog.TAG)
@@ -158,8 +160,13 @@ class MatchFragment : BaseFragment(),
         }
     }
 
-    override fun onRetry() {
-        viewModel.fetchMatches()
+    override fun onRetry(requestCode: Int?) {
+        requestCode?.let {
+            when (it) {
+                RequestCode.FETCH_MATCHES -> viewModel.fetchMatches()
+            }
+        }
+
     }
 }
 

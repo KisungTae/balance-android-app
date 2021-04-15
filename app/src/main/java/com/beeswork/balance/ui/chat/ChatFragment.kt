@@ -70,7 +70,7 @@ class ChatFragment : BaseFragment(),
                 arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY),
                 arguments.getBoolean(BundleKey.MATCH_VALID)
             )
-        } ?: ErrorDialog(null, getString(R.string.error_title_chat_id_not_found), "", null, this).show(
+        } ?: ErrorDialog(null, getString(R.string.error_title_chat_id_not_found), "", null, null, this).show(
             childFragmentManager,
             ErrorDialog.TAG
         )
@@ -100,6 +100,7 @@ class ChatFragment : BaseFragment(),
                 it.error,
                 getString(R.string.error_title_send_chat_message),
                 it.errorMessage,
+                null,
                 null,
                 null
             ).show(childFragmentManager, ErrorDialog.TAG)
