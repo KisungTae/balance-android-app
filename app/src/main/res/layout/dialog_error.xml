@@ -11,6 +11,7 @@
         android:layout_height="72dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
         android:contentDescription="@string/dialog_error_icon_description"
         android:src="@drawable/ic_baseline_error_outline" />
 
@@ -19,9 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ivErrorDialogIcon"
-        android:layout_marginTop="20dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
+        android:layout_marginBottom="20dp"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
 
@@ -30,7 +31,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvErrorDialogTitle"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"

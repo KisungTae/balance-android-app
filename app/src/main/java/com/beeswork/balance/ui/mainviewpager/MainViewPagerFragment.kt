@@ -56,7 +56,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         viewModel.webSocketEventLiveData.observe(viewLifecycleOwner) {
             if (it.isError() && validateAccount(it.error, it.errorMessage)) ErrorDialog(
                 it.error,
-                null,
+                getString(R.string.error_title_web_socket_disconnected),
                 it.errorMessage,
                 RequestCode.CONNECT_TO_WEB_SOCKET,
                 this@MainViewPagerFragment,

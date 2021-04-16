@@ -48,14 +48,15 @@ class ErrorDialog(
 
     private fun setupErrorMessage() {
         errorMessage?.let { message ->
+            binding.tvErrorDialogMessage.visibility = View.VISIBLE
             binding.tvErrorDialogMessage.text = message
         } ?: kotlin.run {
             safeLet(error, context) { e, c ->
                 val resourceId = resources.getIdentifier(e, "string", c.packageName)
-                binding.tvErrorDialogMessage.text = if (resourceId > 0) getString(resourceId)
-                else getString(R.string.error_message_generic)
+                if (resourceId > 0) binding.tvErrorDialogMessage.text = getString(resourceId)
+                else binding.tvErrorDialogMessage.visibility = View.GONE
             } ?: kotlin.run {
-                binding.tvErrorDialogMessage.text = resources.getString(R.string.error_message_generic)
+                binding.tvErrorDialogMessage.visibility = View.GONE
             }
         }
     }

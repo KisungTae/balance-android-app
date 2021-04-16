@@ -2,8 +2,11 @@ package com.beeswork.balance.service.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.StompHeader
+import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +15,8 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 import java.util.*
 
 
@@ -94,7 +99,7 @@ class StompClientImpl(
                 _webSocketEventLiveData.postValue(
                     WebSocketEvent.error(
                         stompFrame.getError(),
-                        stompFrame.getErrorMessage()
+                        if (stompFrame.getError() == null) null else stompFrame.getErrorMessage()
                     )
                 )
             }
@@ -121,12 +126,11 @@ class StompClientImpl(
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         isSocketOpen = false
-
-        // TODO: decide how present exception
-        println("onFailure")
-        println("response: $response")
-        println("websocket: $webSocket")
-        println("throwable: $t")
+        val error: String? =  when (t) {
+            is NoInternetConnectivityException -> ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION
+            else -> null
+        }
+        _webSocketEventLiveData.postValue(WebSocketEvent.error(error, null))
     }
 
     private fun connectToStomp() {
@@ -155,7 +159,8 @@ class StompClientImpl(
 //        webSocket.addListener(object : WebSocketAdapter() {
 //            override fun onConnected(
 //                websocket: WebSocket?,
-//                headers: MutableMap<String, MutableList<String>>?
+//                headers: MutableMap<Str
+    //                ing, MutableList<String>>?
 //            ) {
 //                connectStomp()
 //            }
