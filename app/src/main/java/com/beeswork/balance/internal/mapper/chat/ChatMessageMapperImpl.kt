@@ -15,12 +15,12 @@ class ChatMessageMapperImpl : ChatMessageMapper {
 
     override fun fromDTOToEntity(dto: ChatMessageDTO): ChatMessage {
         return ChatMessage(
-            dto.chatId,
-            dto.body,
+            dto.chatId ?: 0,
+            dto.body ?: "",
             toChatMessageStatusFromMessageId(dto.key),
             dto.createdAt,
-            dto.id,
-            dto.key,
+            dto.id ?: Long.MAX_VALUE,
+            dto.key ?: 0,
         )
     }
 

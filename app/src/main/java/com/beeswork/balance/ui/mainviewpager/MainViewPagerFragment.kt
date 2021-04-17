@@ -43,6 +43,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewPagerViewModel::class.java)
+        viewModel.connectToStomp()
         bindUI()
     }
 

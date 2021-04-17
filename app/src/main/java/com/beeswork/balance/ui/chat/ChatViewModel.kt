@@ -68,19 +68,21 @@ class ChatViewModel(
     }
 
     fun sendChatMessage(body: String) {
-        stompClient.connect()
-//        viewModelScope.launch {
-//            val bodySize = body.toByteArray().size
-//            when {
-//                bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
-//                    Resource.error(ExceptionCode.CHAT_MESSAGE_OVER_SIZED_EXCEPTION)
-//                )
-//                bodySize <= 0 -> _sendChatMessageLiveData.postValue(
-//                    Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
-//                )
-//                else -> matchRepository.sendChatMessage(chatId, body)
-//            }
-//        }
+        viewModelScope.launch {
+            val bodySize = body.toByteArray().size
+            when {
+                bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
+                    Resource.error(ExceptionCode.CHAT_MESSAGE_OVER_SIZED_EXCEPTION)
+                )
+                bodySize <= 0 -> _sendChatMessageLiveData.postValue(
+                    Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
+                )
+                else -> {
+                    val key = matchRepository.sendChatMessage(chatId, body)
+                    stompClient.sendChatMessage(key, chatId, matchedId, body)
+                }
+            }
+        }
     }
 
 

@@ -20,5 +20,6 @@ class StompHeader {
         const val RECEIPT = "receipt"
         const val ERROR = "error"
         const val MESSAGE = "message"
+        const val ACCEPT_LANGUAGE = "accept-language"
     }
 }

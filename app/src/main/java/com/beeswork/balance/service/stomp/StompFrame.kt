@@ -1,5 +1,6 @@
 package com.beeswork.balance.service.stomp
 
+import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.beeswork.balance.internal.util.safeLet
@@ -12,20 +13,12 @@ import java.util.regex.Pattern
 data class StompFrame(
     val command: Command,
     val headers: Map<String, String>?,
-    val message: Message?,
-    val exception: Exception?
+    val chatMessageDTO: ChatMessageDTO?
 ) {
-
-    constructor(
-        command: Command,
-        headers: Map<String, String>,
-        message: Message
-    ) : this(command, headers, message, null)
-
     constructor(
         command: Command,
         headers: Map<String, String>?
-    ) : this(command, headers, null, null)
+    ) : this(command, headers, null)
 
 
     fun compile(): String {
@@ -37,8 +30,8 @@ data class StompFrame(
         }
 
         builder.append(System.lineSeparator())
-        message?.let {
-            builder.append(GsonProvider.gson.toJson(message))
+        chatMessageDTO?.let {
+            builder.append(GsonProvider.gson.toJson(chatMessageDTO))
             builder.append(System.lineSeparator() + System.lineSeparator())
         }
 
@@ -96,8 +89,7 @@ data class StompFrame(
                     Command.MESSAGE, Command.RECEIPT -> return StompFrame(
                         command,
                         headers,
-                        GsonProvider.gson.fromJson(it, Message::class.java),
-                        null
+                        GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
                     )
                     else -> println("")
                 }
@@ -105,15 +97,6 @@ data class StompFrame(
             return StompFrame(command, headers)
         }
     }
-
-    class Message(
-        val id: Long?,
-        val body: String,
-        val accountId: String,
-        val recipientId: String,
-        val chatId: Long?,
-        val createdAt: OffsetDateTime?
-    )
 
     enum class Command {
         SEND,

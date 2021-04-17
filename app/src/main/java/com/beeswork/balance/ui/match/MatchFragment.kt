@@ -57,7 +57,7 @@ class MatchFragment : BaseFragment(),
         setupFetchMatchesLiveDataObserver()
         setupMatchPagingRefreshLiveData()
         search("")
-//        viewModel.fetchMatches()
+        viewModel.fetchMatches()
     }
 
     private fun setupMatchPagingRefreshLiveData() {

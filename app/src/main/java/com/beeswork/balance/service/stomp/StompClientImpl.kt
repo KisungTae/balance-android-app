@@ -2,7 +2,7 @@ package com.beeswork.balance.service.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.StompHeader
@@ -11,12 +11,11 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
-import java.net.ConnectException
-import java.net.SocketTimeoutException
 import java.util.*
 
 
@@ -50,7 +49,8 @@ class StompClientImpl(
         // Everything that goes into the outgoing channel is sent to the web socket.
         // Everything that gets into the incoming channel is sent to incomingFlow.
         scope.launch(Dispatchers.IO) {
-//            try {
+            outgoing.consumeEach { socket?.send(it) }
+        //            try {
 //                outgoing.consumeEach {
 //                    socket.send(it.json)
 //                }
@@ -60,12 +60,6 @@ class StompClientImpl(
         }
     }
 
-    override fun connect() {
-        if (!isSocketOpen) socket = okHttpClient.newWebSocket(
-            Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build(),
-            this
-        )
-    }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         println("onOpen")
@@ -126,11 +120,59 @@ class StompClientImpl(
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         isSocketOpen = false
-        val error: String? =  when (t) {
+        val error: String? = when (t) {
             is NoInternetConnectivityException -> ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION
             else -> null
         }
         _webSocketEventLiveData.postValue(WebSocketEvent.error(error, null))
+    }
+
+    override fun connect() {
+        if (!isSocketOpen) socket = okHttpClient.newWebSocket(
+            Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build(),
+            this
+        )
+    }
+
+    override fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
+        scope.launch {
+            val headers = mutableMapOf<String, String>()
+//            headers[StompHeader.DESTINATION] = getDestination(matchedId)
+            headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
+            headers[StompHeader.ACCOUNT_ID] = "${preferenceProvider.getAccountId()?.toString()}"
+            headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
+            headers[StompHeader.RECIPIENT_ID] = matchedId.toString()
+            headers[StompHeader.RECEIPT] = key.toString()
+            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+            val chatMessageDTO = ChatMessageDTO(null, null, chatId, body, null)
+            val stompFrame = StompFrame(StompFrame.Command.SEND, headers, chatMessageDTO)
+            outgoing.send(stompFrame.compile())
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val headers = mutableMapOf<String, String>()
+//            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
+//            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
+
+//            headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
+//            headers[StompHeader.MESSAGE_ID] = balanceRepository.saveMessage(chatId, message).toString()
+//            val stompMessage = StompFrame.Message(
+//                null,
+//                message,
+//                preferenceProvider.getAccountId(),
+//                matchedId,
+//                chatId,
+//                null
+//            )
+//            webSocket.sendText(
+//                StompFrame(
+//                    StompFrame.Command.SEND,
+//                    headers,
+//                    stompMessage,
+//                    null
+//                ).compile()
+//            )
+//        }
+
+        }
     }
 
     private fun connectToStomp() {
@@ -143,16 +185,22 @@ class StompClientImpl(
     }
 
     private fun subscribeToQueue() {
-        val headers = mutableMapOf<String, String>()
-        val accountId = "${preferenceProvider.getAccountId()?.toString()}"
-        headers[StompHeader.DESTINATION] = "/queue/$accountId"
-        headers[StompHeader.ID] = accountId
-        headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
-        headers[StompHeader.ACK] = DEFAULT_ACK
-        headers[StompHeader.EXCLUSIVE] = false.toString()
-        headers[StompHeader.AUTO_DELETE] = true.toString()
-        headers[StompHeader.DURABLE] = true.toString()
-        scope.launch { socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile()) }
+        scope.launch {
+            val headers = mutableMapOf<String, String>()
+            val accountId: UUID? = preferenceProvider.getAccountId()
+            headers[StompHeader.DESTINATION] = getDestination(accountId)
+            headers[StompHeader.ID] = "$accountId"
+            headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
+            headers[StompHeader.ACK] = DEFAULT_ACK
+            headers[StompHeader.EXCLUSIVE] = false.toString()
+            headers[StompHeader.AUTO_DELETE] = true.toString()
+            headers[StompHeader.DURABLE] = true.toString()
+            socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
+        }
+    }
+
+    private fun getDestination(id: UUID?): String {
+        return "/queue/${id?.toString()}"
     }
 
     private fun setupWebSocketListener() {
@@ -160,7 +208,7 @@ class StompClientImpl(
 //            override fun onConnected(
 //                websocket: WebSocket?,
 //                headers: MutableMap<Str
-    //                ing, MutableList<String>>?
+        //                ing, MutableList<String>>?
 //            ) {
 //                connectStomp()
 //            }

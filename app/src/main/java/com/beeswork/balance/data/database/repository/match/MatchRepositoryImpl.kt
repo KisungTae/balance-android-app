@@ -18,6 +18,7 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.database.response.NewChatMessage
 import com.beeswork.balance.data.database.response.NewMatch
+import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -93,14 +94,16 @@ class MatchRepositoryImpl(
             }
 
             sentChatMessageDTOs.forEach { chatMessageDTO ->
-                chatMessageDAO.findByKey(chatMessageDTO.key)?.let { chatMessage ->
-                    chatMessage.id = chatMessageDTO.id
-                    chatMessage.status = ChatMessageStatus.SENT
-                    chatMessage.createdAt = chatMessageDTO.createdAt
-                    chatMessageDAO.insert(chatMessage)
-                    chatIds.add(chatMessage.chatId)
+                safeLet(chatMessageDTO.key, chatMessageDTO.id) { key, id ->
+                    chatMessageDAO.findByKey(key)?.let { chatMessage ->
+                        chatMessage.id = id
+                        chatMessage.status = ChatMessageStatus.SENT
+                        chatMessage.createdAt = chatMessageDTO.createdAt
+                        chatMessageDAO.insert(chatMessage)
+                        chatIds.add(chatMessage.chatId)
+                    }
+                    sentChatMessageIds.add(id)
                 }
-                sentChatMessageIds.add(chatMessageDTO.id)
             }
         }
         syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
@@ -202,13 +205,12 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun sendChatMessage(chatId: Long, body: String) {
-        withContext(Dispatchers.IO) {
-            chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
+    override suspend fun sendChatMessage(chatId: Long, body: String): Long {
+        return withContext(Dispatchers.IO) {
+            val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
             _chatMessagePagingRefreshLiveData.postValue(PagingRefresh(null))
+            return@withContext key
         }
-
-
     }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
