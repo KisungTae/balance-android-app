@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
 import java.util.*
+import kotlin.random.Random
 
 
 class StompClientImpl(
@@ -30,6 +31,7 @@ class StompClientImpl(
     private var outgoing = Channel<String>()
     private val incomingFlow = incoming.consumeAsFlow()
     private var isSocketOpen: Boolean = false
+    private var subscriptionId = 0
 
     private val _webSocketEventLiveData = MutableLiveData<WebSocketEvent>()
     override val webSocketEventLiveData: LiveData<WebSocketEvent> get() = _webSocketEventLiveData
@@ -137,7 +139,6 @@ class StompClientImpl(
     override fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
         scope.launch {
             val headers = mutableMapOf<String, String>()
-//            headers[StompHeader.DESTINATION] = getDestination(matchedId)
             headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
             headers[StompHeader.ACCOUNT_ID] = "${preferenceProvider.getAccountId()?.toString()}"
             headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
@@ -187,9 +188,8 @@ class StompClientImpl(
     private fun subscribeToQueue() {
         scope.launch {
             val headers = mutableMapOf<String, String>()
-            val accountId: UUID? = preferenceProvider.getAccountId()
-            headers[StompHeader.DESTINATION] = getDestination(accountId)
-            headers[StompHeader.ID] = "$accountId"
+            headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
+            headers[StompHeader.ID] = subscriptionId.toString()
             headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
             headers[StompHeader.ACK] = DEFAULT_ACK
             headers[StompHeader.EXCLUSIVE] = false.toString()
@@ -369,5 +369,6 @@ class StompClientImpl(
 // TODO: change message in stompframe to message entity
 // TODO: lifecycle event error and close socket in subscribe()
 // TODO: what happens when exception is thrown in onFrame()
-// TODO: before sending, check if subscribtion or connection is open
-// TODO: no internet connection then what?
+
+// TODO: send chatmessage and then if successful, then check active of chat set it to true
+// TODO: when send if not connected or web scoket closed, then push the message to buffer and when connected then clear buffer
