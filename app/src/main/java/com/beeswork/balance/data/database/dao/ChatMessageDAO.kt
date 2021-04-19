@@ -42,6 +42,6 @@ interface ChatMessageDAO {
     @Query("select body from chatMessage where id = :chatMessageId")
     fun findBodyById(chatMessageId: Long): String?
 
-    @Query("select (unmatched = 0 or deleted = 0) from `match` where chatId = :chatId")
+    @Query("select unmatched = 0 from `match` where chatId = :chatId")
     fun findUnmatchedById(chatId: Long): LiveData<Boolean>
 }

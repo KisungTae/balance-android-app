@@ -19,7 +19,6 @@ class MatchMapperImpl : MatchMapper {
             dto.unmatched,
             dto.name,
             dto.repPhotoKey,
-            dto.deleted,
             dto.createdAt
         )
     }
@@ -29,12 +28,12 @@ class MatchMapperImpl : MatchMapper {
             entity.chatId,
             entity.matchedId,
             entity.active,
+            entity.unmatched,
             entity.name,
             entity.repPhotoKey,
             entity.updatedAt,
             entity.unread,
-            entity.recentChatMessage,
-            entity.isValid()
+            entity.recentChatMessage
         )
     }
 }

@@ -66,7 +66,7 @@ class MatchPagingDataAdapter(
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
             setupProfilePicture(matchDomain.matchedId, matchDomain.repPhotoKey)
-            setupTextColor(matchDomain.valid)
+            setupTextColor(matchDomain.unmatched)
         }
 
         private fun setupProfilePictureBorder(matchActive: Boolean) {
@@ -83,8 +83,8 @@ class MatchPagingDataAdapter(
 //            Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
         }
 
-        private fun setupTextColor(matchValid: Boolean) {
-            val colorCode = if (matchValid) R.color.TextBlack else R.color.TextGrey
+        private fun setupTextColor(unmatched: Boolean) {
+            val colorCode = if (unmatched) R.color.TextGrey else R.color.TextBlack
             val textColor = context.getColor(colorCode)
             binding.tvMatchName.setTextColor(textColor)
             binding.tvMatchRecentChatMessage.setTextColor(textColor)
@@ -92,7 +92,7 @@ class MatchPagingDataAdapter(
         }
 
         private fun getRecentChatMessage(matchDomain: MatchDomain): String {
-            return if (!matchDomain.valid) context.getString(R.string.recent_chat_message_invalid_match)
+            return if (matchDomain.unmatched) context.getString(R.string.recent_chat_message_invalid_match)
             else if (!matchDomain.active) context.getString(R.string.recent_chat_message_new_match)
             else matchDomain.recentChatMessage
         }

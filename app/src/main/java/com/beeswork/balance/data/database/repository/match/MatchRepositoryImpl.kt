@@ -177,7 +177,7 @@ class MatchRepositoryImpl(
 
     private fun updateMatch(match: Match) {
         matchDAO.findById(match.chatId)?.let {
-            if (match.isValid()) {
+            if (!match.unmatched) {
                 match.updatedAt = it.updatedAt
                 match.recentChatMessage = it.recentChatMessage
                 match.unread = it.unread
@@ -193,7 +193,7 @@ class MatchRepositoryImpl(
                 matchDAO.findById(chatId)?.let { match ->
                     chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageId)?.let { chatMessage ->
                         match.lastReadChatMessageId = chatMessage.id
-                        if (match.isValid()) {
+                        if (!match.unmatched) {
                             updateRecentChatMessage(match, chatMessage)
                             updateUnread(match)
                         }
@@ -265,28 +265,28 @@ class MatchRepositoryImpl(
     }
 
     //  TODO: remove me
-    private fun createDummyMatch() {
-        for ((count, i) in (1..10).withIndex()) {
-            matchDAO.insert(
-                Match(
-                    chatId = count.toLong(),
-                    matchedId = UUID.randomUUID(),
-                    active = false,
-                    unmatched = false,
-                    name = "user-$count",
-                    repPhotoKey = "",
-                    deleted = false,
-                    updatedAt = OffsetDateTime.now()
-                )
-            )
-        }
-    }
+//    private fun createDummyMatch() {
+//        for ((count, i) in (1..10).withIndex()) {
+//            matchDAO.insert(
+//                Match(
+//                    chatId = count.toLong(),
+//                    matchedId = UUID.randomUUID(),
+//                    active = false,
+//                    unmatched = false,
+//                    name = "user-$count",
+//                    repPhotoKey = "",
+//                    deleted = false,
+//                    updatedAt = OffsetDateTime.now()
+//                )
+//            )
+//        }
+//    }
 
 
     //  TODO: remove me
     override fun testFunction() {
         CoroutineScope(Dispatchers.IO).launch {
-            createDummyMatch()
+//            createDummyMatch()
             createDummyChatMessages()
         }
     }

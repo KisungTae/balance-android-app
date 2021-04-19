@@ -7,10 +7,10 @@ data class MatchDomain(
     val chatId: Long,
     val matchedId: UUID,
     val active: Boolean,
+    val unmatched: Boolean,
     val name: String,
     val repPhotoKey: String?,
     val updatedAt: OffsetDateTime?,
     val unread: Boolean,
-    val recentChatMessage: String,
-    val valid: Boolean
+    val recentChatMessage: String
 )

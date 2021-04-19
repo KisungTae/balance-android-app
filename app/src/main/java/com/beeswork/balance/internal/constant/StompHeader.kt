@@ -21,5 +21,6 @@ class StompHeader {
         const val ERROR = "error"
         const val MESSAGE = "message"
         const val ACCEPT_LANGUAGE = "accept-language"
+        const val PUSH_TYPE = "push-type"
     }
 }

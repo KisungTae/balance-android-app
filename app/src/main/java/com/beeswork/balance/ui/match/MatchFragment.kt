@@ -148,7 +148,7 @@ class MatchFragment : BaseFragment(),
             arguments.putLong(BundleKey.CHAT_ID, it.chatId)
             arguments.putString(BundleKey.MATCHED_ID, it.matchedId.toString())
             arguments.putString(BundleKey.MATCHED_NAME, it.name)
-            arguments.putBoolean(BundleKey.MATCH_VALID, it.valid)
+            arguments.putBoolean(BundleKey.UNMATCHED, it.unmatched)
             arguments.putString(BundleKey.MATCHED_REP_PHOTO_KEY, it.repPhotoKey)
             chatFragment.arguments = arguments
         }

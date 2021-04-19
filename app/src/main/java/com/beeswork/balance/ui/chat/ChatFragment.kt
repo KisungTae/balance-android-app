@@ -21,7 +21,6 @@ import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -68,7 +67,7 @@ class ChatFragment : BaseFragment(),
                 matchedId,
                 arguments.getString(BundleKey.MATCHED_NAME),
                 arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY),
-                arguments.getBoolean(BundleKey.MATCH_VALID)
+                arguments.getBoolean(BundleKey.UNMATCHED)
             )
         } ?: ErrorDialog(null, getString(R.string.error_title_chat_id_not_found), "", null, null, this).show(
             childFragmentManager,
@@ -80,7 +79,7 @@ class ChatFragment : BaseFragment(),
         matchedId: UUID,
         matchedName: String?,
         matchedRepPhotoKey: String?,
-        matchValid: Boolean
+        unmatched: Boolean
     ) = lifecycleScope.launch {
         setupBackPressedDispatcherCallback()
         setupToolBar(matchedName)
@@ -89,7 +88,7 @@ class ChatFragment : BaseFragment(),
         setupSendChatMessageObserver()
         setupChatRecyclerView()
 //        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
-        if (!matchValid) setupAsUnmatched()
+        if (unmatched) setupAsUnmatched()
         setupChatMessagePagingRefreshObserver()
         setupChatMessagePagingData()
     }
