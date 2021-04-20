@@ -54,6 +54,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
     }
 
     private fun setupWebSocketEventObserver() {
+//        TODO: if it is message reltated exception like exceed limit size of message then change the title
         viewModel.webSocketEventLiveData.observe(viewLifecycleOwner) {
             if (it.isError() && validateAccount(it.error, it.errorMessage)) ErrorDialog(
                 it.error,
