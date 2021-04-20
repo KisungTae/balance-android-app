@@ -13,14 +13,8 @@ import java.util.regex.Pattern
 data class StompFrame(
     val command: Command,
     val headers: Map<String, String>?,
-    val chatMessageDTO: ChatMessageDTO?
+    val payload: String?
 ) {
-    constructor(
-        command: Command,
-        headers: Map<String, String>?
-    ) : this(command, headers, null)
-
-
     fun compile(): String {
         val builder = StringBuilder()
         builder.append(command).append(System.lineSeparator())
@@ -30,8 +24,8 @@ data class StompFrame(
         }
 
         builder.append(System.lineSeparator())
-        chatMessageDTO?.let {
-            builder.append(GsonProvider.gson.toJson(chatMessageDTO))
+        payload?.let {
+            builder.append(it)
             builder.append(System.lineSeparator() + System.lineSeparator())
         }
 
@@ -64,7 +58,7 @@ data class StompFrame(
 
         fun from(data: String?): StompFrame {
             if (data == null || data.trim().isEmpty())
-                return StompFrame(Command.UNKNOWN, null)
+                return StompFrame(Command.UNKNOWN, null, null)
 
             val reader = Scanner(StringReader(data))
             reader.useDelimiter(System.lineSeparator())
@@ -84,17 +78,7 @@ data class StompFrame(
             reader.useDelimiter(TERMINATE_MESSAGE_SYMBOL)
 
             val payload = if (reader.hasNext()) reader.next() else null
-            payload?.let {
-                when (command) {
-                    Command.MESSAGE, Command.RECEIPT -> return StompFrame(
-                        command,
-                        headers,
-                        GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
-                    )
-                    else -> println("")
-                }
-            }
-            return StompFrame(command, headers)
+            return StompFrame(command, headers, payload)
         }
     }
 

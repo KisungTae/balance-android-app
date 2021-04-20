@@ -8,6 +8,7 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.exception.NoInternetConnectivityException
+import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,25 +42,8 @@ class StompClientImpl(
 //        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
 
     init {
-
-//        val okHttpClient = OkHttpClient.Builder().build()
-//        val request = Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build()
-//        socket = okHttpClient.newWebSocket(request, this)
-
-        // Trigger shutdown of the dispatcher's executor so this process can exit cleanly.
-//        okHttpClient.dispatcher().executorService().shutdown()
-
-        // Everything that goes into the outgoing channel is sent to the web socket.
-        // Everything that gets into the incoming channel is sent to incomingFlow.
         scope.launch(Dispatchers.IO) {
             outgoing.consumeEach { socket?.send(it) }
-        //            try {
-//                outgoing.consumeEach {
-//                    socket.send(it.json)
-//                }
-//            } finally {
-//                close()
-//            }
         }
     }
 
@@ -74,32 +58,10 @@ class StompClientImpl(
         println(text)
         val stompFrame = StompFrame.from(text)
         when (stompFrame.command) {
-            StompFrame.Command.CONNECTED -> {
-                subscribeToQueue()
-            }
-            StompFrame.Command.MESSAGE -> {
-
-            }
-            StompFrame.Command.RECEIPT -> {
-//                safeLet(
-//                    stompFrame.message?.chatId,
-//                    stompFrame.getMessageId(),
-//                    stompFrame.message?.id,
-//                    stompFrame.message?.createdAt,
-//                ) { chatId, messageId, id, createdAt ->
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        balanceRepository.syncMessage(chatId, messageId, id, createdAt)
-//                    }
-//                }
-            }
-            StompFrame.Command.ERROR -> {
-                _webSocketEventLiveData.postValue(
-                    WebSocketEvent.error(
-                        stompFrame.getError(),
-                        if (stompFrame.getError() == null) null else stompFrame.getErrorMessage()
-                    )
-                )
-            }
+            StompFrame.Command.CONNECTED -> subscribeToQueue()
+            StompFrame.Command.MESSAGE -> onMessageFrameReceived(stompFrame)
+            StompFrame.Command.RECEIPT -> onReceiptFrameReceived(stompFrame)
+            StompFrame.Command.ERROR -> onErrorFrameReceived(stompFrame)
             else -> println("stompframe.command when else here")
         }
     }
@@ -137,6 +99,36 @@ class StompClientImpl(
         )
     }
 
+    private fun onMessageFrameReceived(stompFrame: StompFrame) {
+
+    }
+
+    private fun onReceiptFrameReceived(stompFrame: StompFrame) {
+        stompFrame.payload?.let {
+            val chatMessageDTO = GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
+
+        }
+        //                safeLet(
+//                    stompFrame.message?.chatId,
+//                    stompFrame.getMessageId(),
+//                    stompFrame.message?.id,
+//                    stompFrame.message?.createdAt,
+//                ) { chatId, messageId, id, createdAt ->
+//                    CoroutineScope(Dispatchers.IO).launch {
+//                        balanceRepository.syncMessage(chatId, messageId, id, createdAt)
+//                    }
+//                }
+    }
+
+    private fun onErrorFrameReceived(stompFrame: StompFrame) {
+        _webSocketEventLiveData.postValue(
+            WebSocketEvent.error(
+                stompFrame.getError(),
+                if (stompFrame.getError() == null) null else stompFrame.getErrorMessage()
+            )
+        )
+    }
+
     override fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
         scope.launch {
             val headers = mutableMapOf<String, String>()
@@ -147,33 +139,8 @@ class StompClientImpl(
             headers[StompHeader.RECEIPT] = key.toString()
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             val chatMessageDTO = ChatMessageDTO(null, null, chatId, body, null)
-            val stompFrame = StompFrame(StompFrame.Command.SEND, headers, chatMessageDTO)
+            val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
             outgoing.send(stompFrame.compile())
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val headers = mutableMapOf<String, String>()
-//            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
-//            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
-
-//            headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
-//            headers[StompHeader.MESSAGE_ID] = balanceRepository.saveMessage(chatId, message).toString()
-//            val stompMessage = StompFrame.Message(
-//                null,
-//                message,
-//                preferenceProvider.getAccountId(),
-//                matchedId,
-//                chatId,
-//                null
-//            )
-//            webSocket.sendText(
-//                StompFrame(
-//                    StompFrame.Command.SEND,
-//                    headers,
-//                    stompMessage,
-//                    null
-//                ).compile()
-//            )
-//        }
-
         }
     }
 
@@ -182,7 +149,7 @@ class StompClientImpl(
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
             headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
-            socket?.send(StompFrame(StompFrame.Command.CONNECT, headers).compile())
+            socket?.send(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
         }
     }
 
@@ -196,13 +163,17 @@ class StompClientImpl(
             headers[StompHeader.EXCLUSIVE] = false.toString()
             headers[StompHeader.AUTO_DELETE] = true.toString()
             headers[StompHeader.DURABLE] = true.toString()
-            socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers).compile())
+            socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }
 
     private fun getDestination(id: UUID?): String {
         return "/queue/${id?.toString()}"
     }
+
+
+
+
 
     private fun setupWebSocketListener() {
 //        webSocket.addListener(object : WebSocketAdapter() {
@@ -373,3 +344,4 @@ class StompClientImpl(
 
 // TODO: send chatmessage and then if successful, then check active of chat set it to true
 // TODO: when send if not connected or web scoket closed, then push the message to buffer and when connected then clear buffer
+// TODO: init outoing launch in connect() or init()

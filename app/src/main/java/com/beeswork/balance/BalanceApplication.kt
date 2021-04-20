@@ -282,5 +282,6 @@ class BalanceApplication : Application(), KodeinAware {
 //     100. account circle icon should have circle so that I don't need to circlecrop
 //     101. lstmatches error on chat and match fragments
 //     102. hide keyboard when touch outside
+//     103. fetchMatches() after inserting all the chatMessages, check if chatMessage.id < current latest chatMessage.id and chatMessage.status == Sending, then update the status to error to be removed or retry
 
 
