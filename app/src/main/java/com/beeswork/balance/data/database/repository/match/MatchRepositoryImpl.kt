@@ -19,7 +19,9 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.database.response.NewChatMessage
 import com.beeswork.balance.data.database.response.NewMatch
 import com.beeswork.balance.internal.util.safeLet
+import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import java.util.*
@@ -36,7 +38,8 @@ class MatchRepositoryImpl(
     private val matchMapper: MatchMapper,
     private val chatMessageMapper: ChatMessageMapper,
     private val balanceDatabase: BalanceDatabase,
-    private val preferenceProvider: PreferenceProvider
+    private val preferenceProvider: PreferenceProvider,
+    private val stompClient: StompClient
 ) : MatchRepository {
 
     private val _matchPagingRefreshLiveData = MutableLiveData<PagingRefresh<NewMatch>>()
@@ -45,6 +48,19 @@ class MatchRepositoryImpl(
     private val _chatMessagePagingRefreshLiveData = MutableLiveData<PagingRefresh<NewChatMessage>>()
     override val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<NewChatMessage>> get() = _chatMessagePagingRefreshLiveData
 
+    private val _chatMessageReceiptLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    override val chatMessageReceiptLiveData: LiveData<Resource<EmptyResponse>> get() = _chatMessageReceiptLiveData
+
+    init {
+
+    }
+
+    private fun consumeChatMessageReceiptFlow() {
+
+        stompClient.chatMessageReceiptFlow.collect {
+
+        }
+    }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
         return withContext(Dispatchers.IO) {
@@ -193,10 +209,8 @@ class MatchRepositoryImpl(
                 matchDAO.findById(chatId)?.let { match ->
                     chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageId)?.let { chatMessage ->
                         match.lastReadChatMessageId = chatMessage.id
-                        if (!match.unmatched) {
-                            updateRecentChatMessage(match, chatMessage)
-                            updateUnread(match)
-                        }
+                        if (!match.unmatched) updateRecentChatMessage(match, chatMessage)
+                        updateUnread(match)
                         matchDAO.insert(match)
                     }
                 }
@@ -285,9 +299,10 @@ class MatchRepositoryImpl(
 
     //  TODO: remove me
     override fun testFunction() {
-        CoroutineScope(Dispatchers.IO).launch {
+        _chatMessageReceiptLiveData.postValue(Resource.error(""))
+//        CoroutineScope(Dispatchers.IO).launch {
 //            createDummyMatch()
-            createDummyChatMessages()
-        }
+//            createDummyChatMessages()
+//        }
     }
 }

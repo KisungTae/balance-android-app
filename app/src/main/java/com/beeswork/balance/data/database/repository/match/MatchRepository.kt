@@ -12,6 +12,7 @@ import com.beeswork.balance.data.database.response.NewMatch
 interface MatchRepository {
     val matchPagingRefreshLiveData: LiveData<PagingRefresh<NewMatch>>
     val chatMessagePagingRefreshLiveData: LiveData<PagingRefresh<NewChatMessage>>
+    val chatMessageReceiptLiveData: LiveData<Resource<EmptyResponse>>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>

@@ -3,6 +3,7 @@ package com.beeswork.balance.service.stomp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
+import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PushType
@@ -35,14 +36,23 @@ class StompClientImpl(
     private var isSocketOpen: Boolean = false
     private var subscriptionId = 0
 
+    private var chatMessageReceiptChannel = Channel<ChatMessageDTO>()
+    override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
+
+    private var chatMessageReceivedChannel = Channel<ChatMessageDTO>()
+    override val chatMessageReceivedFlow = chatMessageReceivedChannel.consumeAsFlow()
+
+    private var matchedChannel = Channel<MatchDTO>()
+    override val matchedFlow = matchedChannel.consumeAsFlow()
+
+//    private var clickedChannel = Channel<Clicked>
+
+
     private val _webSocketEventLiveData = MutableLiveData<WebSocketEvent>()
     override val webSocketEventLiveData: LiveData<WebSocketEvent> get() = _webSocketEventLiveData
 
-//    private var webSocket: WebSocket =
-//        WebSocketFactory().createSocket(BalanceURL.WEB_SOCKET_ENDPOINT)
-
     init {
-        scope.launch(Dispatchers.IO) {
+        scope.launch {
             outgoing.consumeEach { socket?.send(it) }
         }
     }
@@ -105,19 +115,11 @@ class StompClientImpl(
 
     private fun onReceiptFrameReceived(stompFrame: StompFrame) {
         stompFrame.payload?.let {
-            val chatMessageDTO = GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
-
+            scope.launch {
+                val chatMessageDTO = GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
+                chatMessageReceiptChannel.send(chatMessageDTO)
+            }
         }
-        //                safeLet(
-//                    stompFrame.message?.chatId,
-//                    stompFrame.getMessageId(),
-//                    stompFrame.message?.id,
-//                    stompFrame.message?.createdAt,
-//                ) { chatId, messageId, id, createdAt ->
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        balanceRepository.syncMessage(chatId, messageId, id, createdAt)
-//                    }
-//                }
     }
 
     private fun onErrorFrameReceived(stompFrame: StompFrame) {

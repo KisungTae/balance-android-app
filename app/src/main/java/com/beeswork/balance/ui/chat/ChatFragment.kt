@@ -85,7 +85,7 @@ class ChatFragment : BaseFragment(),
         setupToolBar(matchedName)
         setupSendBtnListener()
         setupEmoticonBtnListener()
-        setupSendChatMessageObserver()
+        setupSendChatMessageMediatorLiveDataObserver()
         setupChatRecyclerView()
 //        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
         if (unmatched) setupAsUnmatched()
@@ -93,8 +93,8 @@ class ChatFragment : BaseFragment(),
         setupChatMessagePagingData()
     }
 
-    private fun setupSendChatMessageObserver() {
-        viewModel.sendChatMessageLiveData.observe(viewLifecycleOwner, {
+    private fun setupSendChatMessageMediatorLiveDataObserver() {
+        viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
             if (it.isError()) ErrorDialog(
                 it.error,
                 getString(R.string.error_title_send_chat_message),
@@ -116,7 +116,6 @@ class ChatFragment : BaseFragment(),
 
     private fun setupAsUnmatched() {
         binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
-        binding.llChatInputWrapper.visibility = View.GONE
     }
 
 
@@ -157,7 +156,7 @@ class ChatFragment : BaseFragment(),
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
-                    chatMessagePagingRefreshAdapter.refresh()
+//                    chatMessagePagingRefreshAdapter.refresh()
                     true
                 }
                 R.id.miChatReport -> {

@@ -3,7 +3,6 @@ package com.beeswork.balance.ui.chat
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.database.response.PagingRefresh
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
@@ -11,11 +10,6 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.service.stomp.StompClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.*
@@ -33,7 +27,18 @@ class ChatViewModel(
     val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshLiveData
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
+    private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
+
+    val sendChatMessageMediatorLiveData = MediatorLiveData<Resource<EmptyResponse>>()
+
+    init {
+        sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
+            sendChatMessageMediatorLiveData.postValue(it)
+        }
+        sendChatMessageMediatorLiveData.addSource(matchRepository.chatMessageReceiptLiveData) {
+            sendChatMessageMediatorLiveData.postValue(it)
+        }
+    }
 
     fun initChatMessagePagingData(): LiveData<PagingData<ChatMessageDomain>> {
         return Pager(
@@ -85,6 +90,13 @@ class ChatViewModel(
         }
     }
 
+    fun test() {
+        matchRepository.testFunction()
+    }
+
+    fun test2() {
+        _sendChatMessageLiveData.postValue(Resource.error("error"))
+    }
 
     companion object {
         private const val MAX_CHAT_MESSAGE_BODY_SIZE = 500
