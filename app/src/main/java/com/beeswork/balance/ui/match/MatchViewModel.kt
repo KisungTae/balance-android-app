@@ -21,7 +21,7 @@ class MatchViewModel(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
-    val matchPagingRefreshLiveData = matchRepository.matchPagingRefreshLiveData
+    val matchPagingRefreshLiveData = matchRepository.matchPagingRefreshFlow.asLiveData()
 
     fun initMatchPagingData(searchKeyword: String): LiveData<PagingData<MatchDomain>> {
         return Pager(

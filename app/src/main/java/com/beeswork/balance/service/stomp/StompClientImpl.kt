@@ -117,6 +117,7 @@ class StompClientImpl(
         stompFrame.payload?.let {
             scope.launch {
                 val chatMessageDTO = GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
+                chatMessageDTO.key = stompFrame.getReceiptId()
                 chatMessageReceiptChannel.send(chatMessageDTO)
             }
         }

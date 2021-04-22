@@ -39,6 +39,12 @@ data class StompFrame(
         }
     }
 
+    fun getReceiptId(): Long? {
+        return headers?.let {
+            it[StompHeader.RECEIPT_ID]?.toLongOrNull()
+        }
+    }
+
     fun getError(): String? {
         return headers?.let {
             it[StompHeader.ERROR]

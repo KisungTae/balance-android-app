@@ -39,9 +39,12 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where chatId = :chatId order by id desc, `key` desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
 
-    @Query("select body from chatMessage where id = :chatMessageId")
-    fun findBodyById(chatMessageId: Long): String?
+    @Query("select body from chatMessage where id = :id")
+    fun findBodyById(id: Long): String?
 
     @Query("select unmatched = 0 from `match` where chatId = :chatId")
     fun findUnmatchedById(chatId: Long): LiveData<Boolean>
+
+    @Query("update chatMessage set status = :status where `key` = :key")
+    fun updateStatus(key: Long, status: ChatMessageStatus)
 }

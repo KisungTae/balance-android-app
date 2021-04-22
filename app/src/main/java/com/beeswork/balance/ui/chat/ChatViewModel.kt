@@ -24,7 +24,7 @@ class ChatViewModel(
     private val stompClient: StompClient
 ) : ViewModel() {
 
-    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshLiveData
+    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshFlow.asLiveData()
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
@@ -35,7 +35,7 @@ class ChatViewModel(
         sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
             sendChatMessageMediatorLiveData.postValue(it)
         }
-        sendChatMessageMediatorLiveData.addSource(matchRepository.chatMessageReceiptLiveData) {
+        sendChatMessageMediatorLiveData.addSource(matchRepository.sendChatMessageFlow.asLiveData()) {
             sendChatMessageMediatorLiveData.postValue(it)
         }
     }
@@ -82,10 +82,7 @@ class ChatViewModel(
                 bodySize <= 0 -> _sendChatMessageLiveData.postValue(
                     Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
                 )
-                else -> {
-                    val key = matchRepository.sendChatMessage(chatId, body)
-                    stompClient.sendChatMessage(key, chatId, matchedId, body)
-                }
+                else -> matchRepository.sendChatMessage(chatId, matchedId, body)
             }
         }
     }

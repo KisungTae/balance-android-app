@@ -4,7 +4,7 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 data class ChatMessageDTO(
-    val key: Long?,
+    var key: Long?,
     val id: Long?,
     val chatId: Long?,
     val body: String?,
