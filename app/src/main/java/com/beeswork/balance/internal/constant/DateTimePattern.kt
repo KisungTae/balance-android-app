@@ -13,6 +13,8 @@ class DateTimePattern {
         private const val TIME_WITH_MERIDIEM_IN_ENGLISH = "h:mm a"
         private const val TIME_WITH_MERIDIEM_IN_KOREA = "a h:mm"
 
+        private const val DATE_WITHOUT_YEAR = "yy/M/d"
+
         fun ofDateWithDayOfWeek(): DateTimeFormatter {
             return when (Locale.getDefault()) {
                 Locale.KOREA -> DateTimeFormatter.ofPattern(DATE_WITH_DAY_OF_WEEK_IN_KOREA)
@@ -27,6 +29,10 @@ class DateTimePattern {
                 Locale.KOREAN -> DateTimeFormatter.ofPattern(TIME_WITH_MERIDIEM_IN_KOREA)
                 else -> DateTimeFormatter.ofPattern(TIME_WITH_MERIDIEM_IN_ENGLISH)
             }
+        }
+
+        fun ofDateWithShortYear(): DateTimeFormatter {
+            return DateTimeFormatter.ofPattern(DATE_WITHOUT_YEAR)
         }
     }
 }

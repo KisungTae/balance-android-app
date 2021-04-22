@@ -76,6 +76,9 @@ class ChatViewModel(
         viewModelScope.launch {
             val bodySize = body.toByteArray().size
             when {
+                matchRepository.isUnmatched(chatId) -> _sendChatMessageLiveData.postValue(
+                    Resource.error(ExceptionCode.MATCH_UNMATCHED_EXCEPTION)
+                )
                 bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
                     Resource.error(ExceptionCode.CHAT_MESSAGE_OVER_SIZED_EXCEPTION)
                 )

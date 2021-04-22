@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.match.MatchDomain
 import com.beeswork.balance.data.database.response.NewMatch
+import org.threeten.bp.ZoneId
 import java.util.*
 
 class MatchMapperImpl : MatchMapper {
@@ -31,7 +32,7 @@ class MatchMapperImpl : MatchMapper {
             entity.unmatched,
             entity.name,
             entity.repPhotoKey,
-            entity.updatedAt,
+            entity.updatedAt?.atZoneSameInstant(ZoneId.systemDefault()),
             entity.unread,
             entity.recentChatMessage
         )

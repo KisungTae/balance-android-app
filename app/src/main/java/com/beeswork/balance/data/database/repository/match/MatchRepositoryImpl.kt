@@ -74,18 +74,15 @@ class MatchRepositoryImpl(
         awaitClose { sendChatMessageListener = null }
     }
 
-//    private val _chatMessageReceiptLiveData = MutableLiveData<Resource<EmptyResponse>>()
-//    override val chatMessageReceiptLiveData: LiveData<Resource<EmptyResponse>> get() = _chatMessageReceiptLiveData
-
-    init {
-
+    override fun collectStompClientFlows() {
+        collectChatMessageReceiptFlow()
     }
 
     private fun collectChatMessageReceiptFlow() {
         stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
             safeLet(chatMessageDTO.key, chatMessageDTO.chatId) { key, chatId ->
                 chatMessageDTO.id?.let { id ->
-                    if (id == -1L) {
+                    if (id == UNMATCHED) {
                         chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
                         onMatchUnmatched(chatId)
                     } else {
@@ -94,7 +91,7 @@ class MatchRepositoryImpl(
                     }
                 } ?: kotlin.run {
                     chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
-                    // TODO error match or matched not found error
+                    sendChatMessageListener?.onInvoke(Resource.error(ExceptionCode.BAD_REQUEST_EXCEPTION))
                 }
                 chatMessagePagingRefreshListener?.onRefresh(PagingRefresh(null))
             }
@@ -106,6 +103,14 @@ class MatchRepositoryImpl(
             chatMessage.id = id
             chatMessage.createdAt = createdAt
             chatMessageDAO.insert(chatMessage)
+            updateMatchActive(chatMessage.chatId)
+        }
+    }
+
+    private fun updateMatchActive(chatId: Long) {
+        matchDAO.findById(chatId)?.let { match ->
+            match.active = true
+            matchDAO.insert(match)
         }
     }
 
@@ -277,15 +282,17 @@ class MatchRepositoryImpl(
         }
     }
 
+    override suspend fun isUnmatched(chatId: Long): Boolean {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.findUnmatched(chatId)
+        }
+    }
+
     override suspend fun sendChatMessage(chatId: Long, matchedId: UUID, body: String) {
         withContext(Dispatchers.IO) {
-            if (matchDAO.findUnmatched(chatId))
-                sendChatMessageListener?.onInvoke(Resource.error(ExceptionCode.MATCH_UNMATCHED_EXCEPTION))
-            else {
-                val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
-                chatMessagePagingRefreshListener?.onRefresh(PagingRefresh(null))
-                stompClient.sendChatMessage(key, chatId, matchedId, body)
-            }
+            val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
+            chatMessagePagingRefreshListener?.onRefresh(PagingRefresh(null))
+            stompClient.sendChatMessage(key, chatId, matchedId, body)
         }
     }
 
@@ -319,6 +326,10 @@ class MatchRepositoryImpl(
             now = now.plusDays(1)
         }
         chatMessageDAO.insert(messages)
+    }
+
+    companion object {
+        const val UNMATCHED = -1L
     }
 
 

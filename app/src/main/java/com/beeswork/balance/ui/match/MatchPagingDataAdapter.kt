@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemMatchBinding
+import com.beeswork.balance.internal.constant.DateTimePattern
 import com.bumptech.glide.request.RequestOptions
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZonedDateTime
 import java.util.*
 
 class MatchPagingDataAdapter(
@@ -59,14 +62,24 @@ class MatchPagingDataAdapter(
 
         fun bind(matchDomain: MatchDomain) {
 //            TODO: remove me
-            binding.tvMatchName.text = "${matchDomain.chatId}"
-//            binding.tvMatchName.text = matchDomain.name
-            binding.tvMatchUpdatedAt.text = matchDomain.updatedAt?.toLocalDate()?.toString() ?: ""
+//            binding.tvMatchName.text = "${matchDomain.chatId}"
+            binding.tvMatchName.text = matchDomain.name
+            binding.tvMatchUpdatedAt.text = formatUpdatedAt(matchDomain.updatedAt)
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
             setupProfilePicture(matchDomain.matchedId, matchDomain.repPhotoKey)
             setupTextColor(matchDomain.unmatched)
+        }
+
+        private fun formatUpdatedAt(updatedAt: ZonedDateTime?): String {
+            updatedAt?.let {
+                val now = LocalDateTime.now()
+                return if (updatedAt.year != now.year) updatedAt.toLocalDate().toString()
+                else if (updatedAt.month != now.month || updatedAt.dayOfMonth != now.dayOfMonth)
+                    updatedAt.toLocalDate().format(DateTimePattern.ofDateWithShortYear())
+                else updatedAt.format(DateTimePattern.ofTimeWithMeridiem())
+            } ?: return ""
         }
 
         private fun setupProfilePictureBorder(matchActive: Boolean) {

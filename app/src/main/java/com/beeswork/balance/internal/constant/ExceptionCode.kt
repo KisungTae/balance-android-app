@@ -33,6 +33,7 @@ class ExceptionCode {
 
         const val CHAT_MESSAGE_OVER_SIZED_EXCEPTION = "chat_message_over_sized_exception"
         const val CHAT_MESSAGE_EMPTY_EXCEPTION = "chat_message_empty_exception"
+
         const val MATCH_UNMATCHED_EXCEPTION = "match_unmatched_exception"
 
     }

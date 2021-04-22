@@ -1,6 +1,7 @@
 package com.beeswork.balance.ui.match
 
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZonedDateTime
 import java.util.*
 
 data class MatchDomain(
@@ -10,7 +11,7 @@ data class MatchDomain(
     val unmatched: Boolean,
     val name: String,
     val repPhotoKey: String?,
-    val updatedAt: OffsetDateTime?,
+    val updatedAt: ZonedDateTime?,
     val unread: Boolean,
     val recentChatMessage: String
 )
