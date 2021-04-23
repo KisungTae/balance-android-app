@@ -9,9 +9,11 @@ import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
+import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.threeten.bp.LocalTime
 import java.util.*
 
 
@@ -48,7 +50,18 @@ class ChatViewModel(
         ).flow.cachedIn(viewModelScope).map { pagingData ->
             pagingData.map { chatMessageMapper.fromEntityToDomain(it) }
         }.map { pagingData ->
+            var afterTimeCreatedAt: LocalTime?
             pagingData.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
+                safeLet(before, after) { b, a ->
+                    afterTimeCreatedAt = a.timeCreatedAt
+                    if (b.status == a.status && a.dateCreatedAt == b.dateCreatedAt && afterTimeCreatedAt == b.timeCreatedAt) {
+                        a.timeCreatedAt = null
+                        b.showRepPhoto = false
+                        if (!b.showTimeCreated) b.timeCreatedAt = null
+                    }
+                }
+
+
                 var separator: ChatMessageDomain? = null
                 before?.dateCreatedAt?.let { b ->
                     after?.dateCreatedAt?.let { a ->

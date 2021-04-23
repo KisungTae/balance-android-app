@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
@@ -146,11 +147,7 @@ interface BalanceAPI {
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-//                .baseUrl("https://nw9pdhgsp6.execute-api.ap-northeast-2.amazonaws.com/prod/balance/")
-//                .baseUrl("http://10.0.2.2:8080/")
-//                .baseUrl("http://localhost:8080/")
-                .baseUrl("http://192.168.1.100:8081/")
-//                .baseUrl("http://192.168.1.92:8081/")
+                .baseUrl(EndPoint.ACCOUNT_SERVICE_ENDPOINT)
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create(GsonProvider.gson))
                 .build()

@@ -373,9 +373,9 @@ class MatchRepositoryImpl(
     //  TODO: remove me
     override fun testFunction() {
 //        _chatMessageReceiptLiveData.postValue(Resource.error(""))
-//        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO).launch {
 //            createDummyMatch()
-//            createDummyChatMessages()
-//        }
+            createDummyChatMessages()
+        }
     }
 }

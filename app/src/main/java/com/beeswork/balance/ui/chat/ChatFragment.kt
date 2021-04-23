@@ -156,6 +156,7 @@ class ChatFragment : BaseFragment(),
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
+                    viewModel.test()
 //                    chatMessagePagingRefreshAdapter.refresh()
                     true
                 }

@@ -10,8 +10,10 @@ data class ChatMessageDomain(
     val id: Long?,
     val body: String,
     var status: ChatMessageStatus,
-    val dateCreatedAt: LocalDate?,
-    val timeCreatedAt: LocalTime?
+    var dateCreatedAt: LocalDate?,
+    var timeCreatedAt: LocalTime?,
+    var showRepPhoto: Boolean = true,
+    var showTimeCreated: Boolean = true
 ) {
     companion object {
         fun toSeparator(body: String): ChatMessageDomain {

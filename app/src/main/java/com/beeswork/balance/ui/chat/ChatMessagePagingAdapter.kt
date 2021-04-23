@@ -15,6 +15,7 @@ import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.util.safeLet
+import com.beeswork.balance.ui.match.MatchDomain
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -69,8 +70,6 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
                 ChatMessageStatus.RECEIVED.ordinal -> {
                     (holder as ReceivedViewHolder).bind(
                         it,
-                        isSameAsPrev(it, position),
-                        isSameAsNext(it, position),
                         marginTop(holder.itemViewType, position),
                         repPhotoEndPoint
                     )
@@ -78,7 +77,6 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
                 else -> {
                     (holder as SentViewHolder).bind(
                         it,
-                        isSameAsPrev(it, position),
                         marginTop(holder.itemViewType, position)
                     )
                 }
@@ -113,34 +111,34 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
         }
     }
 
-    private fun isSameAsPrev(currentChatMessage: ChatMessageDomain, position: Int): Boolean {
-        var sameAsPrev = false
-        if (position > 0)
-            sameAsPrev = isOnSameTime(currentChatMessage, position - 1)
-        return sameAsPrev
-    }
-
-    private fun isSameAsNext(currentChatMessage: ChatMessageDomain, position: Int): Boolean {
-        var sameAsNext = false
-        if (position < (itemCount - 1))
-            sameAsNext = isOnSameTime(currentChatMessage, position + 1)
-        return sameAsNext
-    }
-
-    private fun isOnSameTime(
-        currentChatMessage: ChatMessageDomain,
-        targetPosition: Int
-    ): Boolean {
-        var onSameTime = false
-        getItem(targetPosition)?.let { targetChatMessage ->
-            if (currentChatMessage.status == targetChatMessage.status) {
-                safeLet(currentChatMessage.timeCreatedAt, targetChatMessage.timeCreatedAt) { c, t ->
-                    onSameTime = (c == t)
-                }
-            }
-        }
-        return onSameTime
-    }
+//    private fun isSameAsPrev(currentChatMessage: ChatMessageDomain, position: Int): Boolean {
+//        var sameAsPrev = false
+//        if (position > 0)
+//            sameAsPrev = isOnSameTime(currentChatMessage, position - 1)
+//        return sameAsPrev
+//    }
+//
+//    private fun isSameAsNext(currentChatMessage: ChatMessageDomain, position: Int): Boolean {
+//        var sameAsNext = false
+//        if (position < (itemCount - 1))
+//            sameAsNext = isOnSameTime(currentChatMessage, position + 1)
+//        return sameAsNext
+//    }
+//
+//    private fun isOnSameTime(
+//        currentChatMessage: ChatMessageDomain,
+//        targetPosition: Int
+//    ): Boolean {
+//        var onSameTime = false
+//        getItem(targetPosition)?.let { targetChatMessage ->
+//            if (currentChatMessage.status == targetChatMessage.status) {
+//                safeLet(currentChatMessage.timeCreatedAt, targetChatMessage.timeCreatedAt) { c, t ->
+//                    onSameTime = (c == t)
+//                }
+//            }
+//        }
+//        return onSameTime
+//    }
 
     companion object {
         private const val MARGIN_SHORT = 5
@@ -166,8 +164,7 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
             root.layoutParams = marginLayoutParams
         }
 
-        protected fun formatTimeCreatedAt(timeCreatedAt: LocalTime?, onSameTime: Boolean): String {
-            if (onSameTime) return ""
+        protected fun formatTimeCreatedAt(timeCreatedAt: LocalTime?): String {
             return timeCreatedAt?.format(DateTimePattern.ofTimeWithMeridiem()) ?: ""
         }
     }
@@ -179,14 +176,13 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
 
         fun bind(
             chatMessage: ChatMessageDomain,
-            sameAsPrev: Boolean,
-            sameAsNext: Boolean,
             marginTop: Int,
             repPhotoEndPoint: String?,
         ) {
             binding.tvChatMessageReceivedBody.text = chatMessage.body
-            binding.ivChatMessageReceivedRepPhoto.visibility = if (sameAsNext) View.INVISIBLE else View.VISIBLE
-            binding.tvChatMessageReceivedCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt, sameAsPrev)
+            binding.ivChatMessageReceivedRepPhoto.visibility = if (chatMessage.showRepPhoto) View.VISIBLE else View.INVISIBLE
+//            binding.tvChatMessageReceivedCreatedAt.text = if formatTimeCreatedAt(chatMessage.timeCreatedAt)
+            binding.tvChatMessageReceivedCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
             setMarginTop(binding.root, marginTop, context)
             repPhotoEndPoint?.let {
                 Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedRepPhoto)
@@ -210,7 +206,6 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
 
         fun bind(
             chatMessage: ChatMessageDomain,
-            sameAsPrev: Boolean,
             marginTop: Int
         ) {
             binding.tvChatMessageSentBody.text = chatMessage.body
@@ -220,7 +215,8 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
                 ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
                 ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
                 else -> {
-                    binding.tvChatMessageSentCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt, sameAsPrev)
+//                    binding.tvChatMessageSentCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
+                    binding.tvChatMessageSentCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
                     showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
                 }
             }
