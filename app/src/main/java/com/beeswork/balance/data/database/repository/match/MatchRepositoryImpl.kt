@@ -76,6 +76,7 @@ class MatchRepositoryImpl(
 
     override fun collectStompClientFlows() {
         collectChatMessageReceiptFlow()
+        collectChatMessageReceivedFlow()
     }
 
     private fun collectChatMessageReceiptFlow() {
@@ -95,6 +96,12 @@ class MatchRepositoryImpl(
                 }
                 chatMessagePagingRefreshListener?.onRefresh(PagingRefresh(null))
             }
+        }.launchIn(scope)
+    }
+
+    private fun collectChatMessageReceivedFlow() {
+        stompClient.chatMessageReceivedFlow.onEach { chatMessageDTO ->
+            chatMessageDAO.insert(chatMessageMapper.fromDTOToEntity(chatMessageDTO))
         }.launchIn(scope)
     }
 

@@ -8,5 +8,6 @@ data class ChatMessageDTO(
     val id: Long?,
     val chatId: Long?,
     val body: String?,
-    val createdAt: OffsetDateTime?
+    val createdAt: OffsetDateTime?,
+    val recipientId: UUID?
 )

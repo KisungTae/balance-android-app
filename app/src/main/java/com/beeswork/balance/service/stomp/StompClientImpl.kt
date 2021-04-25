@@ -34,7 +34,7 @@ class StompClientImpl(
     private var outgoing = Channel<String>()
     private val incomingFlow = incoming.consumeAsFlow()
     private var isSocketOpen: Boolean = false
-    private var subscriptionId = 0
+    private var subscriptionId = 8
 
     private var chatMessageReceiptChannel = Channel<ChatMessageDTO>()
     override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
@@ -110,7 +110,22 @@ class StompClientImpl(
     }
 
     private fun onMessageFrameReceived(stompFrame: StompFrame) {
+        when (stompFrame.getPushType()) {
+            PushType.CHAT_MESSAGE -> scope.launch {
+                chatMessageReceivedChannel.send(
+                    GsonProvider.gson.fromJson(
+                        stompFrame.payload,
+                        ChatMessageDTO::class.java
+                    )
+                )
+            }
+            PushType.CLICKED -> scope.launch {
 
+            }
+            PushType.MATCHED -> scope.launch {
+
+            }
+        }
     }
 
     private fun onReceiptFrameReceived(stompFrame: StompFrame) {
@@ -138,10 +153,9 @@ class StompClientImpl(
             headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
             headers[StompHeader.ACCOUNT_ID] = "${preferenceProvider.getAccountId()?.toString()}"
             headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
-            headers[StompHeader.RECIPIENT_ID] = matchedId.toString()
             headers[StompHeader.RECEIPT] = key.toString()
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-            val chatMessageDTO = ChatMessageDTO(null, null, chatId, body, null)
+            val chatMessageDTO = ChatMessageDTO(null, null, chatId, body, null, matchedId)
             val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
             outgoing.send(stompFrame.compile())
         }
@@ -163,9 +177,9 @@ class StompClientImpl(
             headers[StompHeader.ID] = subscriptionId.toString()
             headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
             headers[StompHeader.ACK] = DEFAULT_ACK
-            headers[StompHeader.EXCLUSIVE] = false.toString()
-            headers[StompHeader.AUTO_DELETE] = true.toString()
-            headers[StompHeader.DURABLE] = true.toString()
+//            headers[StompHeader.EXCLUSIVE] = false.toString()
+//            headers[StompHeader.AUTO_DELETE] = true.toString()
+//            headers[StompHeader.DURABLE] = true.toString()
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }
@@ -173,9 +187,6 @@ class StompClientImpl(
     private fun getDestination(id: UUID?): String {
         return "/queue/${id?.toString()}"
     }
-
-
-
 
 
     private fun setupWebSocketListener() {

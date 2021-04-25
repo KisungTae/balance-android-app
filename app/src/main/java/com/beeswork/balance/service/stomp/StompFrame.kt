@@ -1,6 +1,7 @@
 package com.beeswork.balance.service.stomp
 
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
+import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.beeswork.balance.internal.util.safeLet
@@ -31,6 +32,14 @@ data class StompFrame(
 
         builder.append(TERMINATE_MESSAGE_SYMBOL)
         return builder.toString()
+    }
+
+    fun getPushType(): PushType? {
+        return headers?.let { headers ->
+            headers[StompHeader.PUSH_TYPE]?.let { pushType ->
+                PushType.valueOf(pushType)
+            }
+        }
     }
 
     fun getMessageId(): Long? {

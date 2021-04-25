@@ -181,8 +181,8 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
         ) {
             binding.tvChatMessageReceivedBody.text = chatMessage.body
             binding.ivChatMessageReceivedRepPhoto.visibility = if (chatMessage.showRepPhoto) View.VISIBLE else View.INVISIBLE
-//            binding.tvChatMessageReceivedCreatedAt.text = if formatTimeCreatedAt(chatMessage.timeCreatedAt)
-            binding.tvChatMessageReceivedCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
+            binding.tvChatMessageReceivedCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
+//            binding.tvChatMessageReceivedCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
             setMarginTop(binding.root, marginTop, context)
             repPhotoEndPoint?.let {
                 Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedRepPhoto)
@@ -215,8 +215,8 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
                 ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
                 ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
                 else -> {
-//                    binding.tvChatMessageSentCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
-                    binding.tvChatMessageSentCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
+                    binding.tvChatMessageSentCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
+//                    binding.tvChatMessageSentCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
                     showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
                 }
             }

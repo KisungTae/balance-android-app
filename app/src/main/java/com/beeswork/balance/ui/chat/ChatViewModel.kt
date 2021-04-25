@@ -5,6 +5,7 @@ import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -13,7 +14,6 @@ import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalTime
 import java.util.*
 
 
@@ -48,32 +48,46 @@ class ChatViewModel(
             null,
             { ChatMessagePagingSource(matchRepository, chatId) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
-            pagingData.map { chatMessageMapper.fromEntityToDomain(it) }
+            var before = ChatMessageDomain(0, null, "", ChatMessageStatus.ERROR, null, null)
+            var nullifyBeforeTimeCreatedAt = false
+            pagingData.map { chatMessage ->
+                val after = chatMessageMapper.fromEntityToDomain(chatMessage)
+                val isTimeCreatedAtSame = before.timeCreatedAt == after.timeCreatedAt
+                if (nullifyBeforeTimeCreatedAt) before.timeCreatedAt = null
+                if (after.isSentOrReceived()
+                    && after.status == before.status
+                    && after.dateCreatedAt == before.dateCreatedAt
+                    && isTimeCreatedAtSame
+                ) {
+                    nullifyBeforeTimeCreatedAt = true
+                    before.showRepPhoto = false
+                } else nullifyBeforeTimeCreatedAt = false
+
+                before = after
+                after
+            }
         }.map { pagingData ->
-            var afterTimeCreatedAt: LocalTime?
             pagingData.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
-                safeLet(before, after) { b, a ->
-                    afterTimeCreatedAt = a.timeCreatedAt
-                    if (b.status == a.status && a.dateCreatedAt == b.dateCreatedAt && afterTimeCreatedAt == b.timeCreatedAt) {
-                        a.timeCreatedAt = null
-                        b.showRepPhoto = false
-                        if (!b.showTimeCreated) b.timeCreatedAt = null
-                    }
-                }
-
-
                 var separator: ChatMessageDomain? = null
-                before?.dateCreatedAt?.let { b ->
-                    after?.dateCreatedAt?.let { a ->
-                        if (b != a) separator = ChatMessageDomain.toSeparator(
-                            b.format(DateTimePattern.ofDateWithDayOfWeek())
-                        )
-                    } ?: kotlin.run {
-                        separator = ChatMessageDomain.toSeparator(
-                            b.format(DateTimePattern.ofDateWithDayOfWeek())
-                        )
-                    }
-                }
+                if (after?.dateCreatedAt == null || before?.dateCreatedAt != after.dateCreatedAt)
+                    separator = ChatMessageDomain.toSeparator(
+                        before?.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
+                    )
+
+
+//                before?.dateCreatedAt?.let { b ->
+//                    after?.dateCreatedAt?.let { a ->
+//                        if (b != a) separator = ChatMessageDomain.toSeparator(
+//                            b.format(DateTimePattern.ofDateWithDayOfWeek())
+//                        )
+//                    } ?: kotlin.run {
+//                        separator = ChatMessageDomain.toSeparator(
+//                            b.format(DateTimePattern.ofDateWithDayOfWeek())
+//                        )
+//                    }
+//                }
+//                if (after?.dateCreatedAt == null)
+                before?.dateCreatedAt = null
                 separator
             }
         }.asLiveData(viewModelScope.coroutineContext)

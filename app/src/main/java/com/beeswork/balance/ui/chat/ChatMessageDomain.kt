@@ -12,12 +12,18 @@ data class ChatMessageDomain(
     var status: ChatMessageStatus,
     var dateCreatedAt: LocalDate?,
     var timeCreatedAt: LocalTime?,
-    var showRepPhoto: Boolean = true,
-    var showTimeCreated: Boolean = true
+    var showRepPhoto: Boolean = true
 ) {
+
+    fun isSentOrReceived(): Boolean {
+        return (status == ChatMessageStatus.RECEIVED || status == ChatMessageStatus.SENT)
+    }
+
     companion object {
-        fun toSeparator(body: String): ChatMessageDomain {
-            return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, null, null)
+        fun toSeparator(body: String?): ChatMessageDomain? {
+            body?.let {
+                return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, null, null)
+            } ?: return null
         }
     }
 }
