@@ -58,7 +58,7 @@ class MatchRepositoryImpl(
                 offer(matchPagingRefresh)
             }
         }
-        awaitClose { matchPagingRefreshListener = null }
+        awaitClose { }
     }
 
     @ExperimentalCoroutinesApi
@@ -68,7 +68,7 @@ class MatchRepositoryImpl(
                 offer(chatMessagePagingRefresh)
             }
         }
-        awaitClose { chatMessagePagingRefreshListener = null }
+        awaitClose {}
     }
 
     @ExperimentalCoroutinesApi
@@ -78,7 +78,7 @@ class MatchRepositoryImpl(
                 offer(element)
             }
         }
-        awaitClose { sendChatMessageListener = null }
+        awaitClose { }
     }
 
     init {
@@ -97,10 +97,8 @@ class MatchRepositoryImpl(
                         chatMessageDAO.updateStatus(key, ChatMessageStatus.SENT)
                         onChatMessageFetched(key, id, chatMessageDTO.createdAt)
                     }
-                } ?: kotlin.run {
-                    chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
-                    sendChatMessageListener?.onInvoke(Resource.error(chatMessageDTO.body, null))
-                }
+                } ?: chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
+
                 chatMessagePagingRefreshListener?.onRefresh(
                     ChatMessagePagingRefresh(
                         null,
@@ -222,6 +220,8 @@ class MatchRepositoryImpl(
         syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
         updateRecentChatMessages(chatIds)
     }
+
+
 
     private fun updateRecentChatMessages(chatIds: Set<Long>) {
         balanceDatabase.runInTransaction {

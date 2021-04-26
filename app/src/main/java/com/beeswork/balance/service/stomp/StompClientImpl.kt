@@ -29,10 +29,17 @@ class StompClientImpl(
     private val preferenceProvider: PreferenceProvider
 ) : StompClient, WebSocketListener() {
 
+    enum class SocketStatus {
+        CONNECTING,
+        OPEN,
+        CLOSED
+    }
+
     private var socket: WebSocket? = null
     private var outgoing = Channel<String>()
     private var isSocketOpen: Boolean = false
     private var subscriptionId = 8
+    private var socketStatus = SocketStatus.CLOSED
 
     private var chatMessageReceiptChannel = Channel<ChatMessageDTO>()
     override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
@@ -82,17 +89,18 @@ class StompClientImpl(
     }
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-        isSocketOpen = false
+        socketStatus = SocketStatus.CLOSED
         println("onClosing")
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        isSocketOpen = false
+        socketStatus = SocketStatus.CLOSED
         println("onClosed")
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-        isSocketOpen = false
+        println("onFailure!!!!!")
+        socketStatus = SocketStatus.CLOSED
         val error: String? = when (t) {
             is NoInternetConnectivityException -> ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION
             else -> null
@@ -101,10 +109,10 @@ class StompClientImpl(
     }
 
     override fun connect() {
-        if (!isSocketOpen) socket = okHttpClient.newWebSocket(
-            Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build(),
-            this
-        )
+        if (socketStatus == SocketStatus.CLOSED) {
+            socketStatus = SocketStatus.CONNECTING
+            socket = okHttpClient.newWebSocket(Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build(), this)
+        }
     }
 
     private fun onMessageFrameReceived(stompFrame: StompFrame) {
@@ -146,17 +154,23 @@ class StompClientImpl(
     }
 
     override fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
-
         scope.launch {
-            val headers = mutableMapOf<String, String>()
-            headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
-            headers[StompHeader.ACCOUNT_ID] = "${preferenceProvider.getAccountId()?.toString()}"
-            headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
-            headers[StompHeader.RECEIPT] = key.toString()
-            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-            val chatMessageDTO = ChatMessageDTO(null, null, chatId, body, null, matchedId)
-            val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
-            outgoing.send(stompFrame.compile())
+            if (socketStatus == SocketStatus.CLOSED) connect()
+            while (socketStatus == SocketStatus.CONNECTING) { }
+
+            if (socketStatus == SocketStatus.OPEN) {
+                val headers = mutableMapOf<String, String>()
+                headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
+                headers[StompHeader.ACCOUNT_ID] = "${preferenceProvider.getAccountId()?.toString()}"
+                headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
+                headers[StompHeader.RECEIPT] = key.toString()
+                headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+                val chatMessageDTO = ChatMessageDTO(null, null, chatId, body, null, matchedId)
+                val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
+                outgoing.send(stompFrame.compile())
+            } else if (socketStatus == SocketStatus.CLOSED) {
+                chatMessageReceiptChannel.send(ChatMessageDTO(key, null, chatId, null, null, null))
+            }
         }
     }
 
