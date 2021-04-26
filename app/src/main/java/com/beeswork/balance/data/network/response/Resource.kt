@@ -66,6 +66,7 @@ class Resource<out T>(
             return Resource(Status.ERROR, null, null, error, null)
         }
 
+
         fun <T> loading(): Resource<T> {
             return Resource(Status.LOADING, null, null, null, null)
         }

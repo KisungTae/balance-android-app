@@ -30,9 +30,7 @@ class StompClientImpl(
 ) : StompClient, WebSocketListener() {
 
     private var socket: WebSocket? = null
-    private var incoming = Channel<String>()
     private var outgoing = Channel<String>()
-    private val incomingFlow = incoming.consumeAsFlow()
     private var isSocketOpen: Boolean = false
     private var subscriptionId = 8
 
@@ -148,6 +146,7 @@ class StompClientImpl(
     }
 
     override fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
+
         scope.launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
@@ -177,9 +176,6 @@ class StompClientImpl(
             headers[StompHeader.ID] = subscriptionId.toString()
             headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
             headers[StompHeader.ACK] = DEFAULT_ACK
-//            headers[StompHeader.EXCLUSIVE] = false.toString()
-//            headers[StompHeader.AUTO_DELETE] = true.toString()
-//            headers[StompHeader.DURABLE] = true.toString()
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }

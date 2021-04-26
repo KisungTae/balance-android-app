@@ -12,10 +12,6 @@ import java.util.*
 
 class ChatMessageMapperImpl : ChatMessageMapper {
 
-    override fun fromEntityToNewChatMessageDomain(entity: ChatMessage): NewChatMessage {
-        return NewChatMessage(entity.body)
-    }
-
     override fun fromDTOToEntity(dto: ChatMessageDTO): ChatMessage {
         return ChatMessage(
             dto.chatId ?: 0,

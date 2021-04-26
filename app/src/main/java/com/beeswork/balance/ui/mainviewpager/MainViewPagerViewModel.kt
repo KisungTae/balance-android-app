@@ -15,7 +15,6 @@ class MainViewPagerViewModel(
 
 
     fun connectToStomp() {
-        matchRepository.collectStompClientFlows()
         stompClient.connect()
     }
 }

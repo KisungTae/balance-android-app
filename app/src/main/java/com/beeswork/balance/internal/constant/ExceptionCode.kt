@@ -10,7 +10,7 @@ class ExceptionCode {
         const val CONNECT_EXCEPTION = "connect_exception"
         const val NETWORK_EXCEPTION = "network.exception"
 
-        const val BAD_REQUEST_EXCEPTION = "bad.request.exception"
+        const val BAD_REQUEST_EXCEPTION = "bad_request_exception"
 
         const val ACCOUNT_NOT_FOUND_EXCEPTION = "account.not.found.exception"
         const val ACCOUNT_BLOCKED_EXCEPTION = "account.blocked.exception"

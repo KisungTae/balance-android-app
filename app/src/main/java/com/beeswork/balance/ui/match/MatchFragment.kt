@@ -62,7 +62,7 @@ class MatchFragment : BaseFragment(),
 
     private fun setupMatchPagingRefreshLiveData() {
         viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, { pagingRefresh ->
-            pagingRefresh.data?.let { newMatch ->
+            pagingRefresh.newMatch?.let { newMatch ->
                 NewMatchDialog(
                     newMatch.matchedId,
                     newMatch.matchedName,

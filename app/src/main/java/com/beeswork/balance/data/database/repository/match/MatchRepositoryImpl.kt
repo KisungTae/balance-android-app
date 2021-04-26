@@ -4,7 +4,8 @@ import com.beeswork.balance.data.listener.ResourceListener
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.response.PagingRefresh
+import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
+import com.beeswork.balance.data.database.response.MatchPagingRefresh
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -17,8 +18,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.database.response.NewChatMessage
 import com.beeswork.balance.data.database.response.NewMatch
-import com.beeswork.balance.data.listener.PagingRefreshListener
-import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.data.listener.ChatMessagePagingRefreshListener
+import com.beeswork.balance.data.listener.MatchPagingRefreshListener
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.*
@@ -46,22 +47,26 @@ class MatchRepositoryImpl(
     private val stompClient: StompClient,
     private val scope: CoroutineScope
 ) : MatchRepository {
-    private var matchPagingRefreshListener: PagingRefreshListener<NewMatch>? = null
-    private var chatMessagePagingRefreshListener: PagingRefreshListener<NewChatMessage>? = null
+    private var matchPagingRefreshListener: MatchPagingRefreshListener? = null
+    private var chatMessagePagingRefreshListener: ChatMessagePagingRefreshListener? = null
     private var sendChatMessageListener: ResourceListener<EmptyResponse>? = null
 
     @ExperimentalCoroutinesApi
-    override val matchPagingRefreshFlow = callbackFlow<PagingRefresh<NewMatch>> {
-        matchPagingRefreshListener =  object : PagingRefreshListener<NewMatch> {
-            override fun onRefresh(element: PagingRefresh<NewMatch>) { offer(element) }
+    override val matchPagingRefreshFlow = callbackFlow<MatchPagingRefresh> {
+        matchPagingRefreshListener = object : MatchPagingRefreshListener {
+            override fun onRefresh(matchPagingRefresh: MatchPagingRefresh) {
+                offer(matchPagingRefresh)
+            }
         }
         awaitClose { matchPagingRefreshListener = null }
     }
 
     @ExperimentalCoroutinesApi
-    override val chatMessagePagingRefreshFlow = callbackFlow<PagingRefresh<NewChatMessage>> {
-        chatMessagePagingRefreshListener = object : PagingRefreshListener<NewChatMessage> {
-            override fun onRefresh(element: PagingRefresh<NewChatMessage>) { offer(element) }
+    override val chatMessagePagingRefreshFlow = callbackFlow<ChatMessagePagingRefresh> {
+        chatMessagePagingRefreshListener = object : ChatMessagePagingRefreshListener {
+            override fun onRefresh(chatMessagePagingRefresh: ChatMessagePagingRefresh) {
+                offer(chatMessagePagingRefresh)
+            }
         }
         awaitClose { chatMessagePagingRefreshListener = null }
     }
@@ -69,12 +74,14 @@ class MatchRepositoryImpl(
     @ExperimentalCoroutinesApi
     override val sendChatMessageFlow = callbackFlow<Resource<EmptyResponse>> {
         sendChatMessageListener = object : ResourceListener<EmptyResponse> {
-            override fun onInvoke(element: Resource<EmptyResponse>) { offer(element) }
+            override fun onInvoke(element: Resource<EmptyResponse>) {
+                offer(element)
+            }
         }
         awaitClose { sendChatMessageListener = null }
     }
 
-    override fun collectStompClientFlows() {
+    init {
         collectChatMessageReceiptFlow()
         collectChatMessageReceivedFlow()
     }
@@ -92,16 +99,31 @@ class MatchRepositoryImpl(
                     }
                 } ?: kotlin.run {
                     chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
-                    sendChatMessageListener?.onInvoke(Resource.error(ExceptionCode.BAD_REQUEST_EXCEPTION))
+                    sendChatMessageListener?.onInvoke(Resource.error(chatMessageDTO.body, null))
                 }
-                chatMessagePagingRefreshListener?.onRefresh(PagingRefresh(null))
+                chatMessagePagingRefreshListener?.onRefresh(
+                    ChatMessagePagingRefresh(
+                        null,
+                        ChatMessagePagingRefresh.Type.FETCHED
+                    )
+                )
             }
         }.launchIn(scope)
     }
 
     private fun collectChatMessageReceivedFlow() {
         stompClient.chatMessageReceivedFlow.onEach { chatMessageDTO ->
-            chatMessageDAO.insert(chatMessageMapper.fromDTOToEntity(chatMessageDTO))
+            val chatMessage = chatMessageMapper.fromDTOToEntity(chatMessageDTO)
+            chatMessageDAO.insert(chatMessage)
+            matchDAO.findById(chatMessage.chatId)?.let { match ->
+                val newChatMessage = NewChatMessage(match.name, match.matchedId, match.repPhotoKey, chatMessage.body)
+                chatMessagePagingRefreshListener?.onRefresh(
+                    ChatMessagePagingRefresh(
+                        newChatMessage,
+                        ChatMessagePagingRefresh.Type.RECEIVED
+                    )
+                )
+            }
         }.launchIn(scope)
     }
 
@@ -155,8 +177,13 @@ class MatchRepositoryImpl(
                 saveMatches(data.matchDTOs)
                 saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-                chatMessagePagingRefreshListener?.onRefresh(PagingRefresh(null))
-                matchPagingRefreshListener?.onRefresh(PagingRefresh(null))
+                chatMessagePagingRefreshListener?.onRefresh(
+                    ChatMessagePagingRefresh(
+                        null,
+                        ChatMessagePagingRefresh.Type.FETCHED
+                    )
+                )
+                matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
             }
             return@withContext Resource.toEmptyResponse(listMatches)
         }
@@ -285,7 +312,7 @@ class MatchRepositoryImpl(
                     }
                 }
             }
-            matchPagingRefreshListener?.onRefresh(PagingRefresh(null))
+            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
         }
     }
 
@@ -298,7 +325,12 @@ class MatchRepositoryImpl(
     override suspend fun sendChatMessage(chatId: Long, matchedId: UUID, body: String) {
         withContext(Dispatchers.IO) {
             val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
-            chatMessagePagingRefreshListener?.onRefresh(PagingRefresh(null))
+            chatMessagePagingRefreshListener?.onRefresh(
+                ChatMessagePagingRefresh(
+                    null,
+                    ChatMessagePagingRefresh.Type.SEND
+                )
+            )
             stompClient.sendChatMessage(key, chatId, matchedId, body)
         }
     }

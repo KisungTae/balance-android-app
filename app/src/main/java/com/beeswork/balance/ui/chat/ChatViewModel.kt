@@ -73,20 +73,6 @@ class ChatViewModel(
                     separator = ChatMessageDomain.toSeparator(
                         before?.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
                     )
-
-
-//                before?.dateCreatedAt?.let { b ->
-//                    after?.dateCreatedAt?.let { a ->
-//                        if (b != a) separator = ChatMessageDomain.toSeparator(
-//                            b.format(DateTimePattern.ofDateWithDayOfWeek())
-//                        )
-//                    } ?: kotlin.run {
-//                        separator = ChatMessageDomain.toSeparator(
-//                            b.format(DateTimePattern.ofDateWithDayOfWeek())
-//                        )
-//                    }
-//                }
-//                if (after?.dateCreatedAt == null)
                 before?.dateCreatedAt = null
                 separator
             }

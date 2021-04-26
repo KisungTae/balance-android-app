@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.util.safeLet
@@ -109,7 +110,7 @@ class ChatFragment : BaseFragment(),
     private fun setupChatMessagePagingRefreshObserver() {
         viewModel.chatMessagePagingRefreshLiveData.observe(viewLifecycleOwner, {
             //TODO: if data is not null, then check if scroll is bottom if not then new message alert in chat
-
+            if (it.type == ChatMessagePagingRefresh.Type.SEND) binding.etChatMessageBody.setText("")
             chatMessagePagingRefreshAdapter.refresh()
         })
     }
