@@ -16,7 +16,7 @@ import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.ScopeFragment
-import com.beeswork.balance.ui.dialog.NewMatchDialog
+import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -29,7 +29,7 @@ import org.kodein.di.generic.instance
 const val MIN_CARD_STACK_SIZE = 15
 
 class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
-    BalanceGameDialog.BalanceGameListener {
+    BalanceGameDialog.BalanceGameListener, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
@@ -210,6 +210,10 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
     }
 
     override fun onCardDisappeared(view: View?, position: Int) {
+    }
+
+    override fun onFragmentSelected() {
+        println("swipe fragment: onFragmentSelected")
     }
 
 

@@ -54,7 +54,6 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
     }
 
     private fun setupWebSocketEventObserver() {
-//        TODO: if it is message reltated exception like exceed limit size of message then change the title
         viewModel.webSocketEventLiveData.observe(viewLifecycleOwner) {
             if (it.isError() && validateAccount(it.error, it.errorMessage)) ErrorDialog(
                 it.error,
@@ -64,7 +63,6 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
                 this@MainViewPagerFragment,
                 null
             ).show(childFragmentManager, FetchErrorDialog.TAG)
-
         }
     }
 
@@ -78,6 +76,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                mainViewPagerAdapter.getFragmentAt(position).onFragmentSelected()
             }
         })
 
@@ -100,16 +99,16 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         tabLayoutMediator.attach()
     }
 
+    fun onFragmentDisplayed() {
+
+    }
+
     private fun showTabBadge(position: Int, visible: Boolean) {
 //        binding.tlMain.getTabAt(position)?.let {
 //            val badge = it.orCreateBadge
 //            if (visible) badge.backgroundColor = ContextCompat.getColor(applicationContext, R.color.Primary)
 //            badge.isVisible = visible
 //        }
-    }
-
-    companion object {
-        const val TAG = "mainViewPagerFragment"
     }
 
     override fun onRetry(requestCode: Int?) {
@@ -119,4 +118,10 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
             }
         }
     }
+
+    companion object {
+        const val TAG = "mainViewPagerFragment"
+    }
+
+
 }

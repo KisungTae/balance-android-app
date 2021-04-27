@@ -25,7 +25,8 @@ interface MatchRepository {
 
     suspend fun sendChatMessage(chatId: Long, matchedId: UUID, body: String)
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
-
+    suspend fun resendChatMessage(key: Long, matchedId: UUID)
+    suspend fun deleteChatMessage(key: Long)
 
     fun testFunction()
 }

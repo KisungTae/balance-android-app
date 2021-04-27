@@ -5,12 +5,10 @@ import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
-import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -48,31 +46,31 @@ class ChatViewModel(
             null,
             { ChatMessagePagingSource(matchRepository, chatId) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
-            var before = ChatMessageDomain(0, null, "", ChatMessageStatus.ERROR, null, null)
-            var nullifyBeforeTimeCreatedAt = false
-            pagingData.map { chatMessage ->
-                val after = chatMessageMapper.fromEntityToDomain(chatMessage)
-                val isTimeCreatedAtSame = before.timeCreatedAt == after.timeCreatedAt
-                if (nullifyBeforeTimeCreatedAt) before.timeCreatedAt = null
-                if (after.isSentOrReceived()
-                    && after.status == before.status
-                    && after.dateCreatedAt == before.dateCreatedAt
-                    && isTimeCreatedAtSame
-                ) {
-                    nullifyBeforeTimeCreatedAt = true
-                    before.showRepPhoto = false
-                } else nullifyBeforeTimeCreatedAt = false
-
-                before = after
-                after
-            }
+            pagingData.map { chatMessage -> chatMessageMapper.fromEntityToDomain(chatMessage) }
         }.map { pagingData ->
+            var nullifyBeforeTimeCreatedAt = false
             pagingData.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
+                val beforeTimeCreatedAt = before?.timeCreatedAt
+                if (nullifyBeforeTimeCreatedAt) {
+                    before?.timeCreatedAt = null
+                    nullifyBeforeTimeCreatedAt = false
+                }
+
+                if (after?.isSentOrReceived() == true
+                    && after.status == before?.status
+                    && after.dateCreatedAt == before.dateCreatedAt
+                    && after.timeCreatedAt  == beforeTimeCreatedAt) {
+                    before.showRepPhoto = false
+                    nullifyBeforeTimeCreatedAt = true
+                }
+
                 var separator: ChatMessageDomain? = null
-                if (after?.dateCreatedAt == null || before?.dateCreatedAt != after.dateCreatedAt)
+                if (before?.isSentOrReceived() == true
+                    && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)) {
                     separator = ChatMessageDomain.toSeparator(
-                        before?.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
+                        before.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
                     )
+                }
                 before?.dateCreatedAt = null
                 separator
             }
@@ -101,6 +99,14 @@ class ChatViewModel(
                 else -> matchRepository.sendChatMessage(chatId, matchedId, body)
             }
         }
+    }
+
+    fun deleteChatMessage(key: Long) {
+        println("deleteChatMessage: $key")
+    }
+
+    fun resendChatMessage(key: Long) {
+        println("resendChatMessage: $key")
     }
 
     fun test() {

@@ -33,6 +33,7 @@
                 android:id="@+id/btnChatMessageSentResend"
                 android:layout_width="@dimen/chat_message_menu_btn_size"
                 android:layout_height="@dimen/chat_message_menu_btn_size"
+                android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_baseline_refresh"
                 android:contentDescription="@string/chat_message_resend_description" />
 
@@ -40,6 +41,7 @@
                 android:id="@+id/btnChatMessageSentDelete"
                 android:layout_width="@dimen/chat_message_menu_btn_size"
                 android:layout_height="@dimen/chat_message_menu_btn_size"
+                android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_baseline_close"
                 android:contentDescription="@string/delete_chat_message_description" />
 

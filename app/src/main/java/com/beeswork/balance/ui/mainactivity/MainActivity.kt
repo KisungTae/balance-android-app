@@ -12,13 +12,17 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.fragment.NavHostFragment
+import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.NewMatchDialog
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.google.android.gms.location.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -56,6 +60,16 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
         super.onPause()
     }
+
+//    private fun setupBackStackListener() {
+//        supportFragmentManager.addOnBackStackChangedListener {
+//            val currentFragment = supportFragmentManager.fragments.last()
+//            if (currentFragment is NavHostFragment) {
+//                val currentFragmentInNav = currentFragment.childFragmentManager.fragments.first()
+//                if (currentFragmentInNav is MainViewPagerFragment) currentFragmentInNav.onFragmentDisplayed()
+//            }
+//        }
+//    }
 
     private fun setupBroadcastReceiver() {
         broadcastReceiver = object : BroadcastReceiver() {

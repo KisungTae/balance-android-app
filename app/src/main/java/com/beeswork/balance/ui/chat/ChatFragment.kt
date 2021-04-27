@@ -30,7 +30,8 @@ import java.util.*
 
 class ChatFragment : BaseFragment(),
     KodeinAware,
-    ErrorDialog.OnDismissListener {
+    ErrorDialog.OnDismissListener,
+    ChatMessagePagingAdapter.ChatMessageSentListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
@@ -171,7 +172,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun setupChatRecyclerView() {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter()
+        chatMessagePagingAdapter = ChatMessagePagingAdapter(this)
         binding.rvChat.adapter = chatMessagePagingAdapter
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -206,6 +207,18 @@ class ChatFragment : BaseFragment(),
 
     override fun onDismiss() {
         popBackToMatch()
+    }
+
+    override fun onResendChatMessage(position: Int) {
+        chatMessagePagingAdapter.getChatMessage(position)?.let {
+            viewModel.resendChatMessage(it.key)
+        }
+    }
+
+    override fun onDeleteChatMessage(position: Int) {
+        chatMessagePagingAdapter.getChatMessage(position)?.let {
+            viewModel.deleteChatMessage(it.key)
+        }
     }
 }
 

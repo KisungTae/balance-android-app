@@ -1,8 +1,8 @@
 package com.beeswork.balance.internal.constant
 
 enum class FragmentTabPosition {
-    ACCOUNT,
     SWIPE,
+    CLICKER,
     MATCH,
-    CLICKER
+    ACCOUNT
 }

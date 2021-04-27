@@ -11,8 +11,8 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentClickerBinding
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.ScopeFragment
+import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
-import com.beeswork.balance.ui.dialog.NewMatchDialog
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -21,7 +21,7 @@ import org.kodein.di.generic.instance
 
 class ClickerFragment : ScopeFragment(), KodeinAware,
     ClickerPagedListAdapter.OnClickedListener, BalanceGameDialog.BalanceGameListener,
-    FetchErrorDialog.OnRetryListener {
+    FetchErrorDialog.OnRetryListener, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ClickerViewModelFactory by instance()
@@ -96,6 +96,10 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
 
     override fun onRetry() {
         viewModel.fetchClickedList()
+    }
+
+    override fun onFragmentSelected() {
+        println("clicker fragment: onFragmentSelected")
     }
 
 }

@@ -4,15 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAccountBinding
 import com.beeswork.balance.ui.common.ScopeFragment
+import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.profile.ProfileDialog
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 
-class AccountFragment: ScopeFragment(), KodeinAware {
+class AccountFragment: ScopeFragment(), KodeinAware, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
 
@@ -36,5 +36,9 @@ class AccountFragment: ScopeFragment(), KodeinAware {
         binding.llProfile.setOnClickListener {
             ProfileDialog().show(childFragmentManager, ProfileDialog.TAG)
         }
+    }
+
+    override fun onFragmentSelected() {
+        println("account fragment: onFragmentSelected")
     }
 }

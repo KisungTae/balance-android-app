@@ -58,7 +58,7 @@ class MatchRepositoryImpl(
                 offer(matchPagingRefresh)
             }
         }
-        awaitClose { }
+        awaitClose {}
     }
 
     @ExperimentalCoroutinesApi
@@ -78,7 +78,7 @@ class MatchRepositoryImpl(
                 offer(element)
             }
         }
-        awaitClose { }
+        awaitClose {}
     }
 
     init {
@@ -166,6 +166,7 @@ class MatchRepositoryImpl(
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(Dispatchers.IO) {
+            val fetchedAt = OffsetDateTime.now()
             val listMatches = matchRDS.listMatches(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -174,6 +175,7 @@ class MatchRepositoryImpl(
             listMatches.data?.let { data ->
                 saveMatches(data.matchDTOs)
                 saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+                updateSendingChatMessages(fetchedAt)
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
                 chatMessagePagingRefreshListener?.onRefresh(
                     ChatMessagePagingRefresh(
@@ -221,7 +223,9 @@ class MatchRepositoryImpl(
         updateRecentChatMessages(chatIds)
     }
 
-
+    private fun updateSendingChatMessages(fetchedAt: OffsetDateTime) {
+        chatMessageDAO.updateStatusByStatusAndCreatedAt(ChatMessageStatus.ERROR, ChatMessageStatus.SENDING, fetchedAt)
+    }
 
     private fun updateRecentChatMessages(chatIds: Set<Long>) {
         balanceDatabase.runInTransaction {
@@ -324,21 +328,37 @@ class MatchRepositoryImpl(
 
     override suspend fun sendChatMessage(chatId: Long, matchedId: UUID, body: String) {
         withContext(Dispatchers.IO) {
-            val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, null))
-            chatMessagePagingRefreshListener?.onRefresh(
-                ChatMessagePagingRefresh(
-                    null,
-                    ChatMessagePagingRefresh.Type.SEND
-                )
-            )
-            stompClient.sendChatMessage(key, chatId, matchedId, body)
+            val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, OffsetDateTime.now()))
+            sendChatMessage(key, chatId, matchedId, body)
         }
+    }
+
+    private fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
+        chatMessagePagingRefreshListener?.onRefresh(
+            ChatMessagePagingRefresh(
+                null,
+                ChatMessagePagingRefresh.Type.SEND
+            )
+        )
+        stompClient.sendChatMessage(key, chatId, matchedId, body)
     }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
         return withContext(Dispatchers.IO) {
             return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
         }
+    }
+
+    override suspend fun resendChatMessage(key: Long, matchedId: UUID) {
+        withContext(Dispatchers.IO) {
+            chatMessageDAO.findByKey(key)?.let {
+                sendChatMessage(it.key, it.chatId, matchedId, it.body)
+            }
+        }
+    }
+
+    override suspend fun deleteChatMessage(key: Long) {
+        TODO("Not yet implemented")
     }
 
     //  TODO: remove me

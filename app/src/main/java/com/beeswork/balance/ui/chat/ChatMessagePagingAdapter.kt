@@ -25,7 +25,9 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
-class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
+class ChatMessagePagingAdapter(
+    private val chatMessageSentListener: ChatMessageSentListener
+): PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
 
     private var repPhotoEndPoint: String? = null
 
@@ -53,7 +55,8 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
                     parent,
                     false
                 ),
-                parent.context
+                parent.context,
+                chatMessageSentListener
             )
         }
     }
@@ -111,34 +114,14 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
         }
     }
 
-//    private fun isSameAsPrev(currentChatMessage: ChatMessageDomain, position: Int): Boolean {
-//        var sameAsPrev = false
-//        if (position > 0)
-//            sameAsPrev = isOnSameTime(currentChatMessage, position - 1)
-//        return sameAsPrev
-//    }
-//
-//    private fun isSameAsNext(currentChatMessage: ChatMessageDomain, position: Int): Boolean {
-//        var sameAsNext = false
-//        if (position < (itemCount - 1))
-//            sameAsNext = isOnSameTime(currentChatMessage, position + 1)
-//        return sameAsNext
-//    }
-//
-//    private fun isOnSameTime(
-//        currentChatMessage: ChatMessageDomain,
-//        targetPosition: Int
-//    ): Boolean {
-//        var onSameTime = false
-//        getItem(targetPosition)?.let { targetChatMessage ->
-//            if (currentChatMessage.status == targetChatMessage.status) {
-//                safeLet(currentChatMessage.timeCreatedAt, targetChatMessage.timeCreatedAt) { c, t ->
-//                    onSameTime = (c == t)
-//                }
-//            }
-//        }
-//        return onSameTime
-//    }
+    fun getChatMessage(position: Int): ChatMessageDomain? {
+        return getItem(position)
+    }
+
+    interface ChatMessageSentListener {
+        fun onResendChatMessage(position: Int)
+        fun onDeleteChatMessage(position: Int)
+    }
 
     companion object {
         private const val MARGIN_SHORT = 5
@@ -182,7 +165,6 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
             binding.tvChatMessageReceivedBody.text = chatMessage.body
             binding.ivChatMessageReceivedRepPhoto.visibility = if (chatMessage.showRepPhoto) View.VISIBLE else View.INVISIBLE
             binding.tvChatMessageReceivedCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
-//            binding.tvChatMessageReceivedCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
             setMarginTop(binding.root, marginTop, context)
             repPhotoEndPoint?.let {
                 Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedRepPhoto)
@@ -201,7 +183,8 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
 
     class SentViewHolder(
         private val binding: ItemChatMessageSentBinding,
-        private val context: Context
+        private val context: Context,
+        private val chatMessageSentListener: ChatMessageSentListener
     ) : ViewHolder(binding.root) {
 
         fun bind(
@@ -209,14 +192,18 @@ class ChatMessagePagingAdapter: PagingDataAdapter<ChatMessageDomain, ChatMessage
             marginTop: Int
         ) {
             binding.tvChatMessageSentBody.text = chatMessage.body
+            binding.btnChatMessageSentResend.setOnClickListener {
+                chatMessageSentListener.onResendChatMessage(absoluteAdapterPosition)
+            }
+            binding.btnChatMessageSentDelete.setOnClickListener {
+                chatMessageSentListener.onDeleteChatMessage(absoluteAdapterPosition)
+            }
             setMarginTop(binding.root, marginTop, context)
-
             when (chatMessage.status) {
                 ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
                 ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
                 else -> {
                     binding.tvChatMessageSentCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
-//                    binding.tvChatMessageSentCreatedAt.text = if (chatMessage.showTimeCreated) formatTimeCreatedAt(chatMessage.timeCreatedAt) else ""
                     showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
                 }
             }

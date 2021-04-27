@@ -10,10 +10,10 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.RequestCode
-import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
+import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.beeswork.balance.ui.dialog.NewMatchDialog
@@ -24,10 +24,8 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MatchFragment : BaseFragment(),
-    KodeinAware,
-    MatchPagingDataAdapter.MatchListener,
-    ErrorDialog.OnRetryListener {
+class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchListener,
+    ErrorDialog.OnRetryListener, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
@@ -167,6 +165,10 @@ class MatchFragment : BaseFragment(),
             }
         }
 
+    }
+
+    override fun onFragmentSelected() {
+        viewModel.fetchMatches()
     }
 }
 
