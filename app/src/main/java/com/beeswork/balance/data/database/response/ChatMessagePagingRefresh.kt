@@ -10,6 +10,6 @@ class ChatMessagePagingRefresh(
     enum class Type {
         SEND,
         RECEIVED,
-        FETCHED
+        UPDATED
     }
 }

@@ -50,4 +50,7 @@ interface ChatMessageDAO {
 
     @Query("update chatMessage set status = :toStatus where status = :status and createdAt < :createdAt")
     fun updateStatusByStatusAndCreatedAt(toStatus: ChatMessageStatus, status: ChatMessageStatus, createdAt: OffsetDateTime)
+
+    @Query("delete from chatMessage where `key` = :key")
+    fun delete(key: Long)
 }

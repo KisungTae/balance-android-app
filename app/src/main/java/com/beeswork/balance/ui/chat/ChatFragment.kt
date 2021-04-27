@@ -15,9 +15,11 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
+import com.beeswork.balance.ui.dialog.ConfirmDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
@@ -31,7 +33,8 @@ import java.util.*
 class ChatFragment : BaseFragment(),
     KodeinAware,
     ErrorDialog.OnDismissListener,
-    ChatMessagePagingAdapter.ChatMessageSentListener {
+    ChatMessagePagingAdapter.ChatMessageSentListener,
+    ConfirmDialog.ConfirmDialogClickListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
@@ -217,7 +220,23 @@ class ChatFragment : BaseFragment(),
 
     override fun onDeleteChatMessage(position: Int) {
         chatMessagePagingAdapter.getChatMessage(position)?.let {
-            viewModel.deleteChatMessage(it.key)
+            val confirmDialog = ConfirmDialog(
+                getString(R.string.confirm_dialog_delete_button_title),
+                RequestCode.DELETE_CHAT_MESSAGE,
+                this
+            )
+            val arguments = Bundle()
+            arguments.putLong(BundleKey.CHAT_MESSAGE_KEY, it.key)
+            confirmDialog.arguments = arguments
+            confirmDialog.show(childFragmentManager, ConfirmDialog.TAG)
+        }
+    }
+
+    override fun onConfirm(requestCode: Int, argument: Bundle?) {
+        when (requestCode) {
+            RequestCode.DELETE_CHAT_MESSAGE -> {
+                argument?.let { viewModel.deleteChatMessage(it.getLong(BundleKey.CHAT_MESSAGE_KEY)) }
+            }
         }
     }
 }

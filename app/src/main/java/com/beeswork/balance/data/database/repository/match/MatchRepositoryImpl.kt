@@ -17,7 +17,6 @@ import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.database.response.NewChatMessage
-import com.beeswork.balance.data.database.response.NewMatch
 import com.beeswork.balance.data.listener.ChatMessagePagingRefreshListener
 import com.beeswork.balance.data.listener.MatchPagingRefreshListener
 import com.beeswork.balance.internal.util.safeLet
@@ -102,7 +101,7 @@ class MatchRepositoryImpl(
                 chatMessagePagingRefreshListener?.onRefresh(
                     ChatMessagePagingRefresh(
                         null,
-                        ChatMessagePagingRefresh.Type.FETCHED
+                        ChatMessagePagingRefresh.Type.UPDATED
                     )
                 )
             }
@@ -177,12 +176,8 @@ class MatchRepositoryImpl(
                 saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
                 updateSendingChatMessages(fetchedAt)
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-                chatMessagePagingRefreshListener?.onRefresh(
-                    ChatMessagePagingRefresh(
-                        null,
-                        ChatMessagePagingRefresh.Type.FETCHED
-                    )
-                )
+                val chatMessagePagingRefresh = ChatMessagePagingRefresh(null, ChatMessagePagingRefresh.Type.UPDATED)
+                chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
                 matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
             }
             return@withContext Resource.toEmptyResponse(listMatches)
@@ -334,12 +329,8 @@ class MatchRepositoryImpl(
     }
 
     private fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
-        chatMessagePagingRefreshListener?.onRefresh(
-            ChatMessagePagingRefresh(
-                null,
-                ChatMessagePagingRefresh.Type.SEND
-            )
-        )
+        val chatMessagePagingRefresh = ChatMessagePagingRefresh(null, ChatMessagePagingRefresh.Type.SEND)
+        chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
         stompClient.sendChatMessage(key, chatId, matchedId, body)
     }
 
@@ -352,13 +343,18 @@ class MatchRepositoryImpl(
     override suspend fun resendChatMessage(key: Long, matchedId: UUID) {
         withContext(Dispatchers.IO) {
             chatMessageDAO.findByKey(key)?.let {
+                chatMessageDAO.updateStatus(it.key, ChatMessageStatus.SENDING)
                 sendChatMessage(it.key, it.chatId, matchedId, it.body)
             }
         }
     }
 
     override suspend fun deleteChatMessage(key: Long) {
-        TODO("Not yet implemented")
+        withContext(Dispatchers.IO) {
+            chatMessageDAO.delete(key)
+            val chatMessagePagingRefresh = ChatMessagePagingRefresh(null, ChatMessagePagingRefresh.Type.UPDATED)
+            chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
+        }
     }
 
     //  TODO: remove me

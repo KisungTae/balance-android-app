@@ -102,11 +102,11 @@ class ChatViewModel(
     }
 
     fun deleteChatMessage(key: Long) {
-        println("deleteChatMessage: $key")
+        viewModelScope.launch { matchRepository.deleteChatMessage(key) }
     }
 
     fun resendChatMessage(key: Long) {
-        println("resendChatMessage: $key")
+        viewModelScope.launch { matchRepository.resendChatMessage(key, matchedId) }
     }
 
     fun test() {

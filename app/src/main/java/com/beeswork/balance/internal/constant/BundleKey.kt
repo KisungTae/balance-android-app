@@ -9,5 +9,6 @@ class BundleKey {
         const val UNMATCHED = "unmatched"
         const val LAST_READ_CHAT_MESSAGE_ID = "lastReadChatMessageId"
         const val ERROR_MESSAGE = "errorMessage"
+        const val CHAT_MESSAGE_KEY = "chatMessageKey"
     }
 }

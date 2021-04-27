@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Transparent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btnConfirmDialogConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/sh_grey_round_box"
+        android:textColor="@color/TextRed"
+        android:textSize="@dimen/text_medium_size"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnConfirmDialogClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/sh_white_round_box"
+        android:text="@string/dialog_close_btn_text"
+        android:textColor="@color/Accent"
+        android:textSize="@dimen/text_medium_size"
+        android:textStyle="bold" />
+
+
+</LinearLayout>

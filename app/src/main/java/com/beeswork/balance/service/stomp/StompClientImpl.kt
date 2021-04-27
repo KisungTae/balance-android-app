@@ -65,6 +65,7 @@ class StompClientImpl(
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         println("onOpen")
+        socketStatus = SocketStatus.OPEN
         connectToStomp()
     }
 

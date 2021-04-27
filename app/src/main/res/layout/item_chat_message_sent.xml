@@ -35,7 +35,7 @@
                 android:layout_height="@dimen/chat_message_menu_btn_size"
                 android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_baseline_refresh"
-                android:contentDescription="@string/chat_message_resend_description" />
+                android:contentDescription="@string/chat_message_resend_button_description" />
 
             <ImageButton
                 android:id="@+id/btnChatMessageSentDelete"
@@ -43,7 +43,7 @@
                 android:layout_height="@dimen/chat_message_menu_btn_size"
                 android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_baseline_close"
-                android:contentDescription="@string/delete_chat_message_description" />
+                android:contentDescription="@string/chat_message_delete_button_description" />
 
         </LinearLayout>
 

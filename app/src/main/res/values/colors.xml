@@ -7,6 +7,8 @@
     <color name="TextBlack">#282828</color>
     <color name="TextWhite">#FFFFFF</color>
     <color name="TextGrey">#9E9E9E</color>
+    <color name="TextRed">#ff4d4d</color>
+
 
 
     <!-- search bar background, unselected icon,    -->

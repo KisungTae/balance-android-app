@@ -42,6 +42,9 @@
 
 
 
+    <string name="confirm_dialog_delete_chat_message_title">해당 채팅메세지를 삭제하시겠습니다?</string>
+    <string name="confirm_dialog_delete_button_title">메세지 삭제하기</string>
+
     <string name="match_tool_bar_title">MATCH</string>
     <string name="chat_tool_bar_title">CHAT</string>
     <string name="chat_leave_menu_title">채팅룸 나가기</string>
@@ -56,8 +59,8 @@
 
     <string name="dialog_retry_btn_text">다시 시도하기</string>
     <string name="dialog_close_btn_text">닫기</string>
-    <string name="chat_message_resend_description">resend chat message</string>
-    <string name="delete_chat_message_description">delete chat message</string>
+    <string name="chat_message_resend_button_description">resend chat message</string>
+    <string name="chat_message_delete_button_description">delete chat message</string>
     <string name="profile_image_description">profile image</string>
     <string name="chat_message_input_description">message..</string>
     <string name="chat_message_send_button_description">send chat message</string>
