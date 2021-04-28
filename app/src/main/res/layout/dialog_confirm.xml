@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/sh_grey_round_box"
+        android:background="@drawable/sh_round_box_light_grey"
         android:textColor="@color/TextRed"
         android:textSize="@dimen/text_medium_size"
         android:textStyle="bold" />
@@ -24,7 +24,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="30dp"
-        android:background="@drawable/sh_white_round_box"
+        android:background="@drawable/sh_round_box_white"
         android:text="@string/dialog_close_btn_text"
         android:textColor="@color/Accent"
         android:textSize="@dimen/text_medium_size"

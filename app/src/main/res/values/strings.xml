@@ -66,6 +66,8 @@
     <string name="chat_message_send_button_description">send chat message</string>
     <string name="chat_emoticon_button_description">emoticon input button</string>
     <string name="chat_tool_bar_profile_photo_description">chat tool bar profile photo</string>
+    <string name="match_rep_photo_iv_description">profile picture</string>
+    <string name="snack_bar_title_new_chat_message">새로운 메세지</string>
 
 
 </resources>

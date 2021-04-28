@@ -4,13 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Clicker
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import org.threeten.bp.OffsetDateTime
 
 interface BalanceRepository {
 

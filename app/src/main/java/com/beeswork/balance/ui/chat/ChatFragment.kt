@@ -1,9 +1,11 @@
 package com.beeswork.balance.ui.chat
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
 import com.beeswork.balance.databinding.FragmentChatBinding
+import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.safeLet
@@ -23,6 +26,7 @@ import com.beeswork.balance.ui.dialog.ConfirmDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -42,7 +46,8 @@ class ChatFragment : BaseFragment(),
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var chatMessagePagingRefreshAdapter: PagingRefreshAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>
     private lateinit var binding: FragmentChatBinding
-
+    private var newChatMessageSnackBar: Snackbar? = null
+    private var job: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,9 +117,19 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun setupChatMessagePagingRefreshObserver() {
-        viewModel.chatMessagePagingRefreshLiveData.observe(viewLifecycleOwner, {
+        viewModel.chatMessagePagingRefreshMediatorLiveData.observe(viewLifecycleOwner, {
             //TODO: if data is not null, then check if scroll is bottom if not then new message alert in chat
-            if (it.type == ChatMessagePagingRefresh.Type.SEND) binding.etChatMessageBody.setText("")
+            when (it.type) {
+                ChatMessagePagingRefresh.Type.SEND -> {
+                    binding.etChatMessageBody.setText("")
+                }
+                ChatMessagePagingRefresh.Type.RECEIVED -> {
+                    println("received new chat message")
+                    setupChatMessagePagingData()
+                }
+                else -> {
+                }
+            }
             chatMessagePagingRefreshAdapter.refresh()
         })
     }
@@ -123,17 +138,30 @@ class ChatFragment : BaseFragment(),
         binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
     }
 
-
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
             viewModel.sendChatMessage(binding.etChatMessageBody.text.toString().trim())
         }
     }
 
-    private suspend fun setupChatMessagePagingData() {
+//    private suspend fun setupChatMessagePagingData() {
+//        job?.cancel()
+//        registerAdapterDataObserver()
+//        job = lifecycleScope.launch {
+//            viewModel.initChatMessagePagingData().observe(viewLifecycleOwner) {
+//                lifecycleScope.launch { chatMessagePagingAdapter.submitData(it) }
+//            }
+//        }
+//    }
+
+    private fun setupChatMessagePagingData() {
+        job?.cancel()
         registerAdapterDataObserver()
-        viewModel.initChatMessagePagingData().observe(viewLifecycleOwner) {
-            lifecycleScope.launch { chatMessagePagingAdapter.submitData(it) }
+        job = lifecycleScope.launch {
+            viewModel.initChatMessagePagingData().observe(viewLifecycleOwner) {
+                chatMessagePagingRefreshAdapter.reset()
+                lifecycleScope.launch { chatMessagePagingAdapter.submitData(it) }
+            }
         }
     }
 
@@ -142,6 +170,7 @@ class ChatFragment : BaseFragment(),
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 viewModel.synchronizeMatch()
+                binding.rvChat.scrollToPosition(0)
                 chatMessagePagingAdapter.unregisterAdapterDataObserver(this)
             }
         })
@@ -230,6 +259,24 @@ class ChatFragment : BaseFragment(),
             confirmDialog.arguments = arguments
             confirmDialog.show(childFragmentManager, ConfirmDialog.TAG)
         }
+    }
+
+    private fun showNewChatMessageSnackBar(body: String) {
+        val snackBar = Snackbar.make(requireView(), "", Snackbar.LENGTH_SHORT)
+        snackBar.view.setBackgroundColor(Color.TRANSPARENT)
+
+        val binding = SnackBarNewChatMessageBinding.inflate(layoutInflater)
+        binding.tvSnackBarNewChatMessage.text = body
+        binding.llSnackBarChatMessage.setOnClickListener {
+            newChatMessageSnackBar?.dismiss()
+        }
+        val snackBarLayout = snackBar.view as Snackbar.SnackbarLayout
+        snackBarLayout.addView(binding.root, 0)
+        snackBarLayout.setPadding(10, 0, 10, 150)
+
+        newChatMessageSnackBar?.dismiss()
+        newChatMessageSnackBar = snackBar
+        snackBar.show()
     }
 
     override fun onConfirm(requestCode: Int, argument: Bundle?) {

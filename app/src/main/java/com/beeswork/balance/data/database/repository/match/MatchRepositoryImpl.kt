@@ -46,9 +46,9 @@ class MatchRepositoryImpl(
     private val stompClient: StompClient,
     private val scope: CoroutineScope
 ) : MatchRepository {
+
     private var matchPagingRefreshListener: MatchPagingRefreshListener? = null
     private var chatMessagePagingRefreshListener: ChatMessagePagingRefreshListener? = null
-    private var sendChatMessageListener: ResourceListener<EmptyResponse>? = null
 
     @ExperimentalCoroutinesApi
     override val matchPagingRefreshFlow = callbackFlow<MatchPagingRefresh> {
@@ -68,87 +68,6 @@ class MatchRepositoryImpl(
             }
         }
         awaitClose {}
-    }
-
-    @ExperimentalCoroutinesApi
-    override val sendChatMessageFlow = callbackFlow<Resource<EmptyResponse>> {
-        sendChatMessageListener = object : ResourceListener<EmptyResponse> {
-            override fun onInvoke(element: Resource<EmptyResponse>) {
-                offer(element)
-            }
-        }
-        awaitClose {}
-    }
-
-    init {
-        collectChatMessageReceiptFlow()
-        collectChatMessageReceivedFlow()
-    }
-
-    private fun collectChatMessageReceiptFlow() {
-        stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
-            safeLet(chatMessageDTO.key, chatMessageDTO.chatId) { key, chatId ->
-                chatMessageDTO.id?.let { id ->
-                    if (id == UNMATCHED) {
-                        chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
-                        onMatchUnmatched(chatId)
-                    } else {
-                        chatMessageDAO.updateStatus(key, ChatMessageStatus.SENT)
-                        onChatMessageFetched(key, id, chatMessageDTO.createdAt)
-                    }
-                } ?: chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
-
-                chatMessagePagingRefreshListener?.onRefresh(
-                    ChatMessagePagingRefresh(
-                        null,
-                        ChatMessagePagingRefresh.Type.UPDATED
-                    )
-                )
-            }
-        }.launchIn(scope)
-    }
-
-    private fun collectChatMessageReceivedFlow() {
-        stompClient.chatMessageReceivedFlow.onEach { chatMessageDTO ->
-            val chatMessage = chatMessageMapper.fromDTOToEntity(chatMessageDTO)
-            chatMessageDAO.insert(chatMessage)
-            matchDAO.findById(chatMessage.chatId)?.let { match ->
-                val newChatMessage = NewChatMessage(match.name, match.matchedId, match.repPhotoKey, chatMessage.body)
-                chatMessagePagingRefreshListener?.onRefresh(
-                    ChatMessagePagingRefresh(
-                        newChatMessage,
-                        ChatMessagePagingRefresh.Type.RECEIVED
-                    )
-                )
-            }
-        }.launchIn(scope)
-    }
-
-    private fun onChatMessageFetched(key: Long, id: Long, createdAt: OffsetDateTime?) {
-        chatMessageDAO.findByKey(key)?.let { chatMessage ->
-            chatMessage.id = id
-            chatMessage.createdAt = createdAt
-            chatMessageDAO.insert(chatMessage)
-            updateMatchActive(chatMessage.chatId)
-        }
-    }
-
-    private fun updateMatchActive(chatId: Long) {
-        matchDAO.findById(chatId)?.let { match ->
-            match.active = true
-            matchDAO.insert(match)
-        }
-    }
-
-    private fun onMatchUnmatched(chatId: Long) {
-        matchDAO.findById(chatId)?.let { match ->
-            match.unmatched = true
-            match.updatedAt = null
-            match.recentChatMessage = ""
-            match.repPhotoKey = null
-            match.active = true
-            matchDAO.insert(match)
-        }
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
@@ -176,7 +95,7 @@ class MatchRepositoryImpl(
                 saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
                 updateSendingChatMessages(fetchedAt)
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-                val chatMessagePagingRefresh = ChatMessagePagingRefresh(null, ChatMessagePagingRefresh.Type.UPDATED)
+                val chatMessagePagingRefresh = ChatMessagePagingRefresh(ChatMessagePagingRefresh.Type.FETCHED)
                 chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
                 matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
             }
@@ -253,7 +172,6 @@ class MatchRepositoryImpl(
         match.unread = chatMessageDAO.existByIdGreaterThan(match.chatId, match.lastReadChatMessageId)
     }
 
-
     private fun syncChatMessages(
         sentChatMessageIds: List<Long>,
         receivedChatMessageIds: List<Long>
@@ -321,41 +239,11 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun sendChatMessage(chatId: Long, matchedId: UUID, body: String) {
-        withContext(Dispatchers.IO) {
-            val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, OffsetDateTime.now()))
-            sendChatMessage(key, chatId, matchedId, body)
-        }
+    companion object {
+        const val UNMATCHED = -1L
     }
 
-    private fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
-        val chatMessagePagingRefresh = ChatMessagePagingRefresh(null, ChatMessagePagingRefresh.Type.SEND)
-        chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
-        stompClient.sendChatMessage(key, chatId, matchedId, body)
-    }
 
-    override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
-        return withContext(Dispatchers.IO) {
-            return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
-        }
-    }
-
-    override suspend fun resendChatMessage(key: Long, matchedId: UUID) {
-        withContext(Dispatchers.IO) {
-            chatMessageDAO.findByKey(key)?.let {
-                chatMessageDAO.updateStatus(it.key, ChatMessageStatus.SENDING)
-                sendChatMessage(it.key, it.chatId, matchedId, it.body)
-            }
-        }
-    }
-
-    override suspend fun deleteChatMessage(key: Long) {
-        withContext(Dispatchers.IO) {
-            chatMessageDAO.delete(key)
-            val chatMessagePagingRefresh = ChatMessagePagingRefresh(null, ChatMessagePagingRefresh.Type.UPDATED)
-            chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
-        }
-    }
 
     //  TODO: remove me
     private fun createDummyChatMessages() {
@@ -383,9 +271,7 @@ class MatchRepositoryImpl(
         chatMessageDAO.insert(messages)
     }
 
-    companion object {
-        const val UNMATCHED = -1L
-    }
+
 
 
     //  TODO: remove me

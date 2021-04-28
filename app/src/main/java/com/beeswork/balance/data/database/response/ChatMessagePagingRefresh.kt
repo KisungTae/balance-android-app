@@ -4,12 +4,15 @@ import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 
 class ChatMessagePagingRefresh(
-    val newChatMessage: NewChatMessage?,
-    val type: Type
+    val type: Type,
+    val chatId: Long? = null,
+    val newChatMessage: NewChatMessage? = null
 ) {
     enum class Type {
         SEND,
+        SENT,
+        DELETED,
         RECEIVED,
-        UPDATED
+        FETCHED
     }
 }

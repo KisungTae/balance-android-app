@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:background="@drawable/sh_search_box"
+            android:background="@drawable/sh_round_box_light_grey"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingVertical="7dp">
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:adjustViewBounds="true"
-                android:background="@drawable/sh_solid_round_rectagle_primary"
+                android:background="@drawable/sh_round_box_primary_solid"
                 android:contentDescription="@string/chat_message_send_button_description"
                 android:padding="8dp"
                 android:scaleType="fitCenter"

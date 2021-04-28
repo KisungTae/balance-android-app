@@ -85,7 +85,7 @@ class MatchPagingDataAdapter(
         private fun setupProfilePictureBorder(matchActive: Boolean) {
             binding.flMatchProfilePictureWrapper.background = if (matchActive) null else ContextCompat.getDrawable(
                 context,
-                R.drawable.sh_circle_border
+                R.drawable.sh_circle_primary_border
             )
         }
 

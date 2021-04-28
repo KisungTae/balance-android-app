@@ -24,7 +24,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_weight="1"
-            android:background="@drawable/sh_search_box"
+            android:background="@drawable/sh_round_box_light_grey"
             android:clickable="true"
             android:drawableStart="@drawable/ic_baseline_search"
             android:drawablePadding="10dp"

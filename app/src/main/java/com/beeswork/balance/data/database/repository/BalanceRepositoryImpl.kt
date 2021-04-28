@@ -10,14 +10,10 @@ import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.rds.BalanceRDS
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.ui.chat.ChatMessageEvent
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.constant.NotificationType
-import com.beeswork.balance.internal.util.Convert
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.*
 import okhttp3.MediaType

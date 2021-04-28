@@ -22,6 +22,7 @@ class ConfirmDialog (
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialog)
+//        setStyle(STYLE_NO_FRAME, R.style.CustomBottomSheetDialog)
     }
 
     override fun onCreateView(

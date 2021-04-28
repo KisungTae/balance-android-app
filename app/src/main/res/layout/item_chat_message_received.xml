@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginStart="10dp"
-        android:background="@drawable/sh_chat_message_received_box"
+        android:background="@drawable/sh_round_box_light_grey"
         android:elevation="1dp"
         android:maxWidth="@dimen/chat_message_text_view_max_width"
         android:padding="10dp"/>

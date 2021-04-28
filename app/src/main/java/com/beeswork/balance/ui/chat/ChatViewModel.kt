@@ -2,7 +2,9 @@ package com.beeswork.balance.ui.chat
 
 import androidx.lifecycle.*
 import androidx.paging.*
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
@@ -18,25 +20,30 @@ import java.util.*
 class ChatViewModel(
     private val chatId: Long,
     private val matchedId: UUID,
+    private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
-    private val chatMessageMapper: ChatMessageMapper,
-    private val matchMapper: MatchMapper,
-    private val stompClient: StompClient
+    private val chatMessageMapper: ChatMessageMapper
 ) : ViewModel() {
 
-    val chatMessagePagingRefreshLiveData = matchRepository.chatMessagePagingRefreshFlow.asLiveData()
+    val chatMessagePagingRefreshMediatorLiveData = MediatorLiveData<ChatMessagePagingRefresh>()
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
-
     val sendChatMessageMediatorLiveData = MediatorLiveData<Resource<EmptyResponse>>()
 
     init {
         sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
             sendChatMessageMediatorLiveData.postValue(it)
         }
-        sendChatMessageMediatorLiveData.addSource(matchRepository.sendChatMessageFlow.asLiveData()) {
+        sendChatMessageMediatorLiveData.addSource(chatRepository.sendChatMessageFlow.asLiveData()) {
             sendChatMessageMediatorLiveData.postValue(it)
+        }
+
+        chatMessagePagingRefreshMediatorLiveData.addSource(matchRepository.chatMessagePagingRefreshFlow.asLiveData()) {
+            chatMessagePagingRefreshMediatorLiveData.postValue(it)
+        }
+        chatMessagePagingRefreshMediatorLiveData.addSource(chatRepository.chatMessagePagingRefreshFlow.asLiveData()) {
+            if (it.chatId == chatId) chatMessagePagingRefreshMediatorLiveData.postValue(it)
         }
     }
 
@@ -44,7 +51,7 @@ class ChatViewModel(
         return Pager(
             pagingConfig,
             null,
-            { ChatMessagePagingSource(matchRepository, chatId) }
+            { ChatMessagePagingSource(chatRepository, chatId) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
             pagingData.map { chatMessage -> chatMessageMapper.fromEntityToDomain(chatMessage) }
         }.map { pagingData ->
@@ -78,9 +85,7 @@ class ChatViewModel(
     }
 
     fun synchronizeMatch() {
-        viewModelScope.launch {
-            matchRepository.synchronizeMatch(chatId)
-        }
+        viewModelScope.launch { matchRepository.synchronizeMatch(chatId) }
     }
 
     fun sendChatMessage(body: String) {
@@ -96,21 +101,21 @@ class ChatViewModel(
                 bodySize <= 0 -> _sendChatMessageLiveData.postValue(
                     Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
                 )
-                else -> matchRepository.sendChatMessage(chatId, matchedId, body)
+                else -> chatRepository.sendChatMessage(chatId, matchedId, body)
             }
         }
     }
 
     fun deleteChatMessage(key: Long) {
-        viewModelScope.launch { matchRepository.deleteChatMessage(key) }
+        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
     }
 
     fun resendChatMessage(key: Long) {
-        viewModelScope.launch { matchRepository.resendChatMessage(key, matchedId) }
+        viewModelScope.launch { chatRepository.resendChatMessage(key, matchedId) }
     }
 
     fun test() {
-        matchRepository.testFunction()
+        chatRepository.test()
     }
 
     fun test2() {
