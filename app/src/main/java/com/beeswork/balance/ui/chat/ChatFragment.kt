@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -47,7 +46,7 @@ class ChatFragment : BaseFragment(),
     private lateinit var chatMessagePagingRefreshAdapter: PagingRefreshAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>
     private lateinit var binding: FragmentChatBinding
     private var newChatMessageSnackBar: Snackbar? = null
-    private var job: Job? = null
+    private var chatMessagePagingObserveJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -118,19 +117,19 @@ class ChatFragment : BaseFragment(),
 
     private fun setupChatMessagePagingRefreshObserver() {
         viewModel.chatMessagePagingRefreshMediatorLiveData.observe(viewLifecycleOwner, {
-            //TODO: if data is not null, then check if scroll is bottom if not then new message alert in chat
             when (it.type) {
                 ChatMessagePagingRefresh.Type.SEND -> {
                     binding.etChatMessageBody.setText("")
+                    if (binding.rvChat.canScrollVertically(1)) chatMessagePagingRefreshAdapter.refresh()
+                    else setupChatMessagePagingData()
                 }
                 ChatMessagePagingRefresh.Type.RECEIVED -> {
-                    println("received new chat message")
-                    setupChatMessagePagingData()
+                    if (binding.rvChat.canScrollVertically(1)) it.newChatMessage?.let { newChatMessage ->
+                        showNewChatMessageSnackBar(newChatMessage.body)
+                    } else setupChatMessagePagingData()
                 }
-                else -> {
-                }
+                else -> chatMessagePagingRefreshAdapter.refresh()
             }
-            chatMessagePagingRefreshAdapter.refresh()
         })
     }
 
@@ -144,20 +143,10 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-//    private suspend fun setupChatMessagePagingData() {
-//        job?.cancel()
-//        registerAdapterDataObserver()
-//        job = lifecycleScope.launch {
-//            viewModel.initChatMessagePagingData().observe(viewLifecycleOwner) {
-//                lifecycleScope.launch { chatMessagePagingAdapter.submitData(it) }
-//            }
-//        }
-//    }
-
     private fun setupChatMessagePagingData() {
-        job?.cancel()
+        chatMessagePagingObserveJob?.cancel()
         registerAdapterDataObserver()
-        job = lifecycleScope.launch {
+        chatMessagePagingObserveJob = lifecycleScope.launch {
             viewModel.initChatMessagePagingData().observe(viewLifecycleOwner) {
                 chatMessagePagingRefreshAdapter.reset()
                 lifecycleScope.launch { chatMessagePagingAdapter.submitData(it) }
@@ -190,7 +179,6 @@ class ChatFragment : BaseFragment(),
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miChatLeave -> {
-                    viewModel.test()
 //                    chatMessagePagingRefreshAdapter.refresh()
                     true
                 }
@@ -268,6 +256,7 @@ class ChatFragment : BaseFragment(),
         val binding = SnackBarNewChatMessageBinding.inflate(layoutInflater)
         binding.tvSnackBarNewChatMessage.text = body
         binding.llSnackBarChatMessage.setOnClickListener {
+            setupChatMessagePagingData()
             newChatMessageSnackBar?.dismiss()
         }
         val snackBarLayout = snackBar.view as Snackbar.SnackbarLayout

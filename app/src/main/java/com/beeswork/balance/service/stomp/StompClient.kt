@@ -17,6 +17,5 @@ interface StompClient {
 
     fun connect()
     fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String)
-    fun send(chatId: Long, matchedId: String, body: String)
     fun disconnect()
 }

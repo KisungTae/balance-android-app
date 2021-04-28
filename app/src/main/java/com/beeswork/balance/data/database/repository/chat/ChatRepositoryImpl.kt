@@ -165,7 +165,7 @@ class ChatRepositoryImpl(
     override fun test() {
         refreshChatMessagePaging(
             ChatMessagePagingRefresh.Type.RECEIVED,
-            6,
+            352,
             NewChatMessage("test chat message received")
         )
     }

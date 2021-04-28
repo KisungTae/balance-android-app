@@ -1,7 +1,6 @@
 package com.beeswork.balance.ui.mainviewpager
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +42,8 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewPagerViewModel::class.java)
-        viewModel.connectToStomp()
         bindUI()
+//        viewModel.connectToStomp()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -99,8 +98,14 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         tabLayoutMediator.attach()
     }
 
-    fun onFragmentDisplayed() {
+    override fun onResume() {
+        super.onResume()
+        viewModel.connectStomp()
+    }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.disconnectStomp()
     }
 
     private fun showTabBadge(position: Int, visible: Boolean) {
@@ -114,7 +119,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
     override fun onRetry(requestCode: Int?) {
         requestCode?.let {
             when (it) {
-                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectToStomp()
+                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
             }
         }
     }

@@ -25,5 +25,4 @@ class ChatMessagePagingSource(
         val nextPage = if (chatMessages.isEmpty()) null else currentPage + 1
         return LoadResult.Page(chatMessages, prevPage, nextPage)
     }
-
 }

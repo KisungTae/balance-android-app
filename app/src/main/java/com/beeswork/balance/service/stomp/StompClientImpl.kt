@@ -37,8 +37,7 @@ class StompClientImpl(
 
     private var socket: WebSocket? = null
     private var outgoing = Channel<String>()
-    private var isSocketOpen: Boolean = false
-    private var subscriptionId = 8
+    private var subscriptionId = 0
     private var socketStatus = SocketStatus.CLOSED
 
     private var chatMessageReceiptChannel = Channel<ChatMessageDTO>()
@@ -52,7 +51,6 @@ class StompClientImpl(
 
 //    private var clickedChannel = Channel<Clicked>
 
-
     private val _webSocketEventLiveData = MutableLiveData<WebSocketEvent>()
     override val webSocketEventLiveData: LiveData<WebSocketEvent> get() = _webSocketEventLiveData
 
@@ -64,14 +62,11 @@ class StompClientImpl(
 
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        println("onOpen")
         socketStatus = SocketStatus.OPEN
         connectToStomp()
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-        println("onMessage text: ")
-        println(text)
         val stompFrame = StompFrame.from(text)
         when (stompFrame.command) {
             StompFrame.Command.CONNECTED -> subscribeToQueue()
@@ -82,25 +77,19 @@ class StompClientImpl(
         }
     }
 
-    override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-        println("onMessage bytes")
-//            scope.launch(Dispatchers.IO) {
-//                incoming.send(RawData(bytes.toString()))
-//            }
-    }
+    override fun onMessage(webSocket: WebSocket, bytes: ByteString) {}
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+        println("onClosing!!!!!!!!!")
         socketStatus = SocketStatus.CLOSED
-        println("onClosing")
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        println("onClosed!!!!!!!!!!!")
         socketStatus = SocketStatus.CLOSED
-        println("onClosed")
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-        println("onFailure!!!!!")
         socketStatus = SocketStatus.CLOSED
         val error: String? = when (t) {
             is NoInternetConnectivityException -> ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION
@@ -175,6 +164,10 @@ class StompClientImpl(
         }
     }
 
+    override fun disconnect() {
+        socket?.close(1000, null)
+    }
+
     private fun connectToStomp() {
         scope.launch {
             val headers = mutableMapOf<String, String>()
@@ -199,165 +192,10 @@ class StompClientImpl(
         return "/queue/${id?.toString()}"
     }
 
-
-    private fun setupWebSocketListener() {
-//        webSocket.addListener(object : WebSocketAdapter() {
-//            override fun onConnected(
-//                websocket: WebSocket?,
-//                headers: MutableMap<Str
-        //                ing, MutableList<String>>?
-//            ) {
-//                connectStomp()
-//            }
-//
-//            override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
-//                frame?.let {
-//                    val stompFrame = StompFrame.from(frame.payloadText)
-//                    when (stompFrame.command) {
-//                        StompFrame.Command.CONNECTED -> {
-//                            subscribe()
-//                        }
-//                        StompFrame.Command.MESSAGE -> {
-//
-//                        }
-//                        StompFrame.Command.RECEIPT -> {
-//                            safeLet(
-//                                stompFrame.message?.chatId,
-//                                stompFrame.getMessageId(),
-//                                stompFrame.message?.id,
-//                                stompFrame.message?.createdAt,
-//                            ) { chatId, messageId, id, createdAt ->
-//                                CoroutineScope(Dispatchers.IO).launch {
-//                                    balanceRepository.syncMessage(chatId, messageId, id, createdAt)
-//                                }
-//                            }
-//                        }
-//                        StompFrame.Command.ERROR -> {
-//                            mutableWebSocketLifeCycleEvent.postValue(
-//                                WebSocketLifeCycleEvent(
-//                                    WebSocketLifeCycleEvent.Type.ERROR,
-//                                    stompFrame.getError(),
-//                                    stompFrame.getErrorMessage()
-//                                )
-//                            )
-//                        }
-//                        else -> println("stompframe.command when else here")
-//                    }
-//                }
-//            }
-//
-//            override fun onFrameError(
-//                websocket: WebSocket?,
-//                cause: WebSocketException?,
-//                frame: WebSocketFrame?
-//            ) {
-//                println("onFrameError")
-//                super.onFrameError(websocket, cause, frame)
-//            }
-//
-//            override fun onConnectError(websocket: WebSocket?, exception: WebSocketException?) {
-//                println("onConnectError")
-//                super.onConnectError(websocket, exception)
-//            }
-//
-//            override fun onDisconnected(
-//                websocket: WebSocket?,
-//                serverCloseFrame: WebSocketFrame?,
-//                clientCloseFrame: WebSocketFrame?,
-//                closedByServer: Boolean
-//            ) {
-//                println("onDisconnected")
-//                mutableWebSocketLifeCycleEvent.postValue(WebSocketLifeCycleEvent.disconnect())
-//                super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
-//            }
-//
-//            override fun onUnexpectedError(websocket: WebSocket?, cause: WebSocketException?) {
-//                println("onUnexpectedError")
-//                super.onUnexpectedError(websocket, cause)
-//            }
-//        })
-    }
-
-    private fun connectWebSocket() {
-//        if (webSocket.state != WebSocketState.CREATED)
-//            webSocket = webSocket.recreate()
-//        CoroutineScope(Dispatchers.IO).launch {
-//            webSocket.connect()
-//        }
-    }
-
-
-    private fun stompIdentityHeaders(): MutableMap<String, String> {
-        val headers = mutableMapOf<String, String>()
-        headers[StompHeader.DESTINATION] = "/queue/${preferenceProvider.getAccountId()?.toString()}"
-        headers[StompHeader.ID] = "${UUID.randomUUID()}"
-//        headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
-//        headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-        return headers
-    }
-
-    override fun send(chatId: Long, matchedId: String, body: String) {
-
-
-//        CoroutineScope(Dispatchers.IO).launch {
-//            balanceRepository.fetchChatMessages(chatId, matchedId)
-//        }
-
-//        if (message.toByteArray().size > MAX_MESSAGE_SIZE) {
-//            mutableWebSocketLifeCycleEvent.postValue(
-//                WebSocketLifeCycleEvent.error(
-//                    null,
-//                    context.resources.getString(R.string.chat_message_out_of_size_exception)
-//                )
-//            )
-//            return
-//        }
-        CoroutineScope(Dispatchers.IO).launch {
-//            balanceRepository.saveChatMessage(chatId, body)
-        }
-
-
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val headers = mutableMapOf<String, String>()
-//            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken()
-//            headers[StompHeader.DESTINATION] = BalanceURL.STOMP_SEND_ENDPOINT
-//            headers[HttpHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-//            headers[StompHeader.RECEIPT] = preferenceProvider.getAccountId()
-//            headers[StompHeader.MESSAGE_ID] = balanceRepository.saveMessage(chatId, message).toString()
-//            val stompMessage = StompFrame.Message(
-//                null,
-//                message,
-//                preferenceProvider.getAccountId(),
-//                matchedId,
-//                chatId,
-//                null
-//            )
-//            webSocket.sendText(
-//                StompFrame(
-//                    StompFrame.Command.SEND,
-//                    headers,
-//                    stompMessage,
-//                    null
-//                ).compile()
-//            )
-//        }
-    }
-
-    override fun disconnect() {
-//        webSocket.disconnect()
-    }
-
-    private fun queueName(chatId: Long): String {
-//        return "/queue/${preferenceProvider.getAccountId1()}-$chatId"
-        return ""
-    }
-
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_ACK = "auto"
         private const val DEFAULT_HEART_BEAT = "0,0"
-        private const val MAX_MESSAGE_SIZE = 1024
-
     }
 
 }

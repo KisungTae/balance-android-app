@@ -55,7 +55,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         setupFetchMatchesLiveDataObserver()
         setupMatchPagingRefreshLiveData()
         search("")
-        viewModel.fetchMatches()
+//        viewModel.fetchMatches()
     }
 
     private fun setupMatchPagingRefreshLiveData() {
@@ -168,7 +168,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     override fun onFragmentSelected() {
-        viewModel.fetchMatches()
+//        viewModel.fetchMatches()
     }
 }
 

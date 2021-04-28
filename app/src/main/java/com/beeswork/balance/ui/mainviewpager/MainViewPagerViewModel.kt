@@ -14,7 +14,11 @@ class MainViewPagerViewModel(
     val webSocketEventLiveData = stompClient.webSocketEventLiveData
 
 
-    fun connectToStomp() {
+    fun connectStomp() {
         stompClient.connect()
+    }
+
+    fun disconnectStomp() {
+        stompClient.disconnect()
     }
 }

@@ -66,14 +66,16 @@ class ChatViewModel(
                 if (after?.isSentOrReceived() == true
                     && after.status == before?.status
                     && after.dateCreatedAt == before.dateCreatedAt
-                    && after.timeCreatedAt  == beforeTimeCreatedAt) {
+                    && after.timeCreatedAt == beforeTimeCreatedAt
+                ) {
                     before.showRepPhoto = false
                     nullifyBeforeTimeCreatedAt = true
                 }
 
                 var separator: ChatMessageDomain? = null
                 if (before?.isSentOrReceived() == true
-                    && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)) {
+                    && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)
+                ) {
                     separator = ChatMessageDomain.toSeparator(
                         before.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
                     )
@@ -115,7 +117,7 @@ class ChatViewModel(
     }
 
     fun test() {
-        chatRepository.test()
+//        chatRepository.test()
     }
 
     fun test2() {
