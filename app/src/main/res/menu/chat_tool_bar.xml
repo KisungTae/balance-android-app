@@ -2,10 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <group>
-        <item android:id="@+id/miChatLeave"
-            android:title="@string/chat_leave_menu_title" />
-        <item android:id="@+id/miChatReport"
-            android:title="@string/chat_report_menu_title" />
-    </group>
+    <item
+        android:id="@+id/miChatMore"
+        android:icon="@drawable/ic_baseline_more_vert_24"
+        android:title=""
+        app:showAsAction="ifRoom" />
 </menu>

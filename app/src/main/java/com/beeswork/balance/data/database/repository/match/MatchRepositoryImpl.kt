@@ -239,6 +239,18 @@ class MatchRepositoryImpl(
         }
     }
 
+    override suspend fun unmatch(matchedId: UUID) {
+        withContext(Dispatchers.IO) {
+
+        }
+    }
+
+    override suspend fun reportMatch(matchedId: UUID) {
+        withContext(Dispatchers.IO) {
+
+        }
+    }
+
     companion object {
         const val UNMATCHED = -1L
     }

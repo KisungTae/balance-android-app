@@ -2,22 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/Transparent"
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btnConfirmDialogConfirm"
+        android:id="@+id/btnChatMoreMenuDialogUnmatch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/sh_top_round_box_white"
+        android:text="@string/chat_unmatch_btn_title"
         android:textColor="@color/TextRed"
         android:textSize="@dimen/text_medium_size"
         android:textStyle="bold" />
 
     <Button
-        android:id="@+id/btnConfirmDialogClose"
+        android:id="@+id/btnChatMoreMenuDialogReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/sh_box_white"
+        android:text="@string/chat_report_match_btn_title"
+        android:textColor="@color/TextRed"
+        android:textSize="@dimen/text_medium_size"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnChatMoreMenuDialogClose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -28,6 +40,5 @@
         android:textColor="@color/TextGrey"
         android:textSize="@dimen/text_medium_size"
         android:textStyle="bold" />
-
 
 </LinearLayout>

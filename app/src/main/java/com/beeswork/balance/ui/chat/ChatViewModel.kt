@@ -116,6 +116,14 @@ class ChatViewModel(
         viewModelScope.launch { chatRepository.resendChatMessage(key, matchedId) }
     }
 
+    fun unmatch() {
+        viewModelScope.launch { matchRepository.unmatch(matchedId) }
+    }
+
+    fun reportMatch() {
+        viewModelScope.launch { matchRepository.reportMatch(matchedId) }
+    }
+
     fun test() {
 //        chatRepository.test()
     }

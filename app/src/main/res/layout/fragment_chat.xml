@@ -30,6 +30,7 @@
             android:textAlignment="center"
             android:textSize="@dimen/tool_bar_title_medium_text_size"
             android:textStyle="bold" />
+
     </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout

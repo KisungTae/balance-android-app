@@ -100,7 +100,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
 
     override fun onResume() {
         super.onResume()
-        viewModel.connectStomp()
+//        viewModel.connectStomp()
     }
 
     override fun onStop() {
