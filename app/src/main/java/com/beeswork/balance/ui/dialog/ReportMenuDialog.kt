@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.DialogConfirmBinding
 import com.beeswork.balance.databinding.DialogReportMenuBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+
 
 class ReportMenuDialog(
     private val reportMenuDialogClickListener: ReportMenuDialogClickListener
@@ -35,6 +37,32 @@ class ReportMenuDialog(
     }
 
     private fun bindUI() {
+        binding.btnReportMenuDialogClose.setOnClickListener { dismiss() }
+        binding.btnReportMenuDialogInappropriateMessage.setOnClickListener {
+            println("clicked btnReportMenuDialogInappropriateMessage")
+
+//            val transition: Transition = Slide(Gravity.START)
+//            transition.duration = 600
+//            transition.addTarget(binding.llTest)
+//
+//            TransitionManager.beginDelayedTransition(binding.llReportMenuDialogWrapper, transition);
+            val animation = TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, 0f,
+                Animation.RELATIVE_TO_PARENT, 0.80f,
+                Animation.RELATIVE_TO_PARENT, 0f,
+                Animation.RELATIVE_TO_PARENT, 0f
+            )
+
+
+
+            animation.duration = 1000
+            animation.isFillEnabled = true
+            animation.fillAfter = true
+
+            binding.llTest.startAnimation(animation)
+
+        }
+
 //        binding.btn.text = confirmButtonTitle
 //        binding.btnConfirmDialogClose.setOnClickListener { dismiss() }
 //        binding.btnConfirmDialogConfirm.setOnClickListener {

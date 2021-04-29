@@ -4,41 +4,43 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnChatMoreMenuDialogUnmatch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:background="@drawable/sh_top_round_box_white"
+        android:background="@drawable/sh_top_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
         android:text="@string/chat_unmatch_btn_title"
         android:textColor="@color/TextRed"
-        android:textSize="@dimen/text_medium_size"
-        android:textStyle="bold" />
+        android:textSize="@dimen/text_medium_size" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnChatMoreMenuDialogReport"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:background="@drawable/sh_box_white"
+        android:background="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
         android:text="@string/chat_report_match_btn_title"
         android:textColor="@color/TextRed"
-        android:textSize="@dimen/text_medium_size"
-        android:textStyle="bold" />
+        android:textSize="@dimen/text_medium_size" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnChatMoreMenuDialogClose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/sh_bottom_round_box_white"
+        android:background="@drawable/sh_bottom_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
         android:text="@string/dialog_close_btn_text"
         android:textColor="@color/TextGrey"
-        android:textSize="@dimen/text_medium_size"
-        android:textStyle="bold" />
+        android:textSize="@dimen/text_medium_size" />
 
 </LinearLayout>

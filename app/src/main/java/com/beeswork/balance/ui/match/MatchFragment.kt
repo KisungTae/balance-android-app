@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.match
 import android.os.Bundle
 import android.view.*
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -153,6 +154,13 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
         activity?.supportFragmentManager?.beginTransaction()?.let {
             it.addToBackStack(MainViewPagerFragment.TAG)
+            it.setCustomAnimations(
+                R.anim.enter_right_to_left,
+                R.anim.exit_right_to_left,
+                R.anim.enter_left_to_right,
+                R.anim.exit_left_to_right
+            )
+            it.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             it.add(R.id.fcvMain, chatFragment)
             it.commit()
         }

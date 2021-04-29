@@ -70,6 +70,12 @@
     <string name="snack_bar_title_new_chat_message">새로운 메세지</string>
     <string name="chat_unmatch_btn_title">채팅방 나가기</string>
     <string name="chat_report_match_btn_title">신고하기</string>
+    <string name="report_menu_dialog_title">신고하기</string>
+    <string name="report_menu_dialog_description">해당 유저는 누가 신고를 했는지 알수없습니다. 안전하고 편한 위클릭 사용을 위해서 신고를 해주세요</string>
+    <string name="report_dialog_inappropriate_message_button_title">적절하지 않은 메세지</string>
+    <string name="report_menu_dialog_inappropriate_photo_button_title">적절하지않은 사진</string>
+    <string name="report_menu_dialog_spam_button_title">스팸이나 부적절한 부탁</string>
+    <string name="report_menu_dialog_inappropriate_behaviour_button_title">적절하지않은 행동</string>
 
 
 </resources>
