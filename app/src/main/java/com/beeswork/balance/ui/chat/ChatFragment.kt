@@ -286,6 +286,10 @@ class ChatFragment : BaseFragment(),
     override fun onReportMatch() {
         ReportDialog(this).show(childFragmentManager, ReportDialog.TAG)
     }
+
+    override fun submitReport(reportReasonId: Int, description: String) {
+        println("submitreport: $reportReasonId : $description")
+    }
 }
 
 

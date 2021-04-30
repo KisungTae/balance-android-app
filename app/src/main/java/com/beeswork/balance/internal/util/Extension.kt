@@ -1,8 +1,11 @@
 package com.beeswork.balance.internal.util
 
+import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.Resource
@@ -48,6 +51,11 @@ fun <T> CoroutineScope.safeLaunch(callBack: MutableLiveData<Resource<T>>?, launc
     return this.launch(coroutineExceptionHandler) {
         launchBody.invoke()
     }
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
 

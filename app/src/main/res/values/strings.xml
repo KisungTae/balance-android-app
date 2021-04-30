@@ -58,7 +58,7 @@
     <string name="dialog_error_icon_description">errorIcon</string>
 
     <string name="dialog_retry_btn_text">다시 시도하기</string>
-    <string name="dialog_close_btn_text">닫기</string>
+    <string name="dialog_close_btn_title">닫기</string>
     <string name="chat_message_resend_button_description">resend chat message</string>
     <string name="chat_message_delete_button_description">delete chat message</string>
     <string name="profile_image_description">profile image</string>
@@ -70,13 +70,16 @@
     <string name="snack_bar_title_new_chat_message">새로운 메세지</string>
     <string name="chat_unmatch_btn_title">채팅방 나가기</string>
     <string name="chat_report_match_btn_title">신고하기</string>
-    <string name="report_menu_dialog_title">신고하기</string>
-    <string name="report_menu_dialog_description">해당 유저는 누가 신고를 했는지 알수없습니다. 안전하고 편한 위클릭 사용을 위해서 신고를 해주세요</string>
+    <string name="report_dialog_head">신고하기</string>
+    <string name="report_dialog_subhead">해당 유저는 누가 신고를 했는지 알수없습니다. 안전하고 편한 위클릭 사용을 위해서 신고를 해주세요</string>
     <string name="report_dialog_inappropriate_message_button_title">적절하지 않은 메세지</string>
-    <string name="report_menu_dialog_inappropriate_photo_button_title">적절하지않은 사진</string>
-    <string name="report_menu_dialog_spam_button_title">스팸이나 부적절한 부탁</string>
-    <string name="report_menu_dialog_inappropriate_behaviour_button_title">적절하지않은 행동</string>
+    <string name="report_dialog_inappropriate_photo_button_title">적절하지않은 사진</string>
+    <string name="report_dialog_spam_button_title">스팸이나 부적절한 부탁</string>
+    <string name="report_dialog_inappropriate_behaviour_button_title">적절하지않은 행동</string>
     <string name="report_dialog_detail_sub_head">해당 유저가 어떤이유로 신고 받아야하는지 조금더 자세히 알려주세요. 판단하는데 큰 도움이 됩니다.</string>
+    <string name="report_dialog_other_button_title">기타 다른이유</string>
+    <string name="report_dialog_detail_hint">자세한 경위를 설명해주세요</string>
+    <string name="report_dialog_submit_button_title">제출하기</string>
 
 
 </resources>

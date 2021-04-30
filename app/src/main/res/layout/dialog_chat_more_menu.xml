@@ -39,7 +39,7 @@
         android:background="@drawable/sh_bottom_round_box"
         android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
-        android:text="@string/dialog_close_btn_text"
+        android:text="@string/dialog_close_btn_title"
         android:textColor="@color/TextGrey"
         android:textSize="@dimen/text_medium_size" />
 

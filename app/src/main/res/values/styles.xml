@@ -25,17 +25,9 @@
     </style>
 
     <style name="CustomBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
-        <!--<item name="android:windowCloseOnTouchOutside">false</item>-->
-        <!--        <item name="android:windowIsTranslucent">true</item>-->
-        <!--        <item name="android:windowContentOverlay">@null</item>-->
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="android:colorBackground">@android:color/transparent</item>
-        <!--        <item name="android:windowBackground">@android:color/transparent</item>-->
-        <!--        <item name="android:backgroundDimEnabled">false</item>-->
-        <!--        <item name="android:backgroundDimAmount">0</item>-->
-        <!--        <item name="android:backgroundDimEnabled">true</item>-->
-        <!--        <item name="android:backgroundDimAmount">0.3</item>-->
-        <!--        <item name="android:windowFrame">@null</item>-->
-        <!--        <item name="android:windowIsFloating">true</item>-->
     </style>
 
 </resources>
