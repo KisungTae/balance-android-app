@@ -23,7 +23,7 @@ import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.dialog.ConfirmDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.dialog.ReportMenuDialog
+import com.beeswork.balance.ui.dialog.ReportDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -40,7 +40,7 @@ class ChatFragment : BaseFragment(),
     ChatMessagePagingAdapter.ChatMessageSentListener,
     ConfirmDialog.ConfirmDialogClickListener,
     ChatMoreMenuDialog.ChatMoreMenuDialogClickListener,
-    ReportMenuDialog.ReportMenuDialogClickListener {
+    ReportDialog.ReportMenuDialogClickListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
@@ -284,7 +284,7 @@ class ChatFragment : BaseFragment(),
     }
 
     override fun onReportMatch() {
-        ReportMenuDialog(this).show(childFragmentManager, ReportMenuDialog.TAG)
+        ReportDialog(this).show(childFragmentManager, ReportDialog.TAG)
     }
 }
 

@@ -76,6 +76,7 @@
     <string name="report_menu_dialog_inappropriate_photo_button_title">적절하지않은 사진</string>
     <string name="report_menu_dialog_spam_button_title">스팸이나 부적절한 부탁</string>
     <string name="report_menu_dialog_inappropriate_behaviour_button_title">적절하지않은 행동</string>
+    <string name="report_dialog_detail_sub_head">해당 유저가 어떤이유로 신고 받아야하는지 조금더 자세히 알려주세요. 판단하는데 큰 도움이 됩니다.</string>
 
 
 </resources>

@@ -153,15 +153,14 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
 
         activity?.supportFragmentManager?.beginTransaction()?.let {
-            it.addToBackStack(MainViewPagerFragment.TAG)
             it.setCustomAnimations(
                 R.anim.enter_right_to_left,
                 R.anim.exit_right_to_left,
                 R.anim.enter_left_to_right,
                 R.anim.exit_left_to_right
             )
-            it.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             it.add(R.id.fcvMain, chatFragment)
+            it.addToBackStack(MainViewPagerFragment.TAG)
             it.commit()
         }
     }
