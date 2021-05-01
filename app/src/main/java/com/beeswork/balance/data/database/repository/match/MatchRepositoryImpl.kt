@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.database.repository.match
 
-import com.beeswork.balance.data.listener.ResourceListener
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
@@ -16,16 +15,15 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.data.database.response.NewChatMessage
 import com.beeswork.balance.data.listener.ChatMessagePagingRefreshListener
 import com.beeswork.balance.data.listener.MatchPagingRefreshListener
+import com.beeswork.balance.data.network.rds.report.ReportRDS
+import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import java.util.*
@@ -35,6 +33,7 @@ import kotlin.random.Random
 class MatchRepositoryImpl(
     private val matchRDS: MatchRDS,
     private val chatRDS: ChatRDS,
+    private val reportRDS: ReportRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val clickerDAO: ClickerDAO,
@@ -245,16 +244,34 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun reportMatch(matchedId: UUID) {
-        withContext(Dispatchers.IO) {
+    private fun unmatch(chatId: Long) {
+        matchDAO.delete(chatId)
+        matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
+        chatMessageDAO.deleteByChatId(chatId)
+    }
 
+    override suspend fun reportMatch(
+        chatId: Long,
+        matchedId: UUID,
+        reportReason: ReportReason,
+        description: String
+    ): Resource<EmptyResponse> {
+        return withContext(Dispatchers.IO) {
+            val response = reportRDS.reportMatch(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                matchedId,
+                reportReason,
+                description
+            )
+            if (response.isSuccess()) unmatch(chatId)
+            return@withContext response
         }
     }
 
     companion object {
         const val UNMATCHED = -1L
     }
-
 
 
     //  TODO: remove me
@@ -282,8 +299,6 @@ class MatchRepositoryImpl(
         }
         chatMessageDAO.insert(messages)
     }
-
-
 
 
     //  TODO: remove me

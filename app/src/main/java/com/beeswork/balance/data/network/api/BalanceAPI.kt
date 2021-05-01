@@ -25,6 +25,16 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("report/profile")
+    suspend fun reportProfile(
+        @Body reportBody: ReportBody
+    ): Response<EmptyResponse>
+
+    @POST("report/match")
+    suspend fun reportMatch(
+        @Body reportBody: ReportBody
+    ): Response<EmptyResponse>
+
     @POST("chat/message/sync")
     suspend fun syncChatMessages(
         @Body syncChatMessagesBody: SyncChatMessagesBody

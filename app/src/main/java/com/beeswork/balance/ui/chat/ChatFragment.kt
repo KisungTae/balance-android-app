@@ -17,6 +17,7 @@ import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
@@ -103,6 +104,19 @@ class ChatFragment : BaseFragment(),
         if (unmatched) setupAsUnmatched()
         setupChatMessagePagingRefreshObserver()
         setupChatMessagePagingData()
+        setupReportMatchLiveData()
+    }
+
+    private fun setupReportMatchLiveData() {
+        viewModel.reportMatchLiveData.observe(viewLifecycleOwner, {
+            when {
+                it.isSuccess() -> popBackToMatch()
+                it.isLoading() -> {
+                    val f = childFragmentManager.findFragmentByTag(ReportDialog.TAG) as ReportDialog
+
+                }
+            }
+        })
     }
 
 
@@ -287,8 +301,8 @@ class ChatFragment : BaseFragment(),
         ReportDialog(this).show(childFragmentManager, ReportDialog.TAG)
     }
 
-    override fun submitReport(reportReasonId: Int, description: String) {
-        println("submitreport: $reportReasonId : $description")
+    override fun submitReport(reportReason: ReportReason, description: String) {
+        viewModel.reportMatch(reportReason, description)
     }
 }
 

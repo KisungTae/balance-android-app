@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogReportBinding
-import com.beeswork.balance.internal.util.hideKeyboard
+import com.beeswork.balance.internal.constant.ReportReason
+import com.beeswork.balance.internal.util.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -51,24 +51,14 @@ class ReportDialog(
     private fun bindUI() {
         binding.btnReportDialogClose.setOnClickListener { dismiss() }
         binding.btnReportDialogBack.setOnClickListener { showReportOption() }
-        binding.btnReportDialogInappropriateMessage.setOnClickListener {
-            showReportDetail(ReportReason.INAPPROPRIATE_MESSAGE, (it as Button).text.toString())
-        }
-        binding.btnReportDialogInappropriateBehaviour.setOnClickListener {
-            showReportDetail(ReportReason.INAPPROPRIATE_BEHAVIOUR, (it as Button).text.toString())
-        }
-        binding.btnReportDialogSpam.setOnClickListener {
-            showReportDetail(ReportReason.SPAM, (it as Button).text.toString())
-        }
-        binding.btnReportDialogInappropriatePhoto.setOnClickListener {
-            showReportDetail(ReportReason.INAPPROPRIATE_PHOTO, (it as Button).text.toString())
-        }
-        binding.btnReportDialogOther.setOnClickListener {
-            showReportDetail(ReportReason.OTHER, (it as Button).text.toString())
-        }
+        binding.btnReportDialogMessage.setOnClickListener { showReportDetail(ReportReason.MESSAGE, it.getText()) }
+        binding.btnReportDialogBehaviour.setOnClickListener { showReportDetail(ReportReason.BEHAVIOUR, it.getText()) }
+        binding.btnReportDialogSpam.setOnClickListener { showReportDetail(ReportReason.SPAM, it.getText()) }
+        binding.btnReportDialogPhoto.setOnClickListener { showReportDetail(ReportReason.PHOTO, it.getText()) }
+        binding.btnReportDialogOther.setOnClickListener { showReportDetail(ReportReason.OTHER, it.getText()) }
         binding.btnReportDialogSubmit.setOnClickListener {
             reportReason?.let {
-                reportMenuDialogClickListener.submitReport(it.ordinal, binding.etReportDialogDetail.text.toString())
+                reportMenuDialogClickListener.submitReport(it, binding.etReportDialogDetail.text.toString())
             } ?: showReportOption()
         }
     }
@@ -76,43 +66,25 @@ class ReportDialog(
     private fun showReportDetail(reportReason: ReportReason, head: String) {
         this.reportReason = reportReason
         binding.tvReportDialogDetailHead.text = head
-        binding.llReportDialogOptionWrapper.animate()
-            .setDuration(ANIMATION_DURATION)
-            .withEndAction { binding.llReportDialogOptionWrapper.visibility = View.GONE }
-            .translationX(binding.llReportDialogOptionWrapper.width.toFloat().unaryMinus())
-            .start()
-        binding.llReportDialogDetailWrapper.translationX = binding.llReportDialogDetailWrapper.width.toFloat()
-        binding.llReportDialogDetailWrapper.animate().setDuration(ANIMATION_DURATION).translationX(0f).start()
+        binding.llReportDialogOptionWrapper.slideOutToLeft()
+        binding.llReportDialogDetailWrapper.slideInFromRight()
     }
 
     private fun showReportOption() {
-        binding.llReportDialogOptionWrapper.animate()
-            .withStartAction { binding.llReportDialogOptionWrapper.visibility = View.VISIBLE }
-            .setDuration(ANIMATION_DURATION)
-            .translationX(0f)
-            .start()
-        binding.llReportDialogDetailWrapper.animate()
-            .setDuration(ANIMATION_DURATION)
-            .translationX(binding.llReportDialogDetailWrapper.width.toFloat())
-            .withEndAction { requireContext().hideKeyboard(requireView()) }
-            .start()
+        requireContext().hideKeyboard(requireView())
+        binding.llReportDialogDetailWrapper.slideOutToRight()
+        binding.llReportDialogOptionWrapper.slideInFromLeft()
+    }
+
+    fun showLoading() {
+
     }
 
     companion object {
         const val TAG = "reportMenuDialog"
-        const val ANIMATION_DURATION = 100L
-    }
-
-    enum class ReportReason {
-        NOTHING,
-        INAPPROPRIATE_MESSAGE,
-        INAPPROPRIATE_PHOTO,
-        SPAM,
-        INAPPROPRIATE_BEHAVIOUR,
-        OTHER
     }
 
     interface ReportMenuDialogClickListener {
-        fun submitReport(reportReasonId: Int, description: String)
+        fun submitReport(reportReason: ReportReason, description: String)
     }
 }

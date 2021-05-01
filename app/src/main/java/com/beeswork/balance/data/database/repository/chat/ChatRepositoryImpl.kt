@@ -157,7 +157,7 @@ class ChatRepositoryImpl(
 
     override suspend fun deleteChatMessage(chatId: Long, key: Long) {
         withContext(Dispatchers.IO) {
-            chatMessageDAO.delete(key)
+            chatMessageDAO.deleteByKey(key)
             refreshChatMessagePaging(ChatMessagePagingRefresh.Type.DELETED, chatId)
         }
     }

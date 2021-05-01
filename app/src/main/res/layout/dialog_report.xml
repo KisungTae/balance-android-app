@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipChildren="true"
+    android:orientation="vertical"
     android:clipToPadding="true"
     android:paddingStart="10dp"
     android:paddingEnd="10dp"
@@ -89,6 +91,7 @@
 
     </LinearLayout>
 
+
     <LinearLayout
         android:id="@+id/llReportDialogOptionWrapper"
         android:layout_width="match_parent"
@@ -116,7 +119,7 @@
             android:textAlignment="center" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnReportDialogInappropriateMessage"
+            android:id="@+id/btnReportDialogMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/BackgroundWhite"
@@ -127,7 +130,7 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnReportDialogInappropriatePhoto"
+            android:id="@+id/btnReportDialogPhoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/BackgroundWhite"
@@ -147,7 +150,7 @@
             android:textSize="@dimen/text_medium_size" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnReportDialogInappropriateBehaviour"
+            android:id="@+id/btnReportDialogBehaviour"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/BackgroundWhite"
@@ -178,6 +181,5 @@
             android:textColor="@color/TextGrey"
             android:textSize="@dimen/text_medium_size" />
     </LinearLayout>
-
 
 </FrameLayout>

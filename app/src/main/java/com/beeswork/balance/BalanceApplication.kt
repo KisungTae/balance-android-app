@@ -20,6 +20,8 @@ import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
+import com.beeswork.balance.data.network.rds.report.ReportRDS
+import com.beeswork.balance.data.network.rds.report.ReportRDSImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -78,6 +80,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { BalanceAPI(instance()) }
 
         // RDS
+        bind<ReportRDS>() with singleton { ReportRDSImpl(instance()) }
         bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
         bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
 
@@ -99,6 +102,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

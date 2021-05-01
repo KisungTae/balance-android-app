@@ -9,8 +9,10 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
+import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -30,6 +32,9 @@ class ChatViewModel(
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
     val sendChatMessageMediatorLiveData = MediatorLiveData<Resource<EmptyResponse>>()
+
+    private val _reportMatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val reportMatchLiveData: LiveData<Resource<EmptyResponse>> get() = _reportMatchLiveData
 
     init {
         sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
@@ -117,11 +122,15 @@ class ChatViewModel(
     }
 
     fun unmatch() {
-        viewModelScope.launch { matchRepository.unmatch(matchedId) }
+//        viewModelScope.launch { matchRepository.unmatch(matchedId) }
     }
 
-    fun reportMatch() {
-        viewModelScope.launch { matchRepository.reportMatch(matchedId) }
+    fun reportMatch(reportReason: ReportReason, description: String) {
+        viewModelScope.safeLaunch(_reportMatchLiveData) {
+            _reportMatchLiveData.postValue(Resource.loading())
+            val response = matchRepository.reportMatch(chatId, matchedId, reportReason, description)
+            _reportMatchLiveData.postValue(response)
+        }
     }
 
     fun test() {

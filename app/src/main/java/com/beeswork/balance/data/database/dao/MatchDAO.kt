@@ -32,4 +32,7 @@ interface MatchDAO {
     @Query("select unmatched from `match` where chatId = :chatId")
     fun findUnmatched(chatId: Long): Boolean
 
+    @Query("delete from `match` where chatId = :chatId")
+    fun delete(chatId: Long)
+
 }

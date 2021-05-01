@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.Resource
@@ -13,6 +15,7 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
 import com.beeswork.balance.internal.exception.NoInternetConnectivityException
+import com.beeswork.balance.ui.dialog.ReportDialog
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -58,4 +61,48 @@ fun Context.hideKeyboard(view: View) {
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
+const val ANIMATION_DURATION = 100L
 
+fun View.slideInFromLeft() {
+    this.translationX = this.width.toFloat().unaryMinus()
+    this.visibility = View.VISIBLE
+    this.animate()
+        .setDuration(ANIMATION_DURATION)
+        .translationX(0f)
+        .start()
+}
+
+fun View.slideInFromRight() {
+    this.translationX = this.width.toFloat()
+    this.visibility = View.VISIBLE
+    this.animate()
+        .setDuration(ANIMATION_DURATION)
+        .translationX(0f)
+        .start()
+}
+
+fun View.slideOutToRight() {
+    this.animate()
+        .withStartAction { this.translationX = 0f }
+        .withEndAction { this.visibility = View.GONE }
+        .setDuration(ANIMATION_DURATION)
+        .translationX(this.width.toFloat())
+        .start()
+}
+
+fun View.slideOutToLeft() {
+    this.animate()
+        .withStartAction { this.translationX = 0f }
+        .withEndAction { this.visibility = View.GONE }
+        .setDuration(ANIMATION_DURATION)
+        .translationX(this.width.toFloat().unaryMinus())
+        .start()
+}
+
+fun View.getText(): String {
+    return when (this) {
+        is Button -> this.text.toString()
+        is TextView -> this.text.toString()
+        else -> ""
+    }
+}
