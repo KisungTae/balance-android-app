@@ -2,6 +2,7 @@ package com.beeswork.balance.service.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.EndPoint
@@ -19,6 +20,8 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.random.Random
 
@@ -92,7 +95,9 @@ class StompClientImpl(
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         socketStatus = SocketStatus.CLOSED
         val error: String? = when (t) {
+            is SocketTimeoutException -> ExceptionCode.SOCKET_TIMEOUT_EXCEPTION
             is NoInternetConnectivityException -> ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION
+            is ConnectException -> ExceptionCode.CONNECT_EXCEPTION
             else -> null
         }
         _webSocketEventLiveData.postValue(WebSocketEvent.error(error, null))

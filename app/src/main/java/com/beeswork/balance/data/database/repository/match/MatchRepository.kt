@@ -22,7 +22,7 @@ interface MatchRepository {
     suspend fun fetchMatches(): Resource<EmptyResponse>
     suspend fun synchronizeMatch(chatId: Long)
     suspend fun isUnmatched(chatId: Long): Boolean
-    suspend fun unmatch(matchedId: UUID)
+    suspend fun unmatch(chatId: Long, matchedId: UUID): Resource<EmptyResponse>
     suspend fun reportMatch(
         chatId: Long,
         matchedId: UUID,

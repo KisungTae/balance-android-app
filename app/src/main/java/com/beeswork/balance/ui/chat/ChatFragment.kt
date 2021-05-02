@@ -41,7 +41,8 @@ class ChatFragment : BaseFragment(),
     ChatMessagePagingAdapter.ChatMessageSentListener,
     ConfirmDialog.ConfirmDialogClickListener,
     ChatMoreMenuDialog.ChatMoreMenuDialogClickListener,
-    ReportDialog.ReportMenuDialogClickListener {
+    ReportDialog.ReportDialogClickListener,
+    ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
@@ -82,10 +83,7 @@ class ChatFragment : BaseFragment(),
                 arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY),
                 arguments.getBoolean(BundleKey.UNMATCHED)
             )
-        } ?: ErrorDialog(null, getString(R.string.error_title_chat_id_not_found), "", null, null, this).show(
-            childFragmentManager,
-            ErrorDialog.TAG
-        )
+        } ?: showErrorDialog(getString(R.string.error_title_chat_id_not_found), "", this)
     }
 
     private fun bindUI(
@@ -103,33 +101,55 @@ class ChatFragment : BaseFragment(),
 //        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
         if (unmatched) setupAsUnmatched()
         setupChatMessagePagingRefreshObserver()
-        setupChatMessagePagingData()
-        setupReportMatchLiveData()
+        setupChatMessagePagingDataObserver()
+        setupReportMatchLiveDataObserver()
+        setupUnmatchLiveDataObserver()
     }
 
-    private fun setupReportMatchLiveData() {
-        viewModel.reportMatchLiveData.observe(viewLifecycleOwner, {
+    private fun setupUnmatchLiveDataObserver() {
+        viewModel.unmatchLiveData.observe(viewLifecycleOwner, {
             when {
                 it.isSuccess() -> popBackToMatch()
-                it.isLoading() -> {
-                    val f = childFragmentManager.findFragmentByTag(ReportDialog.TAG) as ReportDialog
-
+                it.isLoading() -> showLoading()
+                it.isError() -> {
+                    hideLoading()
+                    val errorTitle = getString(R.string.error_title_report)
+                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
                 }
             }
         })
     }
 
+    private fun showLoading() {
+        binding.llChatLoading.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        binding.llChatLoading.visibility = View.GONE
+    }
+
+    private fun setupReportMatchLiveDataObserver() {
+        viewModel.reportMatchLiveData.observe(viewLifecycleOwner, {
+            when {
+                it.isSuccess() -> popBackToMatch()
+                it.isLoading() -> getReportDialog()?.showLoading()
+                it.isError() -> {
+                    getReportDialog()?.hideLoading()
+                    val errorTitle = getString(R.string.error_title_report)
+                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
+                }
+            }
+        })
+    }
+
+    private fun getReportDialog(): ReportDialog? {
+        return childFragmentManager.findFragmentByTag(ReportDialog.TAG)?.let { return@let it as ReportDialog }
+    }
 
     private fun setupSendChatMessageMediatorLiveDataObserver() {
         viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
-            if (it.isError()) ErrorDialog(
-                it.error,
-                getString(R.string.error_title_send_chat_message),
-                it.errorMessage,
-                null,
-                null,
-                null
-            ).show(childFragmentManager, ErrorDialog.TAG)
+            val errorTitle = getString(R.string.error_title_send_chat_message)
+            if (it.isError()) showErrorDialog(it.error, errorTitle, it.errorMessage)
         })
     }
 
@@ -139,12 +159,12 @@ class ChatFragment : BaseFragment(),
                 ChatMessagePagingRefresh.Type.SEND -> {
                     binding.etChatMessageBody.setText("")
                     if (binding.rvChat.canScrollVertically(1)) chatMessagePagingRefreshAdapter.refresh()
-                    else setupChatMessagePagingData()
+                    else setupChatMessagePagingDataObserver()
                 }
                 ChatMessagePagingRefresh.Type.RECEIVED -> {
                     if (binding.rvChat.canScrollVertically(1)) it.newChatMessage?.let { newChatMessage ->
                         showNewChatMessageSnackBar(newChatMessage.body)
-                    } else setupChatMessagePagingData()
+                    } else setupChatMessagePagingDataObserver()
                 }
                 else -> chatMessagePagingRefreshAdapter.refresh()
             }
@@ -161,7 +181,7 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private fun setupChatMessagePagingData() {
+    private fun setupChatMessagePagingDataObserver() {
         chatMessagePagingObserveJob?.cancel()
         registerAdapterDataObserver()
         chatMessagePagingObserveJob = lifecycleScope.launch {
@@ -242,7 +262,7 @@ class ChatFragment : BaseFragment(),
         requireActivity().supportFragmentManager.popBackStack(MainViewPagerFragment.TAG, POP_BACK_STACK_INCLUSIVE)
     }
 
-    override fun onDismiss() {
+    override fun onDismissErrorDialog() {
         popBackToMatch()
     }
 
@@ -273,7 +293,7 @@ class ChatFragment : BaseFragment(),
         val binding = SnackBarNewChatMessageBinding.inflate(layoutInflater)
         binding.tvSnackBarNewChatMessage.text = body
         binding.llSnackBarChatMessage.setOnClickListener {
-            setupChatMessagePagingData()
+            setupChatMessagePagingDataObserver()
             newChatMessageSnackBar?.dismiss()
         }
         val snackBarLayout = snackBar.view as Snackbar.SnackbarLayout
@@ -303,6 +323,13 @@ class ChatFragment : BaseFragment(),
 
     override fun submitReport(reportReason: ReportReason, description: String) {
         viewModel.reportMatch(reportReason, description)
+    }
+
+    override fun onRetry(requestCode: Int?) {
+        when (requestCode) {
+            RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
+            RequestCode.UNMATCH -> onUnmatch()
+        }
     }
 }
 

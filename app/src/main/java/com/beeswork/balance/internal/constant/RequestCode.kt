@@ -8,5 +8,7 @@ class RequestCode {
         const val FETCH_MATCHES = 4
         const val CONNECT_TO_WEB_SOCKET = 5
         const val DELETE_CHAT_MESSAGE = 6
+        const val REPORT_MATCH = 7
+        const val UNMATCH = 8
     }
 }

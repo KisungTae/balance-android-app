@@ -36,6 +36,9 @@ class ChatViewModel(
     private val _reportMatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val reportMatchLiveData: LiveData<Resource<EmptyResponse>> get() = _reportMatchLiveData
 
+    private val _unmatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val unmatchLiveData: LiveData<Resource<EmptyResponse>> get() = _unmatchLiveData
+
     init {
         sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
             sendChatMessageMediatorLiveData.postValue(it)
@@ -122,7 +125,11 @@ class ChatViewModel(
     }
 
     fun unmatch() {
-//        viewModelScope.launch { matchRepository.unmatch(matchedId) }
+        viewModelScope.safeLaunch(_unmatchLiveData) {
+            _unmatchLiveData.postValue(Resource.loading())
+            val response = matchRepository.unmatch(chatId, matchedId)
+            _unmatchLiveData.postValue(response)
+        }
     }
 
     fun reportMatch(reportReason: ReportReason, description: String) {

@@ -15,7 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
 class ReportDialog(
-    private val reportMenuDialogClickListener: ReportMenuDialogClickListener
+    private val reportDialogClickListener: ReportDialogClickListener
 ) : BottomSheetDialogFragment() {
 
     private lateinit var binding: DialogReportBinding
@@ -58,7 +58,7 @@ class ReportDialog(
         binding.btnReportDialogOther.setOnClickListener { showReportDetail(ReportReason.OTHER, it.getText()) }
         binding.btnReportDialogSubmit.setOnClickListener {
             reportReason?.let {
-                reportMenuDialogClickListener.submitReport(it, binding.etReportDialogDetail.text.toString())
+                reportDialogClickListener.submitReport(it, binding.etReportDialogDetail.text.toString())
             } ?: showReportOption()
         }
     }
@@ -77,14 +77,22 @@ class ReportDialog(
     }
 
     fun showLoading() {
+        binding.llReportDialogLoading.visibility = View.VISIBLE
+    }
 
+    fun hideLoading() {
+        binding.llReportDialogLoading.visibility = View.GONE
+    }
+
+    fun clickSubmitButton() {
+        binding.btnReportDialogSubmit.performClick()
     }
 
     companion object {
         const val TAG = "reportMenuDialog"
     }
 
-    interface ReportMenuDialogClickListener {
+    interface ReportDialogClickListener {
         fun submitReport(reportReason: ReportReason, description: String)
     }
 }

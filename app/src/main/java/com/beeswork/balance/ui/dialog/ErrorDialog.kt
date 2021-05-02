@@ -74,7 +74,7 @@ class ErrorDialog(
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismissListener?.onDismiss()
+        onDismissListener?.onDismissErrorDialog()
     }
 
     companion object {
@@ -86,7 +86,7 @@ class ErrorDialog(
     }
 
     interface OnDismissListener {
-        fun onDismiss()
+        fun onDismissErrorDialog()
     }
 
 }

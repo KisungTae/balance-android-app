@@ -7,6 +7,8 @@ import androidx.navigation.fragment.findNavController
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.login.LoginFragment
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import java.lang.Exception
@@ -36,6 +38,43 @@ abstract class BaseFragment : Fragment() {
         }
         return false
     }
+
+    protected fun showErrorDialog(
+        errorTitle: String,
+        errorMessage: String?,
+        onDismissListener: ErrorDialog.OnDismissListener
+    ) {
+        ErrorDialog(null, errorTitle, errorMessage, null, null, onDismissListener).show(
+            childFragmentManager,
+            ErrorDialog.TAG
+        )
+    }
+
+    protected fun showErrorDialog(
+        error: String?,
+        errorTitle: String,
+        errorMessage: String?,
+        requestCode: Int,
+        retryListener: ErrorDialog.OnRetryListener
+    ) {
+        ErrorDialog(error, errorTitle, errorMessage, requestCode, retryListener, null).show(
+            childFragmentManager,
+            ErrorDialog.TAG
+        )
+    }
+
+    protected fun showErrorDialog(
+        error: String?,
+        errorTitle: String,
+        errorMessage: String?,
+    ) {
+        ErrorDialog(error, errorTitle, errorMessage, null, null, null).show(
+            childFragmentManager,
+            ErrorDialog.TAG
+        )
+    }
+
+
 }
 
 // TODO: remove access token when pop to login fragment

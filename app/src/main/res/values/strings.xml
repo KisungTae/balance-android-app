@@ -11,6 +11,7 @@
     <string name="error_title_fetch_chat_messages">채팅 메세지를 가져오는데 실패했습니다</string>
     <string name="error_title_send_chat_message">채팅 메세지를 전송하지 못했습니다</string>
     <string name="error_title_web_socket_disconnected">서버에 연결할수없습니다</string>
+    <string name="error_title_report">신고요청을 실패했습니다</string>
 
     <string name="chat_message_over_sized_exception">채팅메세지가 너무 깁니다 줄여주세요</string>
     <string name="chat_message_empty_exception">채팅메세지를 입력해주세요</string>
@@ -72,10 +73,10 @@
     <string name="chat_report_match_btn_title">신고하기</string>
     <string name="report_dialog_head">신고하기</string>
     <string name="report_dialog_subhead">해당 유저는 누가 신고를 했는지 알수없습니다. 안전하고 편한 위클릭 사용을 위해서 신고를 해주세요</string>
-    <string name="report_dialog_inappropriate_message_button_title">적절하지 않은 메세지</string>
-    <string name="report_dialog_inappropriate_photo_button_title">적절하지않은 사진</string>
+    <string name="report_dialog_message_button_title">적절하지 않은 메세지</string>
+    <string name="report_dialog_photo_button_title">적절하지않은 사진</string>
     <string name="report_dialog_spam_button_title">스팸이나 부적절한 부탁</string>
-    <string name="report_dialog_inappropriate_behaviour_button_title">적절하지않은 행동</string>
+    <string name="report_dialog_behaviour_button_title">적절하지않은 행동</string>
     <string name="report_dialog_detail_sub_head">해당 유저가 어떤이유로 신고 받아야하는지 조금더 자세히 알려주세요. 판단하는데 큰 도움이 됩니다.</string>
     <string name="report_dialog_other_button_title">기타 다른이유</string>
     <string name="report_dialog_detail_hint">자세한 경위를 설명해주세요</string>

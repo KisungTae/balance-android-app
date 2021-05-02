@@ -25,6 +25,11 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("match/unmatch")
+    suspend fun unmatch(
+        @Body unmatchBody: UnmatchBody
+    ): Response<EmptyResponse>
+
     @POST("report/profile")
     suspend fun reportProfile(
         @Body reportBody: ReportBody

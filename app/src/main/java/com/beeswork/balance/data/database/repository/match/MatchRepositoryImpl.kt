@@ -238,9 +238,15 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun unmatch(matchedId: UUID) {
-        withContext(Dispatchers.IO) {
-
+    override suspend fun unmatch(chatId: Long, matchedId: UUID): Resource<EmptyResponse> {
+        return withContext(Dispatchers.IO) {
+            val response = matchRDS.unmatch(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                matchedId
+            )
+            if (response.isSuccess()) unmatch(chatId)
+            return@withContext response
         }
     }
 
