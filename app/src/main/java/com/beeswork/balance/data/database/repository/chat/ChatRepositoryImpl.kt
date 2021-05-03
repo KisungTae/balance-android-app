@@ -105,13 +105,17 @@ class ChatRepositoryImpl(
 
     private fun collectChatMessageReceivedFlow() {
         stompClient.chatMessageReceivedFlow.onEach { chatMessageDTO ->
-            val chatMessage = chatMessageMapper.fromDTOToEntity(chatMessageDTO)
-            chatMessageDAO.insert(chatMessage)
-            refreshChatMessagePaging(
-                ChatMessagePagingRefresh.Type.RECEIVED,
-                chatMessage.chatId,
-                NewChatMessage(chatMessage.body)
-            )
+            chatMessageDTO.recipientId?.let { recipientId ->
+                if (preferenceProvider.getAccountId() == recipientId) {
+                    val chatMessage = chatMessageMapper.fromDTOToEntity(chatMessageDTO)
+                    chatMessageDAO.insert(chatMessage)
+                    refreshChatMessagePaging(
+                        ChatMessagePagingRefresh.Type.RECEIVED,
+                        chatMessage.chatId,
+                        NewChatMessage(chatMessage.body)
+                    )
+                }
+            }
         }.launchIn(scope)
     }
 

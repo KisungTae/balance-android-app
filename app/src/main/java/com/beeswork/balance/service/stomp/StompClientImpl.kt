@@ -186,9 +186,7 @@ class StompClientImpl(
         scope.launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
-            headers[StompHeader.ID] = subscriptionId.toString()
-            headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
-            headers[StompHeader.ACK] = DEFAULT_ACK
+                headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }
