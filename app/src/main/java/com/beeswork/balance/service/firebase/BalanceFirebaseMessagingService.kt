@@ -22,7 +22,6 @@ class BalanceFirebaseMessagingService : FirebaseMessagingService(), KodeinAware 
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-
         super.onMessageReceived(remoteMessage)
 
         val intent = Intent().apply { action = IntentAction.RECEIVED_FCM_NOTIFICATION }

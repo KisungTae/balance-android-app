@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun onReceiveFCMNotification(intent: Intent?) {
+
         val notificationType = intent!!.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
         val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
 
