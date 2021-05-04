@@ -65,11 +65,11 @@ class ChatFragment : BaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBackPressedDispatcherCallback()
-        safeLet(arguments, arguments?.getString(BundleKey.MATCHED_ID)) { arguments, matchedIdString ->
-            val matchedId = UUID.fromString(matchedIdString)
+        safeLet(arguments, arguments?.getString(BundleKey.SWIPED_ID)) { arguments, swipedIdString ->
+            val swipedId = UUID.fromString(swipedIdString)
             val chatViewModelFactoryParameter = ChatViewModelFactoryParameter(
                 arguments.getLong(BundleKey.CHAT_ID),
-                matchedId
+                swipedId
             )
 
             viewModel = ViewModelProvider(
@@ -78,7 +78,7 @@ class ChatFragment : BaseFragment(),
             ).get(ChatViewModel::class.java)
 
             bindUI(
-                matchedId,
+                swipedId,
                 arguments.getString(BundleKey.MATCHED_NAME),
                 arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY),
                 arguments.getBoolean(BundleKey.UNMATCHED)
@@ -87,7 +87,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun bindUI(
-        matchedId: UUID,
+        swipedId: UUID,
         matchedName: String?,
         matchedRepPhotoKey: String?,
         unmatched: Boolean

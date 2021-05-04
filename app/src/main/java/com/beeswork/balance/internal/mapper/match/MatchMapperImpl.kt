@@ -8,14 +8,14 @@ import org.threeten.bp.ZoneId
 import java.util.*
 
 class MatchMapperImpl : MatchMapper {
-    override fun fromEntityToNewMatchDomain(entity: Match, accountId: UUID?, repPhotoKey: String?): NewMatch {
-        return NewMatch(entity.matchedId, entity.name, entity.repPhotoKey, accountId, repPhotoKey)
+    override fun fromEntityToNewMatch(entity: Match, accountId: UUID?, repPhotoKey: String?): NewMatch {
+        return NewMatch(entity.swipedId, entity.name, entity.repPhotoKey, accountId, repPhotoKey)
     }
 
     override fun fromDTOToEntity(dto: MatchDTO): Match {
         return Match(
             dto.chatId,
-            dto.matchedId,
+            dto.swipedId,
             dto.active,
             dto.unmatched,
             dto.name,
@@ -27,7 +27,7 @@ class MatchMapperImpl : MatchMapper {
     override fun fromEntityToDomain(entity: Match): MatchDomain {
         return MatchDomain(
             entity.chatId,
-            entity.matchedId,
+            entity.swipedId,
             entity.active,
             entity.unmatched,
             entity.name,

@@ -11,8 +11,8 @@ import com.beeswork.balance.data.database.converter.UUIDConverter
 
 
 @Database(
-    entities = [Match::class, ChatMessage::class, Clicked::class, FCMToken::class,
-        Clicker::class, Profile::class, Location::class, Photo::class],
+    entities = [Match::class, ChatMessage::class, Swipe::class, FCMToken::class,
+        Click::class, Profile::class, Location::class, Photo::class],
     version = 1
 )
 @TypeConverters(
@@ -25,9 +25,9 @@ abstract class BalanceDatabase : RoomDatabase() {
 
     abstract fun matchDAO(): MatchDAO
     abstract fun chatMessageDAO(): ChatMessageDAO
-    abstract fun clickDAO(): ClickedDAO
+    abstract fun clickDAO(): SwipeDAO
     abstract fun fcmTokenDAO(): FCMTokenDAO
-    abstract fun clickedDAO(): ClickerDAO
+    abstract fun clickedDAO(): ClickDAO
     abstract fun profileDAO(): ProfileDAO
     abstract fun locationDAO(): LocationDAO
     abstract fun photoDAO(): PhotoDAO

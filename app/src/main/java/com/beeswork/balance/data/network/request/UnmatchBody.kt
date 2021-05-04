@@ -5,5 +5,5 @@ import java.util.*
 data class UnmatchBody(
     val accountId: UUID?,
     val identityToken: UUID?,
-    val unmatchedId: UUID
+    val swipedId: UUID
 )

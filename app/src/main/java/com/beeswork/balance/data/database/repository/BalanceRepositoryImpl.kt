@@ -28,9 +28,9 @@ class BalanceRepositoryImpl(
     private val context: Context,
     private val matchDAO: MatchDAO,
     private val chatMessageDAO: ChatMessageDAO,
-    private val clickedDAO: ClickedDAO,
+    private val swipeDAO: SwipeDAO,
     private val fcmTokenDAO: FCMTokenDAO,
-    private val clickerDAO: ClickerDAO,
+    private val clickDAO: ClickDAO,
     private val profileDAO: ProfileDAO,
     private val photoDAO: PhotoDAO,
     private val locationDAO: LocationDAO,
@@ -42,8 +42,8 @@ class BalanceRepositoryImpl(
 //  ##################################### SWIPE ##################################### //
 //  ################################################################################# //
 
-    private val mutableFetchClickedListResponse = MutableLiveData<Resource<List<Clicker>>>()
-    override val fetchClickerListResponse: LiveData<Resource<List<Clicker>>>
+    private val mutableFetchClickedListResponse = MutableLiveData<Resource<List<Click>>>()
+    override val fetchClickListResponse: LiveData<Resource<List<Click>>>
         get() = mutableFetchClickedListResponse
 
     override fun fetchClickedList() {
@@ -72,13 +72,13 @@ class BalanceRepositoryImpl(
 
     override suspend fun getClickedCount(): LiveData<Int> {
         return withContext(Dispatchers.IO) {
-            return@withContext clickerDAO.count()
+            return@withContext clickDAO.count()
         }
     }
 
-    override suspend fun getClickedList(): DataSource.Factory<Int, Clicker> {
+    override suspend fun getClickedList(): DataSource.Factory<Int, Click> {
         return withContext(Dispatchers.IO) {
-            return@withContext clickerDAO.getClickers()
+            return@withContext clickDAO.getClicks()
         }
     }
 

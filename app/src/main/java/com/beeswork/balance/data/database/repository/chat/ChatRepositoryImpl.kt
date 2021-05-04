@@ -64,7 +64,7 @@ class ChatRepositoryImpl(
 
     init {
         collectChatMessageReceiptFlow()
-        collectChatMessageReceivedFlow()
+        collectChatMessageFlow()
     }
 
     private fun collectChatMessageReceiptFlow() {
@@ -103,8 +103,8 @@ class ChatRepositoryImpl(
         }
     }
 
-    private fun collectChatMessageReceivedFlow() {
-        stompClient.chatMessageReceivedFlow.onEach { chatMessageDTO ->
+    private fun collectChatMessageFlow() {
+        stompClient.chatMessageFlow.onEach { chatMessageDTO ->
             val chatMessage = chatMessageMapper.fromDTOToEntity(chatMessageDTO)
             chatMessageDAO.insert(chatMessage)
             refreshChatMessagePaging(
@@ -128,16 +128,16 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun sendChatMessage(chatId: Long, matchedId: UUID, body: String) {
+    override suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String) {
         withContext(Dispatchers.IO) {
             val key = chatMessageDAO.insert(ChatMessage(chatId, body, ChatMessageStatus.SENDING, OffsetDateTime.now()))
-            sendChatMessage(key, chatId, matchedId, body)
+            sendChatMessage(key, chatId, swipedId, body)
         }
     }
 
-    private fun sendChatMessage(key: Long, chatId: Long, matchedId: UUID, body: String) {
+    private fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
         refreshChatMessagePaging(ChatMessagePagingRefresh.Type.SEND, chatId)
-        stompClient.sendChatMessage(key, chatId, matchedId, body)
+        stompClient.sendChatMessage(key, chatId, swipedId, body)
     }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
@@ -146,11 +146,11 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun resendChatMessage(key: Long, matchedId: UUID) {
+    override suspend fun resendChatMessage(key: Long, swipedId: UUID) {
         withContext(Dispatchers.IO) {
             chatMessageDAO.findByKey(key)?.let {
                 chatMessageDAO.updateStatus(it.key, ChatMessageStatus.SENDING)
-                sendChatMessage(it.key, it.chatId, matchedId, it.body)
+                sendChatMessage(it.key, it.chatId, swipedId, it.body)
             }
         }
     }

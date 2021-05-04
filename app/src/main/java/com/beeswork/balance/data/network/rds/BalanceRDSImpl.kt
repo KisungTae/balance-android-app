@@ -1,6 +1,6 @@
 package com.beeswork.balance.data.network.rds
 
-import com.beeswork.balance.data.database.entity.Clicker
+import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.api.BalanceAPI
@@ -228,7 +228,7 @@ class BalanceRDSImpl(
         accountId: String,
         identityToken: String,
         fetchedAt: String
-    ): Resource<MutableList<Clicker>> {
+    ): Resource<MutableList<Click>> {
         return getResult {
             balanceAPI.fetchClickedList(accountId, identityToken, fetchedAt)
         }

@@ -10,9 +10,9 @@ import com.beeswork.balance.databinding.DialogNewMatchBinding
 import java.util.*
 
 class NewMatchDialog(
-    private val matchedId: UUID,
-    private val matchedName: String,
-    private val matchedRepPhotoKey: String?,
+    private val swipedId: UUID,
+    private val swipedName: String,
+    private val swipedRepPhotoKey: String?,
     private val accountId: UUID?,
     private val repPhotoKey: String?
 ): DialogFragment() {

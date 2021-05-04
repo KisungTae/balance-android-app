@@ -24,6 +24,7 @@ import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import java.util.*
@@ -36,8 +37,8 @@ class MatchRepositoryImpl(
     private val reportRDS: ReportRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
-    private val clickerDAO: ClickerDAO,
-    private val clickedDAO: ClickedDAO,
+    private val clickDAO: ClickDAO,
+    private val swipeDAO: SwipeDAO,
     private val matchMapper: MatchMapper,
     private val chatMessageMapper: ChatMessageMapper,
     private val balanceDatabase: BalanceDatabase,
@@ -67,6 +68,22 @@ class MatchRepositoryImpl(
             }
         }
         awaitClose {}
+    }
+
+    init {
+        collectMatchedFlow()
+    }
+
+    private fun collectMatchedFlow() {
+        stompClient.matchedFlow.onEach { matchDTO ->
+            val match = matchMapper.fromDTOToEntity(matchDTO)
+            updateMatch(match)
+            updateRecentChatMessage(match)
+            updateUnread(match)
+            matchDAO.insert(match)
+//            val newMatch = matchMapper.fromEntityToNewMatch(match, preferenceProvider.getAccountId(), )
+            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh())
+        }
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
@@ -188,19 +205,19 @@ class MatchRepositoryImpl(
 
     private fun saveMatches(matchDTOs: List<MatchDTO>) {
         val matches = matchDTOs.map { matchMapper.fromDTOToEntity(it) }
-        val matchedIds = mutableListOf<UUID>()
-        val clickedList = mutableListOf<Clicked>()
+        val swipedIds = mutableListOf<UUID>()
+        val clickedList = mutableListOf<Swipe>()
 
         balanceDatabase.runInTransaction {
             matches.forEach {
                 updateMatch(it)
-                matchedIds.add(it.matchedId)
-                clickedList.add(Clicked(it.matchedId))
+                swipedIds.add(it.swipedId)
+                clickedList.add(Swipe(it.swipedId))
             }
 
             matchDAO.insert(matches)
-            clickerDAO.deleteInIds(matchedIds)
-            clickedDAO.insert(clickedList)
+            clickDAO.deleteInIds(swipedIds)
+            swipeDAO.insert(clickedList)
         }
     }
 
@@ -238,12 +255,12 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun unmatch(chatId: Long, matchedId: UUID): Resource<EmptyResponse> {
+    override suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse> {
         return withContext(Dispatchers.IO) {
             val response = matchRDS.unmatch(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
-                matchedId
+                swipedId
             )
             if (response.isSuccess()) unmatch(chatId)
             return@withContext response
@@ -258,7 +275,7 @@ class MatchRepositoryImpl(
 
     override suspend fun reportMatch(
         chatId: Long,
-        matchedId: UUID,
+        swipedId: UUID,
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse> {
@@ -266,7 +283,7 @@ class MatchRepositoryImpl(
             val response = reportRDS.reportMatch(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
-                matchedId,
+                swipedId,
                 reportReason,
                 description
             )

@@ -115,7 +115,7 @@ interface BalanceRDS {
         accountId: String,
         identityToken: String,
         fetchedAt: String
-    ): Resource<MutableList<Clicker>>
+    ): Resource<MutableList<Click>>
 
     suspend fun postLocation(
         accountId: String,

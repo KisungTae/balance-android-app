@@ -11,9 +11,7 @@ import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
-import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.safeLaunch
-import com.beeswork.balance.service.stomp.StompClient
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.*
@@ -21,7 +19,7 @@ import java.util.*
 
 class ChatViewModel(
     private val chatId: Long,
-    private val matchedId: UUID,
+    private val swipedId: UUID,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper
@@ -111,7 +109,7 @@ class ChatViewModel(
                 bodySize <= 0 -> _sendChatMessageLiveData.postValue(
                     Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
                 )
-                else -> chatRepository.sendChatMessage(chatId, matchedId, body)
+                else -> chatRepository.sendChatMessage(chatId, swipedId, body)
             }
         }
     }
@@ -121,13 +119,13 @@ class ChatViewModel(
     }
 
     fun resendChatMessage(key: Long) {
-        viewModelScope.launch { chatRepository.resendChatMessage(key, matchedId) }
+        viewModelScope.launch { chatRepository.resendChatMessage(key, swipedId) }
     }
 
     fun unmatch() {
         viewModelScope.safeLaunch(_unmatchLiveData) {
             _unmatchLiveData.postValue(Resource.loading())
-            val response = matchRepository.unmatch(chatId, matchedId)
+            val response = matchRepository.unmatch(chatId, swipedId)
             _unmatchLiveData.postValue(response)
         }
     }
@@ -135,7 +133,7 @@ class ChatViewModel(
     fun reportMatch(reportReason: ReportReason, description: String) {
         viewModelScope.safeLaunch(_reportMatchLiveData) {
             _reportMatchLiveData.postValue(Resource.loading())
-            val response = matchRepository.reportMatch(chatId, matchedId, reportReason, description)
+            val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
             _reportMatchLiveData.postValue(response)
         }
     }

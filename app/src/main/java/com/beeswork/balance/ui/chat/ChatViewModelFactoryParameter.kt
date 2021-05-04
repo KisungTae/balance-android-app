@@ -4,5 +4,5 @@ import java.util.*
 
 data class ChatViewModelFactoryParameter(
     val chatId: Long,
-    val matchedId: UUID
+    val swipedId: UUID
 )

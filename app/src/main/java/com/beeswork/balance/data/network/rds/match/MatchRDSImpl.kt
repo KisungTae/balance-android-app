@@ -13,8 +13,8 @@ import java.util.*
 class MatchRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), MatchRDS {
-    override suspend fun unmatch(accountId: UUID?, identityToken: UUID?, unmatchedId: UUID): Resource<EmptyResponse> {
-        return getResult { balanceAPI.unmatch(UnmatchBody(accountId, identityToken, unmatchedId)) }
+    override suspend fun unmatch(accountId: UUID?, identityToken: UUID?, swipedId: UUID): Resource<EmptyResponse> {
+        return getResult { balanceAPI.unmatch(UnmatchBody(accountId, identityToken, swipedId)) }
     }
 
     override suspend fun listMatches(

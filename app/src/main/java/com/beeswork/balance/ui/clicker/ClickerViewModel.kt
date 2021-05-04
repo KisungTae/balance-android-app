@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.beeswork.balance.data.database.entity.Clicker
+import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.util.lazyDeferred
@@ -17,7 +17,7 @@ class ClickedViewModel(
     private val balanceRepository: BalanceRepository
 ): ViewModel() {
 
-    val fetchClickerListResponse: LiveData<Resource<List<Clicker>>> = balanceRepository.fetchClickerListResponse
+    val fetchClickListResponse: LiveData<Resource<List<Click>>> = balanceRepository.fetchClickListResponse
 
     private val pagedListConfig = PagedList.Config.Builder()
         .setEnablePlaceholders(false)

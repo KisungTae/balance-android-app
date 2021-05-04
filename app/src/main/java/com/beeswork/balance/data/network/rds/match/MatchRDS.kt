@@ -12,7 +12,7 @@ interface MatchRDS {
     suspend fun unmatch(
         accountId: UUID?,
         identityToken: UUID?,
-        unmatchedId: UUID
+        swipedId: UUID
     ): Resource<EmptyResponse>
 
     suspend fun listMatches(

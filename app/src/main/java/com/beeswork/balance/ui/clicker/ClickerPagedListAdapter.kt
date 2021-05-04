@@ -7,14 +7,14 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.Clicker
+import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.databinding.ItemClickerBinding
 import com.beeswork.balance.internal.util.inflate
 
 
 class ClickerPagedListAdapter(
     private val onClickedListener: OnClickedListener
-) : PagedListAdapter<Clicker, ClickerPagedListAdapter.ViewHolder>(diffCallback) {
+) : PagedListAdapter<Click, ClickerPagedListAdapter.ViewHolder>(diffCallback) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,11 +32,11 @@ class ClickerPagedListAdapter(
 
     companion object {
 
-        private val diffCallback = object : DiffUtil.ItemCallback<Clicker>() {
-            override fun areItemsTheSame(oldItem: Clicker, newItem: Clicker): Boolean =
-                oldItem.id == newItem.id
+        private val diffCallback = object : DiffUtil.ItemCallback<Click>() {
+            override fun areItemsTheSame(oldItem: Click, newItem: Click): Boolean =
+                oldItem.swiperId == newItem.swiperId
 
-            override fun areContentsTheSame(oldItem: Clicker, newItem: Clicker): Boolean =
+            override fun areContentsTheSame(oldItem: Click, newItem: Click): Boolean =
                 oldItem == newItem
         }
     }
@@ -54,7 +54,7 @@ class ClickerPagedListAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(clicker: Clicker) {
+        fun bind(click: Click) {
 //            itemView.tag = clicker.id
 //            itemView.tvClicked.text = clicker.id.toString()
 //            itemView.ivClicked.setImageResource(R.drawable.person1)

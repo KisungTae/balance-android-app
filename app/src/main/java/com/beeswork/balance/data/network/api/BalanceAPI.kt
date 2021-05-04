@@ -1,6 +1,6 @@
 package com.beeswork.balance.data.network.api
 
-import com.beeswork.balance.data.database.entity.Clicker
+import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
@@ -148,7 +148,7 @@ interface BalanceAPI {
         @Query(value = "accountId") accountId: String,
         @Query(value = "identityToken") identityToken: String,
         @Query(value = "fetchedAt") fetchedAt: String
-    ): Response<MutableList<Clicker>>
+    ): Response<MutableList<Click>>
 
     @POST("account/location")
     suspend fun postLocation(

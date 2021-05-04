@@ -3,7 +3,6 @@ package com.beeswork.balance.ui.match
 import android.os.Bundle
 import android.view.*
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -63,9 +62,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, { pagingRefresh ->
             pagingRefresh.newMatch?.let { newMatch ->
                 NewMatchDialog(
-                    newMatch.matchedId,
-                    newMatch.matchedName,
-                    newMatch.matchedRepPhotoKey,
+                    newMatch.swipedId,
+                    newMatch.swipedName,
+                    newMatch.swipedRepPhotoKey,
                     newMatch.accountId,
                     newMatch.repPhotoKey
                 ).show(childFragmentManager, NewMatchDialog.TAG)
@@ -145,7 +144,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
         matchPagingDataAdapter.getMatch(position)?.let {
             arguments.putLong(BundleKey.CHAT_ID, it.chatId)
-            arguments.putString(BundleKey.MATCHED_ID, it.matchedId.toString())
+            arguments.putString(BundleKey.SWIPED_ID, it.swipedId.toString())
             arguments.putString(BundleKey.MATCHED_NAME, it.name)
             arguments.putBoolean(BundleKey.UNMATCHED, it.unmatched)
             arguments.putString(BundleKey.MATCHED_REP_PHOTO_KEY, it.repPhotoKey)

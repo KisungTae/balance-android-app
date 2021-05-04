@@ -12,9 +12,9 @@ interface ChatRepository {
     val chatMessagePagingRefreshFlow: Flow<ChatMessagePagingRefresh>
     val sendChatMessageFlow: Flow<Resource<EmptyResponse>>
 
-    suspend fun sendChatMessage(chatId: Long, matchedId: UUID, body: String)
+    suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String)
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
-    suspend fun resendChatMessage(key: Long, matchedId: UUID)
+    suspend fun resendChatMessage(key: Long, swipedId: UUID)
     suspend fun deleteChatMessage(chatId: Long, key: Long)
 
     fun test()

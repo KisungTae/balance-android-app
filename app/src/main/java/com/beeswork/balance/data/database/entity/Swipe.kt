@@ -5,12 +5,10 @@ import androidx.room.PrimaryKey
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
-@Entity(tableName = "clicker")
-data class Clicker(
+
+@Entity(tableName = "swipe")
+data class Swipe(
 
     @PrimaryKey
-    val id: UUID,
-
-    val repPhotoKey: String,
-    val updatedAt: OffsetDateTime
+    val swipedId: UUID
 )

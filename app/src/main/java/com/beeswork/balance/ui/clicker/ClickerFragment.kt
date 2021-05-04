@@ -66,7 +66,7 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
             clickerPagedListAdapter.submitList(pagedClickedList)
         })
 
-        viewModel.fetchClickerListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
+        viewModel.fetchClickListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
 
             when (fetchClickedListResponse.status) {
                 Resource.Status.ERROR -> {

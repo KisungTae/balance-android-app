@@ -16,7 +16,7 @@ data class Match(
     @PrimaryKey
     val chatId: Long,
 
-    val matchedId: UUID,
+    val swipedId: UUID,
     var active: Boolean,
     var unmatched: Boolean,
     var name: String,

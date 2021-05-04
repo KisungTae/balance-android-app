@@ -2,7 +2,7 @@ package com.beeswork.balance.data.database.repository
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
-import com.beeswork.balance.data.database.entity.Clicker
+import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
@@ -12,11 +12,11 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 interface BalanceRepository {
 
     // swipe
-    val fetchClickerListResponse: LiveData<Resource<List<Clicker>>>
+    val fetchClickListResponse: LiveData<Resource<List<Click>>>
     val balanceGame: LiveData<Resource<BalanceGameResponse>>
     val clickResponse: LiveData<Resource<ClickResponse>>
 
-    suspend fun getClickedList(): DataSource.Factory<Int, Clicker>
+    suspend fun getClickedList(): DataSource.Factory<Int, Click>
     suspend fun getClickedCount(): LiveData<Int>
 
     fun fetchClickedList()

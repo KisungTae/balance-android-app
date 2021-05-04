@@ -6,7 +6,7 @@ import java.util.*
 
 data class MatchDomain(
     val chatId: Long,
-    val matchedId: UUID,
+    val swipedId: UUID,
     val active: Boolean,
     val unmatched: Boolean,
     val name: String,
