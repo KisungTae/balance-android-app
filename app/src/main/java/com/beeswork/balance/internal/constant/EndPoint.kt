@@ -19,7 +19,7 @@ class EndPoint {
             return "$PHOTO_BUCKET/$photoKey"
         }
 
-        fun ofAccountRepPhoto() {
+        fun ofAccountProfilePhoto() {
 
         }
     }

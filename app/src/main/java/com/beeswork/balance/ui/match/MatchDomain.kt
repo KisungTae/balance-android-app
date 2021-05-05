@@ -10,7 +10,7 @@ data class MatchDomain(
     val active: Boolean,
     val unmatched: Boolean,
     val name: String,
-    val repPhotoKey: String?,
+    val profilePhotoKey: String?,
     val updatedAt: ZonedDateTime?,
     val unread: Boolean,
     val recentChatMessage: String

@@ -7,7 +7,7 @@
         android:title="" />
 
     <item
-        android:id="@+id/clickedFragment"
+        android:id="@+id/clickFragment"
         android:icon="@drawable/ic_baseline_thumb_up"
         android:title="" />
 

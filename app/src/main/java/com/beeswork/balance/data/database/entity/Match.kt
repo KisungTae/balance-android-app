@@ -20,7 +20,7 @@ data class Match(
     var active: Boolean,
     var unmatched: Boolean,
     var name: String,
-    var repPhotoKey: String?,
+    var profilePhotoKey: String?,
     var updatedAt: OffsetDateTime?,
     var unread: Boolean = false,
     var recentChatMessage: String = "",

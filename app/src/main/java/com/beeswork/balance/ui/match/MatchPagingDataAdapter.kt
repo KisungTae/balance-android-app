@@ -68,7 +68,7 @@ class MatchPagingDataAdapter(
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
-            setupProfilePicture(matchDomain.swipedId, matchDomain.repPhotoKey)
+            setupProfilePicture(matchDomain.swipedId, matchDomain.profilePhotoKey)
             setupTextColor(matchDomain.unmatched)
         }
 
@@ -89,9 +89,9 @@ class MatchPagingDataAdapter(
             )
         }
 
-        private fun setupProfilePicture(swipedId: UUID, repPhotoKey: String?) {
-//            val photoEndPoint = repPhotoKey?.let {
-//                EndPoint.ofPhotoBucket(matchedId, repPhotoKey)
+        private fun setupProfilePicture(swipedId: UUID, profilePhotoKey: String?) {
+//            val photoEndPoint = profilePhotoKey?.let {
+//                EndPoint.ofPhotoBucket(matchedId, profilePhotoKey)
 //            } ?: R.drawable.ic_baseline_account_circle
 //            Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
         }

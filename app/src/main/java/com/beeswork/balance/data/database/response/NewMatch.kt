@@ -5,7 +5,7 @@ import java.util.*
 data class NewMatch(
     val swipedId: UUID,
     val swipedName: String,
-    val swipedRepPhotoKey: String?,
+    val swipedProfilePhotoKey: String?,
     val accountId: UUID?,
-    val repPhotoKey: String?
+    val profilePhotoKey: String?
 )

@@ -14,10 +14,14 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepositoryImpl
+import com.beeswork.balance.data.database.repository.click.ClickRepository
+import com.beeswork.balance.data.database.repository.click.ClickRepositoryImpl
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
+import com.beeswork.balance.data.network.rds.click.ClickRDS
+import com.beeswork.balance.data.network.rds.click.ClickRDSImpl
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
 import com.beeswork.balance.data.network.rds.report.ReportRDS
@@ -30,8 +34,7 @@ import com.beeswork.balance.service.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
-import com.beeswork.balance.ui.clicker.ClickerViewModelFactory
-import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModel
+import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
@@ -68,9 +71,9 @@ class BalanceApplication : Application(), KodeinAware {
         // DAO
         bind() from singleton { instance<BalanceDatabase>().matchDAO() }
         bind() from singleton { instance<BalanceDatabase>().chatMessageDAO() }
-        bind() from singleton { instance<BalanceDatabase>().clickDAO() }
+        bind() from singleton { instance<BalanceDatabase>().swipeDAO() }
         bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
-        bind() from singleton { instance<BalanceDatabase>().clickedDAO() }
+        bind() from singleton { instance<BalanceDatabase>().clickDAO() }
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
@@ -83,10 +86,14 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ReportRDS>() with singleton { ReportRDSImpl(instance()) }
         bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
         bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
+        bind<ClickRDS>() with singleton { ClickRDSImpl(instance()) }
+
 
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
         // Repository
+        bind<ClickRepository>() with singleton { ClickRepositoryImpl(instance(), instance(), instance(), instance()) }
+
         bind<ChatRepository>() with singleton {
             ChatRepositoryImpl(
                 instance(),
@@ -102,6 +109,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -152,7 +160,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { SwipeViewModelFactory(instance()) }
-        bind() from provider { ClickerViewModelFactory(instance()) }
+        bind() from provider { ClickViewModelFactory(instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
 

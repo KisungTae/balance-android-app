@@ -5,7 +5,7 @@ class BundleKey {
         const val CHAT_ID = "chatId"
         const val SWIPED_ID = "swipedId"
         const val MATCHED_NAME = "matchedName"
-        const val MATCHED_REP_PHOTO_KEY = "matchedRepPhotoKey"
+        const val MATCHED_PROFILE_PHOTO_KEY = "matchedProfilePhotoKey"
         const val UNMATCHED = "unmatched"
         const val LAST_READ_CHAT_MESSAGE_ID = "lastReadChatMessageId"
         const val ERROR_MESSAGE = "errorMessage"

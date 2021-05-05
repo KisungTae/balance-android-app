@@ -86,7 +86,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         setupCardsObserver()
 
         viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
-            binding.tvClickedCount.text = clickedCount.toString()
+            binding.tvClickCount.text = clickedCount.toString()
         })
 
 

@@ -55,7 +55,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         setupFetchMatchesLiveDataObserver()
         setupMatchPagingRefreshLiveData()
         search("")
-//        viewModel.fetchMatches()
+        viewModel.fetchMatches()
     }
 
     private fun setupMatchPagingRefreshLiveData() {
@@ -64,9 +64,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
                 NewMatchDialog(
                     newMatch.swipedId,
                     newMatch.swipedName,
-                    newMatch.swipedRepPhotoKey,
+                    newMatch.swipedProfilePhotoKey,
                     newMatch.accountId,
-                    newMatch.repPhotoKey
+                    newMatch.profilePhotoKey
                 ).show(childFragmentManager, NewMatchDialog.TAG)
             }
             matchPagingRefreshAdapter.refresh()
@@ -147,7 +147,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
             arguments.putString(BundleKey.SWIPED_ID, it.swipedId.toString())
             arguments.putString(BundleKey.MATCHED_NAME, it.name)
             arguments.putBoolean(BundleKey.UNMATCHED, it.unmatched)
-            arguments.putString(BundleKey.MATCHED_REP_PHOTO_KEY, it.repPhotoKey)
+            arguments.putString(BundleKey.MATCHED_PROFILE_PHOTO_KEY, it.profilePhotoKey)
             chatFragment.arguments = arguments
         }
 

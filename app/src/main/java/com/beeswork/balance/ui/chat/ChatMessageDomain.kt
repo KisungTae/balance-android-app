@@ -12,7 +12,7 @@ data class ChatMessageDomain(
     var status: ChatMessageStatus,
     var dateCreatedAt: LocalDate?,
     var timeCreatedAt: LocalTime?,
-    var showRepPhoto: Boolean = true
+    var showProfilePhoto: Boolean = true
 ) {
 
     fun isSentOrReceived(): Boolean {

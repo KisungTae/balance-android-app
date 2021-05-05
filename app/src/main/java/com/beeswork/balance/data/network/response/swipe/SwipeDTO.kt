@@ -6,6 +6,6 @@ import java.util.*
 data class SwipeDTO(
     val swiperId: UUID?,
     val swipedId: UUID?,
-    val repPhotoKey: String?,
+    val profilePhotoKey: String?,
     val updatedAt: OffsetDateTime
 )

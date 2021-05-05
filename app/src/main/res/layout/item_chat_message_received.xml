@@ -7,7 +7,7 @@
     android:paddingBottom="1dp">
 
     <ImageView
-        android:id="@+id/ivChatMessageReceivedRepPhoto"
+        android:id="@+id/ivChatMessageReceivedProfilePhoto"
         android:layout_width="@dimen/profile_image_medium_size"
         android:layout_height="@dimen/profile_image_medium_size"
         android:layout_gravity="top"

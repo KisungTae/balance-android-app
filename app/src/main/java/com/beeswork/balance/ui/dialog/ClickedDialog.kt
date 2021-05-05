@@ -9,7 +9,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogClickedBinding
 
 class ClickedDialog(
-    private val clickerPhotoKey: String?
+    private val clickPhotoKey: String?
 ): DialogFragment() {
 
     private lateinit var binding: DialogClickedBinding

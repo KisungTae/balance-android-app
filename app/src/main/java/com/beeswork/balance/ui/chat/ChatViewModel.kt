@@ -74,7 +74,7 @@ class ChatViewModel(
                     && after.dateCreatedAt == before.dateCreatedAt
                     && after.timeCreatedAt == beforeTimeCreatedAt
                 ) {
-                    before.showRepPhoto = false
+                    before.showProfilePhoto = false
                     nullifyBeforeTimeCreatedAt = true
                 }
 

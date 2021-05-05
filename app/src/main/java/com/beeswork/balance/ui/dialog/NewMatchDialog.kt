@@ -12,9 +12,9 @@ import java.util.*
 class NewMatchDialog(
     private val swipedId: UUID,
     private val swipedName: String,
-    private val swipedRepPhotoKey: String?,
+    private val swipedProfilePhotoKey: String?,
     private val accountId: UUID?,
-    private val repPhotoKey: String?
+    private val profilePhotoKey: String?
 ): DialogFragment() {
 
     private lateinit var binding: DialogNewMatchBinding

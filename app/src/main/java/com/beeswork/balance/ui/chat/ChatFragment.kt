@@ -80,7 +80,7 @@ class ChatFragment : BaseFragment(),
             bindUI(
                 swipedId,
                 arguments.getString(BundleKey.MATCHED_NAME),
-                arguments.getString(BundleKey.MATCHED_REP_PHOTO_KEY),
+                arguments.getString(BundleKey.MATCHED_PROFILE_PHOTO_KEY),
                 arguments.getBoolean(BundleKey.UNMATCHED)
             )
         } ?: showErrorDialog(getString(R.string.error_title_chat_id_not_found), "", this)
@@ -89,7 +89,7 @@ class ChatFragment : BaseFragment(),
     private fun bindUI(
         swipedId: UUID,
         matchedName: String?,
-        matchedRepPhotoKey: String?,
+        matchedProfilePhotoKey: String?,
         unmatched: Boolean
     ) = lifecycleScope.launch {
         setupBackPressedDispatcherCallback()
@@ -98,7 +98,7 @@ class ChatFragment : BaseFragment(),
         setupEmoticonBtnListener()
         setupSendChatMessageMediatorLiveDataObserver()
         setupChatRecyclerView()
-//        setupRepPhoto(matchedRepPhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
+//        setupProfilePhoto(matchedProfilePhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
         if (unmatched) setupAsUnmatched()
         setupChatMessagePagingRefreshObserver()
         setupChatMessagePagingDataObserver()
@@ -247,12 +247,12 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private suspend fun setupRepPhoto(repPhotoEndPoint: String?) = withContext(Dispatchers.IO) {
-        repPhotoEndPoint?.let { repPhotoEndPoint ->
+    private suspend fun setupProfilePhoto(profilePhotoEndPoint: String?) = withContext(Dispatchers.IO) {
+        profilePhotoEndPoint?.let { profilePhotoEndPoint ->
             runCatching {
-                val file = Glide.with(requireContext()).downloadOnly().load(repPhotoEndPoint).submit().get()
+                val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
                 if (file.exists()) withContext(Dispatchers.Main) {
-                    chatMessagePagingAdapter.onRepPhotoLoaded(repPhotoEndPoint)
+                    chatMessagePagingAdapter.onProfilePhotoLoaded(profilePhotoEndPoint)
                 }
             }.getOrNull()
         }

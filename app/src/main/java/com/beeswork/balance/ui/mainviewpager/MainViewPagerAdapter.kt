@@ -7,7 +7,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import com.beeswork.balance.internal.constant.FragmentTabPosition
 import com.beeswork.balance.ui.account.AccountFragment
-import com.beeswork.balance.ui.clicker.ClickerFragment
+import com.beeswork.balance.ui.click.ClickFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.match.MatchFragment
 import com.beeswork.balance.ui.swipe.SwipeFragment
@@ -27,7 +27,7 @@ class MainViewPagerAdapter(
         return when (position) {
             FragmentTabPosition.ACCOUNT.ordinal -> addToFragments(AccountFragment())
             FragmentTabPosition.SWIPE.ordinal -> addToFragments(SwipeFragment())
-            FragmentTabPosition.CLICKER.ordinal -> addToFragments(ClickerFragment())
+            FragmentTabPosition.CLICK.ordinal -> addToFragments(ClickFragment())
             FragmentTabPosition.MATCH.ordinal -> addToFragments(MatchFragment())
             else -> fragments[1]
         }

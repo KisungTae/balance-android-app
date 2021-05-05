@@ -91,7 +91,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
             when (position) {
                 FragmentTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_baseline_account_circle)
                 FragmentTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
-                FragmentTabPosition.CLICKER.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
+                FragmentTabPosition.CLICK.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
                 FragmentTabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
             }
         }

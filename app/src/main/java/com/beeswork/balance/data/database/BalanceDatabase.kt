@@ -25,9 +25,9 @@ abstract class BalanceDatabase : RoomDatabase() {
 
     abstract fun matchDAO(): MatchDAO
     abstract fun chatMessageDAO(): ChatMessageDAO
-    abstract fun clickDAO(): SwipeDAO
+    abstract fun swipeDAO(): SwipeDAO
     abstract fun fcmTokenDAO(): FCMTokenDAO
-    abstract fun clickedDAO(): ClickDAO
+    abstract fun clickDAO(): ClickDAO
     abstract fun profileDAO(): ProfileDAO
     abstract fun locationDAO(): LocationDAO
     abstract fun photoDAO(): PhotoDAO

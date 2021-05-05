@@ -35,4 +35,7 @@ interface PhotoDAO {
 
     @Query("update photo set sequence = :sequence where `key` = :photoKey")
     fun updateSequence(photoKey: String, sequence: Int)
+
+    @Query("select `key` from photo order by sequence limit 1")
+    fun findFirstPhotoKey(): String?
 }

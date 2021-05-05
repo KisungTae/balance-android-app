@@ -12,6 +12,6 @@ data class MatchDTO(
     val active: Boolean,
     val unmatched: Boolean,
     val name: String,
-    val repPhotoKey: String?,
+    val profilePhotoKey: String?,
     val createdAt: OffsetDateTime?
 )

@@ -17,8 +17,7 @@ interface ClickDAO {
     fun insert(clicks: List<Click>)
 
     @Query("delete from click where swiperId in (:swiperIds)")
-    fun deleteInIds(swiperIds: List<UUID>)
-
+    fun deleteInSwiperIds(swiperIds: List<UUID>)
 
     @Query("select * from click order by updatedAt desc")
     fun getClicks(): DataSource.Factory<Int, Click>

@@ -14,22 +14,18 @@ import com.beeswork.balance.databinding.ItemChatMessageSentBinding
 import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
-import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.ui.match.MatchDomain
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import org.threeten.bp.LocalTime
-import org.threeten.bp.OffsetDateTime
-import java.util.*
 
 
 class ChatMessagePagingAdapter(
     private val chatMessageSentListener: ChatMessageSentListener
 ): PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
 
-    private var repPhotoEndPoint: String? = null
+    private var profilePhotoEndPoint: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
@@ -74,7 +70,7 @@ class ChatMessagePagingAdapter(
                     (holder as ReceivedViewHolder).bind(
                         it,
                         marginTop(holder.itemViewType, position),
-                        repPhotoEndPoint
+                        profilePhotoEndPoint
                     )
                 }
                 else -> {
@@ -97,8 +93,8 @@ class ChatMessagePagingAdapter(
         } ?: return ChatMessageStatus.SENT.ordinal
     }
 
-    fun onRepPhotoLoaded(repPhotoEndPoint: String?) {
-        this.repPhotoEndPoint = repPhotoEndPoint
+    fun onProfilePhotoLoaded(profilePhotoEndPoint: String?) {
+        this.profilePhotoEndPoint = profilePhotoEndPoint
         notifyDataSetChanged()
     }
 
@@ -160,14 +156,14 @@ class ChatMessagePagingAdapter(
         fun bind(
             chatMessage: ChatMessageDomain,
             marginTop: Int,
-            repPhotoEndPoint: String?,
+            profilePhotoEndPoint: String?,
         ) {
             binding.tvChatMessageReceivedBody.text = chatMessage.body
-            binding.ivChatMessageReceivedRepPhoto.visibility = if (chatMessage.showRepPhoto) View.VISIBLE else View.INVISIBLE
+            binding.ivChatMessageReceivedProfilePhoto.visibility = if (chatMessage.showProfilePhoto) View.VISIBLE else View.INVISIBLE
             binding.tvChatMessageReceivedCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
             setMarginTop(binding.root, marginTop, context)
-            repPhotoEndPoint?.let {
-                Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedRepPhoto)
+            profilePhotoEndPoint?.let {
+                Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedProfilePhoto)
             }
         }
 

@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.clicker
+package com.beeswork.balance.ui.click
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,20 +8,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Click
-import com.beeswork.balance.databinding.ItemClickerBinding
+import com.beeswork.balance.databinding.ItemClickBinding
 import com.beeswork.balance.internal.util.inflate
 
 
-class ClickerPagedListAdapter(
-    private val onClickedListener: OnClickedListener
-) : PagedListAdapter<Click, ClickerPagedListAdapter.ViewHolder>(diffCallback) {
+class ClickPagedListAdapter(
+    private val onClickListener: OnClickListener
+) : PagedListAdapter<Click, ClickPagedListAdapter.ViewHolder>(diffCallback) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = parent.inflate(R.layout.item_clicker)
+        val view = parent.inflate(R.layout.item_click)
         return ViewHolder(
-            ItemClickerBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onClickedListener
+            ItemClickBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onClickListener
         )
     }
 
@@ -41,13 +41,13 @@ class ClickerPagedListAdapter(
         }
     }
 
-    interface OnClickedListener {
-        fun onClickedClick(swipedId: String)
+    interface OnClickListener {
+        fun onSwipe(swiperId: String)
     }
 
     class ViewHolder(
-        private val binding: ItemClickerBinding,
-        private val onClickedListener: OnClickedListener
+        private val binding: ItemClickBinding,
+        private val onClickListener: OnClickListener
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
@@ -61,7 +61,7 @@ class ClickerPagedListAdapter(
         }
 
         override fun onClick(v: View?) {
-            onClickedListener.onClickedClick(v?.tag as String)
+            onClickListener.onSwipe(v?.tag as String)
         }
     }
 }

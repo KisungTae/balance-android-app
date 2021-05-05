@@ -9,5 +9,5 @@ import java.util.*
 
 interface MatchMapper: Mapper<MatchDTO, Match, MatchDomain> {
 
-    fun fromEntityToNewMatch(entity: Match, accountId: UUID?, repPhotoKey: String?): NewMatch
+    fun fromEntityToNewMatch(entity: Match, accountId: UUID?, profilePhotoKey: String?): NewMatch
 }

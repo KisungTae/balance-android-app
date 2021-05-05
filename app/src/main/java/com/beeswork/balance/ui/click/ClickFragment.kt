@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.clicker
+package com.beeswork.balance.ui.click
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.databinding.FragmentClickerBinding
+import com.beeswork.balance.databinding.FragmentClickBinding
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
@@ -19,19 +19,19 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 
-class ClickerFragment : ScopeFragment(), KodeinAware,
-    ClickerPagedListAdapter.OnClickedListener, BalanceGameDialog.BalanceGameListener,
+class ClickFragment : ScopeFragment(), KodeinAware,
+    ClickPagedListAdapter.OnClickListener, BalanceGameDialog.BalanceGameListener,
     FetchErrorDialog.OnRetryListener, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ClickerViewModelFactory by instance()
-    private lateinit var viewModel: ClickedViewModel
-    private lateinit var clickerPagedListAdapter: ClickerPagedListAdapter
-    private lateinit var binding: FragmentClickerBinding
+    private val viewModelFactory: ClickViewModelFactory by instance()
+    private lateinit var viewModel: ClickViewModel
+    private lateinit var clickPagedListAdapter: ClickPagedListAdapter
+    private lateinit var binding: FragmentClickBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = FragmentClickerBinding.inflate(layoutInflater)
+        binding = FragmentClickBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
@@ -39,31 +39,31 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_clicker, container, false)
+        return inflater.inflate(R.layout.fragment_click, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this, viewModelFactory).get(ClickedViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
     }
 
     private fun bindUI() = launch {
 
-        clickerPagedListAdapter = ClickerPagedListAdapter(
-            this@ClickerFragment
+        clickPagedListAdapter = ClickPagedListAdapter(
+            this@ClickFragment
         )
 
-        binding.rvClicked.adapter = clickerPagedListAdapter
-        val gridLayoutManager = GridLayoutManager(this@ClickerFragment.context, 2)
-        binding.rvClicked.layoutManager = gridLayoutManager
+        binding.rvClick.adapter = clickPagedListAdapter
+        val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, 2)
+        binding.rvClick.layoutManager = gridLayoutManager
 
 
-        viewModel.fetchClickedList()
+        viewModel.fetchClicks()
 
-        viewModel.clickedList.await().observe(viewLifecycleOwner, { pagedClickedList ->
-            clickerPagedListAdapter.submitList(pagedClickedList)
+        viewModel.clicks.await().observe(viewLifecycleOwner, { pagedClickedList ->
+            clickPagedListAdapter.submitList(pagedClickedList)
         })
 
         viewModel.fetchClickListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
@@ -72,19 +72,19 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
                 Resource.Status.ERROR -> {
                     FetchErrorDialog(
                         fetchClickedListResponse.errorMessage,
-                        this@ClickerFragment
+                        this@ClickFragment
                     ).show(childFragmentManager, FetchErrorDialog.TAG)
                 }
             }
         })
     }
 
-    override fun onClickedClick(swipedId: String) {
-        BalanceGameDialog(swipedId, this@ClickerFragment).show(
+    override fun onSwipe(swiperId: String) {
+        BalanceGameDialog(swiperId, this@ClickFragment).show(
             childFragmentManager,
             BalanceGameDialog.TAG
         )
-        viewModel.swipe(swipedId)
+        viewModel.swipe(swiperId)
     }
 
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
@@ -95,7 +95,7 @@ class ClickerFragment : ScopeFragment(), KodeinAware,
     }
 
     override fun onRetry() {
-        viewModel.fetchClickedList()
+        viewModel.fetchClicks()
     }
 
     override fun onFragmentSelected() {

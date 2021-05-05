@@ -97,7 +97,7 @@ class ChatRepositoryImpl(
             match.unmatched = true
             match.updatedAt = null
             match.recentChatMessage = ""
-            match.repPhotoKey = null
+            match.profilePhotoKey = null
             match.active = true
             matchDAO.insert(match)
         }

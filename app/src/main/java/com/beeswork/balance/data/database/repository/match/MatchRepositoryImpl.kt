@@ -39,6 +39,7 @@ class MatchRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val clickDAO: ClickDAO,
     private val swipeDAO: SwipeDAO,
+    private val photoDAO: PhotoDAO,
     private val matchMapper: MatchMapper,
     private val chatMessageMapper: ChatMessageMapper,
     private val balanceDatabase: BalanceDatabase,
@@ -81,8 +82,12 @@ class MatchRepositoryImpl(
             updateRecentChatMessage(match)
             updateUnread(match)
             matchDAO.insert(match)
-//            val newMatch = matchMapper.fromEntityToNewMatch(match, preferenceProvider.getAccountId(), )
-            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh())
+            val newMatch = matchMapper.fromEntityToNewMatch(
+                match,
+                preferenceProvider.getAccountId(),
+                photoDAO.findFirstPhotoKey()
+            )
+            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(newMatch))
         }
     }
 
@@ -108,6 +113,13 @@ class MatchRepositoryImpl(
             )
             listMatches.data?.let { data ->
                 saveMatches(data.matchDTOs)
+
+                // todo: remove me
+                saveSentChatMessages(
+                    data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
+                    data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
+
+
                 saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
                 updateSendingChatMessages(fetchedAt)
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
@@ -206,18 +218,18 @@ class MatchRepositoryImpl(
     private fun saveMatches(matchDTOs: List<MatchDTO>) {
         val matches = matchDTOs.map { matchMapper.fromDTOToEntity(it) }
         val swipedIds = mutableListOf<UUID>()
-        val clickedList = mutableListOf<Swipe>()
+        val swipes = mutableListOf<Swipe>()
 
         balanceDatabase.runInTransaction {
             matches.forEach {
                 updateMatch(it)
                 swipedIds.add(it.swipedId)
-                clickedList.add(Swipe(it.swipedId))
+                swipes.add(Swipe(it.swipedId))
             }
 
             matchDAO.insert(matches)
-            clickDAO.deleteInIds(swipedIds)
-            swipeDAO.insert(clickedList)
+            clickDAO.deleteInSwiperIds(swipedIds)
+            swipeDAO.insert(swipes)
         }
     }
 
@@ -352,7 +364,7 @@ class MatchRepositoryImpl(
 //                    active = false,
 //                    unmatched = false,
 //                    name = "user-$count",
-//                    repPhotoKey = "",
+//                    profilePhotoKey = "",
 //                    deleted = false,
 //                    updatedAt = OffsetDateTime.now()
 //                )
