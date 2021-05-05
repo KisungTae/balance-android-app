@@ -35,15 +35,10 @@ interface BalanceRepository {
     val cards: LiveData<Resource<List<CardResponse>>>
     fun fetchCards(reset: Boolean)
 
-    fun insertFCMToken(token: String)
-
-
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionResponse>
     suspend fun fetchQuestions(): Resource<List<QuestionResponse>>
 
-    // location
-    fun saveLocation(latitude: Double, longitude: Double)
 
     // photo
     suspend fun fetchPhotos(): Resource<List<Photo>>

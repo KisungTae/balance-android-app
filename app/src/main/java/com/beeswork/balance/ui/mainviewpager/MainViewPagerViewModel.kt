@@ -3,7 +3,7 @@ package com.beeswork.balance.ui.mainviewpager
 import androidx.lifecycle.ViewModel
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.match.MatchMapper
-import com.beeswork.balance.service.stomp.StompClient
+import com.beeswork.balance.data.network.service.stomp.StompClient
 
 class MainViewPagerViewModel(
     private val matchRepository: MatchRepository,

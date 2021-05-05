@@ -1,4 +1,4 @@
-package com.beeswork.balance.service.stomp
+package com.beeswork.balance.data.network.service.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -144,8 +144,7 @@ class StompClientImpl(
     override fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
         scope.launch {
             if (socketStatus == SocketStatus.CLOSED) connect()
-            while (socketStatus == SocketStatus.CONNECTING) {
-            }
+            while (socketStatus == SocketStatus.CONNECTING)
 
             if (socketStatus == SocketStatus.OPEN) {
                 val headers = mutableMapOf<String, String>()
@@ -191,7 +190,6 @@ class StompClientImpl(
 
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
-        private const val DEFAULT_ACK = "auto"
         private const val DEFAULT_HEART_BEAT = "0,0"
     }
 

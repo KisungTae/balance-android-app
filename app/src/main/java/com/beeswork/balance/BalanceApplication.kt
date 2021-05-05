@@ -18,6 +18,10 @@ import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepositoryImpl
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
+import com.beeswork.balance.data.database.repository.profile.ProfileRepository
+import com.beeswork.balance.data.database.repository.profile.ProfileRepositoryImpl
+import com.beeswork.balance.data.database.repository.setting.SettingRepository
+import com.beeswork.balance.data.database.repository.setting.SettingRepositoryImpl
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
 import com.beeswork.balance.data.network.rds.click.ClickRDS
@@ -30,7 +34,7 @@ import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
-import com.beeswork.balance.service.stomp.StompClientImpl
+import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
@@ -91,7 +95,10 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
 
+
         // Repository
+        bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance()) }
+        bind<SettingRepository>() with singleton { SettingRepositoryImpl(instance(), instance(), instance(), instance()) }
         bind<ClickRepository>() with singleton { ClickRepositoryImpl(instance(), instance(), instance(), instance()) }
 
         bind<ChatRepository>() with singleton {

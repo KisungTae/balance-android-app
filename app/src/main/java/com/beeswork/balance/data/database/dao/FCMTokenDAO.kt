@@ -14,8 +14,4 @@ interface FCMTokenDAO {
 
     @Query("update fcmToken set posted = 1 where id = ${FCMToken.ID}")
     fun sync()
-
-    @Query("select * from fcmToken")
-    fun get(): List<FCMToken>
-
 }

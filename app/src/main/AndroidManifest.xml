@@ -33,7 +33,7 @@
             android:theme="@style/Base.Theme.AppCompat"/>
 
         <service
-            android:name="com.beeswork.balance.service.firebase.BalanceFirebaseMessagingService"
+            android:name="com.beeswork.balance.data.network.service.fcm.FCMService"
             android:exported="false">
 
             <intent-filter>

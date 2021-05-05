@@ -7,7 +7,6 @@ import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "profile")
 data class Profile(
-
     val name: String,
     val birth: OffsetDateTime,
     val gender: Boolean,

@@ -131,8 +131,8 @@ interface BalanceAPI {
     @POST("swipe/click")
     suspend fun click(@Body clickBody: ClickBody): Response<ClickResponse>
 
-    @POST("account/fcm/token")
-    suspend fun postFCMToken(@Body fcmTokenBody: FCMTokenBody): Response<EmptyResponse>
+    @POST("push-token/fcm")
+    suspend fun postFCMToken(@Body postFcmTokenBody: PostFCMTokenBody): Response<EmptyResponse>
 
     @GET("match/list")
     suspend fun fetchMatches(
@@ -150,9 +150,9 @@ interface BalanceAPI {
         @Query(value = "fetchedAt") fetchedAt: String
     ): Response<MutableList<Click>>
 
-    @POST("account/location")
+    @POST("profile/location")
     suspend fun postLocation(
-        @Body locationBody: LocationBody
+        @Body postLocationBody: PostLocationBody
     ): Response<EmptyResponse>
 
     companion object {

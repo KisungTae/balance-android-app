@@ -1,12 +1,10 @@
-package com.beeswork.balance.service.stomp
+package com.beeswork.balance.data.network.service.stomp
 
 import androidx.lifecycle.LiveData
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.consumeAsFlow
 import java.util.*
 
 interface StompClient {

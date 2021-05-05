@@ -196,16 +196,6 @@ class BalanceRDSImpl(
         }
     }
 
-    override suspend fun postFCMToken(
-        accountId: String,
-        identityToken: String,
-        token: String
-    ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.postFCMToken(FCMTokenBody(accountId, identityToken, token))
-        }
-    }
-
     override suspend fun fetchMatches(
         accountId: String,
         identityToken: String,
@@ -234,25 +224,6 @@ class BalanceRDSImpl(
         }
     }
 
-    override suspend fun postLocation(
-        accountId: String,
-        identityToken: String,
-        latitude: Double,
-        longitude: Double,
-        updatedAt: String
-    ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.postLocation(
-                LocationBody(
-                    accountId,
-                    identityToken,
-                    80.0,
-                    "longitude",
-                    updatedAt
-                )
-            )
-        }
-    }
 
 }
 

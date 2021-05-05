@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.match.MatchMapper
-import com.beeswork.balance.service.stomp.StompClient
-import com.beeswork.balance.ui.match.MatchViewModel
+import com.beeswork.balance.data.network.service.stomp.StompClient
 
 class MainViewPagerViewModelFactory(
     private val matchRepository: MatchRepository,

@@ -20,7 +20,7 @@ import com.beeswork.balance.data.listener.MatchPagingRefreshListener
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.service.stomp.StompClient
+import com.beeswork.balance.data.network.service.stomp.StompClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -113,13 +113,6 @@ class MatchRepositoryImpl(
             )
             listMatches.data?.let { data ->
                 saveMatches(data.matchDTOs)
-
-                // todo: remove me
-                saveSentChatMessages(
-                    data.sentChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) },
-                    data.matchDTOs.map { matchMapper.fromDTOToEntity(it) })
-
-
                 saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
                 updateSendingChatMessages(fetchedAt)
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)

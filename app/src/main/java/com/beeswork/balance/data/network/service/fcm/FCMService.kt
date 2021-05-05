@@ -1,24 +1,31 @@
-package com.beeswork.balance.service.firebase
+package com.beeswork.balance.data.network.service.fcm
 
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.beeswork.balance.data.database.repository.BalanceRepository
+import com.beeswork.balance.data.database.repository.setting.SettingRepository
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.IntentAction
+import com.beeswork.balance.internal.util.safeLaunch
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
 
-class BalanceFirebaseMessagingService : FirebaseMessagingService(), KodeinAware {
+class FCMService : FirebaseMessagingService(), KodeinAware {
 
     override val kodein by closestKodein()
-    private val balanceRepository: BalanceRepository by instance()
+    private val settingRepository: SettingRepository by instance()
+
 
     override fun onNewToken(token: String) {
-
-//        balanceRepository.insertFCMToken(token)
+        CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
+            settingRepository.saveFCMToken(token)
+        }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {

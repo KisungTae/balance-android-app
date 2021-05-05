@@ -16,7 +16,7 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.service.stomp.StompClient
+import com.beeswork.balance.data.network.service.stomp.StompClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-    private lateinit var broadcastReceiver: BroadcastReceiver
+//    private lateinit var broadcastReceiver: BroadcastReceiver
     private val preferenceProvider: PreferenceProvider by instance()
     private val balanceRepository: BalanceRepository by instance()
     private lateinit var binding: ActivityMainBinding
@@ -53,11 +53,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         if (type != null) onReceiveFCMNotification(intent)
 
         val filter = IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter)
+//        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter)
     }
 
     override fun onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
+//        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
         super.onPause()
     }
 
@@ -72,13 +72,13 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 //    }
 
     private fun setupBroadcastReceiver() {
-        broadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                when (intent?.action) {
-                    IntentAction.RECEIVED_FCM_NOTIFICATION -> onReceiveFCMNotification(intent)
-                }
-            }
-        }
+//        broadcastReceiver = object : BroadcastReceiver() {
+//            override fun onReceive(context: Context?, intent: Intent?) {
+//                when (intent?.action) {
+//                    IntentAction.RECEIVED_FCM_NOTIFICATION -> onReceiveFCMNotification(intent)
+//                }
+//            }
+//        }
     }
 
     private fun onReceiveFCMNotification(intent: Intent?) {
