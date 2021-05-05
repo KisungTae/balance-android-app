@@ -24,6 +24,7 @@ import com.beeswork.balance.data.network.service.stomp.StompClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -88,7 +89,7 @@ class MatchRepositoryImpl(
                 photoDAO.findFirstPhotoKey()
             )
             matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(newMatch))
-        }
+        }.launchIn(scope)
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {

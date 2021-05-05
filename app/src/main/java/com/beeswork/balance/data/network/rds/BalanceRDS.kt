@@ -97,12 +97,6 @@ interface BalanceRDS {
         answers: Map<Int, Boolean>
     ): Resource<ClickResponse>
 
-    suspend fun postFCMToken(
-        accountId: String,
-        identityToken: String,
-        token: String
-    ): Resource<EmptyResponse>
-
     suspend fun fetchMatches(
         accountId: String,
         identityToken: String,
@@ -117,11 +111,4 @@ interface BalanceRDS {
         fetchedAt: String
     ): Resource<MutableList<Click>>
 
-    suspend fun postLocation(
-        accountId: String,
-        identityToken: String,
-        latitude: Double,
-        longitude: Double,
-        updatedAt: String
-    ): Resource<EmptyResponse>
 }

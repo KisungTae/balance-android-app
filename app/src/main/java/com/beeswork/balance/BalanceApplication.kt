@@ -30,6 +30,8 @@ import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.rds.report.ReportRDSImpl
+import com.beeswork.balance.data.network.rds.setting.SettingRDS
+import com.beeswork.balance.data.network.rds.setting.SettingRDSImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -82,7 +84,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
 
-
         // API
         bind() from singleton { BalanceAPI(instance()) }
 
@@ -91,6 +92,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
         bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
         bind<ClickRDS>() with singleton { ClickRDSImpl(instance()) }
+        bind<SettingRDS>() with singleton { SettingRDSImpl(instance()) }
+
 
 
         bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }

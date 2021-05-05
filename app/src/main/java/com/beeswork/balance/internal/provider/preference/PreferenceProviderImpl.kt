@@ -106,23 +106,23 @@ class PreferenceProviderImpl(
     override fun getAccountId(): UUID? {
 //      TODO: remove accountId and put null for default value
 
-//        val accountId = "136d4f5e-469c-4fc0-9d7d-d04c895bf99d"
-//        val accountId = "2bfe36f7-2be7-4001-aa6c-6e812f0f2d26"
+//        val accountId = "fbd1b88f-1499-41f0-8d20-0c31a7d73860"
+        val accountId = "698f2eb6-3fef-4ee3-9c7d-3e527740548e"
 
-//        val accountId = "039ddaa0-b861-457b-ab47-e4e3978ccc2f"
-        val accountId = "09e14ca0-7786-479e-a712-a46101ad7660"
+//        val accountId = "1b621dfe-63a5-4f8e-8d84-eb9bc72a47c5"
+//        val accountId = "09e14ca0-7786-479e-a712-a46101ad7660"
         return preferences.getString(ACCOUNT_ID, accountId)?.let { UUID.fromString(it) }
     }
 
     override fun getIdentityToken(): UUID? {
 //      TODO: remove identityToken and put null for default value
 
-//        val identityToken = "c5f74ffd-1254-4323-b13f-3ff1dfa42674"
-//        val identityToken = "4a7ce75f-bb6a-4798-8781-099bc03d450e"
+//        val identityToken = "1b621dfe-63a5-4f8e-8d84-eb9bc72a47c5"
+        val identityToken = "f4e06ba3-1e41-47c1-8999-f281c9a2e7b7"
 
 
 //        val identityToken = "39ef7176-3d2c-47f7-a651-f1d26c4bbfcf"
-        val identityToken = "e92c6c50-9dd5-4aea-8b34-9e892a5cb21a"
+//        val identityToken = "e92c6c50-9dd5-4aea-8b34-9e892a5cb21a"
         return preferences.getString(IDENTITY_TOKEN, identityToken)?.let { UUID.fromString(it) }
     }
 

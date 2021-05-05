@@ -144,20 +144,19 @@ class StompClientImpl(
     override fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
         scope.launch {
             if (socketStatus == SocketStatus.CLOSED) connect()
-            while (socketStatus == SocketStatus.CONNECTING)
+            while (socketStatus == SocketStatus.CONNECTING) {}
 
             if (socketStatus == SocketStatus.OPEN) {
                 val headers = mutableMapOf<String, String>()
                 headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
-                headers[StompHeader.ACCOUNT_ID] = "${preferenceProvider.getAccountId()?.toString()}"
                 headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"
                 headers[StompHeader.RECEIPT] = key.toString()
                 headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-                val chatMessageDTO = ChatMessageDTO(null, null, chatId, body, null, swipedId)
+                val chatMessageDTO = ChatMessageDTO(chatId, body, preferenceProvider.getAccountId(), swipedId)
                 val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
                 outgoing.send(stompFrame.compile())
             } else if (socketStatus == SocketStatus.CLOSED) {
-                chatMessageReceiptChannel.send(ChatMessageDTO(key, null, chatId, null, null, null))
+                chatMessageReceiptChannel.send(ChatMessageDTO(key, chatId))
             }
         }
     }

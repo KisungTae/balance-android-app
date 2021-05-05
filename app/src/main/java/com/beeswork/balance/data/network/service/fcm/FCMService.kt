@@ -21,7 +21,6 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
     override val kodein by closestKodein()
     private val settingRepository: SettingRepository by instance()
 
-
     override fun onNewToken(token: String) {
         CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
             settingRepository.saveFCMToken(token)
@@ -30,13 +29,14 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+        println(remoteMessage.data)
 
-        val intent = Intent().apply { action = IntentAction.RECEIVED_FCM_NOTIFICATION }
-
-        for ((key, value) in remoteMessage.data) {
-            intent.putExtra(key, value)
-        }
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+//        val intent = Intent().apply { action = IntentAction.RECEIVED_FCM_NOTIFICATION }
+//
+//        for ((key, value) in remoteMessage.data) {
+//            intent.putExtra(key, value)
+//        }
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     override fun onDeletedMessages() {
