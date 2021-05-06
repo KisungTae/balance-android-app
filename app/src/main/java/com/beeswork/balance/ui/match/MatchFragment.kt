@@ -55,7 +55,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         setupFetchMatchesLiveDataObserver()
         setupMatchPagingRefreshLiveData()
         search("")
-        viewModel.fetchMatches()
+//        viewModel.fetchMatches()
     }
 
     private fun setupMatchPagingRefreshLiveData() {
@@ -85,10 +85,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchSearch -> {
-                    viewModel.testFunction()
-                    showSearchToolBar()
-                }
+                R.id.miMatchSearch -> showSearchToolBar()
                 else -> false
             }
         }

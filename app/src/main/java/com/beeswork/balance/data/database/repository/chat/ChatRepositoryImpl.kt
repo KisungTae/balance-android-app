@@ -11,6 +11,7 @@ import com.beeswork.balance.data.listener.ChatMessagePagingRefreshListener
 import com.beeswork.balance.data.listener.ResourceListener
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -64,7 +65,7 @@ class ChatRepositoryImpl(
 
     init {
         collectChatMessageReceiptFlow()
-        collectChatMessageFlow()
+        collectChatMessageReceivedFlow()
     }
 
     private fun collectChatMessageReceiptFlow() {
@@ -103,15 +104,9 @@ class ChatRepositoryImpl(
         }
     }
 
-    private fun collectChatMessageFlow() {
-        stompClient.chatMessageFlow.onEach { chatMessageDTO ->
-            val chatMessage = chatMessageMapper.fromDTOToEntity(chatMessageDTO)
-            chatMessageDAO.insert(chatMessage)
-            refreshChatMessagePaging(
-                ChatMessagePagingRefresh.Type.RECEIVED,
-                chatMessage.chatId,
-                NewChatMessage(chatMessage.body)
-            )
+    private fun collectChatMessageReceivedFlow() {
+        stompClient.chatMessageReceivedFlow.onEach { chatMessageDTO ->
+            saveChatMessageReceived(chatMessageMapper.fromDTOToEntity(chatMessageDTO))
         }.launchIn(scope)
     }
 
@@ -161,6 +156,25 @@ class ChatRepositoryImpl(
             refreshChatMessagePaging(ChatMessagePagingRefresh.Type.DELETED, chatId)
         }
     }
+
+    override suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO) {
+        withContext(Dispatchers.IO) {
+            saveChatMessageReceived(chatMessageMapper.fromDTOToEntity(chatMessageDTO))
+        }
+    }
+
+    private fun saveChatMessageReceived(chatMessage: ChatMessage) {
+        chatMessageDAO.insert(chatMessage)
+        refreshChatMessagePaging(
+            ChatMessagePagingRefresh.Type.RECEIVED,
+            chatMessage.chatId,
+            NewChatMessage(chatMessage.body)
+        )
+    }
+
+
+
+
 
     override fun test() {
         refreshChatMessagePaging(

@@ -1,14 +1,11 @@
 package com.beeswork.balance.internal.mapper.chat
 
 import com.beeswork.balance.data.database.entity.ChatMessage
-import com.beeswork.balance.data.database.response.NewChatMessage
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.ui.chat.ChatMessageDomain
 import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
-import java.util.*
 
 class ChatMessageMapperImpl : ChatMessageMapper {
 
@@ -16,7 +13,7 @@ class ChatMessageMapperImpl : ChatMessageMapper {
         return ChatMessage(
             dto.chatId ?: 0,
             dto.body ?: "",
-            toChatMessageStatusFromMessageId(dto.key),
+            getStatusByKey(dto.key),
             dto.createdAt,
             dto.id ?: Long.MAX_VALUE,
             dto.key ?: 0,
@@ -36,8 +33,8 @@ class ChatMessageMapperImpl : ChatMessageMapper {
 
     }
 
-    private fun toChatMessageStatusFromMessageId(messageId: Long?): ChatMessageStatus {
-        return messageId?.let {
+    private fun getStatusByKey(key: Long?): ChatMessageStatus {
+        return key?.let {
             ChatMessageStatus.SENT
         } ?: ChatMessageStatus.RECEIVED
     }

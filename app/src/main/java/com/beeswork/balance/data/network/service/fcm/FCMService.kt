@@ -1,16 +1,20 @@
 package com.beeswork.balance.data.network.service.fcm
 
-import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import com.beeswork.balance.data.database.repository.click.ClickRepository
+import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
-import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.constant.IntentAction
+import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
+import com.beeswork.balance.data.network.response.match.MatchDTO
+import com.beeswork.balance.data.network.response.swipe.SwipeDTO
+import com.beeswork.balance.internal.constant.PushType
+import com.beeswork.balance.internal.constant.StompHeader
+import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.beeswork.balance.internal.util.safeLaunch
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
@@ -20,6 +24,9 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
 
     override val kodein by closestKodein()
     private val settingRepository: SettingRepository by instance()
+    private val matchRepository: MatchRepository by instance()
+    private val clickRepository: ClickRepository by instance()
+    private val chatRepository: ChatRepository by instance()
 
     override fun onNewToken(token: String) {
         CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
@@ -29,56 +36,27 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        println(remoteMessage.data)
-
-//        val intent = Intent().apply { action = IntentAction.RECEIVED_FCM_NOTIFICATION }
-//
-//        for ((key, value) in remoteMessage.data) {
-//            intent.putExtra(key, value)
-//        }
-//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        val pushType = remoteMessage.data[StompHeader.PUSH_TYPE]?.let {
+            PushType.valueOf(it)
+        }
+        when (pushType) {
+            PushType.CLICKED -> CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
+                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
+                clickRepository.saveClick(GsonProvider.gson.fromJson(json, SwipeDTO::class.java))
+            }
+            PushType.MATCHED -> CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
+                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
+                matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
+            }
+            PushType.CHAT_MESSAGE -> CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
+                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
+                chatRepository.saveChatMessageReceived(GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java))
+            }
+            else -> {}
+        }
     }
 
     override fun onDeletedMessages() {
-
         super.onDeletedMessages()
     }
-
-//    private fun showNotification() {
-//        val intent = Intent(this, MainActivity::class.java).apply {
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//        }
-//        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-//
-//        val builder = NotificationCompat.Builder(this, "CHANNEL_ID")
-//            .setSmallIcon(R.drawable.ic_baseline_account_circle)
-//            .setContentTitle("My notification")
-//            .setContentText("Hello World!")
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            // Set the intent that will fire when the user taps the notification
-//            .setContentIntent(pendingIntent)
-//            .setAutoCancel(true)
-//
-//        with(NotificationManagerCompat.from(this)) {
-//            // notificationId is a unique int for each notification that you must define
-//            notify(1, builder.build())
-//        }
-//    }
-//
-//
-//    private fun createNotificationChannel() {
-//        // Create the NotificationChannel, but only on API 26+ because
-//        // the NotificationChannel class is new and not in the support library
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//
-//            val importance = NotificationManager.IMPORTANCE_DEFAULT
-//            val channel = NotificationChannel("CHANNEL_ID", "name", importance).apply {
-//                description = "descriptionText"
-//            }
-//            // Register the channel with the system
-//            val notificationManager: NotificationManager =
-//                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//            notificationManager.createNotificationChannel(channel)
-//        }
-//    }
 }

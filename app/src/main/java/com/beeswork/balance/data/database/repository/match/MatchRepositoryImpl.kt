@@ -78,17 +78,7 @@ class MatchRepositoryImpl(
 
     private fun collectMatchedFlow() {
         stompClient.matchedFlow.onEach { matchDTO ->
-            val match = matchMapper.fromDTOToEntity(matchDTO)
-            updateMatch(match)
-            updateRecentChatMessage(match)
-            updateUnread(match)
-            matchDAO.insert(match)
-            val newMatch = matchMapper.fromEntityToNewMatch(
-                match,
-                preferenceProvider.getAccountId(),
-                photoDAO.findFirstPhotoKey()
-            )
-            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(newMatch))
+            saveMatch(matchMapper.fromDTOToEntity(matchDTO))
         }.launchIn(scope)
     }
 
@@ -296,6 +286,23 @@ class MatchRepositoryImpl(
             if (response.isSuccess()) unmatch(chatId)
             return@withContext response
         }
+    }
+
+    override suspend fun saveMatch(matchDTO: MatchDTO) {
+        withContext(Dispatchers.IO) { saveMatch(matchMapper.fromDTOToEntity(matchDTO)) }
+    }
+
+    private fun saveMatch(match: Match) {
+        updateMatch(match)
+        updateRecentChatMessage(match)
+        updateUnread(match)
+        matchDAO.insert(match)
+        val newMatch = matchMapper.fromEntityToNewMatch(
+            match,
+            preferenceProvider.getAccountId(),
+            photoDAO.findFirstPhotoKey()
+        )
+        matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(newMatch))
     }
 
     companion object {

@@ -44,7 +44,7 @@ class StompClientImpl(
     override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
 
     private var chatMessageChannel = Channel<ChatMessageDTO>()
-    override val chatMessageFlow = chatMessageChannel.consumeAsFlow()
+    override val chatMessageReceivedFlow = chatMessageChannel.consumeAsFlow()
 
     private var matchedChannel = Channel<MatchDTO>()
     override val matchedFlow = matchedChannel.consumeAsFlow()

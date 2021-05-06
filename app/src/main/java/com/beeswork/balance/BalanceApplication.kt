@@ -37,6 +37,8 @@ import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
+import com.beeswork.balance.internal.mapper.click.ClickMapper
+import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
@@ -70,6 +72,8 @@ class BalanceApplication : Application(), KodeinAware {
         // Mapper
         bind<MatchMapper>() with singleton { MatchMapperImpl() }
         bind<ChatMessageMapper>() with singleton { ChatMessageMapperImpl() }
+        bind<ClickMapper>() with singleton { ClickMapperImpl() }
+
 
         // Database
         bind() from singleton { BalanceDatabase(instance()) }
@@ -101,8 +105,24 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Repository
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance()) }
-        bind<SettingRepository>() with singleton { SettingRepositoryImpl(instance(), instance(), instance(), instance()) }
-        bind<ClickRepository>() with singleton { ClickRepositoryImpl(instance(), instance(), instance(), instance()) }
+        bind<SettingRepository>() with singleton {
+            SettingRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
+        bind<ClickRepository>() with singleton {
+            ClickRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                applicationScope
+            )
+        }
 
         bind<ChatRepository>() with singleton {
             ChatRepositoryImpl(
@@ -186,8 +206,6 @@ class BalanceApplication : Application(), KodeinAware {
                 .connectTimeout(NETWORK_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                 .build()
         }
-
-
 
 
         // FusedLocationProvider
