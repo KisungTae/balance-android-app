@@ -1,8 +1,6 @@
 package com.beeswork.balance.data.database.repository.chat
 
 import com.beeswork.balance.data.database.entity.ChatMessage
-import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
-import com.beeswork.balance.data.database.response.MatchPagingRefresh
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse

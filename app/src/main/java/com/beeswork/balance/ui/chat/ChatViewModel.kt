@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
@@ -49,7 +49,8 @@ class ChatViewModel(
             chatMessagePagingRefreshMediatorLiveData.postValue(it)
         }
         chatMessagePagingRefreshMediatorLiveData.addSource(chatRepository.chatMessagePagingRefreshFlow.asLiveData()) {
-            if (it.chatId == chatId) chatMessagePagingRefreshMediatorLiveData.postValue(it)
+            if (it.type == ChatMessagePagingRefresh.Type.FETCHED) chatMessagePagingRefreshMediatorLiveData.postValue(it)
+            else if (it.chatId == chatId) chatMessagePagingRefreshMediatorLiveData.postValue(it)
         }
     }
 

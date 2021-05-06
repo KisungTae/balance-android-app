@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 
 class MatchViewModelFactory(

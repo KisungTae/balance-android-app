@@ -5,10 +5,7 @@ import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
-import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
-import com.beeswork.balance.data.database.response.NewChatMessage
-import com.beeswork.balance.data.listener.ChatMessagePagingRefreshListener
-import com.beeswork.balance.data.listener.ResourceListener
+import com.beeswork.balance.data.database.common.ResourceListener
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
@@ -30,12 +27,9 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 class ChatRepositoryImpl(
-    private val chatRDS: ChatRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val chatMessageMapper: ChatMessageMapper,
-    private val balanceDatabase: BalanceDatabase,
-    private val preferenceProvider: PreferenceProvider,
     private val stompClient: StompClient,
     private val scope: CoroutineScope
 ) : ChatRepository {
@@ -88,9 +82,9 @@ class ChatRepositoryImpl(
     private fun refreshChatMessagePaging(
         type: ChatMessagePagingRefresh.Type,
         chatId: Long,
-        newChatMessage: NewChatMessage? = null
+        body: String? = null
     ) {
-        chatMessagePagingRefreshListener?.onRefresh(ChatMessagePagingRefresh(type, chatId, newChatMessage))
+        chatMessagePagingRefreshListener?.onRefresh(ChatMessagePagingRefresh(type, chatId, body))
     }
 
     private fun onMatchUnmatched(chatId: Long) {
@@ -168,7 +162,7 @@ class ChatRepositoryImpl(
         refreshChatMessagePaging(
             ChatMessagePagingRefresh.Type.RECEIVED,
             chatMessage.chatId,
-            NewChatMessage(chatMessage.body)
+            chatMessage.body
         )
     }
 
@@ -180,7 +174,7 @@ class ChatRepositoryImpl(
         refreshChatMessagePaging(
             ChatMessagePagingRefresh.Type.RECEIVED,
             352,
-            NewChatMessage("test chat message received")
+            "test chat message received"
         )
     }
 }

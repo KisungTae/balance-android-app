@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.BundleKey
@@ -162,8 +162,8 @@ class ChatFragment : BaseFragment(),
                     else setupChatMessagePagingDataObserver()
                 }
                 ChatMessagePagingRefresh.Type.RECEIVED -> {
-                    if (binding.rvChat.canScrollVertically(1)) it.newChatMessage?.let { newChatMessage ->
-                        showNewChatMessageSnackBar(newChatMessage.body)
+                    if (binding.rvChat.canScrollVertically(1)) it.body?.let { body ->
+                        showNewChatMessageSnackBar(body)
                     } else setupChatMessagePagingDataObserver()
                 }
                 else -> chatMessagePagingRefreshAdapter.refresh()

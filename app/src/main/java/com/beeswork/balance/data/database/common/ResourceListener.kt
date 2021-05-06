@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.listener
+package com.beeswork.balance.data.database.common
 
 import com.beeswork.balance.data.network.response.Resource
 

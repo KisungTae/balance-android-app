@@ -1,13 +1,9 @@
 package com.beeswork.balance.data.database.repository.match
 
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
-import com.beeswork.balance.data.database.response.MatchPagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.database.response.NewChatMessage
-import com.beeswork.balance.data.database.response.NewMatch
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.ReportReason
 import kotlinx.coroutines.flow.Flow

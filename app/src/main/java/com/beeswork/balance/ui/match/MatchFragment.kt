@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.match
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.core.widget.addTextChangedListener
@@ -7,7 +8,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import com.beeswork.balance.databinding.FragmentMatchBinding
+import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
+import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.chat.ChatFragment
@@ -18,6 +22,8 @@ import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.beeswork.balance.ui.dialog.NewMatchDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -34,6 +40,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>
     private lateinit var binding: FragmentMatchBinding
     private var searchJob: Job? = null
+    private var newMatchSnackBar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,17 +67,35 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     private fun setupMatchPagingRefreshLiveData() {
         viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, { pagingRefresh ->
-            pagingRefresh.newMatch?.let { newMatch ->
-                NewMatchDialog(
-                    newMatch.swipedId,
-                    newMatch.swipedName,
-                    newMatch.swipedProfilePhotoKey,
-                    newMatch.accountId,
-                    newMatch.profilePhotoKey
-                ).show(childFragmentManager, NewMatchDialog.TAG)
+            pagingRefresh.matchProfileTuple?.let { matchProfileTuple ->
+
             }
             matchPagingRefreshAdapter.refresh()
         })
+    }
+
+    private fun showNewMatchSnackBar() {
+        val snackBar = Snackbar.make(requireView(), "", Snackbar.LENGTH_LONG)
+        snackBar.view.setBackgroundColor(Color.TRANSPARENT)
+
+        snackBar.view.setOnClickListener {
+            println("dismiss newmatch snack bar")
+            newMatchSnackBar?.dismiss()
+        }
+        val binding = SnackBarNewMatchBinding.inflate(layoutInflater)
+//        binding.tvSnackBarNewChatMessage.text = body
+//        binding.llSnackBarChatMessage.setOnClickListener {
+//            setupChatMessagePagingDataObserver()
+//            newChatMessageSnackBar?.dismiss()
+//        }
+        val snackBarLayout = snackBar.view as Snackbar.SnackbarLayout
+        snackBarLayout.addView(binding.root, 0)
+        snackBarLayout.setPadding(10, 0, 10, 150)
+
+//
+//        newChatMessageSnackBar?.dismiss()
+//        newChatMessageSnackBar = snackBar
+        snackBar.show()
     }
 
     private fun setupMatchRecyclerView() {
@@ -85,7 +110,10 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchSearch -> showSearchToolBar()
+                R.id.miMatchSearch -> {
+                    showNewMatchSnackBar()
+                    showSearchToolBar()
+                }
                 else -> false
             }
         }

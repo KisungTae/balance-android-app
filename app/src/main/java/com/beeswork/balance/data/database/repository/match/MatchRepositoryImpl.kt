@@ -3,8 +3,7 @@ package com.beeswork.balance.data.database.repository.match
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.response.ChatMessagePagingRefresh
-import com.beeswork.balance.data.database.response.MatchPagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -15,8 +14,8 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.data.listener.ChatMessagePagingRefreshListener
-import com.beeswork.balance.data.listener.MatchPagingRefreshListener
+import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefreshListener
+import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.util.safeLet
@@ -40,7 +39,6 @@ class MatchRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val clickDAO: ClickDAO,
     private val swipeDAO: SwipeDAO,
-    private val photoDAO: PhotoDAO,
     private val matchMapper: MatchMapper,
     private val chatMessageMapper: ChatMessageMapper,
     private val balanceDatabase: BalanceDatabase,
@@ -78,7 +76,9 @@ class MatchRepositoryImpl(
 
     private fun collectMatchedFlow() {
         stompClient.matchedFlow.onEach { matchDTO ->
-            saveMatch(matchMapper.fromDTOToEntity(matchDTO))
+            val match = matchMapper.fromDTOToEntity(matchDTO)
+            saveMatch(match)
+            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(matchMapper.fromEntityToProfileTuple(match)))
         }.launchIn(scope)
     }
 
@@ -289,7 +289,11 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
-        withContext(Dispatchers.IO) { saveMatch(matchMapper.fromDTOToEntity(matchDTO)) }
+        withContext(Dispatchers.IO) {
+            val match = matchMapper.fromDTOToEntity(matchDTO)
+            saveMatch(match)
+            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(matchMapper.fromEntityToProfileTuple(match)))
+        }
     }
 
     private fun saveMatch(match: Match) {
@@ -297,12 +301,6 @@ class MatchRepositoryImpl(
         updateRecentChatMessage(match)
         updateUnread(match)
         matchDAO.insert(match)
-        val newMatch = matchMapper.fromEntityToNewMatch(
-            match,
-            preferenceProvider.getAccountId(),
-            photoDAO.findFirstPhotoKey()
-        )
-        matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(newMatch))
     }
 
     companion object {

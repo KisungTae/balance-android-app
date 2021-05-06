@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.match
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -15,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class MatchViewModel(
     private val matchRepository: MatchRepository,
-    private val matchMapper: MatchMapper
+    private val matchMapper: MatchMapper,
 ) : ViewModel() {
 
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
