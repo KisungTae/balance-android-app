@@ -186,7 +186,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { SwipeViewModelFactory(instance()) }
-        bind() from provider { ClickViewModelFactory(instance()) }
+        bind() from provider { ClickViewModelFactory(instance(), instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
 

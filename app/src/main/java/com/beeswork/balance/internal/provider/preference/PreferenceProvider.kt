@@ -20,4 +20,5 @@ interface PreferenceProvider {
     fun getAccountId(): UUID?
     fun getIdentityToken(): UUID?
     fun getMatchFetchedAt(): OffsetDateTime
+    fun getProfilePhotoKey(): String?
 }

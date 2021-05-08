@@ -1,52 +1,51 @@
 package com.beeswork.balance.ui.click
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.databinding.ItemClickBinding
-import com.beeswork.balance.internal.util.inflate
+import com.beeswork.balance.internal.util.GlideHelper
+import com.bumptech.glide.Glide
 
 
-class ClickPagedListAdapter(
+class ClickPagingDataAdapter(
     private val onClickListener: OnClickListener
-) : PagedListAdapter<Click, ClickPagedListAdapter.ViewHolder>(diffCallback) {
-
+) : PagingDataAdapter<ClickDomain, ClickPagingDataAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = parent.inflate(R.layout.item_click)
         return ViewHolder(
             ItemClickBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            parent.context,
             onClickListener
         )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position)!!)
-
+        getItem(position)?.let { holder.bind(it) }
     }
 
     companion object {
-
-        private val diffCallback = object : DiffUtil.ItemCallback<Click>() {
-            override fun areItemsTheSame(oldItem: Click, newItem: Click): Boolean =
+        private val diffCallback = object : DiffUtil.ItemCallback<ClickDomain>() {
+            override fun areItemsTheSame(oldItem: ClickDomain, newItem: ClickDomain): Boolean =
                 oldItem.swiperId == newItem.swiperId
 
-            override fun areContentsTheSame(oldItem: Click, newItem: Click): Boolean =
+            override fun areContentsTheSame(oldItem: ClickDomain, newItem: ClickDomain): Boolean =
                 oldItem == newItem
         }
     }
 
     interface OnClickListener {
-        fun onSwipe(swiperId: String)
+        fun onSelect(position: Int)
     }
 
     class ViewHolder(
         private val binding: ItemClickBinding,
+        private val context: Context,
         private val onClickListener: OnClickListener
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
@@ -54,14 +53,17 @@ class ClickPagedListAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(click: Click) {
-//            itemView.tag = clicker.id
-//            itemView.tvClicked.text = clicker.id.toString()
-//            itemView.ivClicked.setImageResource(R.drawable.person1)
+        fun bind(click: ClickDomain) {
+            Glide.with(context)
+                .load(R.drawable.person3)
+                .apply(GlideHelper.profilePhotoGlideOptions())
+                .into(binding.ivClick)
+//            binding.tvClicked.text = clicker.id.toString()
+//            binding.ivClicked.setImageResource(R.drawable.person1)
         }
 
         override fun onClick(v: View?) {
-            onClickListener.onSwipe(v?.tag as String)
+            onClickListener.onSelect(absoluteAdapterPosition)
         }
     }
 }

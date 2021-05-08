@@ -111,7 +111,7 @@ class MatchRepositoryImpl(
                 chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
                 matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
             }
-            return@withContext Resource.toEmptyResponse(listMatches)
+            return@withContext listMatches.toEmptyResponse()
         }
     }
 

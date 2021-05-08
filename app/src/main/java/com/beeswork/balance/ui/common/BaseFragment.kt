@@ -74,6 +74,12 @@ abstract class BaseFragment : Fragment() {
         )
     }
 
+    protected fun showErrorDialog(
+
+    ) {
+
+    }
+
 
 }
 

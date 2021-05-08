@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.data.network.response.swipe.SwipeDTO
+import com.beeswork.balance.data.network.response.swipe.ClickDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PushType
@@ -49,7 +49,7 @@ class StompClientImpl(
     private var matchedChannel = Channel<MatchDTO>()
     override val matchedFlow = matchedChannel.consumeAsFlow()
 
-    private var clickedChannel = Channel<SwipeDTO>()
+    private var clickedChannel = Channel<ClickDTO>()
     override val clickedFlow = clickedChannel.consumeAsFlow()
 
     private val _webSocketEventLiveData = MutableLiveData<WebSocketEvent>()
@@ -114,7 +114,7 @@ class StompClientImpl(
                 chatMessageChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java))
             }
             PushType.CLICKED -> scope.launch {
-                clickedChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, SwipeDTO::class.java))
+                clickedChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java))
             }
             PushType.MATCHED -> scope.launch {
                 matchedChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java))

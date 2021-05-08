@@ -1,5 +1,6 @@
 package com.beeswork.balance.internal.constant
 
+import com.beeswork.balance.internal.util.safeLet
 import java.util.*
 
 class EndPoint {
@@ -12,13 +13,14 @@ class EndPoint {
         const val WEB_SOCKET_ENDPOINT = "ws://192.168.1.92:8081/chat"
         const val STOMP_SEND_ENDPOINT = "/app/chat/send"
 
-//        const val ACCOUNT_SERVICE_ENDPOINT = "http://10.0.2.2:8080/"
+        const val ACCOUNT_SERVICE_ENDPOINT = "http://10.0.2.2:8080/"
 //        const val ACCOUNT_SERVICE_ENDPOINT = "http://192.168.1.100:8081/"
-        const val ACCOUNT_SERVICE_ENDPOINT = "http://192.168.1.92:8081/"
+//        const val ACCOUNT_SERVICE_ENDPOINT = "http://192.168.1.92:8081/"
 
-        fun ofPhotoBucket(accountId: UUID, photoKey: String): String {
-//            return "$PHOTO_BUCKET/$accountId/$photoKey"
-            return "$PHOTO_BUCKET/$photoKey"
+        fun ofPhoto(accountId: UUID?, photoKey: String?): String? {
+            return safeLet(accountId, photoKey) { id, key ->
+                return@safeLet "$PHOTO_BUCKET/$id/$key"
+            }
         }
 
         fun ofAccountProfilePhoto() {

@@ -9,20 +9,7 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
-const val GENDER = "gender"
-const val MIN_AGE = "minAge"
-const val MAX_AGE = "maxAge"
-const val DISTANCE = "distance"
-const val MATCH_FETCHED_AT = "matchFetchedAt"
-const val ACCOUNT_ID = "accountId"
-const val IDENTITY_TOKEN = "identityToken"
 
-
-const val DEFAULT_DISTANCE = 10f
-const val DEFAULT_MIN_AGE = 20f
-const val DEFAULT_MAX_AGE = 100f
-const val DEFAULT_GENDER = true
-const val DEFAULT_FETCHED_AT = "2020-01-01T10:06:26.032+11:00"
 
 
 class PreferenceProviderImpl(
@@ -106,23 +93,23 @@ class PreferenceProviderImpl(
     override fun getAccountId(): UUID? {
 //      TODO: remove accountId and put null for default value
 
-//        val accountId = "fbd1b88f-1499-41f0-8d20-0c31a7d73860"
+        val accountId = "fbd1b88f-1499-41f0-8d20-0c31a7d73860"
 //        val accountId = "698f2eb6-3fef-4ee3-9c7d-3e527740548e"
 
 //        val accountId = "1b621dfe-63a5-4f8e-8d84-eb9bc72a47c5"
-        val accountId = "5b4525ba-b325-4752-ae0e-00ece9201d3b"
+//        val accountId = "5b4525ba-b325-4752-ae0e-00ece9201d3b"
         return preferences.getString(ACCOUNT_ID, accountId)?.let { UUID.fromString(it) }
     }
 
     override fun getIdentityToken(): UUID? {
 //      TODO: remove identityToken and put null for default value
 
-//        val identityToken = "1b621dfe-63a5-4f8e-8d84-eb9bc72a47c5"
+        val identityToken = "1b621dfe-63a5-4f8e-8d84-eb9bc72a47c5"
 //        val identityToken = "f4e06ba3-1e41-47c1-8999-f281c9a2e7b7"
 
 
 //        val identityToken = "39ef7176-3d2c-47f7-a651-f1d26c4bbfcf"
-        val identityToken = "925e289f-35fc-4ad5-93c8-82b541df2c82"
+//        val identityToken = "925e289f-35fc-4ad5-93c8-82b541df2c82"
         return preferences.getString(IDENTITY_TOKEN, identityToken)?.let { UUID.fromString(it) }
     }
 
@@ -134,4 +121,25 @@ class PreferenceProviderImpl(
         }
     }
 
+    override fun getProfilePhotoKey(): String? {
+        return preferences.getString(PROFILE_PHOTO_KEY, null)
+    }
+
+    companion object {
+        const val GENDER = "gender"
+        const val MIN_AGE = "minAge"
+        const val MAX_AGE = "maxAge"
+        const val DISTANCE = "distance"
+        const val MATCH_FETCHED_AT = "matchFetchedAt"
+        const val ACCOUNT_ID = "accountId"
+        const val IDENTITY_TOKEN = "identityToken"
+        const val PROFILE_PHOTO_KEY = "profilePhotoKey"
+
+        const val DEFAULT_DISTANCE = 10f
+        const val DEFAULT_MIN_AGE = 20f
+        const val DEFAULT_MAX_AGE = 100f
+        const val DEFAULT_GENDER = true
+        const val DEFAULT_FETCHED_AT = "2020-01-01T10:06:26.032+11:00"
+
+    }
 }

@@ -20,7 +20,7 @@
     <string name="no_internet_connectivity_exception">인터넷이 연결되지 않았습니다</string>
     <string name="connect_exception">서버에 연결할수 없습니다.</string>
 
-    <string name="recent_chat_message_new_match">새로운 매치! 상대방에게 메세지를 보내보세요</string>
+    <string name="recent_chat_message_new_match">상대방에게 메세지를 보내보세요</string>
     <string name="recent_chat_message_invalid_match">상대방이 채팅방을 나갔습니다</string>
 
     <string name="match_unmatched_exception">상대방이 떠난 채팅방입니다.</string>
@@ -81,6 +81,9 @@
     <string name="report_dialog_other_button_title">기타 다른이유</string>
     <string name="report_dialog_detail_hint">자세한 경위를 설명해주세요</string>
     <string name="report_dialog_submit_button_title">제출하기</string>
+    <string name="new_match_snack_bar_iv_description">match profile photo</string>
+    <string name="new_match_snack_bar_my_iv_description">my profile photo</string>
+    <string name="new_match_snack_bar_title">새로운 매치</string>
 
 
 </resources>

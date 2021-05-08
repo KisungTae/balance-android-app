@@ -7,11 +7,15 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Click
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 
 @Dao
 interface ClickDAO {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(click: Click)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(clicks: List<Click>)
@@ -33,4 +37,13 @@ interface ClickDAO {
 
     @Query("select * from click")
     fun get(): List<Click>
+
+    @Query("select * from click order by updatedAt desc limit :loadSize offset :startPosition ")
+    fun findAllPaged(loadSize: Int, startPosition: Int): List<Click>
+
+    @Query("select 1 from click")
+    fun changed(): Flow<Boolean>
+
+    @Query("delete from click")
+    fun delete()
 }

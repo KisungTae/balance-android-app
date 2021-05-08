@@ -13,7 +13,11 @@ import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
@@ -29,6 +33,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import java.util.*
 
 class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchListener,
     ErrorDialog.OnRetryListener, ViewPagerChildFragment {
@@ -41,6 +46,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private lateinit var binding: FragmentMatchBinding
     private var searchJob: Job? = null
     private var newMatchSnackBar: Snackbar? = null
+    private val preferenceProvider: PreferenceProvider by instance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,27 +80,40 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         })
     }
 
-    private fun showNewMatchSnackBar() {
-        val snackBar = Snackbar.make(requireView(), "", Snackbar.LENGTH_LONG)
-        snackBar.view.setBackgroundColor(Color.TRANSPARENT)
-
-        snackBar.view.setOnClickListener {
-            println("dismiss newmatch snack bar")
-            newMatchSnackBar?.dismiss()
-        }
+    private fun showNewMatchSnackBar(matchProfileTuple: MatchProfileTuple) {
         val binding = SnackBarNewMatchBinding.inflate(layoutInflater)
-//        binding.tvSnackBarNewChatMessage.text = body
-//        binding.llSnackBarChatMessage.setOnClickListener {
-//            setupChatMessagePagingDataObserver()
-//            newChatMessageSnackBar?.dismiss()
-//        }
-        val snackBarLayout = snackBar.view as Snackbar.SnackbarLayout
-        snackBarLayout.addView(binding.root, 0)
-        snackBarLayout.setPadding(10, 0, 10, 150)
+        val topPadding = resources.getDimension(R.dimen.snack_bar_new_match_top_padding).toInt()
+        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
+        snackBar.view.setOnClickListener { newMatchSnackBar?.dismiss() }
 
-//
-//        newChatMessageSnackBar?.dismiss()
-//        newChatMessageSnackBar = snackBar
+//        val swiperProfilePhoto = EndPoint.ofPhoto(
+//            preferenceProvider.getAccountId(),
+//            preferenceProvider.getProfilePhotoKey()
+//        )
+//        val swipedProfilePhoto = EndPoint.ofPhoto(matchProfileTuple.swipedId, matchProfileTuple.profilePhotoKey)
+
+        val swiperProfilePhoto = R.drawable.person2
+        val swipedProfilePhoto = R.drawable.person1
+
+        Glide.with(requireContext())
+            .load(swiperProfilePhoto)
+            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+            .into(binding.ivNewMatchSnackBarSwiper)
+
+        Glide.with(requireContext())
+            .load(swipedProfilePhoto)
+            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+            .into(binding.ivNewMatchSnackBarSwiped)
+
+        snackBar.addCallback(object : Snackbar.Callback() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+                if (transientBottomBar === newMatchSnackBar) newMatchSnackBar = null
+            }
+        })
+
+        newMatchSnackBar?.dismiss()
+        newMatchSnackBar = snackBar
         snackBar.show()
     }
 
@@ -110,10 +129,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miMatchSearch -> {
-                    showNewMatchSnackBar()
-                    showSearchToolBar()
-                }
+                R.id.miMatchSearch -> showSearchToolBar()
                 else -> false
             }
         }
@@ -145,14 +161,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) ErrorDialog(
-                it.error,
-                errorTitle(),
-                it.errorMessage,
-                RequestCode.FETCH_MATCHES,
-                this@MatchFragment,
-                null
-            ).show(childFragmentManager, FetchErrorDialog.TAG)
+            if (it.isError() && validateAccount(it.error, it.errorMessage))
+                showErrorDialog(it.error, errorTitle(), it.errorMessage, RequestCode.FETCH_MATCHES, this@MatchFragment)
         })
     }
 

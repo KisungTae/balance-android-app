@@ -34,6 +34,16 @@ class Resource<out T>(
         return this.status == Status.ERROR
     }
 
+    fun toEmptyResponse(): Resource<EmptyResponse> {
+        return Resource(
+            this.status,
+            EmptyResponse(),
+            this.errorMessage,
+            this.error,
+            this.fieldErrorMessages
+        )
+    }
+
     enum class Status {
         SUCCESS,
         ERROR,
@@ -69,16 +79,6 @@ class Resource<out T>(
 
         fun <T> loading(): Resource<T> {
             return Resource(Status.LOADING, null, null, null, null)
-        }
-
-        fun <T> toEmptyResponse(resource: Resource<T>): Resource<EmptyResponse> {
-            return Resource(
-                resource.status,
-                EmptyResponse(),
-                resource.errorMessage,
-                resource.error,
-                resource.fieldErrorMessages
-            )
         }
 
     }

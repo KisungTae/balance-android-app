@@ -3,14 +3,15 @@
     android:id="@+id/llSnackBarChatMessage"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/sh_round_box_light_grey"
+    android:background="@drawable/sh_round_box"
+    android:backgroundTint="@color/LightGrey"
     android:orientation="vertical"
     android:padding="10dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="3dp"
         android:text="@string/snack_bar_title_new_chat_message"
         android:textColor="@color/TextGrey"
         android:textSize="@dimen/text_small_size" />

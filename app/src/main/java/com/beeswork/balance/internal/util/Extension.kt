@@ -16,10 +16,7 @@ import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
 import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import com.beeswork.balance.ui.dialog.ReportDialog
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
@@ -104,5 +101,14 @@ fun View.getText(): String {
         is Button -> this.text.toString()
         is TextView -> this.text.toString()
         else -> ""
+    }
+}
+
+fun <T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>> {
+
+    return lazy {
+        GlobalScope.async(start = CoroutineStart.LAZY) {
+            block.invoke(this)
+        }
     }
 }

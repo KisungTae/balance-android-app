@@ -6,7 +6,7 @@ import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.data.network.response.swipe.SwipeDTO
+import com.beeswork.balance.data.network.response.swipe.ClickDTO
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.gson.GsonProvider
@@ -42,7 +42,7 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
         when (pushType) {
             PushType.CLICKED -> CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                clickRepository.saveClick(GsonProvider.gson.fromJson(json, SwipeDTO::class.java))
+                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
             }
             PushType.MATCHED -> CoroutineScope(Dispatchers.IO).safeLaunch<Any>(null) {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)

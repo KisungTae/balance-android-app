@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.chat
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
@@ -287,19 +289,19 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun showNewChatMessageSnackBar(body: String) {
-        val snackBar = Snackbar.make(requireView(), "", Snackbar.LENGTH_SHORT)
-        snackBar.view.setBackgroundColor(Color.TRANSPARENT)
-
-        val binding = SnackBarNewChatMessageBinding.inflate(layoutInflater)
-        binding.tvSnackBarNewChatMessage.text = body
-        binding.llSnackBarChatMessage.setOnClickListener {
+        val snackBarBinding = SnackBarNewChatMessageBinding.inflate(layoutInflater)
+        val snackBar = SnackBarHelper.make(binding.clChatSnackBarPlaceHolder, 0, 0, snackBarBinding.root)
+        snackBarBinding.tvSnackBarNewChatMessage.text = body
+        snackBarBinding.llSnackBarChatMessage.setOnClickListener {
             setupChatMessagePagingDataObserver()
             newChatMessageSnackBar?.dismiss()
         }
-        val snackBarLayout = snackBar.view as Snackbar.SnackbarLayout
-        snackBarLayout.addView(binding.root, 0)
-        snackBarLayout.setPadding(10, 0, 10, 150)
-
+        snackBar.addCallback(object : Snackbar.Callback() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+                if (transientBottomBar === newChatMessageSnackBar) newChatMessageSnackBar = null
+            }
+        })
         newChatMessageSnackBar?.dismiss()
         newChatMessageSnackBar = snackBar
         snackBar.show()

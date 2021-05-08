@@ -14,6 +14,7 @@ import com.beeswork.balance.databinding.ItemChatMessageSentBinding
 import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
+import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -23,7 +24,7 @@ import org.threeten.bp.LocalTime
 
 class ChatMessagePagingAdapter(
     private val chatMessageSentListener: ChatMessageSentListener
-): PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
 
     private var profilePhotoEndPoint: String? = null
 
@@ -163,17 +164,11 @@ class ChatMessagePagingAdapter(
             binding.tvChatMessageReceivedCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
             setMarginTop(binding.root, marginTop, context)
             profilePhotoEndPoint?.let {
-                Glide.with(context).load(it).apply(glideRequestOptions()).into(binding.ivChatMessageReceivedProfilePhoto)
+                Glide.with(context)
+                    .load(it)
+                    .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+                    .into(binding.ivChatMessageReceivedProfilePhoto)
             }
-        }
-
-        private fun glideRequestOptions(): RequestOptions {
-            return RequestOptions()
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .priority(Priority.HIGH)
-                .placeholder(R.drawable.ic_baseline_account_circle)
-                .error(R.drawable.ic_baseline_account_circle)
-                .circleCrop()
         }
     }
 

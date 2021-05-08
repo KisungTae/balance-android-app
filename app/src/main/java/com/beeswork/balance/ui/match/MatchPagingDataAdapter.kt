@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemMatchBinding
 import com.beeswork.balance.internal.constant.DateTimePattern
+import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.request.RequestOptions
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZonedDateTime
@@ -93,7 +94,10 @@ class MatchPagingDataAdapter(
 //            val photoEndPoint = profilePhotoKey?.let {
 //                EndPoint.ofPhotoBucket(matchedId, profilePhotoKey)
 //            } ?: R.drawable.ic_baseline_account_circle
-//            Glide.with(context).load(photoEndPoint).apply(glideRequestOptions()).into(binding.ivMatchProfilePicture)
+//            Glide.with(context)
+//                .load(photoEndPoint)
+//                .apply(GlideHelper.profilePhotoGlideOptions())
+//                .into(binding.ivMatchProfilePicture)
         }
 
         private fun setupTextColor(unmatched: Boolean) {
@@ -108,12 +112,6 @@ class MatchPagingDataAdapter(
             return if (matchDomain.unmatched) context.getString(R.string.recent_chat_message_invalid_match)
             else if (!matchDomain.active) context.getString(R.string.recent_chat_message_new_match)
             else matchDomain.recentChatMessage
-        }
-
-        private fun glideRequestOptions(): RequestOptions {
-            return RequestOptions().placeholder(R.drawable.ic_baseline_account_circle)
-                .error(R.drawable.ic_baseline_account_circle)
-                .circleCrop()
         }
 
         override fun onClick(view: View?) {
