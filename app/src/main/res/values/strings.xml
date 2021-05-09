@@ -25,7 +25,7 @@
 
     <string name="match_unmatched_exception">상대방이 떠난 채팅방입니다.</string>
 
-
+    <string name="fetch_clicks_exception_title">클릭정보를 가져오는데 실패했습니다</string>
 
 
     <string name="question_loading">질문을 가져오고있습니다</string>
@@ -85,5 +85,10 @@
     <string name="new_match_snack_bar_my_iv_description">my profile photo</string>
     <string name="new_match_snack_bar_title">새로운 매치</string>
 
+    <string name="click_header_title">내 취향에 클릭한 사람들 \n 상대방 취향에 클릭하고 새로운 만남을 만들어보세요</string>
+    <string name="click_tool_bar_title">CLICK</string>
+    <string name="new_click_snack_bar_profile_picture">new click profile picture</string>
+    <string name="new_click_snack_bar_title">새로운 클릭</string>
+    <string name="new_click_snack_bar_body">상대방 취향에 클릭하고 새로운 만남을 만들어보세요</string>
 
 </resources>

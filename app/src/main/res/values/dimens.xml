@@ -9,7 +9,9 @@
     <dimen name="text_medium_size">15sp</dimen>
     <dimen name="text_large_size">17sp</dimen>
     <dimen name="chat_message_text_view_max_width">220dp</dimen>
-    <dimen name="snack_bar_new_match_top_padding">10dp</dimen>
+    <dimen name="snack_bar_top_padding">10dp</dimen>
     <dimen name="snack_bar_new_chat_message_bottom_padding">10dp</dimen>
+    <dimen name="item_click_round">10dp</dimen>
+
 
 </resources>

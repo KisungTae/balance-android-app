@@ -18,6 +18,6 @@ interface MatchRDS {
     suspend fun listMatches(
         accountId: UUID?,
         identityToken: UUID?,
-        matchFetchedAt: OffsetDateTime
+        fetchedAt: OffsetDateTime
     ): Resource<ListMatchesDTO>
 }

@@ -9,6 +9,7 @@ interface PreferenceProvider {
     fun putAccountId(accountId: UUID?)
     fun putIdentityTokenId(identityToken: UUID?)
     fun putMatchFetchedAt(updatedAt: OffsetDateTime?)
+    fun putClickFetchedAt(updatedAt: OffsetDateTime?)
 
     fun getGender(): Boolean
     fun getMinAgeBirthYear(): Int
@@ -20,5 +21,6 @@ interface PreferenceProvider {
     fun getAccountId(): UUID?
     fun getIdentityToken(): UUID?
     fun getMatchFetchedAt(): OffsetDateTime
+    fun getClickFetchedAt(): OffsetDateTime
     fun getProfilePhotoKey(): String?
 }

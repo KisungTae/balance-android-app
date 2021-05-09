@@ -4,7 +4,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class PagingRefreshAdapter<T: Any, VH: RecyclerView.ViewHolder>(
-    private val recyclerView: RecyclerView,
+    recyclerView: RecyclerView,
     private val pagingDataAdapter: PagingDataAdapter<T, VH>
 ): RecyclerView.OnScrollListener() {
 
@@ -30,10 +30,8 @@ class PagingRefreshAdapter<T: Any, VH: RecyclerView.ViewHolder>(
 
     private fun refreshAdapter() {
         if (!scrolling && refresh) {
-//            val scrollToBottom = !recyclerView.canScrollVertically(1)
             pagingDataAdapter.refresh()
             refresh = false
-//            if (scrollToBottom) recyclerView.scrollToPosition(0)
         }
     }
 

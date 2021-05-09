@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/BackgroundWhite"
+        app:contentInsetStart="0dp">
+
+        <com.beeswork.balance.ui.common.GradientTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/click_tool_bar_title"
+            android:textAlignment="center"
+            android:textSize="@dimen/tool_bar_title_large_text_size"
+            android:textStyle="bold"
+            app:endColor="@color/TextWhite"
+            app:startColor="@color/Primary" />
+    </androidx.appcompat.widget.Toolbar>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvClick"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
         tools:listitem="@layout/item_click" />
 
 </LinearLayout>

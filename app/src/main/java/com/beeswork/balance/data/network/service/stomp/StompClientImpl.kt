@@ -119,6 +119,7 @@ class StompClientImpl(
             PushType.MATCHED -> scope.launch {
                 matchedChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java))
             }
+            else -> { }
         }
     }
 

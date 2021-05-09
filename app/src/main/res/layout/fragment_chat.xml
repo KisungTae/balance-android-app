@@ -107,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:adjustViewBounds="true"
-                    android:background="@drawable/sh_round_box_primary_solid"
+                    android:background="@drawable/sh_round_box_primary"
                     android:contentDescription="@string/chat_message_send_button_description"
                     android:padding="8dp"
                     android:scaleType="fitCenter"

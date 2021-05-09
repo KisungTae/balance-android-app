@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
+import com.beeswork.balance.data.network.response.swipe.ClickDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -20,10 +21,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.util.*
 
-//const val NETWORK_READ_TIMEOUT = 100L
-//const val NETWORK_CONNECTION_TIMEOUT = 100L
-
 interface BalanceAPI {
+
+    @GET("click/list")
+    suspend fun listClicks(
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?,
+        @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
+    ): Response<List<ClickDTO>>
 
     @POST("match/unmatch")
     suspend fun unmatch(
@@ -49,7 +54,7 @@ interface BalanceAPI {
     suspend fun listMatches(
         @Query(value = "accountId") accountId: UUID?,
         @Query(value = "identityToken") identityToken: UUID?,
-        @Query(value = "fetchedAt") matchFetchedAt: OffsetDateTime
+        @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
     ): Response<ListMatchesDTO>
 
 

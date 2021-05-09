@@ -14,6 +14,7 @@
     <!-- search bar background, unselected icon,    -->
     <color name="LightGrey">#ededed</color>
     <color name="Grey">#E4E4E4</color>
-
+    <color name="GreyDark">#B8B8B8</color>
+    <color name="Black">#000000</color>
     <color name="BackgroundWhite">#FFFFFF</color>
 </resources>

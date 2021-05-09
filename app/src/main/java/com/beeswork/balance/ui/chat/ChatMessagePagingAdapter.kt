@@ -61,25 +61,16 @@ class ChatMessagePagingAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let {
             when (holder.itemViewType) {
-                ChatMessageStatus.SEPARATOR.ordinal -> {
-                    (holder as SeparatorViewHolder).bind(
-                        it,
-                        marginTop(holder.itemViewType, position)
-                    )
-                }
-                ChatMessageStatus.RECEIVED.ordinal -> {
-                    (holder as ReceivedViewHolder).bind(
-                        it,
-                        marginTop(holder.itemViewType, position),
-                        profilePhotoEndPoint
-                    )
-                }
-                else -> {
-                    (holder as SentViewHolder).bind(
-                        it,
-                        marginTop(holder.itemViewType, position)
-                    )
-                }
+                ChatMessageStatus.SEPARATOR.ordinal -> (holder as SeparatorViewHolder).bind(
+                    it,
+                    marginTop(holder.itemViewType, position)
+                )
+                ChatMessageStatus.RECEIVED.ordinal -> (holder as ReceivedViewHolder).bind(
+                    it,
+                    marginTop(holder.itemViewType, position),
+                    profilePhotoEndPoint
+                )
+                else -> (holder as SentViewHolder).bind(it, marginTop(holder.itemViewType, position))
             }
         }
     }

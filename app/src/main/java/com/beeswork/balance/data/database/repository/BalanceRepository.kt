@@ -16,7 +16,6 @@ interface BalanceRepository {
     val balanceGame: LiveData<Resource<BalanceGameResponse>>
     val clickResponse: LiveData<Resource<ClickResponse>>
 
-    suspend fun getClickedList(): DataSource.Factory<Int, Click>
     suspend fun getClickedCount(): LiveData<Int>
 
     fun fetchClickedList()

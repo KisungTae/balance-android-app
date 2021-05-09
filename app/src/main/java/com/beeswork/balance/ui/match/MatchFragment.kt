@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.match
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.core.widget.addTextChangedListener
@@ -10,10 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import com.beeswork.balance.databinding.FragmentMatchBinding
-import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
@@ -23,8 +20,6 @@ import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.dialog.FetchErrorDialog
-import com.beeswork.balance.ui.dialog.NewMatchDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -74,7 +69,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private fun setupMatchPagingRefreshLiveData() {
         viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, { pagingRefresh ->
             pagingRefresh.matchProfileTuple?.let { matchProfileTuple ->
-
+                showNewMatchSnackBar(matchProfileTuple)
             }
             matchPagingRefreshAdapter.refresh()
         })
@@ -82,7 +77,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     private fun showNewMatchSnackBar(matchProfileTuple: MatchProfileTuple) {
         val binding = SnackBarNewMatchBinding.inflate(layoutInflater)
-        val topPadding = resources.getDimension(R.dimen.snack_bar_new_match_top_padding).toInt()
+        val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
         val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
         snackBar.view.setOnClickListener { newMatchSnackBar?.dismiss() }
 

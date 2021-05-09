@@ -1,18 +1,28 @@
 package com.beeswork.balance.ui.click
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentClickBinding
+import com.beeswork.balance.databinding.SnackBarNewClickBinding
+import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
-import com.beeswork.balance.ui.dialog.FetchErrorDialog
+import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -23,15 +33,16 @@ class ClickFragment : BaseFragment(),
     KodeinAware,
     ClickPagingDataAdapter.OnClickListener,
     BalanceGameDialog.BalanceGameListener,
-    FetchErrorDialog.OnRetryListener,
+    ErrorDialog.OnRetryListener,
     ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ClickViewModelFactory by instance()
     private lateinit var viewModel: ClickViewModel
     private lateinit var clickPagingDataAdapter: ClickPagingDataAdapter
-    private lateinit var clickPagingRefreshAdapter: PagingRefreshAdapter<ClickDomain, ClickPagingDataAdapter.ViewHolder>
+    private lateinit var clickPagingRefreshAdapter: PagingRefreshAdapter<ClickDomain, RecyclerView.ViewHolder>
     private lateinit var binding: FragmentClickBinding
+    private var newClickSnackBar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,53 +57,88 @@ class ClickFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
+        viewModel.fetchClicks()
     }
 
     private fun bindUI() = lifecycleScope.launch {
         setupClickRecyclerView()
+        setupClickInvalidationObserver()
+        setupClickPagingDataObserver()
+        setupFetchClicksObserver()
+        setupNewClickLiveDataObserver()
+    }
+
+    private fun setupNewClickLiveDataObserver() {
+        viewModel.newClickLiveData.observe(viewLifecycleOwner) {
+
+        }
+    }
+
+    private fun showNewClickSnackBar(clickDomain: ClickDomain) {
+        val binding = SnackBarNewClickBinding.inflate(layoutInflater)
+        val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
+        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
+        snackBar.view.setOnClickListener { newClickSnackBar?.dismiss() }
+
+//        val swiperProfilePhoto = EndPoint.ofPhoto(clickDomain.swiperId, clickDomain.profilePhotoKey)
+        val swiperProfilePhoto = R.drawable.person2
+
+        Glide.with(requireContext())
+            .load(swiperProfilePhoto)
+            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+            .into(binding.ivNewClickSnackBarSwiper)
+
+        snackBar.addCallback(object : Snackbar.Callback() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+                if (transientBottomBar === newClickSnackBar) newClickSnackBar = null
+            }
+        })
+
+        newClickSnackBar?.dismiss()
+        newClickSnackBar = snackBar
+        snackBar.show()
+    }
+
+    private fun setupFetchClicksObserver() {
+        viewModel.fetchClicks.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) showErrorDialog(
+                it.error,
+                getString(R.string.fetch_clicks_exception_title),
+                it.errorMessage,
+                RequestCode.FETCH_CLICKS,
+                this@ClickFragment
+            )
+        }
+    }
+
+    private fun setupClickPagingDataObserver() {
         viewModel.initClickPagingData().observe(viewLifecycleOwner) {
             lifecycleScope.launch { clickPagingDataAdapter.submitData(it) }
         }
+    }
 
-
-//        viewModel.initInvalidation().observe(viewLifecycleOwner) {
-//            println("viewModel.initInvalidation().observe(viewLifecycleOwner)")
-//        }
-
-
-//        clickPagedListAdapter = ClickPagedListAdapter(
-//            this@ClickFragment
-//        )
-//
-//        binding.rvClick.adapter = clickPagedListAdapter
-//        val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, 2)
-//        binding.rvClick.layoutManager = gridLayoutManager
-
-
-//        viewModel.fetchClicks()
-//
-//        viewModel.clicks.await().observe(viewLifecycleOwner, { pagedClickedList ->
-//            clickPagedListAdapter.submitList(pagedClickedList)
-//        })
-//
-//        viewModel.fetchClickListResponse.observe(viewLifecycleOwner, { fetchClickedListResponse ->
-//
-//            when (fetchClickedListResponse.status) {
-//                Resource.Status.ERROR -> {
-//                    FetchErrorDialog(
-//                        fetchClickedListResponse.errorMessage,
-//                        this@ClickFragment
-//                    ).show(childFragmentManager, FetchErrorDialog.TAG)
-//                }
-//            }
-//        })
+    private fun setupClickInvalidationObserver() {
+        viewModel.initInvalidation().observe(viewLifecycleOwner) {
+            clickPagingRefreshAdapter.refresh()
+        }
     }
 
     private fun setupClickRecyclerView() {
         clickPagingDataAdapter = ClickPagingDataAdapter(this)
-        binding.rvClick.layoutManager = GridLayoutManager(this@ClickFragment.context, SPAN_COUNT)
+        val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, SPAN_COUNT)
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (clickPagingDataAdapter.getItemViewType(position)) {
+                    ClickDomain.Type.ITEM.ordinal -> ITEM_SPAN_COUNT
+                    ClickDomain.Type.HEADER.ordinal -> SPAN_COUNT
+                    else -> ITEM_SPAN_COUNT
+                }
+            }
+        }
         binding.rvClick.itemAnimator = null
         binding.rvClick.adapter = clickPagingDataAdapter
+        binding.rvClick.layoutManager = gridLayoutManager
         clickPagingRefreshAdapter = PagingRefreshAdapter(binding.rvClick, clickPagingDataAdapter)
     }
 
@@ -103,20 +149,27 @@ class ClickFragment : BaseFragment(),
 //        )
     }
 
-    override fun onRetry() {
-//        viewModel.fetchClicks()
-    }
-
     override fun onFragmentSelected() {
         println("clicker fragment: onFragmentSelected")
     }
 
-    override fun onSelect(position: Int) {
-        TODO("Not yet implemented")
+    override fun onSelectClick(position: Int) {
+        viewModel.test()
+//        clickPagingDataAdapter.getClick(position)?.let {
+//
+//        }
     }
 
     companion object {
         const val SPAN_COUNT = 2
+        const val ITEM_SPAN_COUNT = 1
+    }
+
+    override fun onRetry(requestCode: Int?) {
+        when (requestCode) {
+            RequestCode.FETCH_CLICKS -> viewModel.fetchClicks()
+        }
+
     }
 
 }

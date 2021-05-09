@@ -76,11 +76,7 @@ class BalanceRepositoryImpl(
         }
     }
 
-    override suspend fun getClickedList(): DataSource.Factory<Int, Click> {
-        return withContext(Dispatchers.IO) {
-            return@withContext clickDAO.getClicks()
-        }
-    }
+
 
     private val mutableBalanceGameResponse = MutableLiveData<Resource<BalanceGameResponse>>()
     override val balanceGame: LiveData<Resource<BalanceGameResponse>>

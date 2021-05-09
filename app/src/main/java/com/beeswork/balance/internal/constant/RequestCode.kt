@@ -10,5 +10,6 @@ class RequestCode {
         const val DELETE_CHAT_MESSAGE = 6
         const val REPORT_MATCH = 7
         const val UNMATCH = 8
+        const val FETCH_CLICKS = 9
     }
 }

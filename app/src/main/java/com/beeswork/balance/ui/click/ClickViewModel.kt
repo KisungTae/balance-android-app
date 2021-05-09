@@ -1,18 +1,14 @@
 package com.beeswork.balance.ui.click
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
-import com.beeswork.balance.data.database.entity.Click
-import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.click.ClickMapper
-import com.beeswork.balance.internal.util.lazyDeferred
-import com.beeswork.balance.ui.match.MatchViewModel
+import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class ClickViewModel(
     private val clickRepository: ClickRepository,
@@ -24,12 +20,13 @@ class ClickViewModel(
 //        LivePagedListBuilder(balanceRepository.getClickedList(), pagedListConfig).build()
 //    }
 
-    fun test() {
-        clickRepository.test()
-    }
+    val newClickLiveData = clickRepository.newClickFlow.map { clickMapper.fromEntityToDomain(it) }.asLiveData()
+
+    private val _fetchClicks = MutableLiveData<Resource<EmptyResponse>>()
+    val fetchClicks: LiveData<Resource<EmptyResponse>> get() = _fetchClicks
 
     fun initInvalidation(): LiveData<Boolean> {
-        return clickRepository.initInvalidation().asLiveData()
+        return clickRepository.getInvalidation().asLiveData()
     }
 
     fun initClickPagingData(): LiveData<PagingData<ClickDomain>> {
@@ -38,9 +35,23 @@ class ClickViewModel(
             null,
             { ClickPagingSource(clickRepository) }
         ).flow.cachedIn(viewModelScope)
-            .map { pagingData -> pagingData.map { clickMapper.fromEntityToDomain(it) } }
-            .asLiveData(viewModelScope.coroutineContext)
+            .map { pagingData ->
+                pagingData.map { clickMapper.fromEntityToDomain(it) }
+            }.map { pagingData ->
+                pagingData.insertHeaderItem(TerminalSeparatorType.FULLY_COMPLETE, ClickDomain.header())
+            }.asLiveData(viewModelScope.coroutineContext)
     }
+
+    fun fetchClicks() {
+        viewModelScope.safeLaunch(_fetchClicks) {
+            _fetchClicks.postValue(clickRepository.fetchClicks())
+        }
+    }
+
+    fun test() {
+        clickRepository.test()
+    }
+
 
 //    fun fetchClicks() {
 //        balanceRepository.fetchClickedList()

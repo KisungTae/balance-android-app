@@ -49,15 +49,17 @@ class PreferenceProviderImpl(
 
     override fun putMatchFetchedAt(updatedAt: OffsetDateTime?) {
         updatedAt?.let {
-            editor.putString(
-                MATCH_FETCHED_AT,
-                OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt)
-            )
+            editor.putString(MATCH_FETCHED_AT, OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt))
         }
         editor.apply()
     }
 
-
+    override fun putClickFetchedAt(updatedAt: OffsetDateTime?) {
+        updatedAt?.let {
+            editor.putString(CLICK_FETCHED_AT, OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt))
+        }
+        editor.apply()
+    }
 
 
     override fun getGender(): Boolean {
@@ -121,6 +123,14 @@ class PreferenceProviderImpl(
         }
     }
 
+    override fun getClickFetchedAt(): OffsetDateTime {
+        preferences.getString(CLICK_FETCHED_AT, DEFAULT_FETCHED_AT)?.let {
+            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(it)
+        } ?: kotlin.run {
+            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(DEFAULT_FETCHED_AT)
+        }
+    }
+
     override fun getProfilePhotoKey(): String? {
         return preferences.getString(PROFILE_PHOTO_KEY, null)
     }
@@ -131,6 +141,7 @@ class PreferenceProviderImpl(
         const val MAX_AGE = "maxAge"
         const val DISTANCE = "distance"
         const val MATCH_FETCHED_AT = "matchFetchedAt"
+        const val CLICK_FETCHED_AT = "clickFetchedAt"
         const val ACCOUNT_ID = "accountId"
         const val IDENTITY_TOKEN = "identityToken"
         const val PROFILE_PHOTO_KEY = "profilePhotoKey"

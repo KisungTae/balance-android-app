@@ -8,10 +8,13 @@ import com.beeswork.balance.data.network.response.swipe.ClickDTO
 import kotlinx.coroutines.flow.Flow
 
 interface ClickRepository {
+
+    val newClickFlow: Flow<Click>
+
     suspend fun saveClick(clickDTO: ClickDTO)
     suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click>
     suspend fun fetchClicks(): Resource<EmptyResponse>
-    fun initInvalidation(): Flow<Boolean>
+    fun getInvalidation(): Flow<Boolean>
 
 
     fun test()
