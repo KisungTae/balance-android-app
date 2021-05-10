@@ -44,13 +44,13 @@ class StompClientImpl(
     override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
 
     private var chatMessageChannel = Channel<ChatMessageDTO>()
-    override val chatMessageReceivedFlow = chatMessageChannel.consumeAsFlow()
+    override val newChatMessageFlow = chatMessageChannel.consumeAsFlow()
 
-    private var matchedChannel = Channel<MatchDTO>()
-    override val matchedFlow = matchedChannel.consumeAsFlow()
+    private var matchChannel = Channel<MatchDTO>()
+    override val newMatchFlow = matchChannel.consumeAsFlow()
 
-    private var clickedChannel = Channel<ClickDTO>()
-    override val clickedFlow = clickedChannel.consumeAsFlow()
+    private var clickChannel = Channel<ClickDTO>()
+    override val newClickFlow = clickChannel.consumeAsFlow()
 
     private val _webSocketEventLiveData = MutableLiveData<WebSocketEvent>()
     override val webSocketEventLiveData: LiveData<WebSocketEvent> get() = _webSocketEventLiveData
@@ -114,10 +114,10 @@ class StompClientImpl(
                 chatMessageChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java))
             }
             PushType.CLICKED -> scope.launch {
-                clickedChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java))
+                clickChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java))
             }
             PushType.MATCHED -> scope.launch {
-                matchedChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java))
+                matchChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java))
             }
             else -> { }
         }

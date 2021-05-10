@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Match
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
@@ -37,5 +38,8 @@ interface MatchDAO {
 
     @Query("delete from `match` where chatId = :chatId")
     fun delete(chatId: Long)
+
+    @Query("select 1 from `match`")
+    fun invalidation(): Flow<Boolean>
 
 }

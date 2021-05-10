@@ -6,28 +6,26 @@ import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.click.ClickMapper
+import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class ClickViewModel(
     private val clickRepository: ClickRepository,
     private val clickMapper: ClickMapper
 ) : ViewModel() {
 
-//    val fetchClickListResponse: LiveData<Resource<List<Click>>> = balanceRepository.fetchClickListResponse
-//    val clicks by lazyDeferred {
-//        LivePagedListBuilder(balanceRepository.getClickedList(), pagedListConfig).build()
-//    }
+    val clickInvalidation by lazyDeferred {
+        clickRepository.getClickInvalidation().asLiveData()
+    }
 
-    val newClickLiveData = clickRepository.newClickFlow.map { clickMapper.fromEntityToDomain(it) }.asLiveData()
+    val newClickLiveData by lazyDeferred {
+        clickRepository.newClickFlow.map { clickMapper.fromEntityToDomain(it) }.asLiveData()
+    }
 
     private val _fetchClicks = MutableLiveData<Resource<EmptyResponse>>()
     val fetchClicks: LiveData<Resource<EmptyResponse>> get() = _fetchClicks
 
-    fun initInvalidation(): LiveData<Boolean> {
-        return clickRepository.getInvalidation().asLiveData()
-    }
 
     fun initClickPagingData(): LiveData<PagingData<ClickDomain>> {
         return Pager(

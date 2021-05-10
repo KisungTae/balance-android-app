@@ -14,7 +14,7 @@ interface ClickRepository {
     suspend fun saveClick(clickDTO: ClickDTO)
     suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click>
     suspend fun fetchClicks(): Resource<EmptyResponse>
-    fun getInvalidation(): Flow<Boolean>
+    suspend fun getClickInvalidation(): Flow<Boolean>
 
 
     fun test()

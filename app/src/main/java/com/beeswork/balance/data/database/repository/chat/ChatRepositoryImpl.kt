@@ -1,18 +1,15 @@
 package com.beeswork.balance.data.database.repository.chat
 
-import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
 import com.beeswork.balance.data.database.common.ResourceListener
-import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +56,7 @@ class ChatRepositoryImpl(
 
     init {
         collectChatMessageReceiptFlow()
-        collectChatMessageReceivedFlow()
+        collectNewChatMessageFlow()
     }
 
     private fun collectChatMessageReceiptFlow() {
@@ -69,6 +66,7 @@ class ChatRepositoryImpl(
                     if (id == MatchRepositoryImpl.UNMATCHED) {
                         chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
                         onMatchUnmatched(chatId)
+
                     } else {
                         chatMessageDAO.updateStatus(key, ChatMessageStatus.SENT)
                         onChatMessageSent(key, id, chatMessageDTO.createdAt)
@@ -98,8 +96,8 @@ class ChatRepositoryImpl(
         }
     }
 
-    private fun collectChatMessageReceivedFlow() {
-        stompClient.chatMessageReceivedFlow.onEach { chatMessageDTO ->
+    private fun collectNewChatMessageFlow() {
+        stompClient.newChatMessageFlow.onEach { chatMessageDTO ->
             saveChatMessageReceived(chatMessageMapper.fromDTOToEntity(chatMessageDTO))
         }.launchIn(scope)
     }

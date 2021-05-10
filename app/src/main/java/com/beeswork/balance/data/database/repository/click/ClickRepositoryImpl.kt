@@ -36,7 +36,7 @@ class ClickRepositoryImpl(
     @ExperimentalCoroutinesApi
     override val newClickFlow: Flow<Click> = callbackFlow {
         newClickFlowListener = object : NewClickFlowListener {
-            override fun onNewClickReceived(click: Click) {
+            override fun onReceive(click: Click) {
                 offer(click)
             }
         }
@@ -45,20 +45,20 @@ class ClickRepositoryImpl(
 
 
     init {
-        collectClickedFlow()
+        collectNewClickFlow()
     }
 
-    private fun collectClickedFlow() {
-        stompClient.clickedFlow.onEach { clickDTO ->
+    private fun collectNewClickFlow() {
+        stompClient.newClickFlow.onEach { clickDTO ->
             val click = clickMapper.fromDTOToEntity(clickDTO)
-            if (saveClick(click)) newClickFlowListener?.onNewClickReceived(click)
+            if (saveClick(click)) newClickFlowListener?.onReceive(click)
         }.launchIn(scope)
     }
 
 
     override suspend fun saveClick(clickDTO: ClickDTO) {
         val click = clickMapper.fromDTOToEntity(clickDTO)
-        if (saveClick(click)) newClickFlowListener?.onNewClickReceived(click)
+        if (saveClick(click)) newClickFlowListener?.onReceive(click)
     }
 
     private fun saveClick(click: Click): Boolean {
@@ -88,13 +88,14 @@ class ClickRepositoryImpl(
                     clicks.forEach { click -> saveClick(click) }
                 }
             }
-
             return@withContext response.toEmptyResponse()
         }
     }
 
-    override fun getInvalidation(): Flow<Boolean> {
-        return clickDAO.invalidation()
+    override suspend fun getClickInvalidation(): Flow<Boolean> {
+        return withContext(Dispatchers.IO) {
+            return@withContext clickDAO.invalidation()
+        }
     }
 
     override fun test() {
@@ -109,6 +110,8 @@ class ClickRepositoryImpl(
 //                clicks.add(Click(UUID.randomUUID(), "test", OffsetDateTime.now()))
 //            }
 //            clickDAO.insert(clicks)
+
+            clickDAO.insert(Click(UUID.randomUUID(), "", OffsetDateTime.now()))
         }
     }
 

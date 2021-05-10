@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentClickBinding
 import com.beeswork.balance.databinding.SnackBarNewClickBinding
-import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
@@ -27,6 +26,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import java.util.*
 
 
 class ClickFragment : BaseFragment(),
@@ -57,20 +57,20 @@ class ClickFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
-        viewModel.fetchClicks()
+//        viewModel.fetchClicks()
     }
 
     private fun bindUI() = lifecycleScope.launch {
         setupClickRecyclerView()
         setupClickInvalidationObserver()
-        setupClickPagingDataObserver()
         setupFetchClicksObserver()
         setupNewClickLiveDataObserver()
+        setupClickPagingDataObserver()
     }
 
-    private fun setupNewClickLiveDataObserver() {
-        viewModel.newClickLiveData.observe(viewLifecycleOwner) {
-
+    private suspend fun setupNewClickLiveDataObserver() {
+        viewModel.newClickLiveData.await().observe(viewLifecycleOwner) {
+            showNewClickSnackBar(it)
         }
     }
 
@@ -118,8 +118,8 @@ class ClickFragment : BaseFragment(),
         }
     }
 
-    private fun setupClickInvalidationObserver() {
-        viewModel.initInvalidation().observe(viewLifecycleOwner) {
+    private suspend fun setupClickInvalidationObserver() {
+        viewModel.clickInvalidation.await().observe(viewLifecycleOwner) {
             clickPagingRefreshAdapter.refresh()
         }
     }
@@ -150,10 +150,12 @@ class ClickFragment : BaseFragment(),
     }
 
     override fun onFragmentSelected() {
-        println("clicker fragment: onFragmentSelected")
+//        viewModel.fetchClicks()
     }
 
     override fun onSelectClick(position: Int) {
+
+//        showNewClickSnackBar(ClickDomain(UUID.randomUUID(), ""))
         viewModel.test()
 //        clickPagingDataAdapter.getClick(position)?.let {
 //

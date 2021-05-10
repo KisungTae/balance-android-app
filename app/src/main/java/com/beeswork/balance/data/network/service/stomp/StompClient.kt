@@ -11,9 +11,9 @@ interface StompClient {
 
     val webSocketEventLiveData: LiveData<WebSocketEvent>
     val chatMessageReceiptFlow: Flow<ChatMessageDTO>
-    val chatMessageReceivedFlow: Flow<ChatMessageDTO>
-    val matchedFlow: Flow<MatchDTO>
-    val clickedFlow: Flow<ClickDTO>
+    val newChatMessageFlow: Flow<ChatMessageDTO>
+    val newMatchFlow: Flow<MatchDTO>
+    val newClickFlow: Flow<ClickDTO>
 
     fun connect()
     fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String)

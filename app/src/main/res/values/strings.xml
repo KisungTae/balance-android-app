@@ -89,6 +89,6 @@
     <string name="click_tool_bar_title">CLICK</string>
     <string name="new_click_snack_bar_profile_picture">new click profile picture</string>
     <string name="new_click_snack_bar_title">새로운 클릭</string>
-    <string name="new_click_snack_bar_body">상대방 취향에 클릭하고 새로운 만남을 만들어보세요</string>
+    <string name="new_click_snack_bar_body">새로운 만남을 만들어보세요</string>
 
 </resources>

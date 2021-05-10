@@ -22,6 +22,7 @@ import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -47,18 +48,8 @@ class MatchRepositoryImpl(
     private val scope: CoroutineScope
 ) : MatchRepository {
 
-    private var matchPagingRefreshListener: MatchPagingRefreshListener? = null
     private var chatMessagePagingRefreshListener: ChatMessagePagingRefreshListener? = null
-
-    @ExperimentalCoroutinesApi
-    override val matchPagingRefreshFlow = callbackFlow<MatchPagingRefresh> {
-        matchPagingRefreshListener = object : MatchPagingRefreshListener {
-            override fun onRefresh(matchPagingRefresh: MatchPagingRefresh) {
-                offer(matchPagingRefresh)
-            }
-        }
-        awaitClose {}
-    }
+    private var newMatchFlowListener: NewMatchFlowListener? = null
 
     @ExperimentalCoroutinesApi
     override val chatMessagePagingRefreshFlow = callbackFlow<ChatMessagePagingRefresh> {
@@ -70,15 +61,25 @@ class MatchRepositoryImpl(
         awaitClose {}
     }
 
-    init {
-        collectMatchedFlow()
+    @ExperimentalCoroutinesApi
+    override val newMatchFlow = callbackFlow<MatchProfileTuple> {
+        newMatchFlowListener = object : NewMatchFlowListener {
+            override fun onReceive(matchProfileTuple: MatchProfileTuple) {
+                offer(matchProfileTuple)
+            }
+        }
+        awaitClose {  }
     }
 
-    private fun collectMatchedFlow() {
-        stompClient.matchedFlow.onEach { matchDTO ->
+    init {
+        collectNewMatchFlow()
+    }
+
+    private fun collectNewMatchFlow() {
+        stompClient.newMatchFlow.onEach { matchDTO ->
             val match = matchMapper.fromDTOToEntity(matchDTO)
             saveMatch(match)
-            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(matchMapper.fromEntityToProfileTuple(match)))
+            newMatchFlowListener?.onReceive(matchMapper.fromEntityToProfileTuple(match))
         }.launchIn(scope)
     }
 
@@ -109,7 +110,6 @@ class MatchRepositoryImpl(
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
                 val chatMessagePagingRefresh = ChatMessagePagingRefresh(ChatMessagePagingRefresh.Type.FETCHED)
                 chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
-                matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
             }
             return@withContext listMatches.toEmptyResponse()
         }
@@ -126,8 +126,7 @@ class MatchRepositoryImpl(
 
         balanceDatabase.runInTransaction {
             receivedChatMessages.forEach {
-                if (!chatMessageDAO.existById(it.id))
-                    chatMessageDAO.insert(it)
+                if (!chatMessageDAO.existById(it.id)) chatMessageDAO.insert(it)
                 chatIds.add(it.chatId)
                 receivedChatMessageIds.add(it.id)
             }
@@ -236,7 +235,6 @@ class MatchRepositoryImpl(
                     }
                 }
             }
-            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
         }
     }
 
@@ -259,9 +257,10 @@ class MatchRepositoryImpl(
     }
 
     private fun unmatch(chatId: Long) {
-        matchDAO.delete(chatId)
-        matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(null))
-        chatMessageDAO.deleteByChatId(chatId)
+        balanceDatabase.runInTransaction {
+            matchDAO.delete(chatId)
+            chatMessageDAO.deleteByChatId(chatId)
+        }
     }
 
     override suspend fun reportMatch(
@@ -287,7 +286,13 @@ class MatchRepositoryImpl(
         withContext(Dispatchers.IO) {
             val match = matchMapper.fromDTOToEntity(matchDTO)
             saveMatch(match)
-            matchPagingRefreshListener?.onRefresh(MatchPagingRefresh(matchMapper.fromEntityToProfileTuple(match)))
+            newMatchFlowListener?.onReceive(matchMapper.fromEntityToProfileTuple(match))
+        }
+    }
+
+    override suspend fun getMatchInvalidation(): Flow<Boolean> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.invalidation()
         }
     }
 
@@ -376,7 +381,6 @@ class MatchRepositoryImpl(
         }
     }
 }
-
 
 
 // 698F2EB63FEF4EE39C7D3E527740548E

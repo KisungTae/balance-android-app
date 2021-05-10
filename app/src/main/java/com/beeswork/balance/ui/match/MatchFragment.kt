@@ -60,19 +60,24 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private fun bindUI() = lifecycleScope.launch {
         setupMatchRecyclerView()
         setupToolBars()
+        setupMatchInvalidationObserver()
+//        setupMatchPagingRefreshLiveData()
         setupFetchMatchesLiveDataObserver()
-        setupMatchPagingRefreshLiveData()
+        setupNewMatchLiveDataObserver()
         search("")
 //        viewModel.fetchMatches()
     }
 
-    private fun setupMatchPagingRefreshLiveData() {
-        viewModel.matchPagingRefreshLiveData.observe(viewLifecycleOwner, { pagingRefresh ->
-            pagingRefresh.matchProfileTuple?.let { matchProfileTuple ->
-                showNewMatchSnackBar(matchProfileTuple)
-            }
+    private suspend fun setupNewMatchLiveDataObserver() {
+        viewModel.newMatchLiveData.await().observe(viewLifecycleOwner) {
+            showNewMatchSnackBar(it)
+        }
+    }
+
+    private suspend fun setupMatchInvalidationObserver() {
+        viewModel.matchInvalidation.await().observe(viewLifecycleOwner) {
             matchPagingRefreshAdapter.refresh()
-        })
+        }
     }
 
     private fun showNewMatchSnackBar(matchProfileTuple: MatchProfileTuple) {

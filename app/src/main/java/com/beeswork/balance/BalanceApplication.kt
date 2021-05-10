@@ -338,3 +338,4 @@ class BalanceApplication : Application(), KodeinAware {
 //     103. fetchMatches() after inserting all the chatMessages, check if chatMessage.id < current latest chatMessage.id and chatMessage.status == Sending, then update the status to error to be removed or retry
 //      104. think about putting fcm token table to profile as variable
 //      105. display profile photo in chatmessage snackbar if any defined in chatMessageAdapter profilePhotoEndPoint
+//      106. at first login, save fcm token to server to update the updatedAt so that if even multiple devices, server can use the most recent token
