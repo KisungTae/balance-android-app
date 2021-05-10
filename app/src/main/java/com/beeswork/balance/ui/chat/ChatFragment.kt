@@ -1,8 +1,6 @@
 package com.beeswork.balance.ui.chat
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.BundleKey
@@ -158,12 +156,12 @@ class ChatFragment : BaseFragment(),
     private fun setupChatMessagePagingRefreshObserver() {
         viewModel.chatMessagePagingRefreshMediatorLiveData.observe(viewLifecycleOwner, {
             when (it.type) {
-                ChatMessagePagingRefresh.Type.SEND -> {
+                ChatMessageInvalidation.Type.SEND -> {
                     binding.etChatMessageBody.setText("")
                     if (binding.rvChat.canScrollVertically(1)) chatMessagePagingRefreshAdapter.refresh()
                     else setupChatMessagePagingDataObserver()
                 }
-                ChatMessagePagingRefresh.Type.RECEIVED -> {
+                ChatMessageInvalidation.Type.RECEIVED -> {
                     if (binding.rvChat.canScrollVertically(1)) it.body?.let { body ->
                         showNewChatMessageSnackBar(body)
                     } else setupChatMessagePagingDataObserver()

@@ -1,6 +1,6 @@
 package com.beeswork.balance.data.database.repository.chat
 
-class ChatMessagePagingRefresh(
+class ChatMessageInvalidation(
     val type: Type,
     val chatId: Long? = null,
     val body: String? = null
@@ -10,6 +10,7 @@ class ChatMessagePagingRefresh(
         SENT,
         DELETED,
         RECEIVED,
-        FETCHED
+        FETCHED,
+        RECEIPT
     }
 }

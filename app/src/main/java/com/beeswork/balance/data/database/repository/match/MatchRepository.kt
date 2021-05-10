@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.entity.Match
-import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
 import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -12,8 +12,9 @@ import java.util.*
 
 interface MatchRepository {
 
-    val chatMessagePagingRefreshFlow: Flow<ChatMessagePagingRefresh>
+    val chatMessageInvalidationFlow: Flow<ChatMessageInvalidation>
     val newMatchFlow: Flow<MatchProfileTuple>
+    val chatMessageReceiptFlow: Flow<Resource<EmptyResponse>>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>

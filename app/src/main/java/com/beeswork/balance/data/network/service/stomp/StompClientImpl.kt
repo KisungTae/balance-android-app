@@ -44,13 +44,13 @@ class StompClientImpl(
     override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
 
     private var chatMessageChannel = Channel<ChatMessageDTO>()
-    override val newChatMessageFlow = chatMessageChannel.consumeAsFlow()
+    override val chatMessageFlow = chatMessageChannel.consumeAsFlow()
 
     private var matchChannel = Channel<MatchDTO>()
-    override val newMatchFlow = matchChannel.consumeAsFlow()
+    override val matchFlow = matchChannel.consumeAsFlow()
 
     private var clickChannel = Channel<ClickDTO>()
-    override val newClickFlow = clickChannel.consumeAsFlow()
+    override val clickFlow = clickChannel.consumeAsFlow()
 
     private val _webSocketEventLiveData = MutableLiveData<WebSocketEvent>()
     override val webSocketEventLiveData: LiveData<WebSocketEvent> get() = _webSocketEventLiveData

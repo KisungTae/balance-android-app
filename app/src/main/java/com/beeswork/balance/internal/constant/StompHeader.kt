@@ -14,5 +14,6 @@ class StompHeader {
         const val ACCEPT_LANGUAGE = "accept-language"
         const val PUSH_TYPE = "pushType"
         const val RECEIPT_ID = "receipt-id"
+        const val UNMATCHED_RECEIPT_ID = -1L
     }
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
@@ -25,7 +25,7 @@ class ChatViewModel(
     private val chatMessageMapper: ChatMessageMapper
 ) : ViewModel() {
 
-    val chatMessagePagingRefreshMediatorLiveData = MediatorLiveData<ChatMessagePagingRefresh>()
+    val chatMessagePagingRefreshMediatorLiveData = MediatorLiveData<ChatMessageInvalidation>()
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
@@ -45,11 +45,11 @@ class ChatViewModel(
             sendChatMessageMediatorLiveData.postValue(it)
         }
 
-        chatMessagePagingRefreshMediatorLiveData.addSource(matchRepository.chatMessagePagingRefreshFlow.asLiveData()) {
+        chatMessagePagingRefreshMediatorLiveData.addSource(matchRepository.chatMessageInvalidationFlow.asLiveData()) {
             chatMessagePagingRefreshMediatorLiveData.postValue(it)
         }
-        chatMessagePagingRefreshMediatorLiveData.addSource(chatRepository.chatMessagePagingRefreshFlow.asLiveData()) {
-            if (it.type == ChatMessagePagingRefresh.Type.FETCHED) chatMessagePagingRefreshMediatorLiveData.postValue(it)
+        chatMessagePagingRefreshMediatorLiveData.addSource(chatRepository.chatMessageInvalidationFlow.asLiveData()) {
+            if (it.type == ChatMessageInvalidation.Type.FETCHED) chatMessagePagingRefreshMediatorLiveData.postValue(it)
             else if (it.chatId == chatId) chatMessagePagingRefreshMediatorLiveData.postValue(it)
         }
     }

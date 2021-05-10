@@ -11,7 +11,7 @@ interface SwipeDAO {
     fun insert(swipe: Swipe)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(swipeList: List<Swipe>)
+    fun insert(swipes: List<Swipe>)
 
     @Query("select swipedId from swipe")
     fun findSwipedIds(): List<UUID>

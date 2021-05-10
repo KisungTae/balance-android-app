@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface ChatRepository {
-    val chatMessagePagingRefreshFlow: Flow<ChatMessagePagingRefresh>
+    val chatMessageInvalidationFlow: Flow<ChatMessageInvalidation>
     val sendChatMessageFlow: Flow<Resource<EmptyResponse>>
 
     suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String)

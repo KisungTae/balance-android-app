@@ -15,7 +15,7 @@ class ChatMessageMapperImpl : ChatMessageMapper {
             dto.body ?: "",
             getStatusByKey(dto.key),
             dto.createdAt,
-            dto.id ?: Long.MAX_VALUE,
+            dto.id ?: 0,
             dto.key ?: 0,
         )
     }

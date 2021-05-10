@@ -45,11 +45,11 @@ class ClickRepositoryImpl(
 
 
     init {
-        collectNewClickFlow()
+        collectClickFlow()
     }
 
-    private fun collectNewClickFlow() {
-        stompClient.newClickFlow.onEach { clickDTO ->
+    private fun collectClickFlow() {
+        stompClient.clickFlow.onEach { clickDTO ->
             val click = clickMapper.fromDTOToEntity(clickDTO)
             if (saveClick(click)) newClickFlowListener?.onReceive(click)
         }.launchIn(scope)

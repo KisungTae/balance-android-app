@@ -1,9 +1,10 @@
 package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.BalanceDatabase
+import com.beeswork.balance.data.database.common.ResourceListener
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefresh
+import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -14,12 +15,13 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.data.database.repository.chat.ChatMessagePagingRefreshListener
+import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidationListener
 import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.internal.constant.StompHeader
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -48,14 +50,15 @@ class MatchRepositoryImpl(
     private val scope: CoroutineScope
 ) : MatchRepository {
 
-    private var chatMessagePagingRefreshListener: ChatMessagePagingRefreshListener? = null
+    private var chatMessageInvalidationListener: ChatMessageInvalidationListener? = null
     private var newMatchFlowListener: NewMatchFlowListener? = null
+    private var chatMessageReceiptListener: ResourceListener<EmptyResponse>? = null
 
     @ExperimentalCoroutinesApi
-    override val chatMessagePagingRefreshFlow = callbackFlow<ChatMessagePagingRefresh> {
-        chatMessagePagingRefreshListener = object : ChatMessagePagingRefreshListener {
-            override fun onRefresh(chatMessagePagingRefresh: ChatMessagePagingRefresh) {
-                offer(chatMessagePagingRefresh)
+    override val chatMessageInvalidationFlow = callbackFlow<ChatMessageInvalidation> {
+        chatMessageInvalidationListener = object : ChatMessageInvalidationListener {
+            override fun onInvalidate(chatMessageInvalidation: ChatMessageInvalidation) {
+                offer(chatMessageInvalidation)
             }
         }
         awaitClose {}
@@ -68,15 +71,43 @@ class MatchRepositoryImpl(
                 offer(matchProfileTuple)
             }
         }
-        awaitClose {  }
+        awaitClose { }
+    }
+
+    @ExperimentalCoroutinesApi
+    override val chatMessageReceiptFlow = callbackFlow<Resource<EmptyResponse>> {
+        chatMessageReceiptListener = object : ResourceListener<EmptyResponse> {
+            override fun onInvoke(element: Resource<EmptyResponse>) {
+                offer(element)
+            }
+        }
+        awaitClose {}
     }
 
     init {
-        collectNewMatchFlow()
+        collectMatchFlow()
+        collectChatMessageReceiptFlow()
     }
 
-    private fun collectNewMatchFlow() {
-        stompClient.newMatchFlow.onEach { matchDTO ->
+    private fun collectChatMessageReceiptFlow() {
+        stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
+            safeLet(chatMessageDTO.key, chatMessageDTO.chatId) { key, chatId ->
+                chatMessageDTO.id?.let { id ->
+                    if (id == StompHeader.UNMATCHED_RECEIPT_ID) {
+                        chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
+                        onMatchUnmatched(chatId)
+                    } else onChatMessageSent(key, id, chatMessageDTO.createdAt)
+                } ?: chatMessageDAO.updateStatus(key, ChatMessageStatus.ERROR)
+                invalidateChatMessages(ChatMessageInvalidation.Type.RECEIPT, chatId)
+            }
+        }.launchIn(scope)
+    }
+
+
+
+
+    private fun collectMatchFlow() {
+        stompClient.matchFlow.onEach { matchDTO ->
             val match = matchMapper.fromDTOToEntity(matchDTO)
             saveMatch(match)
             newMatchFlowListener?.onReceive(matchMapper.fromEntityToProfileTuple(match))
@@ -104,12 +135,12 @@ class MatchRepositoryImpl(
                 preferenceProvider.getMatchFetchedAt()
             )
             listMatches.data?.let { data ->
-                saveMatches(data.matchDTOs)
-                saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+                val chatIds = saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+                saveMatches(data.matchDTOs, chatIds)
                 updateSendingChatMessages(fetchedAt)
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-                val chatMessagePagingRefresh = ChatMessagePagingRefresh(ChatMessagePagingRefresh.Type.FETCHED)
-                chatMessagePagingRefreshListener?.onRefresh(chatMessagePagingRefresh)
+                val chatMessageInvalidation = ChatMessageInvalidation(ChatMessageInvalidation.Type.FETCHED)
+                chatMessageInvalidationListener?.onInvalidate(chatMessageInvalidation)
             }
             return@withContext listMatches.toEmptyResponse()
         }
@@ -118,49 +149,88 @@ class MatchRepositoryImpl(
     private fun saveChatMessages(
         sentChatMessageDTOs: List<ChatMessageDTO>,
         receivedChatMessageDTOs: List<ChatMessageDTO>
-    ) {
-        val receivedChatMessages = receivedChatMessageDTOs.map { chatMessageMapper.fromDTOToEntity(it) }
+    ): MutableSet<Long> {
         val chatIds = mutableSetOf<Long>()
         val sentChatMessageIds = mutableListOf<Long>()
         val receivedChatMessageIds = mutableListOf<Long>()
+        val newChatMessages = mutableListOf<ChatMessage>()
 
-        balanceDatabase.runInTransaction {
-            receivedChatMessages.forEach {
-                if (!chatMessageDAO.existById(it.id)) chatMessageDAO.insert(it)
-                chatIds.add(it.chatId)
-                receivedChatMessageIds.add(it.id)
-            }
+        receivedChatMessageDTOs.forEach { chatMessageDTO ->
+            val chatMessage = chatMessageMapper.fromDTOToEntity(chatMessageDTO)
+            newChatMessages.add(chatMessage)
+            receivedChatMessageIds.add(chatMessage.id)
+            chatIds.add(chatMessage.chatId)
+        }
 
-            sentChatMessageDTOs.forEach { chatMessageDTO ->
-                safeLet(chatMessageDTO.key, chatMessageDTO.id) { key, id ->
-                    chatMessageDAO.findByKey(key)?.let { chatMessage ->
-                        chatMessage.id = id
-                        chatMessage.status = ChatMessageStatus.SENT
-                        chatMessage.createdAt = chatMessageDTO.createdAt
-                        chatMessageDAO.insert(chatMessage)
-                        chatIds.add(chatMessage.chatId)
-                    }
-                    sentChatMessageIds.add(id)
+        sentChatMessageDTOs.forEach { chatMessageDTO ->
+            safeLet(chatMessageDTO.key, chatMessageDTO.id) { key, id ->
+                chatMessageDAO.findByKey(key)?.let { chatMessage ->
+                    chatMessage.id = id
+                    chatMessage.status = ChatMessageStatus.SENT
+                    chatMessage.createdAt = chatMessageDTO.createdAt
+                    newChatMessages.add(chatMessage)
+                    chatIds.add(chatMessage.chatId)
                 }
+                sentChatMessageIds.add(id)
             }
         }
         syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
-        updateRecentChatMessages(chatIds)
+        chatMessageDAO.insert(newChatMessages)
+        return chatIds
     }
 
-    private fun updateSendingChatMessages(fetchedAt: OffsetDateTime) {
-        chatMessageDAO.updateStatusByStatusAndCreatedAt(ChatMessageStatus.ERROR, ChatMessageStatus.SENDING, fetchedAt)
+    private fun syncChatMessages(
+        sentChatMessageIds: List<Long>,
+        receivedChatMessageIds: List<Long>
+    ) {
+        if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
+        CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
+            chatRDS.syncChatMessages(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                sentChatMessageIds,
+                receivedChatMessageIds
+            )
+        }
     }
 
-    private fun updateRecentChatMessages(chatIds: Set<Long>) {
+    //    NOTE 1. forEach in runInTransaction to make sure no chat message is inserted while inserting matches
+    private fun saveMatches(matchDTOs: List<MatchDTO>, chatIds: MutableSet<Long>) {
+        val swipes = mutableListOf<Swipe>()
+        val swipedIds = mutableListOf<UUID>()
+        val matches = matchDTOs.map {
+            val match = matchMapper.fromDTOToEntity(it)
+            swipes.add(Swipe(match.swipedId))
+            swipedIds.add(match.swipedId)
+            updateMatch(match)
+            match
+        }
+
         balanceDatabase.runInTransaction {
-            chatIds.forEach { chatId ->
-                matchDAO.findById(chatId)?.let { match ->
-                    if (!match.unmatched) updateRecentChatMessage(match)
-                    updateUnread(match)
-                    matchDAO.insert(match)
-                }
+            matchDAO.insert(matches)
+            swipeDAO.insert(swipes)
+            clickDAO.deleteInSwiperIds(swipedIds)
+            chatIds.forEach { chatId -> updateRecentChatMessage(chatId) }
+        }
+    }
+
+    private fun updateMatch(match: Match) {
+        matchDAO.findById(match.chatId)?.let {
+            if (!match.unmatched) {
+                match.updatedAt = it.updatedAt
+                match.recentChatMessage = it.recentChatMessage
+                match.active = it.active
             }
+            match.unread = it.unread
+            match.lastReadChatMessageId = it.lastReadChatMessageId
+        }
+    }
+
+    private fun updateRecentChatMessage(chatId: Long) {
+        matchDAO.findById(chatId)?.let { match ->
+            if (!match.unmatched) updateRecentChatMessage(match)
+            updateUnread(match)
+            matchDAO.insert(match)
         }
     }
 
@@ -183,44 +253,8 @@ class MatchRepositoryImpl(
         match.unread = chatMessageDAO.existByIdGreaterThan(match.chatId, match.lastReadChatMessageId)
     }
 
-    private fun syncChatMessages(
-        sentChatMessageIds: List<Long>,
-        receivedChatMessageIds: List<Long>
-    ) {
-        if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
-        CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
-            chatRDS.syncChatMessages(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                sentChatMessageIds,
-                receivedChatMessageIds
-            )
-        }
-    }
-
-    private fun saveMatches(matchDTOs: List<MatchDTO>) {
-        val matches = matchDTOs.map { matchMapper.fromDTOToEntity(it) }
-
-        balanceDatabase.runInTransaction {
-            matches.forEach {
-                updateMatch(it)
-                swipeDAO.insert(Swipe(it.swipedId))
-                matchDAO.insert(it)
-                clickDAO.deleteBySwiperId(it.swipedId)
-            }
-        }
-    }
-
-    private fun updateMatch(match: Match) {
-        matchDAO.findById(match.chatId)?.let {
-            if (!match.unmatched) {
-                match.updatedAt = it.updatedAt
-                match.recentChatMessage = it.recentChatMessage
-                match.active = it.active
-            }
-            match.unread = it.unread
-            match.lastReadChatMessageId = it.lastReadChatMessageId
-        }
+    private fun updateSendingChatMessages(fetchedAt: OffsetDateTime) {
+        chatMessageDAO.updateStatusByStatusAndCreatedAt(ChatMessageStatus.ERROR, ChatMessageStatus.SENDING, fetchedAt)
     }
 
     override suspend fun synchronizeMatch(chatId: Long) {
@@ -290,6 +324,8 @@ class MatchRepositoryImpl(
         }
     }
 
+
+
     override suspend fun getMatchInvalidation(): Flow<Boolean> {
         return withContext(Dispatchers.IO) {
             return@withContext matchDAO.invalidation()
@@ -303,9 +339,12 @@ class MatchRepositoryImpl(
         matchDAO.insert(match)
     }
 
-    companion object {
-        const val UNMATCHED = -1L
-    }
+
+
+
+
+
+
 
 
     //  TODO: remove me
