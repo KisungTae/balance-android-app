@@ -6,4 +6,7 @@ import com.beeswork.balance.internal.mapper.common.Mapper
 import com.beeswork.balance.ui.chat.ChatMessageDomain
 
 interface ChatMessageMapper: Mapper<ChatMessageDTO, ChatMessage, ChatMessageDomain> {
+
+    fun toReceivedChatMessage(chatMessageDTO: ChatMessageDTO): ChatMessage?
+
 }

@@ -55,7 +55,7 @@ class ChatViewModel(
             null,
             { ChatMessagePagingSource(chatRepository, chatId) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
-            pagingData.map { chatMessage -> chatMessageMapper.fromEntityToDomain(chatMessage) }
+            pagingData.map { chatMessage -> chatMessageMapper.toDomain(chatMessage) }
         }.map { pagingData ->
             var nullifyBeforeTimeCreatedAt = false
             pagingData.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
@@ -65,7 +65,7 @@ class ChatViewModel(
                     nullifyBeforeTimeCreatedAt = false
                 }
 
-                if (after?.isSentOrReceived() == true
+                if (after?.isProcessed == true
                     && after.status == before?.status
                     && after.dateCreatedAt == before.dateCreatedAt
                     && after.timeCreatedAt == beforeTimeCreatedAt
@@ -75,7 +75,7 @@ class ChatViewModel(
                 }
 
                 var separator: ChatMessageDomain? = null
-                if (before?.isSentOrReceived() == true
+                if (before?.isProcessed == true
                     && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)
                 ) {
                     separator = ChatMessageDomain.toSeparator(
@@ -158,5 +158,4 @@ class ChatViewModel(
 }
 
 
-// TODO: websocket receives dto, pass it from viewmodel to repository, map to entity and save
-// TODO: fetchMatches observer check validate of parent
+// TODO: check insertSepartors becasue I added processed field in chatMessageDomain check if I can just check times

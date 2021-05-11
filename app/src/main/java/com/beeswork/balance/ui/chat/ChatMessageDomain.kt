@@ -10,15 +10,11 @@ data class ChatMessageDomain(
     val id: Long?,
     val body: String,
     var status: ChatMessageStatus,
+    var isProcessed: Boolean,
     var dateCreatedAt: LocalDate?,
     var timeCreatedAt: LocalTime?,
     var showProfilePhoto: Boolean = true
 ) {
-
-    fun isSentOrReceived(): Boolean {
-        return (status == ChatMessageStatus.RECEIVED || status == ChatMessageStatus.SENT)
-    }
-
     companion object {
         fun toSeparator(body: String?): ChatMessageDomain? {
             body?.let {

@@ -18,12 +18,16 @@ data class ChatMessage(
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
-    var createdAt: OffsetDateTime?,
+    var createdAt: OffsetDateTime,
     var id: Long = Long.MAX_VALUE,
 
     @PrimaryKey(autoGenerate = true)
     val key: Long = 0
-)
+) {
+    fun isProcessed(): Boolean {
+        return (status == ChatMessageStatus.RECEIVED || status == ChatMessageStatus.SENT)
+    }
+}
 
 
 // explain query plan select count(cm.id) from chatMessage cm left join `match` m on cm.chatId = m.chatId where cm.chatId = 1 and cm.id > m.lastReadChatMessageId and cm.status = 1

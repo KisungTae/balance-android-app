@@ -11,7 +11,7 @@ class MatchMapperImpl : MatchMapper {
         return MatchProfileTuple(entity.swipedId, entity.name, entity.profilePhotoKey)
     }
 
-    override fun fromDTOToEntity(dto: MatchDTO): Match {
+    override fun toEntity(dto: MatchDTO): Match {
         return Match(
             dto.chatId,
             dto.swipedId,
@@ -23,7 +23,7 @@ class MatchMapperImpl : MatchMapper {
         )
     }
 
-    override fun fromEntityToDomain(entity: Match): MatchDomain {
+    override fun toDomain(entity: Match): MatchDomain {
         return MatchDomain(
             entity.chatId,
             entity.swipedId,

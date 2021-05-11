@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
 import java.util.*
 import kotlin.random.Random
 
@@ -59,7 +58,7 @@ class MatchRepositoryImpl(
 
     private fun collectMatchFlow() {
         stompClient.matchFlow.onEach { matchDTO ->
-            saveMatchAndOffer(matchMapper.fromDTOToEntity(matchDTO))
+            saveMatchAndOffer(matchMapper.toEntity(matchDTO))
         }.launchIn(scope)
     }
 
@@ -86,7 +85,7 @@ class MatchRepositoryImpl(
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
                     data.matchDTOs?.forEach { matchDTO ->
-                        saveMatch(matchMapper.fromDTOToEntity(matchDTO))
+                        saveMatch(matchMapper.toEntity(matchDTO))
                     }
                 }
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
@@ -176,7 +175,7 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
-        withContext(Dispatchers.IO) { saveMatchAndOffer(matchMapper.fromDTOToEntity(matchDTO)) }
+        withContext(Dispatchers.IO) { saveMatchAndOffer(matchMapper.toEntity(matchDTO)) }
     }
 
     private fun saveMatchAndOffer(match: Match) {
@@ -218,23 +217,7 @@ class MatchRepositoryImpl(
     }
 
 
-    //  TODO: remove me
-    private fun saveSentChatMessages(sentChatMessages: List<ChatMessage>, matches: List<Match>) {
-        val chatIds = matches.map { it.chatId }
-        for (msg in sentChatMessages) {
-            val randomIndex = Random.nextInt(0, chatIds.size - 1)
-            chatMessageDAO.insert(
-                ChatMessage(
-                    chatIds[randomIndex],
-                    "message-${Random.nextFloat()}",
-                    ChatMessageStatus.SENDING,
-                    OffsetDateTime.now(ZoneOffset.UTC),
-                    msg.key,
-                    msg.id,
-                )
-            )
-        }
-    }
+
 
     //  TODO: remove me
 //    private fun createDummyMatch() {
