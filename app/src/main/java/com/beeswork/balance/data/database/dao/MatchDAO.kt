@@ -25,7 +25,7 @@ interface MatchDAO {
     fun findById(chatId: Long): Match?
 
     @Query("select count(swipedId) > 0 from `match` where swipedId = :swipedId")
-    fun existsBySwipedId(swipedId: UUID): Boolean
+    fun existBySwipedId(swipedId: UUID): Boolean
 
     @Query("select * from `match` where name like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
@@ -41,5 +41,8 @@ interface MatchDAO {
 
     @Query("select 1 from `match`")
     fun invalidation(): Flow<Boolean>
+
+    @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', profilePhotoKey = null, active = 1 where chatId = :chatId")
+    fun updateAsUnmatched(chatId: Long)
 
 }

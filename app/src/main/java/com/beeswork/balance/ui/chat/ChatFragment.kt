@@ -92,18 +92,18 @@ class ChatFragment : BaseFragment(),
         matchedProfilePhotoKey: String?,
         unmatched: Boolean
     ) = lifecycleScope.launch {
+        setupChatRecyclerView()
+        setupChatMessageInvalidationObserver()
         setupBackPressedDispatcherCallback()
         setupToolBar(matchedName)
         setupSendBtnListener()
         setupEmoticonBtnListener()
         setupSendChatMessageMediatorLiveDataObserver()
-        setupChatRecyclerView()
 //        setupProfilePhoto(matchedProfilePhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
         if (unmatched) setupAsUnmatched()
-        setupChatMessagePagingRefreshObserver()
-        setupChatMessagePagingDataObserver()
         setupReportMatchLiveDataObserver()
         setupUnmatchLiveDataObserver()
+        setupChatMessagePagingDataObserver()
     }
 
     private fun setupUnmatchLiveDataObserver() {
@@ -153,8 +153,8 @@ class ChatFragment : BaseFragment(),
         })
     }
 
-    private fun setupChatMessagePagingRefreshObserver() {
-        viewModel.chatMessagePagingRefreshMediatorLiveData.observe(viewLifecycleOwner, {
+    private fun setupChatMessageInvalidationObserver() {
+        viewModel.chatMessageInvalidationLiveData.observe(viewLifecycleOwner, {
             when (it.type) {
                 ChatMessageInvalidation.Type.SEND -> {
                     binding.etChatMessageBody.setText("")

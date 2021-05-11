@@ -62,7 +62,7 @@ class ClickRepositoryImpl(
     }
 
     private fun saveClick(click: Click): Boolean {
-        return if (!matchDAO.existsBySwipedId(click.swiperId)) {
+        return if (!matchDAO.existBySwipedId(click.swiperId)) {
             clickDAO.insert(click)
             true
         } else false

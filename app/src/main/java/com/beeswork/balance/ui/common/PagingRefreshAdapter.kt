@@ -29,7 +29,7 @@ class PagingRefreshAdapter<T: Any, VH: RecyclerView.ViewHolder>(
     }
 
     private fun refreshAdapter() {
-        if (!scrolling && refresh && pagingDataAdapter.itemCount > 0) {
+        if (!scrolling && refresh) {
             pagingDataAdapter.refresh()
             refresh = false
         }

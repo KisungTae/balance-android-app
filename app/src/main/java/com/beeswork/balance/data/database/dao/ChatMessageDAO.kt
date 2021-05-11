@@ -16,9 +16,6 @@ interface ChatMessageDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(chatMessages: List<ChatMessage>)
 
-    @Query("select count(*) > 0 from chatMessage where id = :id")
-    fun existById(id: Long): Boolean
-
     @Query("select * from chatMessage where `key` = :key")
     fun findByKey(key: Long): ChatMessage?
 
@@ -30,7 +27,7 @@ interface ChatMessageDAO {
     ): ChatMessage?
 
     @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and id > :lastReadChatMessageId limit 1")
-    fun existByIdGreaterThan(
+    fun existAfter(
         chatId: Long,
         lastReadChatMessageId: Long,
         status: ChatMessageStatus = ChatMessageStatus.RECEIVED
@@ -39,17 +36,11 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where chatId = :chatId order by id desc, `key` desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
 
-    @Query("select body from chatMessage where id = :id")
-    fun findBodyById(id: Long): String?
-
-    @Query("select unmatched = 0 from `match` where chatId = :chatId")
-    fun findUnmatchedById(chatId: Long): LiveData<Boolean>
-
     @Query("update chatMessage set status = :status where `key` = :key")
-    fun updateStatus(key: Long, status: ChatMessageStatus)
+    fun updateStatusByKey(key: Long, status: ChatMessageStatus)
 
-    @Query("update chatMessage set status = :toStatus where status = :status and createdAt < :createdAt")
-    fun updateStatusByStatusAndCreatedAt(toStatus: ChatMessageStatus, status: ChatMessageStatus, createdAt: OffsetDateTime)
+    @Query("update chatMessage set status = :toStatus where status = :whereStatus and createdAt < :createdAt")
+    fun updateStatusBefore(createdAt: OffsetDateTime, whereStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
     @Query("delete from chatMessage where `key` = :key")
     fun deleteByKey(key: Long)

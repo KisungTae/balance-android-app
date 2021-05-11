@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
+import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.swipe.ClickDTO
@@ -56,9 +57,6 @@ interface BalanceAPI {
         @Query(value = "identityToken") identityToken: UUID?,
         @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
     ): Response<ListMatchesDTO>
-
-
-
 
 
     @GET("chat/message/list")

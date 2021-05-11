@@ -133,14 +133,14 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
+                instance(),
                 applicationScope
             )
         }
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
-                instance(),
-                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -179,7 +179,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
-        bind() from provider { MatchViewModelFactory(instance(), instance()) }
+        bind() from provider { MatchViewModelFactory(instance(), instance(), instance()) }
         bind() from factory { param: ChatViewModelFactoryParameter ->
             ChatViewModelFactory(
                 param,

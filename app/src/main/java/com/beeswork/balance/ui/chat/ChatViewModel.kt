@@ -12,6 +12,7 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.*
@@ -25,7 +26,9 @@ class ChatViewModel(
     private val chatMessageMapper: ChatMessageMapper
 ) : ViewModel() {
 
-    val chatMessagePagingRefreshMediatorLiveData = MediatorLiveData<ChatMessageInvalidation>()
+    val chatMessageInvalidationLiveData = chatRepository.chatMessageInvalidationFlow.filter {
+        it.type == ChatMessageInvalidation.Type.FETCHED || it.chatId == chatId
+    }.asLiveData()
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
@@ -41,16 +44,8 @@ class ChatViewModel(
         sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
             sendChatMessageMediatorLiveData.postValue(it)
         }
-        sendChatMessageMediatorLiveData.addSource(chatRepository.sendChatMessageFlow.asLiveData()) {
+        sendChatMessageMediatorLiveData.addSource(chatRepository.chatMessageReceiptFlow.asLiveData()) {
             sendChatMessageMediatorLiveData.postValue(it)
-        }
-
-        chatMessagePagingRefreshMediatorLiveData.addSource(matchRepository.chatMessageInvalidationFlow.asLiveData()) {
-            chatMessagePagingRefreshMediatorLiveData.postValue(it)
-        }
-        chatMessagePagingRefreshMediatorLiveData.addSource(chatRepository.chatMessageInvalidationFlow.asLiveData()) {
-            if (it.type == ChatMessageInvalidation.Type.FETCHED) chatMessagePagingRefreshMediatorLiveData.postValue(it)
-            else if (it.chatId == chatId) chatMessagePagingRefreshMediatorLiveData.postValue(it)
         }
     }
 

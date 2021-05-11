@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidatio
 import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.ReportReason
 import kotlinx.coroutines.flow.Flow
@@ -12,13 +13,11 @@ import java.util.*
 
 interface MatchRepository {
 
-    val chatMessageInvalidationFlow: Flow<ChatMessageInvalidation>
     val newMatchFlow: Flow<MatchProfileTuple>
-    val chatMessageReceiptFlow: Flow<Resource<EmptyResponse>>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
-    suspend fun fetchMatches(): Resource<EmptyResponse>
+    suspend fun fetchMatches(): Resource<ListMatchesDTO>
     suspend fun synchronizeMatch(chatId: Long)
     suspend fun isUnmatched(chatId: Long): Boolean
     suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse>

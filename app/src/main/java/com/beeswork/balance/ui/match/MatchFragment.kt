@@ -61,7 +61,6 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         setupMatchRecyclerView()
         setupToolBars()
         setupMatchInvalidationObserver()
-//        setupMatchPagingRefreshLiveData()
         setupFetchMatchesLiveDataObserver()
         setupNewMatchLiveDataObserver()
         search("")
@@ -154,8 +153,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     private fun showSearchToolBar(): Boolean {
-        binding.tbMatch.visibility = View.GONE
-        binding.tbMatchSearch.visibility = View.VISIBLE
+        viewModel.testFunction()
+//        binding.tbMatch.visibility = View.GONE
+//        binding.tbMatchSearch.visibility = View.VISIBLE
         return true
     }
 

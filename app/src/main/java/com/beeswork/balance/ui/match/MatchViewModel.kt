@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.match
 
 import androidx.lifecycle.*
 import androidx.paging.*
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.*
 
 class MatchViewModel(
     private val matchRepository: MatchRepository,
+    private val chatRepository: ChatRepository,
     private val matchMapper: MatchMapper,
 ) : ViewModel() {
 
@@ -39,7 +41,11 @@ class MatchViewModel(
 
     fun fetchMatches() {
         viewModelScope.safeLaunch(_fetchMatchesLiveData) {
-            _fetchMatchesLiveData.postValue(matchRepository.fetchMatches())
+            val response = matchRepository.fetchMatches()
+            response.data?.let { data ->
+                chatRepository.saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs, data.fetchedAt)
+            }
+            _fetchMatchesLiveData.postValue(response.toEmptyResponse())
         }
     }
 
