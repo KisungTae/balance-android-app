@@ -52,7 +52,6 @@ class BalanceGameDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindUI()
-
     }
 
     private fun bindUI() {

@@ -91,7 +91,7 @@ class SwipeFragment : BaseFragment(),
     }
 
     private fun showSwipeFilter(): Boolean {
-
+        SwipeFilterDialog().show(childFragmentManager, SwipeFilterDialog.TAG)
         return true
     }
 

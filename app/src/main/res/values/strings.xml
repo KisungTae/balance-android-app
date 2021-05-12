@@ -92,5 +92,8 @@
     <string name="new_click_snack_bar_body">새로운 만남을 만들어보세요</string>
     <string name="swipe_tool_bar_title">SWIPE</string>
     <string name="fetch_card_exception_title">카드를 가져오는데 실패했습니다</string>
+    <string name="swipe_filter_dialog_radio_button_male_title">남자</string>
+    <string name="swipe_filter_dialog_radio_button_female_title">여자</string>
+    <string name="swipe_filter_dialog_title">필터</string>
 
 </resources>

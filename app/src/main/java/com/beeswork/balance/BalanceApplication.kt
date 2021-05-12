@@ -49,6 +49,7 @@ import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
+import com.beeswork.balance.ui.swipe.SwipeFilterDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -91,6 +92,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
+        bind() from singleton { instance<BalanceDatabase>().swipeFilterDAO() }
 
         // API
         bind() from singleton { BalanceAPI(instance()) }
@@ -109,7 +111,7 @@ class BalanceApplication : Application(), KodeinAware {
 
 
         // Repository
-        bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance()) }
+        bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance(), instance()) }
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance()) }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
@@ -197,6 +199,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickViewModelFactory(instance(), instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
+        bind() from provider { SwipeFilterDialogViewModelFactory(instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
 
 
@@ -348,3 +351,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      106. at first login, save fcm token to server to update the updatedAt so that if even multiple devices, server can use the most recent token
 //      107. hide keyboard when touched outside
 //      108. chat enter slide does not animate mainvewipager fragment
+//      109. reportDiloag has a viewmodel to report?
