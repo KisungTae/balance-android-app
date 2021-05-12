@@ -90,5 +90,7 @@
     <string name="new_click_snack_bar_profile_picture">new click profile picture</string>
     <string name="new_click_snack_bar_title">새로운 클릭</string>
     <string name="new_click_snack_bar_body">새로운 만남을 만들어보세요</string>
+    <string name="swipe_tool_bar_title">SWIPE</string>
+    <string name="fetch_card_exception_title">카드를 가져오는데 실패했습니다</string>
 
 </resources>

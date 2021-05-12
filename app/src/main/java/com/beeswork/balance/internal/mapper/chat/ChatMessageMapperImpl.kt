@@ -21,26 +21,23 @@ class ChatMessageMapperImpl : ChatMessageMapper {
         }
     }
 
-    override fun toEntity(dto: ChatMessageDTO): ChatMessage? {
-        return null
-//        return ChatMessage(
-//            dto.chatId ?: 0,
-//            dto.body ?: "",
-//            getStatusByKey(dto.key),
-//            dto.createdAt,
-//            dto.id ?: 0,
-//            dto.key ?: 0,
-//        )
+    override fun toSentChatMessage(chatMessage: ChatMessage?, chatMessageDTO: ChatMessageDTO): ChatMessage? {
+        return safeLet(chatMessage, chatMessageDTO.id, chatMessageDTO.createdAt) { _chatMessage, id, createdAt ->
+            _chatMessage.id = id
+            _chatMessage.status = ChatMessageStatus.SENT
+            _chatMessage.createdAt = createdAt
+            return@safeLet _chatMessage
+        }
     }
 
-    override fun toDomain(entity: ChatMessage): ChatMessageDomain {
-        val createdAt = if (entity.isProcessed()) entity.createdAt.atZoneSameInstant(ZoneId.systemDefault()) else null
+    override fun toDomain(chatMessage: ChatMessage): ChatMessageDomain {
+        val createdAt = if (chatMessage.isProcessed()) chatMessage.createdAt.atZoneSameInstant(ZoneId.systemDefault()) else null
         return ChatMessageDomain(
-            entity.key,
-            entity.id,
-            entity.body,
-            entity.status,
-            entity.isProcessed(),
+            chatMessage.key,
+            chatMessage.id,
+            chatMessage.body,
+            chatMessage.status,
+            chatMessage.isProcessed(),
             createdAt?.toLocalDate(),
             createdAt?.toLocalTime()?.truncatedTo(ChronoUnit.MINUTES)
         )

@@ -20,7 +20,7 @@ class ClickViewModel(
     }
 
     val newClickLiveData by lazyDeferred {
-        clickRepository.newClickFlow.map { clickMapper.toDomain(it) }.asLiveData()
+        clickRepository.newClickFlow.map { clickMapper.toClickDomain(it) }.asLiveData()
     }
 
     private val _fetchClicks = MutableLiveData<Resource<EmptyResponse>>()
@@ -34,7 +34,7 @@ class ClickViewModel(
             { ClickPagingSource(clickRepository) }
         ).flow.cachedIn(viewModelScope)
             .map { pagingData ->
-                pagingData.map { clickMapper.toDomain(it) }
+                pagingData.map { clickMapper.toClickDomain(it) }
             }.map { pagingData ->
                 pagingData.insertHeaderItem(TerminalSeparatorType.FULLY_COMPLETE, ClickDomain.header())
             }.asLiveData(viewModelScope.coroutineContext)

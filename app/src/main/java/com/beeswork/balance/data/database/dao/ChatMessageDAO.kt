@@ -17,7 +17,7 @@ interface ChatMessageDAO {
     fun insert(chatMessages: List<ChatMessage>)
 
     @Query("select * from chatMessage where `key` = :key")
-    fun findByKey(key: Long): ChatMessage?
+    fun findByKey(key: Long?): ChatMessage?
 
     @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId and status in (:statuses) order by id desc limit 1")
     fun findMostRecentAfter(
@@ -37,7 +37,7 @@ interface ChatMessageDAO {
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
 
     @Query("update chatMessage set status = :status where `key` = :key")
-    fun updateStatusByKey(key: Long, status: ChatMessageStatus)
+    fun updateStatusByKey(key: Long?, status: ChatMessageStatus)
 
     @Query("update chatMessage set status = :toStatus where status = :whereStatus and createdAt < :createdAt")
     fun updateStatusBefore(createdAt: OffsetDateTime, whereStatus: ChatMessageStatus, toStatus: ChatMessageStatus)

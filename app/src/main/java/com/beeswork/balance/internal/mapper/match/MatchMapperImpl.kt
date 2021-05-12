@@ -7,33 +7,33 @@ import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import org.threeten.bp.ZoneId
 
 class MatchMapperImpl : MatchMapper {
-    override fun fromEntityToProfileTuple(entity: Match): MatchProfileTuple {
-        return MatchProfileTuple(entity.swipedId, entity.name, entity.profilePhotoKey)
+    override fun toProfileTuple(match: Match): MatchProfileTuple {
+        return MatchProfileTuple(match.swipedId, match.name, match.profilePhotoKey)
     }
 
-    override fun toEntity(dto: MatchDTO): Match {
+    override fun toMatch(matchDTO: MatchDTO): Match {
         return Match(
-            dto.chatId,
-            dto.swipedId,
-            dto.active,
-            dto.unmatched,
-            dto.name,
-            dto.profilePhotoKey,
-            dto.createdAt
+            matchDTO.chatId,
+            matchDTO.swipedId,
+            matchDTO.active,
+            matchDTO.unmatched,
+            matchDTO.name,
+            matchDTO.profilePhotoKey,
+            matchDTO.createdAt
         )
     }
 
-    override fun toDomain(entity: Match): MatchDomain {
+    override fun toMatchDomain(match: Match): MatchDomain {
         return MatchDomain(
-            entity.chatId,
-            entity.swipedId,
-            entity.active,
-            entity.unmatched,
-            entity.name,
-            entity.profilePhotoKey,
-            entity.updatedAt?.atZoneSameInstant(ZoneId.systemDefault()),
-            entity.unread,
-            entity.recentChatMessage
+            match.chatId,
+            match.swipedId,
+            match.active,
+            match.unmatched,
+            match.name,
+            match.profilePhotoKey,
+            match.updatedAt?.atZoneSameInstant(ZoneId.systemDefault()),
+            match.unread,
+            match.recentChatMessage
         )
     }
 }

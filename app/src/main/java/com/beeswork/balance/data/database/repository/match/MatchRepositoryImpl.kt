@@ -58,7 +58,7 @@ class MatchRepositoryImpl(
 
     private fun collectMatchFlow() {
         stompClient.matchFlow.onEach { matchDTO ->
-            saveMatchAndOffer(matchMapper.toEntity(matchDTO))
+            saveMatchAndOffer(matchMapper.toMatch(matchDTO))
         }.launchIn(scope)
     }
 
@@ -85,7 +85,7 @@ class MatchRepositoryImpl(
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
                     data.matchDTOs?.forEach { matchDTO ->
-                        saveMatch(matchMapper.toEntity(matchDTO))
+                        saveMatch(matchMapper.toMatch(matchDTO))
                     }
                 }
                 preferenceProvider.putMatchFetchedAt(data.fetchedAt)
@@ -175,12 +175,12 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
-        withContext(Dispatchers.IO) { saveMatchAndOffer(matchMapper.toEntity(matchDTO)) }
+        withContext(Dispatchers.IO) { saveMatchAndOffer(matchMapper.toMatch(matchDTO)) }
     }
 
     private fun saveMatchAndOffer(match: Match) {
         saveMatch(match)
-        newMatchFlowListener?.onReceive(matchMapper.fromEntityToProfileTuple(match))
+        newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
     }
 
     override suspend fun getMatchInvalidation(): Flow<Boolean> {
@@ -199,7 +199,7 @@ class MatchRepositoryImpl(
 
         for (i in 1..10) {
             val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
-            messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, null))
+//            messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, null))
             count++
         }
 
@@ -245,7 +245,20 @@ class MatchRepositoryImpl(
 //            createDummyMatch()
 //            createDummyChatMessages()
 //            matchDAO.insert(Match(Random.nextLong(), UUID.randomUUID(), false, false, "test match", "", OffsetDateTime.now()))
-            matchDAO.updateAsUnmatched(3)
+//            matchDAO.updateAsUnmatched(3)
+//            chatMessageDAO.updateStatusByKey(null, ChatMessageStatus.ERROR)
+//            for (i in 0..10) {
+//                chatMessageDAO.insert(ChatMessage(1, "test", ChatMessageStatus.SENDING, OffsetDateTime.now()))
+//            }
+
+//            val cm = chatMessageDAO.findByKey(3)
+//            val cm2 = chatMessageDAO.findByKey(null)
+//            println("$cm")
+//            println("$cm2")
+
+//            val list = listOf<Long>()
+
+
         }
     }
 }

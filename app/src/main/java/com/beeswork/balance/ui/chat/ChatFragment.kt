@@ -16,6 +16,7 @@ import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidatio
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.SnackBarHelper
@@ -79,8 +80,8 @@ class ChatFragment : BaseFragment(),
 
             bindUI(
                 swipedId,
-                arguments.getString(BundleKey.MATCHED_NAME),
-                arguments.getString(BundleKey.MATCHED_PROFILE_PHOTO_KEY),
+                arguments.getString(BundleKey.SWIPED_NAME),
+                arguments.getString(BundleKey.SWIPED_PROFILE_PHOTO_KEY),
                 arguments.getBoolean(BundleKey.UNMATCHED)
             )
         } ?: showErrorDialog(getString(R.string.error_title_chat_id_not_found), "", this)
@@ -88,14 +89,14 @@ class ChatFragment : BaseFragment(),
 
     private fun bindUI(
         swipedId: UUID,
-        matchedName: String?,
-        matchedProfilePhotoKey: String?,
+        swipedName: String?,
+        swipedProfilePhotoKey: String?,
         unmatched: Boolean
     ) = lifecycleScope.launch {
         setupChatRecyclerView()
         setupChatMessageInvalidationObserver()
         setupBackPressedDispatcherCallback()
-        setupToolBar(matchedName)
+        setupToolBar(swipedName)
         setupSendBtnListener()
         setupEmoticonBtnListener()
         setupSendChatMessageMediatorLiveDataObserver()
@@ -149,7 +150,10 @@ class ChatFragment : BaseFragment(),
     private fun setupSendChatMessageMediatorLiveDataObserver() {
         viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
             val errorTitle = getString(R.string.error_title_send_chat_message)
-            if (it.isError()) showErrorDialog(it.error, errorTitle, it.errorMessage)
+            if (it.isError()) {
+                if (it.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) setupAsUnmatched()
+                showErrorDialog(it.error, errorTitle, it.errorMessage)
+            }
         })
     }
 
@@ -172,7 +176,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun setupAsUnmatched() {
-        binding.tvChatMatchedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
+        binding.tvChatSwipedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
     }
 
     private fun setupSendBtnListener() {
@@ -211,8 +215,8 @@ class ChatFragment : BaseFragment(),
         })
     }
 
-    private fun setupToolBar(matchedName: String?) {
-        binding.tvChatMatchedName.text = matchedName ?: ""
+    private fun setupToolBar(swipedName: String?) {
+        binding.tvChatSwipedName.text = swipedName ?: ""
         binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {

@@ -47,7 +47,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentMatchBinding.inflate(layoutInflater)
+        binding = FragmentMatchBinding.inflate(inflater)
         return binding.root
     }
 
@@ -64,7 +64,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         setupFetchMatchesLiveDataObserver()
         setupNewMatchLiveDataObserver()
         search("")
-//        viewModel.fetchMatches()
+        viewModel.fetchMatches()
     }
 
     private suspend fun setupNewMatchLiveDataObserver() {
@@ -153,9 +153,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     private fun showSearchToolBar(): Boolean {
-        viewModel.testFunction()
-//        binding.tbMatch.visibility = View.GONE
-//        binding.tbMatchSearch.visibility = View.VISIBLE
+        binding.tbMatch.visibility = View.GONE
+        binding.tbMatchSearch.visibility = View.VISIBLE
         return true
     }
 
@@ -180,9 +179,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         matchPagingDataAdapter.getMatch(position)?.let {
             arguments.putLong(BundleKey.CHAT_ID, it.chatId)
             arguments.putString(BundleKey.SWIPED_ID, it.swipedId.toString())
-            arguments.putString(BundleKey.MATCHED_NAME, it.name)
+            arguments.putString(BundleKey.SWIPED_NAME, it.name)
             arguments.putBoolean(BundleKey.UNMATCHED, it.unmatched)
-            arguments.putString(BundleKey.MATCHED_PROFILE_PHOTO_KEY, it.profilePhotoKey)
+            arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, it.profilePhotoKey)
             chatFragment.arguments = arguments
         }
 

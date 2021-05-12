@@ -18,7 +18,7 @@ data class ChatMessageDomain(
     companion object {
         fun toSeparator(body: String?): ChatMessageDomain? {
             body?.let {
-                return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, null, null)
+                return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, false, null, null)
             } ?: return null
         }
     }

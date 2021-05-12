@@ -1,21 +1,19 @@
 package com.beeswork.balance.ui.swipe
 
 import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
-import com.beeswork.balance.ui.common.ScopeFragment
+import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -26,10 +24,11 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-const val MIN_CARD_STACK_SIZE = 15
-
-class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
-    BalanceGameDialog.BalanceGameListener, ViewPagerChildFragment {
+class SwipeFragment : BaseFragment(),
+    KodeinAware,
+    CardStackListener,
+    BalanceGameDialog.BalanceGameListener,
+    ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
@@ -37,41 +36,14 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
     private lateinit var viewModel: SwipeViewModel
     private lateinit var cardStackAdapter: CardStackAdapter
-    private lateinit var broadcastReceiver: BroadcastReceiver
     private lateinit var binding: FragmentSwipeBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = FragmentSwipeBinding.inflate(layoutInflater)
-        setHasOptionsMenu(true)
-        setupBroadcastReceiver()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-
-    }
-
-    private fun setupBroadcastReceiver() {
-        broadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                when (intent?.action) {
-                    IntentAction.RECEIVED_FCM_NOTIFICATION -> {
-                        when (intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)) {
-                            NotificationType.MATCH -> viewModel.fetchMatches()
-                            NotificationType.CLICKED -> viewModel.fetchClickedList()
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_swipe, container, false)
+    ): View {
+        binding = FragmentSwipeBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,59 +53,75 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 //        viewModel.fetchCards(false)
     }
 
-    private fun bindUI() = launch {
+    private fun bindUI() = lifecycleScope.launch {
+        setupToolBar()
         setupSwipeCardStackView()
-        setupCardsObserver()
+//        setupCardsObserver()
 
-        viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
-            binding.tvClickCount.text = clickedCount.toString()
-        })
+//        viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
+//            binding.tvClickCount.text = clickedCount.toString()
+//        })
 
 
 
-        binding.btnSwipeFilter.setOnClickListener {
-            SwipeFilterDialog(preferenceProvider).show(
-                childFragmentManager,
-                SwipeFilterDialog.TAG
-            )
-        }
+//        binding.btnSwipeFilter.setOnClickListener {
+//            SwipeFilterDialog(preferenceProvider).show(
+//                childFragmentManager,
+//                SwipeFilterDialog.TAG
+//            )
+//        }
 
-        binding.btnCardStackReload.setOnClickListener {
-            viewModel.fetchCards(false)
-        }
+//        binding.btnCardStackReload.setOnClickListener {
+//            viewModel.fetchCards(false)
+//        }
+//
+//        binding.btnCardStackReset.setOnClickListener {
+//            viewModel.fetchCards(true)
+//        }
+    }
 
-        binding.btnCardStackReset.setOnClickListener {
-            viewModel.fetchCards(true)
+    private fun setupToolBar() {
+        binding.tbSwipe.inflateMenu(R.menu.swipe_tool_bar)
+        binding.tbSwipe.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.miSwipeFilter -> showSwipeFilter()
+                else -> false
+            }
         }
     }
 
+    private fun showSwipeFilter(): Boolean {
+
+        return true
+    }
+
     private fun setupCardsObserver() {
-        viewModel.cards.observe(viewLifecycleOwner, { cardResource ->
-            when (cardResource.status) {
-                Resource.Status.SUCCESS -> {
-
-                    val cards = cardResource.data
-
-                    if (cards == null || cards.isEmpty()) {
-                        resetCardStackLayouts()
-                        binding.llCardStackReset.visibility = View.VISIBLE
-                    } else {
-                        cardStackAdapter.addCards(cardResource.data)
-                        binding.csvSwipe.visibility = View.VISIBLE
-                    }
-
-                }
-                Resource.Status.LOADING -> {
-                    resetCardStackLayouts()
-                    binding.llCardStackLoading.visibility = View.VISIBLE
-
-                }
-                Resource.Status.ERROR -> {
-                    resetCardStackLayouts()
-                    binding.llCardStackError.visibility = View.VISIBLE
-                }
-            }
-        })
+//        viewModel.cards.observe(viewLifecycleOwner, { cardResource ->
+//            when (cardResource.status) {
+//                Resource.Status.SUCCESS -> {
+//
+//                    val cards = cardResource.data
+//
+//                    if (cards == null || cards.isEmpty()) {
+//                        resetCardStackLayouts()
+//                        binding.llCardStackReset.visibility = View.VISIBLE
+//                    } else {
+//                        cardStackAdapter.addCards(cardResource.data)
+//                        binding.csvSwipe.visibility = View.VISIBLE
+//                    }
+//
+//                }
+//                Resource.Status.LOADING -> {
+//                    resetCardStackLayouts()
+//                    binding.llCardStackLoading.visibility = View.VISIBLE
+//
+//                }
+//                Resource.Status.ERROR -> {
+//                    resetCardStackLayouts()
+//                    binding.llCardStackError.visibility = View.VISIBLE
+//                }
+//            }
+//        })
     }
 
     private fun resetCardStackLayouts() {
@@ -142,7 +130,7 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
 
         binding.llCardStackLoading.visibility = View.GONE
         binding.llCardStackError.visibility = View.GONE
-        binding.llCardStackReset.visibility = View.GONE
+//        binding.llCardStackReset.visibility = View.GONE
     }
 
     private fun setupSwipeCardStackView() {
@@ -157,18 +145,6 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         binding.csvSwipe.itemAnimator = DefaultItemAnimator()
     }
 
-    override fun onResume() {
-        super.onResume()
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
-            broadcastReceiver,
-            IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
-        )
-    }
-
-    override fun onPause() {
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(broadcastReceiver)
-        super.onPause()
-    }
 
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
 //        NewMatchDialog("", matchedPhotoKey).show(
@@ -216,5 +192,8 @@ class SwipeFragment : ScopeFragment(), KodeinAware, CardStackListener,
         println("swipe fragment: onFragmentSelected")
     }
 
+    companion object {
+        const val MIN_CARD_STACK_SIZE = 15
+    }
 
 }

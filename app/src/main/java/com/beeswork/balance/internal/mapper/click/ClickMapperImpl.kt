@@ -5,11 +5,11 @@ import com.beeswork.balance.data.network.response.swipe.ClickDTO
 import com.beeswork.balance.ui.click.ClickDomain
 
 class ClickMapperImpl: ClickMapper {
-    override fun toEntity(dto: ClickDTO): Click {
-        return Click(dto.swiperId, dto.profilePhotoKey, dto.updatedAt)
+    override fun toClick(clickDTO: ClickDTO): Click {
+        return Click(clickDTO.swiperId, clickDTO.profilePhotoKey, clickDTO.updatedAt)
     }
 
-    override fun toDomain(entity: Click): ClickDomain {
-        return ClickDomain(entity.swiperId, entity.profilePhotoKey)
+    override fun toClickDomain(click: Click): ClickDomain {
+        return ClickDomain(click.swiperId, click.profilePhotoKey)
     }
 }

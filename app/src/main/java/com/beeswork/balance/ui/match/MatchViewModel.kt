@@ -35,7 +35,7 @@ class MatchViewModel(
             null,
             { MatchPagingSource(matchRepository, searchKeyword) }
         ).flow.cachedIn(viewModelScope)
-            .map { pagingData -> pagingData.map { matchMapper.toDomain(it) } }
+            .map { pagingData -> pagingData.map { matchMapper.toMatchDomain(it) } }
             .asLiveData(viewModelScope.coroutineContext)
     }
 

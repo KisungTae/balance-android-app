@@ -68,16 +68,13 @@ class ChatRepositoryImpl(
 
     private fun collectChatMessageReceiptFlow() {
         stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
-
-
-
-            safeLet(chatMessageDTO.key, chatMessageDTO.chatId) { key, chatId ->
-                chatMessageDTO.id?.let { id ->
-                    if (id == StompHeader.UNMATCHED_RECEIPT_ID) onUnmatchedReceiptReceived(key, chatId)
-                    else onChatMessageSent(key, id, chatMessageDTO.createdAt)
-                } ?: chatMessageDAO.updateStatusByKey(key, ChatMessageStatus.ERROR)
-                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceipt(chatId))
-            }
+            chatMessageDTO.id?.let { id ->
+                if (id == StompHeader.UNMATCHED_RECEIPT_ID) onUnmatchedReceiptReceived(
+                    chatMessageDTO.key,
+                    chatMessageDTO.chatId
+                ) else onChatMessageSent(chatMessageDTO)
+            } ?: chatMessageDAO.updateStatusByKey(chatMessageDTO.key, ChatMessageStatus.ERROR)
+            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceipt(chatMessageDTO.chatId))
         }.launchIn(scope)
     }
 
@@ -87,17 +84,17 @@ class ChatRepositoryImpl(
         }.launchIn(scope)
     }
 
-    private fun onUnmatchedReceiptReceived(key: Long, chatId: Long) {
+    private fun onUnmatchedReceiptReceived(key: Long?, chatId: Long?) {
         chatMessageDAO.updateStatusByKey(key, ChatMessageStatus.ERROR)
         matchDAO.updateAsUnmatched(chatId)
         chatMessageReceiptFlowListener?.onInvoke(Resource.error(ExceptionCode.MATCH_UNMATCHED_EXCEPTION))
     }
 
-    private fun onChatMessageSent(key: Long, id: Long, createdAt: OffsetDateTime?) {
-        chatMessageDAO.findByKey(key)?.let { chatMessage ->
-            chatMessage.id = id
-            chatMessage.createdAt = createdAt
-            chatMessage.status = ChatMessageStatus.SENT
+    private fun onChatMessageSent(chatMessageDTO: ChatMessageDTO) {
+        chatMessageMapper.toSentChatMessage(
+            chatMessageDAO.findByKey(chatMessageDTO.key),
+            chatMessageDTO
+        )?.let { chatMessage ->
             chatMessageDAO.insert(chatMessage)
             updateMatchOnNewChatMessage(chatMessage.chatId)
         }
@@ -174,23 +171,22 @@ class ChatRepositoryImpl(
         val newChatMessages = mutableListOf<ChatMessage>()
 
         receivedChatMessageDTOs?.forEach { chatMessageDTO ->
-            val chatMessage = chatMessageMapper.toEntity(chatMessageDTO)
-            newChatMessages.add(chatMessage)
-            receivedChatMessageIds.add(chatMessage.id)
-            chatIds.add(chatMessage.chatId)
+            chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
+                newChatMessages.add(chatMessage)
+                receivedChatMessageIds.add(chatMessage.id)
+                chatIds.add(chatMessage.chatId)
+            }
         }
 
         sentChatMessageDTOs?.forEach { chatMessageDTO ->
-            safeLet(chatMessageDTO.key, chatMessageDTO.id, chatMessageDTO.createdAt) { key, id, createdAt ->
-                chatMessageDAO.findByKey(key)?.let { chatMessage ->
-                    chatMessage.id = id
-                    chatMessage.status = ChatMessageStatus.SENT
-                    chatMessage.createdAt = createdAt
-                    newChatMessages.add(chatMessage)
-                    chatIds.add(chatMessage.chatId)
-                }
-                sentChatMessageIds.add(id)
+            chatMessageMapper.toSentChatMessage(
+                chatMessageDAO.findByKey(chatMessageDTO.key),
+                chatMessageDTO
+            )?.let { chatMessage ->
+                newChatMessages.add(chatMessage)
+                chatIds.add(chatMessage.chatId)
             }
+            chatMessageDTO.id?.let { sentChatMessageIds.add(it) }
         }
         syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
         chatMessageDAO.insert(newChatMessages)
@@ -220,7 +216,6 @@ class ChatRepositoryImpl(
             )?.let { chatMessage ->
                 match.recentChatMessage = chatMessage.body
                 match.updatedAt = chatMessage.createdAt
-//                chatMessage.createdAt?.let { match.updatedAt = it }
                 match.active = true
             }
             match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageId)
@@ -252,6 +247,7 @@ class ChatRepositoryImpl(
 //            352,
 //            "test chat message received"
 //        )
+
     }
 }
 

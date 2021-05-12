@@ -194,8 +194,8 @@
 
         <com.github.ybq.android.spinkit.SpinKitView
             style="@style/SpinKitView.Large.Circle"
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_width="@dimen/spin_kit_medium_size"
+            android:layout_height="@dimen/spin_kit_medium_size"
             android:background="@color/Transparent"
             app:SpinKit_Color="@color/Primary" />
 

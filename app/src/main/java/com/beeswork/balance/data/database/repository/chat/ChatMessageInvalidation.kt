@@ -7,7 +7,7 @@ class ChatMessageInvalidation(
 ) {
 
     companion object {
-        fun ofReceipt(chatId: Long): ChatMessageInvalidation {
+        fun ofReceipt(chatId: Long?): ChatMessageInvalidation {
             return ChatMessageInvalidation(Type.RECEIPT, chatId, null)
         }
 

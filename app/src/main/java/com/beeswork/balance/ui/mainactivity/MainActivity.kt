@@ -1,14 +1,17 @@
 package com.beeswork.balance.ui.mainactivity
 
 import android.Manifest
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,6 +23,7 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.dialog.ClickedDialog
 import com.beeswork.balance.ui.dialog.NewMatchDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
@@ -44,6 +48,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         setContentView(binding.root)
         setupBroadcastReceiver()
         setupLocationManager()
+
     }
 
     override fun onResume() {
@@ -142,31 +147,30 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        val v: View? = currentFocus
+        if (v != null && (ev.action == MotionEvent.ACTION_UP || ev.action == MotionEvent.ACTION_MOVE) && v is EditText &&
+            !v.javaClass.name.startsWith("android.webkit.")
+        ) {
+            val sourceCoordinates = IntArray(2)
+            v.getLocationOnScreen(sourceCoordinates)
+            val x: Float = ev.rawX + v.getLeft() - sourceCoordinates[0]
+            val y: Float = ev.rawY + v.getTop() - sourceCoordinates[1]
+            if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
+                hideKeyboard(this)
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
-//    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-//        val v: View? = currentFocus
-//        if (v != null && (ev.action == MotionEvent.ACTION_UP || ev.action == MotionEvent.ACTION_MOVE) && v is EditText &&
-//            !v.javaClass.name.startsWith("android.webkit.")
-//        ) {
-//            val sourceCoordinates = IntArray(2)
-//            v.getLocationOnScreen(sourceCoordinates)
-//            val x: Float = ev.rawX + v.getLeft() - sourceCoordinates[0]
-//            val y: Float = ev.rawY + v.getTop() - sourceCoordinates[1]
-//            if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
-//                hideKeyboard(this)
-//            }
-//        }
-//        return super.dispatchTouchEvent(ev)
-//    }
-//
-//    private fun hideKeyboard(activity: Activity?) {
-//        safeLet(activity, activity?.window) { a, w ->
-//            (a.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-//                a.window.decorView.windowToken,
-//                0
-//            )
-//        }
-//    }
+    private fun hideKeyboard(activity: Activity?) {
+        safeLet(activity, activity?.window) { a, w ->
+            (a.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                a.window.decorView.windowToken,
+                0
+            )
+        }
+    }
 
     fun hideKeyboard(view: View?) {
         if (view != null) {

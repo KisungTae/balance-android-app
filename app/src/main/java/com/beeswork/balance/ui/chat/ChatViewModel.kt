@@ -135,7 +135,7 @@ class ChatViewModel(
     }
 
     fun test() {
-//        chatRepository.test()
+        chatRepository.test()
     }
 
     fun test2() {
@@ -156,6 +156,3 @@ class ChatViewModel(
         )
     }
 }
-
-
-// TODO: check insertSepartors becasue I added processed field in chatMessageDomain check if I can just check times

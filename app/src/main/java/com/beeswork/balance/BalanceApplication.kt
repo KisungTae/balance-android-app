@@ -22,6 +22,8 @@ import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepositoryImpl
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepositoryImpl
+import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
+import com.beeswork.balance.data.database.repository.swipe.SwipeRepositoryImpl
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
 import com.beeswork.balance.data.network.rds.click.ClickRDS
@@ -32,6 +34,8 @@ import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.rds.report.ReportRDSImpl
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.rds.setting.SettingRDSImpl
+import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
+import com.beeswork.balance.data.network.rds.swipe.SwipeRDSImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -97,6 +101,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
         bind<ClickRDS>() with singleton { ClickRDSImpl(instance()) }
         bind<SettingRDS>() with singleton { SettingRDSImpl(instance()) }
+        bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance()) }
 
 
 
@@ -104,6 +109,7 @@ class BalanceApplication : Application(), KodeinAware {
 
 
         // Repository
+        bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance()) }
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance()) }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
@@ -340,3 +346,5 @@ class BalanceApplication : Application(), KodeinAware {
 //      104. think about putting fcm token table to profile as variable
 //      105. display profile photo in chatmessage snackbar if any defined in chatMessageAdapter profilePhotoEndPoint
 //      106. at first login, save fcm token to server to update the updatedAt so that if even multiple devices, server can use the most recent token
+//      107. hide keyboard when touched outside
+//      108. chat enter slide does not animate mainvewipager fragment

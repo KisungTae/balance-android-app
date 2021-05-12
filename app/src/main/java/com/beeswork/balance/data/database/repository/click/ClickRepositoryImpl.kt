@@ -50,14 +50,14 @@ class ClickRepositoryImpl(
 
     private fun collectClickFlow() {
         stompClient.clickFlow.onEach { clickDTO ->
-            val click = clickMapper.toEntity(clickDTO)
+            val click = clickMapper.toClick(clickDTO)
             if (saveClick(click)) newClickFlowListener?.onReceive(click)
         }.launchIn(scope)
     }
 
 
     override suspend fun saveClick(clickDTO: ClickDTO) {
-        val click = clickMapper.toEntity(clickDTO)
+        val click = clickMapper.toClick(clickDTO)
         if (saveClick(click)) newClickFlowListener?.onReceive(click)
     }
 
@@ -83,7 +83,7 @@ class ClickRepositoryImpl(
             )
 
             response.data?.let { data ->
-                val clicks = data.map { clickMapper.toEntity(it) }
+                val clicks = data.map { clickMapper.toClick(it) }
                 balanceDatabase.runInTransaction {
                     clicks.forEach { click -> saveClick(click) }
                 }

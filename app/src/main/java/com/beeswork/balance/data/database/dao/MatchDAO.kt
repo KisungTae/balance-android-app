@@ -22,7 +22,7 @@ interface MatchDAO {
     fun insert(matches: List<Match>)
 
     @Query("select * from `match` where chatId = :chatId")
-    fun findById(chatId: Long): Match?
+    fun findById(chatId: Long?): Match?
 
     @Query("select count(swipedId) > 0 from `match` where swipedId = :swipedId")
     fun existBySwipedId(swipedId: UUID): Boolean
@@ -43,6 +43,6 @@ interface MatchDAO {
     fun invalidation(): Flow<Boolean>
 
     @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', profilePhotoKey = null, active = 1 where chatId = :chatId")
-    fun updateAsUnmatched(chatId: Long)
+    fun updateAsUnmatched(chatId: Long?)
 
 }
