@@ -9,7 +9,7 @@
         <item name="android:textSize">15sp</item>
         <item name="android:statusBarColor">@color/BackgroundWhite</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
+<!--        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>-->
     </style>
 
 
@@ -25,9 +25,12 @@
     </style>
 
     <style name="CustomBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="colorPrimary">@color/Primary</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="android:colorBackground">@android:color/transparent</item>
     </style>
+
+
 
 </resources>

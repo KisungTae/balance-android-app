@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="true"
@@ -28,6 +29,13 @@
         android:paddingHorizontal="20dp"
         android:paddingTop="20dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/swipe_filter_gender_title" />
+
         <RadioGroup
             android:id="@+id/rgSwipeFilterGender"
             android:layout_width="match_parent"
@@ -35,7 +43,8 @@
             android:layout_marginBottom="20dp"
             android:background="@color/BackgroundWhite"
             android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="13dp">
 
             <RadioButton
                 android:id="@+id/rbSwipeFilterMale"
@@ -45,10 +54,9 @@
                 android:background="@drawable/st_radio_button_left"
                 android:button="@color/Transparent"
                 android:gravity="center"
-                android:paddingVertical="10dp"
+                android:paddingVertical="8dp"
                 android:text="@string/swipe_filter_dialog_radio_button_male_title"
                 android:textColor="@color/radio_button_text" />
-
 
             <RadioButton
                 android:id="@+id/rbSwipeFilterFemale"
@@ -58,7 +66,7 @@
                 android:background="@drawable/st_radio_button_right"
                 android:button="@color/Transparent"
                 android:gravity="center"
-                android:paddingVertical="10dp"
+                android:paddingVertical="8dp"
                 android:text="@string/swipe_filter_dialog_radio_button_female_title"
                 android:textColor="@color/radio_button_text" />
 
@@ -66,34 +74,31 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="상대방 나이는 " />
+                android:text="@string/swipe_filter_age_slider_title" />
 
             <TextView
                 android:id="@+id/tvSwipeFilterMinAge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="" />
+                android:layout_marginStart="3dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" 에서 " />
+                android:layout_marginStart="3dp"
+                android:text="@string/swipe_filter_age_slider_between" />
 
             <TextView
                 android:id="@+id/tvSwipeFilterMaxAge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" 까지 볼래요" />
+                android:layout_marginStart="3dp"/>
 
         </LinearLayout>
 
@@ -101,30 +106,39 @@
             android:id="@+id/rsSwipeFilterAge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/LightGrey"
             android:stepSize="1"
             android:valueFrom="20"
-            android:valueTo="100" />
+            android:valueTo="80"
+            app:haloColor="@color/Transparent"
+            app:labelBehavior="gone"
+            app:tickVisible="false"
+            app:trackColorInactive="@color/LightGrey"
+            app:trackHeight="3dp"
+            app:values="@array/initial_slider_values" />
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/swipe_filter_distance_slider_title" />
 
             <TextView
                 android:id="@+id/tvSwipeFilterDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="" />
+                android:layout_marginStart="3dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="km" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" 까지 떨어진 상대방을 볼래요" />
+                android:layout_marginStart="3dp"
+                android:text="@string/swipe_filter_distance_slider_unit" />
 
         </LinearLayout>
 
@@ -132,11 +146,16 @@
             android:id="@+id/sliderSwipeFilterDistance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/LightGrey"
             android:stepSize="1"
             android:valueFrom="1"
-            android:valueTo="10" />
-
-
+            android:valueTo="30"
+            app:haloColor="@color/Transparent"
+            app:labelBehavior="gone"
+            app:tickVisible="false"
+            app:trackColorActive="@color/Primary"
+            app:trackColorInactive="@color/LightGrey"
+            app:trackHeight="3dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -144,13 +163,16 @@
         android:layout_height="wrap_content"
         android:background="@drawable/sh_bottom_round_box"
         android:backgroundTint="@color/BackgroundWhite"
-        android:gravity="center">
+        android:gravity="center"
+        android:paddingHorizontal="33dp"
+        android:paddingVertical="20dp">
 
         <Button
             android:id="@+id/btnSwipeFilterClose"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CLOSE" />
+            android:stateListAnimator="@null"
+            android:text="@string/apply_button_text" />
 
     </LinearLayout>
 

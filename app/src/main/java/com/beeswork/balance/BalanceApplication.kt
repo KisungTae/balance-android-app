@@ -43,6 +43,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
+import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
+import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapperImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
@@ -78,6 +80,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<MatchMapper>() with singleton { MatchMapperImpl() }
         bind<ChatMessageMapper>() with singleton { ChatMessageMapperImpl() }
         bind<ClickMapper>() with singleton { ClickMapperImpl() }
+        bind<SwipeFilterMapper>() with singleton { SwipeFilterMapperImpl() }
 
 
         // Database
@@ -199,7 +202,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeViewModelFactory(instance()) }
         bind() from provider { ClickViewModelFactory(instance(), instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
-        bind() from provider { SwipeFilterDialogViewModelFactory(instance()) }
+        bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
 
 

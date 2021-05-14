@@ -95,5 +95,11 @@
     <string name="swipe_filter_dialog_radio_button_male_title">남자</string>
     <string name="swipe_filter_dialog_radio_button_female_title">여자</string>
     <string name="swipe_filter_dialog_title">필터</string>
+    <string name="swipe_filter_age_slider_title">상대방의 나이는</string>
+    <string name="swipe_filter_age_slider_between">에서</string>
+    <string name="swipe_filter_distance_slider_title">상대방과의 거리는 최대</string>
+    <string name="swipe_filter_distance_slider_unit">km</string>
+    <string name="apply_button_text">적용하기</string>
+    <string name="swipe_filter_gender_title">상대방의 성별은</string>
 
 </resources>

@@ -2,12 +2,9 @@ package com.beeswork.balance.data.database
 
 import android.content.Context
 import androidx.room.*
+import com.beeswork.balance.data.database.converter.*
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.converter.ChatMessageStatusConverter
-import com.beeswork.balance.data.database.converter.OffsetDateTimeConverter
-import com.beeswork.balance.data.database.converter.ResourceStatusConverter
-import com.beeswork.balance.data.database.converter.UUIDConverter
 
 
 @Database(
@@ -19,7 +16,8 @@ import com.beeswork.balance.data.database.converter.UUIDConverter
     OffsetDateTimeConverter::class,
     ChatMessageStatusConverter::class,
     UUIDConverter::class,
-    ResourceStatusConverter::class
+    ResourceStatusConverter::class,
+    GenderConverter::class
 )
 abstract class BalanceDatabase : RoomDatabase() {
 

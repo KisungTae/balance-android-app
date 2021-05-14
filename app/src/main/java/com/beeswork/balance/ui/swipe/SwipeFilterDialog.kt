@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogSwipeFilterBinding
+import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
@@ -45,7 +46,38 @@ class SwipeFilterDialog : BottomSheetDialogFragment(), KodeinAware {
     }
 
     private fun bind() = lifecycleScope.launch {
+        setupSliders()
+        setupSwipeFilterLiveData()
+        viewModel.fetchSwipeFilter()
     }
+
+
+    private fun setupSliders() {
+        binding.rsSwipeFilterAge.addOnChangeListener { rangeSlider, _, _ ->
+            binding.tvSwipeFilterMinAge.text = rangeSlider.values[0].toInt().toString()
+            binding.tvSwipeFilterMaxAge.text = rangeSlider.values[1].toInt().toString()
+        }
+
+        binding.sliderSwipeFilterDistance.addOnChangeListener { _, value, _ ->
+            binding.tvSwipeFilterDistance.text = value.toInt().toString()
+        }
+    }
+
+    private fun setupSwipeFilterLiveData() {
+        viewModel.swipeFilterLiveData.observe(viewLifecycleOwner) {
+//            when (it.gender) {
+//                Gender.FEMALE -> binding.rbSwipeFilterFemale.isChecked = true
+//                Gender.MALE -> binding.rbSwipeFilterMale.isChecked = true
+//            }
+            binding.rbSwipeFilterFemale.isChecked = it.gender == Gender.FEMALE
+            binding.rbSwipeFilterMale.isChecked = it.gender == Gender.MALE
+            binding.sliderSwipeFilterDistance.value = it.distance.toFloat()
+            binding.rsSwipeFilterAge.values = arrayListOf(it.minAge.toFloat(), it.maxAge.toFloat())
+        }
+    }
+
+
+
 
     override fun onStop() {
 
