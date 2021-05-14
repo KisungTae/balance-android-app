@@ -13,5 +13,6 @@
     <dimen name="snack_bar_new_chat_message_bottom_padding">10dp</dimen>
     <dimen name="item_click_round">10dp</dimen>
     <dimen name="spin_kit_medium_size">48dp</dimen>
+    <dimen name="spin_kit_small_size">24dp</dimen>
 
 </resources>

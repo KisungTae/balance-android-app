@@ -16,8 +16,6 @@ interface BalanceRepository {
     val balanceGame: LiveData<Resource<BalanceGameResponse>>
     val clickResponse: LiveData<Resource<ClickResponse>>
 
-    suspend fun getClickedCount(): LiveData<Int>
-
     fun fetchClickedList()
     fun swipe(swipeId: Long?, swipedId: String)
     fun click(swipedId: String, swipeId: Long, answers: Map<Int, Boolean>)

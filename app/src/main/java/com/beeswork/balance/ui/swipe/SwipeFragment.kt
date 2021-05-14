@@ -28,11 +28,11 @@ class SwipeFragment : BaseFragment(),
     KodeinAware,
     CardStackListener,
     BalanceGameDialog.BalanceGameListener,
-    ViewPagerChildFragment {
+    ViewPagerChildFragment,
+    SwipeFilterDialog.SwipeFilterDialogListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
-    private val preferenceProvider: PreferenceProvider by instance()
 
     private lateinit var viewModel: SwipeViewModel
     private lateinit var cardStackAdapter: CardStackAdapter
@@ -50,7 +50,7 @@ class SwipeFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
-//        viewModel.fetchCards(false)
+        viewModel.fetchCards(false)
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -61,7 +61,6 @@ class SwipeFragment : BaseFragment(),
 //        viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
 //            binding.tvClickCount.text = clickedCount.toString()
 //        })
-
 
 
 //        binding.btnSwipeFilter.setOnClickListener {
@@ -91,7 +90,7 @@ class SwipeFragment : BaseFragment(),
     }
 
     private fun showSwipeFilter(): Boolean {
-        SwipeFilterDialog().show(childFragmentManager, SwipeFilterDialog.TAG)
+        SwipeFilterDialog(this).show(childFragmentManager, SwipeFilterDialog.TAG)
         return true
     }
 
@@ -194,6 +193,10 @@ class SwipeFragment : BaseFragment(),
 
     companion object {
         const val MIN_CARD_STACK_SIZE = 15
+    }
+
+    override fun onApplySwipeFilter() {
+        println("onApplySwipeFilter")
     }
 
 }

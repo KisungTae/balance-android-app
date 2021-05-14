@@ -45,4 +45,7 @@ interface MatchDAO {
     @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', profilePhotoKey = null, active = 1 where chatId = :chatId")
     fun updateAsUnmatched(chatId: Long?)
 
+    @Query("select count(unread) from `match` where unread = 1 or active = 0")
+    fun countUnread(): Flow<Int>
+
 }

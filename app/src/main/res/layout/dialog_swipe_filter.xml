@@ -10,6 +10,7 @@
     android:paddingEnd="10dp"
     android:paddingBottom="20dp">
 
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,7 +87,7 @@
                 android:id="@+id/tvSwipeFilterMinAge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"/>
+                android:layout_marginStart="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -98,7 +99,7 @@
                 android:id="@+id/tvSwipeFilterMaxAge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"/>
+                android:layout_marginStart="3dp" />
 
         </LinearLayout>
 
@@ -132,7 +133,7 @@
                 android:id="@+id/tvSwipeFilterDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"/>
+                android:layout_marginStart="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -163,18 +164,18 @@
         android:layout_height="wrap_content"
         android:background="@drawable/sh_bottom_round_box"
         android:backgroundTint="@color/BackgroundWhite"
-        android:gravity="center"
+        android:orientation="vertical"
         android:paddingHorizontal="33dp"
         android:paddingVertical="20dp">
 
         <Button
-            android:id="@+id/btnSwipeFilterClose"
+            android:background="@drawable/sh_round_box"
+            android:id="@+id/btnSwipeFilterApply"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:stateListAnimator="@null"
             android:text="@string/apply_button_text" />
 
     </LinearLayout>
-
 
 </LinearLayout>

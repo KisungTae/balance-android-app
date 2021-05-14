@@ -8,6 +8,7 @@
     <color name="TextWhite">#FFFFFF</color>
     <color name="TextGrey">#9E9E9E</color>
     <color name="TextRed">#ff4d4d</color>
+    <color name="WarningRed">#ff4d4d</color>
 
 
 
@@ -17,4 +18,5 @@
     <color name="GreyDark">#B8B8B8</color>
     <color name="Black">#000000</color>
     <color name="BackgroundWhite">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
 </resources>

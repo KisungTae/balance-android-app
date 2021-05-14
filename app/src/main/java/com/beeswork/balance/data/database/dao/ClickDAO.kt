@@ -30,7 +30,7 @@ interface ClickDAO {
     fun deleteIfMatched()
 
     @Query("select count(*) from click")
-    fun count(): LiveData<Int>
+    fun count(): Flow<Int>
 
     @Query("select * from click order by updatedAt desc limit :loadSize offset :startPosition ")
     fun findAllPaged(loadSize: Int, startPosition: Int): List<Click>

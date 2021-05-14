@@ -189,6 +189,12 @@ class MatchRepositoryImpl(
         }
     }
 
+    override suspend fun getUnreadMatchCount(): Flow<Int> {
+        return withContext(Dispatchers.IO) {
+            return@withContext matchDAO.countUnread()
+        }
+    }
+
 
     //  TODO: remove me
     private fun createDummyChatMessages() {

@@ -19,4 +19,10 @@ class SwipeRepositoryImpl(
             return@withContext swipeFilterDAO.findById()
         }
     }
+
+    override suspend fun saveSwipeFilter(gender: Gender, minAge: Int, maxAge: Int, distance: Int) {
+        withContext(Dispatchers.IO) {
+            swipeFilterDAO.insert(SwipeFilter(gender, minAge, maxAge, distance))
+        }
+    }
 }

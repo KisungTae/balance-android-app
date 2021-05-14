@@ -29,7 +29,7 @@ interface MatchRepository {
     ): Resource<EmptyResponse>
     suspend fun saveMatch(matchDTO: MatchDTO)
     suspend fun getMatchInvalidation(): Flow<Boolean>
-
+    suspend fun getUnreadMatchCount(): Flow<Int>
 
     fun testFunction()
 }

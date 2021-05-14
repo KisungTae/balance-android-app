@@ -70,11 +70,7 @@ class BalanceRepositoryImpl(
 //        }
     }
 
-    override suspend fun getClickedCount(): LiveData<Int> {
-        return withContext(Dispatchers.IO) {
-            return@withContext clickDAO.count()
-        }
-    }
+
 
 
 

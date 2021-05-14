@@ -98,6 +98,12 @@ class ClickRepositoryImpl(
         }
     }
 
+    override suspend fun getClickCount(): Flow<Int> {
+        return withContext(Dispatchers.IO) {
+            return@withContext clickDAO.count()
+        }
+    }
+
     override fun test() {
 
         CoroutineScope(Dispatchers.IO).launch {

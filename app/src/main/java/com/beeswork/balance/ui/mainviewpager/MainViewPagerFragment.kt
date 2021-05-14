@@ -50,6 +50,25 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         setupViewPager()
         setupViewPagerTab()
         setupWebSocketEventObserver()
+        setupUnreadMatchCountObserver()
+        setupClickCountObserver()
+    }
+
+    private suspend fun setupClickCountObserver() {
+        viewModel.clickCount.await().observe(viewLifecycleOwner) { count ->
+            showBadgeWithCount(FragmentTabPosition.CLICK.ordinal, count)
+        }
+    }
+
+    private suspend fun setupUnreadMatchCountObserver() {
+        viewModel.unreadMatchCount.await().observe(viewLifecycleOwner) { count ->
+            showBadgeWithCount(FragmentTabPosition.MATCH.ordinal, count)
+        }
+    }
+
+    private fun showBadgeWithCount(position: Int, count: Int) {
+        if (count > 0) showTabBadge(position, count)
+        else hideTabBadge(position)
     }
 
     private fun setupWebSocketEventObserver() {
@@ -90,8 +109,8 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         ) { tab, position ->
             when (position) {
                 FragmentTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_baseline_account_circle)
-                FragmentTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
-                FragmentTabPosition.CLICK.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
+                FragmentTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
+                FragmentTabPosition.CLICK.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
                 FragmentTabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
             }
         }
@@ -108,12 +127,20 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         viewModel.disconnectStomp()
     }
 
-    private fun showTabBadge(position: Int, visible: Boolean) {
-//        binding.tlMain.getTabAt(position)?.let {
-//            val badge = it.orCreateBadge
-//            if (visible) badge.backgroundColor = ContextCompat.getColor(applicationContext, R.color.Primary)
-//            badge.isVisible = visible
-//        }
+    private fun showTabBadge(position: Int, count: Int?) {
+        binding.tlMain.getTabAt(position)?.let {
+            val badge = it.orCreateBadge
+            count?.let { badge.number = it }
+            badge.maxCharacterCount = BADGE_MAX_CHAR_COUNT
+            badge.backgroundColor = ContextCompat.getColor(requireContext(), R.color.WarningRed)
+            badge.isVisible = true
+        }
+    }
+
+    private fun hideTabBadge(position: Int) {
+        binding.tlMain.getTabAt(position)?.let { tab ->
+            tab.badge?.let { badgeDrawable -> badgeDrawable.isVisible = false }
+        }
     }
 
     override fun onRetry(requestCode: Int?) {
@@ -126,6 +153,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
 
     companion object {
         const val TAG = "mainViewPagerFragment"
+        const val BADGE_MAX_CHAR_COUNT = 3
     }
 
 
