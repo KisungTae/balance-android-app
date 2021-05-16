@@ -2,20 +2,17 @@ package com.beeswork.balance.ui.swipe
 
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.CardResponse
+import com.beeswork.balance.data.network.response.swipe.CardDTO
 import com.beeswork.balance.databinding.ItemCardStackBinding
-import com.google.android.material.tabs.TabLayoutMediator
 
 
 class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     private lateinit var cardImageViewPager: ViewPager2
-    private val cardResponses: MutableList<CardResponse> = arrayListOf()
+    private val cardRespons: MutableList<CardDTO> = arrayListOf()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,16 +35,16 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 //        TabLayoutMediator(holder.itemView.tlCardImage, holder.itemView.vpCardImage) { tab, pos -> }.attach()
     }
 
-    fun addCards(newCardResponses: List<CardResponse>) {
-        val startIndex = if (cardResponses.size > 0) cardResponses.size - 1 else 0
-        cardResponses.addAll(startIndex, newCardResponses)
-        notifyItemRangeInserted(startIndex, newCardResponses.size)
+    fun addCards(newCardRespons: List<CardDTO>) {
+        val startIndex = if (cardRespons.size > 0) cardRespons.size - 1 else 0
+        cardRespons.addAll(startIndex, newCardRespons)
+        notifyItemRangeInserted(startIndex, newCardRespons.size)
     }
 
-    fun removeCard(): CardResponse? {
+    fun removeCard(): CardDTO? {
 
-        if (cardResponses.size > 0) {
-            val removedCard = cardResponses.removeAt(0)
+        if (cardRespons.size > 0) {
+            val removedCard = cardRespons.removeAt(0)
             notifyItemRemoved(0)
             return removedCard
         }
@@ -69,7 +66,7 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return cardResponses.size
+        return cardRespons.size
     }
 
 

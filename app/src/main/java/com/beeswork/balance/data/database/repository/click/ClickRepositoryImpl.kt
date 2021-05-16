@@ -7,7 +7,7 @@ import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.response.swipe.ClickDTO
+import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.mapper.click.ClickMapper

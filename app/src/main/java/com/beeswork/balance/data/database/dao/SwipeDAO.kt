@@ -10,14 +10,6 @@ interface SwipeDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(swipe: Swipe)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(swipes: List<Swipe>)
-
-    @Query("select swipedId from swipe")
-    fun findSwipedIds(): List<UUID>
-
-//  TODO: remove me
-    @Query("select * from swipe")
-    fun get(): List<Swipe>
-
+    @Query("select count(*) > 0 from swipe where swipedId = :swipedId")
+    fun existBySwipedId(swipedId: UUID): Boolean
 }

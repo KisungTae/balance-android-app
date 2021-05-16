@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.swipe.CardDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -69,18 +70,18 @@ interface BalanceRDS {
         answers: Map<Int, Boolean>
     ): Resource<EmptyResponse>
 
-    suspend fun fetchCards(
-        accountId: String,
-        identityToken: String,
-        minAge: Int,
-        maxAge: Int,
-        gender: Boolean,
-        distance: Int,
-        latitude: Double?,
-        longitude: Double?,
-        locationUpdatedAt: String?,
-        reset: Boolean
-    ): Resource<MutableList<CardResponse>>
+//    suspend fun fetchCards(
+//        accountId: String,
+//        identityToken: String,
+//        minAge: Int,
+//        maxAge: Int,
+//        gender: Boolean,
+//        distance: Int,
+//        latitude: Double?,
+//        longitude: Double?,
+//        locationUpdatedAt: String?,
+//        reset: Boolean
+//    ): Resource<MutableList<CardDTO>>
 
     suspend fun swipe(
         accountId: String,

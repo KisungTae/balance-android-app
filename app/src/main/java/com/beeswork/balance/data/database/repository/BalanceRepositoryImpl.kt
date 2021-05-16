@@ -4,7 +4,6 @@ import android.content.Context
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.DataSource
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
@@ -13,6 +12,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.swipe.CardDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.*
@@ -194,8 +194,8 @@ class BalanceRepositoryImpl(
 //  ##################################### ACCOUNT ################################### //
 //  ################################################################################# //
 
-    private val mutableCards = MutableLiveData<Resource<List<CardResponse>>>()
-    override val cards: LiveData<Resource<List<CardResponse>>>
+    private val mutableCards = MutableLiveData<Resource<List<CardDTO>>>()
+    override val cards: LiveData<Resource<List<CardDTO>>>
         get() = mutableCards
 
     private var fetchingCards = false

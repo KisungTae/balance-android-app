@@ -11,7 +11,7 @@ import org.threeten.bp.OffsetDateTime
 interface LocationDAO {
 
     @Query("select * from location where id = ${Location.ID}")
-    fun get(): Location
+    fun findById(): Location?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(location: Location)

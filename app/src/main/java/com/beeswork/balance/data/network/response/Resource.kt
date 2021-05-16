@@ -34,6 +34,10 @@ class Resource<out T>(
         return this.status == Status.ERROR
     }
 
+    fun <P> mapData(data: P?): Resource<P> {
+        return Resource(this.status, data, this.errorMessage, this.error, this.fieldErrorMessages)
+    }
+
     fun toEmptyResponse(): Resource<EmptyResponse> {
         return Resource(
             this.status,
@@ -80,6 +84,5 @@ class Resource<out T>(
         fun <T> loading(): Resource<T> {
             return Resource(Status.LOADING, null, null, null, null)
         }
-
     }
 }

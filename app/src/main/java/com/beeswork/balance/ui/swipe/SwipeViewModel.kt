@@ -1,11 +1,18 @@
 package com.beeswork.balance.ui.swipe
 
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
+import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.internal.mapper.swipe.CardMapper
+import kotlinx.coroutines.launch
+import java.util.*
 
 class SwipeViewModel(
-    private val swipeRepository: SwipeRepository
-): ViewModel() {
+    private val swipeRepository: SwipeRepository,
+    private val settingRepository: SettingRepository,
+    private val cardMapper: CardMapper
+) : ViewModel() {
 
 //    val cards: LiveData<Resource<List<CardResponse>>> = balanceRepository.cards
 
@@ -13,9 +20,24 @@ class SwipeViewModel(
 //        balanceRepository.getClickedCount()
 //    }
 
+    private val _fetchCards = MutableLiveData<Resource<List<CardDomain>>>()
+    val fetchCards: LiveData<Resource<List<CardDomain>>> get() = _fetchCards
 
-    fun fetchCards(reset: Boolean) {
-//        balanceRepository.fetchCards(reset)
+    private var fetchingCards = false
+
+    fun fetchCards() {
+        viewModelScope.launch {
+            if (!fetchingCards) {
+                fetchingCards = true
+                _fetchCards.postValue(Resource.loading())
+                settingRepository.syncLocation()
+                val response = swipeRepository.fetchCards().let {
+                    it.mapData(it.data?.cardDTOs?.map { cardDTO -> cardMapper.toCardDomain(cardDTO) })
+                }
+                _fetchCards.postValue(response)
+            }
+        }
+
     }
 
     fun swipe(swipeId: String) {

@@ -50,7 +50,7 @@ class SwipeFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
-        viewModel.fetchCards(false)
+        viewModel.fetchCards()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -160,16 +160,16 @@ class SwipeFragment : BaseFragment(),
             binding.csvSwipe.visibility = View.GONE
 
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE)
-            viewModel.fetchCards(false)
+            viewModel.fetchCards()
 
-        if (direction == Direction.Right && removedCard != null) {
-            BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(
-                childFragmentManager,
-                BalanceGameDialog.TAG
-            )
-
-            viewModel.swipe(removedCard.accountId)
-        }
+//        if (direction == Direction.Right && removedCard != null) {
+//            BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(
+//                childFragmentManager,
+//                BalanceGameDialog.TAG
+//            )
+//
+//            viewModel.swipe(removedCard.accountId)
+//        }
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {

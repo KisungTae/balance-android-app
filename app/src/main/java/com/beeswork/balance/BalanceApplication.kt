@@ -43,6 +43,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
+import com.beeswork.balance.internal.mapper.swipe.CardMapper
+import com.beeswork.balance.internal.mapper.swipe.CardMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapperImpl
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
@@ -81,6 +83,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ChatMessageMapper>() with singleton { ChatMessageMapperImpl() }
         bind<ClickMapper>() with singleton { ClickMapperImpl() }
         bind<SwipeFilterMapper>() with singleton { SwipeFilterMapperImpl() }
+        bind<CardMapper>() with singleton { CardMapperImpl() }
 
 
         // Database
@@ -114,7 +117,7 @@ class BalanceApplication : Application(), KodeinAware {
 
 
         // Repository
-        bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance(), instance()) }
+        bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance(), instance(), instance()) }
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance()) }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
@@ -199,7 +202,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
-        bind() from provider { SwipeViewModelFactory(instance()) }
+        bind() from provider { SwipeViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { ClickViewModelFactory(instance(), instance()) }
         bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
@@ -355,3 +358,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      107. hide keyboard when touched outside
 //      108. chat enter slide does not animate mainvewipager fragment
 //      109. reportDiloag has a viewmodel to report?
+//      110. if location is not synched, then put some ! mark in the setting so that users can manually trigger synchroniation

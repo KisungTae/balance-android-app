@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network.response.swipe
+package com.beeswork.balance.data.network.response.click
 
 import org.threeten.bp.OffsetDateTime
 import java.util.*

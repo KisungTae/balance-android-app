@@ -1,7 +1,9 @@
-package com.beeswork.balance.data.network.response
+package com.beeswork.balance.data.network.response.swipe
 
-data class CardResponse (
-    val accountId: String,
+import java.util.*
+
+data class CardDTO (
+    val accountId: UUID,
     val name: String,
     val about: String,
     val height: Int?,

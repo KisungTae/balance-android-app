@@ -1,13 +1,13 @@
 package com.beeswork.balance.data.database.repository
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.swipe.CardDTO
 
 interface BalanceRepository {
 
@@ -29,7 +29,7 @@ interface BalanceRepository {
 
 
     // account
-    val cards: LiveData<Resource<List<CardResponse>>>
+    val cards: LiveData<Resource<List<CardDTO>>>
     fun fetchCards(reset: Boolean)
 
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>

@@ -6,7 +6,7 @@ import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.data.network.response.swipe.ClickDTO
+import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.gson.GsonProvider

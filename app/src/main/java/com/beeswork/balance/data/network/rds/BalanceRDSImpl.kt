@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.swipe.CardDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -144,34 +145,34 @@ class BalanceRDSImpl(
     }
 
 
-    override suspend fun fetchCards(
-        accountId: String,
-        identityToken: String,
-        minAge: Int,
-        maxAge: Int,
-        gender: Boolean,
-        distance: Int,
-        latitude: Double?,
-        longitude: Double?,
-        locationUpdatedAt: String?,
-        reset: Boolean
-    ): Resource<MutableList<CardResponse>> {
-
-        return getResult {
-            balanceAPI.fetchCards(
-                accountId,
-                identityToken,
-                minAge,
-                maxAge,
-                gender,
-                distance,
-                latitude,
-                longitude,
-                locationUpdatedAt,
-                reset
-            )
-        }
-    }
+//    override suspend fun fetchCards(
+//        accountId: String,
+//        identityToken: String,
+//        minAge: Int,
+//        maxAge: Int,
+//        gender: Boolean,
+//        distance: Int,
+//        latitude: Double?,
+//        longitude: Double?,
+//        locationUpdatedAt: String?,
+//        reset: Boolean
+//    ): Resource<MutableList<CardDTO>> {
+//
+//        return getResult {
+//            balanceAPI.fetchCards(
+//                accountId,
+//                identityToken,
+//                minAge,
+//                maxAge,
+//                gender,
+//                distance,
+//                latitude,
+//                longitude,
+//                locationUpdatedAt,
+//                reset
+//            )
+//        }
+//    }
 
     override suspend fun swipe(
         accountId: String,

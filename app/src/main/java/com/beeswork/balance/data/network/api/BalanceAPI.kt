@@ -5,11 +5,13 @@ import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
-import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
-import com.beeswork.balance.data.network.response.swipe.ClickDTO
+import com.beeswork.balance.data.network.response.swipe.CardDTO
+import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
@@ -116,17 +118,14 @@ interface BalanceAPI {
 
     @GET("account/recommend")
     suspend fun fetchCards(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String,
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?,
         @Query(value = "minAge") minAge: Int,
         @Query(value = "maxAge") maxAge: Int,
-        @Query(value = "gender") gender: Boolean,
+        @Query(value = "gender") gender: Gender,
         @Query(value = "distance") distance: Int,
-        @Query(value = "latitude") latitude: Double?,
-        @Query(value = "longitude") longitude: Double?,
-        @Query(value = "locationUpdatedAt") locationUpdatedAt: String?,
-        @Query(value = "reset") reset: Boolean
-    ): Response<MutableList<CardResponse>>
+        @Query(value = "pageIndex") pageIndex: Int
+    ): Response<FetchCardsDTO>
 
     @POST("swipe")
     suspend fun swipe(@Body swipeBody: SwipeBody): Response<BalanceGameResponse>

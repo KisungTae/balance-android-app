@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.data.network.response.swipe.ClickDTO
+import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PushType
