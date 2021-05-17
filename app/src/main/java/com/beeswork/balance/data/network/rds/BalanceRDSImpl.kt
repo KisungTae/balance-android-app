@@ -16,23 +16,6 @@ class BalanceRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), BalanceRDS {
 
-    override suspend fun fetchChatMessages(
-        accountId: String,
-        identityToken: String,
-        chatId: Long,
-        recipientId: String,
-        lastChatMessageId: Long
-    ): Resource<List<ChatMessageResponse>> {
-        return getResult {
-            balanceAPI.fetchChatMessages(
-                accountId,
-                identityToken,
-                chatId,
-                recipientId,
-                lastChatMessageId
-            )
-        }
-    }
 
     override suspend fun reorderPhotos(
         accountId: String,
@@ -194,34 +177,6 @@ class BalanceRDSImpl(
     ): Resource<ClickResponse> {
         return getResult {
             balanceAPI.click(ClickBody(accountId, identityToken, swipedId, swipeId, answers))
-        }
-    }
-
-    override suspend fun fetchMatches(
-        accountId: String,
-        identityToken: String,
-        lastAccountUpdatedAt: String,
-        lastMatchUpdatedAt: String,
-        lastChatMessageCreatedAt: String
-    ): Resource<MutableList<Match>> {
-        return getResult {
-            balanceAPI.fetchMatches(
-                accountId,
-                identityToken,
-                lastAccountUpdatedAt,
-                lastMatchUpdatedAt,
-                lastChatMessageCreatedAt
-            )
-        }
-    }
-
-    override suspend fun fetchClickedList(
-        accountId: String,
-        identityToken: String,
-        fetchedAt: String
-    ): Resource<MutableList<Click>> {
-        return getResult {
-            balanceAPI.fetchClickedList(accountId, identityToken, fetchedAt)
         }
     }
 

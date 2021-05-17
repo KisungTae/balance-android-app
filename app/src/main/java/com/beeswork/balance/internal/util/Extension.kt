@@ -43,9 +43,11 @@ fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any, R : Any> safeLet(
 }
 
 
-
-
-fun <T> CoroutineScope.safeLaunch(callBack: MutableLiveData<Resource<T>>?, launchBody: suspend () -> Unit): Job {
+fun <T> CoroutineScope.safeLaunch(
+    callBack: MutableLiveData<Resource<T>>?,
+    finallyBody: (() -> Unit)? = null,
+    launchBody: suspend () -> Unit
+): Job {
     val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         when (throwable) {
             is SocketTimeoutException -> callBack?.postValue(Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION))
@@ -53,12 +55,15 @@ fun <T> CoroutineScope.safeLaunch(callBack: MutableLiveData<Resource<T>>?, launc
             is ConnectException -> callBack?.postValue(Resource.error(ExceptionCode.CONNECT_EXCEPTION))
             else -> throw throwable
         }
+        finallyBody?.invoke()
     }
 
     return this.launch(coroutineExceptionHandler) {
         launchBody.invoke()
     }
 }
+
+
 
 fun Context.hideKeyboard(view: View) {
     val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager

@@ -10,14 +10,6 @@ import okhttp3.RequestBody
 
 interface BalanceRDS {
 
-    suspend fun fetchChatMessages(
-        accountId: String,
-        identityToken: String,
-        chatId: Long,
-        recipientId: String,
-        lastChatMessageId: Long
-    ): Resource<List<ChatMessageResponse>>
-
     suspend fun reorderPhotos(
         accountId: String,
         identityToken: String,
@@ -70,19 +62,6 @@ interface BalanceRDS {
         answers: Map<Int, Boolean>
     ): Resource<EmptyResponse>
 
-//    suspend fun fetchCards(
-//        accountId: String,
-//        identityToken: String,
-//        minAge: Int,
-//        maxAge: Int,
-//        gender: Boolean,
-//        distance: Int,
-//        latitude: Double?,
-//        longitude: Double?,
-//        locationUpdatedAt: String?,
-//        reset: Boolean
-//    ): Resource<MutableList<CardDTO>>
-
     suspend fun swipe(
         accountId: String,
         identityToken: String,
@@ -98,18 +77,5 @@ interface BalanceRDS {
         answers: Map<Int, Boolean>
     ): Resource<ClickResponse>
 
-    suspend fun fetchMatches(
-        accountId: String,
-        identityToken: String,
-        lastAccountUpdatedAt: String,
-        lastMatchUpdatedAt: String,
-        lastChatMessageCreatedAt: String
-    ): Resource<MutableList<Match>>
-
-    suspend fun fetchClickedList(
-        accountId: String,
-        identityToken: String,
-        fetchedAt: String
-    ): Resource<MutableList<Click>>
 
 }

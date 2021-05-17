@@ -60,15 +60,35 @@ interface BalanceAPI {
         @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
     ): Response<ListMatchesDTO>
 
+    @GET("profile/recommend")
+    suspend fun recommend(
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?,
+        @Query(value = "minAge") minAge: Int,
+        @Query(value = "maxAge") maxAge: Int,
+        @Query(value = "gender") gender: Gender,
+        @Query(value = "distance") distance: Int,
+        @Query(value = "pageIndex") pageIndex: Int
+    ): Response<FetchCardsDTO>
 
-    @GET("chat/message/list")
-    suspend fun fetchChatMessages(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String,
-        @Query(value = "chatId") chatId: Long,
-        @Query(value = "recipientId") recipientId: String,
-        @Query(value = "lastChatMessageId") lastChatMessageId: Long
-    ): Response<List<ChatMessageResponse>>
+    @POST("profile/location")
+    suspend fun postLocation(
+        @Body postLocationBody: PostLocationBody
+    ): Response<EmptyResponse>
+
+    @POST("push-token/fcm")
+    suspend fun postFCMToken(@Body postFcmTokenBody: PostFCMTokenBody): Response<EmptyResponse>
+
+
+
+
+
+
+
+
+
+
+
 
     @POST("photo/reorder")
     suspend fun reorderPhotos(
@@ -116,16 +136,7 @@ interface BalanceAPI {
     @POST("/account/answers")
     suspend fun postAnswers(@Body postAnswersBody: PostAnswersBody): Response<EmptyResponse>
 
-    @GET("account/recommend")
-    suspend fun fetchCards(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?,
-        @Query(value = "minAge") minAge: Int,
-        @Query(value = "maxAge") maxAge: Int,
-        @Query(value = "gender") gender: Gender,
-        @Query(value = "distance") distance: Int,
-        @Query(value = "pageIndex") pageIndex: Int
-    ): Response<FetchCardsDTO>
+
 
     @POST("swipe")
     suspend fun swipe(@Body swipeBody: SwipeBody): Response<BalanceGameResponse>
@@ -133,29 +144,11 @@ interface BalanceAPI {
     @POST("swipe/click")
     suspend fun click(@Body clickBody: ClickBody): Response<ClickResponse>
 
-    @POST("push-token/fcm")
-    suspend fun postFCMToken(@Body postFcmTokenBody: PostFCMTokenBody): Response<EmptyResponse>
 
-    @GET("match/list")
-    suspend fun fetchMatches(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String,
-        @Query(value = "lastAccountUpdatedAt") lastAccountUpdatedAt: String,
-        @Query(value = "lastMatchUpdatedAt") lastMatchUpdatedAt: String,
-        @Query(value = "lastChatMessageCreatedAt") lastChatMessageCreatedAt: String
-    ): Response<MutableList<Match>>
 
-    @GET("swipe/clicked/list")
-    suspend fun fetchClickedList(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String,
-        @Query(value = "fetchedAt") fetchedAt: String
-    ): Response<MutableList<Click>>
 
-    @POST("profile/location")
-    suspend fun postLocation(
-        @Body postLocationBody: PostLocationBody
-    ): Response<EmptyResponse>
+
+
 
     companion object {
         operator fun invoke(

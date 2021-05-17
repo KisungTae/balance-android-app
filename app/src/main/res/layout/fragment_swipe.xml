@@ -35,13 +35,33 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/llCardStackError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="17dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnCardStackReload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:text="@string/dialog_retry_btn_text" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/llCardStackLoading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="17dp"
             android:background="@android:color/white"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <com.github.ybq.android.spinkit.SpinKitView
                 style="@style/SpinKitView.Large.Circle"
@@ -53,27 +73,18 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llCardStackError"
+            android:id="@+id/llCardStackEmpty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="17dp"
-            android:background="@android:color/white"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="@string/fetch_card_exception_title"
-                android:textAlignment="center" />
-
-            <Button
-                android:id="@+id/btnCardStackReload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:stateListAnimator="@null"
-                android:text="@string/dialog_retry_btn_text" />
+                android:text="현재 주변에 이성이없습니다. 필터를 재조정해보세요" />
 
         </LinearLayout>
 
@@ -82,7 +93,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:visibility="gone" />
+
 
     </FrameLayout>
 

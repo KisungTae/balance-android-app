@@ -56,27 +56,35 @@ class SwipeFragment : BaseFragment(),
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
         setupSwipeCardStackView()
-//        setupCardsObserver()
+        setupFetchCardsLiveDataObserver()
+        binding.btnCardStackReload.setOnClickListener { viewModel.fetchCards() }
+    }
 
-//        viewModel.clickedCount.await().observe(viewLifecycleOwner, { clickedCount ->
-//            binding.tvClickCount.text = clickedCount.toString()
-//        })
+    private fun setupFetchCardsLiveDataObserver() {
+        viewModel.fetchCards.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE)
+                it.isError() -> {
+                    val errorTitle = getString(R.string.fetch_card_exception_title)
+                    showErrorDialog(it.error, errorTitle, it.errorMessage)
+                    showLayouts(View.GONE, View.GONE, View.VISIBLE)
+                }
+                else -> {
+                    it.data?.let { cardDomains ->
+                        if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE)
+                        else {
+                            showLayouts(View.VISIBLE, View.GONE, View.GONE)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-
-//        binding.btnSwipeFilter.setOnClickListener {
-//            SwipeFilterDialog(preferenceProvider).show(
-//                childFragmentManager,
-//                SwipeFilterDialog.TAG
-//            )
-//        }
-
-//        binding.btnCardStackReload.setOnClickListener {
-//            viewModel.fetchCards(false)
-//        }
-//
-//        binding.btnCardStackReset.setOnClickListener {
-//            viewModel.fetchCards(true)
-//        }
+    private fun showLayouts(loading: Int, empty: Int, error: Int) {
+        binding.llCardStackLoading.visibility = loading
+        binding.llCardStackEmpty.visibility = empty
+        binding.llCardStackError.visibility = error
     }
 
     private fun setupToolBar() {
@@ -123,14 +131,6 @@ class SwipeFragment : BaseFragment(),
 //        })
     }
 
-    private fun resetCardStackLayouts() {
-        if (cardStackAdapter.itemCount == 0)
-            binding.csvSwipe.visibility = View.GONE
-
-        binding.llCardStackLoading.visibility = View.GONE
-        binding.llCardStackError.visibility = View.GONE
-//        binding.llCardStackReset.visibility = View.GONE
-    }
 
     private fun setupSwipeCardStackView() {
         cardStackAdapter = CardStackAdapter()
@@ -153,6 +153,7 @@ class SwipeFragment : BaseFragment(),
     }
 
     override fun onCardSwiped(direction: Direction?) {
+//      if size <= 0 then View.Gone so that loading or error page shown
 
         val removedCard = cardStackAdapter.removeCard()
 

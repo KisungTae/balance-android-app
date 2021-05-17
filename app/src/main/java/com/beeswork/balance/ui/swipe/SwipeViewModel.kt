@@ -5,8 +5,7 @@ import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
-import kotlinx.coroutines.launch
-import java.util.*
+import com.beeswork.balance.internal.util.safeLaunch
 
 class SwipeViewModel(
     private val swipeRepository: SwipeRepository,
@@ -26,7 +25,7 @@ class SwipeViewModel(
     private var fetchingCards = false
 
     fun fetchCards() {
-        viewModelScope.launch {
+        viewModelScope.safeLaunch(_fetchCards, { fetchingCards = false }) {
             if (!fetchingCards) {
                 fetchingCards = true
                 _fetchCards.postValue(Resource.loading())
@@ -34,6 +33,7 @@ class SwipeViewModel(
                 val response = swipeRepository.fetchCards().let {
                     it.mapData(it.data?.cardDTOs?.map { cardDTO -> cardMapper.toCardDomain(cardDTO) })
                 }
+                fetchingCards = false
                 _fetchCards.postValue(response)
             }
         }
