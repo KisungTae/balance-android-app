@@ -4,7 +4,6 @@ import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.response.swipe.CardDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 

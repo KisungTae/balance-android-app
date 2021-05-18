@@ -1,14 +1,11 @@
 package com.beeswork.balance.data.network.rds
 
-import com.beeswork.balance.data.database.entity.Click
-import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.response.swipe.CardDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 

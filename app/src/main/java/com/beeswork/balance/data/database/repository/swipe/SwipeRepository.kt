@@ -2,7 +2,6 @@ package com.beeswork.balance.data.database.repository.swipe
 
 import com.beeswork.balance.data.database.entity.SwipeFilter
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.swipe.CardDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.Gender
 

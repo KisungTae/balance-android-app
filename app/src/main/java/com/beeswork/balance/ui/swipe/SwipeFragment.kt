@@ -1,17 +1,13 @@
 package com.beeswork.balance.ui.swipe
 
-import android.content.BroadcastReceiver
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
@@ -74,6 +70,7 @@ class SwipeFragment : BaseFragment(),
                         if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE)
                         else {
                             showLayouts(View.VISIBLE, View.GONE, View.GONE)
+                            cardStackAdapter.submitCards(cardDomains)
                         }
                     }
                 }

@@ -1,15 +1,15 @@
 package com.beeswork.balance.ui.swipe
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemCardImageBinding
-import com.bumptech.glide.Glide
+import com.beeswork.balance.internal.constant.EndPoint
+import java.util.*
 
 class CardImageViewPagerAdapter(
-    private val images: List<Int>,
+    private val accountId: UUID,
+    private val photoKeys: List<String>,
     private val cardImageListener: CardImageListener
 ) : RecyclerView.Adapter<CardImageViewPagerAdapter.ViewHolder>() {
 
@@ -17,7 +17,6 @@ class CardImageViewPagerAdapter(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
         return ViewHolder(
             ItemCardImageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             cardImageListener
@@ -25,10 +24,11 @@ class CardImageViewPagerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return images.size
+        return photoKeys.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(EndPoint.ofPhoto(accountId, photoKeys[position]))
 //        holder.itemView.imageView.setImageResource(images[position])
     }
 
@@ -45,15 +45,19 @@ class CardImageViewPagerAdapter(
         init {
             binding.btnCardImageLeft.setOnClickListener {
                 println("btnCardImageLeft.setOnClickListener")
-                cardImageListener.onLeftButtonClick(adapterPosition)
+                cardImageListener.onLeftButtonClick(absoluteAdapterPosition)
 //                viewPager2.currentItem = adapterPosition - 1
             }
 
             binding.btnCardImageRight.setOnClickListener {
                 println("btnCardImageRight.setOnClickListener")
-                cardImageListener.onRightButtonClick(adapterPosition)
+                cardImageListener.onRightButtonClick(absoluteAdapterPosition)
 //                viewPager2.currentItem = adapterPosition + 1
             }
+        }
+
+        fun bind(photoKey: String?) {
+
         }
 
     }

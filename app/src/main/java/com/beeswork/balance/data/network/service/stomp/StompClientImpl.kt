@@ -30,15 +30,9 @@ class StompClientImpl(
     private val preferenceProvider: PreferenceProvider
 ) : StompClient, WebSocketListener() {
 
-    enum class SocketStatus {
-        CONNECTING,
-        OPEN,
-        CLOSED
-    }
-
     private var socket: WebSocket? = null
-    private var outgoing = Channel<String>()
     private var socketStatus = SocketStatus.CLOSED
+    private var outgoing = Channel<String>()
 
     private var chatMessageReceiptChannel = Channel<ChatMessageDTO>()
     override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
@@ -193,13 +187,14 @@ class StompClientImpl(
         private const val DEFAULT_HEART_BEAT = "0,0"
     }
 
+    enum class SocketStatus {
+        CONNECTING,
+        OPEN,
+        CLOSED
+    }
+
 }
 
 
-// TODO: change message in stompframe to message entity
 // TODO: lifecycle event error and close socket in subscribe()
 // TODO: what happens when exception is thrown in onFrame()
-
-// TODO: send chatmessage and then if successful, then check active of chat set it to true
-// TODO: when send if not connected or web scoket closed, then push the message to buffer and when connected then clear buffer
-// TODO: init outoing launch in connect() or init()

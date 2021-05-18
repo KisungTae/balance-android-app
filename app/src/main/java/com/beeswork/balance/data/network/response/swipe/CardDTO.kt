@@ -7,7 +7,7 @@ data class CardDTO (
     val name: String,
     val about: String,
     val height: Int?,
-    var birthYear: Int,
+    val birthYear: Int,
     val distance: Int,
-    val photos: List<String>
+    val photoKeys: List<String> = arrayListOf()
 )

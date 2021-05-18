@@ -7,7 +7,7 @@ data class CardDomain(
     val name: String,
     val about: String,
     val height: Int?,
-    var age: Int,
+    val age: Int,
     val distance: Int,
-    val photos: List<String>
+    val photoKeys: List<String>
 )

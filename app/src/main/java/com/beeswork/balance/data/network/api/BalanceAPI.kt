@@ -1,13 +1,11 @@
 package com.beeswork.balance.data.network.api
 
-import com.beeswork.balance.data.database.entity.Click
-import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.database.entity.Photo
+import com.beeswork.balance.data.network.converter.EnumConverterFactory
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
-import com.beeswork.balance.data.network.response.swipe.CardDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
@@ -80,16 +78,6 @@ interface BalanceAPI {
     suspend fun postFCMToken(@Body postFcmTokenBody: PostFCMTokenBody): Response<EmptyResponse>
 
 
-
-
-
-
-
-
-
-
-
-
     @POST("photo/reorder")
     suspend fun reorderPhotos(
         @Body reorderPhotosBody: ReorderPhotosBody
@@ -137,17 +125,11 @@ interface BalanceAPI {
     suspend fun postAnswers(@Body postAnswersBody: PostAnswersBody): Response<EmptyResponse>
 
 
-
     @POST("swipe")
     suspend fun swipe(@Body swipeBody: SwipeBody): Response<BalanceGameResponse>
 
     @POST("swipe/click")
     suspend fun click(@Body clickBody: ClickBody): Response<ClickResponse>
-
-
-
-
-
 
 
     companion object {
@@ -160,6 +142,7 @@ interface BalanceAPI {
                 .baseUrl(EndPoint.ACCOUNT_SERVICE_ENDPOINT)
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create(GsonProvider.gson))
+                .addConverterFactory(EnumConverterFactory())
                 .build()
                 .create(BalanceAPI::class.java)
         }

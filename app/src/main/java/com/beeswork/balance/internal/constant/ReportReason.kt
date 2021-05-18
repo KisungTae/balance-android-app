@@ -1,5 +1,6 @@
 package com.beeswork.balance.internal.constant
 
+import com.beeswork.balance.internal.util.safeLet
 import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import java.lang.reflect.Type
@@ -14,17 +15,11 @@ enum class ReportReason {
     BEHAVIOUR,
     OTHER;
 
-    internal class Serializer : JsonSerializer<ReportReason?>, JsonDeserializer<ReportReason?> {
+    internal class Serializer : JsonSerializer<ReportReason?> {
         override fun serialize(src: ReportReason?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement? {
-            return context?.serialize(src?.ordinal ?: NOTHING.ordinal)
-        }
-
-        override fun deserialize(
-            json: JsonElement?,
-            typeOfT: Type?,
-            context: JsonDeserializationContext?
-        ): ReportReason {
-            return values()[json?.asInt ?: 0]
+            return safeLet(src, context) { s, c ->
+                c.serialize(s.ordinal)
+            }
         }
     }
 }

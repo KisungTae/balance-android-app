@@ -1,18 +1,15 @@
 package com.beeswork.balance.data.database.repository.swipe
 
-import com.beeswork.balance.data.database.dao.LocationDAO
 import com.beeswork.balance.data.database.dao.SwipeDAO
 import com.beeswork.balance.data.database.dao.SwipeFilterDAO
-import com.beeswork.balance.data.database.entity.Swipe
 import com.beeswork.balance.data.database.entity.SwipeFilter
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.swipe.CardDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
-import java.security.spec.RSAOtherPrimeInfo
+import java.util.*
 
 class SwipeRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
@@ -29,7 +26,13 @@ class SwipeRepositoryImpl(
 
     override suspend fun saveSwipeFilter(gender: Gender, minAge: Int, maxAge: Int, distance: Int) {
         withContext(Dispatchers.IO) {
-            swipeFilterDAO.insert(SwipeFilter(gender, minAge, maxAge, distance))
+            val swipeFilter = SwipeFilter(
+                gender,
+                if (minAge < SwipeFilter.MIN_AGE) SwipeFilter.MIN_AGE else minAge,
+                if (maxAge > SwipeFilter.MAX_AGE) SwipeFilter.MAX_AGE else minAge,
+                if (distance < SwipeFilter.MIN_DISTANCE || distance > SwipeFilter.MAX_DISTANCE) SwipeFilter.MAX_DISTANCE else distance
+            )
+            swipeFilterDAO.insert(swipeFilter)
         }
     }
 
@@ -47,23 +50,28 @@ class SwipeRepositoryImpl(
             val response = swipeRDS.fetchCards(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
-                swipeFilter.minAge,
-                swipeFilter.maxAge,
+                yearFromAge(swipeFilter.minAge),
+                yearFromAge(swipeFilter.maxAge),
                 swipeFilter.gender,
-                swipeFilter.distance,
+                swipeFilter.distance * METER_UNIT,
                 swipeFilter.pageIndex
             )
             response.data?.let { data ->
                 savePageIndex(swipeFilter.pageIndex, data.reset)
                 val cardDTOs = data.cardDTOs
                 for (i in cardDTOs.size - 1 downTo 0) {
-                    val cardDTO = cardDTOs[i]
-                    if (swipeDAO.existBySwipedId(cardDTO.accountId))
+                    if (swipeDAO.existBySwipedId(cardDTOs[i].accountId))
                         cardDTOs.removeAt(i)
                 }
+                cardDTOs.shuffle()
             }
             return@withContext response
         }
+    }
+
+    private fun yearFromAge(age: Int): Int {
+        if (age == SwipeFilter.MAX_AGE) return 0
+        return Calendar.getInstance().get(Calendar.YEAR) - age + 1
     }
 
     private suspend fun savePageIndex(currentPageIndex: Int, reset: Boolean) {
@@ -72,5 +80,9 @@ class SwipeRepositoryImpl(
             pageIndex++
             swipeFilterDAO.updatePageIndex(pageIndex)
         }
+    }
+
+    companion object {
+        const val METER_UNIT = 1000
     }
 }
