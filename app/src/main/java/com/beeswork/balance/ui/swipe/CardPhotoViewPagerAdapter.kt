@@ -1,25 +1,30 @@
 package com.beeswork.balance.ui.swipe
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.beeswork.balance.databinding.ItemCardImageBinding
+import com.beeswork.balance.R
+import com.beeswork.balance.databinding.ItemCardPhotoBinding
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.util.GlideHelper
+import com.bumptech.glide.Glide
 import java.util.*
 
-class CardImageViewPagerAdapter(
+class CardPhotoViewPagerAdapter(
     private val accountId: UUID,
     private val photoKeys: List<String>,
-    private val cardImageListener: CardImageListener
-) : RecyclerView.Adapter<CardImageViewPagerAdapter.ViewHolder>() {
+    private val cardPhotoListener: CardPhotoListener
+) : RecyclerView.Adapter<CardPhotoViewPagerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
         return ViewHolder(
-            ItemCardImageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            cardImageListener
+            ItemCardPhotoBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            cardPhotoListener,
+            parent.context
         )
     }
 
@@ -32,32 +37,37 @@ class CardImageViewPagerAdapter(
 //        holder.itemView.imageView.setImageResource(images[position])
     }
 
-    interface CardImageListener {
+    interface CardPhotoListener {
         fun onLeftButtonClick(position: Int)
         fun onRightButtonClick(position: Int)
     }
 
     class ViewHolder(
-        private val binding: ItemCardImageBinding,
-        private val cardImageListener: CardImageListener
+        private val binding: ItemCardPhotoBinding,
+        private val cardPhotoListener: CardPhotoListener,
+        private val context: Context
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
             binding.btnCardImageLeft.setOnClickListener {
                 println("btnCardImageLeft.setOnClickListener")
-                cardImageListener.onLeftButtonClick(absoluteAdapterPosition)
+                cardPhotoListener.onLeftButtonClick(absoluteAdapterPosition)
 //                viewPager2.currentItem = adapterPosition - 1
             }
 
             binding.btnCardImageRight.setOnClickListener {
                 println("btnCardImageRight.setOnClickListener")
-                cardImageListener.onRightButtonClick(absoluteAdapterPosition)
+                cardPhotoListener.onRightButtonClick(absoluteAdapterPosition)
 //                viewPager2.currentItem = adapterPosition + 1
             }
         }
 
         fun bind(photoKey: String?) {
-
+            Glide.with(context)
+                .load(R.drawable.person4)
+                .apply(GlideHelper.cardPhotoGlideOptions())
+                .centerCrop()
+                .into(binding.civCardPhoto)
         }
 
     }

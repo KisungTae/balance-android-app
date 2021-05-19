@@ -101,5 +101,7 @@
     <string name="swipe_filter_distance_slider_unit">km</string>
     <string name="apply_button_text">적용하기</string>
     <string name="swipe_filter_gender_title">상대방의 성별은</string>
+    <string name="card_stac_empty_text">현재 주변에 이성이없습니다. 필터를 재조정해보세요</string>
+    <string name="click_profile_photo_image_view_description">click profile photo</string>
 
 </resources>

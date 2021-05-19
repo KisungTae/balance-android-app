@@ -360,3 +360,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      109. reportDiloag has a viewmodel to report?
 //      110. if location is not synched, then put some ! mark in the setting so that users can manually trigger synchroniation
 //      111. implement the limit on chatmessage body on stomp on server
+//      112. change the default picture for card photo the person photo change it

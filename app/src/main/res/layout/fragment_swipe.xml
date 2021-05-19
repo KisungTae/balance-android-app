@@ -84,7 +84,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="현재 주변에 이성이없습니다. 필터를 재조정해보세요" />
+                android:text="@string/card_stac_empty_text" />
 
         </LinearLayout>
 
@@ -93,9 +93,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="10dp"
+            android:paddingStart="10dp"
+            android:paddingTop="0dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
             android:visibility="gone" />
-
 
     </FrameLayout>
 

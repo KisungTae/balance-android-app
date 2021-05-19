@@ -16,5 +16,13 @@ class GlideHelper {
                 .placeholder(R.drawable.ic_baseline_account_circle)
                 .error(R.drawable.ic_baseline_account_circle)
         }
+
+        fun cardPhotoGlideOptions(): RequestOptions {
+            return RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .priority(Priority.HIGH)
+                .placeholder(R.drawable.ic_baseline_person_1024)
+                .error(R.drawable.ic_baseline_person_1024)
+        }
     }
 }

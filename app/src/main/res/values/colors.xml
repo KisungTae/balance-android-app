@@ -19,4 +19,6 @@
     <color name="Black">#000000</color>
     <color name="BackgroundWhite">#FFFFFF</color>
     <color name="white">#FFFFFF</color>
+    <color name="lighterGrey">#F6F6F6</color>
+    <color name="darkerGrey">#A3A3A3</color>
 </resources>

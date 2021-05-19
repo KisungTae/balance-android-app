@@ -71,6 +71,7 @@ class SwipeFragment : BaseFragment(),
                         else {
                             showLayouts(View.VISIBLE, View.GONE, View.GONE)
                             cardStackAdapter.submitCards(cardDomains)
+                            binding.csvSwipe.visibility = View.VISIBLE
                         }
                     }
                 }
@@ -97,6 +98,18 @@ class SwipeFragment : BaseFragment(),
     private fun showSwipeFilter(): Boolean {
         SwipeFilterDialog(this).show(childFragmentManager, SwipeFilterDialog.TAG)
         return true
+    }
+
+    private fun setupSwipeCardStackView() {
+        cardStackAdapter = CardStackAdapter()
+
+        val cardStackLayoutManager = CardStackLayoutManager(context, this@SwipeFragment)
+        cardStackLayoutManager.setCanScrollVertical(false)
+        cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
+
+        binding.csvSwipe.layoutManager = cardStackLayoutManager
+        binding.csvSwipe.adapter = cardStackAdapter
+        binding.csvSwipe.itemAnimator = DefaultItemAnimator()
     }
 
     private fun setupCardsObserver() {
@@ -129,17 +142,7 @@ class SwipeFragment : BaseFragment(),
     }
 
 
-    private fun setupSwipeCardStackView() {
-        cardStackAdapter = CardStackAdapter()
 
-        val cardStackLayoutManager = CardStackLayoutManager(context, this@SwipeFragment)
-        cardStackLayoutManager.setCanScrollVertical(false)
-        cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
-
-        binding.csvSwipe.layoutManager = cardStackLayoutManager
-        binding.csvSwipe.adapter = cardStackAdapter
-        binding.csvSwipe.itemAnimator = DefaultItemAnimator()
-    }
 
 
     override fun onBalanceGameMatch(matchedPhotoKey: String) {
