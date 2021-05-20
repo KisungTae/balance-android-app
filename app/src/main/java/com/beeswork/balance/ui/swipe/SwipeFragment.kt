@@ -2,11 +2,17 @@ package com.beeswork.balance.ui.swipe
 
 import android.os.Bundle
 import android.view.*
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.core.view.ViewCompat
+import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
+import com.beeswork.balance.databinding.ItemCardStackBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.BaseFragment
@@ -32,6 +38,7 @@ class SwipeFragment : BaseFragment(),
 
     private lateinit var viewModel: SwipeViewModel
     private lateinit var cardStackAdapter: CardStackAdapter
+    private lateinit var cardStackLayoutManager: CardStackLayoutManager
     private lateinit var binding: FragmentSwipeBinding
 
     override fun onCreateView(
@@ -103,9 +110,13 @@ class SwipeFragment : BaseFragment(),
     private fun setupSwipeCardStackView() {
         cardStackAdapter = CardStackAdapter()
 
-        val cardStackLayoutManager = CardStackLayoutManager(context, this@SwipeFragment)
+        cardStackLayoutManager = CardStackLayoutManager(context, this@SwipeFragment)
         cardStackLayoutManager.setCanScrollVertical(false)
         cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
+        cardStackLayoutManager.setSwipeThreshold(0.5f)
+        cardStackLayoutManager.setMaxDegree(0.0f)
+
+
 
         binding.csvSwipe.layoutManager = cardStackLayoutManager
         binding.csvSwipe.adapter = cardStackAdapter
@@ -153,6 +164,7 @@ class SwipeFragment : BaseFragment(),
     }
 
     override fun onCardSwiped(direction: Direction?) {
+        println("onCardSwiped")
 //      if size <= 0 then View.Gone so that loading or error page shown
 
         val removedCard = cardStackAdapter.removeCard()
@@ -174,18 +186,23 @@ class SwipeFragment : BaseFragment(),
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {
+
     }
 
     override fun onCardRewound() {
+        println("onCardRewound")
     }
 
     override fun onCardCanceled() {
+        println("onCardCanceled")
     }
 
     override fun onCardAppeared(view: View?, position: Int) {
+        println("onCardAppeared")
     }
 
     override fun onCardDisappeared(view: View?, position: Int) {
+        println("onCardDisappeared")
     }
 
     override fun onFragmentSelected() {

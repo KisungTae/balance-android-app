@@ -45,21 +45,8 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
     ) : RecyclerView.ViewHolder(binding.root), CardPhotoViewPagerAdapter.CardPhotoListener {
 
         fun bind(cardDomain: CardDomain) {
-//            cardImageViewPager = binding.vpCardImage
-            println("")
             binding.vpCardPhoto.adapter = CardPhotoViewPagerAdapter(cardDomain.accountId, cardDomain.photoKeys, this)
             TabLayoutMediator(binding.tlCardImage, binding.vpCardPhoto) { tab, pos -> }.attach()
-            // TODO: change to photos
-//            holder.binding.vpCardImage.adapter =
-//                CardImageViewPagerAdapter(
-//                    arrayListOf(
-//                        R.drawable.person3,
-//                        R.drawable.person2,
-//                        R.drawable.person1
-//                    ), holder
-//                )
-
-
         }
 
         override fun onLeftButtonClick(position: Int) {

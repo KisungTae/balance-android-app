@@ -103,5 +103,9 @@
     <string name="swipe_filter_gender_title">상대방의 성별은</string>
     <string name="card_stac_empty_text">현재 주변에 이성이없습니다. 필터를 재조정해보세요</string>
     <string name="click_profile_photo_image_view_description">click profile photo</string>
+    <string name="height_icon_description">height icon</string>
+    <string name="location_icon_description">location icon</string>
+    <string name="gender_icon_description">gender icon</string>
+    <string name="card_stack_item_about_title">자기소개</string>
 
 </resources>
