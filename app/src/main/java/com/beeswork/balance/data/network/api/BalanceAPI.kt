@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.Gender
@@ -126,7 +127,7 @@ interface BalanceAPI {
 
 
     @POST("swipe")
-    suspend fun swipe(@Body swipeBody: SwipeBody): Response<BalanceGameResponse>
+    suspend fun swipe(@Body swipeBody: SwipeBody): Response<List<QuestionDTO>>
 
     @POST("swipe/click")
     suspend fun click(@Body clickBody: ClickBody): Response<ClickResponse>

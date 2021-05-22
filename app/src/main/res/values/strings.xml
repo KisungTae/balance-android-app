@@ -107,5 +107,6 @@
     <string name="location_icon_description">location icon</string>
     <string name="gender_icon_description">gender icon</string>
     <string name="card_stack_item_about_title">자기소개</string>
+    <string name="report_button_text">신고하기</string>
 
 </resources>

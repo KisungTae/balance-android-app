@@ -1,8 +1,9 @@
 package com.beeswork.balance.data.network.request
 
+import java.util.*
+
 data class SwipeBody(
-    val accountId: String,
-    val identityToken: String,
-    val swipeId: Long?,
-    val swipedId: String
+    val accountId: UUID?,
+    val identityToken: UUID?,
+    val swipedId: UUID?
 )

@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.dao.SwipeFilterDAO
 import com.beeswork.balance.data.database.entity.SwipeFilter
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -66,6 +67,16 @@ class SwipeRepositoryImpl(
                 cardDTOs.shuffle()
             }
             return@withContext response
+        }
+    }
+
+    override suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>> {
+        return withContext(Dispatchers.IO) {
+            return@withContext swipeRDS.swipe(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                swipedId
+            )
         }
     }
 

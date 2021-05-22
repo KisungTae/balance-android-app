@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item>
+        <rotate android:fromDegrees="20"
+            android:toDegrees="0"
+            android:pivotX="100%"
+            android:pivotY="70%">
+
+            <shape android:shape="rectangle" >
+                <solid android:color="@color/Primary"/>
+                <size android:width="100dp"
+                    android:height="100dp"/>
+            </shape>
+        </rotate>
+    </item>
+</layer-list>
+<!--<layer-list xmlns:android="http://schemas.android.com/apk/res/android">-->
+
+<!--    &lt;!&ndash; Colored rectangle&ndash;&gt;-->
+<!--    <item>-->
+<!--        <shape android:shape="rectangle">-->
+<!--            <size-->
+<!--                android:width="100dp"-->
+<!--                android:height="40dp" />-->
+<!--            <solid android:color="#F00" />-->
+<!--        </shape>-->
+<!--    </item>-->
+
+<!--    &lt;!&ndash; Overlay with same color as background&ndash;&gt;-->
+<!--    <item-->
+<!--        android:top="20dp"-->
+<!--        android:bottom="-40dp"-->
+<!--        android:right="-30dp">-->
+<!--        <rotate-->
+<!--            android:fromDegrees="-60">-->
+<!--            <shape android:shape="rectangle">-->
+<!--                <solid android:color="#FFF" />-->
+<!--            </shape>-->
+<!--        </rotate>-->
+<!--    </item>-->
+<!--</layer-list>-->

@@ -64,7 +64,7 @@ class CardPhotoViewPagerAdapter(
 
         fun bind(photoKey: String?) {
             Glide.with(context)
-                .load(R.drawable.person4)
+                .load(R.drawable.person1)
                 .apply(GlideHelper.cardPhotoGlideOptions())
                 .centerCrop()
                 .into(binding.civCardPhoto)

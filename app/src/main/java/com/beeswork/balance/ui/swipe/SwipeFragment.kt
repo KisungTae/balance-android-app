@@ -2,17 +2,12 @@ package com.beeswork.balance.ui.swipe
 
 import android.os.Bundle
 import android.view.*
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.cardview.widget.CardView
-import androidx.core.view.ViewCompat
-import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.converter.UUIDConverter
 import com.beeswork.balance.databinding.FragmentSwipeBinding
-import com.beeswork.balance.databinding.ItemCardStackBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.BaseFragment
@@ -25,11 +20,11 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import java.util.*
 
 class SwipeFragment : BaseFragment(),
     KodeinAware,
     CardStackListener,
-    BalanceGameDialog.BalanceGameListener,
     ViewPagerChildFragment,
     SwipeFilterDialog.SwipeFilterDialogListener {
 
@@ -53,7 +48,8 @@ class SwipeFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
-        viewModel.fetchCards()
+//        viewModel.fetchCards()
+        BalanceGameDialog(UUID.randomUUID()).show(childFragmentManager, BalanceGameDialog.TAG)
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -116,8 +112,6 @@ class SwipeFragment : BaseFragment(),
         cardStackLayoutManager.setSwipeThreshold(0.5f)
         cardStackLayoutManager.setMaxDegree(0.0f)
 
-
-
         binding.csvSwipe.layoutManager = cardStackLayoutManager
         binding.csvSwipe.adapter = cardStackAdapter
         binding.csvSwipe.itemAnimator = DefaultItemAnimator()
@@ -156,33 +150,21 @@ class SwipeFragment : BaseFragment(),
 
 
 
-    override fun onBalanceGameMatch(matchedPhotoKey: String) {
+//    override fun onBalanceGameMatch(matchedPhotoKey: String) {
 //        NewMatchDialog("", matchedPhotoKey).show(
 //            childFragmentManager,
 //            NewMatchDialog.TAG
 //        )
-    }
+//    }
 
     override fun onCardSwiped(direction: Direction?) {
-        println("onCardSwiped")
-//      if size <= 0 then View.Gone so that loading or error page shown
+        val accountId = cardStackAdapter.removeCard()
+        if (cardStackAdapter.itemCount == 0) binding.csvSwipe.visibility = View.GONE
+        if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) viewModel.fetchCards()
 
-        val removedCard = cardStackAdapter.removeCard()
-
-        if (cardStackAdapter.itemCount == 0)
-            binding.csvSwipe.visibility = View.GONE
-
-        if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE)
-            viewModel.fetchCards()
-
-//        if (direction == Direction.Right && removedCard != null) {
-//            BalanceGameDialog(removedCard.accountId, this@SwipeFragment).show(
-//                childFragmentManager,
-//                BalanceGameDialog.TAG
-//            )
-//
-//            viewModel.swipe(removedCard.accountId)
-//        }
+        if (direction == Direction.Right) accountId?.let { swipedId ->
+            BalanceGameDialog(swipedId).show(childFragmentManager, BalanceGameDialog.TAG)
+        }
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {

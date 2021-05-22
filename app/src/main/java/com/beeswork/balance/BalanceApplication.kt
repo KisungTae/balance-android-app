@@ -204,7 +204,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { ClickViewModelFactory(instance(), instance()) }
-        bind() from provider { BalanceGameDialogViewModelFactory(instance()) }
+        bind() from provider { BalanceGameDialogViewModelFactory(instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
 
@@ -361,3 +361,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      110. if location is not synched, then put some ! mark in the setting so that users can manually trigger synchroniation
 //      111. implement the limit on chatmessage body on stomp on server
 //      112. change the default picture for card photo the person photo change it
+//      113. when you set cardStackLayoutManager.setMaxDegree(0.0f) degree more than 0, and you drag a card, the nested views are blinking in centre

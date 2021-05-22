@@ -61,12 +61,12 @@ interface BalanceRDS {
         answers: Map<Int, Boolean>
     ): Resource<EmptyResponse>
 
-    suspend fun swipe(
-        accountId: String,
-        identityToken: String,
-        swipeId: Long?,
-        swipedId: String
-    ): Resource<BalanceGameResponse>
+//    suspend fun swipe(
+//        accountId: String,
+//        identityToken: String,
+//        swipeId: Long?,
+//        swipedId: String
+//    ): Resource<BalanceGameResponse>
 
     suspend fun click(
         accountId: String,

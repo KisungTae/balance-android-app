@@ -154,16 +154,16 @@ class BalanceRDSImpl(
 //        }
 //    }
 
-    override suspend fun swipe(
-        accountId: String,
-        identityToken: String,
-        swipeId: Long?,
-        swipedId: String
-    ): Resource<BalanceGameResponse> {
-        return getResult {
-            balanceAPI.swipe(SwipeBody(accountId, identityToken, swipeId, swipedId))
-        }
-    }
+//    override suspend fun swipe(
+//        accountId: String,
+//        identityToken: String,
+//        swipeId: Long?,
+//        swipedId: String
+//    ): Resource<BalanceGameResponse> {
+//        return getResult {
+//            balanceAPI.swipe(SwipeBody(accountId, identityToken, swipeId, swipedId))
+//        }
+//    }
 
     override suspend fun click(
         accountId: String,

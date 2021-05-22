@@ -15,7 +15,6 @@ import com.beeswork.balance.databinding.SnackBarNewClickBinding
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
-import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
@@ -32,7 +31,6 @@ import java.util.*
 class ClickFragment : BaseFragment(),
     KodeinAware,
     ClickPagingDataAdapter.OnClickListener,
-    BalanceGameDialog.BalanceGameListener,
     ErrorDialog.OnRetryListener,
     ViewPagerChildFragment {
 
@@ -140,13 +138,6 @@ class ClickFragment : BaseFragment(),
         binding.rvClick.adapter = clickPagingDataAdapter
         binding.rvClick.layoutManager = gridLayoutManager
         clickPagingRefreshAdapter = PagingRefreshAdapter(binding.rvClick, clickPagingDataAdapter)
-    }
-
-    override fun onBalanceGameMatch(matchedPhotoKey: String) {
-//        NewMatchDialog("", matchedPhotoKey).show(
-//            childFragmentManager,
-//            NewMatchDialog.TAG
-//        )
     }
 
     override fun onFragmentSelected() {

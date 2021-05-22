@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.ItemCardStackBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import java.util.*
 
 
 class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
@@ -17,7 +18,6 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        println("onBindViewHolder")
         cardDomains[position].let { holder.bind(it) }
     }
 
@@ -31,11 +31,11 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
         notifyItemRangeInserted(startIndex, newCardDomains.size)
     }
 
-    fun removeCard(): CardDomain? {
+    fun removeCard(): UUID? {
         if (cardDomains.size > 0) {
             val removedCard = cardDomains.removeAt(0)
             notifyItemRemoved(0)
-            return removedCard
+            return removedCard.accountId
         }
         return null
     }

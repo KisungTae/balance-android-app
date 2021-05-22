@@ -2,7 +2,9 @@ package com.beeswork.balance.data.network.rds.swipe
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
+import com.beeswork.balance.data.network.request.SwipeBody
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.Gender
 import java.util.*
@@ -21,6 +23,12 @@ class SwipeRDSImpl(
     ): Resource<FetchCardsDTO> {
         return getResult {
             balanceAPI.recommend(accountId, identityToken, minAge, maxAge, gender, distance, pageIndex)
+        }
+    }
+
+    override suspend fun swipe(accountId: UUID?, identityToken: UUID?, swipedId: UUID): Resource<List<QuestionDTO>> {
+        return getResult {
+            balanceAPI.swipe(SwipeBody(accountId, identityToken, swipedId))
         }
     }
 }

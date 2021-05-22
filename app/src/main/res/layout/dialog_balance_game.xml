@@ -1,161 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <LinearLayout
-        android:id="@+id/llBalanceGame"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvQuestionDescription"
+        <Button
+            android:background="@drawable/sh_round_box"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="this is question textview"
-            android:textColor="@color/TextBlack" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <Button
-            android:id="@+id/btnTopOption"
+            android:background="@drawable/sh_round_box_border"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="this is top option textview" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-        <Button
-            android:id="@+id/btnBottomOption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="this is bottom option textview" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
-        android:id="@+id/llBalanceGameLoadError"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+<!--    <Button-->
+<!--        android:id="@+id/btnBottomOption"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="500dp"-->
+<!--        android:background="@drawable/sh_balance_game_option_bottom"-->
+<!--        android:text="this is bottom option textview"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textColor="@color/Primary" />-->
 
-        <TextView
-            android:id="@+id/tvBalanceGameLoadErrorMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="this is Error page"
-            android:textColor="@color/TextBlack"/>
+    <!--    <FrameLayout-->
+    <!--        android:id="@+id/llBalanceGame"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:orientation="vertical">-->
 
-        <Button
-            android:id="@+id/btnBalanceGameReload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="load questions" />
+    <!--        <Button-->
+    <!--            android:id="@+id/btnTopOption"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:text="this is top option textview" />-->
 
-        <Button
-            android:id="@+id/btnBalanceGameLoadErrorClose"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="close"/>
 
-    </LinearLayout>
+    <!--    </FrameLayout>-->
 
-    <LinearLayout
-        android:id="@+id/llBalanceGameLoading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/llBalanceGameLoadError"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:orientation="vertical">-->
 
-        <TextView
-            android:id="@+id/tvBalanceGameLoadingMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="this is loading page"
-            android:textColor="@color/TextBlack"/>
-    </LinearLayout>
+    <!--        <TextView-->
+    <!--            android:id="@+id/tvBalanceGameLoadErrorMessage"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="this is Error page"-->
+    <!--            android:textColor="@color/TextBlack"/>-->
 
-    <LinearLayout
-        android:id="@+id/llBalanceGameClickError"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameReload"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="load questions" />-->
 
-        <TextView
-            android:id="@+id/tvBalanceGameClickErrorMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="This is balance game click error message"
-            android:textColor="@color/TextBlack"/>
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameLoadErrorClose"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="close"/>-->
 
-        <Button
-            android:id="@+id/btnBalanceGameClickErrorCloseBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="close"/>
+    <!--    </LinearLayout>-->
 
-        <Button
-            android:id="@+id/btnBalanceGameClick"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="retry"/>
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/llBalanceGameLoading"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent">-->
 
-        <Button
-            android:id="@+id/btnBalanceGameRefresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="reload"/>
+    <!--        <TextView-->
+    <!--            android:id="@+id/tvBalanceGameLoadingMessage"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="this is loading page"-->
+    <!--            android:textColor="@color/TextBlack"/>-->
+    <!--    </LinearLayout>-->
 
-    </LinearLayout>
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/llBalanceGameClickError"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:orientation="vertical">-->
 
-    <LinearLayout
-        android:id="@+id/llBalanceGameNotClick"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <!--        <TextView-->
+    <!--            android:id="@+id/tvBalanceGameClickErrorMessage"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="This is balance game click error message"-->
+    <!--            android:textColor="@color/TextBlack"/>-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="상대방 밸런스에 클릭하지 못했습니다"
-            android:textColor="@color/TextBlack"/>
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameClickErrorCloseBtn"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="close"/>-->
 
-        <Button
-            android:id="@+id/btnBalanceGameRetry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="retry"/>
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameClick"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="retry"/>-->
 
-        <Button
-            android:id="@+id/btnBalanceGameNotClickClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="닫기"/>
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameRefresh"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="reload"/>-->
 
-    </LinearLayout>
+    <!--    </LinearLayout>-->
 
-    <LinearLayout
-        android:id="@+id/llBalanceGameClicked"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/llBalanceGameNotClick"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:orientation="vertical">-->
 
-        <ImageView
-            android:id="@+id/ivBalanceGameClicked"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+    <!--        <TextView-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="상대방 밸런스에 클릭하지 못했습니다"-->
+    <!--            android:textColor="@color/TextBlack"/>-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="상대방 밸러스에 클릭했어요!! 상대방도 내 밸런스에 클릭할때까지 스와이프를 계속 즐겨주세요"
-            android:textColor="@color/TextBlack"/>
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameRetry"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="retry"/>-->
 
-        <Button
-            android:id="@+id/btnBalanceGameClickedClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="닫기"/>
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameNotClickClose"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="닫기"/>-->
 
-    </LinearLayout>
+    <!--    </LinearLayout>-->
+
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/llBalanceGameClicked"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:orientation="vertical">-->
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/ivBalanceGameClicked"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"/>-->
+
+    <!--        <TextView-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="상대방 밸러스에 클릭했어요!! 상대방도 내 밸런스에 클릭할때까지 스와이프를 계속 즐겨주세요"-->
+    <!--            android:textColor="@color/TextBlack"/>-->
+
+    <!--        <Button-->
+    <!--            android:id="@+id/btnBalanceGameClickedClose"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="닫기"/>-->
+
+    <!--    </LinearLayout>-->
 
 </FrameLayout>

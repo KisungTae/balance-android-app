@@ -211,9 +211,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/sh_round_box"
-                    android:backgroundTint="@color/WarningRed"
-                    android:text="신고하기" />
+                    android:background="@color/Transparent"
+                    android:textColor="@color/WarningRed"
+                    android:text="@string/report_button_text" />
 
             </LinearLayout>
 
