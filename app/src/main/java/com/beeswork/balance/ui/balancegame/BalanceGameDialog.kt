@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.databinding.DialogBalanceGameBinding
-import com.beeswork.balance.internal.constant.BalanceGameAnswer
+import com.beeswork.balance.internal.constant.PushType
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.ui.common.BaseDialog
+import com.beeswork.balance.ui.profile.QuestionDomain
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -18,18 +20,22 @@ import java.util.*
 
 
 class BalanceGameDialog(
-    private val swipedId: UUID
-): DialogFragment(), KodeinAware {
+    private val swipedId: UUID,
+    private val swipedName: String,
+    private val swipedProfilePhotoKey: String?
+) : BaseDialog(), KodeinAware {
 
     override val kodein by closestKodein()
     private val viewModelFactory: BalanceGameDialogViewModelFactory by instance()
+    private val preferenceProvider: PreferenceProvider by instance()
     private lateinit var viewModel: BalanceGameDialogViewModel
     private lateinit var binding: DialogBalanceGameBinding
 
-    private lateinit var questions: List<QuestionResponse>
+    private lateinit var questions: List<QuestionDomain>
+    private val answers: MutableMap<Int, Boolean> = mutableMapOf()
+
     private var swipeId: Long? = null
     private var currentIndex = -1
-    private val answers: MutableMap<Int, Boolean> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,10 +57,102 @@ class BalanceGameDialog(
         bindUI()
     }
 
+
     private fun bindUI() {
+//        setupSwipeLiveDataObserver()
+//        setupClickLiveDataObserver()
 //        setupBalanceGameObserver()
 //        setupClickResponseObserver()
 //        setupListeners()
+    }
+
+    private fun setupSwipeLiveDataObserver() {
+        viewModel.swipeLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
+                it.isError() -> showError(
+                    View.VISIBLE,
+                    View.GONE,
+                    getString(R.string.error_title_fetch_question),
+                    it.error,
+                    it.errorMessage
+                )
+                it.isSuccess() -> it.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
+            }
+        }
+    }
+
+    private fun setupClickLiveDataObserver() {
+        viewModel.clickLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> showLoading(getString(R.string.balance_game_checking_text))
+                it.isError() -> showError(
+                    View.GONE,
+                    View.VISIBLE,
+                    getString(R.string.error_title_click),
+                    it.error,
+                    it.errorMessage
+                )
+                it.isSuccess() -> it.data?.let { pushType ->
+                    when (pushType) {
+                        PushType.MISSED -> showLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE)
+                        PushType.CLICKED -> showClicked()
+                        PushType.MATCHED -> showMatched()
+                        else -> { }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showClicked() {
+        showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+        binding.llBalanceGameClicked.visibility = View.VISIBLE
+    }
+
+    private fun showMatched() {
+        showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+        binding.llBalanceGameDialogMatched.visibility = View.VISIBLE
+    }
+
+
+
+    private fun setupBalanceGame(newQuestions: List<QuestionDomain>) {
+        currentIndex = -1
+        answers.clear()
+        questions = newQuestions
+        nextQuestion()
+        showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+    }
+
+    private fun nextQuestion() {
+        currentIndex++
+        if (currentIndex < questions.size) {
+            val question = questions[currentIndex]
+            binding.btnBalanceGameTopOption.text = question.topOption
+            binding.btnBalanceGameBottomOption.text = question.bottomOption
+        } else viewModel.click(swipedId, answers)
+    }
+
+    private fun showLoading(loadingMessage: String) {
+        showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
+        binding.tvLoadingMessage.text = loadingMessage
+    }
+
+    private fun showError(fetchBtn: Int, saveBtn: Int, errorTitle: String, error: String?, errorMessage: String?) {
+        showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+        binding.btnBalanceGameDialogFetch.visibility = fetchBtn
+        binding.btnBalanceGameDialogSave.visibility = saveBtn
+        binding.tvBalanceGameDialogErrorTitle.text = errorTitle
+        binding.tvBalanceGameDialogErrorMessage.text = errorMessage
+        setupErrorMessage(error, errorMessage, binding.tvBalanceGameDialogErrorMessage)
+    }
+
+    private fun showLayouts(balanceGame: Int, loading: Int, error: Int, missed: Int) {
+        binding.llBalanceGameWrapper.visibility = balanceGame
+        binding.llBalanceGameLoading.visibility = loading
+        binding.llBalanceGameError.visibility = error
+        binding.llBalanceGameDialogMissed.visibility = missed
     }
 
     private fun setupBalanceObserver() {
@@ -150,10 +248,10 @@ class BalanceGameDialog(
         currentIndex = -1
         answers.clear()
         hideLayouts()
-        binding.llBalanceGame.visibility = LinearLayout.VISIBLE
+//        binding.llBalanceGame.visibility = LinearLayout.VISIBLE
 
         swipeId = newSwipeId
-        questions = newQuestionResponses
+//        questions = newQuestionResponses
         nextQuestion()
     }
 
@@ -163,18 +261,6 @@ class BalanceGameDialog(
         nextQuestion()
     }
 
-    private fun nextQuestion() {
-        currentIndex++
-//        if (currentIndex < questions.size) {
-//            val question = questions[currentIndex]
-//            binding.tvQuestionDescription.text = question.description
-//            binding.btnTopOption.text = question.topOption
-//            binding.btnBottomOption.text = question.bottomOption
-//        } else {
-//            viewModel.click(swipedId, swipeId!!, answers)
-//            setBalanceGameLoading(getString(R.string.question_checking))
-//        }
-    }
 
     private fun setBalanceGameLoadError(enableReloadBtn: Boolean, exceptionMessage: String) {
         hideLayouts()
@@ -219,10 +305,10 @@ class BalanceGameDialog(
 
     private fun setupListeners() {
 //        binding.btnTopOption.setOnClickListener { selectAnswer(BalanceGameAnswer.TOP) }
-        binding.btnBottomOption.setOnClickListener {
-            println("bottom option clicked!!!!!")
-            selectAnswer(BalanceGameAnswer.BOTTOM)
-        }
+//        binding.btnBottomOption.setOnClickListener {
+//            println("bottom option clicked!!!!!")
+//            selectAnswer(BalanceGameAnswer.BOTTOM)
+//        }
 
 //        binding.btnBalanceGameReload.setOnClickListener { viewModel.swipe(swipeId, swipedId) }
 //        binding.btnBalanceGameLoadErrorClose.setOnClickListener { dismiss() }

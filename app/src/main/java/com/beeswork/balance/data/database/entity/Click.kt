@@ -11,6 +11,7 @@ data class Click(
     @PrimaryKey
     val swiperId: UUID,
 
+    val name: String,
     var profilePhotoKey: String,
     var updatedAt: OffsetDateTime
 )

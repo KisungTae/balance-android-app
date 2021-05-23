@@ -5,6 +5,7 @@ import java.util.*
 
 data class ClickDTO(
     val swiperId: UUID,
+    val name: String,
     val deleted: Boolean,
     val profilePhotoKey: String,
     val updatedAt: OffsetDateTime

@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
@@ -24,6 +25,12 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @POST("swipe")
+    suspend fun swipe(@Body swipeBody: SwipeBody): Response<List<QuestionDTO>>
+
+    @POST("click")
+    suspend fun click(@Body clickBody: ClickBody): Response<MatchDTO>
 
     @GET("click/list")
     suspend fun listClicks(
@@ -126,11 +133,6 @@ interface BalanceAPI {
     suspend fun postAnswers(@Body postAnswersBody: PostAnswersBody): Response<EmptyResponse>
 
 
-    @POST("swipe")
-    suspend fun swipe(@Body swipeBody: SwipeBody): Response<List<QuestionDTO>>
-
-    @POST("swipe/click")
-    suspend fun click(@Body clickBody: ClickBody): Response<ClickResponse>
 
 
     companion object {

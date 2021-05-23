@@ -31,11 +31,11 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
         notifyItemRangeInserted(startIndex, newCardDomains.size)
     }
 
-    fun removeCard(): UUID? {
+    fun removeCard(): CardDomain? {
         if (cardDomains.size > 0) {
             val removedCard = cardDomains.removeAt(0)
             notifyItemRemoved(0)
-            return removedCard.accountId
+            return removedCard
         }
         return null
     }

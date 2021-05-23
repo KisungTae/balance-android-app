@@ -68,13 +68,13 @@ interface BalanceRDS {
 //        swipedId: String
 //    ): Resource<BalanceGameResponse>
 
-    suspend fun click(
-        accountId: String,
-        identityToken: String,
-        swipedId: String,
-        swipeId: Long,
-        answers: Map<Int, Boolean>
-    ): Resource<ClickResponse>
+//    suspend fun click(
+//        accountId: String,
+//        identityToken: String,
+//        swipedId: String,
+//        swipeId: Long,
+//        answers: Map<Int, Boolean>
+//    ): Resource<ClickResponse>
 
 
 }

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.tuple.MatchProfileTuple
+import com.beeswork.balance.data.database.repository.match.MatchProfileTuple
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey

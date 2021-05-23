@@ -48,8 +48,8 @@ class SwipeFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
-//        viewModel.fetchCards()
-        BalanceGameDialog(UUID.randomUUID()).show(childFragmentManager, BalanceGameDialog.TAG)
+        viewModel.fetchCards()
+//        BalanceGameDialog(UUID.randomUUID()).show(childFragmentManager, BalanceGameDialog.TAG)
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -63,7 +63,7 @@ class SwipeFragment : BaseFragment(),
         viewModel.fetchCards.observe(viewLifecycleOwner) {
             when {
                 it.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE)
-                it.isError() -> {
+                it.isError() && validateAccount(it.error, it.errorMessage) -> {
                     val errorTitle = getString(R.string.fetch_card_exception_title)
                     showErrorDialog(it.error, errorTitle, it.errorMessage)
                     showLayouts(View.GONE, View.GONE, View.VISIBLE)
@@ -117,53 +117,17 @@ class SwipeFragment : BaseFragment(),
         binding.csvSwipe.itemAnimator = DefaultItemAnimator()
     }
 
-    private fun setupCardsObserver() {
-//        viewModel.cards.observe(viewLifecycleOwner, { cardResource ->
-//            when (cardResource.status) {
-//                Resource.Status.SUCCESS -> {
-//
-//                    val cards = cardResource.data
-//
-//                    if (cards == null || cards.isEmpty()) {
-//                        resetCardStackLayouts()
-//                        binding.llCardStackReset.visibility = View.VISIBLE
-//                    } else {
-//                        cardStackAdapter.addCards(cardResource.data)
-//                        binding.csvSwipe.visibility = View.VISIBLE
-//                    }
-//
-//                }
-//                Resource.Status.LOADING -> {
-//                    resetCardStackLayouts()
-//                    binding.llCardStackLoading.visibility = View.VISIBLE
-//
-//                }
-//                Resource.Status.ERROR -> {
-//                    resetCardStackLayouts()
-//                    binding.llCardStackError.visibility = View.VISIBLE
-//                }
-//            }
-//        })
-    }
-
-
-
-
-
-//    override fun onBalanceGameMatch(matchedPhotoKey: String) {
-//        NewMatchDialog("", matchedPhotoKey).show(
-//            childFragmentManager,
-//            NewMatchDialog.TAG
-//        )
-//    }
-
     override fun onCardSwiped(direction: Direction?) {
-        val accountId = cardStackAdapter.removeCard()
+        val removedCard = cardStackAdapter.removeCard()
         if (cardStackAdapter.itemCount == 0) binding.csvSwipe.visibility = View.GONE
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) viewModel.fetchCards()
 
-        if (direction == Direction.Right) accountId?.let { swipedId ->
-            BalanceGameDialog(swipedId).show(childFragmentManager, BalanceGameDialog.TAG)
+        if (direction == Direction.Right) removedCard?.let { _removedCard ->
+            val profilePhotoKey = if (_removedCard.photoKeys.isNotEmpty()) _removedCard.photoKeys[0] else null
+            BalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
+                childFragmentManager,
+                BalanceGameDialog.TAG
+            )
         }
     }
 

@@ -165,17 +165,17 @@ class BalanceRDSImpl(
 //        }
 //    }
 
-    override suspend fun click(
-        accountId: String,
-        identityToken: String,
-        swipedId: String,
-        swipeId: Long,
-        answers: Map<Int, Boolean>
-    ): Resource<ClickResponse> {
-        return getResult {
-            balanceAPI.click(ClickBody(accountId, identityToken, swipedId, swipeId, answers))
-        }
-    }
+//    override suspend fun click(
+//        accountId: String,
+//        identityToken: String,
+//        swipedId: String,
+//        swipeId: Long,
+//        answers: Map<Int, Boolean>
+//    ): Resource<ClickResponse> {
+//        return getResult {
+//            balanceAPI.click(ClickBody(accountId, identityToken, swipedId, swipeId, answers))
+//        }
+//    }
 
 
 }

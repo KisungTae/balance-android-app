@@ -20,9 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ivErrorDialogIcon"
+        android:layout_marginBottom="20dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:layout_marginBottom="20dp"
         android:textAlignment="center"
         android:textColor="@android:color/black" />
 
@@ -46,15 +46,19 @@
 
         <Button
             android:id="@+id/btnErrorDialogClose"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/sh_round_box"
             android:text="@string/dialog_close_btn_title" />
 
         <Button
             android:id="@+id/btnErrorDialogRetry"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
+            android:background="@drawable/sh_round_box"
             android:text="@string/dialog_retry_btn_text" />
 
     </LinearLayout>

@@ -117,7 +117,7 @@ class ClickRepositoryImpl(
 //            }
 //            clickDAO.insert(clicks)
 
-            clickDAO.insert(Click(UUID.randomUUID(), "", OffsetDateTime.now()))
+//            clickDAO.insert(Click(UUID.randomUUID(), "", OffsetDateTime.now()))
         }
     }
 

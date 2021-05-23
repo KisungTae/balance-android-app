@@ -112,7 +112,7 @@ class ChatFragment : BaseFragment(),
             when {
                 it.isSuccess() -> popBackToMatch()
                 it.isLoading() -> showLoading()
-                it.isError() -> {
+                it.isError() && validateAccount(it.error, it.errorMessage) -> {
                     hideLoading()
                     val errorTitle = getString(R.string.error_title_report)
                     showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
@@ -134,7 +134,7 @@ class ChatFragment : BaseFragment(),
             when {
                 it.isSuccess() -> popBackToMatch()
                 it.isLoading() -> getReportDialog()?.showLoading()
-                it.isError() -> {
+                it.isError() && validateAccount(it.error, it.errorMessage) -> {
                     getReportDialog()?.hideLoading()
                     val errorTitle = getString(R.string.error_title_report)
                     showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
@@ -150,7 +150,7 @@ class ChatFragment : BaseFragment(),
     private fun setupSendChatMessageMediatorLiveDataObserver() {
         viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
             val errorTitle = getString(R.string.error_title_send_chat_message)
-            if (it.isError()) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
                 if (it.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) setupAsUnmatched()
                 showErrorDialog(it.error, errorTitle, it.errorMessage)
             }

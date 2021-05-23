@@ -10,11 +10,11 @@ import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.data.database.tuple.MatchProfileTuple
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.internal.constant.PushType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -195,6 +195,26 @@ class MatchRepositoryImpl(
         }
     }
 
+    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType> {
+        return withContext(Dispatchers.IO) {
+            val response = matchRDS.click(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                swipedId,
+                answers
+            )
+            response.data?.let { matchDTO ->
+                when (matchDTO.pushType) {
+                    PushType.MATCHED -> saveMatch(matchMapper.toMatch(matchDTO))
+                    PushType.CLICKED -> swipeDAO.insert(Swipe(swipedId))
+                    else -> {}
+                }
+                return@withContext response.mapData(matchDTO.pushType)
+            }
+            return@withContext response.mapData(null)
+        }
+    }
+
 
     //  TODO: remove me
     private fun createDummyChatMessages() {
@@ -221,8 +241,6 @@ class MatchRepositoryImpl(
         }
         chatMessageDAO.insert(messages)
     }
-
-
 
 
     //  TODO: remove me

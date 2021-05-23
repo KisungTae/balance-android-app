@@ -73,14 +73,6 @@ abstract class BaseFragment : Fragment() {
             ErrorDialog.TAG
         )
     }
-
-    protected fun showErrorDialog(
-
-    ) {
-
-    }
-
-
 }
 
 // TODO: remove access token when pop to login fragment

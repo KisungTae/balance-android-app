@@ -5,6 +5,7 @@ import java.util.*
 
 data class ClickDomain(
     val swiperId: UUID,
+    val name: String,
     val profilePhotoKey: String,
     val type: Type = Type.ITEM
 ) {
@@ -16,7 +17,7 @@ data class ClickDomain(
 
     companion object {
         fun header(): ClickDomain {
-            return ClickDomain(UUID.randomUUID(), "", Type.HEADER)
+            return ClickDomain(UUID.randomUUID(), "", "", Type.HEADER)
         }
     }
 }

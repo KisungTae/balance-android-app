@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.dialog
 
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.fragment.app.DialogFragment
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogErrorBinding
 import com.beeswork.balance.internal.util.safeLet
+import com.beeswork.balance.ui.common.BaseDialog
 
 class ErrorDialog(
     private val error: String?,
@@ -17,7 +19,7 @@ class ErrorDialog(
     private val requestCode: Int?,
     private val onRetryListener: OnRetryListener?,
     private val onDismissListener: OnDismissListener?
-) : DialogFragment() {
+) : BaseDialog() {
 
     private lateinit var binding: DialogErrorBinding
 
@@ -38,7 +40,7 @@ class ErrorDialog(
     private fun bindUI() {
         setupRetryListener()
         setupErrorTitle()
-        setupErrorMessage()
+        setupErrorMessage(error, errorMessage, binding.tvErrorDialogMessage)
         binding.btnErrorDialogClose.setOnClickListener { dismiss() }
     }
 
@@ -46,20 +48,20 @@ class ErrorDialog(
         binding.tvErrorDialogTitle.text = errorTitle ?: resources.getString(R.string.error_title_generic)
     }
 
-    private fun setupErrorMessage() {
-        errorMessage?.let { message ->
-            binding.tvErrorDialogMessage.visibility = View.VISIBLE
-            binding.tvErrorDialogMessage.text = message
-        } ?: kotlin.run {
-            safeLet(error, context) { e, c ->
-                val resourceId = resources.getIdentifier(e, "string", c.packageName)
-                if (resourceId > 0) binding.tvErrorDialogMessage.text = getString(resourceId)
-                else binding.tvErrorDialogMessage.visibility = View.GONE
-            } ?: kotlin.run {
-                binding.tvErrorDialogMessage.visibility = View.GONE
-            }
-        }
-    }
+//    private fun setupErrorMessage() {
+//        errorMessage?.let { message ->
+//            binding.tvErrorDialogMessage.visibility = View.VISIBLE
+//            binding.tvErrorDialogMessage.text = message
+//        } ?: kotlin.run {
+//            safeLet(error, context) { e, c ->
+//                val resourceId = resources.getIdentifier(e, "string", c.packageName)
+//                if (resourceId > 0) binding.tvErrorDialogMessage.text = getString(resourceId)
+//                else binding.tvErrorDialogMessage.visibility = View.GONE
+//            } ?: kotlin.run {
+//                binding.tvErrorDialogMessage.visibility = View.GONE
+//            }
+//        }
+//    }
 
     private fun setupRetryListener() {
         onRetryListener?.let {

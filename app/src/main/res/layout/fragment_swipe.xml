@@ -93,10 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingStart="10dp"
-            android:paddingTop="0dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="10dp"
+            android:paddingHorizontal="10dp"
             android:visibility="gone" />
 
     </FrameLayout>

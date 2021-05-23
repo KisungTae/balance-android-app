@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.database.tuple
+package com.beeswork.balance.data.database.repository.match
 
 import java.util.*
 

@@ -43,6 +43,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
+import com.beeswork.balance.internal.mapper.profile.QuestionMapper
+import com.beeswork.balance.internal.mapper.profile.QuestionMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.internal.mapper.swipe.CardMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
@@ -84,6 +86,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ClickMapper>() with singleton { ClickMapperImpl() }
         bind<SwipeFilterMapper>() with singleton { SwipeFilterMapperImpl() }
         bind<CardMapper>() with singleton { CardMapperImpl() }
+        bind<QuestionMapper>() with singleton { QuestionMapperImpl() }
 
 
         // Database
@@ -204,7 +207,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { ClickViewModelFactory(instance(), instance()) }
-        bind() from provider { BalanceGameDialogViewModelFactory(instance(), instance()) }
+        bind() from provider { BalanceGameDialogViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
 
@@ -362,3 +365,5 @@ class BalanceApplication : Application(), KodeinAware {
 //      111. implement the limit on chatmessage body on stomp on server
 //      112. change the default picture for card photo the person photo change it
 //      113. when you set cardStackLayoutManager.setMaxDegree(0.0f) degree more than 0, and you drag a card, the nested views are blinking in centre
+//      114. check balance game dialg design it's not looking good
+//      115. check if validateAccount() in chatFragment

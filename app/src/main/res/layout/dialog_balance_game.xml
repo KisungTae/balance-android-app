@@ -1,175 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundWhite"
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.beeswork.balance.ui.common.GradientTextView
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="center"
+        android:text="@string/balance_game_dialog_title"
+        android:textAlignment="center"
+        android:textSize="@dimen/tool_bar_title_large_text_size"
+        android:textStyle="bold"
+        app:endColor="@color/TextWhite"
+        app:startColor="@color/Primary" />
+
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:paddingHorizontal="30dp"
+        android:paddingBottom="50dp">
 
-        <Button
-            android:background="@drawable/sh_round_box"
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/llBalanceGameWrapper"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <Button
-            android:background="@drawable/sh_round_box_border"
+            <Button
+                android:id="@+id/btnBalanceGameTopOption"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/sh_top_round_box"
+                android:textColor="@color/TextWhite"
+                android:textSize="@dimen/text_large_size" />
+
+            <Button
+                android:id="@+id/btnBalanceGameBottomOption"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/sh_round_box_border"
+                android:textColor="@color/Primary"
+                android:textSize="@dimen/text_large_size" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/llBalanceGameLoading"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:layout_marginBottom="10dp"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/spin_kit_medium_size"
+                android:layout_height="@dimen/spin_kit_medium_size"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Primary" />
+
+            <TextView
+                android:id="@+id/tvLoadingMessage"
+                android:textColor="@color/TextGrey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llBalanceGameError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginBottom="20dp"
+                android:contentDescription="@string/dialog_error_icon_description"
+                android:src="@drawable/ic_baseline_error_outline" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameDialogErrorTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textAlignment="center"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameDialogErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/TextGrey" />
+
+            <Button
+                android:id="@+id/btnBalanceGameDialogFetch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:text="@string/retry"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnBalanceGameDialogSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:text="@string/retry"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llBalanceGameDialogMissed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="@string/balance_game_retry_icon_description"
+                android:src="@drawable/ic_refresh"
+                app:tint="@color/Primary" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="@string/balance_game_missed_text"
+                android:textAlignment="center"
+                android:textColor="@color/TextBlack" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/btnBalanceGameRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box"
+                android:text="@string/retry"
+                android:textColor="@color/TextWhite" />
 
-<!--    <Button-->
-<!--        android:id="@+id/btnBottomOption"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="500dp"-->
-<!--        android:background="@drawable/sh_balance_game_option_bottom"-->
-<!--        android:text="this is bottom option textview"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textColor="@color/Primary" />-->
-
-    <!--    <FrameLayout-->
-    <!--        android:id="@+id/llBalanceGame"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:orientation="vertical">-->
-
-    <!--        <Button-->
-    <!--            android:id="@+id/btnTopOption"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_weight="1"-->
-    <!--            android:text="this is top option textview" />-->
+            <Button
+                android:id="@+id/btnBalanceGameDialogMissedClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/Transparent"
+                android:text="@string/balance_game_keep_swiping_btn_text"
+                android:textColor="@color/Primary" />
+        </LinearLayout>
 
 
-    <!--    </FrameLayout>-->
+        <LinearLayout
+            android:id="@+id/llBalanceGameClicked"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/llBalanceGameLoadError"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:orientation="vertical">-->
+            <ImageView
+                android:id="@+id/ivBalanceGameClicked"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/person4"
+                android:contentDescription="@string/swipe_profile_photo_description" />
 
-    <!--        <TextView-->
-    <!--            android:id="@+id/tvBalanceGameLoadErrorMessage"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="this is Error page"-->
-    <!--            android:textColor="@color/TextBlack"/>-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="상대방 취향에 클릭!"
+                android:textAlignment="center"
+                android:textSize="@dimen/text_large_size"
+                android:textStyle="bold" />
 
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameReload"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="load questions" />-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="상대방도 내 취향에 곧 클릭할거에요"
+                android:textAlignment="center"
+                android:textColor="@color/TextBlack" />
 
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameLoadErrorClose"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="close"/>-->
+            <Button
+                android:id="@+id/btnBalanceGameClickedClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/Transparent"
+                android:text="@string/balance_game_keep_swiping_btn_text"
+                android:textColor="@color/Primary" />
 
-    <!--    </LinearLayout>-->
+        </LinearLayout>
 
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/llBalanceGameLoading"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent">-->
+        <LinearLayout
+            android:id="@+id/llBalanceGameDialogMatched"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <!--        <TextView-->
-    <!--            android:id="@+id/tvBalanceGameLoadingMessage"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="this is loading page"-->
-    <!--            android:textColor="@color/TextBlack"/>-->
-    <!--    </LinearLayout>-->
 
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/llBalanceGameClickError"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:orientation="vertical">-->
 
-    <!--        <TextView-->
-    <!--            android:id="@+id/tvBalanceGameClickErrorMessage"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="This is balance game click error message"-->
-    <!--            android:textColor="@color/TextBlack"/>-->
 
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameClickErrorCloseBtn"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="close"/>-->
+        </LinearLayout>
+    </FrameLayout>
 
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameClick"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="retry"/>-->
 
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameRefresh"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="reload"/>-->
-
-    <!--    </LinearLayout>-->
-
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/llBalanceGameNotClick"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:orientation="vertical">-->
-
-    <!--        <TextView-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="상대방 밸런스에 클릭하지 못했습니다"-->
-    <!--            android:textColor="@color/TextBlack"/>-->
-
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameRetry"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="retry"/>-->
-
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameNotClickClose"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="닫기"/>-->
-
-    <!--    </LinearLayout>-->
-
-    <!--    <LinearLayout-->
-    <!--        android:id="@+id/llBalanceGameClicked"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:orientation="vertical">-->
-
-    <!--        <ImageView-->
-    <!--            android:id="@+id/ivBalanceGameClicked"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"/>-->
-
-    <!--        <TextView-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="상대방 밸러스에 클릭했어요!! 상대방도 내 밸런스에 클릭할때까지 스와이프를 계속 즐겨주세요"-->
-    <!--            android:textColor="@color/TextBlack"/>-->
-
-    <!--        <Button-->
-    <!--            android:id="@+id/btnBalanceGameClickedClose"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="닫기"/>-->
-
-    <!--    </LinearLayout>-->
-
-</FrameLayout>
+</LinearLayout>
