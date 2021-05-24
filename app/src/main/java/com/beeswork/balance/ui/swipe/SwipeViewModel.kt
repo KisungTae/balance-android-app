@@ -13,12 +13,6 @@ class SwipeViewModel(
     private val cardMapper: CardMapper
 ) : ViewModel() {
 
-//    val cards: LiveData<Resource<List<CardResponse>>> = balanceRepository.cards
-
-//    val clickedCount by lazyDeferred {
-//        balanceRepository.getClickedCount()
-//    }
-
     private val _fetchCards = MutableLiveData<Resource<List<CardDomain>>>()
     val fetchCards: LiveData<Resource<List<CardDomain>>> get() = _fetchCards
 
@@ -38,17 +32,5 @@ class SwipeViewModel(
             }
         }
 
-    }
-
-    fun swipe(swipeId: String) {
-//        balanceRepository.swipe(null, swipeId)
-    }
-
-    fun fetchMatches() {
-//        balanceRepository.fetchMatches()
-    }
-
-    fun fetchClickedList() {
-//        balanceRepository.fetchClickedList()
     }
 }

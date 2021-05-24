@@ -11,7 +11,6 @@ import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.network.response.QuestionResponse
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.DialogEditBalanceGameBinding
-import com.beeswork.balance.internal.constant.BalanceGameAnswer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,8 +50,8 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
     private fun bindUI() {
 
-        binding.btnEditBalanceGameTopOption.setOnClickListener { answer(BalanceGameAnswer.TOP) }
-        binding.btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
+//        binding.btnEditBalanceGameTopOption.setOnClickListener { answer(BalanceGameAnswer.TOP) }
+//        binding.btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
         binding.btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
         binding.btnEditBalanceGameClose.setOnClickListener { dismiss() }
         binding.btnEditBalanceGameRandomQuestion.setOnClickListener { fetchRandomQuestion() }
@@ -208,9 +207,9 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
     private fun highlightAnswer(answer: Boolean?) {
         resetAnswer()
-        if (answer == BalanceGameAnswer.TOP)
-            binding.btnEditBalanceGameTopOption.setBackgroundColor(Color.GREEN)
-        else binding.btnEditBalanceGameBottomOption.setBackgroundColor(Color.GREEN)
+//        if (answer == BalanceGameAnswer.TOP)
+//            binding.btnEditBalanceGameTopOption.setBackgroundColor(Color.GREEN)
+//        else binding.btnEditBalanceGameBottomOption.setBackgroundColor(Color.GREEN)
     }
 
     private fun showErrorLayout(

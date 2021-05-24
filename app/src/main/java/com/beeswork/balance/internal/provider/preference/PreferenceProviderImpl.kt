@@ -8,10 +8,6 @@ import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
-
-
-
-
 class PreferenceProviderImpl(
     context: Context
 ) : PreferenceProvider {

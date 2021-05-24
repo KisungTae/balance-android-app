@@ -6,6 +6,7 @@ import android.view.*
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
+import com.beeswork.balance.data.database.entity.SwipeFilter
 import com.beeswork.balance.databinding.DialogSwipeFilterBinding
 import com.beeswork.balance.internal.constant.Gender
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -66,6 +67,7 @@ class SwipeFilterDialog(
             val maxAge = binding.rsSwipeFilterAge.values[1].toInt()
             val distance = binding.sliderSwipeFilterDistance.value.toInt()
             viewModel.saveSwipeFilter(getGender(), minAge, maxAge, distance)
+            dismiss()
         }
     }
 

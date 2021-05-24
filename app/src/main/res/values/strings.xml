@@ -118,4 +118,5 @@
     <string name="balance_game_loading_text">밸런스 질문을 가져오고있습니다</string>
     <string name="balance_game_checking_text">상대방 밸런스와 내 취향을 체크하는중이에요..</string>
     <string name="swipe_profile_photo_description">swipe profile photo</string>
+    <string name="account_tool_bar_title">ACCOUNT</string>
 </resources>

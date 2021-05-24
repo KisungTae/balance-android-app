@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/llProfile"
+    <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/BackgroundWhite"
+        app:contentInsetStart="0dp">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <com.beeswork.balance.ui.common.GradientTextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Michael Profile"/>
-
-    </LinearLayout>
-
+            android:text="@string/account_tool_bar_title"
+            android:textAlignment="center"
+            android:textSize="@dimen/tool_bar_title_large_text_size"
+            android:textStyle="bold"
+            app:endColor="@color/TextWhite"
+            app:startColor="@color/Primary" />
+    </androidx.appcompat.widget.Toolbar>
 
 
 </LinearLayout>

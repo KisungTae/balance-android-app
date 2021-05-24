@@ -15,6 +15,7 @@ import com.beeswork.balance.databinding.SnackBarNewClickBinding
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
+import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
@@ -145,12 +146,12 @@ class ClickFragment : BaseFragment(),
     }
 
     override fun onSelectClick(position: Int) {
-
-//        showNewClickSnackBar(ClickDomain(UUID.randomUUID(), ""))
-        viewModel.test()
-//        clickPagingDataAdapter.getClick(position)?.let {
-//
-//        }
+        clickPagingDataAdapter.getClick(position)?.let { click ->
+            BalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
+                childFragmentManager,
+                BalanceGameDialog.TAG
+            )
+        }
     }
 
     companion object {

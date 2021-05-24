@@ -49,6 +49,7 @@ import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.internal.mapper.swipe.CardMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapperImpl
+import com.beeswork.balance.ui.account.AccountViewModelFactory
 import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
@@ -210,7 +211,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { BalanceGameDialogViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
-
+        bind() from provider { AccountViewModelFactory() }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
@@ -367,3 +368,5 @@ class BalanceApplication : Application(), KodeinAware {
 //      113. when you set cardStackLayoutManager.setMaxDegree(0.0f) degree more than 0, and you drag a card, the nested views are blinking in centre
 //      114. check balance game dialg design it's not looking good
 //      115. check if validateAccount() in chatFragment
+//      116 check the number of card bind becuase it needs to bind a couple of cards ahead before users actually hit the card, taking the time to load first image
+//      117. desing clicked, matched, and missed in balancegamedialog

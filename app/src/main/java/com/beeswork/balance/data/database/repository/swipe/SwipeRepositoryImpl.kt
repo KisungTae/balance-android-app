@@ -30,7 +30,7 @@ class SwipeRepositoryImpl(
             val swipeFilter = SwipeFilter(
                 gender,
                 if (minAge < SwipeFilter.MIN_AGE) SwipeFilter.MIN_AGE else minAge,
-                if (maxAge > SwipeFilter.MAX_AGE) SwipeFilter.MAX_AGE else minAge,
+                if (maxAge > SwipeFilter.MAX_AGE) SwipeFilter.MAX_AGE else maxAge,
                 if (distance < SwipeFilter.MIN_DISTANCE || distance > SwipeFilter.MAX_DISTANCE) SwipeFilter.MAX_DISTANCE else distance
             )
             swipeFilterDAO.insert(swipeFilter)

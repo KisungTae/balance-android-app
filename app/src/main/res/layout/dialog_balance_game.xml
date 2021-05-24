@@ -25,11 +25,11 @@
         android:paddingBottom="50dp">
 
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/llBalanceGameWrapper"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/btnBalanceGameTopOption"
@@ -52,28 +52,28 @@
         </LinearLayout>
 
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/llBalanceGameLoading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/white"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <com.github.ybq.android.spinkit.SpinKitView
-                android:layout_marginBottom="10dp"
                 style="@style/SpinKitView.Large.Circle"
                 android:layout_width="@dimen/spin_kit_medium_size"
                 android:layout_height="@dimen/spin_kit_medium_size"
+                android:layout_marginBottom="10dp"
                 android:background="@color/Transparent"
                 app:SpinKit_Color="@color/Primary" />
 
             <TextView
                 android:id="@+id/tvLoadingMessage"
-                android:textColor="@color/TextGrey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/TextGrey" />
 
         </LinearLayout>
 
@@ -117,7 +117,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/sh_round_box"
-                android:text="@string/retry"
+                android:text="@string/dialog_retry_btn_text"
+                android:textColor="@color/TextWhite"
                 android:visibility="gone" />
 
             <Button
@@ -125,8 +126,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/sh_round_box"
-                android:text="@string/retry"
+                android:text="@string/dialog_retry_btn_text"
+                android:textColor="@color/TextWhite"
                 android:visibility="gone" />
+
+            <Button
+                android:layout_marginTop="10dp"
+                android:id="@+id/btnBalanceGameDialogErrorClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/Transparent"
+                android:textColor="@color/Primary"
+                android:text="@string/dialog_close_btn_title" />
 
         </LinearLayout>
 
@@ -154,14 +165,13 @@
                 android:textAlignment="center"
                 android:textColor="@color/TextBlack" />
 
-
             <Button
                 android:id="@+id/btnBalanceGameRetry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/sh_round_box"
-                android:text="@string/retry"
+                android:text="@string/dialog_retry_btn_text"
                 android:textColor="@color/TextWhite" />
 
             <Button
@@ -183,11 +193,11 @@
             android:visibility="gone">
 
             <ImageView
-                android:id="@+id/ivBalanceGameClicked"
+                android:id="@+id/ivBalanceGameClickedProfile"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:src="@drawable/person4"
-                android:contentDescription="@string/swipe_profile_photo_description" />
+                android:contentDescription="@string/swipe_profile_photo_description"
+                android:src="@drawable/person4" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -220,10 +230,13 @@
             android:id="@+id/llBalanceGameDialogMatched"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
-
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="matched layout" />
 
         </LinearLayout>
     </FrameLayout>

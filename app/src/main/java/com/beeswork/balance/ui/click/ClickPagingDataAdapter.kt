@@ -95,6 +95,7 @@ class ClickPagingDataAdapter(
         fun bind(click: ClickDomain) {
 //            val profilePhoto = EndPoint.ofPhoto(click.swiperId, click.profilePhotoKey)
 
+//            TODO: remove me
             val r = Random.nextInt(50)
             val re = r % 5
             val pic = when (re) {
