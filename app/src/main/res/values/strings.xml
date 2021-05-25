@@ -119,4 +119,14 @@
     <string name="balance_game_checking_text">상대방 밸런스와 내 취향을 체크하는중이에요..</string>
     <string name="swipe_profile_photo_description">swipe profile photo</string>
     <string name="account_tool_bar_title">ACCOUNT</string>
+    <string name="account_profile_photo_description">account profile photo</string>
+    <string name="profile_edit_icon_description">profile edit icon</string>
+    <string name="edit_profile_text">프로필 편집하기</string>
+    <string name="select_arrow_icon_description">select arrow</string>
+    <string name="charge_point_icon_description">charge point icon</string>
+    <string name="charge_point_text">포인트 충전하기</string>
+    <string name="setting_icon_description">setting icon</string>
+    <string name="setting_text">세팅하기</string>
+    <string name="about_weclick_icon_description">about weclick</string>
+    <string name="about_weclick_text">위클릭 알아보기</string>
 </resources>

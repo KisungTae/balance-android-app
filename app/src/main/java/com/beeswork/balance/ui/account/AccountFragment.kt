@@ -8,18 +8,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAccountBinding
+import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.ui.click.ClickViewModel
 import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.profile.ProfileDialog
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class AccountFragment: BaseFragment(), KodeinAware, ViewPagerChildFragment {
+class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: AccountViewModelFactory by instance()
@@ -43,6 +45,16 @@ class AccountFragment: BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        binding.llAccountEditProfile.setOnClickListener {
+            println("click edit profile")
+        }
+
+
+        Glide.with(requireContext())
+            .load(R.drawable.person4)
+            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+            .into(binding.ivAccountProfile)
+
 //        binding.llProfile.setOnClickListener {
 //            ProfileDialog().show(childFragmentManager, ProfileDialog.TAG)
 //        }

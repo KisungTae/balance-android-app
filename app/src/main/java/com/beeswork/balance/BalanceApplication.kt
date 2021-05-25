@@ -370,3 +370,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      115. check if validateAccount() in chatFragment
 //      116 check the number of card bind becuase it needs to bind a couple of cards ahead before users actually hit the card, taking the time to load first image
 //      117. desing clicked, matched, and missed in balancegamedialog
+//      118. balancegame design reference: https://www.pinterest.com.au/pin/430234570658958064/
+//      119. card scroll bar like bumble bee
+//      120. profile design reference https://dribbble.com/shots/15054650-BoltCard-Settings-Profile
+//      121. the bottom ad in account should be view pager and then ads should be retrieved from server
