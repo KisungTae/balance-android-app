@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/llChatFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/BackgroundWhite"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
@@ -24,7 +26,7 @@
                 android:layout_width="@dimen/tool_bar_menu_item_btn_size"
                 android:layout_height="@dimen/tool_bar_menu_item_btn_size"
                 android:background="@color/BackgroundWhite"
-                android:contentDescription="@string/chat_back_button_description"
+                android:contentDescription="@string/back_button_description"
                 android:src="@drawable/ic_baseline_arrow_back_ios" />
 
             <TextView
@@ -58,12 +60,11 @@
 
                 <androidx.coordinatorlayout.widget.CoordinatorLayout
                     android:id="@+id/clChatSnackBarPlaceHolder"
-                    android:layout_gravity="bottom"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp" />
+                    android:layout_height="200dp"
+                    android:layout_gravity="bottom" />
 
             </FrameLayout>
-
 
 
             <LinearLayout
@@ -122,10 +123,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha=".8"
+        android:background="@color/BackgroundWhite"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:background="@color/BackgroundWhite">
+        android:visibility="gone">
 
         <com.github.ybq.android.spinkit.SpinKitView
             style="@style/SpinKitView.Large.Circle"

@@ -4,6 +4,7 @@ import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.PostFCMTokenBody
 import com.beeswork.balance.data.network.request.PostLocationBody
+import com.beeswork.balance.data.network.request.PostSettingsBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import org.threeten.bp.OffsetDateTime
@@ -28,6 +29,12 @@ class SettingRDSImpl(
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postLocation(PostLocationBody(accountId, identityToken, latitude, longitude, updatedAt))
+        }
+    }
+
+    override suspend fun postSettings(accountId: UUID?, identityToken: UUID?, email: String?): Resource<EmptyResponse> {
+        return getResult {
+            balanceAPI.postSettings(PostSettingsBody(accountId, identityToken, email))
         }
     }
 

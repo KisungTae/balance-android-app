@@ -26,6 +26,9 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("setting")
+    suspend fun postSettings(@Body postSettingsBody: PostSettingsBody): Response<EmptyResponse>
+
     @POST("swipe")
     suspend fun swipe(@Body swipeBody: SwipeBody): Response<List<QuestionDTO>>
 

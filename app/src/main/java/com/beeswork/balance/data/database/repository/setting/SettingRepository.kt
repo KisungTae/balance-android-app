@@ -4,4 +4,5 @@ interface SettingRepository {
     suspend fun saveFCMToken(token: String)
     suspend fun saveLocation(latitude: Double, longitude: Double)
     suspend fun syncLocation()
+    suspend fun fetchEmail(): String?
 }

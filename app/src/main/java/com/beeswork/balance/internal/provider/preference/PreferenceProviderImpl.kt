@@ -31,6 +31,11 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
+    override fun putName(name: String) {
+        editor.putString(NAME, name)
+        editor.apply()
+    }
+
     override fun putMatchFetchedAt(updatedAt: OffsetDateTime?) {
         updatedAt?.let {
             editor.putString(MATCH_FETCHED_AT, OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt))
@@ -70,6 +75,10 @@ class PreferenceProviderImpl(
         return preferences.getString(IDENTITY_TOKEN, identityToken)?.let { UUID.fromString(it) }
     }
 
+    override fun getName(): String {
+        return preferences.getString(NAME, "") ?: ""
+    }
+
     override fun getMatchFetchedAt(): OffsetDateTime {
         preferences.getString(MATCH_FETCHED_AT, DEFAULT_FETCHED_AT)?.let {
             return OffsetDateTimeConverter.toOffsetDateTimeNonNull(it)
@@ -97,6 +106,7 @@ class PreferenceProviderImpl(
         const val ACCOUNT_ID = "accountId"
         const val IDENTITY_TOKEN = "identityToken"
         const val PROFILE_PHOTO_KEY = "profilePhotoKey"
+        const val NAME = "name"
 
         const val DEFAULT_FETCHED_AT = "2020-01-01T10:06:26.032+11:00"
 

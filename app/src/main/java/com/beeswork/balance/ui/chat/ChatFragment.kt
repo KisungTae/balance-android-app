@@ -110,7 +110,7 @@ class ChatFragment : BaseFragment(),
     private fun setupUnmatchLiveDataObserver() {
         viewModel.unmatchLiveData.observe(viewLifecycleOwner, {
             when {
-                it.isSuccess() -> popBackToMatch()
+                it.isSuccess() -> popBackStack()
                 it.isLoading() -> showLoading()
                 it.isError() && validateAccount(it.error, it.errorMessage) -> {
                     hideLoading()
@@ -132,7 +132,7 @@ class ChatFragment : BaseFragment(),
     private fun setupReportMatchLiveDataObserver() {
         viewModel.reportMatchLiveData.observe(viewLifecycleOwner, {
             when {
-                it.isSuccess() -> popBackToMatch()
+                it.isSuccess() -> popBackStack()
                 it.isLoading() -> getReportDialog()?.showLoading()
                 it.isError() && validateAccount(it.error, it.errorMessage) -> {
                     getReportDialog()?.hideLoading()
@@ -210,7 +210,7 @@ class ChatFragment : BaseFragment(),
     private fun setupBackPressedDispatcherCallback() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                popBackToMatch()
+                popBackStack()
             }
         })
     }
@@ -224,7 +224,7 @@ class ChatFragment : BaseFragment(),
                 else -> false
             }
         }
-        binding.btnChatBack.setOnClickListener { popBackToMatch() }
+        binding.btnChatBack.setOnClickListener { popBackStack() }
     }
 
     private fun showMoreMenu(): Boolean {
@@ -262,12 +262,12 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private fun popBackToMatch() {
+    private fun popBackStack() {
         requireActivity().supportFragmentManager.popBackStack(MainViewPagerFragment.TAG, POP_BACK_STACK_INCLUSIVE)
     }
 
     override fun onDismissErrorDialog() {
-        popBackToMatch()
+        popBackStack()
     }
 
     override fun onResendChatMessage(position: Int) {

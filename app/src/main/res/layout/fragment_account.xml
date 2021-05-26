@@ -105,6 +105,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llAccountChargePoint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -137,6 +138,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llAccountSetting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -169,6 +171,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llAccountAbout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

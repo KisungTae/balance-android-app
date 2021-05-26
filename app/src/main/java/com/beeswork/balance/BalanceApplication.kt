@@ -43,8 +43,12 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
+import com.beeswork.balance.internal.mapper.profile.ProfileMapper
+import com.beeswork.balance.internal.mapper.profile.ProfileMapperImpl
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.internal.mapper.profile.QuestionMapperImpl
+import com.beeswork.balance.internal.mapper.setting.SettingMapper
+import com.beeswork.balance.internal.mapper.setting.SettingMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.internal.mapper.swipe.CardMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
@@ -56,6 +60,7 @@ import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
+import com.beeswork.balance.ui.profile.ProfileViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeFilterDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
@@ -88,6 +93,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SwipeFilterMapper>() with singleton { SwipeFilterMapperImpl() }
         bind<CardMapper>() with singleton { CardMapperImpl() }
         bind<QuestionMapper>() with singleton { QuestionMapperImpl() }
+        bind<ProfileMapper>() with singleton { ProfileMapperImpl() }
+        bind<SettingMapper>() with singleton { SettingMapperImpl() }
 
 
         // Database
@@ -103,6 +110,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
         bind() from singleton { instance<BalanceDatabase>().swipeFilterDAO() }
+        bind() from singleton { instance<BalanceDatabase>().settingDAO() }
 
         // API
         bind() from singleton { BalanceAPI(instance()) }
@@ -125,6 +133,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance()) }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -211,7 +220,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { BalanceGameDialogViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
-        bind() from provider { AccountViewModelFactory() }
+        bind() from provider { AccountViewModelFactory(instance()) }
+        bind() from provider { ProfileViewModelFactory(instance(), instance()) }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
@@ -374,3 +384,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      119. card scroll bar like bumble bee
 //      120. profile design reference https://dribbble.com/shots/15054650-BoltCard-Settings-Profile
 //      121. the bottom ad in account should be view pager and then ads should be retrieved from server
+//      122. save name in sharedPreference because it does not change

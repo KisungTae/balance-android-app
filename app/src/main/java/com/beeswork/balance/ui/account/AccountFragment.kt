@@ -8,13 +8,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAccountBinding
+import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.ui.click.ClickViewModel
 import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.beeswork.balance.ui.profile.ProfileDialog
+import com.beeswork.balance.ui.profile.ProfileFragment
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -25,6 +29,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: AccountViewModelFactory by instance()
+    private val preferenceProvider: PreferenceProvider by instance()
 
     private lateinit var viewModel: AccountViewModel
     private lateinit var binding: FragmentAccountBinding
@@ -42,22 +47,54 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AccountViewModel::class.java)
         bindUI()
+        viewModel.fetchEmail()
     }
 
     private fun bindUI() = lifecycleScope.launch {
-        binding.llAccountEditProfile.setOnClickListener {
-            println("click edit profile")
-        }
+        setupEmailLiveDataObserver()
+        setupAccountInfo()
+        setupListeners()
+    }
 
+    private fun setupListeners() {
+        binding.llAccountEditProfile.setOnClickListener { moveToProfileFragment() }
+        binding.llAccountChargePoint.setOnClickListener {  }
+        binding.llAccountAbout.setOnClickListener {  }
+        binding.llAccountSetting.setOnClickListener {  }
+    }
 
+    private fun setupAccountInfo() {
+//        val profilePhotoKey = EndPoint.ofPhoto(
+//            preferenceProvider.getAccountId(),
+//            preferenceProvider.getProfilePhotoKey()
+//        )
         Glide.with(requireContext())
             .load(R.drawable.person4)
-            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+            .apply(GlideHelper.profilePhotoGlideOptions())
+            .circleCrop()
             .into(binding.ivAccountProfile)
+        binding.tvAccountName.text = preferenceProvider.getName()
+    }
 
-//        binding.llProfile.setOnClickListener {
-//            ProfileDialog().show(childFragmentManager, ProfileDialog.TAG)
-//        }
+    private fun moveToProfileFragment() {
+        val profileFragment = ProfileFragment()
+        activity?.supportFragmentManager?.beginTransaction()?.let {
+            it.setCustomAnimations(
+                R.anim.enter_right_to_left,
+                R.anim.exit_right_to_left,
+                R.anim.enter_left_to_right,
+                R.anim.exit_left_to_right
+            )
+            it.add(R.id.fcvMain, profileFragment)
+            it.addToBackStack(MainViewPagerFragment.TAG)
+            it.commit()
+        }
+    }
+
+    private fun setupEmailLiveDataObserver() {
+        viewModel.emailLiveData.observe(viewLifecycleOwner) { email ->
+            binding.tvAccountEmail.text = email ?: ""
+        }
     }
 
     override fun onFragmentSelected() {

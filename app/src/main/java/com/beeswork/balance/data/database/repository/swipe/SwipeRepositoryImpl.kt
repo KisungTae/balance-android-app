@@ -39,9 +39,9 @@ class SwipeRepositoryImpl(
 
     private fun getSwipeFilterOrDefault(): SwipeFilter {
         return swipeFilterDAO.findById() ?: kotlin.run {
-            val defaultSwipeFilter = SwipeFilter()
-            swipeFilterDAO.insert(defaultSwipeFilter)
-            defaultSwipeFilter
+            val swipeFilter = SwipeFilter()
+            swipeFilterDAO.insert(swipeFilter)
+            swipeFilter
         }
     }
 

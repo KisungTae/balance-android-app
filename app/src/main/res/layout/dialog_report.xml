@@ -34,7 +34,7 @@
                 android:layout_height="@dimen/tool_bar_menu_item_btn_size"
                 android:layout_marginStart="10dp"
                 android:background="@color/Transparent"
-                android:contentDescription="@string/chat_back_button_description"
+                android:contentDescription="@string/back_button_description"
                 android:src="@drawable/ic_baseline_arrow_back_ios" />
 
             <TextView

@@ -14,4 +14,10 @@ interface SettingRDS {
         longitude: Double,
         updatedAt: OffsetDateTime
     ): Resource<EmptyResponse>
+
+    suspend fun postSettings(
+        accountId: UUID?,
+        identityToken: UUID?,
+        email: String?
+    ): Resource<EmptyResponse>
 }

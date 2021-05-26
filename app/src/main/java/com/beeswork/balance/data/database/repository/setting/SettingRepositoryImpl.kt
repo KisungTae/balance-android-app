@@ -2,21 +2,21 @@ package com.beeswork.balance.data.database.repository.setting
 
 import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.dao.LocationDAO
+import com.beeswork.balance.data.database.dao.SettingDAO
 import com.beeswork.balance.data.database.entity.FCMToken
 import com.beeswork.balance.data.database.entity.Location
+import com.beeswork.balance.data.database.entity.Setting
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
 class SettingRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
     private val fcmTokenDAO: FCMTokenDAO,
     private val locationDAO: LocationDAO,
-    private val settingRDS: SettingRDS
+    private val settingRDS: SettingRDS,
+    private val settingDAO: SettingDAO
 ) : SettingRepository {
 
     override suspend fun saveFCMToken(token: String) {
@@ -52,6 +52,20 @@ class SettingRepositoryImpl(
                 if (!location.synced)
                     syncLocation(location.latitude, location.longitude, location.updatedAt)
             }
+        }
+    }
+
+    private fun getSettingOrDefault(): Setting {
+        return settingDAO.findById() ?: kotlin.run {
+            val setting = Setting("null@naver.com", false)
+            settingDAO.insert(setting)
+            setting
+        }
+    }
+
+    override suspend fun fetchEmail(): String? {
+        return withContext(Dispatchers.IO) {
+            return@withContext getSettingOrDefault().email
         }
     }
 }
