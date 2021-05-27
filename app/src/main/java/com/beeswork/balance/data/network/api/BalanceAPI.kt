@@ -75,7 +75,7 @@ interface BalanceAPI {
         @Query(value = "identityToken") identityToken: UUID?,
         @Query(value = "minAge") minAge: Int,
         @Query(value = "maxAge") maxAge: Int,
-        @Query(value = "gender") gender: Gender,
+        @Query(value = "gender") gender: Boolean,
         @Query(value = "distance") distance: Int,
         @Query(value = "pageIndex") pageIndex: Int
     ): Response<FetchCardsDTO>

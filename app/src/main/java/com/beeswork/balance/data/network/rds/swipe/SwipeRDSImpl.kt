@@ -20,7 +20,7 @@ class SwipeRDSImpl(
         identityToken: UUID?,
         minAge: Int,
         maxAge: Int,
-        gender: Gender,
+        gender: Boolean,
         distance: Int,
         pageIndex: Int
     ): Resource<FetchCardsDTO> {

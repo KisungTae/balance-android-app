@@ -61,7 +61,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="10dp"
-                            android:text="태기성"
+                            android:text="마이클리"
                             android:textColor="@color/TextWhite"
                             android:textSize="@dimen/text_extra_large_size"
                             android:textStyle="bold" />
@@ -128,8 +128,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="3dp"
-                            android:text="172 cm"
+                            android:text="172"
                             android:textSize="@dimen/text_medium_size" />
+
+                        <TextView
+                            android:layout_marginStart="3dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/height_unit_label"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -204,7 +210,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="50dp"
-                    android:text="This is Michael. I am looking for a serious relationship. Please no hook up or node pictures. I don't want them. I like listening to music and watch movies on my free time"
+                    android:text="This is Michael. I am looking for a serious relationship. Please no hook up or node pictures. I don't want them. I like listening to music and watch movies in my free time"
                     android:textSize="@dimen/text_large_size" />
 
                 <Button

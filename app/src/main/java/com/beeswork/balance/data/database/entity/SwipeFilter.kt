@@ -6,7 +6,7 @@ import com.beeswork.balance.internal.constant.Gender
 
 @Entity(tableName = "swipeFilter")
 data class SwipeFilter(
-    val gender: Gender = Gender.FEMALE,
+    val gender: Boolean = Gender.FEMALE,
     val minAge: Int = MIN_AGE,
     val maxAge: Int = MAX_AGE,
     val distance: Int = MAX_DISTANCE,

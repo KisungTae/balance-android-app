@@ -29,7 +29,7 @@ class SwipeFilterDialogViewModel(
         }
     }
 
-    fun saveSwipeFilter(gender: Gender, minAge: Int, maxAge: Int, distance: Int) {
+    fun saveSwipeFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int) {
         viewModelScope.launch {
             swipeRepository.saveSwipeFilter(gender, minAge, maxAge, distance)
         }

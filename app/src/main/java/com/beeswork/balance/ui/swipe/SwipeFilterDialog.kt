@@ -71,7 +71,7 @@ class SwipeFilterDialog(
         }
     }
 
-    private fun getGender(): Gender {
+    private fun getGender(): Boolean {
         return when (binding.rgSwipeFilterGender.checkedRadioButtonId) {
             R.id.rbSwipeFilterMale -> Gender.MALE
             else -> Gender.FEMALE

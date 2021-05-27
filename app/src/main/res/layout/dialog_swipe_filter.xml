@@ -56,7 +56,7 @@
                 android:button="@color/Transparent"
                 android:gravity="center"
                 android:paddingVertical="8dp"
-                android:text="@string/swipe_filter_dialog_radio_button_male_title"
+                android:text="@string/gender_male_label"
                 android:textColor="@color/radio_button_text" />
 
             <RadioButton
@@ -68,7 +68,7 @@
                 android:button="@color/Transparent"
                 android:gravity="center"
                 android:paddingVertical="8dp"
-                android:text="@string/swipe_filter_dialog_radio_button_female_title"
+                android:text="@string/gender_female_label"
                 android:textColor="@color/radio_button_text" />
 
         </RadioGroup>

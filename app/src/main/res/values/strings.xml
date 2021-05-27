@@ -95,8 +95,8 @@
     <string name="new_click_snack_bar_body">새로운 만남을 만들어보세요</string>
     <string name="swipe_tool_bar_title">SWIPE</string>
     <string name="fetch_card_exception_title">카드를 가져오는데 실패했습니다</string>
-    <string name="swipe_filter_dialog_radio_button_male_title">남자</string>
-    <string name="swipe_filter_dialog_radio_button_female_title">여자</string>
+    <string name="gender_male_label">남자</string>
+    <string name="gender_female_label">여자</string>
     <string name="swipe_filter_dialog_title">필터</string>
     <string name="swipe_filter_age_slider_title">상대방의 나이는</string>
     <string name="swipe_filter_age_slider_between">에서</string>
@@ -130,4 +130,14 @@
     <string name="about_weclick_icon_description">about weclick</string>
     <string name="about_weclick_text">위클릭 알아보기</string>
     <string name="profile_tool_bar_title">프로필</string>
+    <string name="profile_name_label">이름</string>
+    <string name="profile_date_of_birth_label">생년월일</string>
+    <string name="profile_gender_label">성별</string>
+    <string name="profile_height_label">키</string>
+    <string name="height_unit_label">cm</string>
+    <string name="down_arrow_icon_description">down arrow</string>
+    <string name="profile_about_label">자기소개</string>
+    <string name="profile_about_hint">간단히 자기를 소개해주세요!</string>
+    <string name="profile_balance_game_label">밸런스 질문</string>
+    <string name="right_arrow_icon_description">right arrow</string>
 </resources>

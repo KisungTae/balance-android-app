@@ -25,7 +25,7 @@ class SwipeRepositoryImpl(
         }
     }
 
-    override suspend fun saveSwipeFilter(gender: Gender, minAge: Int, maxAge: Int, distance: Int) {
+    override suspend fun saveSwipeFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int) {
         withContext(Dispatchers.IO) {
             val swipeFilter = SwipeFilter(
                 gender,

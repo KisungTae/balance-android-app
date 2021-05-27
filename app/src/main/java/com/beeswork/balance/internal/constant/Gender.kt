@@ -7,11 +7,9 @@ import com.google.gson.annotations.SerializedName
 import java.lang.reflect.Type
 
 
-enum class Gender {
-
-    @SerializedName("0")
-    MALE,
-
-    @SerializedName("1")
-    FEMALE;
+class Gender {
+    companion object {
+        const val FEMALE = false
+        const val MALE = true
+    }
 }

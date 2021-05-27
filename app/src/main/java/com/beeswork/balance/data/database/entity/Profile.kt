@@ -15,5 +15,9 @@ data class Profile(
     val synced: Boolean,
 
     @PrimaryKey
-    val id: Int = 0,
-)
+    val id: Int = ID,
+) {
+    companion object {
+        const val ID = 0
+    }
+}
