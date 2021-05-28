@@ -30,6 +30,8 @@ import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.rds.click.ClickRDSImpl
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
+import com.beeswork.balance.data.network.rds.profile.ProfileRDS
+import com.beeswork.balance.data.network.rds.profile.ProfileRDSImpl
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.rds.report.ReportRDSImpl
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
@@ -122,6 +124,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ClickRDS>() with singleton { ClickRDSImpl(instance()) }
         bind<SettingRDS>() with singleton { SettingRDSImpl(instance()) }
         bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance()) }
+        bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance()) }
 
 
 
@@ -130,7 +133,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Repository
         bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance(), instance(), instance()) }
-        bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance()) }
+        bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance()) }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
                 instance(),
@@ -385,3 +388,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      120. profile design reference https://dribbble.com/shots/15054650-BoltCard-Settings-Profile
 //      121. the bottom ad in account should be view pager and then ads should be retrieved from server
 //      122. save name in sharedPreference because it does not change
+//      123. when app goes ot pause like put into background, then stop websocket and connect when app back to foreground

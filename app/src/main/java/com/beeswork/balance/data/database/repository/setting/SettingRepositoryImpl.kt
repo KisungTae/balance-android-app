@@ -57,7 +57,7 @@ class SettingRepositoryImpl(
 
     private fun getSettingOrDefault(): Setting {
         return settingDAO.findById() ?: kotlin.run {
-            val setting = Setting("null@naver.com", false)
+            val setting = Setting(null, false)
             settingDAO.insert(setting)
             setting
         }

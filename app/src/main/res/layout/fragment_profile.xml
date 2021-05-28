@@ -8,12 +8,12 @@
     android:focusable="true"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tbProfile"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/BackgroundWhite"
-        app:contentInsetStart="0dp">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btnProfileBack"
@@ -24,19 +24,46 @@
             android:src="@drawable/ic_baseline_arrow_back_ios" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
             android:text="@string/profile_tool_bar_title"
             android:textAlignment="center"
             android:textSize="@dimen/tool_bar_title_medium_text_size"
             android:textStyle="bold" />
 
-    </androidx.appcompat.widget.Toolbar>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/btnProfileSave"
+                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:background="@color/BackgroundWhite"
+                android:contentDescription="@string/profile_save_icon_description"
+                android:src="@drawable/ic_baseline_done_24" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/spvProfileLoading"
+                style="@style/SpinKitView.Circle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:layout_margin="12dp"
+                android:background="@color/Transparent"
+                android:visibility="gone"
+                app:SpinKit_Color="@color/GreyDark" />
+
+        </FrameLayout>
+
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/lighterGrey">
+        android:background="@color/BackgroundWhite">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -67,10 +94,9 @@
                     android:id="@+id/tvProfileName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="25dp"
                     android:background="@drawable/sh_profile_edit_box"
                     android:padding="15dp"
-                    android:text="태기성"
                     android:textColor="@color/TextGrey" />
 
 
@@ -84,10 +110,9 @@
                     android:id="@+id/tvProfileDateOfBirth"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="25dp"
                     android:background="@drawable/sh_profile_edit_box"
                     android:padding="15dp"
-                    android:text="1987년 12월 10일"
                     android:textColor="@color/TextGrey" />
 
                 <TextView
@@ -99,7 +124,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="25dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -110,7 +135,8 @@
                         android:background="@drawable/sh_radio_button_left_unchecked"
                         android:paddingVertical="15dp"
                         android:text="@string/gender_female_label"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textColor="@color/TextGrey" />
 
                     <TextView
                         android:id="@+id/tvProfileGenderMale"
@@ -120,7 +146,8 @@
                         android:background="@drawable/sh_radio_button_right_unchecked"
                         android:paddingVertical="15dp"
                         android:text="@string/gender_male_label"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textColor="@color/TextGrey" />
                 </LinearLayout>
 
                 <TextView
@@ -130,9 +157,10 @@
                     android:text="@string/profile_height_label" />
 
                 <LinearLayout
+                    android:id="@+id/llProfileHeightWrapper"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="25dp"
                     android:background="@drawable/sh_profile_edit_box"
                     android:clickable="true"
                     android:focusable="true"
@@ -148,8 +176,7 @@
                         <TextView
                             android:id="@+id/tvProfileHeight"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="159" />
+                            android:layout_height="wrap_content" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -172,14 +199,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginBottom="10dp"
                     android:text="@string/profile_about_label" />
 
                 <EditText
                     android:id="@+id/etProfileAbout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="25dp"
                     android:autofillHints="@string/profile_about_hint"
                     android:background="@drawable/sh_profile_edit_box"
                     android:gravity="top"
@@ -193,14 +220,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="5dp"
                     android:text="@string/profile_balance_game_label" />
 
                 <LinearLayout
+                    android:id="@+id/btnProfileEditBalanceGame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/sh_profile_edit_box"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -211,7 +241,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:padding="15dp"
-                        android:text="내 절친집에 남자친구 속옷, 남자친구 집에 내절친 속옷" />
+                        android:text="@string/edit_balance_game_text" />
 
                     <ImageView
                         android:layout_width="24dp"
@@ -220,38 +250,9 @@
                         android:contentDescription="@string/right_arrow_icon_description"
                         android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
 
-
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/sh_profile_edit_box"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:padding="15dp"
-                        android:text="토 맛 카레먹기 카레맛 토 먹기" />
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="15dp"
-                        android:contentDescription="@string/right_arrow_icon_description"
-                        android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
-
-
-                </LinearLayout>
-
 
             </LinearLayout>
-
 
         </LinearLayout>
 

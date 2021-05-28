@@ -15,6 +15,7 @@
     <string name="error_title_fetch_question">밸런스 질문을 가져오지 못했습니다</string>
     <string name="error_title_save_question">밸런스 질문을 저장하지 못했습니다</string>
     <string name="error_title_click">밸런스를 체크하지 못했습니다</string>
+    <string name="error_title_save_about">프로필을 저장하지 못했습니다</string>
 
 
     <string name="chat_message_over_sized_exception">채팅메세지가 너무 깁니다 줄여주세요</string>
@@ -140,4 +141,7 @@
     <string name="profile_about_hint">간단히 자기를 소개해주세요!</string>
     <string name="profile_balance_game_label">밸런스 질문</string>
     <string name="right_arrow_icon_description">right arrow</string>
+    <string name="dialog_select_btn_text">선택</string>
+    <string name="profile_save_icon_description">profile save icon</string>
+    <string name="edit_balance_game_text">밸런스 질문 편집하기</string>
 </resources>

@@ -17,7 +17,6 @@ interface SettingRDS {
 
     suspend fun postSettings(
         accountId: UUID?,
-        identityToken: UUID?,
-        email: String?
+        identityToken: UUID?
     ): Resource<EmptyResponse>
 }

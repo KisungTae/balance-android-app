@@ -16,4 +16,7 @@ interface ProfileDAO {
     @Query("select * from profile where id = :id")
     fun findById(id: Int = Profile.ID): Profile
 
+    @Query("update profile set height = :height, about = :about where id = ${Profile.ID}")
+    fun updateAbout(height: Int?, about: String)
+
 }

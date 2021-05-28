@@ -32,9 +32,9 @@ class SettingRDSImpl(
         }
     }
 
-    override suspend fun postSettings(accountId: UUID?, identityToken: UUID?, email: String?): Resource<EmptyResponse> {
+    override suspend fun postSettings(accountId: UUID?, identityToken: UUID?): Resource<EmptyResponse> {
         return getResult {
-            balanceAPI.postSettings(PostSettingsBody(accountId, identityToken, email))
+            balanceAPI.postSettings(PostSettingsBody(accountId, identityToken))
         }
     }
 

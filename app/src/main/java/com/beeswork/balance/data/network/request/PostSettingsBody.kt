@@ -4,6 +4,5 @@ import java.util.*
 
 data class PostSettingsBody(
     val accountId: UUID?,
-    val identityToken: UUID?,
-    val email: String?
+    val identityToken: UUID?
 )

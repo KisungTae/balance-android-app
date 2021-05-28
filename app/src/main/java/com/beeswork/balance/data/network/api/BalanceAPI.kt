@@ -26,6 +26,9 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("profile/about")
+    suspend fun postAbout(@Body saveAboutBody: SaveAboutBody): Response<EmptyResponse>
+
     @POST("setting")
     suspend fun postSettings(@Body postSettingsBody: PostSettingsBody): Response<EmptyResponse>
 

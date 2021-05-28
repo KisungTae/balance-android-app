@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <NumberPicker
+        android:id="@+id/npProfileHeightOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:background="@drawable/sh_top_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:theme="@style/MyAppTheme.NumberPicker" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="15dp"
+        android:background="@color/LightGrey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnProfileHeightOptionClose"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:background="@drawable/sh_left_bottom_round_box"
+            android:text="@string/dialog_close_btn_title"
+            android:textColor="@color/TextGrey"
+            app:backgroundTint="@color/BackgroundWhite" />
+
+        <Button
+            android:id="@+id/btnProfileHeightOptionSelect"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:background="@drawable/sh_right_bottom_round_box"
+            android:text="@string/dialog_select_btn_text"
+            android:textColor="@color/Primary"
+            app:backgroundTint="@color/BackgroundWhite" />
+
+
+    </LinearLayout>
+
+</LinearLayout>
