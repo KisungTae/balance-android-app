@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.entity.Profile
 import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,25 @@ class ProfileRepositoryImpl(
             )
             if (response.isSuccess()) profileDAO.updateAbout(height, about)
             return@withContext response
+        }
+    }
+
+    override suspend fun fetchQuestions(): Resource<List<QuestionDTO>> {
+        return withContext(Dispatchers.IO) {
+            return@withContext profileRDS.listQuestions(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken()
+            )
+        }
+    }
+
+    override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
+        return withContext(Dispatchers.IO) {
+            return@withContext profileRDS.saveQuestions(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                answers
+            )
         }
     }
 

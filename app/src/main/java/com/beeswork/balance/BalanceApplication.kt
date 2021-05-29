@@ -56,13 +56,14 @@ import com.beeswork.balance.internal.mapper.swipe.CardMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapperImpl
 import com.beeswork.balance.ui.account.AccountViewModelFactory
-import com.beeswork.balance.ui.balancegame.BalanceGameDialogViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
+import com.beeswork.balance.ui.profile.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profile.ProfileViewModelFactory
+import com.beeswork.balance.ui.swipe.SwipeBalanceGameViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeFilterDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
@@ -220,11 +221,12 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { ClickViewModelFactory(instance(), instance()) }
-        bind() from provider { BalanceGameDialogViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind() from provider { SwipeBalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { AccountViewModelFactory(instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance()) }
+        bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }

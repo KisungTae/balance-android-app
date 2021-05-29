@@ -9,7 +9,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.converter.UUIDConverter
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.ui.balancegame.BalanceGameDialog
+
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
@@ -49,7 +49,6 @@ class SwipeFragment : BaseFragment(),
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
         viewModel.fetchCards()
-//        BalanceGameDialog(UUID.randomUUID()).show(childFragmentManager, BalanceGameDialog.TAG)
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -124,9 +123,9 @@ class SwipeFragment : BaseFragment(),
 
         if (direction == Direction.Right) removedCard?.let { _removedCard ->
             val profilePhotoKey = if (_removedCard.photoKeys.isNotEmpty()) _removedCard.photoKeys[0] else null
-            BalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
+            SwipeBalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
                 childFragmentManager,
-                BalanceGameDialog.TAG
+                SwipeBalanceGameDialog.TAG
             )
         }
     }

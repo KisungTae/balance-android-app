@@ -15,11 +15,11 @@ import com.beeswork.balance.databinding.SnackBarNewClickBinding
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
-import com.beeswork.balance.ui.balancegame.BalanceGameDialog
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.swipe.SwipeBalanceGameDialog
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -147,9 +147,9 @@ class ClickFragment : BaseFragment(),
 
     override fun onSelectClick(position: Int) {
         clickPagingDataAdapter.getClick(position)?.let { click ->
-            BalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
+            SwipeBalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
                 childFragmentManager,
-                BalanceGameDialog.TAG
+                SwipeBalanceGameDialog.TAG
             )
         }
     }

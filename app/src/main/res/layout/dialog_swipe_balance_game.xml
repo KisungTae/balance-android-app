@@ -24,122 +24,14 @@
         android:paddingHorizontal="30dp"
         android:paddingBottom="50dp">
 
-        <LinearLayout
-            android:id="@+id/llBalanceGameWrapper"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone">
+        <include android:id="@+id/layoutBalanceGame"
+            layout="@layout/layout_balance_game" />
 
-            <Button
-                android:id="@+id/btnBalanceGameTopOption"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@drawable/sh_top_round_box"
-                android:textColor="@color/TextWhite"
-                android:textSize="@dimen/text_large_size" />
+        <include android:id="@+id/layoutBalanceGameLoading"
+            layout="@layout/layout_balance_game_loading" />
 
-            <Button
-                android:id="@+id/btnBalanceGameBottomOption"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@drawable/sh_bottom_round_box"
-                android:textColor="@color/Primary"
-                android:textSize="@dimen/text_large_size" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llBalanceGameLoading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/white"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <com.github.ybq.android.spinkit.SpinKitView
-                style="@style/SpinKitView.Large.Circle"
-                android:layout_width="@dimen/spin_kit_medium_size"
-                android:layout_height="@dimen/spin_kit_medium_size"
-                android:layout_marginBottom="10dp"
-                android:background="@color/Transparent"
-                app:SpinKit_Color="@color/Primary" />
-
-            <TextView
-                android:id="@+id/tvLoadingMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textColor="@color/TextGrey" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llBalanceGameError"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_marginBottom="20dp"
-                android:contentDescription="@string/dialog_error_icon_description"
-                android:src="@drawable/ic_baseline_error_outline" />
-
-            <TextView
-                android:id="@+id/tvBalanceGameDialogErrorTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textAlignment="center"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/tvBalanceGameDialogErrorMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textAlignment="center"
-                android:textColor="@color/TextGrey" />
-
-            <Button
-                android:id="@+id/btnBalanceGameDialogFetch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/sh_round_box"
-                android:text="@string/dialog_retry_btn_text"
-                android:textColor="@color/TextWhite"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btnBalanceGameDialogSave"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/sh_round_box"
-                android:text="@string/dialog_retry_btn_text"
-                android:textColor="@color/TextWhite"
-                android:visibility="gone" />
-
-            <Button
-                android:layout_marginTop="10dp"
-                android:id="@+id/btnBalanceGameDialogErrorClose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/Transparent"
-                android:textColor="@color/Primary"
-                android:text="@string/dialog_close_btn_title" />
-
-        </LinearLayout>
+        <include android:id="@+id/layoutBalanceGameError"
+            layout="@layout/layout_balance_game_error" />
 
         <LinearLayout
             android:id="@+id/llBalanceGameDialogMissed"

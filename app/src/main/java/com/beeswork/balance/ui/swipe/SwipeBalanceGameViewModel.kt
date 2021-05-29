@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.balancegame
+package com.beeswork.balance.ui.swipe
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,9 +14,8 @@ import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.profile.QuestionDomain
 import java.util.*
 
-class BalanceGameDialogViewModel(
+class SwipeBalanceGameViewModel(
     private val swipeRepository: SwipeRepository,
-    private val profileRepository: ProfileRepository,
     private val matchRepository: MatchRepository,
     private val questionMapper: QuestionMapper
 ) : ViewModel() {

@@ -3,13 +3,31 @@ package com.beeswork.balance.data.network.rds.profile
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.SaveAboutBody
+import com.beeswork.balance.data.network.request.SaveAnswersBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import java.util.*
 
 class ProfileRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ProfileRDS {
+
+    override suspend fun saveQuestions(
+        accountId: UUID?,
+        identityToken: UUID?,
+        answers: Map<Int, Boolean>
+    ): Resource<EmptyResponse> {
+        return getResult {
+            balanceAPI.saveAnswers(SaveAnswersBody(accountId, identityToken, answers))
+        }
+    }
+
+    override suspend fun listQuestions(accountId: UUID?, identityToken: UUID?): Resource<List<QuestionDTO>> {
+        return getResult {
+            balanceAPI.listQuestions(accountId, identityToken)
+        }
+    }
 
     override suspend fun postAbout(
         accountId: UUID?,

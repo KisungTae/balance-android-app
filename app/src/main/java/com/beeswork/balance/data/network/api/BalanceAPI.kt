@@ -26,6 +26,15 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("account/question/answers")
+    suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
+
+    @GET("account/question/list")
+    suspend fun listQuestions(
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?
+    ): Response<List<QuestionDTO>>
+
     @POST("profile/about")
     suspend fun postAbout(@Body saveAboutBody: SaveAboutBody): Response<EmptyResponse>
 
@@ -121,8 +130,6 @@ interface BalanceAPI {
         @Query(value = "identityToken") identityToken: String
     ): Response<List<Photo>>
 
-    @POST("/account/answers")
-    suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
 
     @GET("/question/list")
     suspend fun fetchQuestions(

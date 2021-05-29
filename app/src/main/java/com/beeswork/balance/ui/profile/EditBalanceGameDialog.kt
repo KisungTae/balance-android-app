@@ -52,18 +52,18 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
 //        binding.btnEditBalanceGameTopOption.setOnClickListener { answer(BalanceGameAnswer.TOP) }
 //        binding.btnEditBalanceGameBottomOption.setOnClickListener { answer(BalanceGameAnswer.BOTTOM) }
-        binding.btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
-        binding.btnEditBalanceGameClose.setOnClickListener { dismiss() }
-        binding.btnEditBalanceGameRandomQuestion.setOnClickListener { fetchRandomQuestion() }
-
-        binding.btnEditBalanceGameErrorFetchQuestions.setOnClickListener { fetchQuestions() }
-        binding.btnEditBalanceGameErrorSaveAnswers.setOnClickListener { saveAnswers() }
-        binding.btnEditBalanceGameErrorClose.setOnClickListener {
-            if (binding.btnEditBalanceGameErrorFetchQuestions.visibility == View.VISIBLE)
-                dismiss()
-            else showLayout(loading = false, error = false)
-        }
-        fetchQuestions()
+//        binding.btnEditBalanceGameBack.setOnClickListener { previousQuestion() }
+//        binding.btnEditBalanceGameClose.setOnClickListener { dismiss() }
+//        binding.btnEditBalanceGameRandomQuestion.setOnClickListener { fetchRandomQuestion() }
+//
+//        binding.btnEditBalanceGameErrorFetchQuestions.setOnClickListener { fetchQuestions() }
+//        binding.btnEditBalanceGameErrorSaveAnswers.setOnClickListener { saveAnswers() }
+//        binding.btnEditBalanceGameErrorClose.setOnClickListener {
+//            if (binding.btnEditBalanceGameErrorFetchQuestions.visibility == View.VISIBLE)
+//                dismiss()
+//            else showLayout(loading = false, error = false)
+//        }
+//        fetchQuestions()
     }
 
     private fun fetchQuestions() {
