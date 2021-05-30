@@ -18,6 +18,8 @@ import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepositoryImpl
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
+import com.beeswork.balance.data.database.repository.photo.PhotoRepository
+import com.beeswork.balance.data.database.repository.photo.PhotoRepositoryImpl
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepositoryImpl
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
@@ -30,6 +32,8 @@ import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.rds.click.ClickRDSImpl
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
+import com.beeswork.balance.data.network.rds.photo.PhotoRDS
+import com.beeswork.balance.data.network.rds.photo.PhotoRDSImpl
 import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.rds.profile.ProfileRDSImpl
 import com.beeswork.balance.data.network.rds.report.ReportRDS
@@ -45,6 +49,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
+import com.beeswork.balance.internal.mapper.photo.PhotoMapper
+import com.beeswork.balance.internal.mapper.photo.PhotoMapperImpl
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapperImpl
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
@@ -98,6 +104,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<QuestionMapper>() with singleton { QuestionMapperImpl() }
         bind<ProfileMapper>() with singleton { ProfileMapperImpl() }
         bind<SettingMapper>() with singleton { SettingMapperImpl() }
+        bind<PhotoMapper>() with singleton { PhotoMapperImpl() }
 
 
         // Database
@@ -126,6 +133,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SettingRDS>() with singleton { SettingRDSImpl(instance()) }
         bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance()) }
         bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance()) }
+        bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance()) }
 
 
 
@@ -134,6 +142,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Repository
         bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance(), instance(), instance()) }
+        bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance()) }
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance()) }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
@@ -225,7 +234,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { AccountViewModelFactory(instance()) }
-        bind() from provider { ProfileViewModelFactory(instance(), instance()) }
+        bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
 
         // Interceptor

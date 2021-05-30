@@ -79,21 +79,21 @@ class BalanceRDSImpl(
         return getResult { balanceAPI.fetchPhotos(accountId, identityToken) }
     }
 
-    override suspend fun saveAnswers(
-        accountId: String,
-        identityToken: String,
-        answers: Map<Int, Boolean>
-    ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.saveAnswers(
-                SaveAnswersBody(
-                    accountId,
-                    identityToken,
-                    answers
-                )
-            )
-        }
-    }
+//    override suspend fun saveAnswers(
+//        accountId: String,
+//        identityToken: String,
+//        answers: Map<Int, Boolean>
+//    ): Resource<EmptyResponse> {
+//        return getResult {
+//            balanceAPI.saveAnswers(
+//                SaveAnswersBody(
+//                    accountId,
+//                    identityToken,
+//                    answers
+//                )
+//            )
+//        }
+//    }
 
     override suspend fun fetchQuestions(
         accountId: String,

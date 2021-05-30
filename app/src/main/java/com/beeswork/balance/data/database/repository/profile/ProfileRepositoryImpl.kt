@@ -1,6 +1,8 @@
 package com.beeswork.balance.data.database.repository.profile
 
+import com.beeswork.balance.data.database.dao.PhotoDAO
 import com.beeswork.balance.data.database.dao.ProfileDAO
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.database.entity.Profile
 import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -59,7 +61,7 @@ class ProfileRepositoryImpl(
 
     override fun test() {
         CoroutineScope(Dispatchers.IO).launch {
-            profileDAO.insert(Profile("Michael", OffsetDateTime.now(), true, 177, "I am Michael this is about", true))
+            profileDAO.insert(Profile("Michael", OffsetDateTime.now(), true, 177, "I am Michael this is about"))
         }
     }
 }

@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp">
+    android:layout_marginStart="15dp"
+    android:layout_marginBottom="10dp">
 
     <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@drawable/sh_photo_picker_box"
         app:layout_constraintDimensionRatio="1:1.3"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -16,44 +18,47 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/holo_purple"
-            android:src="@drawable/ic_baseline_add"
+            android:contentDescription="@string/photo_picker_photo_iv_description"
             android:tag="photoPickerPhoto" />
 
-        <TextView
-            android:id="@+id/tvSequence"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:textSize="30sp" />
+        <ImageView
+            android:layout_width="@dimen/photo_picker_icon_size"
+            android:layout_height="@dimen/photo_picker_icon_size"
+            android:layout_gravity="center"
+            android:contentDescription="@string/add_icon_description"
+            android:src="@drawable/ic_baseline_add"
+            android:tag="photoPickerAdd"
+            app:tint="@color/BackgroundWhite" />
 
         <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/spin_kit"
             style="@style/SpinKitView.Large.Circle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/photo_picker_icon_size"
+            android:layout_height="@dimen/photo_picker_icon_size"
             android:layout_gravity="center"
-            android:alpha="0.5"
             android:background="@color/Transparent"
             android:clickable="true"
             android:focusable="true"
             android:tag="photoPickerLoading"
-            android:visibility="gone"
-            app:SpinKit_Color="@color/Primary" />
+            app:SpinKit_Color="@color/BackgroundWhite" />
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/photo_picker_icon_size"
+            android:layout_height="@dimen/photo_picker_icon_size"
+            android:layout_gravity="center"
             android:clickable="false"
-            android:src="@drawable/ic_baseline_warning"
+            android:contentDescription="@string/download_icon_description"
+            android:src="@drawable/ic_baseline_download_24"
             android:tag="photoPickerDownloadError"
             android:visibility="gone" />
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/photo_picker_icon_size"
+            android:layout_height="@dimen/photo_picker_icon_size"
+            android:layout_gravity="center"
             android:clickable="false"
-            android:src="@drawable/ic_baseline_error"
+            android:contentDescription="@string/upload_icon_description"
+            android:src="@drawable/ic_baseline_upload_24"
             android:tag="photoPickerUploadError"
             android:visibility="gone" />
 

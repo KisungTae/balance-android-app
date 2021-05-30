@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.room.PrimaryKey
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogHeightOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -38,13 +37,13 @@ class HeightOptionDialog(
         binding.npProfileHeightOption.wrapSelectorWheel = false
         binding.btnProfileHeightOptionClose.setOnClickListener { dismiss() }
         binding.btnProfileHeightOptionSelect.setOnClickListener {
-            heightOptionDialogListener.onValueChanged(binding.npProfileHeightOption.value.toString().toInt())
+            heightOptionDialogListener.onHeightChanged(binding.npProfileHeightOption.value.toString().toInt())
             dismiss()
         }
     }
 
     interface HeightOptionDialogListener {
-        fun onValueChanged(height: Int)
+        fun onHeightChanged(height: Int)
     }
 
     companion object {

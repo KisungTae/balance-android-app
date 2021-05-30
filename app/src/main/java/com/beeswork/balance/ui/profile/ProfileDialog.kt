@@ -83,7 +83,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         binding.rvPhotoPicker.adapter = PhotoPickerRecyclerViewAdapter(
             requireContext(),
             this,
-            preferenceProvider.getAccountId().toString()
+            preferenceProvider.getAccountId()
         )
 
         binding.rvPhotoPicker.layoutManager =
@@ -108,7 +108,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             withContext(Dispatchers.Main) {
                 response.data?.let {
                     binding.llPhotoPickerGalleryError.visibility = View.GONE
-                    adapter.initializePhotoPickers(it)
+//                    adapter.initPhotoPicker(it)
                 } ?: kotlin.run {
                     binding.llPhotoPickerGalleryError.visibility = View.VISIBLE
                 }
@@ -163,8 +163,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         }
     }
 
-    override fun onReuploadPhoto(photoKey: String, photoUri: Uri?) {
-        uploadPhoto(photoUri, photoKey)
+    override fun onReuploadPhoto(photoKey: String) {
+//        uploadPhoto(photoUri, photoKey)
     }
 
     private fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
@@ -213,16 +213,16 @@ class ProfileDialog : DialogFragment(), KodeinAware,
             .start(requireContext(), this)
     }
 
-    override fun onClickPhotoPicker(
-        photoKey: String?,
-        photoPickerStatus: PhotoPicker.Status,
-        photoUri: Uri?
-    ) {
-        PhotoPickerOptionDialog(this, photoKey, photoPickerStatus, photoUri).show(
-            childFragmentManager,
-            PhotoPickerOptionDialog.TAG
-        )
-    }
+//    override fun onClickPhotoPicker(
+//        photoKey: String?,
+//        photoPickerStatus: PhotoPicker.Status,
+//        photoUri: Uri?
+//    ) {
+//        PhotoPickerOptionDialog(this, photoKey, photoPickerStatus, photoUri).show(
+//            childFragmentManager,
+//            PhotoPickerOptionDialog.TAG
+//        )
+//    }
 
     override fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
         val adapter = photoPickerRecyclerViewAdapter()
@@ -360,6 +360,10 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         const val PHOTO_PICKER_GALLERY_COLUMN_NUM = 3
         val PHOTO_MIME_TYPES = arrayOf("image/jpeg", "image/png", "image/jpg")
         const val PHOTO_INTENT_TYPE = "image/*"
+    }
+
+    override fun onClickPhotoPicker(position: Int) {
+
     }
 
 

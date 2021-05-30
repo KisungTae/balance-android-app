@@ -18,5 +18,4 @@ interface ProfileDAO {
 
     @Query("update profile set height = :height, about = :about where id = ${Profile.ID}")
     fun updateAbout(height: Int?, about: String)
-
 }

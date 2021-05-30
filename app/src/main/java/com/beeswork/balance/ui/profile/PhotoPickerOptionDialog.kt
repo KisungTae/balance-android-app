@@ -10,10 +10,9 @@ import com.beeswork.balance.databinding.DialogPhotoPickerOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class PhotoPickerOptionDialog(
-    private val photoPickerOptionListener: PhotoPickerOptionListener,
     private val photoKey: String?,
     private val photoPickerStatus: PhotoPicker.Status,
-    private val photoUri: Uri?
+    private val photoPickerOptionListener: PhotoPickerOptionListener
 ) : BottomSheetDialogFragment() {
 
     private lateinit var binding: DialogPhotoPickerOptionBinding
@@ -53,7 +52,7 @@ class PhotoPickerOptionDialog(
                 binding.btnPhotoErrorUpload.visibility = View.VISIBLE
                 binding.btnPhotoErrorUpload.setOnClickListener {
                     dismiss()
-                    photoKey?.let { photoPickerOptionListener.onReuploadPhoto(it, photoUri) }
+                    photoKey?.let { photoPickerOptionListener.onReuploadPhoto(it) }
                 }
                 setDeleteBtnListener()
             }
@@ -83,7 +82,7 @@ class PhotoPickerOptionDialog(
 
     interface PhotoPickerOptionListener {
         fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status)
-        fun onReuploadPhoto(photoKey: String, photoUri: Uri?)
+        fun onReuploadPhoto(photoKey: String)
         fun onRedownloadPhoto(photoKey: String)
         fun onUploadPhotoFromGallery()
         fun onUploadPhotoFromCapture()

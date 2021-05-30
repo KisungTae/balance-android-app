@@ -39,11 +39,11 @@ interface BalanceRDS {
         identityToken: String,
     ): Resource<List<Photo>>
 
-    suspend fun saveAnswers(
-        accountId: String,
-        identityToken: String,
-        answers: Map<Int, Boolean>
-    ): Resource<EmptyResponse>
+//    suspend fun saveAnswers(
+//        accountId: String,
+//        identityToken: String,
+//        answers: Map<Int, Boolean>
+//    ): Resource<EmptyResponse>
 
     suspend fun fetchQuestions(
         accountId: String,

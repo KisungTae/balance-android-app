@@ -123,23 +123,23 @@ class EditBalanceGameDialog : DialogFragment(), KodeinAware {
 
         showLayout(loading = true, error = false)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val response = balanceRepository.saveAnswers(getAnswers())
-            withContext(Dispatchers.Main) {
-                when (response.status) {
-                    Resource.Status.SUCCESS -> {
-                        showLayout(loading = false, error = false)
-                        dismiss()
-                    }
-                    Resource.Status.LOADING -> {}
-                    Resource.Status.ERROR -> showErrorLayout(
-                        response.errorMessage,
-                        showSaveQuestionsBtn = true,
-                        showFetchQuestionsBtn = false
-                    )
-                }
-            }
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val response = balanceRepository.saveAnswers(getAnswers())
+//            withContext(Dispatchers.Main) {
+//                when (response.status) {
+//                    Resource.Status.SUCCESS -> {
+//                        showLayout(loading = false, error = false)
+//                        dismiss()
+//                    }
+//                    Resource.Status.LOADING -> {}
+//                    Resource.Status.ERROR -> showErrorLayout(
+//                        response.errorMessage,
+//                        showSaveQuestionsBtn = true,
+//                        showFetchQuestionsBtn = false
+//                    )
+//                }
+//            }
+//        }
     }
 
     private fun answer(answer: Boolean) {

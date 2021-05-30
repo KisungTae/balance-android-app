@@ -76,7 +76,8 @@ class PreferenceProviderImpl(
     }
 
     override fun getName(): String {
-        return preferences.getString(NAME, "") ?: ""
+//      TODO: remove Michael
+        return preferences.getString(NAME, "Michael") ?: ""
     }
 
     override fun getMatchFetchedAt(): OffsetDateTime {

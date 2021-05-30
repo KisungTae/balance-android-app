@@ -32,7 +32,7 @@ interface BalanceRepository {
     val cards: LiveData<Resource<List<CardDTO>>>
     fun fetchCards(reset: Boolean)
 
-    suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
+//    suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionResponse>
     suspend fun fetchQuestions(): Resource<List<QuestionResponse>>
 

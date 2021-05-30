@@ -24,5 +24,13 @@ class GlideHelper {
                 .placeholder(R.drawable.ic_baseline_person_1024)
                 .error(R.drawable.ic_baseline_person_1024)
         }
+
+        // NOTE 1. DiskCacheStrategy.NONE, then image is not stored in cache directory
+        fun photoPickerGlideOptions(): RequestOptions {
+            return RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .priority(Priority.HIGH)
+                .centerCrop()
+        }
     }
 }

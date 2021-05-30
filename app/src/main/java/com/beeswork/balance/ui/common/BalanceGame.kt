@@ -36,6 +36,10 @@ abstract class BalanceGame : BaseDialog() {
             val question = questions[currentIndex]
             balanceGameBinding.btnBalanceGameTopOption.text = question.topOption
             balanceGameBinding.btnBalanceGameBottomOption.text = question.bottomOption
+            question.answer?.let { answer ->
+                println("question answer: $answer")
+                // TODO: check answer
+            }
         } else onSaveBalanceGame(answers)
     }
 

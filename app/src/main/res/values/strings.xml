@@ -16,6 +16,7 @@
     <string name="error_title_save_question">밸런스 질문을 저장하지 못했습니다</string>
     <string name="error_title_click">밸런스를 체크하지 못했습니다</string>
     <string name="error_title_save_about">프로필을 저장하지 못했습니다</string>
+    <string name="error_title_fetch_photos">사진을 가져오지 못했습니다</string>
 
 
     <string name="chat_message_over_sized_exception">채팅메세지가 너무 깁니다 줄여주세요</string>
@@ -118,6 +119,7 @@
     <string name="balance_game_keep_swiping_btn_text">스와이프 하기</string>
     <string name="balance_game_loading_text">밸런스 질문을 가져오고있습니다</string>
     <string name="balance_game_checking_text">상대방 밸런스와 내 취향을 체크하는중이에요..</string>
+    <string name="balance_game_saving_answers_text">밸런스 답변을 저장하고있습니다..</string>
     <string name="swipe_profile_photo_description">swipe profile photo</string>
     <string name="account_tool_bar_title">ACCOUNT</string>
     <string name="account_profile_photo_description">account profile photo</string>
@@ -144,4 +146,13 @@
     <string name="dialog_select_btn_text">선택</string>
     <string name="profile_save_icon_description">profile save icon</string>
     <string name="edit_balance_game_text">밸런스 질문 편집하기</string>
+    <string name="photo_picker_photo_iv_description">photo picker photo imageview</string>
+    <string name="download_icon_description">download icon</string>
+    <string name="upload_icon_description">upload icon</string>
+    <string name="add_icon_description">add icon</string>
+    <string name="upload_text">업로드</string>
+    <string name="download_text">다운로드</string>
+    <string name="photo_picker_option_upload_from_gallery_text">사진첩에서 선택하기</string>
+    <string name="photo_picker_option_upload_from_capture">사진찍어서 올리기</string>
+    <string name="delete_text">삭제하기</string>
 </resources>

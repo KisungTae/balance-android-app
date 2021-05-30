@@ -23,6 +23,11 @@
             android:contentDescription="@string/back_button_description"
             android:src="@drawable/ic_baseline_arrow_back_ios" />
 
+        <ImageButton
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:background="@color/BackgroundWhite" />
+
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -32,6 +37,15 @@
             android:textAlignment="center"
             android:textSize="@dimen/tool_bar_title_medium_text_size"
             android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnProfileRefresh"
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:background="@color/BackgroundWhite"
+            android:contentDescription="@string/back_button_description"
+            android:src="@drawable/ic_refresh"
+            android:visibility="invisible" />
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -69,12 +83,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingVertical="30dp">
+            android:paddingTop="20dp"
+            android:paddingBottom="30dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPhotoPicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:layout_marginBottom="30dp"
                 android:clipToPadding="false" />
 

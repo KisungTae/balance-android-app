@@ -1,13 +1,9 @@
 package com.beeswork.balance.ui.profile
 
-import android.net.Uri
-import com.google.firebase.iid.GmsRpc
-
 data class PhotoPicker(
     var key: String?,
-    var status: Status,
-    var uri: Uri?,
-    var sequence: Int
+    var sequence: Int,
+    var status: Status
 ) {
 
     enum class Status {
@@ -25,7 +21,7 @@ data class PhotoPicker(
         const val MAX_PHOTO_HEIGHT = 1560
 
         fun asEmpty(): PhotoPicker {
-            return PhotoPicker(null, Status.EMPTY, null, Int.MAX_VALUE)
+            return PhotoPicker(null, Int.MAX_VALUE, Status.EMPTY)
         }
     }
 }

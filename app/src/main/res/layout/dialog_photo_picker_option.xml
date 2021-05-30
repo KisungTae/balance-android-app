@@ -8,35 +8,35 @@
         android:id="@+id/btnPhotoErrorUpload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="다시업로드"
+        android:text="@string/upload_text"
         android:visibility="gone" />
 
     <Button
         android:id="@+id/btnPhotoErrorDownload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="다시다운로드"
+        android:text="@string/download_text"
         android:visibility="gone" />
 
     <Button
         android:id="@+id/btnUploadPhotoFromGallery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="upload from gallery"
+        android:text="@string/photo_picker_option_upload_from_gallery_text"
         android:visibility="gone" />
 
     <Button
         android:id="@+id/btnUploadPhotoFromCapture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="upload from capture"
+        android:text="@string/photo_picker_option_upload_from_capture"
         android:visibility="gone" />
 
     <Button
         android:id="@+id/btnPhotoErrorDelete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="삭제하기"
+        android:text="@string/delete_text"
         android:visibility="gone" />
 
 </LinearLayout>

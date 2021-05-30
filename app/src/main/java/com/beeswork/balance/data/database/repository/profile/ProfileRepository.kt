@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.database.repository.profile
 
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.database.entity.Profile
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse

@@ -12,7 +12,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.databinding.ItemPhotoPickerBinding
 import com.beeswork.balance.internal.constant.EndPoint
-import com.beeswork.balance.internal.util.inflate
+import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
@@ -22,154 +22,49 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.github.ybq.android.spinkit.SpinKitView
+import java.util.*
 
 class PhotoPickerRecyclerViewAdapter(
     private val context: Context,
     private val photoPickerListener: PhotoPickerListener,
-    private val accountId: String
+    private val accountId: UUID?
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
 
     private val photoPickers: MutableList<PhotoPicker> = mutableListOf()
     private var lastFromIndex = 0
     private var lastToIndex = 0
 
-
     init {
         repeat(MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(PhotoPicker(null, PhotoPicker.Status.LOADING, null, Int.MAX_VALUE))
+            photoPickers.add(PhotoPicker(null, Int.MAX_VALUE, PhotoPicker.Status.LOADING))
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = parent.inflate(R.layout.item_photo_picker)
-        val binding = ItemPhotoPickerBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-//        view.setOnClickListener {
-//            photoPickers.find { p ->
-//                p.key == it.tag?.let { tag -> return@let tag.toString() }
-//            }?.let { p ->
-//                photoPickerListener.onClickPhotoPicker(p.key, p.status, p.uri)
-//            }
-//        }
-        return ViewHolder(binding)
+        val binding = ItemPhotoPickerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding, accountId, photoPickerListener, context)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        updateViewHolder(holder, photoPickers[position])
+        holder.bind(photoPickers[position])
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        updateViewHolder(holder, photoPickers[position])
-    }
-
-    private fun updateViewHolder(holder: ViewHolder, photoPicker: PhotoPicker) {
-//        holder.itemView.tvSequence.text = photoPicker.sequence.toString()
-
-        holder.itemView.tag = photoPicker.key
-        when (photoPicker.status) {
-            PhotoPicker.Status.EMPTY -> {
-                showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
-                holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO)
-                    .setImageResource(R.drawable.ic_baseline_add)
-            }
-            PhotoPicker.Status.LOADING -> {
-                showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
-            }
-            PhotoPicker.Status.UPLOADING -> {
-                loadPhotoFromUri(holder, photoPicker.uri)
-                showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
-            }
-            PhotoPicker.Status.UPLOAD_ERROR -> {
-                showLayout(holder.itemView, View.GONE, View.VISIBLE, View.GONE)
-            }
-            PhotoPicker.Status.DOWNLOADING -> {
-                loadPhotoFromUrl(holder, photoPicker)
-            }
-            PhotoPicker.Status.DOWNLOAD_ERROR -> {
-                showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
-            }
-            PhotoPicker.Status.OCCUPIED -> {
-                photoPicker.uri = null
-                showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
-            }
-        }
+        holder.bind(photoPickers[position])
     }
 
     override fun getItemCount(): Int = photoPickers.size
 
-    private fun loadPhotoFromUri(holder: ViewHolder, photoUri: Uri?) {
-        holder.itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO).setImageURI(photoUri)
-    }
-
-    private fun loadPhotoFromUrl(holder: ViewHolder, photoPicker: PhotoPicker) {
-        photoPicker.key?.let {
-            val photoUrl = "${EndPoint.PHOTO_BUCKET}/$accountId/${it}"
-            showLayout(holder.itemView, View.VISIBLE, View.GONE, View.GONE)
-            Glide.with(context).load(photoUrl)
-                .apply(glideRequestOptions())
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
-                        showLayout(holder.itemView, View.GONE, View.GONE, View.VISIBLE)
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        photoPicker.status = PhotoPicker.Status.OCCUPIED
-                        showLayout(holder.itemView, View.GONE, View.GONE, View.GONE)
-                        return false
-                    }
-                }).into(holder.itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
-        }
-    }
-
-    // NOTE 1. DiskCacheStrategy.NONE, then image is not stored in cache directory
-    private fun glideRequestOptions(): RequestOptions {
-        return RequestOptions()
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .priority(Priority.HIGH)
-            .centerCrop()
-    }
-
-    private fun showLayout(
-        itemView: View,
-        loading: Int,
-        uploadError: Int,
-        downloadError: Int
-    ) {
-        itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING).visibility = loading
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR).visibility = uploadError
-        itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility =
-            downloadError
-    }
-
-    fun initializePhotoPickers(photos: List<Photo>) {
-        for (i in photos.indices) {
-            val photoPicker = photoPickers[i]
-            val photo = photos[i]
-            photoPicker.status = PhotoPicker.Status.DOWNLOADING
-            photoPicker.key = photo.key
-            photoPicker.sequence = photo.sequence
-        }
-
-        for (i in photos.size until photoPickers.size) {
-            photoPickers[i].status = PhotoPicker.Status.EMPTY
+    fun initPhotoPicker(photos: List<PhotoPicker>) {
+        for (i in photoPickers.indices) {
+            if (i < photos.size) photoPickers[i] = photos[i]
+            else photoPickers[i].status = PhotoPicker.Status.EMPTY
         }
         notifyDataSetChanged()
+    }
+
+    fun getPhotoPicker(position: Int): PhotoPicker {
+        return photoPickers[position]
     }
 
     fun uploadPhoto(photoKey: String, photoUri: Uri?): Int {
@@ -181,7 +76,7 @@ class PhotoPickerRecyclerViewAdapter(
                     sequence++
                     photoPicker.key = photoKey
                     photoPicker.status = PhotoPicker.Status.UPLOADING
-                    photoPicker.uri = photoUri
+//                    photoPicker.uri = photoUri
                     photoPicker.sequence = sequence
                     notifyItemChanged(photoPickers.indexOf(photoPicker))
                     return sequence
@@ -294,26 +189,97 @@ class PhotoPickerRecyclerViewAdapter(
         }
     }
 
-
     companion object {
-        private const val IV_PHOTO_PICKER_PHOTO = "photoPickerPhoto"
-        private const val SKV_PHOTO_PICKER_LOADING = "photoPickerLoading"
-        private const val IV_PHOTO_PICKER_UPLOAD_ERROR = "photoPickerUploadError"
-        private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR = "photoPickerDownloadError"
         private const val MAXIMUM_NUM_OF_PHOTOS = 6
         private const val PHOTO_PICKER_PAYLOAD = "photoPickerPayload"
     }
 
     interface PhotoPickerListener {
-        fun onClickPhotoPicker(
-            photoKey: String?,
-            photoPickerStatus: PhotoPicker.Status,
-            photoUri: Uri?
-        )
+        fun onClickPhotoPicker(position: Int)
     }
 
     class ViewHolder(
-        private val binding: ItemPhotoPickerBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+        binding: ItemPhotoPickerBinding,
+        private val accountId: UUID?,
+        private val photoPickerListener: PhotoPickerListener,
+        private val context: Context
+    ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        fun bind(photoPicker: PhotoPicker) {
+            when (photoPicker.status) {
+                PhotoPicker.Status.EMPTY -> showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                PhotoPicker.Status.LOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                PhotoPicker.Status.UPLOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                PhotoPicker.Status.UPLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                PhotoPicker.Status.DOWNLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
+                PhotoPicker.Status.OCCUPIED -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
+                PhotoPicker.Status.DOWNLOADING -> {
+                    loadPhotoFromUrl(itemView, photoPicker)
+                    showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                }
+            }
+        }
+
+        private fun loadPhotoFromUrl(itemView: View, photoPicker: PhotoPicker) {
+            photoPicker.key?.let { key ->
+                showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                Glide.with(context).load(EndPoint.ofPhoto(accountId, key))
+                    .apply(GlideHelper.photoPickerGlideOptions())
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
+                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            photoPicker.status = PhotoPicker.Status.OCCUPIED
+                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
+                            return false
+                        }
+                    }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
+            }
+        }
+
+        private fun showLayout(
+            itemView: View,
+            add: Int,
+            loading: Int,
+            uploadError: Int,
+            downloadError: Int
+        ) {
+            itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_ADD).visibility = add
+            itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING).visibility = loading
+            itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR).visibility = uploadError
+            itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility = downloadError
+        }
+
+        override fun onClick(view: View?) {
+            photoPickerListener.onClickPhotoPicker(absoluteAdapterPosition)
+        }
+
+        companion object {
+            private const val IV_PHOTO_PICKER_PHOTO = "photoPickerPhoto"
+            private const val IV_PHOTO_PICKER_ADD = "photoPickerAdd"
+            private const val SKV_PHOTO_PICKER_LOADING = "photoPickerLoading"
+            private const val IV_PHOTO_PICKER_UPLOAD_ERROR = "photoPickerUploadError"
+            private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR = "photoPickerDownloadError"
+        }
+    }
 
 }

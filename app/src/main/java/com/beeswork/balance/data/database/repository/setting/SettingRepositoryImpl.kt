@@ -9,6 +9,7 @@ import com.beeswork.balance.data.database.entity.Setting
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 
 class SettingRepositoryImpl(
@@ -52,6 +53,12 @@ class SettingRepositoryImpl(
                 if (!location.synced)
                     syncLocation(location.latitude, location.longitude, location.updatedAt)
             }
+        }
+    }
+
+    override suspend fun getEmailFlow(): Flow<String?> {
+        return withContext(Dispatchers.IO) {
+            return@withContext settingDAO.findEmailFlow()
         }
     }
 

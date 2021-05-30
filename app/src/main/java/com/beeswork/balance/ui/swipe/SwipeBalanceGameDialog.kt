@@ -128,7 +128,7 @@ class SwipeBalanceGameDialog(
     }
 
     companion object {
-        const val TAG = "balanceDialog"
+        const val TAG = "swipeBalanceGameDialog"
     }
 
 }

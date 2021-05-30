@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogProfileBalanceGameBinding
 import com.beeswork.balance.databinding.DialogSwipeBalanceGameBinding
+import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.ui.common.BalanceGame
 import com.beeswork.balance.ui.swipe.SwipeBalanceGameViewModel
 import kotlinx.coroutines.launch
@@ -16,7 +17,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class ProfileBalanceGameDialog: BalanceGame(), KodeinAware {
+class ProfileBalanceGameDialog : BalanceGame(), KodeinAware {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ProfileBalanceGameViewModelFactory by instance()
@@ -47,18 +48,44 @@ class ProfileBalanceGameDialog: BalanceGame(), KodeinAware {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileBalanceGameViewModel::class.java)
         bindUI()
+        viewModel.fetchQuestions()
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        setupFetchQuestionsLiveDataObserver()
+        setupSaveAnswersLiveDataObserver()
+    }
 
+    private fun setupSaveAnswersLiveDataObserver() {
+        viewModel.saveAnswersLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> showLoading(getString(R.string.balance_game_saving_answers_text))
+                it.isError() -> showSaveError(it.error, it.errorMessage)
+                it.isSuccess() -> dismiss()
+            }
+        }
+    }
+
+    private fun setupFetchQuestionsLiveDataObserver() {
+        viewModel.fetchQuestionsLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
+                it.isError() -> showFetchQuestionsError(it.error, it.errorMessage)
+                it.isSuccess() -> it.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
+            }
+        }
     }
 
     override fun onSaveBalanceGame(answers: Map<Int, Boolean>) {
-        TODO("Not yet implemented")
+        viewModel.saveQuestions(answers)
     }
 
     override fun onFetchBalanceGame() {
-        TODO("Not yet implemented")
+        viewModel.fetchQuestions()
+    }
+
+    companion object {
+        const val TAG = "profileBalanceGameDialog"
     }
 
 }

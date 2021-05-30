@@ -11,5 +11,7 @@ class RequestCode {
         const val REPORT_MATCH = 7
         const val UNMATCH = 8
         const val FETCH_CLICKS = 9
+        const val FETCH_PHOTOS = 10
+        const val SAVE_ABOUT = 11
     }
 }

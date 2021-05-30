@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
+import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
@@ -25,6 +26,12 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @GET("photo/list")
+    suspend fun listPhotos(
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?
+    ): Response<List<PhotoDTO>>
 
     @POST("account/question/answers")
     suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>

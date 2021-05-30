@@ -277,13 +277,13 @@ class BalanceRepositoryImpl(
 //        }
     }
 
-    override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
-        return balanceRDS.saveAnswers(
-            preferenceProvider.getAccountId().toString(),
-            preferenceProvider.getIdentityToken().toString(),
-            answers
-        )
-    }
+//    override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
+//        return balanceRDS.saveAnswers(
+//            preferenceProvider.getAccountId().toString(),
+//            preferenceProvider.getIdentityToken().toString(),
+//            answers
+//        )
+//    }
 
     override suspend fun fetchQuestions(): Resource<List<QuestionResponse>> {
         return balanceRDS.fetchQuestions(
@@ -319,7 +319,7 @@ class BalanceRepositoryImpl(
                 photoDAO.insert(photos)
             }
         }
-        return Resource.success(photoDAO.getPhotos())
+        return Resource.success(photoDAO.findAll())
     }
 
 

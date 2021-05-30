@@ -47,7 +47,6 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AccountViewModel::class.java)
         bindUI()
-        viewModel.fetchEmail()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -91,8 +90,8 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         }
     }
 
-    private fun setupEmailLiveDataObserver() {
-        viewModel.emailLiveData.observe(viewLifecycleOwner) { email ->
+    private suspend fun setupEmailLiveDataObserver() {
+        viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
             binding.tvAccountEmail.text = email ?: ""
         }
     }
