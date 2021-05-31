@@ -143,6 +143,16 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         startActivityForResult(intent, RequestCode.READ_PHOTO_FROM_GALLERY)
     }
 
+    override fun onUploadPhotoFromGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (hasExternalStoragePermission()) selectPhotoFromGallery()
+            else requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                RequestCode.READ_PHOTO_FROM_GALLERY
+            )
+        } else selectPhotoFromGallery()
+    }
+
     // CASE 1. Read an image from gallery and deleted when launch CropImage --> CropImage activity will result in error
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
@@ -251,15 +261,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         )
     }
 
-    override fun onUploadPhotoFromGallery() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (hasExternalStoragePermission()) selectPhotoFromGallery()
-            else requestPermissions(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                RequestCode.READ_PHOTO_FROM_GALLERY
-            )
-        } else selectPhotoFromGallery()
-    }
+
 
     override fun onUploadPhotoFromCapture() {
 

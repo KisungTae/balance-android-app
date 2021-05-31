@@ -17,6 +17,8 @@
     <string name="error_title_click">밸런스를 체크하지 못했습니다</string>
     <string name="error_title_save_about">프로필을 저장하지 못했습니다</string>
     <string name="error_title_fetch_photos">사진을 가져오지 못했습니다</string>
+    <string name="error_title_crop_image">사진을 편집하지 못했습니다</string>
+
 
 
     <string name="chat_message_over_sized_exception">채팅메세지가 너무 깁니다 줄여주세요</string>
@@ -155,4 +157,5 @@
     <string name="photo_picker_option_upload_from_gallery_text">사진첩에서 선택하기</string>
     <string name="photo_picker_option_upload_from_capture">사진찍어서 올리기</string>
     <string name="delete_text">삭제하기</string>
+    <string name="photo_picker_option_title">사진옵션</string>
 </resources>

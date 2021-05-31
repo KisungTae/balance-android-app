@@ -1,11 +1,19 @@
 package com.beeswork.balance.ui.profile
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.MimeTypeMap
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
@@ -19,8 +27,14 @@ import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -30,7 +44,7 @@ class ProfileFragment : BaseFragment(),
     HeightOptionDialog.HeightOptionDialogListener,
     PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
     ErrorDialog.OnRetryListener,
-    PhotoPickerOptionDialog.PhotoPickerOptionListener {
+    AddPhotoOptionDialog.AddPhotoOptionListener {
 
     override val kodein by closestKodein()
     private val preferenceProvider: PreferenceProvider by instance()
@@ -40,7 +54,15 @@ class ProfileFragment : BaseFragment(),
     private lateinit var binding: FragmentProfileBinding
     private lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    private val requestPermissionForGallery = registerForActivityResult(RequestPermission()) { granted ->
+        if (granted) selectPhotoFromGallery()
+    }
+
+    private val readFromGalleryActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) result.data?.data?.let { uri -> launchCropImage(uri) }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentProfileBinding.inflate(inflater)
         return binding.root
     }
@@ -49,8 +71,10 @@ class ProfileFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
         bindUI()
-        viewModel.fetchProfile()
-        viewModel.fetchPhotos()
+        println("onViewCreatedonViewCreatedonViewCreated")
+//        viewModel.test()
+//        viewModel.fetchProfile()
+//        viewModel.fetchPhotos()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -192,29 +216,102 @@ class ProfileFragment : BaseFragment(),
 
     override fun onClickPhotoPicker(position: Int) {
         val photoPicker = photoPickerRecyclerViewAdapter.getPhotoPicker(position)
-        PhotoPickerOptionDialog(photoPicker.key, photoPicker.status, this).show(
-            childFragmentManager,
-            PhotoPickerOptionDialog.TAG
-        )
+        when (photoPicker.status) {
+            PhotoPicker.Status.EMPTY -> AddPhotoOptionDialog(this).show(
+                childFragmentManager,
+                AddPhotoOptionDialog.TAG
+            )
+            PhotoPicker.Status.OCCUPIED,
+            PhotoPicker.Status.UPLOAD_ERROR,
+            PhotoPicker.Status.DOWNLOAD_ERROR -> EditPhotoOptionDialog().show(
+                childFragmentManager,
+                EditPhotoOptionDialog.TAG
+            )
+            else -> println("")
+        }
     }
 
-    override fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onReuploadPhoto(photoKey: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onRedownloadPhoto(photoKey: String) {
-        TODO("Not yet implemented")
+    private fun hasExternalStoragePermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onUploadPhotoFromGallery() {
-        TODO("Not yet implemented")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (hasExternalStoragePermission()) selectPhotoFromGallery()
+            else requestPermissionForGallery.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else selectPhotoFromGallery()
     }
 
+    private fun selectPhotoFromGallery() {
+        val intent = Intent(Intent.ACTION_PICK);
+        intent.type = ProfileDialog.PHOTO_INTENT_TYPE
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, ProfileDialog.PHOTO_MIME_TYPES)
+        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        readFromGalleryActivityResult.launch(intent)
+    }
+
+    // CASE 1. Read an image from gallery and deleted when launch CropImage --> CropImage activity will result in error
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                val result = CropImage.getActivityResult(data)
+                if (resultCode == Activity.RESULT_OK) uploadPhoto(result.uri, null)
+                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) showErrorDialog(
+                    getString(R.string.error_title_crop_image),
+                    result.error.localizedMessage ?: "",
+                    null
+                )
+            }
+        }
+    }
+
+    private fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
+
+        println("uploadPhoto")
+//        photoUri?.path?.let { path ->
+//            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
+//            val key = photoKey ?: "${generatePhotoKey()}.$extension"
+//            val adapter = photoPickerRecyclerViewAdapter()
+//            val sequence = adapter.uploadPhoto(key, photoUri)
+//            if (sequence == -1) return
+//
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val response = balanceRepository.uploadPhoto(key, extension, path, sequence)
+//                withContext(Dispatchers.Main) {
+//                    if (response.isSuccess())
+//                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.OCCUPIED)
+//                    else if (response.isError()) {
+//                        ExceptionDialog(response.errorMessage, null).show(
+//                            childFragmentManager,
+//                            ExceptionDialog.TAG
+//                        )
+//                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.UPLOAD_ERROR)
+//                    }
+//                }
+//            }
+//        } ?: ExceptionDialog(getString(R.string.photo_not_found_exception), null).show(
+//            childFragmentManager,
+//            ExceptionDialog.TAG
+//        )
+    }
+
+    private fun launchCropImage(uri: Uri) {
+        CropImage.activity(uri)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setAspectRatio(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
+            .setAutoZoomEnabled(false)
+            .setFixAspectRatio(true)
+            .setMaxCropResultSize(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
+            .setMinCropResultSize(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
+            .setCropShape(CropImageView.CropShape.RECTANGLE)
+            .start(requireContext(), this)
+    }
+
+
     override fun onUploadPhotoFromCapture() {
-        TODO("Not yet implemented")
+        println("onUploadPhotoFromCapture")
     }
 }

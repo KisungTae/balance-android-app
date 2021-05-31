@@ -5,30 +5,27 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnChatMoreMenuDialogUnmatch"
+        android:id="@+id/btnUploadPhotoFromGallery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="15dp"
         android:background="@drawable/sh_top_round_box"
         android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
-        android:text="@string/chat_unmatch_btn_title"
-        android:textColor="@color/TextRed"
-        android:textSize="@dimen/text_medium_size" />
+        android:text="@string/photo_picker_option_upload_from_gallery_text" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnChatMoreMenuDialogReport"
+        android:id="@+id/btnUploadPhotoFromCapture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="15dp"
         android:background="@color/BackgroundWhite"
         android:stateListAnimator="@null"
-        android:text="@string/chat_report_match_btn_title"
-        android:textColor="@color/TextRed"
-        android:textSize="@dimen/text_medium_size" />
+        android:text="@string/photo_picker_option_upload_from_capture" />
+
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnChatMoreMenuDialogClose"
+        android:id="@+id/btnPhotoAddOptionClose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="15dp"
@@ -37,7 +34,6 @@
         android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
         android:text="@string/dialog_close_btn_title"
-        android:textColor="@color/TextGrey"
-        android:textSize="@dimen/text_medium_size" />
+        android:textColor="@color/TextGrey" />
 
 </LinearLayout>

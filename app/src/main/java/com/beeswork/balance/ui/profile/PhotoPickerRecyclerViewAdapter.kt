@@ -36,7 +36,8 @@ class PhotoPickerRecyclerViewAdapter(
 
     init {
         repeat(MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(PhotoPicker(null, Int.MAX_VALUE, PhotoPicker.Status.LOADING))
+//          TODO: change empty to loading
+            photoPickers.add(PhotoPicker(null, Int.MAX_VALUE, PhotoPicker.Status.EMPTY, null))
         }
     }
 

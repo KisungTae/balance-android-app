@@ -1,9 +1,12 @@
 package com.beeswork.balance.ui.profile
 
+import android.net.Uri
+
 data class PhotoPicker(
     var key: String?,
     var sequence: Int,
-    var status: Status
+    var status: Status,
+    var uri: Uri?
 ) {
 
     enum class Status {
@@ -21,7 +24,7 @@ data class PhotoPicker(
         const val MAX_PHOTO_HEIGHT = 1560
 
         fun asEmpty(): PhotoPicker {
-            return PhotoPicker(null, Int.MAX_VALUE, Status.EMPTY)
+            return PhotoPicker(null, Int.MAX_VALUE, Status.EMPTY, null)
         }
     }
 }

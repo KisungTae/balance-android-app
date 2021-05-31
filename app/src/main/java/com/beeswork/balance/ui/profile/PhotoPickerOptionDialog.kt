@@ -19,15 +19,16 @@ class PhotoPickerOptionDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DialogPhotoPickerOptionBinding.inflate(layoutInflater)
+        setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialog)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_photo_picker_option, container, false)
+    ): View {
+        binding = DialogPhotoPickerOptionBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,7 +41,6 @@ class PhotoPickerOptionDialog(
                     dismiss()
                     photoPickerOptionListener.onUploadPhotoFromCapture()
                 }
-
                 binding.btnUploadPhotoFromGallery.visibility = View.VISIBLE
                 binding.btnUploadPhotoFromGallery.setOnClickListener {
                     dismiss()

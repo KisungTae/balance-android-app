@@ -11,7 +11,7 @@ class PhotoMapperImpl : PhotoMapper {
     }
 
     override fun toPhotoPicker(photo: Photo): PhotoPicker {
-        return PhotoPicker(photo.key, photo.sequence, PhotoPicker.Status.DOWNLOADING)
+        return PhotoPicker(photo.key, photo.sequence, PhotoPicker.Status.DOWNLOADING, null)
     }
 
 }
