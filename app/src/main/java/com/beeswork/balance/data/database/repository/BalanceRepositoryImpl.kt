@@ -323,74 +323,74 @@ class BalanceRepositoryImpl(
     }
 
 
-    override suspend fun uploadPhoto(
-        photoKey: String,
-        photoExtension: String,
-        photoPath: String,
-        photoSequence: Int
-    ): Resource<EmptyResponse> {
-        try {
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)?.let { mimeType ->
-                val photo = File(photoPath)
-                val compressedPhoto = Compressor.compress(context, photo)
-                if (compressedPhoto.length() > Photo.MAX_SIZE)
-                    return Resource.error(
-                        context.resources.getString(R.string.photo_out_of_size_exception),
-                        null,
-                    )
-
-                photoDAO.insert(Photo(photoKey, photoSequence, false))
-
-                val fetchPreSignedUrlResponse = balanceRDS.addPhoto(
-                    preferenceProvider.getAccountId().toString(),
-                    preferenceProvider.getIdentityToken().toString(),
-                    photoKey,
-                    photoSequence
-                )
-
-                if (fetchPreSignedUrlResponse.isSuccess()) {
-                    fetchPreSignedUrlResponse.data?.let {
-                        photoDAO.sync(photoKey, true)
-
-                        val formData = mutableMapOf<String, RequestBody>()
-                        for ((key, value) in it.fields) {
-                            formData[key] = RequestBody.create(MultipartBody.FORM, value)
-                        }
-
-                        val requestBody =
-                            RequestBody.create(MediaType.parse(mimeType), compressedPhoto)
-
-                        val multiPartBody =
-                            MultipartBody.Part.createFormData("file", photoKey, requestBody)
-
-                        val uploadPhotoToS3Response =
-                            balanceRDS.uploadPhotoToS3(it.url, formData, multiPartBody)
-
-                        if (uploadPhotoToS3Response.isSuccess()) {
-                            deleteFile(compressedPhoto)
-                            deleteFile(photo)
-                        }
-                        return uploadPhotoToS3Response
-                    } ?: return Resource.error(
-                        context.resources.getString(R.string.presigned_url_not_found_exception),
-                        null
-                    )
-                }
-                return Resource.error(
-                    fetchPreSignedUrlResponse.errorMessage,
-                    fetchPreSignedUrlResponse.error
-                )
-            } ?: return Resource.error(
-                context.resources.getString(R.string.mime_type_not_found_exception),
-                null
-            )
-        } catch (e: NoSuchFileException) {
-            return Resource.error(
-                context.resources.getString(R.string.photo_not_found_exception),
-                null
-            )
-        }
-    }
+//    override suspend fun uploadPhoto(
+//        photoKey: String,
+//        photoExtension: String,
+//        photoPath: String,
+//        photoSequence: Int
+//    ): Resource<EmptyResponse> {
+//        try {
+//            MimeTypeMap.getSingleton().getMimeTypeFromExtension(photoExtension)?.let { mimeType ->
+//                val photo = File(photoPath)
+//                val compressedPhoto = Compressor.compress(context, photo)
+//                if (compressedPhoto.length() > Photo.MAX_SIZE)
+//                    return Resource.error(
+//                        context.resources.getString(R.string.photo_out_of_size_exception),
+//                        null,
+//                    )
+//
+//                photoDAO.insert(Photo(photoKey, photoSequence, false))
+//
+//                val fetchPreSignedUrlResponse = balanceRDS.addPhoto(
+//                    preferenceProvider.getAccountId().toString(),
+//                    preferenceProvider.getIdentityToken().toString(),
+//                    photoKey,
+//                    photoSequence
+//                )
+//
+//                if (fetchPreSignedUrlResponse.isSuccess()) {
+//                    fetchPreSignedUrlResponse.data?.let {
+//                        photoDAO.sync(photoKey, true)
+//
+//                        val formData = mutableMapOf<String, RequestBody>()
+//                        for ((key, value) in it.fields) {
+//                            formData[key] = RequestBody.create(MultipartBody.FORM, value)
+//                        }
+//
+//                        val requestBody =
+//                            RequestBody.create(MediaType.parse(mimeType), compressedPhoto)
+//
+//                        val multiPartBody =
+//                            MultipartBody.Part.createFormData("file", photoKey, requestBody)
+//
+//                        val uploadPhotoToS3Response =
+//                            balanceRDS.uploadPhotoToS3(it.url, formData, multiPartBody)
+//
+//                        if (uploadPhotoToS3Response.isSuccess()) {
+//                            deleteFile(compressedPhoto)
+//                            deleteFile(photo)
+//                        }
+//                        return uploadPhotoToS3Response
+//                    } ?: return Resource.error(
+//                        context.resources.getString(R.string.presigned_url_not_found_exception),
+//                        null
+//                    )
+//                }
+//                return Resource.error(
+//                    fetchPreSignedUrlResponse.errorMessage,
+//                    fetchPreSignedUrlResponse.error
+//                )
+//            } ?: return Resource.error(
+//                context.resources.getString(R.string.mime_type_not_found_exception),
+//                null
+//            )
+//        } catch (e: NoSuchFileException) {
+//            return Resource.error(
+//                context.resources.getString(R.string.photo_not_found_exception),
+//                null
+//            )
+//        }
+//    }
 
     private fun deleteFile(file: File) {
         try {

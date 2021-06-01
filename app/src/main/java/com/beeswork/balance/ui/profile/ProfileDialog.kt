@@ -178,31 +178,31 @@ class ProfileDialog : DialogFragment(), KodeinAware,
     }
 
     private fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
-        photoUri?.path?.let { path ->
-            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
-            val key = photoKey ?: "${generatePhotoKey()}.$extension"
-            val adapter = photoPickerRecyclerViewAdapter()
-            val sequence = adapter.uploadPhoto(key, photoUri)
-            if (sequence == -1) return
-
-            CoroutineScope(Dispatchers.IO).launch {
-                val response = balanceRepository.uploadPhoto(key, extension, path, sequence)
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccess())
-                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.OCCUPIED)
-                    else if (response.isError()) {
-                        ExceptionDialog(response.errorMessage, null).show(
-                            childFragmentManager,
-                            ExceptionDialog.TAG
-                        )
-                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.UPLOAD_ERROR)
-                    }
-                }
-            }
-        } ?: ExceptionDialog(getString(R.string.photo_not_found_exception), null).show(
-            childFragmentManager,
-            ExceptionDialog.TAG
-        )
+//        photoUri?.path?.let { path ->
+//            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
+//            val key = photoKey ?: "${generatePhotoKey()}.$extension"
+//            val adapter = photoPickerRecyclerViewAdapter()
+//            val sequence = adapter.uploadPhoto(key, photoUri)
+//            if (sequence == -1) return
+//
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val response = balanceRepository.uploadPhoto(key, extension, path, sequence)
+//                withContext(Dispatchers.Main) {
+//                    if (response.isSuccess())
+//                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.OCCUPIED)
+//                    else if (response.isError()) {
+//                        ExceptionDialog(response.errorMessage, null).show(
+//                            childFragmentManager,
+//                            ExceptionDialog.TAG
+//                        )
+//                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.UPLOAD_ERROR)
+//                    }
+//                }
+//            }
+//        } ?: ExceptionDialog(getString(R.string.photo_not_found_exception), null).show(
+//            childFragmentManager,
+//            ExceptionDialog.TAG
+//        )
     }
 
     private fun generatePhotoKey(): String {

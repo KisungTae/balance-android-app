@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Photo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PhotoDAO {
@@ -14,6 +15,10 @@ interface PhotoDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(photos: List<Photo>)
+
+    @Query("select * from photo order by sequence")
+    fun findAllAsFlow(): Flow<List<Photo>>
+
 
     @Query("select * from photo order by sequence")
     fun findAll(): List<Photo>
@@ -38,4 +43,7 @@ interface PhotoDAO {
 
     @Query("select `key` from photo order by sequence limit 1")
     fun findFirstPhotoKey(): String?
+
+
+
 }

@@ -14,8 +14,13 @@ interface ProfileDAO {
     fun insert(profile: Profile)
 
     @Query("select * from profile where id = :id")
-    fun findById(id: Int = Profile.ID): Profile
+    fun findById(id: Int = Profile.ID): Profile?
 
-    @Query("update profile set height = :height, about = :about where id = ${Profile.ID}")
+    @Query("update profile set height = :height, about = :about, synced = 0 where id = ${Profile.ID}")
     fun updateAbout(height: Int?, about: String)
+
+    @Query("update profile set synced = 1 where id = ${Profile.ID}")
+    fun sync()
+
+
 }

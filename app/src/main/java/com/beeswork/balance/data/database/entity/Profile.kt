@@ -12,6 +12,7 @@ data class Profile(
     val gender: Boolean,
     val height: Int?,
     val about: String,
+    val synced: Boolean,
 
     @PrimaryKey
     val id: Int = ID,

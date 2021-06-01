@@ -16,7 +16,8 @@ import com.beeswork.balance.data.database.entity.*
     OffsetDateTimeConverter::class,
     ChatMessageStatusConverter::class,
     UUIDConverter::class,
-    ResourceStatusConverter::class
+    ResourceStatusConverter::class,
+    PhotoStatusConverter::class
 )
 abstract class BalanceDatabase : RoomDatabase() {
 

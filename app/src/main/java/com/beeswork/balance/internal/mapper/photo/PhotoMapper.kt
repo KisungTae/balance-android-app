@@ -6,6 +6,6 @@ import com.beeswork.balance.ui.profile.PhotoPicker
 
 interface PhotoMapper {
 
-    fun toPhoto(photoDTO: PhotoDTO): Photo
+//    fun toPhoto(photoDTO: PhotoDTO): Photo
     fun toPhotoPicker(photo: Photo): PhotoPicker
 }

@@ -21,7 +21,7 @@ class ProfileRepositoryImpl(
     private val profileRDS: ProfileRDS
 ) : ProfileRepository {
 
-    override suspend fun fetchProfile(): Profile {
+    override suspend fun fetchProfile(): Profile? {
         return withContext(Dispatchers.IO) {
             return@withContext profileDAO.findById()
         }
@@ -29,13 +29,14 @@ class ProfileRepositoryImpl(
 
     override suspend fun saveAbout(height: Int?, about: String): Resource<EmptyResponse> {
         return withContext(Dispatchers.IO) {
+            profileDAO.updateAbout(height, about)
             val response = profileRDS.postAbout(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
                 height,
                 about
             )
-            if (response.isSuccess()) profileDAO.updateAbout(height, about)
+            if (response.isSuccess()) profileDAO.sync()
             return@withContext response
         }
     }
@@ -59,9 +60,10 @@ class ProfileRepositoryImpl(
         }
     }
 
+
     override fun test() {
         CoroutineScope(Dispatchers.IO).launch {
-            profileDAO.insert(Profile("Michael", OffsetDateTime.now(), true, 177, "I am Michael this is about"))
+            profileDAO.insert(Profile("Michael", OffsetDateTime.now(), true, 177, "I am Michael this is about", false))
         }
     }
 }

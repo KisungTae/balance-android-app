@@ -6,12 +6,12 @@ import com.beeswork.balance.ui.profile.PhotoPicker
 
 class PhotoMapperImpl : PhotoMapper {
 
-    override fun toPhoto(photoDTO: PhotoDTO): Photo {
-        return Photo(photoDTO.key, photoDTO.sequence, false)
-    }
+//    override fun toPhoto(photoDTO: PhotoDTO): Photo {
+//        return Photo(photoDTO.key, )
+//    }
 
     override fun toPhotoPicker(photo: Photo): PhotoPicker {
-        return PhotoPicker(photo.key, photo.sequence, PhotoPicker.Status.DOWNLOADING, null)
+        return PhotoPicker(photo.key, photo.status, photo.uriPath, photo.sequence)
     }
 
 }

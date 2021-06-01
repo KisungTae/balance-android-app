@@ -7,11 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.databinding.ItemPhotoPickerBinding
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
@@ -30,15 +32,15 @@ class PhotoPickerRecyclerViewAdapter(
     private val accountId: UUID?
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
 
-    private val photoPickers: MutableList<PhotoPicker> = mutableListOf()
+    private var photoPickers = mutableListOf<PhotoPicker>()
     private var lastFromIndex = 0
     private var lastToIndex = 0
 
     init {
-        repeat(MAXIMUM_NUM_OF_PHOTOS) {
+//        repeat(MAXIMUM_NUM_OF_PHOTOS) {
 //          TODO: change empty to loading
-            photoPickers.add(PhotoPicker(null, Int.MAX_VALUE, PhotoPicker.Status.EMPTY, null))
-        }
+//            photoPickers.add(PhotoPicker(null, Int.MAX_VALUE, PhotoPicker.Status.EMPTY, null))
+//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,10 +58,16 @@ class PhotoPickerRecyclerViewAdapter(
 
     override fun getItemCount(): Int = photoPickers.size
 
+    fun submit(newPhotoPickers: MutableList<PhotoPicker>) {
+        val diffResult = DiffUtil.calculateDiff(PhotoPickerDiffCallBack(photoPickers, newPhotoPickers))
+        photoPickers = newPhotoPickers
+        diffResult.dispatchUpdatesTo(this)
+    }
+
     fun initPhotoPicker(photos: List<PhotoPicker>) {
         for (i in photoPickers.indices) {
-            if (i < photos.size) photoPickers[i] = photos[i]
-            else photoPickers[i].status = PhotoPicker.Status.EMPTY
+//            if (i < photos.size) photoPickers[i] = photos[i]
+//            else photoPickers[i].status = PhotoPicker.Status.EMPTY
         }
         notifyDataSetChanged()
     }
@@ -73,17 +81,17 @@ class PhotoPickerRecyclerViewAdapter(
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
             when {
-                photoPicker.status == PhotoPicker.Status.EMPTY -> {
-                    sequence++
-                    photoPicker.key = photoKey
-                    photoPicker.status = PhotoPicker.Status.UPLOADING
+//                photoPicker.status == PhotoPicker.Status.EMPTY -> {
+//                    sequence++
+//                    photoPicker.key = photoKey
+//                    photoPicker.status = PhotoPicker.Status.UPLOADING
 //                    photoPicker.uri = photoUri
-                    photoPicker.sequence = sequence
-                    notifyItemChanged(photoPickers.indexOf(photoPicker))
-                    return sequence
-                }
+//                    photoPicker.sequence = sequence
+//                    notifyItemChanged(photoPickers.indexOf(photoPicker))
+//                    return sequence
+//                }
                 photoPicker.key == photoKey -> {
-                    photoPicker.status = PhotoPicker.Status.UPLOADING
+//                    photoPicker.status = PhotoPicker.Status.UPLOADING
                     notifyItemChanged(photoPickers.indexOf(photoPicker))
                     return photoPicker.sequence
                 }
@@ -102,40 +110,41 @@ class PhotoPickerRecyclerViewAdapter(
             notifyItemRemoved(index)
         }
 
-        if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS) {
-            photoPickers.add(PhotoPicker.asEmpty())
-            notifyItemInserted((photoPickers.size - 1))
-        }
+//        if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS) {
+//            photoPickers.add(PhotoPicker.asEmpty())
+//            notifyItemInserted((photoPickers.size - 1))
+//        }
     }
 
     fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
         photoPickers.find { it.key == photoKey }?.let {
-            it.status = photoPickerStatus
+//            it.status = photoPickerStatus
             notifyItemChanged(photoPickers.indexOf(it), PHOTO_PICKER_PAYLOAD)
         }
     }
 
     fun swapPhotos(from: Int, to: Int) {
-        if (photoPickers[to].status == PhotoPicker.Status.OCCUPIED) {
-            val photoPicker = photoPickers.removeAt(from)
-            photoPickers.add(to, photoPicker)
-            lastFromIndex = from
-            lastToIndex = to
-            notifyItemMoved(from, to)
-        }
+//        if (photoPickers[to].status == PhotoPicker.Status.OCCUPIED) {
+//            val photoPicker = photoPickers.removeAt(from)
+//            photoPickers.add(to, photoPicker)
+//            lastFromIndex = from
+//            lastToIndex = to
+//            notifyItemMoved(from, to)
+//        }
     }
 
     fun isPhotoPickerDraggable(position: Int): Boolean {
-        val photoPicker = photoPickers[position]
-        return photoPicker.status == PhotoPicker.Status.OCCUPIED
+//        val photoPicker = photoPickers[position]
+//        return photoPicker.status == PhotoPicker.Status.OCCUPIED
+        return false
     }
 
     fun isOrderable(): Boolean {
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-            if (photoPicker.status != PhotoPicker.Status.EMPTY && photoPicker.status != PhotoPicker.Status.OCCUPIED)
-                return false
-        }
+//        for (i in photoPickers.indices) {
+//            val photoPicker = photoPickers[i]
+//            if (photoPicker.status != PhotoPicker.Status.EMPTY && photoPicker.status != PhotoPicker.Status.OCCUPIED)
+//                return false
+//        }
         return true
     }
 
@@ -153,13 +162,13 @@ class PhotoPickerRecyclerViewAdapter(
 
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
-            if (photoPicker.status == PhotoPicker.Status.OCCUPIED) {
-                photoPicker.key?.let {
-                    photoPickerSequences[it] = i
-                    photoPicker.status = PhotoPicker.Status.LOADING
-                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
-                }
-            }
+//            if (photoPicker.status == PhotoPicker.Status.OCCUPIED) {
+//                photoPicker.key?.let {
+//                    photoPickerSequences[it] = i
+//                    photoPicker.status = PhotoPicker.Status.LOADING
+//                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+//                }
+//            }
         }
         return photoPickerSequences
     }
@@ -170,7 +179,7 @@ class PhotoPickerRecyclerViewAdapter(
             val sequence = photoPickerSequences[photoPicker.key]
             sequence?.let { s ->
                 photoPicker.sequence = s
-                photoPicker.status = PhotoPicker.Status.OCCUPIED
+//                photoPicker.status = PhotoPicker.Status.OCCUPIED
                 notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
             }
         }
@@ -184,14 +193,13 @@ class PhotoPickerRecyclerViewAdapter(
         for (i in photoPickers.indices) {
             val photoPicker = photoPickers[i]
             if (photoPickerSequences.containsKey(photoPicker.key)) {
-                photoPicker.status = PhotoPicker.Status.OCCUPIED
+//                photoPicker.status = PhotoPicker.Status.OCCUPIED
                 notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
             }
         }
     }
 
     companion object {
-        private const val MAXIMUM_NUM_OF_PHOTOS = 6
         private const val PHOTO_PICKER_PAYLOAD = "photoPickerPayload"
     }
 
@@ -212,13 +220,13 @@ class PhotoPickerRecyclerViewAdapter(
 
         fun bind(photoPicker: PhotoPicker) {
             when (photoPicker.status) {
-                PhotoPicker.Status.EMPTY -> showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                PhotoPicker.Status.LOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                PhotoPicker.Status.UPLOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                PhotoPicker.Status.UPLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE)
-                PhotoPicker.Status.DOWNLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
-                PhotoPicker.Status.OCCUPIED -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
-                PhotoPicker.Status.DOWNLOADING -> {
+                PhotoStatus.EMPTY -> showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                PhotoStatus.LOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                PhotoStatus.UPLOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                PhotoStatus.UPLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                PhotoStatus.DOWNLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
+                PhotoStatus.OCCUPIED -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
+                PhotoStatus.DOWNLOADING -> {
                     loadPhotoFromUrl(itemView, photoPicker)
                     showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
                 }
@@ -237,7 +245,7 @@ class PhotoPickerRecyclerViewAdapter(
                             target: Target<Drawable>?,
                             isFirstResource: Boolean
                         ): Boolean {
-                            photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
+//                            photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
                             showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
                             return false
                         }
@@ -249,7 +257,7 @@ class PhotoPickerRecyclerViewAdapter(
                             dataSource: DataSource?,
                             isFirstResource: Boolean
                         ): Boolean {
-                            photoPicker.status = PhotoPicker.Status.OCCUPIED
+//                            photoPicker.status = PhotoPicker.Status.OCCUPIED
                             showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
                             return false
                         }
@@ -281,6 +289,29 @@ class PhotoPickerRecyclerViewAdapter(
             private const val IV_PHOTO_PICKER_UPLOAD_ERROR = "photoPickerUploadError"
             private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR = "photoPickerDownloadError"
         }
+    }
+
+    class PhotoPickerDiffCallBack(
+        var oldList: List<PhotoPicker>,
+        var newList: List<PhotoPicker>
+    ): DiffUtil.Callback() {
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].key == newList[newItemPosition].key
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
+
+
     }
 
 }

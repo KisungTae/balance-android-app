@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class PhotoRepositoryImpl(
@@ -17,6 +18,7 @@ class PhotoRepositoryImpl(
 ) : PhotoRepository {
 
 
+
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
         return withContext(Dispatchers.IO) {
             if (photoDAO.existsBySynced(false) || photoDAO.count() <= 0) {
@@ -24,16 +26,22 @@ class PhotoRepositoryImpl(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken()
                 )
-                response.data?.let { photoDTOs ->
-                    val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(photoDTO) }
-                    photos.forEach { photo -> photo.synced = true }
-                    photos.sortedBy { photo -> photo.sequence }
-                    photoDAO.insert(photos)
-                    return@withContext response.mapData(photos)
-                }
-                return@withContext response.mapData(listOf<Photo>())
+//                response.data?.let { photoDTOs ->
+//                    val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(photoDTO) }
+//                    photos.forEach { photo -> photo.synced = true }
+//                    photos.sortedBy { photo -> photo.sequence }
+//                    photoDAO.insert(photos)
+//                    return@withContext response.mapData(photos)
+//                }
+//                return@withContext response.mapData(listOf<Photo>())
             }
             return@withContext Resource.success(photoDAO.findAll())
+        }
+    }
+
+    override suspend fun getPhotosFlow(): Flow<List<Photo>> {
+        return withContext(Dispatchers.IO) {
+            return@withContext photoDAO.findAllAsFlow()
         }
     }
 }

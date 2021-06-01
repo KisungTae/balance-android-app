@@ -1,9 +1,7 @@
 package com.beeswork.balance.ui.profile
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.net.Uri
+import androidx.lifecycle.*
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
@@ -11,7 +9,9 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
+import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
@@ -20,6 +20,17 @@ class ProfileViewModel(
     private val photoMapper: PhotoMapper,
     private val profileMapper: ProfileMapper
 ) : ViewModel() {
+
+    val photos by lazyDeferred {
+        photoRepository.getPhotosFlow().map { photos ->
+            val photoPickers = mutableListOf<PhotoPicker>()
+            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
+            repeat((MAX_PHOTO_COUNT - photos.size)) {
+                photoPickers.add(PhotoPicker.asEmpty())
+            }
+            photoPickers
+        }.asLiveData()
+    }
 
     private val _fetchProfileLiveData = MutableLiveData<ProfileDomain>()
     val fetchProfileLiveData: LiveData<ProfileDomain> get() = _fetchProfileLiveData
@@ -32,7 +43,10 @@ class ProfileViewModel(
 
     fun fetchProfile() {
         viewModelScope.launch {
-            _fetchProfileLiveData.postValue(profileMapper.toProfileDomain(profileRepository.fetchProfile()))
+            profileRepository.fetchProfile()?.let { profile ->
+                if (!profile.synced) saveAbout(profile.height, profile.about)
+                _fetchProfileLiveData.postValue(profileMapper.toProfileDomain(profile))
+            }
         }
     }
 
@@ -53,7 +67,17 @@ class ProfileViewModel(
         }
     }
 
+    fun addPhoto(photoUri: Uri?) {
+        photoUri?.path?.let { path ->
+
+        }
+    }
+
     fun test() {
         profileRepository.test()
+    }
+
+    companion object {
+        const val MAX_PHOTO_COUNT = 6
     }
 }

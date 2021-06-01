@@ -400,3 +400,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      121. the bottom ad in account should be view pager and then ads should be retrieved from server
 //      122. save name in sharedPreference because it does not change
 //      123. when app goes ot pause like put into background, then stop websocket and connect when app back to foreground
+//      124. when launching app, check token synced, if false, then postToken()

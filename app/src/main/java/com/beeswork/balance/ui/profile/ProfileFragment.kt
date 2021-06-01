@@ -23,6 +23,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentProfileBinding
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.Gender
+import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseFragment
@@ -71,9 +72,8 @@ class ProfileFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
         bindUI()
-        println("onViewCreatedonViewCreatedonViewCreated")
 //        viewModel.test()
-//        viewModel.fetchProfile()
+        viewModel.fetchProfile()
 //        viewModel.fetchPhotos()
     }
 
@@ -82,27 +82,34 @@ class ProfileFragment : BaseFragment(),
         setupFetchProfileLiveDataObserver()
         setupPhotoPickerRecyclerView()
         setupSaveAboutLiveDataObserver()
-        setupFetchPhotosLiveDataObserver()
+//        setupFetchPhotosLiveDataObserver()
+        setupPhotosLiveDataObserver()
         setupListeners()
     }
 
-    private fun setupFetchPhotosLiveDataObserver() {
-        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
-            when {
-                it.isSuccess() -> it.data?.let { photos -> photoPickerRecyclerViewAdapter.initPhotoPicker(photos) }
-                it.isError() && validateAccount(it.error, it.errorMessage) -> {
-                    binding.btnProfileRefresh.visibility = View.VISIBLE
-                    showErrorDialog(
-                        it.error,
-                        getString(R.string.error_title_fetch_photos),
-                        it.errorMessage,
-                        RequestCode.FETCH_PHOTOS,
-                        this
-                    )
-                }
-            }
+    private suspend fun setupPhotosLiveDataObserver() {
+        viewModel.photos.await().observe(viewLifecycleOwner) {
+            photoPickerRecyclerViewAdapter.submit(it)
         }
     }
+
+//    private fun setupFetchPhotosLiveDataObserver() {
+//        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
+//            when {
+//                it.isSuccess() -> it.data?.let { photos -> photoPickerRecyclerViewAdapter.initPhotoPicker(photos) }
+//                it.isError() && validateAccount(it.error, it.errorMessage) -> {
+//                    binding.btnProfileRefresh.visibility = View.VISIBLE
+//                    showErrorDialog(
+//                        it.error,
+//                        getString(R.string.error_title_fetch_photos),
+//                        it.errorMessage,
+//                        RequestCode.FETCH_PHOTOS,
+//                        this
+//                    )
+//                }
+//            }
+//        }
+//    }
 
     private fun setupSaveAboutLiveDataObserver() {
         viewModel.saveAboutLiveData.observe(viewLifecycleOwner) {
@@ -118,7 +125,9 @@ class ProfileFragment : BaseFragment(),
                         this
                     )
                 }
-                it.isSuccess() -> popBackStack()
+                it.isSuccess() -> {
+                    // TODO: show popup saying profile saved
+                }
             }
         }
     }
@@ -217,17 +226,14 @@ class ProfileFragment : BaseFragment(),
     override fun onClickPhotoPicker(position: Int) {
         val photoPicker = photoPickerRecyclerViewAdapter.getPhotoPicker(position)
         when (photoPicker.status) {
-            PhotoPicker.Status.EMPTY -> AddPhotoOptionDialog(this).show(
-                childFragmentManager,
-                AddPhotoOptionDialog.TAG
-            )
-            PhotoPicker.Status.OCCUPIED,
-            PhotoPicker.Status.UPLOAD_ERROR,
-            PhotoPicker.Status.DOWNLOAD_ERROR -> EditPhotoOptionDialog().show(
-                childFragmentManager,
-                EditPhotoOptionDialog.TAG
-            )
-            else -> println("")
+            PhotoStatus.EMPTY -> AddPhotoOptionDialog(this).show(childFragmentManager, AddPhotoOptionDialog.TAG)
+//            PhotoPicker.Status.OCCUPIED,
+//            PhotoPicker.Status.UPLOAD_ERROR,
+//            PhotoPicker.Status.DOWNLOAD_ERROR -> EditPhotoOptionDialog().show(
+//                childFragmentManager,
+//                EditPhotoOptionDialog.TAG
+//            )
+//            else -> println("")
         }
     }
 
@@ -258,7 +264,7 @@ class ProfileFragment : BaseFragment(),
         when (requestCode) {
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val result = CropImage.getActivityResult(data)
-                if (resultCode == Activity.RESULT_OK) uploadPhoto(result.uri, null)
+                if (resultCode == Activity.RESULT_OK) uploadPhoto(result.uri)
                 else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) showErrorDialog(
                     getString(R.string.error_title_crop_image),
                     result.error.localizedMessage ?: "",
@@ -268,9 +274,8 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    private fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
-
-        println("uploadPhoto")
+    private fun uploadPhoto(photoUri: Uri?) {
+        viewModel.addPhoto(photoUri)
 //        photoUri?.path?.let { path ->
 //            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
 //            val key = photoKey ?: "${generatePhotoKey()}.$extension"
