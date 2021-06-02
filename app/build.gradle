@@ -124,7 +124,7 @@ dependencies {
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 
     // compress image
-    implementation 'id.zelory:compressor:3.0.0'
+//    implementation 'id.zelory:compressor:3.0.0'
 
     // rx-java
 //    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'

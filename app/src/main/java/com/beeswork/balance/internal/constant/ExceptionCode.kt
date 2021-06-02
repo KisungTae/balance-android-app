@@ -27,9 +27,10 @@ class ExceptionCode {
         const val SWIPED_BLOCKED_EXCEPTION = "swiped.blocked.exception"
 
 
-        const val PHOTO_OVER_SIZED_EXCEPTION = "photo_over_sized_exception"
+        const val PHOTO_OVER_SIZE_EXCEPTION = "photo_over_size_exception"
+        const val PHOTO_NOT_EXIST_EXCEPTION = "photo_not_exist_exception"
         const val PHOTO_NOT_FOUND_EXCEPTION = "photo.not.found.exception"
-        const val PHOTO_NOT_EXIST_EXCEPTION = "photo.not.exist.exception"
+        const val PHOTO_NOT_SUPPORTED_TYPE_EXCEPTION = "photo_not_supported_type_exception"
 
         const val CHAT_MESSAGE_OVER_SIZED_EXCEPTION = "chat_message_over_sized_exception"
         const val CHAT_MESSAGE_EMPTY_EXCEPTION = "chat_message_empty_exception"

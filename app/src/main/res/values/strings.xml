@@ -18,6 +18,8 @@
     <string name="error_title_save_about">프로필을 저장하지 못했습니다</string>
     <string name="error_title_fetch_photos">사진을 가져오지 못했습니다</string>
     <string name="error_title_crop_image">사진을 편집하지 못했습니다</string>
+    <string name="error_title_add_photo">사진을 업로드 하지못했습니다</string>
+
 
 
 
@@ -38,9 +40,12 @@
 
 
 
-    <string name="photo_out_of_size_exception">포토사이즈는 %1$d MB 이하만 가능</string>
+    <string name="photo_over_size_exception">최대 허용 사진용량을 초과했습니다. 다른사진으로 시도해주세요</string>
+    <string name="photo_not_supported_type_exception">해당 이미지는 지원하지 않는 파일타입입니다</string>
+<!--    <string name="photo_max_count_exception">사진은 최대 %1$d 까지 업로드 할수있습니다</string>-->
+
     <string name="photo_not_orderable_exception">에러나 로딩중인 사진이 없을때 다시 시도해주세여</string>
-    <string name="photo_not_found_exception">사진을 찾을수가 없습니다 사진을 다시 선택하시거나 삭제 해주세요</string>
+    <string name="photo_not_exist_exception">업로드할 사진이 존재하지 않습니다</string>
     <string name="presigned_url_not_found_exception">사진업로드중 에러가 발생했습니다 다시 시도해주세요</string>
     <string name="mime_type_not_found_exception">해당이미지는 지원되지않는 파일입니다</string>
     <string name="chat_id_not_found_exception">해당 채팅은 유효하지 않습니다</string>

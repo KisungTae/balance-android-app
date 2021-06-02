@@ -36,13 +36,6 @@ class PhotoPickerRecyclerViewAdapter(
     private var lastFromIndex = 0
     private var lastToIndex = 0
 
-    init {
-//        repeat(MAXIMUM_NUM_OF_PHOTOS) {
-//          TODO: change empty to loading
-//            photoPickers.add(PhotoPicker(null, Int.MAX_VALUE, PhotoPicker.Status.EMPTY, null))
-//        }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPhotoPickerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding, accountId, photoPickerListener, context)
@@ -64,14 +57,6 @@ class PhotoPickerRecyclerViewAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    fun initPhotoPicker(photos: List<PhotoPicker>) {
-        for (i in photoPickers.indices) {
-//            if (i < photos.size) photoPickers[i] = photos[i]
-//            else photoPickers[i].status = PhotoPicker.Status.EMPTY
-        }
-        notifyDataSetChanged()
-    }
-
     fun getPhotoPicker(position: Int): PhotoPicker {
         return photoPickers[position]
     }
@@ -90,11 +75,11 @@ class PhotoPickerRecyclerViewAdapter(
 //                    notifyItemChanged(photoPickers.indexOf(photoPicker))
 //                    return sequence
 //                }
-                photoPicker.key == photoKey -> {
+//                photoPicker.key == photoKey -> {
 //                    photoPicker.status = PhotoPicker.Status.UPLOADING
-                    notifyItemChanged(photoPickers.indexOf(photoPicker))
-                    return photoPicker.sequence
-                }
+//                    notifyItemChanged(photoPickers.indexOf(photoPicker))
+//                    return photoPicker.sequence
+//                }
                 photoPicker.sequence > sequence -> {
                     sequence = photoPicker.sequence
                 }
@@ -104,11 +89,11 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun deletePhoto(photoKey: String) {
-        photoPickers.find { it.key == photoKey }?.let {
-            val index = photoPickers.indexOf(it)
-            photoPickers.removeAt(index)
-            notifyItemRemoved(index)
-        }
+//        photoPickers.find { it.key == photoKey }?.let {
+//            val index = photoPickers.indexOf(it)
+//            photoPickers.removeAt(index)
+//            notifyItemRemoved(index)
+//        }
 
 //        if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS) {
 //            photoPickers.add(PhotoPicker.asEmpty())
@@ -117,10 +102,10 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
-        photoPickers.find { it.key == photoKey }?.let {
+//        photoPickers.find { it.key == photoKey }?.let {
 //            it.status = photoPickerStatus
-            notifyItemChanged(photoPickers.indexOf(it), PHOTO_PICKER_PAYLOAD)
-        }
+//            notifyItemChanged(photoPickers.indexOf(it), PHOTO_PICKER_PAYLOAD)
+//        }
     }
 
     fun swapPhotos(from: Int, to: Int) {
@@ -234,35 +219,35 @@ class PhotoPickerRecyclerViewAdapter(
         }
 
         private fun loadPhotoFromUrl(itemView: View, photoPicker: PhotoPicker) {
-            photoPicker.key?.let { key ->
-                showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                Glide.with(context).load(EndPoint.ofPhoto(accountId, key))
-                    .apply(GlideHelper.photoPickerGlideOptions())
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
+//            photoPicker.key?.let { key ->
+//                showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+//                Glide.with(context).load(EndPoint.ofPhoto(accountId, key))
+//                    .apply(GlideHelper.photoPickerGlideOptions())
+//                    .listener(object : RequestListener<Drawable> {
+//                        override fun onLoadFailed(
+//                            e: GlideException?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
 //                            photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
-                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
+//                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
+//                            return false
+//                        }
+//
+//                        override fun onResourceReady(
+//                            resource: Drawable?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            dataSource: DataSource?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
 //                            photoPicker.status = PhotoPicker.Status.OCCUPIED
-                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
-                            return false
-                        }
-                    }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
-            }
+//                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
+//                            return false
+//                        }
+//                    }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
+//            }
         }
 
         private fun showLayout(

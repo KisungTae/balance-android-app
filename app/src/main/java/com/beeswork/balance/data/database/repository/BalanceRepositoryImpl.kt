@@ -14,7 +14,6 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.swipe.CardDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
-import id.zelory.compressor.Compressor
 import kotlinx.coroutines.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -302,23 +301,23 @@ class BalanceRepositoryImpl(
 //  ################################################################################# //
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
-        if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
-            val accountId = preferenceProvider.getAccountId().toString()
-            val identityToken = preferenceProvider.getAccountId().toString()
-
-            val response = balanceRDS.fetchPhotos(accountId, identityToken)
-            if (response.status == Resource.Status.ERROR)
-                return response
-
-            val photos = response.data
-            if (photos == null || photos.isEmpty())
-                photoDAO.deletePhotosNotIn(listOf(""))
-            else {
-                photoDAO.deletePhotosNotIn(photos.map { it.key })
-                photos.forEach { it.synced = true }
-                photoDAO.insert(photos)
-            }
-        }
+//        if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
+//            val accountId = preferenceProvider.getAccountId().toString()
+//            val identityToken = preferenceProvider.getAccountId().toString()
+//
+//            val response = balanceRDS.fetchPhotos(accountId, identityToken)
+//            if (response.status == Resource.Status.ERROR)
+//                return response
+//
+//            val photos = response.data
+//            if (photos == null || photos.isEmpty())
+//                photoDAO.deletePhotosNotIn(listOf(""))
+//            else {
+//                photoDAO.deletePhotosNotIn(photos.map { it.key })
+//                photos.forEach { it.synced = true }
+//                photoDAO.insert(photos)
+//            }
+//        }
         return Resource.success(photoDAO.findAll())
     }
 
@@ -403,21 +402,21 @@ class BalanceRepositoryImpl(
     }
 
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
-        photoDAO.sync(photoKey, false)
+//        photoDAO.sync(photoKey, false)
         val response = balanceRDS.deletePhoto(
             preferenceProvider.getAccountId().toString(),
             preferenceProvider.getIdentityToken().toString(),
             photoKey
         )
-        if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
-            photoDAO.deletePhoto(photoKey)
+//        if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
+//            photoDAO.deletePhoto(photoKey)
         return response
     }
 
     override suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyResponse> {
-        for ((k, v) in photoOrders) {
-            photoDAO.sync(k, false)
-        }
+//        for ((k, v) in photoOrders) {
+//            photoDAO.sync(k, false)
+//        }
 
         val response = balanceRDS.reorderPhotos(
             preferenceProvider.getAccountId().toString(),
@@ -425,11 +424,11 @@ class BalanceRepositoryImpl(
             photoOrders
         )
 
-        for ((photoKey, sequence) in photoOrders) {
-            photoDAO.sync(photoKey, true)
-            if (response.isSuccess())
-                photoDAO.updateSequence(photoKey, sequence)
-        }
+//        for ((photoKey, sequence) in photoOrders) {
+//            photoDAO.sync(photoKey, true)
+//            if (response.isSuccess())
+//                photoDAO.updateSequence(photoKey, sequence)
+//        }
         return response
     }
 

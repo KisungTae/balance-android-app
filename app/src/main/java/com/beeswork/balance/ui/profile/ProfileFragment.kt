@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -28,14 +27,10 @@ import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.dialog.ExceptionDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -85,6 +80,13 @@ class ProfileFragment : BaseFragment(),
 //        setupFetchPhotosLiveDataObserver()
         setupPhotosLiveDataObserver()
         setupListeners()
+        setupUploadPhotoLiveData()
+    }
+
+    private fun setupUploadPhotoLiveData() {
+        viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
+            if (it.isError()) showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
+        }
     }
 
     private suspend fun setupPhotosLiveDataObserver() {
@@ -275,7 +277,7 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun uploadPhoto(photoUri: Uri?) {
-        viewModel.addPhoto(photoUri)
+        viewModel.uploadPhoto(photoUri)
 //        photoUri?.path?.let { path ->
 //            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
 //            val key = photoKey ?: "${generatePhotoKey()}.$extension"

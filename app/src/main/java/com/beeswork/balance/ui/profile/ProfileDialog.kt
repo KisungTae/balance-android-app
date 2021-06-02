@@ -205,11 +205,7 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 //        )
     }
 
-    private fun generatePhotoKey(): String {
-        var photoKey = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(ZoneOffset.UTC))
-        photoKey = photoKey.replace(":", "")
-        return photoKey.replace(".", "")
-    }
+
 
     private fun launchCropImage(uri: Uri) {
         CropImage.activity(uri)

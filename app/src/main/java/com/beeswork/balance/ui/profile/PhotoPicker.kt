@@ -2,11 +2,12 @@ package com.beeswork.balance.ui.profile
 
 import android.net.Uri
 import com.beeswork.balance.internal.constant.PhotoStatus
+import java.util.*
 
 data class PhotoPicker(
-    var key: String?,
+    var key: UUID?,
     var status: PhotoStatus,
-    var uriPath: String?,
+    var uriPath: Uri?,
     var sequence: Int,
 ) {
 
