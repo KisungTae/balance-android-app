@@ -4,8 +4,9 @@ enum class PhotoStatus {
     EMPTY,
     LOADING,
     DOWNLOADING,
+    DOWNLOAD_ERROR,
     UPLOADING,
     UPLOAD_ERROR,
-    DOWNLOAD_ERROR,
+    ORDERING,
     OCCUPIED
 }

@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.profile
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.*
+import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
@@ -12,6 +13,9 @@ import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
@@ -49,6 +53,8 @@ class ProfileViewModel(
     private val _uploadPhotoLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val uploadPhotoLiveData: LiveData<Resource<EmptyResponse>> get() = _uploadPhotoLiveData
 
+    private var photosLiveDataInitialized = false
+
     fun fetchProfile() {
         viewModelScope.launch {
             profileRepository.fetchProfile()?.let { profile ->
@@ -65,14 +71,53 @@ class ProfileViewModel(
         }
     }
 
-    fun fetchPhotos() {
-        viewModelScope.safeLaunch(_fetchPhotosLiveData) {
-//            _fetchPhotosLiveData.postValue(Resource.loading())
-            val response = photoRepository.fetchPhotos().let {
-                it.mapData(it.data?.map { photo -> photoMapper.toPhotoPicker(photo) })
+    fun testd(): LiveData<MutableList<PhotoPicker>> {
+        return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
+            val photoPickers = mutableListOf<PhotoPicker>()
+            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
+            repeat((MAX_PHOTO_COUNT - photos.size)) {
+                photoPickers.add(PhotoPicker.asEmpty())
             }
-            _fetchPhotosLiveData.postValue(response)
+            photoPickers
+        }.asLiveData()
+    }
+
+    suspend fun getPhotosLiveData(): LiveData<MutableList<PhotoPicker>> {
+
+
+        viewModelScope.launch { }
+        photoRepository.getPhotosFlow(4)
+            .flowOn(Dispatchers.IO)
+            .map { }
+            .asLiveData(viewModelScope.coroutineContext + Dispatchers.IO)
+        photosLiveDataInitialized = false
+        return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
+//            if (!photosLiveDataInitialized) {
+//                syncPhotos(photos)
+//                photosLiveDataInitialized = true
+//            }
+
+            val photoPickers = mutableListOf<PhotoPicker>()
+            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
+//            repeat((MAX_PHOTO_COUNT - photos.size)) {
+//                println("add empty photopickers $it")
+//                photoPickers.add(PhotoPicker.asEmpty())
+//            }
+//            delay(5000)
+            println("here end of map of photos")
+            photoPickers
+        }.asLiveData()
+    }
+
+    private fun syncPhotos(photos: List<Photo>) {
+        repeat(1000) { index ->
+            viewModelScope.launch {
+                repeat(1000) {
+                    println("sync photos $index")
+                }
+            }
         }
+
     }
 
     fun uploadPhoto(photoUri: Uri?) {
@@ -103,7 +148,14 @@ class ProfileViewModel(
     }
 
     fun test() {
-        profileRepository.test()
+//        profileRepository.test()
+        viewModelScope.launch {
+            repeat(1000) {
+                println("viewmodelscope $it")
+            }
+//            photoRepository.test()
+        }
+
     }
 
     companion object {

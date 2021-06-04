@@ -401,3 +401,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      122. save name in sharedPreference because it does not change
 //      123. when app goes ot pause like put into background, then stop websocket and connect when app back to foreground
 //      124. when launching app, check token synced, if false, then postToken()
+//      125. create table called "" to check if profile and photos are synced when login, listPhotos() and fetchPhotos,because
+//           when user delete the app and reinstall then he needs to fetch profile and photos from server, when failed then
+//           flag in the table, and before diaply profile and photos in profileFragment, check if profile and photos are sycned
+//           if not, then display refresh button, and saveAbout, and upload, reorder, delete photo should check the flag in the table
+//           if not syched, then display error message saying you need to sync first before saving about or photos.

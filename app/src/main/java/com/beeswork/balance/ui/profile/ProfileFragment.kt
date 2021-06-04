@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
@@ -19,6 +20,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.databinding.FragmentProfileBinding
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.Gender
@@ -68,8 +71,9 @@ class ProfileFragment : BaseFragment(),
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
         bindUI()
 //        viewModel.test()
-        viewModel.fetchProfile()
 //        viewModel.fetchPhotos()
+//        viewModel.fetchProfile()
+
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -90,48 +94,32 @@ class ProfileFragment : BaseFragment(),
     }
 
     private suspend fun setupPhotosLiveDataObserver() {
-        viewModel.photos.await().observe(viewLifecycleOwner) {
-            photoPickerRecyclerViewAdapter.submit(it)
+//        viewModel.photos.await().observe(viewLifecycleOwner) {
+//            photoPickerRecyclerViewAdapter.submit(it)
+//        }
+        viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
+            println("viewModel.getPhotosLiveData().observe(viewLifecycleOwner)")
         }
     }
-
-//    private fun setupFetchPhotosLiveDataObserver() {
-//        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
-//            when {
-//                it.isSuccess() -> it.data?.let { photos -> photoPickerRecyclerViewAdapter.initPhotoPicker(photos) }
-//                it.isError() && validateAccount(it.error, it.errorMessage) -> {
-//                    binding.btnProfileRefresh.visibility = View.VISIBLE
-//                    showErrorDialog(
-//                        it.error,
-//                        getString(R.string.error_title_fetch_photos),
-//                        it.errorMessage,
-//                        RequestCode.FETCH_PHOTOS,
-//                        this
-//                    )
-//                }
-//            }
-//        }
-//    }
 
     private fun setupSaveAboutLiveDataObserver() {
         viewModel.saveAboutLiveData.observe(viewLifecycleOwner) {
             when {
                 it.isLoading() -> showLoading()
-                it.isError() && validateAccount(it.error, it.errorMessage) -> {
-                    hideLoading()
-                    showErrorDialog(
-                        it.error,
-                        getString(R.string.error_title_save_about),
-                        it.errorMessage,
-                        RequestCode.SAVE_ABOUT,
-                        this
-                    )
-                }
-                it.isSuccess() -> {
-                    // TODO: show popup saying profile saved
-                }
+                it.isError() && validateAccount(it.error, it.errorMessage) -> showSaveAboutError(it)
+                it.isSuccess() -> showSaveAboutSuccessToast()
             }
         }
+    }
+
+    private fun showSaveAboutSuccessToast() {
+        Toast.makeText(requireContext(), getString(R.string.save_about_success_message), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showSaveAboutError(resource: Resource<EmptyResponse>) {
+        hideLoading()
+        val errorTitle = getString(R.string.error_title_save_about)
+        showErrorDialog(resource.error, errorTitle, resource.errorMessage, RequestCode.SAVE_ABOUT, this)
     }
 
     private fun showLoading() {
@@ -154,7 +142,7 @@ class ProfileFragment : BaseFragment(),
         }
         binding.btnProfileRefresh.setOnClickListener {
             if (it.visibility == View.VISIBLE) {
-                viewModel.fetchPhotos()
+//                viewModel.fetchPhotos()
                 it.visibility = View.INVISIBLE
             }
         }
@@ -200,10 +188,24 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun saveAbout(): Boolean {
-        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
-        val about = binding.etProfileAbout.text.toString()
-        viewModel.saveAbout(height, about)
+//        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
+//        val about = binding.etProfileAbout.text.toString()
+//        viewModel.saveAbout(height, about)
+        viewModel.test()
+        lifecycleScope.launch { test() }
+//        lifecycleScope.launch {
+//            repeat(1000) {
+//                println("ui lifecyclecope: $it")
+//            }
+//        }
+
         return true
+    }
+
+    private suspend fun test() {
+        repeat(1000) {
+            println("ui lifecyclecope: $it")
+        }
     }
 
     private fun popBackStack() {
@@ -221,7 +223,7 @@ class ProfileFragment : BaseFragment(),
     override fun onRetry(requestCode: Int?) {
         when (requestCode) {
             RequestCode.SAVE_ABOUT -> saveAbout()
-            RequestCode.FETCH_PHOTOS -> viewModel.fetchPhotos()
+//            RequestCode.FETCH_PHOTOS -> viewModel.fetchPhotos()
         }
     }
 
@@ -321,4 +323,24 @@ class ProfileFragment : BaseFragment(),
     override fun onUploadPhotoFromCapture() {
         println("onUploadPhotoFromCapture")
     }
+
+
+
+//    private fun setupFetchPhotosLiveDataObserver() {
+//        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
+//            when {
+//                it.isSuccess() -> it.data?.let { photos -> photoPickerRecyclerViewAdapter.initPhotoPicker(photos) }
+//                it.isError() && validateAccount(it.error, it.errorMessage) -> {
+//                    binding.btnProfileRefresh.visibility = View.VISIBLE
+//                    showErrorDialog(
+//                        it.error,
+//                        getString(R.string.error_title_fetch_photos),
+//                        it.errorMessage,
+//                        RequestCode.FETCH_PHOTOS,
+//                        this
+//                    )
+//                }
+//            }
+//        }
+//    }
 }

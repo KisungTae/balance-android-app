@@ -61,6 +61,15 @@ class PhotoPickerRecyclerViewAdapter(
         return photoPickers[position]
     }
 
+
+
+
+
+
+
+
+
+
     fun uploadPhoto(photoKey: String, photoUri: Uri?): Int {
         var sequence = 0
         for (i in photoPickers.indices) {
@@ -207,7 +216,10 @@ class PhotoPickerRecyclerViewAdapter(
             when (photoPicker.status) {
                 PhotoStatus.EMPTY -> showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
                 PhotoStatus.LOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                PhotoStatus.UPLOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                PhotoStatus.UPLOADING -> {
+
+                    showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                }
                 PhotoStatus.UPLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE)
                 PhotoStatus.DOWNLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
                 PhotoStatus.OCCUPIED -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)

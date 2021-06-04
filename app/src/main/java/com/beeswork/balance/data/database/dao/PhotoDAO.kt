@@ -19,7 +19,7 @@ interface PhotoDAO {
     @Query("select * from photo order by sequence limit :maxPhotoCount")
     fun findAllAsFlow(maxPhotoCount: Int): Flow<List<Photo>>
 
-    @Query("select sequence from photo order by sequence limit 1")
+    @Query("select sequence from photo order by sequence desc limit 1")
     fun findLastSequence(): Int?
 
 
@@ -33,8 +33,8 @@ interface PhotoDAO {
 //    @Query("update photo set synced = :synced where `key` = :photoKey")
 //    fun sync(photoKey: String, synced: Boolean)
 
-    @Query("select exists (select * from photo where synced = :synced)")
-    fun existsBySynced(synced: Boolean): Boolean
+//    @Query("select exists (select * from photo where synced = :synced)")
+//    fun existsBySynced(synced: Boolean): Boolean
 
     @Query("select count(*) from photo")
     fun count(): Int

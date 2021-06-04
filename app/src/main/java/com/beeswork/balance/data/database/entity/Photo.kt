@@ -16,15 +16,7 @@ data class Photo(
     var status: PhotoStatus,
     var uri: Uri?,
     var sequence: Int,
-    var synced: Boolean
-) {
-    companion object {
-
-        const val MAX_SIZE = 1048576
-
-        fun maxSizeInMB(): Int {
-            val divider = 1024.0.pow(2.0)
-            return (MAX_SIZE / divider).toInt()
-        }
-    }
-}
+    var oldSequence: Int,
+    var photoUploaded: Boolean,
+    var photoCreated: Boolean,
+)

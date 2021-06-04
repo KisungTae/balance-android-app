@@ -38,7 +38,7 @@
     <string name="fetch_clicks_exception_title">클릭정보를 가져오는데 실패했습니다</string>
 
 
-
+    <string name="save_about_success_message">프로필을 저장했습니다</string>
 
     <string name="photo_over_size_exception">최대 허용 사진용량을 초과했습니다. 다른사진으로 시도해주세요</string>
     <string name="photo_not_supported_type_exception">해당 이미지는 지원하지 않는 파일타입입니다</string>

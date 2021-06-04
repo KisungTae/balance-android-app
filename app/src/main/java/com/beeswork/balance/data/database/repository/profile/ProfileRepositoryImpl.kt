@@ -62,8 +62,9 @@ class ProfileRepositoryImpl(
 
 
     override fun test() {
-        CoroutineScope(Dispatchers.IO).launch {
-            profileDAO.insert(Profile("Michael", OffsetDateTime.now(), true, 177, "I am Michael this is about", false))
-        }
+
+//        CoroutineScope(Dispatchers.IO).launch {
+//            profileDAO.insert(Profile("Michael", OffsetDateTime.now(), true, 177, "I am Michael this is about", false))
+//        }
     }
 }

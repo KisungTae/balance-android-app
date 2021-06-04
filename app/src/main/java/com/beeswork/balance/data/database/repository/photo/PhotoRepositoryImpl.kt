@@ -14,6 +14,7 @@ import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
@@ -27,7 +28,8 @@ class PhotoRepositoryImpl(
 
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
         return withContext(Dispatchers.IO) {
-            if (photoDAO.existsBySynced(false) || photoDAO.count() <= 0) {
+//            if (photoDAO.existsBySynced(false) || photoDAO.count() <= 0) {
+            if (photoDAO.count() <= 0) {
                 val response = photoRDS.listPhotos(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken()
@@ -45,20 +47,36 @@ class PhotoRepositoryImpl(
         }
     }
 
-    override suspend fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>> {
-        return withContext(Dispatchers.IO) {
-            return@withContext photoDAO.findAllAsFlow(maxPhotoCount)
-        }
+    override fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>> {
+        return photoDAO.findAllAsFlow(maxPhotoCount)
     }
 
     override suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String): Resource<EmptyResponse> {
-        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)?.let { mimeType ->
-            val sequence = photoDAO.findLastSequence() ?: 0
-            val photo = Photo(UUID.randomUUID(), PhotoStatus.UPLOADING, photoUri, (sequence + 1), false)
-            photoDAO.insert(photo)
+        return withContext(Dispatchers.IO) {
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)?.let { mimeType ->
+                val sequence = (photoDAO.findLastSequence() ?: 0) + 1
+                val photo = Photo(UUID.randomUUID(), PhotoStatus.UPLOADING, photoUri, sequence, sequence, false, false)
+                photoDAO.insert(photo)
+
+                // presigned
 
 
-            return Resource.success(null)
-        } ?: return Resource.error(ExceptionCode.PHOTO_NOT_SUPPORTED_TYPE_EXCEPTION)
+                // upload to s3
+
+
+                // create on server
+
+
+
+                return@withContext Resource.success(null)
+            } ?: return@withContext Resource.error(ExceptionCode.PHOTO_NOT_SUPPORTED_TYPE_EXCEPTION)
+        }
+
+    }
+
+    override suspend fun test() {
+        withContext(Dispatchers.IO) {
+            photoDAO.insert(Photo(UUID.randomUUID(), PhotoStatus.EMPTY, null, 100, 100, false, false))
+        }
     }
 }
