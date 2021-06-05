@@ -9,37 +9,23 @@ import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
-import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 import java.io.File
+import java.util.*
 
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
     private val photoRepository: PhotoRepository,
     private val photoMapper: PhotoMapper,
-    private val profileMapper: ProfileMapper
+    private val profileMapper: ProfileMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
-    val photos by lazyDeferred {
-        photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
-            val photoPickers = mutableListOf<PhotoPicker>()
-            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
-            repeat((MAX_PHOTO_COUNT - photos.size)) {
-                photoPickers.add(PhotoPicker.asEmpty())
-            }
-            photoPickers
-        }.asLiveData()
-    }
 
     private val _fetchProfileLiveData = MutableLiveData<ProfileDomain>()
     val fetchProfileLiveData: LiveData<ProfileDomain> get() = _fetchProfileLiveData
@@ -53,7 +39,11 @@ class ProfileViewModel(
     private val _uploadPhotoLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val uploadPhotoLiveData: LiveData<Resource<EmptyResponse>> get() = _uploadPhotoLiveData
 
-    private var photosLiveDataInitialized = false
+    private val _deletePhotoLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val deletePhotoLiveData: LiveData<Resource<EmptyResponse>> get() = _deletePhotoLiveData
+
+    private val _orderPhotosLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val orderPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _deletePhotoLiveData
 
     fun fetchProfile() {
         viewModelScope.launch {
@@ -71,64 +61,30 @@ class ProfileViewModel(
         }
     }
 
-    fun testd(): LiveData<MutableList<PhotoPicker>> {
+    fun getPhotosLiveData(): LiveData<MutableList<PhotoPicker>> {
         return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
             val photoPickers = mutableListOf<PhotoPicker>()
             photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
-            repeat((MAX_PHOTO_COUNT - photos.size)) {
-                photoPickers.add(PhotoPicker.asEmpty())
-            }
+            repeat((MAX_PHOTO_COUNT - photos.size)) { photoPickers.add(PhotoPicker.asEmpty()) }
             photoPickers
-        }.asLiveData()
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    suspend fun getPhotosLiveData(): LiveData<MutableList<PhotoPicker>> {
-
-
-        viewModelScope.launch { }
-        photoRepository.getPhotosFlow(4)
-            .flowOn(Dispatchers.IO)
-            .map { }
-            .asLiveData(viewModelScope.coroutineContext + Dispatchers.IO)
-        photosLiveDataInitialized = false
-        return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
-//            if (!photosLiveDataInitialized) {
-//                syncPhotos(photos)
-//                photosLiveDataInitialized = true
-//            }
-
-            val photoPickers = mutableListOf<PhotoPicker>()
-            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
-//            repeat((MAX_PHOTO_COUNT - photos.size)) {
-//                println("add empty photopickers $it")
-//                photoPickers.add(PhotoPicker.asEmpty())
-//            }
-//            delay(5000)
-            println("here end of map of photos")
-            photoPickers
-        }.asLiveData()
-    }
-
-    private fun syncPhotos(photos: List<Photo>) {
-        repeat(1000) { index ->
-            viewModelScope.launch {
-                repeat(1000) {
-                    println("sync photos $index")
-                }
-            }
-        }
-
-    }
-
-    fun uploadPhoto(photoUri: Uri?) {
+    fun uploadPhoto(photoUri: Uri?, photoKey: UUID?) {
         viewModelScope.safeLaunch(_uploadPhotoLiveData) {
             photoUri?.path?.let { path ->
                 val photoFile = File(path)
                 val extension = MimeTypeMap.getFileExtensionFromUrl(path)
-                if (validatePhoto(photoFile, extension))
-                    _uploadPhotoLiveData.postValue(photoRepository.uploadPhoto(photoFile, photoUri, extension))
+                if (validatePhoto(photoFile, extension)) {
+                    val response = photoRepository.uploadPhoto(photoFile, photoUri, extension, photoKey)
+                    _uploadPhotoLiveData.postValue(response)
+                } else photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.UPLOAD_ERROR) }
             }
         }
+    }
+
+    private fun reorderPhotos() {
+
     }
 
     private fun validatePhoto(photoFile: File, extension: String): Boolean {
@@ -147,6 +103,35 @@ class ProfileViewModel(
         return true
     }
 
+
+    fun syncPhotos() {
+        viewModelScope.safeLaunch<Any>(null) {
+            val photos = photoRepository.loadPhotos(MAX_PHOTO_COUNT)
+            var ordered = true
+            photos.forEach { photo ->
+                when (photo.status) {
+                    PhotoStatus.UPLOADING -> reuploadPhoto(photo)
+                    PhotoStatus.DELETING -> deletePhoto(photo.key)
+                    PhotoStatus.ORDERING -> ordered = false
+                    else -> println("")
+                }
+            }
+            if (!ordered) reorderPhotos()
+        }
+    }
+
+
+    fun deletePhoto(photoKey: UUID) {
+        viewModelScope.safeLaunch(_deletePhotoLiveData) {
+            _deletePhotoLiveData.postValue(photoRepository.deletePhoto(photoKey))
+        }
+    }
+
+    private fun reuploadPhoto(photo: Photo) {
+
+    }
+
+
     fun test() {
 //        profileRepository.test()
         viewModelScope.launch {
@@ -164,3 +149,8 @@ class ProfileViewModel(
         private val photoExtensions = setOf("jpg", "jpeg", "gif", "png")
     }
 }
+
+
+
+
+

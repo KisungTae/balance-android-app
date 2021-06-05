@@ -5,14 +5,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.internal.mapper.click.ClickMapper
+import kotlinx.coroutines.CoroutineDispatcher
 
 class ClickViewModelFactory(
     private val clickRepository: ClickRepository,
-    private val clickMapper: ClickMapper
+    private val clickMapper: ClickMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ClickViewModel(clickRepository, clickMapper) as T
+        return ClickViewModel(clickRepository, clickMapper, defaultDispatcher) as T
     }
 }

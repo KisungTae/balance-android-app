@@ -12,6 +12,7 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -23,7 +24,8 @@ class ChatViewModel(
     private val swipedId: UUID,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
-    private val chatMessageMapper: ChatMessageMapper
+    private val chatMessageMapper: ChatMessageMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val chatMessageInvalidationLiveData = chatRepository.chatMessageInvalidationFlow.filter {
@@ -85,7 +87,7 @@ class ChatViewModel(
                 before?.dateCreatedAt = null
                 separator
             }
-        }.asLiveData(viewModelScope.coroutineContext)
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
     fun synchronizeMatch() {

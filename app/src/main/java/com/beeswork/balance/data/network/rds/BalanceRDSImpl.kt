@@ -30,21 +30,7 @@ class BalanceRDSImpl(
         }
     }
 
-    override suspend fun deletePhoto(
-        accountId: String,
-        identityToken: String,
-        photoKey: String
-    ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.deletePhoto(
-                DeletePhotoBody(
-                    accountId,
-                    identityToken,
-                    photoKey
-                )
-            )
-        }
-    }
+
 
     override suspend fun uploadPhotoToS3(
         url: String,
@@ -52,24 +38,6 @@ class BalanceRDSImpl(
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse> {
         return getResult { balanceAPI.uploadPhotoToS3(url, formData, multipartBody) }
-    }
-
-    override suspend fun addPhoto(
-        accountId: String,
-        identityToken: String,
-        photoKey: String,
-        sequence: Int
-    ): Resource<PreSignedUrlResponse> {
-        return getResult {
-            balanceAPI.addPhoto(
-                AddPhotoBody(
-                    accountId,
-                    identityToken,
-                    photoKey,
-                    sequence
-                )
-            )
-        }
     }
 
     override suspend fun fetchPhotos(

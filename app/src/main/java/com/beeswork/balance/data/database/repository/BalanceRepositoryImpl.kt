@@ -318,7 +318,7 @@ class BalanceRepositoryImpl(
 //                photoDAO.insert(photos)
 //            }
 //        }
-        return Resource.success(photoDAO.findAll())
+        return Resource.success(photoDAO.findAll(5))
     }
 
 
@@ -403,14 +403,14 @@ class BalanceRepositoryImpl(
 
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
 //        photoDAO.sync(photoKey, false)
-        val response = balanceRDS.deletePhoto(
-            preferenceProvider.getAccountId().toString(),
-            preferenceProvider.getIdentityToken().toString(),
-            photoKey
-        )
+//        val response = balanceRDS.deletePhoto(
+//            preferenceProvider.getAccountId().toString(),
+//            preferenceProvider.getIdentityToken().toString(),
+//            photoKey
+//        )
 //        if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
 //            photoDAO.deletePhoto(photoKey)
-        return response
+        return Resource.success(null)
     }
 
     override suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyResponse> {

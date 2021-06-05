@@ -37,7 +37,8 @@ class MatchRepositoryImpl(
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
     private val stompClient: StompClient,
-    private val scope: CoroutineScope
+    private val applicationScope: CoroutineScope,
+    private val ioDispatcher: CoroutineDispatcher
 ) : MatchRepository {
 
     private var newMatchFlowListener: NewMatchFlowListener? = null
@@ -59,23 +60,23 @@ class MatchRepositoryImpl(
     private fun collectMatchFlow() {
         stompClient.matchFlow.onEach { matchDTO ->
             saveMatchAndOffer(matchMapper.toMatch(matchDTO))
-        }.launchIn(scope)
+        }.launchIn(applicationScope)
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext matchDAO.findAllPaged(loadSize, startPosition)
         }
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext matchDAO.findAllPaged(loadSize, startPosition, "%${searchKeyword}%")
         }
     }
 
     override suspend fun fetchMatches(): Resource<ListMatchesDTO> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val fetchedAt = OffsetDateTime.now()
             val response = matchRDS.listMatches(
                 preferenceProvider.getAccountId(),
@@ -116,7 +117,7 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun synchronizeMatch(chatId: Long) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             balanceDatabase.runInTransaction {
                 matchDAO.findById(chatId)?.let { match ->
                     chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageId)?.let { chatMessage ->
@@ -131,13 +132,13 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun isUnmatched(chatId: Long): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext matchDAO.findUnmatched(chatId)
         }
     }
 
     override suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val response = matchRDS.unmatch(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -161,7 +162,7 @@ class MatchRepositoryImpl(
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val response = reportRDS.reportMatch(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -175,7 +176,7 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
-        withContext(Dispatchers.IO) { saveMatchAndOffer(matchMapper.toMatch(matchDTO)) }
+        saveMatchAndOffer(matchMapper.toMatch(matchDTO))
     }
 
     private fun saveMatchAndOffer(match: Match) {
@@ -183,20 +184,16 @@ class MatchRepositoryImpl(
         newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
     }
 
-    override suspend fun getMatchInvalidation(): Flow<Boolean> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.invalidation()
-        }
+    override fun getMatchInvalidation(): Flow<Boolean> {
+        return matchDAO.invalidation()
     }
 
-    override suspend fun getUnreadMatchCount(): Flow<Int> {
-        return withContext(Dispatchers.IO) {
-            return@withContext matchDAO.countUnread()
-        }
+    override fun getUnreadMatchCount(): Flow<Int> {
+        return matchDAO.countUnread()
     }
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val response = matchRDS.click(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -207,7 +204,8 @@ class MatchRepositoryImpl(
                 when (matchDTO.pushType) {
                     PushType.MATCHED -> saveMatch(matchMapper.toMatch(matchDTO))
                     PushType.CLICKED -> swipeDAO.insert(Swipe(swipedId))
-                    else -> {}
+                    else -> {
+                    }
                 }
                 return@withContext response.mapData(matchDTO.pushType)
             }
@@ -265,7 +263,7 @@ class MatchRepositoryImpl(
     //  TODO: remove me
     override fun testFunction() {
 //        _chatMessageReceiptLiveData.postValue(Resource.error(""))
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(ioDispatcher).launch {
 //            createDummyMatch()
 //            createDummyChatMessages()
 //            matchDAO.insert(Match(Random.nextLong(), UUID.randomUUID(), false, false, "test match", "", OffsetDateTime.now()))

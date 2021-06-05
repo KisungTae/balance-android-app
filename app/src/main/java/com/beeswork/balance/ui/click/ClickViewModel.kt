@@ -8,11 +8,13 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 
 class ClickViewModel(
     private val clickRepository: ClickRepository,
-    private val clickMapper: ClickMapper
+    private val clickMapper: ClickMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val clickInvalidation by lazyDeferred {
@@ -37,7 +39,7 @@ class ClickViewModel(
                 pagingData.map { clickMapper.toClickDomain(it) }
             }.map { pagingData ->
                 pagingData.insertHeaderItem(TerminalSeparatorType.FULLY_COMPLETE, ClickDomain.header())
-            }.asLiveData(viewModelScope.coroutineContext)
+            }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
     fun fetchClicks() {

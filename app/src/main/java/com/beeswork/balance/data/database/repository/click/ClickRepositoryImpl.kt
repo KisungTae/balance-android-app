@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 class ClickRepositoryImpl(
@@ -28,7 +27,8 @@ class ClickRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val balanceDatabase: BalanceDatabase,
     private val stompClient: StompClient,
-    private val scope: CoroutineScope
+    private val applicationScope: CoroutineScope,
+    private val ioDispatcher: CoroutineDispatcher
 ) : ClickRepository {
 
     private var newClickFlowListener: NewClickFlowListener? = null
@@ -52,7 +52,7 @@ class ClickRepositoryImpl(
         stompClient.clickFlow.onEach { clickDTO ->
             val click = clickMapper.toClick(clickDTO)
             if (saveClick(click)) newClickFlowListener?.onReceive(click)
-        }.launchIn(scope)
+        }.launchIn(applicationScope)
     }
 
 
@@ -69,13 +69,13 @@ class ClickRepositoryImpl(
     }
 
     override suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext clickDAO.findAllPaged(loadSize, startPosition)
         }
     }
 
     override suspend fun fetchClicks(): Resource<EmptyResponse> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val response = clickRDS.listClicks(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -92,21 +92,17 @@ class ClickRepositoryImpl(
         }
     }
 
-    override suspend fun getClickInvalidation(): Flow<Boolean> {
-        return withContext(Dispatchers.IO) {
-            return@withContext clickDAO.invalidation()
-        }
+    override fun getClickInvalidation(): Flow<Boolean> {
+        return clickDAO.invalidation()
     }
 
-    override suspend fun getClickCount(): Flow<Int> {
-        return withContext(Dispatchers.IO) {
-            return@withContext clickDAO.count()
-        }
+    override fun getClickCount(): Flow<Int> {
+        return clickDAO.count()
     }
 
     override fun test() {
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(ioDispatcher).launch {
 //            clickDAO.insert(Click(UUID.fromString("698f2eb6-3fef-4ee3-9c7d-3e527740548e"), "new profile", OffsetDateTime.now()))
 //            clickDAO.insert(Click(UUID.fromString("cd4f05bf-1192-4f16-90c7-f97b46584ba6"), "new profile", OffsetDateTime.now()))
 //            clickDAO.insert(Click(UUID.fromString("82585030-2f0e-4be5-bbf1-bbcce26d0408"), "new profile", OffsetDateTime.now()))

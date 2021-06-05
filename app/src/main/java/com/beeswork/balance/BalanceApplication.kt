@@ -141,16 +141,40 @@ class BalanceApplication : Application(), KodeinAware {
 
 
         // Repository
-        bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance(), instance(), instance()) }
-        bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance()) }
-        bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance()) }
+        bind<SwipeRepository>() with singleton {
+            SwipeRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.IO
+            )
+        }
+        bind<PhotoRepository>() with singleton {
+            PhotoRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.IO
+            )
+        }
+        bind<ProfileRepository>() with singleton {
+            ProfileRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.IO
+            )
+        }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
                 instance(),
                 instance(),
                 instance(),
                 instance(),
-                instance()
+                instance(),
+                Dispatchers.IO
             )
         }
         bind<ClickRepository>() with singleton {
@@ -162,7 +186,8 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                applicationScope
+                applicationScope,
+                Dispatchers.IO
             )
         }
 
@@ -175,7 +200,8 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                applicationScope
+                applicationScope,
+                Dispatchers.IO
             )
         }
 
@@ -191,7 +217,8 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                applicationScope
+                applicationScope,
+                Dispatchers.IO
             )
         }
 
@@ -219,22 +246,31 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
-        bind() from provider { MatchViewModelFactory(instance(), instance(), instance()) }
+        bind() from provider { MatchViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from factory { param: ChatViewModelFactoryParameter ->
             ChatViewModelFactory(
                 param,
                 instance(),
                 instance(),
-                instance()
+                instance(),
+                Dispatchers.Default
             )
         }
-        bind() from provider { SwipeViewModelFactory(instance(), instance(), instance()) }
-        bind() from provider { ClickViewModelFactory(instance(), instance()) }
+        bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { ClickViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeBalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { AccountViewModelFactory(instance()) }
-        bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind() from provider {
+            ProfileViewModelFactory(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.Default
+            )
+        }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
 
         // Interceptor

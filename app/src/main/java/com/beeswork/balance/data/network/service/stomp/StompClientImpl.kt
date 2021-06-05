@@ -25,7 +25,7 @@ import java.util.*
 
 
 class StompClientImpl(
-    private val scope: CoroutineScope,
+    private val applicationScope: CoroutineScope,
     private val okHttpClient: OkHttpClient,
     private val preferenceProvider: PreferenceProvider
 ) : StompClient, WebSocketListener() {
@@ -50,7 +50,7 @@ class StompClientImpl(
     override val webSocketEventLiveData: LiveData<WebSocketEvent> get() = _webSocketEventLiveData
 
     init {
-        scope.launch {
+        applicationScope.launch {
             outgoing.consumeEach { socket?.send(it) }
         }
     }
@@ -104,13 +104,13 @@ class StompClientImpl(
 
     private fun onMessageFrameReceived(stompFrame: StompFrame) {
         when (stompFrame.getPushType()) {
-            PushType.CHAT_MESSAGE -> scope.launch {
+            PushType.CHAT_MESSAGE -> applicationScope.launch {
                 chatMessageChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java))
             }
-            PushType.CLICKED -> scope.launch {
+            PushType.CLICKED -> applicationScope.launch {
                 clickChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java))
             }
-            PushType.MATCHED -> scope.launch {
+            PushType.MATCHED -> applicationScope.launch {
                 matchChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java))
             }
             else -> { }
@@ -119,7 +119,7 @@ class StompClientImpl(
 
     private fun onReceiptFrameReceived(stompFrame: StompFrame) {
         stompFrame.payload?.let {
-            scope.launch {
+            applicationScope.launch {
                 val chatMessageDTO = GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
                 chatMessageDTO.key = stompFrame.getReceiptId()
                 chatMessageReceiptChannel.send(chatMessageDTO)
@@ -137,7 +137,7 @@ class StompClientImpl(
     }
 
     override fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
-        scope.launch {
+        applicationScope.launch {
             if (socketStatus == SocketStatus.CLOSED) connect()
             while (socketStatus == SocketStatus.CONNECTING) {}
 
@@ -161,7 +161,7 @@ class StompClientImpl(
     }
 
     private fun connectToStomp() {
-        scope.launch {
+        applicationScope.launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
             headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
@@ -170,7 +170,7 @@ class StompClientImpl(
     }
 
     private fun subscribeToQueue() {
-        scope.launch {
+        applicationScope.launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
             headers[StompHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()?.toString()}"

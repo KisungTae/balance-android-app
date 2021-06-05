@@ -16,7 +16,7 @@ interface ChatRepository {
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
     suspend fun resendChatMessage(key: Long, swipedId: UUID)
     suspend fun deleteChatMessage(chatId: Long, key: Long)
-    suspend fun onChatMessageReceived(chatMessageDTO: ChatMessageDTO)
+    suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO)
     suspend fun saveChatMessages(
         sentChatMessagesDTOs: List<ChatMessageDTO>?,
         receivedChatMessageDTOs: List<ChatMessageDTO>?,

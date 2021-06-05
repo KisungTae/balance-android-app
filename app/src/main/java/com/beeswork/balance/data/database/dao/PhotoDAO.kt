@@ -5,7 +5,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Photo
+import com.beeswork.balance.internal.constant.PhotoStatus
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 @Dao
 interface PhotoDAO {
@@ -22,13 +24,24 @@ interface PhotoDAO {
     @Query("select sequence from photo order by sequence desc limit 1")
     fun findLastSequence(): Int?
 
+    @Query("select * from photo order by sequence limit :maxPhotoCount")
+    fun findAll(maxPhotoCount: Int): List<Photo>
+
+    @Query("select * from photo where `key` = :key")
+    fun findByKey(key: UUID): Photo?
+
+    @Query("update photo set status = :status where `key` = :key")
+    fun updateStatus(key: UUID, status: PhotoStatus)
+
+    @Query("update photo set uploaded = :uploaded where `key` = :key")
+    fun updateUploaded(key: UUID, uploaded: Boolean)
+
+    @Query("update photo set status = :status, saved = :saved where `key` = :key")
+    fun updateOnPhotoSaved(key: UUID, status: PhotoStatus = PhotoStatus.OCCUPIED, saved: Boolean = true)
 
 
 
 
-
-    @Query("select * from photo order by sequence")
-    fun findAll(): List<Photo>
 
 //    @Query("update photo set synced = :synced where `key` = :photoKey")
 //    fun sync(photoKey: String, synced: Boolean)

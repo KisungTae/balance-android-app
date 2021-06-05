@@ -17,7 +17,8 @@ class SettingRepositoryImpl(
     private val fcmTokenDAO: FCMTokenDAO,
     private val locationDAO: LocationDAO,
     private val settingRDS: SettingRDS,
-    private val settingDAO: SettingDAO
+    private val settingDAO: SettingDAO,
+    private val ioDispatcher: CoroutineDispatcher
 ) : SettingRepository {
 
     override suspend fun saveFCMToken(token: String) {
@@ -31,9 +32,11 @@ class SettingRepositoryImpl(
     }
 
     override suspend fun saveLocation(latitude: Double, longitude: Double) {
-        val now = OffsetDateTime.now()
-        locationDAO.insert(Location(latitude, longitude, false, now))
-        syncLocation(latitude, longitude, now)
+        withContext(ioDispatcher) {
+            val now = OffsetDateTime.now()
+            locationDAO.insert(Location(latitude, longitude, false, now))
+            syncLocation(latitude, longitude, now)
+        }
     }
 
     private suspend fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
@@ -48,7 +51,7 @@ class SettingRepositoryImpl(
     }
 
     override suspend fun syncLocation() {
-        CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { c, t -> }) {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
             locationDAO.findById()?.let { location ->
                 if (!location.synced)
                     syncLocation(location.latitude, location.longitude, location.updatedAt)
@@ -56,10 +59,8 @@ class SettingRepositoryImpl(
         }
     }
 
-    override suspend fun getEmailFlow(): Flow<String?> {
-        return withContext(Dispatchers.IO) {
-            return@withContext settingDAO.findEmailFlow()
-        }
+    override fun getEmailFlow(): Flow<String?> {
+        return settingDAO.findEmailFlow()
     }
 
     private fun getSettingOrDefault(): Setting {
@@ -67,12 +68,6 @@ class SettingRepositoryImpl(
             val setting = Setting(null, false)
             settingDAO.insert(setting)
             setting
-        }
-    }
-
-    override suspend fun fetchEmail(): String? {
-        return withContext(Dispatchers.IO) {
-            return@withContext getSettingOrDefault().email
         }
     }
 }

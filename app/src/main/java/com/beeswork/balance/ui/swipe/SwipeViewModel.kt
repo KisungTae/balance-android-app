@@ -6,11 +6,13 @@ import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.CoroutineDispatcher
 
 class SwipeViewModel(
     private val swipeRepository: SwipeRepository,
     private val settingRepository: SettingRepository,
-    private val cardMapper: CardMapper
+    private val cardMapper: CardMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _fetchCards = MutableLiveData<Resource<List<CardDomain>>>()

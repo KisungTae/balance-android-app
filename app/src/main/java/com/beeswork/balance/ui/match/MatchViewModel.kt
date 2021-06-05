@@ -9,6 +9,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 
@@ -17,6 +18,7 @@ class MatchViewModel(
     private val matchRepository: MatchRepository,
     private val chatRepository: ChatRepository,
     private val matchMapper: MatchMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val matchInvalidation by lazyDeferred {
@@ -37,7 +39,7 @@ class MatchViewModel(
             { MatchPagingSource(matchRepository, searchKeyword) }
         ).flow.cachedIn(viewModelScope)
             .map { pagingData -> pagingData.map { matchMapper.toMatchDomain(it) } }
-            .asLiveData(viewModelScope.coroutineContext)
+            .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
     fun fetchMatches() {

@@ -15,24 +15,11 @@ interface BalanceRDS {
         photoOrders: Map<String, Int>
     ): Resource<EmptyResponse>
 
-    suspend fun deletePhoto(
-        accountId: String,
-        identityToken: String,
-        photoKey: String
-    ): Resource<EmptyResponse>
-
     suspend fun uploadPhotoToS3(
         url: String,
         formData: Map<String, RequestBody>,
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse>
-
-    suspend fun addPhoto(
-        accountId: String,
-        identityToken: String,
-        photoKey: String,
-        sequence: Int
-    ): Resource<PreSignedUrlResponse>
 
     suspend fun fetchPhotos(
         accountId: String,

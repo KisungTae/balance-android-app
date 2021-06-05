@@ -16,17 +16,18 @@ class SwipeRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
     private val swipeFilterDAO: SwipeFilterDAO,
     private val swipeDAO: SwipeDAO,
-    private val swipeRDS: SwipeRDS
+    private val swipeRDS: SwipeRDS,
+    private val ioDispatcher: CoroutineDispatcher
 ) : SwipeRepository {
 
     override suspend fun getSwipeFilter(): SwipeFilter {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext getSwipeFilterOrDefault()
         }
     }
 
     override suspend fun saveSwipeFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val swipeFilter = SwipeFilter(
                 gender,
                 if (minAge < SwipeFilter.MIN_AGE) SwipeFilter.MIN_AGE else minAge,
@@ -46,7 +47,7 @@ class SwipeRepositoryImpl(
     }
 
     override suspend fun fetchCards(): Resource<FetchCardsDTO> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val swipeFilter = getSwipeFilterOrDefault()
             val response = swipeRDS.fetchCards(
                 preferenceProvider.getAccountId(),
@@ -71,7 +72,7 @@ class SwipeRepositoryImpl(
     }
 
     override suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext swipeRDS.swipe(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -86,7 +87,7 @@ class SwipeRepositoryImpl(
     }
 
     private suspend fun savePageIndex(currentPageIndex: Int, reset: Boolean) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             var pageIndex = if (reset) 0 else currentPageIndex
             pageIndex++
             swipeFilterDAO.updatePageIndex(pageIndex)

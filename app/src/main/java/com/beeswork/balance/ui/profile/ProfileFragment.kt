@@ -72,7 +72,7 @@ class ProfileFragment : BaseFragment(),
         bindUI()
 //        viewModel.test()
 //        viewModel.fetchPhotos()
-//        viewModel.fetchProfile()
+        viewModel.fetchProfile()
 
     }
 
@@ -93,13 +93,11 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    private suspend fun setupPhotosLiveDataObserver() {
-//        viewModel.photos.await().observe(viewLifecycleOwner) {
-//            photoPickerRecyclerViewAdapter.submit(it)
-//        }
+    private fun setupPhotosLiveDataObserver() {
         viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
-            println("viewModel.getPhotosLiveData().observe(viewLifecycleOwner)")
+            photoPickerRecyclerViewAdapter.submit(it)
         }
+        viewModel.syncPhotos()
     }
 
     private fun setupSaveAboutLiveDataObserver() {
@@ -188,17 +186,9 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun saveAbout(): Boolean {
-//        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
-//        val about = binding.etProfileAbout.text.toString()
-//        viewModel.saveAbout(height, about)
-        viewModel.test()
-        lifecycleScope.launch { test() }
-//        lifecycleScope.launch {
-//            repeat(1000) {
-//                println("ui lifecyclecope: $it")
-//            }
-//        }
-
+        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
+        val about = binding.etProfileAbout.text.toString()
+        viewModel.saveAbout(height, about)
         return true
     }
 
@@ -268,7 +258,7 @@ class ProfileFragment : BaseFragment(),
         when (requestCode) {
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val result = CropImage.getActivityResult(data)
-                if (resultCode == Activity.RESULT_OK) uploadPhoto(result.uri)
+                if (resultCode == Activity.RESULT_OK) viewModel.uploadPhoto(result.uri, null)
                 else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) showErrorDialog(
                     getString(R.string.error_title_crop_image),
                     result.error.localizedMessage ?: "",
@@ -279,7 +269,7 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun uploadPhoto(photoUri: Uri?) {
-        viewModel.uploadPhoto(photoUri)
+//        viewModel.uploadPhoto(photoUri)
 //        photoUri?.path?.let { path ->
 //            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
 //            val key = photoKey ?: "${generatePhotoKey()}.$extension"

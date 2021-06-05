@@ -9,10 +9,10 @@ import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
+import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
-import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
@@ -26,6 +26,13 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @GET("photo/sign")
+    suspend fun getPreSignedURL(
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?,
+        @Query(value = "photoKey") photoKey: UUID
+    ): Response<PreSignedURLDTO>
 
     @GET("photo/list")
     suspend fun listPhotos(
@@ -126,10 +133,10 @@ interface BalanceAPI {
         @Part multipartBody: MultipartBody.Part
     ): Response<EmptyResponse>
 
-    @POST("photo/add")
-    suspend fun addPhoto(
-        @Body addPhotoBody: AddPhotoBody
-    ): Response<PreSignedUrlResponse>
+    @POST("photo/save")
+    suspend fun savePhoto(
+        @Body savePhotoBody: SavePhotoBody
+    ): Response<EmptyResponse>
 
     @GET("/photo/list")
     suspend fun fetchPhotos(

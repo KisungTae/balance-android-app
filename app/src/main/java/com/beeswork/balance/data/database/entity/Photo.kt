@@ -17,6 +17,6 @@ data class Photo(
     var uri: Uri?,
     var sequence: Int,
     var oldSequence: Int,
-    var photoUploaded: Boolean,
-    var photoCreated: Boolean,
+    var uploaded: Boolean,
+    var saved: Boolean,
 )
