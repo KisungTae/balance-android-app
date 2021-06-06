@@ -57,8 +57,10 @@ class ClickRepositoryImpl(
 
 
     override suspend fun saveClick(clickDTO: ClickDTO) {
-        val click = clickMapper.toClick(clickDTO)
-        if (saveClick(click)) newClickFlowListener?.onReceive(click)
+        withContext(Dispatchers.IO) {
+            val click = clickMapper.toClick(clickDTO)
+            if (saveClick(click)) newClickFlowListener?.onReceive(click)
+        }
     }
 
     private fun saveClick(click: Click): Boolean {

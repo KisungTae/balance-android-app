@@ -11,7 +11,7 @@ import kotlin.math.pow
 data class Photo(
 
     @PrimaryKey
-    val key: UUID,
+    val key: String,
 
     var status: PhotoStatus,
     var uri: Uri?,

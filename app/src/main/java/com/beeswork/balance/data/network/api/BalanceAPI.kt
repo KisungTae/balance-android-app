@@ -31,7 +31,7 @@ interface BalanceAPI {
     suspend fun getPreSignedURL(
         @Query(value = "accountId") accountId: UUID?,
         @Query(value = "identityToken") identityToken: UUID?,
-        @Query(value = "photoKey") photoKey: UUID
+        @Query(value = "photoKey") photoKey: String
     ): Response<PreSignedURLDTO>
 
     @GET("photo/list")

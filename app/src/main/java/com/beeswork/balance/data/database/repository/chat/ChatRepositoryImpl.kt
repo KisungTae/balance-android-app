@@ -135,7 +135,9 @@ class ChatRepositoryImpl(
     }
 
     override suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO) {
-        saveChatMessageReceived(chatMessageMapper.toReceivedChatMessage(chatMessageDTO))
+        withContext(Dispatchers.IO) {
+            saveChatMessageReceived(chatMessageMapper.toReceivedChatMessage(chatMessageDTO))
+        }
     }
 
     private fun saveChatMessageReceived(chatMessage: ChatMessage?) {

@@ -12,9 +12,9 @@ import java.util.*
 interface PhotoRepository {
     suspend fun fetchPhotos(): Resource<List<Photo>>
     fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>>
-    suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String, photoKey: UUID?): Resource<EmptyResponse>
+    suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String, photoKey: String?): Resource<EmptyResponse>
     suspend fun loadPhotos(maxPhotoCount: Int): List<Photo>
-    suspend fun deletePhoto(photoKey: UUID): Resource<EmptyResponse>
-    suspend fun updatePhotoStatus(photoKey: UUID, photoStatus: PhotoStatus)
+    suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse>
+    suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus)
     suspend fun test()
 }

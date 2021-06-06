@@ -9,6 +9,7 @@ class ExceptionCode {
         const val SOCKET_TIMEOUT_EXCEPTION = "socket_timeout_exception"
         const val CONNECT_EXCEPTION = "connect_exception"
         const val NETWORK_EXCEPTION = "network.exception"
+        const val UNKNOWN_HOST_EXCEPTION = "unknown_host_exception"
 
         const val BAD_REQUEST_EXCEPTION = "bad_request_exception"
 
@@ -31,6 +32,7 @@ class ExceptionCode {
         const val PHOTO_NOT_EXIST_EXCEPTION = "photo_not_exist_exception"
         const val PHOTO_NOT_FOUND_EXCEPTION = "photo.not.found.exception"
         const val PHOTO_NOT_SUPPORTED_TYPE_EXCEPTION = "photo_not_supported_type_exception"
+        const val PHOTO_ALREADY_EXIST_EXCEPTION = "photo.already.exists.exception"
 
         const val CHAT_MESSAGE_OVER_SIZED_EXCEPTION = "chat_message_over_sized_exception"
         const val CHAT_MESSAGE_EMPTY_EXCEPTION = "chat_message_empty_exception"

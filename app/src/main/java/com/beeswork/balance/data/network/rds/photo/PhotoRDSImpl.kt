@@ -19,7 +19,7 @@ class PhotoRDSImpl(
     override suspend fun savePhoto(
         accountId: UUID?,
         identityToken: UUID?,
-        photoKey: UUID,
+        photoKey: String,
         sequence: Int
     ): Resource<EmptyResponse> {
         return getResult { balanceAPI.savePhoto(SavePhotoBody(accountId, identityToken, photoKey, sequence)) }
@@ -36,7 +36,7 @@ class PhotoRDSImpl(
     override suspend fun getPreSignedURL(
         accountId: UUID?,
         identityToken: UUID?,
-        photoKey: UUID
+        photoKey: String
     ): Resource<PreSignedURLDTO> {
         return getResult {
             balanceAPI.getPreSignedURL(accountId, identityToken, photoKey)
@@ -44,7 +44,7 @@ class PhotoRDSImpl(
     }
 
 
-    override suspend fun deletePhoto(accountId: UUID?, identityToken: UUID?, photoKey: UUID): Resource<EmptyResponse> {
+    override suspend fun deletePhoto(accountId: UUID?, identityToken: UUID?, photoKey: String): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.deletePhoto(DeletePhotoBody(accountId, identityToken, photoKey))
         }

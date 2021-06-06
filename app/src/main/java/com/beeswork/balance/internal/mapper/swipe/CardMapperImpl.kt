@@ -1,11 +1,12 @@
 package com.beeswork.balance.internal.mapper.swipe
 
+import com.beeswork.balance.data.network.response.swipe.CardDTO
 import com.beeswork.balance.ui.swipe.CardDomain
 import java.util.*
 
 class CardMapperImpl : CardMapper {
 
-    override fun toCardDomain(cardDTO: com.beeswork.balance.data.network.response.swipe.CardDTO): CardDomain {
+    override fun toCardDomain(cardDTO: CardDTO): CardDomain {
         return CardDomain(
             cardDTO.accountId,
             cardDTO.name,

@@ -28,16 +28,16 @@ interface PhotoDAO {
     fun findAll(maxPhotoCount: Int): List<Photo>
 
     @Query("select * from photo where `key` = :key")
-    fun findByKey(key: UUID): Photo?
+    fun findByKey(key: String): Photo?
 
     @Query("update photo set status = :status where `key` = :key")
-    fun updateStatus(key: UUID, status: PhotoStatus)
+    fun updateStatus(key: String, status: PhotoStatus)
 
     @Query("update photo set uploaded = :uploaded where `key` = :key")
-    fun updateUploaded(key: UUID, uploaded: Boolean)
+    fun updateUploaded(key: String, uploaded: Boolean)
 
     @Query("update photo set status = :status, saved = :saved where `key` = :key")
-    fun updateOnPhotoSaved(key: UUID, status: PhotoStatus = PhotoStatus.OCCUPIED, saved: Boolean = true)
+    fun updateOnPhotoSaved(key: String, status: PhotoStatus = PhotoStatus.OCCUPIED, saved: Boolean = true)
 
 
 

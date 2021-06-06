@@ -176,7 +176,9 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
-        saveMatchAndOffer(matchMapper.toMatch(matchDTO))
+        withContext(Dispatchers.IO) {
+            saveMatchAndOffer(matchMapper.toMatch(matchDTO))
+        }
     }
 
     private fun saveMatchAndOffer(match: Match) {

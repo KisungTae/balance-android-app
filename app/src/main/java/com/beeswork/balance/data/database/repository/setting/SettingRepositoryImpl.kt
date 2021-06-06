@@ -22,13 +22,15 @@ class SettingRepositoryImpl(
 ) : SettingRepository {
 
     override suspend fun saveFCMToken(token: String) {
-        fcmTokenDAO.insert(FCMToken(token, false))
-        val response = settingRDS.postFCMToken(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
-            token
-        )
-        if (response.isSuccess()) fcmTokenDAO.sync()
+        withContext(Dispatchers.IO) {
+            fcmTokenDAO.insert(FCMToken(token, false))
+            val response = settingRDS.postFCMToken(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                token
+            )
+            if (response.isSuccess()) fcmTokenDAO.sync()
+        }
     }
 
     override suspend fun saveLocation(latitude: Double, longitude: Double) {

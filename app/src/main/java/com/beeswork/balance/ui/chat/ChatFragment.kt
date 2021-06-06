@@ -15,10 +15,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
-import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.constant.ReportReason
-import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
@@ -100,7 +97,7 @@ class ChatFragment : BaseFragment(),
         setupSendBtnListener()
         setupEmoticonBtnListener()
         setupSendChatMessageMediatorLiveDataObserver()
-//        setupProfilePhoto(matchedProfilePhotoKey?.let { EndPoint.ofPhotoBucket(matchedId, it) })
+        setupProfilePhoto(swipedId, swipedProfilePhotoKey)
         if (unmatched) setupAsUnmatched()
         setupReportMatchLiveDataObserver()
         setupUnmatchLiveDataObserver()
@@ -251,15 +248,15 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private suspend fun setupProfilePhoto(profilePhotoEndPoint: String?) = withContext(Dispatchers.IO) {
-        profilePhotoEndPoint?.let { profilePhotoEndPoint ->
-            runCatching {
-                val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
-                if (file.exists()) withContext(Dispatchers.Main) {
-                    chatMessagePagingAdapter.onProfilePhotoLoaded(profilePhotoEndPoint)
-                }
-            }.getOrNull()
-        }
+    private suspend fun setupProfilePhoto(accountId: UUID, photoKey: String?) = withContext(Dispatchers.IO) {
+//        EndPoint.ofPhoto(accountId, photoKey)?.let { profilePhotoEndPoint ->
+//            runCatching {
+//                val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
+//                if (file.exists()) withContext(Dispatchers.Main) {
+//                    chatMessagePagingAdapter.onProfilePhotoLoaded(profilePhotoEndPoint)
+//                }
+//            }.getOrNull()
+//        }
     }
 
     private fun popBackStack() {

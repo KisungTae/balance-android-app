@@ -15,6 +15,12 @@ abstract class BaseRDS {
         val response = call()
         val headers = response.headers()
 
+        println("response: $response")
+
+//        Gson().toJson(response.errorBody()?.charStream())
+
+        println("error body: ${Gson().toJson(response.errorBody()?.toString())}")
+
         if (response.isSuccessful)
             return Resource.success(response.body())
 
@@ -22,6 +28,8 @@ abstract class BaseRDS {
             response.errorBody()?.charStream(),
             ErrorResponse::class.java
         )
+
+        println("errorResponse: $errorResponse")
 
         return Resource.error(
             errorResponse.message,

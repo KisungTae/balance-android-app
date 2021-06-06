@@ -70,7 +70,7 @@ class ProfileViewModel(
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    fun uploadPhoto(photoUri: Uri?, photoKey: UUID?) {
+    fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
         viewModelScope.safeLaunch(_uploadPhotoLiveData) {
             photoUri?.path?.let { path ->
                 val photoFile = File(path)
@@ -121,7 +121,7 @@ class ProfileViewModel(
     }
 
 
-    fun deletePhoto(photoKey: UUID) {
+    fun deletePhoto(photoKey: String) {
         viewModelScope.safeLaunch(_deletePhotoLiveData) {
             _deletePhotoLiveData.postValue(photoRepository.deletePhoto(photoKey))
         }

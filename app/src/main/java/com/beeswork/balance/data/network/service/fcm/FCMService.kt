@@ -15,6 +15,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -28,7 +29,7 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
     private val matchRepository: MatchRepository by instance()
     private val clickRepository: ClickRepository by instance()
     private val chatRepository: ChatRepository by instance()
-    private val scope: CoroutineScope by instance()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override fun onNewToken(token: String) {
         scope.safeLaunch<Any>(null) { settingRepository.saveFCMToken(token) }

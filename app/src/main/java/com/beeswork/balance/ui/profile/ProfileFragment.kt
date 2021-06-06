@@ -23,10 +23,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.databinding.FragmentProfileBinding
-import com.beeswork.balance.internal.constant.DateTimePattern
-import com.beeswork.balance.internal.constant.Gender
-import com.beeswork.balance.internal.constant.PhotoStatus
-import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
@@ -89,7 +86,10 @@ class ProfileFragment : BaseFragment(),
 
     private fun setupUploadPhotoLiveData() {
         viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError()) showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
+            if (it.isError()
+                && validateAccount(it.error, it.errorMessage)
+                && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
+                showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
         }
     }
 
@@ -313,7 +313,6 @@ class ProfileFragment : BaseFragment(),
     override fun onUploadPhotoFromCapture() {
         println("onUploadPhotoFromCapture")
     }
-
 
 
 //    private fun setupFetchPhotosLiveDataObserver() {

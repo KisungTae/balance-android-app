@@ -13,7 +13,7 @@ interface PhotoRDS {
     suspend fun savePhoto(
         accountId: UUID?,
         identityToken: UUID?,
-        photoKey: UUID,
+        photoKey: String,
         sequence: Int
     ): Resource<EmptyResponse>
 
@@ -26,13 +26,13 @@ interface PhotoRDS {
     suspend fun getPreSignedURL(
         accountId: UUID?,
         identityToken: UUID?,
-        photoKey: UUID
+        photoKey: String
     ): Resource<PreSignedURLDTO>
 
     suspend fun deletePhoto(
         accountId: UUID?,
         identityToken: UUID?,
-        photoKey: UUID
+        photoKey: String
     ): Resource<EmptyResponse>
 
     suspend fun listPhotos(

@@ -21,6 +21,7 @@
     <string name="error_title_add_photo">사진을 업로드 하지못했습니다</string>
 
 
+    <string name="unknown_host_exception">유효하지 않은 요청입니다</string>
 
 
     <string name="chat_message_over_sized_exception">채팅메세지가 너무 깁니다 줄여주세요</string>

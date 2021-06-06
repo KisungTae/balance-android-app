@@ -5,7 +5,7 @@ import com.beeswork.balance.internal.constant.PhotoStatus
 import java.util.*
 
 data class PhotoPicker(
-    var key: UUID?,
+    var key: String?,
     var status: PhotoStatus,
     var uriPath: Uri?,
     var sequence: Int,

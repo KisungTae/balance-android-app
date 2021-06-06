@@ -181,7 +181,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
             arguments.putString(BundleKey.SWIPED_ID, it.swipedId.toString())
             arguments.putString(BundleKey.SWIPED_NAME, it.name)
             arguments.putBoolean(BundleKey.UNMATCHED, it.unmatched)
-            arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, it.profilePhotoKey)
+            arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, it.profilePhotoKey.toString())
             chatFragment.arguments = arguments
         }
 
