@@ -442,3 +442,4 @@ class BalanceApplication : Application(), KodeinAware {
 //           flag in the table, and before diaply profile and photos in profileFragment, check if profile and photos are sycned
 //           if not, then display refresh button, and saveAbout, and upload, reorder, delete photo should check the flag in the table
 //           if not syched, then display error message saying you need to sync first before saving about or photos.
+//      126. check profile validation like about >= 500 characters,

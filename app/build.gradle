@@ -140,4 +140,6 @@ dependencies {
 //    implementation "androidx.emoji:emoji-appcompat:1.1.0"
 
 
+//    implementation "com.squareup.retrofit2:converter-simplexml:2.3.0"
+
 }

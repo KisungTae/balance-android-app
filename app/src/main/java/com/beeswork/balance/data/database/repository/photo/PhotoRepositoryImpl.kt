@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.repository.photo
 
 import android.net.Uri
+import android.nfc.tech.MifareUltralight
 import android.webkit.MimeTypeMap
 import com.beeswork.balance.data.database.dao.PhotoDAO
 import com.beeswork.balance.data.database.entity.Photo
@@ -19,6 +20,7 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
+import java.io.IOException
 import java.lang.Exception
 import java.util.*
 
@@ -80,8 +82,8 @@ class PhotoRepositoryImpl(
         val getPreSignedURLResponse = photoRDS.getPreSignedURL(
             preferenceProvider.getAccountId(),
             preferenceProvider.getIdentityToken(),
-//            photo.key
-            "6641d2f0-edf2-421f-af51-485bf142fb69"
+            photo.key
+//            "720ff7cc-4ec8-48d7-89a2-d190df74b5cd.jpg"
         )
 
         if (getPreSignedURLResponse.isError()) {
@@ -123,7 +125,7 @@ class PhotoRepositoryImpl(
     }
 
     private suspend fun uploadPhotoToS3(
-        photo: File,
+        photoFile: File,
         photoKey: String,
         mimeType: String,
         url: String,
@@ -133,19 +135,25 @@ class PhotoRepositoryImpl(
         for ((key, value) in fields) {
             formData[key] = RequestBody.create(MultipartBody.FORM, value)
         }
-        val requestBody = RequestBody.create(MediaType.parse(mimeType), photo)
-        val multiPartBody = MultipartBody.Part.createFormData(FILE, photoKey.toString(), requestBody)
 
-        println("url: $url")
+        formData["Content-Type"] = RequestBody.create(MultipartBody.FORM, "")
+
+        val requestBody = RequestBody.create(MediaType.parse(mimeType), photoFile)
+        val multiPartBody = MultipartBody.Part.createFormData(FILE, photoKey, requestBody)
+        val response = photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
+
+        if (response.isSuccess()) deletePhoto(photoFile)
+        return response
+    }
+
+    private fun deletePhoto(photoFile: File) {
         try {
-            photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
-        } catch (e: Exception) {
-            println("e: ${e.cause}")
-            println("e: ${e.localizedMessage}")
-            println("exception is thrown")
+            photoFile.delete()
+        } catch (e: IOException) {
+            // TODO: log exception?
+        } catch (e: SecurityException) {
+            // TODO: log exception?
         }
-        return Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
-//        return photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
     }
 
 

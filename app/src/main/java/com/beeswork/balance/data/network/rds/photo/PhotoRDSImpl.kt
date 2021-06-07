@@ -30,7 +30,13 @@ class PhotoRDSImpl(
         formData: Map<String, RequestBody>,
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse> {
-        return getResult { balanceAPI.uploadPhotoToS3(url, formData, multipartBody) }
+        return getResult {
+            val response = balanceAPI.uploadPhotoToS3(url, formData, multipartBody)
+            println("response: ${response.raw()}")
+            println("response: ${response.body()}")
+
+            response
+        }
     }
 
     override suspend fun getPreSignedURL(

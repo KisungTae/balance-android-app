@@ -5,8 +5,8 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 class Resource<out T>(
     val status: Status,
     val data: T?,
-    val errorMessage: String?,
     val error: String?,
+    val errorMessage: String?,
     val fieldErrorMessages: Map<String, String>?
 ) {
 
@@ -60,16 +60,16 @@ class Resource<out T>(
         }
 
         fun <T> error(
-            errorMessage: String,
-            error: String,
+            error: String?,
+            errorMessage: String?,
             fieldErrorMessages: Map<String, String>?
         ): Resource<T> {
             return Resource(Status.ERROR, null, errorMessage, error, fieldErrorMessages)
         }
 
         fun <T> error(
-            errorMessage: String?,
             error: String?,
+            errorMessage: String?,
         ): Resource<T> {
             return Resource(Status.ERROR, null, errorMessage, error, null)
         }
