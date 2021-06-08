@@ -39,7 +39,8 @@ interface PhotoDAO {
     @Query("update photo set status = :status, saved = :saved where `key` = :key")
     fun updateOnPhotoSaved(key: String, status: PhotoStatus = PhotoStatus.OCCUPIED, saved: Boolean = true)
 
-
+    @Query("delete from photo where `key` = :photoKey")
+    fun deletePhoto(photoKey: String)
 
 
 
@@ -55,8 +56,7 @@ interface PhotoDAO {
 //    @Query("delete from photo where `key` not in (:photoIds)")
 //    fun deletePhotosNotIn(photoIds: List<String>)
 
-//    @Query("delete from photo where `key` = :photoKey")
-//    fun deletePhoto(photoKey: String)
+
 
     @Query("update photo set sequence = :sequence where `key` = :photoKey")
     fun updateSequence(photoKey: String, sequence: Int)

@@ -11,11 +11,16 @@ import java.util.*
 
 abstract class BaseRDS {
 
-    protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
+    protected suspend fun <T> getResultForAWS(call: suspend () -> Response<T>): Resource<T> {
         val response = call()
 
         if (response.isSuccessful)
             return Resource.success(response.body())
+
+//        response.errorBody()?.charStream()?.forEachLine {
+//            println("printing charstream")
+//            println(it)
+//        }
 
         if (response.headers()["Content-Type"] == "application/xml") {
             val factory = XmlPullParserFactory.newInstance()
@@ -45,21 +50,19 @@ abstract class BaseRDS {
             return Resource.error(error, message)
         }
 
-//        response.errorBody()?.charStream()?.forEachLine {
-//            println("printing charstream")
-//            println(it)
-//        }
+        val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
+        return Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
+    }
 
-        val errorResponse = Gson().fromJson(
-            response.errorBody()?.charStream(),
-            ErrorResponse::class.java
-        )
+    protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
+        val response = call()
 
-        return Resource.error(
-            errorResponse.error,
-            errorResponse.message,
-            errorResponse.fieldErrorMessages
-        )
+        if (response.isSuccessful)
+            return Resource.success(response.body())
+
+        val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
+        return Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
+
 //        try {
 //            val response = call()
 //            val headers = response.headers()

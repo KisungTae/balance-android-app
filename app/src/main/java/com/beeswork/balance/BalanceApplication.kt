@@ -67,7 +67,7 @@ import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
-import com.beeswork.balance.ui.profile.ProfileBalanceGameViewModelFactory
+import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profile.ProfileViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeBalanceGameViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeFilterDialogViewModelFactory

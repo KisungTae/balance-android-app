@@ -1,7 +1,7 @@
 package com.beeswork.balance.internal.mapper.profile
 
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
-import com.beeswork.balance.ui.profile.QuestionDomain
+import com.beeswork.balance.ui.profile.balancegame.QuestionDomain
 
 class QuestionMapperImpl: QuestionMapper {
 

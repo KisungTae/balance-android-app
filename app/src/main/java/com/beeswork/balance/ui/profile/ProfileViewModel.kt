@@ -13,11 +13,11 @@ import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import com.beeswork.balance.ui.profile.photo.PhotoPicker
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.*
 
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
@@ -79,7 +79,7 @@ class ProfileViewModel(
                     val response = photoRepository.uploadPhoto(photoFile, photoUri, extension, photoKey)
                     _uploadPhotoLiveData.postValue(response)
                 } else photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.UPLOAD_ERROR) }
-            }
+            } ?: _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION))
         }
     }
 

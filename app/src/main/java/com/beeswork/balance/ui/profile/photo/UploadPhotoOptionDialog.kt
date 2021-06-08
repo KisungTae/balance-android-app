@@ -1,18 +1,18 @@
-package com.beeswork.balance.ui.profile
+package com.beeswork.balance.ui.profile.photo
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.DialogAddPhotoOptionBinding
+import com.beeswork.balance.databinding.DialogUploadPhotoOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class AddPhotoOptionDialog(
-    private val addPhotoOptionListener: AddPhotoOptionListener
+class UploadPhotoOptionDialog(
+    private val photoPickerOptionListener: PhotoPickerOptionListener
 ) : BottomSheetDialogFragment() {
 
-    private lateinit var binding: DialogAddPhotoOptionBinding
+    private lateinit var binding: DialogUploadPhotoOptionBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +20,7 @@ class AddPhotoOptionDialog(
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DialogAddPhotoOptionBinding.inflate(inflater)
+        binding = DialogUploadPhotoOptionBinding.inflate(inflater)
         return binding.root
     }
 
@@ -29,20 +29,15 @@ class AddPhotoOptionDialog(
         binding.btnPhotoAddOptionClose.setOnClickListener { dismiss() }
         binding.btnUploadPhotoFromCapture.setOnClickListener {
             dismiss()
-            addPhotoOptionListener.onUploadPhotoFromCapture()
+            photoPickerOptionListener.uploadPhotoFromCapture()
         }
         binding.btnUploadPhotoFromGallery.setOnClickListener {
             dismiss()
-            addPhotoOptionListener.onUploadPhotoFromGallery()
+            photoPickerOptionListener.uploadPhotoFromGallery()
         }
     }
 
     companion object {
         const val TAG = "photoAddOptionDialog"
-    }
-
-    interface AddPhotoOptionListener {
-        fun onUploadPhotoFromGallery()
-        fun onUploadPhotoFromCapture()
     }
 }

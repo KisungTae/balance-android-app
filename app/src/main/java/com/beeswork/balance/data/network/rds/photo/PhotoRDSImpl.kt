@@ -30,12 +30,8 @@ class PhotoRDSImpl(
         formData: Map<String, RequestBody>,
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse> {
-        return getResult {
-            val response = balanceAPI.uploadPhotoToS3(url, formData, multipartBody)
-            println("response: ${response.raw()}")
-            println("response: ${response.body()}")
-
-            response
+        return getResultForAWS {
+            balanceAPI.uploadPhotoToS3(url, formData, multipartBody)
         }
     }
 
@@ -50,7 +46,11 @@ class PhotoRDSImpl(
     }
 
 
-    override suspend fun deletePhoto(accountId: UUID?, identityToken: UUID?, photoKey: String): Resource<EmptyResponse> {
+    override suspend fun deletePhoto(
+        accountId: UUID?,
+        identityToken: UUID?,
+        photoKey: String
+    ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.deletePhoto(DeletePhotoBody(accountId, identityToken, photoKey))
         }

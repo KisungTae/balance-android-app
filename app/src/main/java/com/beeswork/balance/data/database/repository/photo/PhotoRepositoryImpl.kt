@@ -83,7 +83,6 @@ class PhotoRepositoryImpl(
             preferenceProvider.getAccountId(),
             preferenceProvider.getIdentityToken(),
             photo.key
-//            "720ff7cc-4ec8-48d7-89a2-d190df74b5cd.jpg"
         )
 
         if (getPreSignedURLResponse.isError()) {
@@ -135,9 +134,6 @@ class PhotoRepositoryImpl(
         for ((key, value) in fields) {
             formData[key] = RequestBody.create(MultipartBody.FORM, value)
         }
-
-        formData["Content-Type"] = RequestBody.create(MultipartBody.FORM, "")
-
         val requestBody = RequestBody.create(MediaType.parse(mimeType), photoFile)
         val multiPartBody = MultipartBody.Part.createFormData(FILE, photoKey, requestBody)
         val response = photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
@@ -177,13 +173,18 @@ class PhotoRepositoryImpl(
     }
 
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
-//        return withContext(Dispatchers.IO) {
-//            photoDAO.findByKey(photoKey)?.let { photo ->
-//                if (!photo.photoCreated && !photo.photoUploaded)
-//
-//            } ?: return@withContext Resource.success(EmptyResponse())
-//        }
-        return Resource.success(null)
+        return withContext(Dispatchers.IO) {
+            photoDAO.findByKey(photoKey)?.let { photo ->
+                val response = if (photo.uploaded || photo.saved) photoRDS.deletePhoto(
+                    preferenceProvider.getAccountId(),
+                    preferenceProvider.getIdentityToken(),
+                    photo.key
+                ) else Resource.success(null)
+
+                if (response.isSuccess()) photoDAO.deletePhoto(photo.key)
+                return@withContext response
+            } ?: return@withContext Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION)
+        }
     }
 
     override suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus) {

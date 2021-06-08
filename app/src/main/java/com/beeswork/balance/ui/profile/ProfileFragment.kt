@@ -28,6 +28,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameDialog
+import com.beeswork.balance.ui.profile.photo.*
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
@@ -40,7 +42,7 @@ class ProfileFragment : BaseFragment(),
     HeightOptionDialog.HeightOptionDialogListener,
     PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
     ErrorDialog.OnRetryListener,
-    AddPhotoOptionDialog.AddPhotoOptionListener {
+    PhotoPickerOptionListener {
 
     override val kodein by closestKodein()
     private val preferenceProvider: PreferenceProvider by instance()
@@ -88,7 +90,8 @@ class ProfileFragment : BaseFragment(),
         viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
             if (it.isError()
                 && validateAccount(it.error, it.errorMessage)
-                && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
+                && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
+            )
                 showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
         }
     }
@@ -220,14 +223,20 @@ class ProfileFragment : BaseFragment(),
     override fun onClickPhotoPicker(position: Int) {
         val photoPicker = photoPickerRecyclerViewAdapter.getPhotoPicker(position)
         when (photoPicker.status) {
-            PhotoStatus.EMPTY -> AddPhotoOptionDialog(this).show(childFragmentManager, AddPhotoOptionDialog.TAG)
-//            PhotoPicker.Status.OCCUPIED,
-//            PhotoPicker.Status.UPLOAD_ERROR,
-//            PhotoPicker.Status.DOWNLOAD_ERROR -> EditPhotoOptionDialog().show(
-//                childFragmentManager,
-//                EditPhotoOptionDialog.TAG
-//            )
-//            else -> println("")
+            PhotoStatus.EMPTY -> UploadPhotoOptionDialog(this).show(childFragmentManager, UploadPhotoOptionDialog.TAG)
+            PhotoStatus.OCCUPIED -> DeletePhotoOptionDialog(photoPicker.key, this).show(
+                childFragmentManager,
+                DeletePhotoOptionDialog.TAG
+            )
+            PhotoStatus.UPLOAD_ERROR -> UploadPhotoErrorOptionDialog(photoPicker.uri, photoPicker.key, this).show(
+                childFragmentManager,
+                UploadPhotoErrorOptionDialog.TAG
+            )
+            PhotoStatus.DOWNLOAD_ERROR -> DownloadPhotoErrorOptionDialog(photoPicker.key, this).show(
+                childFragmentManager,
+                DownloadPhotoErrorOptionDialog.TAG
+            )
+            else -> println("")
         }
     }
 
@@ -238,15 +247,8 @@ class ProfileFragment : BaseFragment(),
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onUploadPhotoFromGallery() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (hasExternalStoragePermission()) selectPhotoFromGallery()
-            else requestPermissionForGallery.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else selectPhotoFromGallery()
-    }
-
     private fun selectPhotoFromGallery() {
-        val intent = Intent(Intent.ACTION_PICK);
+        val intent = Intent(Intent.ACTION_PICK)
         intent.type = ProfileDialog.PHOTO_INTENT_TYPE
         intent.putExtra(Intent.EXTRA_MIME_TYPES, ProfileDialog.PHOTO_MIME_TYPES)
         intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -268,35 +270,6 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    private fun uploadPhoto(photoUri: Uri?) {
-//        viewModel.uploadPhoto(photoUri)
-//        photoUri?.path?.let { path ->
-//            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
-//            val key = photoKey ?: "${generatePhotoKey()}.$extension"
-//            val adapter = photoPickerRecyclerViewAdapter()
-//            val sequence = adapter.uploadPhoto(key, photoUri)
-//            if (sequence == -1) return
-//
-//            CoroutineScope(Dispatchers.IO).launch {
-//                val response = balanceRepository.uploadPhoto(key, extension, path, sequence)
-//                withContext(Dispatchers.Main) {
-//                    if (response.isSuccess())
-//                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.OCCUPIED)
-//                    else if (response.isError()) {
-//                        ExceptionDialog(response.errorMessage, null).show(
-//                            childFragmentManager,
-//                            ExceptionDialog.TAG
-//                        )
-//                        adapter.updatePhotoPickerStatus(key, PhotoPicker.Status.UPLOAD_ERROR)
-//                    }
-//                }
-//            }
-//        } ?: ExceptionDialog(getString(R.string.photo_not_found_exception), null).show(
-//            childFragmentManager,
-//            ExceptionDialog.TAG
-//        )
-    }
-
     private fun launchCropImage(uri: Uri) {
         CropImage.activity(uri)
             .setGuidelines(CropImageView.Guidelines.ON)
@@ -310,26 +283,27 @@ class ProfileFragment : BaseFragment(),
     }
 
 
-    override fun onUploadPhotoFromCapture() {
-        println("onUploadPhotoFromCapture")
+    override fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
+        viewModel.uploadPhoto(photoUri, photoKey)
     }
 
+    override fun downloadPhoto(photoKey: String?) {
+        TODO("Not yet implemented")
+    }
 
-//    private fun setupFetchPhotosLiveDataObserver() {
-//        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
-//            when {
-//                it.isSuccess() -> it.data?.let { photos -> photoPickerRecyclerViewAdapter.initPhotoPicker(photos) }
-//                it.isError() && validateAccount(it.error, it.errorMessage) -> {
-//                    binding.btnProfileRefresh.visibility = View.VISIBLE
-//                    showErrorDialog(
-//                        it.error,
-//                        getString(R.string.error_title_fetch_photos),
-//                        it.errorMessage,
-//                        RequestCode.FETCH_PHOTOS,
-//                        this
-//                    )
-//                }
-//            }
-//        }
-//    }
+    override fun deletePhoto(photoKey: String?) {
+        photoKey?.let { key -> viewModel.deletePhoto(key) }
+    }
+
+    override fun uploadPhotoFromGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (hasExternalStoragePermission()) selectPhotoFromGallery()
+            else requestPermissionForGallery.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else selectPhotoFromGallery()
+    }
+
+    override fun uploadPhotoFromCapture() {
+        TODO("Not yet implemented")
+    }
+
 }

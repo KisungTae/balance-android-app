@@ -5,13 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.internal.util.safeLaunch
-import com.beeswork.balance.ui.profile.QuestionDomain
+import com.beeswork.balance.ui.profile.balancegame.QuestionDomain
 import java.util.*
 
 class SwipeBalanceGameViewModel(

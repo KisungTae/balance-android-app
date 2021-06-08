@@ -164,4 +164,6 @@
     <string name="photo_picker_option_upload_from_capture">사진찍어서 올리기</string>
     <string name="delete_text">삭제하기</string>
     <string name="photo_picker_option_title">사진옵션</string>
+    <string name="reupload_text">다시 업로드하기</string>
+    <string name="redownload_text">다시 다운로드</string>
 </resources>

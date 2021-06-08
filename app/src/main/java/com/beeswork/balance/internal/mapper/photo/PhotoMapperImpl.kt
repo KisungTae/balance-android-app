@@ -1,7 +1,7 @@
 package com.beeswork.balance.internal.mapper.photo
 
 import com.beeswork.balance.data.database.entity.Photo
-import com.beeswork.balance.ui.profile.PhotoPicker
+import com.beeswork.balance.ui.profile.photo.PhotoPicker
 
 class PhotoMapperImpl : PhotoMapper {
 

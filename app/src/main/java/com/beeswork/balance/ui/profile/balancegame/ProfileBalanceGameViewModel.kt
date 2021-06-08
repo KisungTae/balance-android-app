@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.profile
+package com.beeswork.balance.ui.profile.balancegame
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

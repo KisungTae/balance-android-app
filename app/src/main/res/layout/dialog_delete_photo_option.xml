@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDeletePhoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:background="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
+        android:text="@string/download_text"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDeletePhotoClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/sh_bottom_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
+        android:text="@string/dialog_close_btn_title"
+        android:textColor="@color/TextGrey" />
+
+</LinearLayout>

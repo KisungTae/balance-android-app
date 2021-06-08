@@ -64,20 +64,20 @@ class Resource<out T>(
             errorMessage: String?,
             fieldErrorMessages: Map<String, String>?
         ): Resource<T> {
-            return Resource(Status.ERROR, null, errorMessage, error, fieldErrorMessages)
+            return Resource(Status.ERROR, null, error, errorMessage, fieldErrorMessages)
         }
 
         fun <T> error(
             error: String?,
             errorMessage: String?,
         ): Resource<T> {
-            return Resource(Status.ERROR, null, errorMessage, error, null)
+            return Resource(Status.ERROR, null, error, errorMessage, null)
         }
 
         fun <T> error(
             error: String,
         ): Resource<T> {
-            return Resource(Status.ERROR, null, null, error, null)
+            return Resource(Status.ERROR, null, error, null, null)
         }
 
 

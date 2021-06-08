@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.profile
+package com.beeswork.balance.ui.profile.balancegame
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,10 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogProfileBalanceGameBinding
-import com.beeswork.balance.databinding.DialogSwipeBalanceGameBinding
-import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.ui.common.BalanceGame
-import com.beeswork.balance.ui.swipe.SwipeBalanceGameViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein

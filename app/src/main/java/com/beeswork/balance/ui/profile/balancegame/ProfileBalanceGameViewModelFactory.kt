@@ -1,10 +1,9 @@
-package com.beeswork.balance.ui.profile
+package com.beeswork.balance.ui.profile.balancegame
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
-import com.beeswork.balance.ui.swipe.SwipeBalanceGameViewModel
 
 class ProfileBalanceGameViewModelFactory(
     private val profileRepository: ProfileRepository,

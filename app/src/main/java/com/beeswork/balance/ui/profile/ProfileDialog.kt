@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,6 +23,8 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.dialog.ExceptionDialog
+import com.beeswork.balance.ui.profile.photo.PhotoPicker
+import com.beeswork.balance.ui.profile.photo.PhotoPickerRecyclerViewAdapter
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.CoroutineScope
@@ -33,14 +34,10 @@ import kotlinx.coroutines.withContext
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 
 
 class ProfileDialog : DialogFragment(), KodeinAware,
-    PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
-    PhotoPickerOptionDialog.PhotoPickerOptionListener {
+    PhotoPickerRecyclerViewAdapter.PhotoPickerListener{
 
     override val kodein by closestKodein()
     private val balanceRepository: BalanceRepository by instance()
@@ -143,15 +140,15 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         startActivityForResult(intent, RequestCode.READ_PHOTO_FROM_GALLERY)
     }
 
-    override fun onUploadPhotoFromGallery() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (hasExternalStoragePermission()) selectPhotoFromGallery()
-            else requestPermissions(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                RequestCode.READ_PHOTO_FROM_GALLERY
-            )
-        } else selectPhotoFromGallery()
-    }
+//    override fun onUploadPhotoFromGallery() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (hasExternalStoragePermission()) selectPhotoFromGallery()
+//            else requestPermissions(
+//                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+//                RequestCode.READ_PHOTO_FROM_GALLERY
+//            )
+//        } else selectPhotoFromGallery()
+//    }
 
     // CASE 1. Read an image from gallery and deleted when launch CropImage --> CropImage activity will result in error
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -173,9 +170,9 @@ class ProfileDialog : DialogFragment(), KodeinAware,
         }
     }
 
-    override fun onReuploadPhoto(photoKey: String) {
-//        uploadPhoto(photoUri, photoKey)
-    }
+//    override fun onReuploadPhoto(photoKey: String) {
+////        uploadPhoto(photoUri, photoKey)
+//    }
 
     private fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
 //        photoUri?.path?.let { path ->
@@ -230,38 +227,38 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 //        )
 //    }
 
-    override fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
-        val adapter = photoPickerRecyclerViewAdapter()
-        adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.LOADING)
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val response = balanceRepository.deletePhoto(photoKey)
-            withContext(Dispatchers.Main) {
-                if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
-                    adapter.deletePhoto(photoKey)
-                else if (response.isError()) {
-                    ExceptionDialog(response.errorMessage, null).show(
-                        childFragmentManager,
-                        ExceptionDialog.TAG
-                    )
-                    adapter.updatePhotoPickerStatus(photoKey, photoPickerStatus)
-                }
-            }
-        }
-    }
-
-    override fun onRedownloadPhoto(photoKey: String) {
-        photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
-            photoKey,
-            PhotoPicker.Status.DOWNLOADING
-        )
-    }
-
-
-
-    override fun onUploadPhotoFromCapture() {
-
-    }
+//    override fun onDeletePhoto(photoKey: String, photoPickerStatus: PhotoPicker.Status) {
+//        val adapter = photoPickerRecyclerViewAdapter()
+//        adapter.updatePhotoPickerStatus(photoKey, PhotoPicker.Status.LOADING)
+//
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val response = balanceRepository.deletePhoto(photoKey)
+//            withContext(Dispatchers.Main) {
+//                if (response.isSuccess() || response.error == ExceptionCode.PHOTO_NOT_FOUND_EXCEPTION)
+//                    adapter.deletePhoto(photoKey)
+//                else if (response.isError()) {
+//                    ExceptionDialog(response.errorMessage, null).show(
+//                        childFragmentManager,
+//                        ExceptionDialog.TAG
+//                    )
+//                    adapter.updatePhotoPickerStatus(photoKey, photoPickerStatus)
+//                }
+//            }
+//        }
+//    }
+//
+//    override fun onRedownloadPhoto(photoKey: String) {
+//        photoPickerRecyclerViewAdapter().updatePhotoPickerStatus(
+//            photoKey,
+//            PhotoPicker.Status.DOWNLOADING
+//        )
+//    }
+//
+//
+//
+//    override fun onUploadPhotoFromCapture() {
+//
+//    }
 
     private fun photoPickerRecyclerViewAdapter(): PhotoPickerRecyclerViewAdapter {
         return binding.rvPhotoPicker.adapter as PhotoPickerRecyclerViewAdapter
