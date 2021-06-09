@@ -2,6 +2,7 @@ package com.beeswork.balance.internal.util
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -126,3 +127,6 @@ fun <T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>> {
         }
     }
 }
+
+
+fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()

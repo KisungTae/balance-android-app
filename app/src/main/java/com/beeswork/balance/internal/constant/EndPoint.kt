@@ -7,7 +7,8 @@ class EndPoint {
 
     companion object {
 //        const val PHOTO_BUCKET = "https://balance-photo-bucket.s3.ap-northeast-2.amazonaws.com"
-        private const val PHOTO_BUCKET = "https://test-balance-photo-bucket.s3-ap-southeast-2.amazonaws.com"
+//        private const val PHOTO_BUCKET = "https://test-balance-photo-bucket.s3-ap-southeast-2.amazonaws.com"
+        private const val PHOTO_BUCKET = "https://test-balance-photo-bucket.s3-ap-southeast-2.amazonaw.com"
 //        const val WEB_SOCKET_ENDPOINT = "ws://10.0.2.2:8080/chat"
         const val WEB_SOCKET_ENDPOINT = "ws://192.168.1.100:8081/chat"
 //        const val WEB_SOCKET_ENDPOINT = "ws://192.168.1.92:8081/chat"

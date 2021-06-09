@@ -14,7 +14,7 @@ data class Photo(
     val key: String,
 
     var status: PhotoStatus,
-    var uri: Uri?,
+    var uri: Uri,
     var sequence: Int,
     var oldSequence: Int,
     var uploaded: Boolean,

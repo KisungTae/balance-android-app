@@ -91,8 +91,7 @@ class ProfileFragment : BaseFragment(),
             if (it.isError()
                 && validateAccount(it.error, it.errorMessage)
                 && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
-            )
-                showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
+            ) showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
         }
     }
 
@@ -283,12 +282,12 @@ class ProfileFragment : BaseFragment(),
     }
 
 
-    override fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
+    override fun reuploadPhoto(photoUri: Uri?, photoKey: String?) {
         viewModel.uploadPhoto(photoUri, photoKey)
     }
 
-    override fun downloadPhoto(photoKey: String?) {
-        TODO("Not yet implemented")
+    override fun redownloadPhoto(photoKey: String?) {
+        photoKey?.let { key -> photoPickerRecyclerViewAdapter.downloadPhoto(key) }
     }
 
     override fun deletePhoto(photoKey: String?) {

@@ -1,6 +1,7 @@
 package com.beeswork.balance.ui.profile.photo
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,19 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.ItemPhotoPickerBinding
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.PhotoStatus
+import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.toPx
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.github.ybq.android.spinkit.SpinKitView
+import java.io.File
 import java.util.*
 
 class PhotoPickerRecyclerViewAdapter(
@@ -48,13 +60,12 @@ class PhotoPickerRecyclerViewAdapter(
         return photoPickers[position]
     }
 
-
-
-
-
-
-
-
+    fun downloadPhoto(photoKey: String) {
+        val index = photoPickers.indexOfFirst { it.key == photoKey }
+        val photoPicker = photoPickers[index]
+        photoPicker.status = PhotoStatus.OCCUPIED
+        notifyItemChanged(index)
+    }
 
 
     fun uploadPhoto(photoKey: String, photoUri: Uri?): Int {
@@ -186,6 +197,7 @@ class PhotoPickerRecyclerViewAdapter(
 
     interface PhotoPickerListener {
         fun onClickPhotoPicker(position: Int)
+        fun onDownloadPhotoError(position: Int)
     }
 
     class ViewHolder(
@@ -201,52 +213,74 @@ class PhotoPickerRecyclerViewAdapter(
 
         fun bind(photoPicker: PhotoPicker) {
             when (photoPicker.status) {
-                PhotoStatus.EMPTY -> showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                PhotoStatus.LOADING -> showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                PhotoStatus.UPLOADING -> {
-
-                    showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                PhotoStatus.EMPTY -> showEmpty()
+                PhotoStatus.LOADING -> showLoading()
+                PhotoStatus.UPLOAD_ERROR -> showUploadError()
+                PhotoStatus.OCCUPIED -> {
+                    photoPicker.status = PhotoStatus.LOADING
+                    loadPhoto(itemView, photoPicker)
                 }
-                PhotoStatus.UPLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE)
-                PhotoStatus.DOWNLOAD_ERROR -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
-                PhotoStatus.OCCUPIED -> showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
-                PhotoStatus.DOWNLOADING -> {
-                    loadPhotoFromUrl(itemView, photoPicker)
-                    showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                }
+                PhotoStatus.UPLOADING -> loadPhoto(itemView, photoPicker)
+                else -> println()
             }
         }
 
-        private fun loadPhotoFromUrl(itemView: View, photoPicker: PhotoPicker) {
-//            photoPicker.key?.let { key ->
-//                showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE)
-//                Glide.with(context).load(EndPoint.ofPhoto(accountId, key))
-//                    .apply(GlideHelper.photoPickerGlideOptions())
-//                    .listener(object : RequestListener<Drawable> {
-//                        override fun onLoadFailed(
-//                            e: GlideException?,
-//                            model: Any?,
-//                            target: Target<Drawable>?,
-//                            isFirstResource: Boolean
-//                        ): Boolean {
-//                            photoPicker.status = PhotoPicker.Status.DOWNLOAD_ERROR
-//                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE)
-//                            return false
-//                        }
-//
-//                        override fun onResourceReady(
-//                            resource: Drawable?,
-//                            model: Any?,
-//                            target: Target<Drawable>?,
-//                            dataSource: DataSource?,
-//                            isFirstResource: Boolean
-//                        ): Boolean {
-//                            photoPicker.status = PhotoPicker.Status.OCCUPIED
-//                            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE)
-//                            return false
-//                        }
-//                    }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
-//            }
+        private fun showEmpty() {
+            showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE, View.GONE)
+        }
+
+        private fun showLoading() {
+            showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE)
+        }
+
+        private fun showUploadError() {
+            showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+        }
+
+        private fun showDownloadError() {
+            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE, View.GONE)
+        }
+
+        private fun showOccupied() {
+            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE, View.VISIBLE)
+        }
+
+
+        private fun loadPhoto(itemView: View, photoPicker: PhotoPicker) {
+            showLoading()
+
+            val photoEndPoint = photoPicker.uri?.path?.let { path ->
+                val photoFile = File(path)
+                if (photoFile.exists()) path else EndPoint.ofPhoto(accountId, photoPicker.key)
+            } ?: EndPoint.ofPhoto(accountId, photoPicker.key)
+
+            Glide.with(context).load(photoEndPoint)
+                .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toPx()))
+                .apply(GlideHelper.photoPickerGlideOptions())
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        photoPicker.status = PhotoStatus.DOWNLOAD_ERROR
+                        showDownloadError()
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        photoPicker.status = PhotoStatus.OCCUPIED
+                        showOccupied()
+                        return false
+                    }
+                }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
         }
 
         private fun showLayout(
@@ -254,12 +288,16 @@ class PhotoPickerRecyclerViewAdapter(
             add: Int,
             loading: Int,
             uploadError: Int,
-            downloadError: Int
+            downloadError: Int,
+            delete: Int
         ) {
             itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_ADD).visibility = add
             itemView.findViewWithTag<SpinKitView>(SKV_PHOTO_PICKER_LOADING).visibility = loading
             itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_UPLOAD_ERROR).visibility = uploadError
             itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DOWNLOAD_ERROR).visibility = downloadError
+            val maskVisibility = if (uploadError == View.VISIBLE || downloadError == View.VISIBLE) View.VISIBLE else View.GONE
+            itemView.findViewWithTag<View>(VIEW_PHOTO_PICKER_MASK).visibility = maskVisibility
+            itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_DELETE_ICON).visibility = delete
         }
 
         override fun onClick(view: View?) {
@@ -272,13 +310,16 @@ class PhotoPickerRecyclerViewAdapter(
             private const val SKV_PHOTO_PICKER_LOADING = "photoPickerLoading"
             private const val IV_PHOTO_PICKER_UPLOAD_ERROR = "photoPickerUploadError"
             private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR = "photoPickerDownloadError"
+            private const val VIEW_PHOTO_PICKER_MASK = "photoPickerMask"
+            private const val IV_PHOTO_PICKER_DELETE_ICON = "photoPickerDeleteIcon"
+            private const val PHOTO_ROUND_CORNER_DP = 5
         }
     }
 
     class PhotoPickerDiffCallBack(
         var oldList: List<PhotoPicker>,
         var newList: List<PhotoPicker>
-    ): DiffUtil.Callback() {
+    ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int {
             return oldList.size
         }
@@ -294,8 +335,7 @@ class PhotoPickerRecyclerViewAdapter(
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
-
-
     }
+
 
 }

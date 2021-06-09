@@ -36,7 +36,7 @@ class UploadPhotoErrorOptionDialog(
         }
         binding.btnUploadPhotoErrorReupload.setOnClickListener {
             dismiss()
-            photoPickerOptionListener.uploadPhoto(photoUri, photoKey)
+            photoPickerOptionListener.reuploadPhoto(photoUri, photoKey)
         }
     }
 

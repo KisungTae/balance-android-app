@@ -31,7 +31,6 @@ class GlideHelper {
             return RequestOptions()
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .priority(Priority.HIGH)
-                .centerCrop()
         }
     }
 }

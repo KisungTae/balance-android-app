@@ -9,10 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="15dp"
-        android:background="@color/BackgroundWhite"
+        android:background="@drawable/sh_top_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
-        android:text="@string/download_text"
-        android:visibility="gone" />
+        android:text="@string/delete_text" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnDeletePhotoClose"

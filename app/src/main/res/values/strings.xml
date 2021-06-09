@@ -166,4 +166,5 @@
     <string name="photo_picker_option_title">사진옵션</string>
     <string name="reupload_text">다시 업로드하기</string>
     <string name="redownload_text">다시 다운로드</string>
+    <string name="delete_photo_icon_description">delete photo icon</string>
 </resources>

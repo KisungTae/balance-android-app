@@ -134,12 +134,13 @@ class PhotoRepositoryImpl(
         for ((key, value) in fields) {
             formData[key] = RequestBody.create(MultipartBody.FORM, value)
         }
+
+//      TODO: remove me
+        formData.put("Content-Type", RequestBody.create(MultipartBody.FORM, ""))
+
         val requestBody = RequestBody.create(MediaType.parse(mimeType), photoFile)
         val multiPartBody = MultipartBody.Part.createFormData(FILE, photoKey, requestBody)
-        val response = photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
-
-        if (response.isSuccess()) deletePhoto(photoFile)
-        return response
+        return photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
     }
 
     private fun deletePhoto(photoFile: File) {
@@ -195,7 +196,7 @@ class PhotoRepositoryImpl(
 
     override suspend fun test() {
         withContext(ioDispatcher) {
-            photoDAO.insert(Photo("", PhotoStatus.EMPTY, null, 100, 100, false, false))
+//            photoDAO.insert(Photo("", PhotoStatus.EMPTY, null, 100, 100, false, false))
         }
     }
 

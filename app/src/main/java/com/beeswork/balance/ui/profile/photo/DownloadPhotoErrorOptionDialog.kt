@@ -34,7 +34,7 @@ class DownloadPhotoErrorOptionDialog(
         }
         binding.btnDownloadPhotoErrorRedownload.setOnClickListener {
             dismiss()
-            photoPickerOptionListener.downloadPhoto(photoKey)
+            photoPickerOptionListener.redownloadPhoto(photoKey)
         }
     }
 

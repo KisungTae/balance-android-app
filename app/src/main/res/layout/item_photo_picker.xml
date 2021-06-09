@@ -15,11 +15,33 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/photo_picker_photo_iv_description"
             android:tag="photoPickerPhoto" />
+
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="@string/delete_photo_icon_description"
+            android:src="@drawable/ic_baseline_close"
+            android:tag="photoPickerDeleteIcon"
+            app:tint="@color/lighterGrey" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha=".2"
+            android:background="@drawable/sh_round_box"
+            android:backgroundTint="@color/Black"
+            android:tag="photoPickerMask"
+            android:visibility="gone" />
 
         <ImageView
             android:layout_width="@dimen/photo_picker_icon_size"
