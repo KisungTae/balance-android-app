@@ -40,7 +40,6 @@ abstract class BaseRDS {
                         text = parser.text
                     }
                     XmlPullParser.END_TAG -> {
-                        println("$tagName: $text")
                         if (tagName.toLowerCase(Locale.ROOT) == "code") error = text
                         if (tagName.toLowerCase(Locale.ROOT) == "message") message = text
                     }

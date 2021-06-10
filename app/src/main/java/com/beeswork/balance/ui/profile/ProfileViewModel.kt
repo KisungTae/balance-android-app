@@ -15,6 +15,7 @@ import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.profile.photo.PhotoPicker
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File
@@ -44,6 +45,9 @@ class ProfileViewModel(
 
     private val _orderPhotosLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val orderPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _deletePhotoLiveData
+
+    private val _syncPhotosLiveData = MutableLiveData<Boolean>()
+    val syncPhotosLiveData: LiveData<Boolean> get() = _syncPhotosLiveData
 
     fun fetchProfile() {
         viewModelScope.launch {
@@ -83,10 +87,6 @@ class ProfileViewModel(
         }
     }
 
-    private fun reorderPhotos() {
-
-    }
-
     private fun validatePhoto(photoFile: File, extension: String): Boolean {
         if (!photoFile.exists()) {
             _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION))
@@ -103,32 +103,72 @@ class ProfileViewModel(
         return true
     }
 
-
-    fun syncPhotos() {
-        viewModelScope.safeLaunch<Any>(null) {
-            val photos = photoRepository.loadPhotos(MAX_PHOTO_COUNT)
-            var ordered = true
-            photos.forEach { photo ->
-                when (photo.status) {
-                    PhotoStatus.UPLOADING -> reuploadPhoto(photo)
-                    PhotoStatus.DELETING -> deletePhoto(photo.key)
-                    PhotoStatus.ORDERING -> ordered = false
-                    else -> println("")
-                }
-            }
-            if (!ordered) reorderPhotos()
+    fun onDownloadPhotoError(photoKey: String?) {
+        viewModelScope.launch {
+            photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.DOWNLOAD_ERROR) }
         }
     }
 
+    fun onDownloadPhotoSuccess(photoKey: String?) {
+        viewModelScope.launch {
+            photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.OCCUPIED) }
+        }
+    }
 
-    fun deletePhoto(photoKey: String) {
+    private fun reorderPhotos() {
+
+    }
+
+    fun syncPhotos() {
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val photos = photoRepository.loadPhotos(MAX_PHOTO_COUNT)
+            val orderingPhotos = mutableListOf<Photo>()
+            photos.forEach { photo ->
+                when (photo.status) {
+                    PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> downloadPhoto(photo.key)
+                    PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> reuploadPhoto(photo)
+                    PhotoStatus.DELETING -> deletePhoto(photo.key)
+                    PhotoStatus.ORDERING -> orderingPhotos.add(photo)
+                    else -> println("")
+                }
+            }
+            _syncPhotosLiveData.postValue(true)
+        }
+
+//        viewModelScope.safeLaunch<Any>(null) {
+//            val photos = photoRepository.loadPhotos(MAX_PHOTO_COUNT)
+//            val orderingPhotos = mutableListOf<Photo>()
+//            photos.forEach { photo ->
+//                when (photo.status) {
+//                    PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> downloadPhoto(photo.key)
+//                    PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> reuploadPhoto(photo)
+//                    PhotoStatus.DELETING -> deletePhoto(photo.key)
+//                    PhotoStatus.ORDERING -> orderingPhotos.add(photo)
+//                    else -> println("")
+//                }
+//            }
+
+//            TODO: send a request to order photos with orderingPhotos
+
+//            _syncPhotosLiveData.postValue(true)
+//        }
+    }
+
+    fun downloadPhoto(photoKey: String?) {
+        viewModelScope.launch {
+            photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.DOWNLOADING) }
+        }
+    }
+
+    fun deletePhoto(photoKey: String?) {
         viewModelScope.safeLaunch(_deletePhotoLiveData) {
-            _deletePhotoLiveData.postValue(photoRepository.deletePhoto(photoKey))
+            photoKey?.let { key -> _deletePhotoLiveData.postValue(photoRepository.deletePhoto(key)) }
         }
     }
 
     private fun reuploadPhoto(photo: Photo) {
-
+        uploadPhoto(photo.uri, photo.key)
     }
 
 

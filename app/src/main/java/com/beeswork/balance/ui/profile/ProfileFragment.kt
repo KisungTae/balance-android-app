@@ -77,16 +77,25 @@ class ProfileFragment : BaseFragment(),
 
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
-        setupFetchProfileLiveDataObserver()
+        observeFetchProfileLiveData()
         setupPhotoPickerRecyclerView()
-        setupSaveAboutLiveDataObserver()
+        observeSaveAboutLiveData()
 //        setupFetchPhotosLiveDataObserver()
-        setupPhotosLiveDataObserver()
+//        observePhotosLiveData()
         setupListeners()
-        setupUploadPhotoLiveData()
+        observeUploadPhotoLiveData()
+        observeSyncPhotos()
+        viewModel.syncPhotos()
     }
 
-    private fun setupUploadPhotoLiveData() {
+    private fun observeSyncPhotos() {
+        viewModel.syncPhotosLiveData.observe(viewLifecycleOwner) {
+            println("synchobserver")
+            if (it) observePhotosLiveData()
+        }
+    }
+
+    private fun observeUploadPhotoLiveData() {
         viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
             if (it.isError()
                 && validateAccount(it.error, it.errorMessage)
@@ -95,14 +104,14 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    private fun setupPhotosLiveDataObserver() {
+    private fun observePhotosLiveData() {
         viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
+            println("photoslivedata")
             photoPickerRecyclerViewAdapter.submit(it)
         }
-        viewModel.syncPhotos()
     }
 
-    private fun setupSaveAboutLiveDataObserver() {
+    private fun observeSaveAboutLiveData() {
         viewModel.saveAboutLiveData.observe(viewLifecycleOwner) {
             when {
                 it.isLoading() -> showLoading()
@@ -148,7 +157,7 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    private fun setupFetchProfileLiveDataObserver() {
+    private fun observeFetchProfileLiveData() {
         viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
             binding.tvProfileName.text = it.name
             binding.tvProfileDateOfBirth.text = it.birth.format(DateTimePattern.ofDate())
@@ -239,6 +248,14 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
+    override fun onDownloadPhotoError(photoKey: String?) {
+        viewModel.onDownloadPhotoError(photoKey)
+    }
+
+    override fun onDownloadPhotoSuccess(photoKey: String?) {
+        viewModel.onDownloadPhotoSuccess(photoKey)
+    }
+
     private fun hasExternalStoragePermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             requireContext(),
@@ -287,11 +304,11 @@ class ProfileFragment : BaseFragment(),
     }
 
     override fun redownloadPhoto(photoKey: String?) {
-        photoKey?.let { key -> photoPickerRecyclerViewAdapter.downloadPhoto(key) }
+        viewModel.downloadPhoto(photoKey)
     }
 
     override fun deletePhoto(photoKey: String?) {
-        photoKey?.let { key -> viewModel.deletePhoto(key) }
+        viewModel.deletePhoto(photoKey)
     }
 
     override fun uploadPhotoFromGallery() {

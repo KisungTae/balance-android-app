@@ -41,6 +41,7 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        println("onBindViewHolder: ${photoPickers[position].key}")
         holder.bind(photoPickers[position])
     }
 
@@ -197,7 +198,8 @@ class PhotoPickerRecyclerViewAdapter(
 
     interface PhotoPickerListener {
         fun onClickPhotoPicker(position: Int)
-        fun onDownloadPhotoError(position: Int)
+        fun onDownloadPhotoError(photoKey: String?)
+        fun onDownloadPhotoSuccess(photoKey: String?)
     }
 
     class ViewHolder(
@@ -215,34 +217,13 @@ class PhotoPickerRecyclerViewAdapter(
             when (photoPicker.status) {
                 PhotoStatus.EMPTY -> showEmpty()
                 PhotoStatus.LOADING -> showLoading()
+                PhotoStatus.DOWNLOADING -> println("downloading bind")
+                PhotoStatus.DOWNLOAD_ERROR -> showDownloadError()
                 PhotoStatus.UPLOAD_ERROR -> showUploadError()
-                PhotoStatus.OCCUPIED -> {
-                    photoPicker.status = PhotoStatus.LOADING
-                    loadPhoto(itemView, photoPicker)
-                }
+                PhotoStatus.OCCUPIED -> println("occupied bind!!!!!!!!!!!!!!!")
                 PhotoStatus.UPLOADING -> loadPhoto(itemView, photoPicker)
                 else -> println()
             }
-        }
-
-        private fun showEmpty() {
-            showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE, View.GONE)
-        }
-
-        private fun showLoading() {
-            showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE)
-        }
-
-        private fun showUploadError() {
-            showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE)
-        }
-
-        private fun showDownloadError() {
-            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE, View.GONE)
-        }
-
-        private fun showOccupied() {
-            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE, View.VISIBLE)
         }
 
 
@@ -264,8 +245,7 @@ class PhotoPickerRecyclerViewAdapter(
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPicker.status = PhotoStatus.DOWNLOAD_ERROR
-                        showDownloadError()
+                        photoPickerListener.onDownloadPhotoError(photoPicker.key)
                         return false
                     }
 
@@ -276,11 +256,30 @@ class PhotoPickerRecyclerViewAdapter(
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPicker.status = PhotoStatus.OCCUPIED
-                        showOccupied()
+                        photoPickerListener.onDownloadPhotoSuccess(photoPicker.key)
                         return false
                     }
                 }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
+        }
+
+        private fun showEmpty() {
+            showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE, View.GONE)
+        }
+
+        private fun showLoading() {
+            showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE)
+        }
+
+        private fun showUploadError() {
+            showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+        }
+
+        private fun showDownloadError() {
+            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.VISIBLE, View.GONE)
+        }
+
+        private fun showOccupied() {
+            showLayout(itemView, View.GONE, View.GONE, View.GONE, View.GONE, View.VISIBLE)
         }
 
         private fun showLayout(

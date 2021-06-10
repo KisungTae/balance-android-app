@@ -361,5 +361,11 @@ class ProfileDialog : DialogFragment(), KodeinAware,
 
     }
 
+    override fun onDownloadPhotoError(photoKey: String?) {
+        TODO("Not yet implemented")
+    }
 
+    override fun onDownloadPhotoSuccess(photoKey: String?) {
+        TODO("Not yet implemented")
+    }
 }
