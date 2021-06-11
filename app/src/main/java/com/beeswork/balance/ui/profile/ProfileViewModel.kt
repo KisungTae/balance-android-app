@@ -115,44 +115,28 @@ class ProfileViewModel(
         }
     }
 
-    private fun reorderPhotos() {
-
+    private fun orderPhotos(photoSequences: Map<String, Int>) {
+        viewModelScope.safeLaunch(_orderPhotosLiveData) {
+            _orderPhotosLiveData.postValue(photoRepository.orderPhotos(photoSequences))
+        }
     }
 
     fun syncPhotos() {
-
         viewModelScope.launch(Dispatchers.Default) {
             val photos = photoRepository.loadPhotos(MAX_PHOTO_COUNT)
-            val orderingPhotos = mutableListOf<Photo>()
+            val photoSequences = mutableMapOf<String, Int>()
             photos.forEach { photo ->
                 when (photo.status) {
                     PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> downloadPhoto(photo.key)
                     PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> reuploadPhoto(photo)
                     PhotoStatus.DELETING -> deletePhoto(photo.key)
-                    PhotoStatus.ORDERING -> orderingPhotos.add(photo)
+                    PhotoStatus.ORDERING -> photoSequences[photo.key] = photo.sequence
                     else -> println("")
                 }
             }
+            if (photoSequences.isNotEmpty()) orderPhotos(photoSequences)
             _syncPhotosLiveData.postValue(true)
         }
-
-//        viewModelScope.safeLaunch<Any>(null) {
-//            val photos = photoRepository.loadPhotos(MAX_PHOTO_COUNT)
-//            val orderingPhotos = mutableListOf<Photo>()
-//            photos.forEach { photo ->
-//                when (photo.status) {
-//                    PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> downloadPhoto(photo.key)
-//                    PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> reuploadPhoto(photo)
-//                    PhotoStatus.DELETING -> deletePhoto(photo.key)
-//                    PhotoStatus.ORDERING -> orderingPhotos.add(photo)
-//                    else -> println("")
-//                }
-//            }
-
-//            TODO: send a request to order photos with orderingPhotos
-
-//            _syncPhotosLiveData.postValue(true)
-//        }
     }
 
     fun downloadPhoto(photoKey: String?) {

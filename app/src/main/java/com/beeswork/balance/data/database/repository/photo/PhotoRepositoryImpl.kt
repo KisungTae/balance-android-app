@@ -168,13 +168,13 @@ class PhotoRepositoryImpl(
 
 
     override suspend fun loadPhotos(maxPhotoCount: Int): List<Photo> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext photoDAO.findAll(maxPhotoCount)
         }
     }
 
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             photoDAO.findByKey(photoKey)?.let { photo ->
                 val response = if (photo.uploaded || photo.saved) photoRDS.deletePhoto(
                     preferenceProvider.getAccountId(),
@@ -189,10 +189,24 @@ class PhotoRepositoryImpl(
     }
 
     override suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             photoDAO.updateStatus(photoKey, photoStatus)
         }
     }
+
+    override suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+
+
+            // TODO: send a request to server
+
+            return@withContext Resource.success(null)
+        }
+    }
+
+
+
+
 
     override suspend fun test() {
         withContext(ioDispatcher) {

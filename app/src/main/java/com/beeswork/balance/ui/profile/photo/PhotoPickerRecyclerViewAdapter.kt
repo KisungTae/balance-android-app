@@ -52,9 +52,30 @@ class PhotoPickerRecyclerViewAdapter(
     override fun getItemCount(): Int = photoPickers.size
 
     fun submit(newPhotoPickers: MutableList<PhotoPicker>) {
-        val diffResult = DiffUtil.calculateDiff(PhotoPickerDiffCallBack(photoPickers, newPhotoPickers))
-        photoPickers = newPhotoPickers
-        diffResult.dispatchUpdatesTo(this)
+
+//        val diffResult = DiffUtil.calculateDiff(PhotoPickerDiffCallBack(photoPickers, newPhotoPickers))
+//        photoPickers = newPhotoPickers
+//        diffResult.dispatchUpdatesTo(this)
+//
+//
+//
+//
+//        photoPickers = newPhotoPickers
+//        notifyDataSetChanged()
+        if (photoPickers.isEmpty()) {
+            photoPickers = newPhotoPickers
+            notifyDataSetChanged()
+        } else {
+            for (i in newPhotoPickers.indices) {
+                if (photoPickers[i].status != newPhotoPickers[i].status) {
+                    photoPickers[i] = newPhotoPickers[i]
+                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+                }
+            }
+        }
+
+
+
     }
 
     fun getPhotoPicker(position: Int): PhotoPicker {
@@ -217,23 +238,31 @@ class PhotoPickerRecyclerViewAdapter(
             when (photoPicker.status) {
                 PhotoStatus.EMPTY -> showEmpty()
                 PhotoStatus.LOADING -> showLoading()
-                PhotoStatus.DOWNLOADING -> println("downloading bind")
+                PhotoStatus.DOWNLOADING -> loadPhoto(itemView, photoPicker.uri, photoPicker.key)
                 PhotoStatus.DOWNLOAD_ERROR -> showDownloadError()
+                PhotoStatus.UPLOADING -> loadPhoto(itemView, photoPicker.uri)
                 PhotoStatus.UPLOAD_ERROR -> showUploadError()
-                PhotoStatus.OCCUPIED -> println("occupied bind!!!!!!!!!!!!!!!")
-                PhotoStatus.UPLOADING -> loadPhoto(itemView, photoPicker)
+                PhotoStatus.OCCUPIED -> showOccupied()
                 else -> println()
             }
         }
 
-
-        private fun loadPhoto(itemView: View, photoPicker: PhotoPicker) {
+        private fun loadPhoto(itemView: View, photoUri: Uri?) {
             showLoading()
+            Glide.with(context)
+                .load(photoUri)
+                .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toPx()))
+                .apply(GlideHelper.photoPickerGlideOptions())
+                .into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
 
-            val photoEndPoint = photoPicker.uri?.path?.let { path ->
+        }
+
+        private fun loadPhoto(itemView: View, photoUri: Uri?, photoKey: String?) {
+            showLoading()
+            val photoEndPoint = photoUri?.path?.let { path ->
                 val photoFile = File(path)
-                if (photoFile.exists()) path else EndPoint.ofPhoto(accountId, photoPicker.key)
-            } ?: EndPoint.ofPhoto(accountId, photoPicker.key)
+                if (photoFile.exists()) path else EndPoint.ofPhoto(accountId, photoKey)
+            } ?: EndPoint.ofPhoto(accountId, photoKey)
 
             Glide.with(context).load(photoEndPoint)
                 .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toPx()))
@@ -245,7 +274,7 @@ class PhotoPickerRecyclerViewAdapter(
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPickerListener.onDownloadPhotoError(photoPicker.key)
+                        photoPickerListener.onDownloadPhotoError(photoKey)
                         return false
                     }
 
@@ -256,7 +285,7 @@ class PhotoPickerRecyclerViewAdapter(
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPickerListener.onDownloadPhotoSuccess(photoPicker.key)
+                        photoPickerListener.onDownloadPhotoSuccess(photoKey)
                         return false
                     }
                 }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
@@ -333,6 +362,10 @@ class PhotoPickerRecyclerViewAdapter(
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
+        }
+
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            return "photoPickerPayload"
         }
     }
 

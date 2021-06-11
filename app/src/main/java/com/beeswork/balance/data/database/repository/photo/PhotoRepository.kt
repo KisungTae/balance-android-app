@@ -16,5 +16,6 @@ interface PhotoRepository {
     suspend fun loadPhotos(maxPhotoCount: Int): List<Photo>
     suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse>
     suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus)
+    suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse>
     suspend fun test()
 }
