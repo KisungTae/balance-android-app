@@ -12,7 +12,6 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
-import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.profile.photo.PhotoPicker
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -59,23 +58,28 @@ class ProfileViewModel(
     }
 
     fun saveAbout(height: Int?, about: String) {
-        viewModelScope.safeLaunch(_saveAboutLiveData) {
+        viewModelScope.launch {
             _saveAboutLiveData.postValue(Resource.loading())
             _saveAboutLiveData.postValue(profileRepository.saveAbout(height, about))
         }
     }
 
-    fun getPhotosLiveData(): LiveData<MutableList<PhotoPicker>> {
+    fun getPhotosLiveData(): LiveData<MutableMap<String, PhotoPicker>> {
         return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
-            val photoPickers = mutableListOf<PhotoPicker>()
-            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
-            repeat((MAX_PHOTO_COUNT - photos.size)) { photoPickers.add(PhotoPicker.asEmpty()) }
+            val photoPickers = mutableMapOf<String, PhotoPicker>()
+            photos.mapIndexed { index, photo ->
+                val photoPicker = photoMapper.toPhotoPicker(photo)
+                photoPicker.sequence = index
+                photoPickers[photo.key] = photoPicker
+            }
+//            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
+//            repeat((MAX_PHOTO_COUNT - photos.size)) { photoPickers.add(PhotoPicker.asEmpty()) }
             photoPickers
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
     fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
-        viewModelScope.safeLaunch(_uploadPhotoLiveData) {
+        viewModelScope.launch {
             photoUri?.path?.let { path ->
                 val photoFile = File(path)
                 val extension = MimeTypeMap.getFileExtensionFromUrl(path)
@@ -116,7 +120,7 @@ class ProfileViewModel(
     }
 
     private fun orderPhotos(photoSequences: Map<String, Int>) {
-        viewModelScope.safeLaunch(_orderPhotosLiveData) {
+        viewModelScope.launch {
             _orderPhotosLiveData.postValue(photoRepository.orderPhotos(photoSequences))
         }
     }
@@ -146,7 +150,7 @@ class ProfileViewModel(
     }
 
     fun deletePhoto(photoKey: String?) {
-        viewModelScope.safeLaunch(_deletePhotoLiveData) {
+        viewModelScope.launch {
             photoKey?.let { key -> _deletePhotoLiveData.postValue(photoRepository.deletePhoto(key)) }
         }
     }

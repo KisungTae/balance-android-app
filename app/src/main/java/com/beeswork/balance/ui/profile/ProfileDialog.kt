@@ -288,10 +288,8 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ) {
-                viewHolder.itemView.setTag(
-                    androidx.recyclerview.R.id.item_touch_helper_previous_elevation,
-                    null
-                )
+
+                viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
                 val sequences = photoPickerRecyclerViewAdapter().getPhotoPickerSequences()
                 if (sequences.isEmpty()) return
                 CoroutineScope(Dispatchers.IO).launch {

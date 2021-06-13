@@ -30,7 +30,7 @@ class PhotoRDSImpl(
         formData: Map<String, RequestBody>,
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse> {
-        return getResultForAWS {
+        return getResult {
             balanceAPI.uploadPhotoToS3(url, formData, multipartBody)
         }
     }

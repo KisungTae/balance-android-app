@@ -19,6 +19,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -90,7 +92,6 @@ class ProfileFragment : BaseFragment(),
 
     private fun observeSyncPhotos() {
         viewModel.syncPhotosLiveData.observe(viewLifecycleOwner) {
-            println("synchobserver")
             if (it) observePhotosLiveData()
         }
     }
@@ -106,7 +107,6 @@ class ProfileFragment : BaseFragment(),
 
     private fun observePhotosLiveData() {
         viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
-            println("photoslivedata")
             photoPickerRecyclerViewAdapter.submit(it)
         }
     }
@@ -189,6 +189,31 @@ class ProfileFragment : BaseFragment(),
             override fun canScrollVertically(): Boolean = false
             override fun canScrollHorizontally(): Boolean = false
         }
+
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                photoPickerRecyclerViewAdapter.swapPhotos(
+                    viewHolder.absoluteAdapterPosition,
+                    target.absoluteAdapterPosition
+                )
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
+
+            }
+
+        })
+        itemTouchHelper.attachToRecyclerView(binding.rvPhotoPicker)
     }
 
     private fun setupToolBar() {

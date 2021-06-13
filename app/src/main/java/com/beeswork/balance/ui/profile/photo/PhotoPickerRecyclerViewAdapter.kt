@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.ItemPhotoPickerBinding
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.constant.PhotoConstant
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.toPx
@@ -41,7 +42,6 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        println("onBindViewHolder: ${photoPickers[position].key}")
         holder.bind(photoPickers[position])
     }
 
@@ -51,31 +51,47 @@ class PhotoPickerRecyclerViewAdapter(
 
     override fun getItemCount(): Int = photoPickers.size
 
-    fun submit(newPhotoPickers: MutableList<PhotoPicker>) {
-
-//        val diffResult = DiffUtil.calculateDiff(PhotoPickerDiffCallBack(photoPickers, newPhotoPickers))
-//        photoPickers = newPhotoPickers
-//        diffResult.dispatchUpdatesTo(this)
-//
-//
-//
-//
-//        photoPickers = newPhotoPickers
-//        notifyDataSetChanged()
+    fun submit(newPhotoPickers: MutableMap<String, PhotoPicker>) {
         if (photoPickers.isEmpty()) {
-            photoPickers = newPhotoPickers
+            newPhotoPickers.map { photoPickers.add(it.value) }
+            repeat((PhotoConstant.MAX_PHOTO_COUNT - newPhotoPickers.size)) {
+                photoPickers.add(PhotoPicker.asEmpty())
+            }
             notifyDataSetChanged()
         } else {
-            for (i in newPhotoPickers.indices) {
-                if (photoPickers[i].status != newPhotoPickers[i].status) {
-                    photoPickers[i] = newPhotoPickers[i]
-                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
-                }
+            var index = 0
+            while (index < photoPickers.size) {
+                val photoPicker = photoPickers[index]
+                photoPicker.key?.let { key ->
+                    newPhotoPickers[key]?.let { newPhotoPicker ->
+                        if (photoPicker.status != newPhotoPicker.status) {
+                            photoPicker.status = newPhotoPicker.status
+                            notifyItemChanged(index, PHOTO_PICKER_PAYLOAD)
+                        }
+                        if (photoPicker.sequence != newPhotoPicker.sequence) {
+                            photoPicker.sequence = newPhotoPicker.sequence
+                            notifyItemMoved(index, newPhotoPicker.sequence)
+                        } else {
+                            index++
+                        }
+                        newPhotoPickers.remove(key)
+                    } ?: kotlin.run {
+                        photoPickers.removeAt(index)
+                        notifyItemRemoved(index)
+                        photoPickers.add(PhotoPicker.asEmpty())
+                        notifyItemInserted(photoPickers.size - 1)
+                    }
+                } ?: break
+            }
+
+            newPhotoPickers.forEach {
+                val newPhotoPicker = it.value
+                photoPickers.removeAt(newPhotoPicker.sequence)
+                notifyItemRemoved(newPhotoPicker.sequence)
+                photoPickers.add(newPhotoPicker.sequence, newPhotoPicker)
+                notifyItemInserted(newPhotoPicker.sequence)
             }
         }
-
-
-
     }
 
     fun getPhotoPicker(position: Int): PhotoPicker {
@@ -138,13 +154,13 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun swapPhotos(from: Int, to: Int) {
-//        if (photoPickers[to].status == PhotoPicker.Status.OCCUPIED) {
-//            val photoPicker = photoPickers.removeAt(from)
-//            photoPickers.add(to, photoPicker)
-//            lastFromIndex = from
-//            lastToIndex = to
-//            notifyItemMoved(from, to)
-//        }
+        if (photoPickers[to].status == PhotoStatus.OCCUPIED) {
+            val photoPicker = photoPickers.removeAt(from)
+            photoPickers.add(to, photoPicker)
+            lastFromIndex = from
+            lastToIndex = to
+            notifyItemMoved(from, to)
+        }
     }
 
     fun isPhotoPickerDraggable(position: Int): Boolean {
@@ -192,9 +208,10 @@ class PhotoPickerRecyclerViewAdapter(
             val photoPicker = photoPickers[i]
             val sequence = photoPickerSequences[photoPicker.key]
             sequence?.let { s ->
-                photoPicker.sequence = s
+//                photoPicker.sequence = s
 //                photoPicker.status = PhotoPicker.Status.OCCUPIED
                 notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+
             }
         }
     }
@@ -238,16 +255,16 @@ class PhotoPickerRecyclerViewAdapter(
             when (photoPicker.status) {
                 PhotoStatus.EMPTY -> showEmpty()
                 PhotoStatus.LOADING -> showLoading()
-                PhotoStatus.DOWNLOADING -> loadPhoto(itemView, photoPicker.uri, photoPicker.key)
+                PhotoStatus.DOWNLOADING -> loadPhoto(photoPicker.uri, photoPicker.key)
                 PhotoStatus.DOWNLOAD_ERROR -> showDownloadError()
-                PhotoStatus.UPLOADING -> loadPhoto(itemView, photoPicker.uri)
-                PhotoStatus.UPLOAD_ERROR -> showUploadError()
+                PhotoStatus.UPLOADING -> loadPhoto(photoPicker.uri)
+                PhotoStatus.UPLOAD_ERROR -> showUploadError(photoPicker.uri)
                 PhotoStatus.OCCUPIED -> showOccupied()
                 else -> println()
             }
         }
 
-        private fun loadPhoto(itemView: View, photoUri: Uri?) {
+        private fun loadPhoto(photoUri: Uri?) {
             showLoading()
             Glide.with(context)
                 .load(photoUri)
@@ -257,7 +274,7 @@ class PhotoPickerRecyclerViewAdapter(
 
         }
 
-        private fun loadPhoto(itemView: View, photoUri: Uri?, photoKey: String?) {
+        private fun loadPhoto(photoUri: Uri?, photoKey: String?) {
             showLoading()
             val photoEndPoint = photoUri?.path?.let { path ->
                 val photoFile = File(path)
@@ -292,6 +309,9 @@ class PhotoPickerRecyclerViewAdapter(
         }
 
         private fun showEmpty() {
+            val photoImageView = itemView.findViewWithTag<ImageView>(IV_PHOTO_PICKER_PHOTO)
+            photoImageView.setImageResource(0)
+            photoImageView.setImageBitmap(null)
             showLayout(itemView, View.VISIBLE, View.GONE, View.GONE, View.GONE, View.GONE)
         }
 
@@ -299,7 +319,8 @@ class PhotoPickerRecyclerViewAdapter(
             showLayout(itemView, View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE)
         }
 
-        private fun showUploadError() {
+        private fun showUploadError(photoUri: Uri?) {
+            loadPhoto(photoUri)
             showLayout(itemView, View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE)
         }
 
@@ -343,31 +364,4 @@ class PhotoPickerRecyclerViewAdapter(
             private const val PHOTO_ROUND_CORNER_DP = 5
         }
     }
-
-    class PhotoPickerDiffCallBack(
-        var oldList: List<PhotoPicker>,
-        var newList: List<PhotoPicker>
-    ) : DiffUtil.Callback() {
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
-
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].key == newList[newItemPosition].key
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition] == newList[newItemPosition]
-        }
-
-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-            return "photoPickerPayload"
-        }
-    }
-
-
 }

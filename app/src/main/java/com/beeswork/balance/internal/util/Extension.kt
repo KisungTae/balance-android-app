@@ -55,7 +55,10 @@ fun <T> CoroutineScope.safeLaunch(
             is SocketTimeoutException -> callBack?.postValue(Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION))
             is NoInternetConnectivityException -> callBack?.postValue(Resource.error(ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION))
             is ConnectException -> callBack?.postValue(Resource.error(ExceptionCode.CONNECT_EXCEPTION))
-            is UnknownHostException -> callBack?.postValue(Resource.error(ExceptionCode.UNKNOWN_HOST_EXCEPTION))
+            is UnknownHostException -> {
+                println("UnknownHostException thronw")
+                callBack?.postValue(Resource.error(ExceptionCode.UNKNOWN_HOST_EXCEPTION))
+            }
             else -> throw throwable
         }
         finallyBody?.invoke()

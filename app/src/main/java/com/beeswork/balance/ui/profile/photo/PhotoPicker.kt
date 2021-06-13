@@ -7,7 +7,7 @@ data class PhotoPicker(
     var key: String?,
     var status: PhotoStatus,
     var uri: Uri?,
-    var sequence: Int,
+    var sequence: Int
 ) {
 
     companion object {

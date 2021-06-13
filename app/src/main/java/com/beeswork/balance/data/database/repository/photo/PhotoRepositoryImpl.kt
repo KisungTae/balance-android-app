@@ -134,10 +134,6 @@ class PhotoRepositoryImpl(
         for ((key, value) in fields) {
             formData[key] = RequestBody.create(MultipartBody.FORM, value)
         }
-
-//      TODO: remove me
-        formData.put("Content-Type", RequestBody.create(MultipartBody.FORM, ""))
-
         val requestBody = RequestBody.create(MediaType.parse(mimeType), photoFile)
         val multiPartBody = MultipartBody.Part.createFormData(FILE, photoKey, requestBody)
         return photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
