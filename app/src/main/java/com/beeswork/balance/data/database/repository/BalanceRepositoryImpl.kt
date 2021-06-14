@@ -413,24 +413,24 @@ class BalanceRepositoryImpl(
         return Resource.success(null)
     }
 
-    override suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyResponse> {
+//    override suspend fun reorderPhoto(photoOrders: Map<String, Int>): Resource<EmptyResponse> {
 //        for ((k, v) in photoOrders) {
 //            photoDAO.sync(k, false)
 //        }
 
-        val response = balanceRDS.reorderPhotos(
-            preferenceProvider.getAccountId().toString(),
-            preferenceProvider.getIdentityToken().toString(),
-            photoOrders
-        )
+//        val response = balanceRDS.reorderPhotos(
+//            preferenceProvider.getAccountId().toString(),
+//            preferenceProvider.getIdentityToken().toString(),
+//            photoOrders
+//        )
 
 //        for ((photoKey, sequence) in photoOrders) {
 //            photoDAO.sync(photoKey, true)
 //            if (response.isSuccess())
 //                photoDAO.updateSequence(photoKey, sequence)
 //        }
-        return response
-    }
+//        return response
+//    }
 
 
 //  ################################################################################# //

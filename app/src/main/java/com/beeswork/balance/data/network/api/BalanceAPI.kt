@@ -116,8 +116,8 @@ interface BalanceAPI {
 
 
     @POST("photo/reorder")
-    suspend fun reorderPhotos(
-        @Body reorderPhotosBody: ReorderPhotosBody
+    suspend fun orderPhotos(
+        @Body orderPhotosBody: OrderPhotosBody
     ): Response<EmptyResponse>
 
     @POST("photo/delete")

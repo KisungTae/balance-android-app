@@ -293,18 +293,18 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 val sequences = photoPickerRecyclerViewAdapter().getPhotoPickerSequences()
                 if (sequences.isEmpty()) return
                 CoroutineScope(Dispatchers.IO).launch {
-                    val response = balanceRepository.reorderPhoto(sequences)
-                    withContext(Dispatchers.Main) {
-                        if (response.isSuccess())
-                            photoPickerRecyclerViewAdapter().reorderPhotoPickers(sequences)
-                        else if (response.isError()) {
-                            ExceptionDialog(response.errorMessage, null).show(
-                                childFragmentManager,
-                                ExceptionDialog.TAG
-                            )
-                            photoPickerRecyclerViewAdapter().revertPhotoPickersSequence(sequences)
-                        }
-                    }
+//                    val response = balanceRepository.reorderPhoto(sequences)
+//                    withContext(Dispatchers.Main) {
+//                        if (response.isSuccess())
+//                            photoPickerRecyclerViewAdapter().reorderPhotoPickers(sequences)
+//                        else if (response.isError()) {
+//                            ExceptionDialog(response.errorMessage, null).show(
+//                                childFragmentManager,
+//                                ExceptionDialog.TAG
+//                            )
+//                            photoPickerRecyclerViewAdapter().revertPhotoPickersSequence(sequences)
+//                        }
+//                    }
                 }
             }
 

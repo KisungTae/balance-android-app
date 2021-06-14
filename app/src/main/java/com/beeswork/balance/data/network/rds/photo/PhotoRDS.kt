@@ -10,6 +10,12 @@ import java.util.*
 
 interface PhotoRDS {
 
+    suspend fun orderPhotos(
+        accountId: UUID?,
+        identityToken: UUID?,
+        photoSequences: Map<String, Int>
+    ): Resource<EmptyResponse>
+
     suspend fun savePhoto(
         accountId: UUID?,
         identityToken: UUID?,

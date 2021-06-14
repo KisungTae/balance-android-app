@@ -9,6 +9,7 @@ import com.beeswork.balance.data.network.rds.photo.PhotoRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.constant.PhotoConstant
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -192,16 +193,43 @@ class PhotoRepositoryImpl(
 
     override suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
+            val photos = photoDAO.findAll(PhotoConstant.MAX_PHOTO_COUNT).toMutableList()
 
+            for (i in photos.size - 1 downTo 0) {
+                val photo = photos[i]
+                if (photo.status != PhotoStatus.OCCUPIED) {
+                    return@withContext Resource.error(ExceptionCode.PHOTO_NOT_ORDERABLE_EXCEPTION)
+                }
+                photoSequences[photo.key]?.let { sequence ->
+                    if (photo.sequence != sequence) {
+                        photo.status = PhotoStatus.ORDERING
+                    } else photos.removeAt(i)
+                } ?: kotlin.run {
+                    photos.removeAt(i)
+                }
+            }
 
-            // TODO: send a request to server
+            println("photos.size: ${photos.size}")
+            if (photos.size <= 0) return@withContext Resource.success(EmptyResponse())
 
-            return@withContext Resource.success(null)
+            photoDAO.insert(photos)
+
+            val response = photoRDS.orderPhotos(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(), photoSequences
+            )
+
+            photos.forEach { it.status = PhotoStatus.OCCUPIED }
+
+            if (response.isSuccess()) photos.forEach { photo ->
+                photoSequences[photo.key]?.let { sequence ->
+                    photo.sequence = sequence
+                }
+            }
+            photoDAO.insert(photos)
+            return@withContext response
         }
     }
-
-
-
 
 
     override suspend fun test() {

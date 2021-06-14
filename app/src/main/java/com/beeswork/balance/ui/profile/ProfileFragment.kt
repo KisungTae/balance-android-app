@@ -86,11 +86,22 @@ class ProfileFragment : BaseFragment(),
 //        observePhotosLiveData()
         setupListeners()
         observeUploadPhotoLiveData()
-        observeSyncPhotos()
+        observeSyncPhotosLiveData()
+        observeOrderPhotosLiveData()
         viewModel.syncPhotos()
     }
 
-    private fun observeSyncPhotos() {
+    private fun observeOrderPhotosLiveData() {
+        viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) showErrorDialog(
+                it.error,
+                getString(R.string.error_title_order_photos_exception),
+                it.errorMessage
+            )
+        }
+    }
+
+    private fun observeSyncPhotosLiveData() {
         viewModel.syncPhotosLiveData.observe(viewLifecycleOwner) {
             if (it) observePhotosLiveData()
         }
@@ -209,7 +220,7 @@ class ProfileFragment : BaseFragment(),
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
-
+                viewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
             }
 
         })

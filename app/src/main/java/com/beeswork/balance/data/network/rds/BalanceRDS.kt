@@ -9,12 +9,6 @@ import okhttp3.RequestBody
 
 interface BalanceRDS {
 
-    suspend fun reorderPhotos(
-        accountId: String,
-        identityToken: String,
-        photoOrders: Map<String, Int>
-    ): Resource<EmptyResponse>
-
     suspend fun uploadPhotoToS3(
         url: String,
         formData: Map<String, RequestBody>,

@@ -33,6 +33,7 @@ class ExceptionCode {
         const val PHOTO_NOT_FOUND_EXCEPTION = "photo.not.found.exception"
         const val PHOTO_NOT_SUPPORTED_TYPE_EXCEPTION = "photo_not_supported_type_exception"
         const val PHOTO_ALREADY_EXIST_EXCEPTION = "photo.already.exists.exception"
+        const val PHOTO_NOT_ORDERABLE_EXCEPTION = "photo_not_orderable_exception"
 
         const val CHAT_MESSAGE_OVER_SIZED_EXCEPTION = "chat_message_over_sized_exception"
         const val CHAT_MESSAGE_EMPTY_EXCEPTION = "chat_message_empty_exception"

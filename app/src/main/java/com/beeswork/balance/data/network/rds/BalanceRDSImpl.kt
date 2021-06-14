@@ -14,21 +14,6 @@ class BalanceRDSImpl(
 ) : BaseRDS(), BalanceRDS {
 
 
-    override suspend fun reorderPhotos(
-        accountId: String,
-        identityToken: String,
-        photoOrders: Map<String, Int>
-    ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.reorderPhotos(
-                ReorderPhotosBody(
-                    accountId,
-                    identityToken,
-                    photoOrders
-                )
-            )
-        }
-    }
 
 
 

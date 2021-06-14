@@ -68,6 +68,7 @@ class ProfileViewModel(
         return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
             val photoPickers = mutableMapOf<String, PhotoPicker>()
             photos.mapIndexed { index, photo ->
+//                println("photo key: ${photo.key} | photo status: ${photo.status} | photo sequence: ${photo.sequence} | photos.mapIndexed: $index")
                 val photoPicker = photoMapper.toPhotoPicker(photo)
                 photoPicker.sequence = index
                 photoPickers[photo.key] = photoPicker
@@ -119,7 +120,7 @@ class ProfileViewModel(
         }
     }
 
-    private fun orderPhotos(photoSequences: Map<String, Int>) {
+    fun orderPhotos(photoSequences: Map<String, Int>) {
         viewModelScope.launch {
             _orderPhotosLiveData.postValue(photoRepository.orderPhotos(photoSequences))
         }

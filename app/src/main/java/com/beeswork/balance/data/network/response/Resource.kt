@@ -35,15 +35,15 @@ class Resource<out T>(
     }
 
     fun <P> mapData(data: P?): Resource<P> {
-        return Resource(this.status, data, this.errorMessage, this.error, this.fieldErrorMessages)
+        return Resource(this.status, data, this.error, this.errorMessage, this.fieldErrorMessages)
     }
 
     fun toEmptyResponse(): Resource<EmptyResponse> {
         return Resource(
             this.status,
             EmptyResponse(),
-            this.errorMessage,
             this.error,
+            this.errorMessage,
             this.fieldErrorMessages
         )
     }

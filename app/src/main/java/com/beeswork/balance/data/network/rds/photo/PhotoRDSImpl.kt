@@ -3,6 +3,7 @@ package com.beeswork.balance.data.network.rds.photo
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.DeletePhotoBody
+import com.beeswork.balance.data.network.request.OrderPhotosBody
 import com.beeswork.balance.data.network.request.SavePhotoBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -15,6 +16,15 @@ import java.util.*
 class PhotoRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), PhotoRDS {
+
+    override suspend fun orderPhotos(
+        accountId: UUID?,
+        identityToken: UUID?,
+        photoSequences: Map<String, Int>
+    ): Resource<EmptyResponse> {
+        return getResult { balanceAPI.orderPhotos(OrderPhotosBody(accountId, identityToken, photoSequences)) }
+    }
+
 
     override suspend fun savePhoto(
         accountId: UUID?,

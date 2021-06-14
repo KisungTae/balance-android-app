@@ -68,7 +68,8 @@ class PhotoPickerRecyclerViewAdapter(
                             photoPicker.status = newPhotoPicker.status
                             notifyItemChanged(index, PHOTO_PICKER_PAYLOAD)
                         }
-                        if (photoPicker.sequence != newPhotoPicker.sequence) {
+                        println("photoKey: ${photoPicker.key} | index: $index | photoSequence: ${newPhotoPicker.sequence} | photostatus: ${newPhotoPicker.status}")
+                        if (index != newPhotoPicker.sequence && photoPicker.status != PhotoStatus.ORDERING) {
                             photoPicker.sequence = newPhotoPicker.sequence
                             notifyItemMoved(index, newPhotoPicker.sequence)
                         } else {
@@ -97,6 +98,17 @@ class PhotoPickerRecyclerViewAdapter(
     fun getPhotoPicker(position: Int): PhotoPicker {
         return photoPickers[position]
     }
+
+    fun swapPhotos(from: Int, to: Int) {
+        if (photoPickers[to].status == PhotoStatus.OCCUPIED) {
+            val photoPicker = photoPickers.removeAt(from)
+            photoPickers.add(to, photoPicker)
+            lastFromIndex = from
+            lastToIndex = to
+            notifyItemMoved(from, to)
+        }
+    }
+
 
     fun downloadPhoto(photoKey: String) {
         val index = photoPickers.indexOfFirst { it.key == photoKey }
@@ -153,15 +165,6 @@ class PhotoPickerRecyclerViewAdapter(
 //        }
     }
 
-    fun swapPhotos(from: Int, to: Int) {
-        if (photoPickers[to].status == PhotoStatus.OCCUPIED) {
-            val photoPicker = photoPickers.removeAt(from)
-            photoPickers.add(to, photoPicker)
-            lastFromIndex = from
-            lastToIndex = to
-            notifyItemMoved(from, to)
-        }
-    }
 
     fun isPhotoPickerDraggable(position: Int): Boolean {
 //        val photoPicker = photoPickers[position]
@@ -180,25 +183,8 @@ class PhotoPickerRecyclerViewAdapter(
 
     fun getPhotoPickerSequences(): Map<String, Int> {
         val photoPickerSequences = mutableMapOf<String, Int>()
-        var isOutOfOrder = false
-        for (i in 0 until photoPickers.size - 1) {
-            if (photoPickers[i].sequence > photoPickers[i + 1].sequence) {
-                isOutOfOrder = true
-                break
-            }
-        }
-
-        if (!isOutOfOrder) return photoPickerSequences
-
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-//            if (photoPicker.status == PhotoPicker.Status.OCCUPIED) {
-//                photoPicker.key?.let {
-//                    photoPickerSequences[it] = i
-//                    photoPicker.status = PhotoPicker.Status.LOADING
-//                    notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
-//                }
-//            }
+        photoPickers.forEachIndexed { index, photoPicker ->
+            photoPicker.key?.let { key -> photoPickerSequences[key] = index }
         }
         return photoPickerSequences
     }
@@ -259,6 +245,7 @@ class PhotoPickerRecyclerViewAdapter(
                 PhotoStatus.DOWNLOAD_ERROR -> showDownloadError()
                 PhotoStatus.UPLOADING -> loadPhoto(photoPicker.uri)
                 PhotoStatus.UPLOAD_ERROR -> showUploadError(photoPicker.uri)
+                PhotoStatus.ORDERING -> showLoading()
                 PhotoStatus.OCCUPIED -> showOccupied()
                 else -> println()
             }
