@@ -52,46 +52,51 @@ class PhotoPickerRecyclerViewAdapter(
     override fun getItemCount(): Int = photoPickers.size
 
     fun submit(newPhotoPickers: MutableMap<String, PhotoPicker>) {
+
         if (photoPickers.isEmpty()) {
             newPhotoPickers.map { photoPickers.add(it.value) }
             repeat((PhotoConstant.MAX_PHOTO_COUNT - newPhotoPickers.size)) {
                 photoPickers.add(PhotoPicker.asEmpty())
             }
             notifyDataSetChanged()
-        } else {
-            var index = 0
-            while (index < photoPickers.size) {
-                val photoPicker = photoPickers[index]
-                photoPicker.key?.let { key ->
-                    newPhotoPickers[key]?.let { newPhotoPicker ->
-                        if (photoPicker.status != newPhotoPicker.status) {
-                            photoPicker.status = newPhotoPicker.status
-                            notifyItemChanged(index, PHOTO_PICKER_PAYLOAD)
-                        }
-                        println("photoKey: ${photoPicker.key} | index: $index | photoSequence: ${newPhotoPicker.sequence} | photostatus: ${newPhotoPicker.status}")
-                        if (index != newPhotoPicker.sequence && photoPicker.status != PhotoStatus.ORDERING) {
-                            photoPicker.sequence = newPhotoPicker.sequence
-                            notifyItemMoved(index, newPhotoPicker.sequence)
-                        } else {
-                            index++
-                        }
-                        newPhotoPickers.remove(key)
-                    } ?: kotlin.run {
-                        photoPickers.removeAt(index)
-                        notifyItemRemoved(index)
-                        photoPickers.add(PhotoPicker.asEmpty())
-                        notifyItemInserted(photoPickers.size - 1)
-                    }
-                } ?: break
-            }
+            return
+        }
 
-            newPhotoPickers.forEach {
-                val newPhotoPicker = it.value
-                photoPickers.removeAt(newPhotoPicker.sequence)
-                notifyItemRemoved(newPhotoPicker.sequence)
-                photoPickers.add(newPhotoPicker.sequence, newPhotoPicker)
-                notifyItemInserted(newPhotoPicker.sequence)
+        for (i in photoPickers.size - 1 downTo 0) {
+            val photoPicker = photoPickers[i]
+            photoPicker.key?.let { key ->
+                newPhotoPickers[key]?.let { newPhotoPicker ->
+                    if (photoPicker.status != newPhotoPicker.status) {
+                        photoPicker.status = newPhotoPicker.status
+                        notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+                    }
+                } ?: kotlin.run {
+                    photoPickers.removeAt(i)
+                    notifyItemRemoved(i)
+                    photoPickers.add(PhotoPicker.asEmpty())
+                    notifyItemInserted(photoPickers.size - 1)
+                }
             }
+        }
+
+        var index = 0
+        while (index < photoPickers.size) {
+            val photoPicker = photoPickers[index]
+            newPhotoPickers[photoPicker.key]?.let { newPhotoPicker ->
+                if (newPhotoPicker.status != PhotoStatus.ORDERING && index != newPhotoPicker.sequence) {
+                    swapPhotos(index, newPhotoPicker.sequence)
+                    photoPicker.sequence = newPhotoPicker.sequence
+                } else index++
+                newPhotoPickers.remove(photoPicker.key)
+            } ?: kotlin.run { index++ }
+        }
+
+        newPhotoPickers.forEach {
+            val newPhotoPicker = it.value
+            photoPickers.removeAt(newPhotoPicker.sequence)
+            notifyItemRemoved(newPhotoPicker.sequence)
+            photoPickers.add(newPhotoPicker.sequence, newPhotoPicker)
+            notifyItemInserted(newPhotoPicker.sequence)
         }
     }
 
@@ -100,7 +105,7 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     fun swapPhotos(from: Int, to: Int) {
-        if (photoPickers[to].status == PhotoStatus.OCCUPIED) {
+        if (photoPickers[to].status == PhotoStatus.OCCUPIED && from != to) {
             val photoPicker = photoPickers.removeAt(from)
             photoPickers.add(to, photoPicker)
             lastFromIndex = from

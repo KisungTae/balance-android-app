@@ -209,7 +209,6 @@ class PhotoRepositoryImpl(
                 }
             }
 
-            println("photos.size: ${photos.size}")
             if (photos.size <= 0) return@withContext Resource.success(EmptyResponse())
 
             photoDAO.insert(photos)
