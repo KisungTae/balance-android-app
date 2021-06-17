@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,11 +55,20 @@ class ProfileFragment : BaseFragment(),
     private lateinit var binding: FragmentProfileBinding
     private lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
 
-    private val requestPermissionForGallery = registerForActivityResult(RequestPermission()) { granted ->
+    private val requestGalleryPermission = registerForActivityResult(RequestPermission()) { granted ->
         if (granted) selectPhotoFromGallery()
     }
 
+    private val requestCameraPermission = registerForActivityResult(RequestPermission()) { granted ->
+        if (granted) selectPhotoFromCapture()
+    }
+
     private val readFromGalleryActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) result.data?.data?.let { uri -> launchCropImage(uri) }
+    }
+
+    private val readFromCaptureActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
+        println("result.resultCode ${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) result.data?.data?.let { uri -> launchCropImage(uri) }
     }
 
@@ -82,20 +92,29 @@ class ProfileFragment : BaseFragment(),
         observeFetchProfileLiveData()
         setupPhotoPickerRecyclerView()
         observeSaveAboutLiveData()
-//        setupFetchPhotosLiveDataObserver()
-//        observePhotosLiveData()
         setupListeners()
         observeUploadPhotoLiveData()
         observeSyncPhotosLiveData()
         observeOrderPhotosLiveData()
+        observeDeletePhotoLiveData()
         viewModel.syncPhotos()
+    }
+
+    private fun observeDeletePhotoLiveData() {
+        viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) showErrorDialog(
+                it.error,
+                getString(R.string.error_title_delete_photo),
+                it.errorMessage
+            )
+        }
     }
 
     private fun observeOrderPhotosLiveData() {
         viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) {
             if (it.isError() && validateAccount(it.error, it.errorMessage)) showErrorDialog(
                 it.error,
-                getString(R.string.error_title_order_photos_exception),
+                getString(R.string.error_title_order_photos),
                 it.errorMessage
             )
         }
@@ -299,10 +318,11 @@ class ProfileFragment : BaseFragment(),
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+
     private fun selectPhotoFromGallery() {
         val intent = Intent(Intent.ACTION_PICK)
-        intent.type = ProfileDialog.PHOTO_INTENT_TYPE
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, ProfileDialog.PHOTO_MIME_TYPES)
+        intent.type = PhotoConstant.PHOTO_INTENT_TYPE
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, PhotoConstant.PHOTO_MIME_TYPES)
         intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         readFromGalleryActivityResult.launch(intent)
     }
@@ -350,12 +370,32 @@ class ProfileFragment : BaseFragment(),
     override fun uploadPhotoFromGallery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (hasExternalStoragePermission()) selectPhotoFromGallery()
-            else requestPermissionForGallery.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            else requestGalleryPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         } else selectPhotoFromGallery()
     }
 
     override fun uploadPhotoFromCapture() {
-        TODO("Not yet implemented")
+        val cameraIsAvailable = activity?.packageManager?.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) ?: false
+        if (cameraIsAvailable) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (hasCameraPermission()) selectPhotoFromCapture()
+                else requestCameraPermission.launch(Manifest.permission.CAMERA)
+            } else selectPhotoFromCapture()
+        }
     }
 
+    private fun hasCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun selectPhotoFromCapture() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//        intent.type = ProfileDialog.PHOTO_INTENT_TYPE
+//        intent.putExtra(Intent.EXTRA_MIME_TYPES, ProfileDialog.PHOTO_MIME_TYPES)
+//        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        readFromCaptureActivityResult.launch(intent)
+    }
 }

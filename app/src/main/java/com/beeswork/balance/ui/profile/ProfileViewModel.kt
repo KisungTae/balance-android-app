@@ -43,7 +43,7 @@ class ProfileViewModel(
     val deletePhotoLiveData: LiveData<Resource<EmptyResponse>> get() = _deletePhotoLiveData
 
     private val _orderPhotosLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val orderPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _deletePhotoLiveData
+    val orderPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _orderPhotosLiveData
 
     private val _syncPhotosLiveData = MutableLiveData<Boolean>()
     val syncPhotosLiveData: LiveData<Boolean> get() = _syncPhotosLiveData
@@ -68,13 +68,10 @@ class ProfileViewModel(
         return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
             val photoPickers = mutableMapOf<String, PhotoPicker>()
             photos.mapIndexed { index, photo ->
-//                println("photo key: ${photo.key} | photo status: ${photo.status} | photo sequence: ${photo.sequence} | photos.mapIndexed: $index")
                 val photoPicker = photoMapper.toPhotoPicker(photo)
                 photoPicker.sequence = index
                 photoPickers[photo.key] = photoPicker
             }
-//            photos.map { photo -> photoPickers.add(photoMapper.toPhotoPicker(photo)) }
-//            repeat((MAX_PHOTO_COUNT - photos.size)) { photoPickers.add(PhotoPicker.asEmpty()) }
             photoPickers
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }

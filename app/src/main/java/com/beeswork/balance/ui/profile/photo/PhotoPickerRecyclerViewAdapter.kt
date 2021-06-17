@@ -33,8 +33,6 @@ class PhotoPickerRecyclerViewAdapter(
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
 
     private var photoPickers = mutableListOf<PhotoPicker>()
-    private var lastFromIndex = 0
-    private var lastToIndex = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPhotoPickerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -83,7 +81,7 @@ class PhotoPickerRecyclerViewAdapter(
         while (index < photoPickers.size) {
             val photoPicker = photoPickers[index]
             newPhotoPickers[photoPicker.key]?.let { newPhotoPicker ->
-                if (newPhotoPicker.status != PhotoStatus.ORDERING && index != newPhotoPicker.sequence) {
+                if (index != newPhotoPicker.sequence) {
                     swapPhotos(index, newPhotoPicker.sequence)
                     photoPicker.sequence = newPhotoPicker.sequence
                 } else index++
@@ -108,82 +106,8 @@ class PhotoPickerRecyclerViewAdapter(
         if (photoPickers[to].status == PhotoStatus.OCCUPIED && from != to) {
             val photoPicker = photoPickers.removeAt(from)
             photoPickers.add(to, photoPicker)
-            lastFromIndex = from
-            lastToIndex = to
             notifyItemMoved(from, to)
         }
-    }
-
-
-    fun downloadPhoto(photoKey: String) {
-        val index = photoPickers.indexOfFirst { it.key == photoKey }
-        val photoPicker = photoPickers[index]
-        photoPicker.status = PhotoStatus.OCCUPIED
-        notifyItemChanged(index)
-    }
-
-
-    fun uploadPhoto(photoKey: String, photoUri: Uri?): Int {
-        var sequence = 0
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-            when {
-//                photoPicker.status == PhotoPicker.Status.EMPTY -> {
-//                    sequence++
-//                    photoPicker.key = photoKey
-//                    photoPicker.status = PhotoPicker.Status.UPLOADING
-//                    photoPicker.uri = photoUri
-//                    photoPicker.sequence = sequence
-//                    notifyItemChanged(photoPickers.indexOf(photoPicker))
-//                    return sequence
-//                }
-//                photoPicker.key == photoKey -> {
-//                    photoPicker.status = PhotoPicker.Status.UPLOADING
-//                    notifyItemChanged(photoPickers.indexOf(photoPicker))
-//                    return photoPicker.sequence
-//                }
-                photoPicker.sequence > sequence -> {
-                    sequence = photoPicker.sequence
-                }
-            }
-        }
-        return -1
-    }
-
-    fun deletePhoto(photoKey: String) {
-//        photoPickers.find { it.key == photoKey }?.let {
-//            val index = photoPickers.indexOf(it)
-//            photoPickers.removeAt(index)
-//            notifyItemRemoved(index)
-//        }
-
-//        if (photoPickers.size < MAXIMUM_NUM_OF_PHOTOS) {
-//            photoPickers.add(PhotoPicker.asEmpty())
-//            notifyItemInserted((photoPickers.size - 1))
-//        }
-    }
-
-    fun updatePhotoPickerStatus(photoKey: String, photoPickerStatus: PhotoStatus) {
-//        photoPickers.find { it.key == photoKey }?.let {
-//            it.status = photoPickerStatus
-//            notifyItemChanged(photoPickers.indexOf(it), PHOTO_PICKER_PAYLOAD)
-//        }
-    }
-
-
-    fun isPhotoPickerDraggable(position: Int): Boolean {
-//        val photoPicker = photoPickers[position]
-//        return photoPicker.status == PhotoPicker.Status.OCCUPIED
-        return false
-    }
-
-    fun isOrderable(): Boolean {
-//        for (i in photoPickers.indices) {
-//            val photoPicker = photoPickers[i]
-//            if (photoPicker.status != PhotoPicker.Status.EMPTY && photoPicker.status != PhotoPicker.Status.OCCUPIED)
-//                return false
-//        }
-        return true
     }
 
     fun getPhotoPickerSequences(): Map<String, Int> {
@@ -192,33 +116,6 @@ class PhotoPickerRecyclerViewAdapter(
             photoPicker.key?.let { key -> photoPickerSequences[key] = index }
         }
         return photoPickerSequences
-    }
-
-    fun reorderPhotoPickers(photoPickerSequences: Map<String, Int>) {
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-            val sequence = photoPickerSequences[photoPicker.key]
-            sequence?.let { s ->
-//                photoPicker.sequence = s
-//                photoPicker.status = PhotoPicker.Status.OCCUPIED
-                notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
-
-            }
-        }
-    }
-
-    fun revertPhotoPickersSequence(photoPickerSequences: Map<String, Int>) {
-        val removed = photoPickers.removeAt(lastToIndex)
-        photoPickers.add(lastFromIndex, removed)
-        notifyItemMoved(lastToIndex, lastFromIndex)
-
-        for (i in photoPickers.indices) {
-            val photoPicker = photoPickers[i]
-            if (photoPickerSequences.containsKey(photoPicker.key)) {
-//                photoPicker.status = PhotoPicker.Status.OCCUPIED
-                notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
-            }
-        }
     }
 
     companion object {

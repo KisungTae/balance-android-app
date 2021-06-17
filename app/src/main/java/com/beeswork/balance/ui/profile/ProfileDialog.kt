@@ -312,14 +312,14 @@ class ProfileDialog : DialogFragment(), KodeinAware,
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
-                if (!photoPickerRecyclerViewAdapter().isPhotoPickerDraggable(viewHolder.layoutPosition)) return 0
-                if (!photoPickerRecyclerViewAdapter().isOrderable()) {
-                    ExceptionDialog(getString(R.string.photo_not_orderable_exception), null).show(
-                        childFragmentManager,
-                        ExceptionDialog.TAG
-                    )
-                    return 0
-                }
+//                if (!photoPickerRecyclerViewAdapter().isPhotoPickerDraggable(viewHolder.layoutPosition)) return 0
+//                if (!photoPickerRecyclerViewAdapter().isOrderable()) {
+//                    ExceptionDialog(getString(R.string.photo_not_orderable_exception), null).show(
+//                        childFragmentManager,
+//                        ExceptionDialog.TAG
+//                    )
+//                    return 0
+//                }
                 return super.getMovementFlags(recyclerView, viewHolder)
             }
 

@@ -78,7 +78,7 @@ class PhotoRepositoryImpl(
     }
 
     private suspend fun uploadPhotoToS3(photoFile: File, photo: Photo, mimeType: String): Resource<EmptyResponse> {
-        if (photo.uploaded) return Resource.success(null)
+        if (photo.uploaded) return Resource.success(EmptyResponse())
 
         val getPreSignedURLResponse = photoRDS.getPreSignedURL(
             preferenceProvider.getAccountId(),
@@ -105,7 +105,7 @@ class PhotoRepositoryImpl(
     private suspend fun savePhoto(photo: Photo): Resource<EmptyResponse> {
         if (photo.saved) {
             photoDAO.updateStatus(photo.key, PhotoStatus.OCCUPIED)
-            return Resource.success(null)
+            return Resource.success(EmptyResponse())
         }
 
         val savePhotoResponse = photoRDS.savePhoto(
@@ -140,17 +140,6 @@ class PhotoRepositoryImpl(
         return photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
     }
 
-    private fun deletePhoto(photoFile: File) {
-        try {
-            photoFile.delete()
-        } catch (e: IOException) {
-            // TODO: log exception?
-        } catch (e: SecurityException) {
-            // TODO: log exception?
-        }
-    }
-
-
     private fun createPhoto(photoKey: String?, photoUri: Uri, extension: String): Photo {
         return photoKey?.let { key ->
             val photo = photoDAO.findByKey(key)
@@ -159,7 +148,7 @@ class PhotoRepositoryImpl(
         } ?: kotlin.run {
             val sequence = (photoDAO.findLastSequence() ?: 0) + 1
             val newPhotoKey = UUID.randomUUID().toString() + "." + extension
-            Photo(newPhotoKey, PhotoStatus.UPLOADING, photoUri, sequence, sequence, false, false)
+            Photo(newPhotoKey, PhotoStatus.UPLOADING, photoUri, sequence, sequence, uploaded = false, saved = false)
         }
     }
 
@@ -177,11 +166,24 @@ class PhotoRepositoryImpl(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken(),
                     photo.key
-                ) else Resource.success(null)
+                ) else Resource.success(EmptyResponse())
 
-                if (response.isSuccess()) photoDAO.deletePhoto(photo.key)
+                if (response.isSuccess()) {
+                    deletePhoto(photo.uri)
+                    photoDAO.deletePhoto(photo.key)
+                }
                 return@withContext response
             } ?: return@withContext Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION)
+        }
+    }
+
+    private fun deletePhoto(photoUri: Uri) {
+        try {
+            photoUri.path?.let { path -> File(path).delete() }
+        } catch (e: IOException) {
+            // TODO: log exception?
+        } catch (e: SecurityException) {
+            // TODO: log exception?
         }
     }
 
@@ -197,33 +199,29 @@ class PhotoRepositoryImpl(
 
             for (i in photos.size - 1 downTo 0) {
                 val photo = photos[i]
-                if (photo.status != PhotoStatus.OCCUPIED) {
+                if (photo.status != PhotoStatus.OCCUPIED)
                     return@withContext Resource.error(ExceptionCode.PHOTO_NOT_ORDERABLE_EXCEPTION)
-                }
+
                 photoSequences[photo.key]?.let { sequence ->
                     if (photo.sequence != sequence) {
                         photo.status = PhotoStatus.ORDERING
+                        photo.oldSequence = photo.sequence
+                        photo.sequence = sequence
                     } else photos.removeAt(i)
-                } ?: kotlin.run {
-                    photos.removeAt(i)
-                }
+                } ?: kotlin.run { photos.removeAt(i) }
             }
-
             if (photos.size <= 0) return@withContext Resource.success(EmptyResponse())
 
             photoDAO.insert(photos)
-
             val response = photoRDS.orderPhotos(
                 preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(), photoSequences
+                preferenceProvider.getIdentityToken(),
+                photoSequences
             )
 
-            photos.forEach { it.status = PhotoStatus.OCCUPIED }
-
-            if (response.isSuccess()) photos.forEach { photo ->
-                photoSequences[photo.key]?.let { sequence ->
-                    photo.sequence = sequence
-                }
+            photos.forEach { photo ->
+                photo.status = PhotoStatus.OCCUPIED
+                if (response.isError()) photo.sequence = photo.oldSequence
             }
             photoDAO.insert(photos)
             return@withContext response
