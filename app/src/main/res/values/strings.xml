@@ -23,6 +23,8 @@
     <string name="error_title_delete_photo">사진을 삭제하지 못했습니다</string>
 
 
+    <string name="error_message_bad_request">유효하지 않은 요청입니다</string>
+
     <string name="unknown_host_exception">인터넷이 연결되어있는지 확인해주세요</string>
 
 

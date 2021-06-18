@@ -13,9 +13,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +40,8 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import java.io.File
+
 
 class ProfileFragment : BaseFragment(),
     KodeinAware,
@@ -68,8 +71,7 @@ class ProfileFragment : BaseFragment(),
     }
 
     private val readFromCaptureActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
-        println("result.resultCode ${result.resultCode}")
-        if (result.resultCode == Activity.RESULT_OK) result.data?.data?.let { uri -> launchCropImage(uri) }
+        if (result.resultCode == Activity.RESULT_OK){ launchCropImage(getCapturedPhotoUri()) }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -157,8 +159,18 @@ class ProfileFragment : BaseFragment(),
 
     private fun showSaveAboutError(resource: Resource<EmptyResponse>) {
         hideLoading()
+        resource.fieldErrorMessages?.let { fieldErrorMessages ->
+            for ((key, value) in fieldErrorMessages) {
+                getErrorViewByTag(key).text = value
+            }
+        }
         val errorTitle = getString(R.string.error_title_save_about)
-        showErrorDialog(resource.error, errorTitle, resource.errorMessage, RequestCode.SAVE_ABOUT, this)
+        val errorMessage = getString(R.string.error_message_bad_request)
+        showErrorDialog(resource.error, errorTitle, errorMessage, RequestCode.SAVE_ABOUT, this)
+    }
+
+    private fun getErrorViewByTag(tag: String): TextView {
+        return binding.root.findViewWithTag("tv${tag}Error")
     }
 
     private fun showLoading() {
@@ -338,6 +350,7 @@ class ProfileFragment : BaseFragment(),
                     result.error.localizedMessage ?: "",
                     null
                 )
+                deleteCapturedPhoto()
             }
         }
     }
@@ -393,9 +406,29 @@ class ProfileFragment : BaseFragment(),
 
     private fun selectPhotoFromCapture() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        intent.type = ProfileDialog.PHOTO_INTENT_TYPE
-//        intent.putExtra(Intent.EXTRA_MIME_TYPES, ProfileDialog.PHOTO_MIME_TYPES)
-//        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, getCapturedPhotoUri())
         readFromCaptureActivityResult.launch(intent)
+    }
+
+    private fun getCapturedPhotoUri(): Uri {
+        return FileProvider.getUriForFile(
+            requireContext(),
+            requireContext().packageName.toString() + FILE_PROVIDER_SUFFIX,
+            getCapturedPhotoFile()
+        )
+    }
+
+    private fun getCapturedPhotoFile(): File {
+        return File(requireContext().getExternalFilesDir(null), CAPTURED_PHOTO_NAME)
+    }
+
+    private fun deleteCapturedPhoto() {
+        val file = getCapturedPhotoFile()
+        if (file.exists()) file.delete()
+    }
+
+    companion object {
+        private const val CAPTURED_PHOTO_NAME = "capturedPhoto.jpg"
+        private const val FILE_PROVIDER_SUFFIX = ".fileProvider"
     }
 }

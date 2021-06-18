@@ -86,13 +86,13 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPhotoPicker"
-                android:paddingTop="15dp"
-                android:paddingBottom="30dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="20dp"
-                android:clipToPadding="false" />
+                android:clipToPadding="false"
+                android:paddingTop="15dp"
+                android:paddingBottom="30dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -218,6 +218,13 @@
                     android:layout_marginBottom="10dp"
                     android:text="@string/profile_about_label" />
 
+                <TextView
+                    android:text="자기소개는 최소 500글자 까지 가능합니다"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@color/WarningRed" />
+
                 <EditText
                     android:id="@+id/etProfileAbout"
                     android:layout_width="match_parent"
@@ -234,6 +241,7 @@
                     android:textCursorDrawable="@drawable/sh_edit_text_cursor" />
 
                 <TextView
+                    android:tag="tvAboutError"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
@@ -243,7 +251,7 @@
                     android:id="@+id/btnProfileEditBalanceGame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="40dp"
                     android:background="@drawable/sh_profile_edit_box"
                     android:clickable="true"
                     android:focusable="true"

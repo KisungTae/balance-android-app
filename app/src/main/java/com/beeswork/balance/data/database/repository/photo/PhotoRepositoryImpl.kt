@@ -179,7 +179,10 @@ class PhotoRepositoryImpl(
 
     private fun deletePhoto(photoUri: Uri) {
         try {
-            photoUri.path?.let { path -> File(path).delete() }
+            photoUri.path?.let { path ->
+                val file = File(path)
+                if (file.exists()) file.delete()
+            }
         } catch (e: IOException) {
             // TODO: log exception?
         } catch (e: SecurityException) {
