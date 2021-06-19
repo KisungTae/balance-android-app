@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="15dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="10dp"
                 android:clipToPadding="false"
                 android:paddingTop="15dp"
                 android:paddingBottom="30dp" />
@@ -111,7 +111,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="25dp"
-                    android:background="@drawable/sh_profile_edit_box"
+                    android:background="@drawable/sh_round_box_thin_border"
                     android:padding="15dp"
                     android:textColor="@color/TextGrey" />
 
@@ -127,7 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="25dp"
-                    android:background="@drawable/sh_profile_edit_box"
+                    android:background="@drawable/sh_round_box_thin_border"
                     android:padding="15dp"
                     android:textColor="@color/TextGrey" />
 
@@ -177,7 +177,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="25dp"
-                    android:background="@drawable/sh_profile_edit_box"
+                    android:background="@drawable/sh_round_box_thin_border"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
@@ -219,10 +219,12 @@
                     android:text="@string/profile_about_label" />
 
                 <TextView
-                    android:text="자기소개는 최소 500글자 까지 가능합니다"
+                    android:visibility="gone"
+                    android:id="@+id/tvAboutError"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
+                    android:tag="aboutError"
                     android:textColor="@color/WarningRed" />
 
                 <EditText
@@ -231,7 +233,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="25dp"
                     android:autofillHints="@string/profile_about_hint"
-                    android:background="@drawable/sh_profile_edit_box"
+                    android:background="@drawable/sh_round_box_thin_border"
                     android:gravity="top"
                     android:hint="@string/profile_about_hint"
                     android:inputType="textMultiLine"
@@ -241,7 +243,6 @@
                     android:textCursorDrawable="@drawable/sh_edit_text_cursor" />
 
                 <TextView
-                    android:tag="tvAboutError"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
@@ -252,7 +253,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="40dp"
-                    android:background="@drawable/sh_profile_edit_box"
+                    android:background="@drawable/sh_round_box_thin_border"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"

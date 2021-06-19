@@ -1,7 +1,7 @@
 package com.beeswork.balance.internal.mapper.swipe
 
 import com.beeswork.balance.data.network.response.swipe.CardDTO
-import com.beeswork.balance.ui.swipe.CardDomain
+import com.beeswork.balance.ui.swipe.card.CardDomain
 import java.util.*
 
 class CardMapperImpl : CardMapper {

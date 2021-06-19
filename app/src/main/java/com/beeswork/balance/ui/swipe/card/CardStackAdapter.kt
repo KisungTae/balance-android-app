@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipe
+package com.beeswork.balance.ui.swipe.card
 
 
 import android.view.LayoutInflater
@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.ItemCardStackBinding
 import com.google.android.material.tabs.TabLayoutMediator
-import java.util.*
 
 
 class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
@@ -50,12 +49,10 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
         }
 
         override fun onLeftButtonClick(position: Int) {
-            println("onLeftButtonClick position: $position")
             binding.vpCardPhoto.currentItem = position - 1
         }
 
         override fun onRightButtonClick(position: Int) {
-            println("onRightButtonClick position: $position")
             binding.vpCardPhoto.currentItem = position + 1
         }
     }

@@ -69,8 +69,8 @@ import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profile.ProfileViewModelFactory
-import com.beeswork.balance.ui.swipe.SwipeBalanceGameViewModelFactory
-import com.beeswork.balance.ui.swipe.SwipeFilterDialogViewModelFactory
+import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameViewModelFactory
+import com.beeswork.balance.ui.swipe.filter.SwipeFilterDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen

@@ -1,7 +1,7 @@
 package com.beeswork.balance.internal.mapper.setting
 
 import com.beeswork.balance.data.database.entity.Setting
-import com.beeswork.balance.ui.settings.SettingDomain
+import com.beeswork.balance.ui.setting.SettingDomain
 
 interface SettingMapper {
 

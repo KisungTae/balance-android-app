@@ -168,40 +168,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/llAccountAbout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingVertical="15dp">
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="10dp"
-                android:contentDescription="@string/about_weclick_icon_description"
-                android:src="@drawable/ic_baseline_search" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:text="@string/about_weclick_text"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/select_arrow_icon_description"
-                android:src="@drawable/ic_baseline_arrow_forward_ios_24"
-                app:tint="@color/GreyDark" />
-
-        </LinearLayout>
-
-
     </LinearLayout>
 
     <LinearLayout

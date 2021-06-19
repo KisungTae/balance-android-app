@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.beeswork.balance.ui.swipe.CardImageView
+    <com.beeswork.balance.ui.swipe.card.CardImageView
         android:id="@+id/civCardPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

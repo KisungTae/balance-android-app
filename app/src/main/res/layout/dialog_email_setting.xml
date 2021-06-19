@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lighterGrey"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/BackgroundWhite"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnEmailSettingBack"
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:background="@color/BackgroundWhite"
+            android:contentDescription="@string/back_button_description"
+            android:src="@drawable/ic_baseline_arrow_back_ios" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/email_setting_title"
+            android:textAlignment="center"
+            android:textSize="@dimen/tool_bar_title_medium_text_size"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:background="@color/BackgroundWhite"
+            android:contentDescription="@string/profile_save_icon_description" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginVertical="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/email_label" />
+
+        <TextView
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/WarningRed" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/sh_round_box_thin_border"
+            android:padding="15dp"
+            android:textCursorDrawable="@drawable/sh_edit_text_cursor" />
+
+        <androidx.appcompat.widget.AppCompatButton
+
+            android:id="@+id/btnEmailSettingSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sh_round_box_thin_border"
+            android:text="저장하기"
+            android:textColor="@color/Primary"
+            android:textSize="@dimen/text_medium_size" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

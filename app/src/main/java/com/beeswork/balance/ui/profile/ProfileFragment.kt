@@ -71,7 +71,9 @@ class ProfileFragment : BaseFragment(),
     }
 
     private val readFromCaptureActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK){ launchCropImage(getCapturedPhotoUri()) }
+        if (result.resultCode == Activity.RESULT_OK) {
+            launchCropImage(getCapturedPhotoUri())
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -154,23 +156,34 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun showSaveAboutSuccessToast() {
+        binding.btnProfileSave.visibility = View.VISIBLE
+        binding.spvProfileLoading.visibility = View.GONE
         Toast.makeText(requireContext(), getString(R.string.save_about_success_message), Toast.LENGTH_SHORT).show()
     }
 
     private fun showSaveAboutError(resource: Resource<EmptyResponse>) {
         hideLoading()
+        var errorMessage = resource.errorMessage
         resource.fieldErrorMessages?.let { fieldErrorMessages ->
             for ((key, value) in fieldErrorMessages) {
-                getErrorViewByTag(key).text = value
+                val errorTextView = getErrorViewByTag(key)
+                errorTextView.text = value
+                errorTextView.visibility = View.VISIBLE
             }
+            errorMessage = getString(R.string.error_message_bad_request)
+        } ?: kotlin.run {
+            hideFieldErrors()
         }
         val errorTitle = getString(R.string.error_title_save_about)
-        val errorMessage = getString(R.string.error_message_bad_request)
         showErrorDialog(resource.error, errorTitle, errorMessage, RequestCode.SAVE_ABOUT, this)
     }
 
+    private fun hideFieldErrors() {
+        binding.tvAboutError.visibility = View.GONE
+    }
+
     private fun getErrorViewByTag(tag: String): TextView {
-        return binding.root.findViewWithTag("tv${tag}Error")
+        return binding.root.findViewWithTag("${tag}Error")
     }
 
     private fun showLoading() {
@@ -260,7 +273,7 @@ class ProfileFragment : BaseFragment(),
 
     private fun setupToolBar() {
         binding.btnProfileSave.setOnClickListener { saveAbout() }
-        binding.btnProfileBack.setOnClickListener { popBackStack() }
+        binding.btnProfileBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
     }
 
     private fun saveAbout(): Boolean {
@@ -274,13 +287,6 @@ class ProfileFragment : BaseFragment(),
         repeat(1000) {
             println("ui lifecyclecope: $it")
         }
-    }
-
-    private fun popBackStack() {
-        requireActivity().supportFragmentManager.popBackStack(
-            MainViewPagerFragment.TAG,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
     }
 
     override fun onHeightChanged(height: Int) {

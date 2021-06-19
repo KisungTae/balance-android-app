@@ -6,12 +6,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.converter.UUIDConverter
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.internal.constant.*
 
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
+import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameDialog
+import com.beeswork.balance.ui.swipe.card.CardStackAdapter
+import com.beeswork.balance.ui.swipe.filter.SwipeFilterDialog
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction

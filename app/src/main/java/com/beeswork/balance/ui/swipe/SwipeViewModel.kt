@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import com.beeswork.balance.ui.swipe.card.CardDomain
 import kotlinx.coroutines.CoroutineDispatcher
 
 class SwipeViewModel(

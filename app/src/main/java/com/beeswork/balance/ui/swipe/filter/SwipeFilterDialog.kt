@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipe
+package com.beeswork.balance.ui.swipe.filter
 
 
 import android.os.Bundle
@@ -6,7 +6,6 @@ import android.view.*
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.entity.SwipeFilter
 import com.beeswork.balance.databinding.DialogSwipeFilterBinding
 import com.beeswork.balance.internal.constant.Gender
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

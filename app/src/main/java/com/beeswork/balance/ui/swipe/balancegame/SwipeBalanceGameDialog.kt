@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipe
+package com.beeswork.balance.ui.swipe.balancegame
 
 import android.os.Bundle
 import android.view.LayoutInflater

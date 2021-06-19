@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipe
+package com.beeswork.balance.ui.swipe.card
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -50,15 +50,11 @@ class CardPhotoViewPagerAdapter(
 
         init {
             binding.btnCardImageLeft.setOnClickListener {
-                println("btnCardImageLeft.setOnClickListener")
                 cardPhotoListener.onLeftButtonClick(absoluteAdapterPosition)
-//                viewPager2.currentItem = adapterPosition - 1
             }
 
             binding.btnCardImageRight.setOnClickListener {
-                println("btnCardImageRight.setOnClickListener")
                 cardPhotoListener.onRightButtonClick(absoluteAdapterPosition)
-//                viewPager2.currentItem = adapterPosition + 1
             }
         }
 

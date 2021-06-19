@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipe
+package com.beeswork.balance.ui.swipe.card
 
 import android.content.Context
 import android.util.AttributeSet

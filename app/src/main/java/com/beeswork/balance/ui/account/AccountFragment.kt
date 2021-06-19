@@ -19,6 +19,7 @@ import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.beeswork.balance.ui.profile.ProfileDialog
 import com.beeswork.balance.ui.profile.ProfileFragment
+import com.beeswork.balance.ui.setting.SettingFragment
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -56,10 +57,13 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun setupListeners() {
-        binding.llAccountEditProfile.setOnClickListener { moveToProfileFragment() }
-        binding.llAccountChargePoint.setOnClickListener {  }
-        binding.llAccountAbout.setOnClickListener {  }
-        binding.llAccountSetting.setOnClickListener {  }
+        binding.llAccountEditProfile.setOnClickListener {
+            moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+        }
+        binding.llAccountChargePoint.setOnClickListener { }
+        binding.llAccountSetting.setOnClickListener {
+            moveToFragment(SettingFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+        }
     }
 
     private fun setupAccountInfo() {
@@ -73,21 +77,6 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
             .circleCrop()
             .into(binding.ivAccountProfile)
         binding.tvAccountName.text = preferenceProvider.getName()
-    }
-
-    private fun moveToProfileFragment() {
-        val profileFragment = ProfileFragment()
-        activity?.supportFragmentManager?.beginTransaction()?.let {
-            it.setCustomAnimations(
-                R.anim.enter_right_to_left,
-                R.anim.exit_right_to_left,
-                R.anim.enter_left_to_right,
-                R.anim.exit_left_to_right
-            )
-            it.add(R.id.fcvMain, profileFragment)
-            it.addToBackStack(MainViewPagerFragment.TAG)
-            it.commit()
-        }
     }
 
     private suspend fun setupEmailLiveDataObserver() {

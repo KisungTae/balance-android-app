@@ -107,7 +107,7 @@ class ChatFragment : BaseFragment(),
     private fun setupUnmatchLiveDataObserver() {
         viewModel.unmatchLiveData.observe(viewLifecycleOwner, {
             when {
-                it.isSuccess() -> popBackStack()
+                it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 it.isLoading() -> showLoading()
                 it.isError() && validateAccount(it.error, it.errorMessage) -> {
                     hideLoading()
@@ -129,7 +129,7 @@ class ChatFragment : BaseFragment(),
     private fun setupReportMatchLiveDataObserver() {
         viewModel.reportMatchLiveData.observe(viewLifecycleOwner, {
             when {
-                it.isSuccess() -> popBackStack()
+                it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 it.isLoading() -> getReportDialog()?.showLoading()
                 it.isError() && validateAccount(it.error, it.errorMessage) -> {
                     getReportDialog()?.hideLoading()
@@ -207,7 +207,7 @@ class ChatFragment : BaseFragment(),
     private fun setupBackPressedDispatcherCallback() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                popBackStack()
+                popBackStack(MainViewPagerFragment.TAG)
             }
         })
     }
@@ -221,7 +221,7 @@ class ChatFragment : BaseFragment(),
                 else -> false
             }
         }
-        binding.btnChatBack.setOnClickListener { popBackStack() }
+        binding.btnChatBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
     }
 
     private fun showMoreMenu(): Boolean {
@@ -259,12 +259,8 @@ class ChatFragment : BaseFragment(),
 //        }
     }
 
-    private fun popBackStack() {
-        requireActivity().supportFragmentManager.popBackStack(MainViewPagerFragment.TAG, POP_BACK_STACK_INCLUSIVE)
-    }
-
     override fun onDismissErrorDialog() {
-        popBackStack()
+        popBackStack(MainViewPagerFragment.TAG)
     }
 
     override fun onResendChatMessage(position: Int) {

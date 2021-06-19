@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipe
+package com.beeswork.balance.ui.swipe.filter
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

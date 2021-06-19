@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipe
+package com.beeswork.balance.ui.swipe.filter
 
 import com.beeswork.balance.data.database.entity.SwipeFilter
 import com.beeswork.balance.internal.constant.Gender

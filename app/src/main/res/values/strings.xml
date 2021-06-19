@@ -170,4 +170,8 @@
     <string name="reupload_text">다시 업로드하기</string>
     <string name="redownload_text">다시 다운로드</string>
     <string name="delete_photo_icon_description">delete photo icon</string>
+    <string name="setting_tool_bar_title">Setting</string>
+    <string name="setting_email_label">Email</string>
+    <string name="email_setting_title">Email</string>
+    <string name="email_label">Email</string>
 </resources>

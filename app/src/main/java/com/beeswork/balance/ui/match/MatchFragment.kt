@@ -184,18 +184,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
             arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, it.profilePhotoKey.toString())
             chatFragment.arguments = arguments
         }
-
-        activity?.supportFragmentManager?.beginTransaction()?.let {
-            it.setCustomAnimations(
-                R.anim.enter_right_to_left,
-                R.anim.exit_right_to_left,
-                R.anim.enter_left_to_right,
-                R.anim.exit_left_to_right
-            )
-            it.add(R.id.fcvMain, chatFragment)
-            it.addToBackStack(MainViewPagerFragment.TAG)
-            it.commit()
-        }
+        moveToFragment(chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)
     }
 
     override fun onRetry(requestCode: Int?) {
