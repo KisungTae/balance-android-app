@@ -2,8 +2,8 @@ package com.beeswork.balance.data.network.rds.profile
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
+import com.beeswork.balance.data.network.request.PostAnswersBody
 import com.beeswork.balance.data.network.request.SaveAboutBody
-import com.beeswork.balance.data.network.request.SaveAnswersBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
@@ -19,7 +19,7 @@ class ProfileRDSImpl(
         answers: Map<Int, Boolean>
     ): Resource<EmptyResponse> {
         return getResult {
-            balanceAPI.saveAnswers(SaveAnswersBody(accountId, identityToken, answers))
+            balanceAPI.postAnswers(PostAnswersBody(accountId, identityToken, answers))
         }
     }
 

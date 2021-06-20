@@ -2,6 +2,7 @@ package com.beeswork.balance.data.network.rds.setting
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
+import com.beeswork.balance.data.network.request.PostEmailBody
 import com.beeswork.balance.data.network.request.PostFCMTokenBody
 import com.beeswork.balance.data.network.request.PostLocationBody
 import com.beeswork.balance.data.network.request.PostSettingsBody
@@ -13,6 +14,14 @@ import java.util.*
 class SettingRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), SettingRDS {
+
+    override suspend fun getEmail(accountId: UUID?, identityToken: UUID?): Resource<String> {
+        return getResult { balanceAPI.getEmail(accountId, identityToken) }
+    }
+
+    override suspend fun postEmail(accountId: UUID?, identityToken: UUID?, email: String): Resource<EmptyResponse> {
+        return getResult { balanceAPI.postEmail(PostEmailBody(accountId, identityToken, email)) }
+    }
 
     override suspend fun postFCMToken(accountId: UUID?, identityToken: UUID?, token: String): Resource<EmptyResponse> {
         return getResult {

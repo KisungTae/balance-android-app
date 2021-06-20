@@ -1,4 +1,9 @@
 package com.beeswork.balance.ui.setting.notification
 
-class NotificationSettingViewModel {
+import androidx.lifecycle.ViewModel
+import com.beeswork.balance.data.database.repository.setting.SettingRepository
+
+class NotificationSettingViewModel(
+    private val settingRepository: SettingRepository
+): ViewModel() {
 }

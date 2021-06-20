@@ -7,6 +7,8 @@ import com.beeswork.balance.data.database.entity.FCMToken
 import com.beeswork.balance.data.database.entity.Location
 import com.beeswork.balance.data.database.entity.Setting
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
+import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -57,6 +59,31 @@ class SettingRepositoryImpl(
             locationDAO.findById()?.let { location ->
                 if (!location.synced)
                     syncLocation(location.latitude, location.longitude, location.updatedAt)
+            }
+        }
+    }
+
+    override suspend fun saveEmail(email: String): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val response = settingRDS.postEmail(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                email
+            )
+            if (response.isSuccess()) settingDAO.syncEmail(email)
+            return@withContext response
+        }
+    }
+
+    override suspend fun fetchEmail() {
+        withContext(ioDispatcher) {
+            val setting = getSettingOrDefault()
+            if (!setting.emailSynced) {
+                val response = settingRDS.getEmail(
+                    preferenceProvider.getAccountId(),
+                    preferenceProvider.getIdentityToken()
+                )
+                response.data?.let { email -> settingDAO.syncEmail(email) }
             }
         }
     }

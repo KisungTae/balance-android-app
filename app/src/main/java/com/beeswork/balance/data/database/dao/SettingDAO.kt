@@ -18,4 +18,7 @@ interface SettingDAO {
 
     @Query("select email from setting where id = ${Setting.ID}")
     fun findEmailFlow(): Flow<String?>
+
+    @Query("update setting set email = :email, emailSynced = 1 where id = ${Setting.ID}")
+    fun syncEmail(email: String)
 }

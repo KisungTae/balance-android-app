@@ -2,8 +2,8 @@ package com.beeswork.balance.data.network.request
 
 import java.util.*
 
-data class SaveAnswersBody(
+data class PostEmailBody(
     val accountId: UUID?,
     val identityToken: UUID?,
-    val answers: Map<Int, Boolean>
+    val email: String
 )

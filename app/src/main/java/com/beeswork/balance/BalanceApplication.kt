@@ -69,6 +69,8 @@ import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profile.ProfileViewModelFactory
+import com.beeswork.balance.ui.setting.email.EmailSettingViewModelFactory
+import com.beeswork.balance.ui.setting.notification.NotificationSettingViewModelFactory
 import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameViewModelFactory
 import com.beeswork.balance.ui.swipe.filter.SwipeFilterDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
@@ -272,6 +274,8 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
+        bind() from provider { EmailSettingViewModelFactory(instance()) }
+        bind() from provider { NotificationSettingViewModelFactory(instance()) }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }

@@ -27,6 +27,15 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @GET("login/email")
+    suspend fun getEmail(
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?,
+    ): Response<String>
+
+    @POST("login/email")
+    suspend fun postEmail(@Body postEmailBody: PostEmailBody): Response<EmptyResponse>
+
     @GET("photo/sign")
     suspend fun getPreSignedURL(
         @Query(value = "accountId") accountId: UUID?,
@@ -39,9 +48,6 @@ interface BalanceAPI {
         @Query(value = "accountId") accountId: UUID?,
         @Query(value = "identityToken") identityToken: UUID?
     ): Response<List<PhotoDTO>>
-
-    @POST("account/question/answers")
-    suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
 
     @GET("account/question/list")
     suspend fun listQuestions(

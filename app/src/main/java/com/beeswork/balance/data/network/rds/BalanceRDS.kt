@@ -36,11 +36,11 @@ interface BalanceRDS {
         questionIds: List<Int>
     ): Resource<QuestionResponse>
 
-    suspend fun postAnswers(
-        accountId: String,
-        identityToken: String,
-        answers: Map<Int, Boolean>
-    ): Resource<EmptyResponse>
+//    suspend fun postAnswers(
+//        accountId: String,
+//        identityToken: String,
+//        answers: Map<Int, Boolean>
+//    ): Resource<EmptyResponse>
 
 //    suspend fun swipe(
 //        accountId: String,

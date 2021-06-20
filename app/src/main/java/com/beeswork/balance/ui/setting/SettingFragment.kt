@@ -7,11 +7,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceFragmentCompat
 import com.beeswork.balance.R
+import com.beeswork.balance.databinding.DialogNotificationSettingBinding
 import com.beeswork.balance.databinding.FragmentAccountBinding
 import com.beeswork.balance.databinding.FragmentSettingBinding
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.beeswork.balance.ui.setting.email.EmailSettingDialog
+import com.beeswork.balance.ui.setting.notification.NotificationSettingDialog
 import kotlinx.coroutines.launch
 
 class SettingFragment : BaseFragment() {
@@ -36,6 +38,9 @@ class SettingFragment : BaseFragment() {
         binding.btnSettingBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
         binding.btnSettingEmail.setOnClickListener {
             EmailSettingDialog().show(childFragmentManager, EmailSettingDialog.TAG)
+        }
+        binding.btnSettingNotification.setOnClickListener {
+            NotificationSettingDialog().show(childFragmentManager, NotificationSettingDialog.TAG)
         }
     }
 

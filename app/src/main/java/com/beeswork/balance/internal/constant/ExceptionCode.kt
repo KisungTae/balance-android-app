@@ -40,6 +40,8 @@ class ExceptionCode {
 
         const val MATCH_UNMATCHED_EXCEPTION = "match_unmatched_exception"
 
+        const val INVALID_EMAIL_EXCEPTION = "invalid_email_exception"
+
     }
 
 }

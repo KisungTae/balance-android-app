@@ -21,9 +21,12 @@
     <string name="error_title_add_photo">사진을 업로드 하지못했습니다</string>
     <string name="error_title_order_photos">사진을 재정리 하지 못했습니다</string>
     <string name="error_title_delete_photo">사진을 삭제하지 못했습니다</string>
+    <string name="error_title_save_email">이메일을 저장하지 못했습니다</string>
 
 
     <string name="error_message_bad_request">유효하지 않은 요청입니다</string>
+    <string name="invalid_email_exception">유효하지 않은 이메일입니다</string>
+    <string name="save_email_success_message">이메일을 저장했습니다</string>
 
     <string name="unknown_host_exception">인터넷이 연결되어있는지 확인해주세요</string>
 
@@ -174,4 +177,10 @@
     <string name="setting_email_label">Email</string>
     <string name="email_setting_title">Email</string>
     <string name="email_label">Email</string>
+    <string name="notification_setting_title">Notification</string>
+    <string name="save_btn_text">저장하기</string>
+    <string name="email_hint">이메일을 입력해주세요</string>
+    <string name="match_notification_label">매치 알람</string>
+    <string name="clicked_notification_label">좋아요 알람</string>
+    <string name="chat_message_notification_label">채팅메세지 알람</string>
 </resources>

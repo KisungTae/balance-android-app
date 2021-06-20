@@ -61,21 +61,21 @@ class BalanceRDSImpl(
         return getResult { balanceAPI.fetchRandomQuestion(questionIds) }
     }
 
-    override suspend fun postAnswers(
-        accountId: String,
-        identityToken: String,
-        answers: Map<Int, Boolean>
-    ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.postAnswers(
-                PostAnswersBody(
-                    accountId,
-                    identityToken,
-                    answers
-                )
-            )
-        }
-    }
+//    override suspend fun postAnswers(
+//        accountId: String,
+//        identityToken: String,
+//        answers: Map<Int, Boolean>
+//    ): Resource<EmptyResponse> {
+//        return getResult {
+//            balanceAPI.postAnswers(
+//                PostAnswersBody(
+//                    accountId,
+//                    identityToken,
+//                    answers
+//                )
+//            )
+//        }
+//    }
 
 
 //    override suspend fun fetchCards(
