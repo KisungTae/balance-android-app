@@ -10,5 +10,8 @@ interface SettingRepository {
     suspend fun syncLocation()
     suspend fun saveEmail(email: String): Resource<EmptyResponse>
     suspend fun fetchEmail()
+    suspend fun updateMatchPush(matchPush: Boolean)
+    suspend fun updateClickedPush(clickedPush: Boolean)
+    suspend fun updateChatMessagePush(chatMessage: Boolean)
     fun getEmailFlow(): Flow<String?>
 }

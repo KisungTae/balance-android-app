@@ -56,7 +56,7 @@ class ClickRepositoryImpl(
     }
 
 
-    override suspend fun saveClick(clickDTO: ClickDTO) {
+    override suspend fun saveClickFromFCMPush(clickDTO: ClickDTO) {
         withContext(Dispatchers.IO) {
             val click = clickMapper.toClick(clickDTO)
             if (saveClick(click)) newClickFlowListener?.onReceive(click)

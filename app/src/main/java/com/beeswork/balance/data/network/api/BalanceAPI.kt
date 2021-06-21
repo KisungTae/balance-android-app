@@ -27,6 +27,9 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("setting/push")
+    suspend fun postPushSettings(@Body postPushSettingsBody: PostPushSettingsBody): Response<EmptyResponse>
+
     @GET("login/email")
     suspend fun getEmail(
         @Query(value = "accountId") accountId: UUID?,
@@ -164,8 +167,6 @@ interface BalanceAPI {
 
     @POST("/account/answers")
     suspend fun postAnswers(@Body postAnswersBody: PostAnswersBody): Response<EmptyResponse>
-
-
 
 
     companion object {

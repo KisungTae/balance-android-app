@@ -70,7 +70,7 @@ import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profile.ProfileViewModelFactory
 import com.beeswork.balance.ui.setting.email.EmailSettingViewModelFactory
-import com.beeswork.balance.ui.setting.notification.NotificationSettingViewModelFactory
+import com.beeswork.balance.ui.setting.push.PushSettingViewModelFactory
 import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameViewModelFactory
 import com.beeswork.balance.ui.swipe.filter.SwipeFilterDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
@@ -275,7 +275,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
         bind() from provider { EmailSettingViewModelFactory(instance()) }
-        bind() from provider { NotificationSettingViewModelFactory(instance()) }
+        bind() from provider { PushSettingViewModelFactory(instance()) }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
@@ -447,3 +447,4 @@ class BalanceApplication : Application(), KodeinAware {
 //           if not, then display refresh button, and saveAbout, and upload, reorder, delete photo should check the flag in the table
 //           if not syched, then display error message saying you need to sync first before saving about or photos.
 //      126. check profile validation like about >= 500 characters,
+//      127. check fmc notiication with pushsettngs

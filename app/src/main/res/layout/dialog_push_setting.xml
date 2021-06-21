@@ -64,7 +64,7 @@
 
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/scMatchNotification"
+                android:id="@+id/scMatchPush"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
                 android:thumb="@drawable/sh_thumb"
@@ -89,7 +89,7 @@
 
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/scClickedNotification"
+                android:id="@+id/scClickedPush"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
                 android:thumb="@drawable/sh_thumb"
@@ -112,7 +112,7 @@
                 android:text="@string/chat_message_notification_label" />
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/scChatMessageNotification"
+                android:id="@+id/scChatMessagePush"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
                 android:thumb="@drawable/sh_thumb"

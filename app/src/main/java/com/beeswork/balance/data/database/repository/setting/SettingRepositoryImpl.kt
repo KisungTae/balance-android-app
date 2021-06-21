@@ -88,13 +88,51 @@ class SettingRepositoryImpl(
         }
     }
 
+    override suspend fun updateMatchPush(matchPush: Boolean) {
+        withContext(ioDispatcher) {
+            settingDAO.updateMatchPush(matchPush)
+            val response = postPushSettings(matchPush, null, null)
+            if (response.isSuccess()) settingDAO.syncMatchPush()
+        }
+    }
+
+    override suspend fun updateClickedPush(clickedPush: Boolean) {
+        withContext(ioDispatcher) {
+            settingDAO.updateClickedPush(clickedPush)
+            val response = postPushSettings(null, clickedPush, null)
+            if (response.isSuccess()) settingDAO.syncClickedPush()
+        }
+    }
+
+    override suspend fun updateChatMessagePush(chatMessagePush: Boolean) {
+        withContext(ioDispatcher) {
+            settingDAO.updateChatMessagePush(chatMessagePush)
+            val response = postPushSettings(null, null, chatMessagePush)
+            if (response.isSuccess()) settingDAO.syncChatMessagePush()
+        }
+    }
+
+    private suspend fun postPushSettings(
+        matchPush: Boolean?,
+        clickedPush: Boolean?,
+        chatMessagePush: Boolean?
+    ): Resource<EmptyResponse> {
+        return settingRDS.postPushSettings(
+            preferenceProvider.getAccountId(),
+            preferenceProvider.getIdentityToken(),
+            matchPush,
+            clickedPush,
+            chatMessagePush
+        )
+    }
+
     override fun getEmailFlow(): Flow<String?> {
         return settingDAO.findEmailFlow()
     }
 
     private fun getSettingOrDefault(): Setting {
         return settingDAO.findById() ?: kotlin.run {
-            val setting = Setting(null, false)
+            val setting = Setting()
             settingDAO.insert(setting)
             setting
         }
