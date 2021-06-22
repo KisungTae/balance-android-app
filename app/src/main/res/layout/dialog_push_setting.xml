@@ -52,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
             android:background="@drawable/sh_circle_box_thin_border"
+            android:gravity="center"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp">
@@ -61,6 +62,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/match_notification_label" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvMatchPushLoading"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/spin_kit_small_size"
+                android:layout_height="@dimen/spin_kit_small_size"
+                android:layout_marginEnd="5dp"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Grey" />
 
 
             <androidx.appcompat.widget.SwitchCompat
@@ -77,6 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
             android:background="@drawable/sh_circle_box_thin_border"
+            android:gravity="center"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp">
@@ -86,6 +97,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/clicked_notification_label" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvClickedPushLoading"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/spin_kit_small_size"
+                android:layout_height="@dimen/spin_kit_small_size"
+                android:layout_marginEnd="5dp"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Grey" />
 
 
             <androidx.appcompat.widget.SwitchCompat
@@ -101,6 +121,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/sh_circle_box_thin_border"
+            android:gravity="center"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp">
@@ -110,6 +131,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/chat_message_notification_label" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvChatMessagePushLoading"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/spin_kit_small_size"
+                android:layout_height="@dimen/spin_kit_small_size"
+                android:layout_marginEnd="5dp"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Grey" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/scChatMessagePush"

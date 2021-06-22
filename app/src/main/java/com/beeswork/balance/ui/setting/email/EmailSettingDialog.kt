@@ -50,7 +50,8 @@ class EmailSettingDialog : BaseDialog(), KodeinAware {
 
     private suspend fun observeEmailLiveData() {
         viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
-            binding.etEmailSettingEmail.setText(email)
+            if (binding.etEmailSettingEmail.text.toString() != email)
+                binding.etEmailSettingEmail.setText(email)
         }
     }
 

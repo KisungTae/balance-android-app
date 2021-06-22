@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.dao.SettingDAO
 import com.beeswork.balance.data.database.entity.FCMToken
 import com.beeswork.balance.data.database.entity.Location
 import com.beeswork.balance.data.database.entity.Setting
+import com.beeswork.balance.data.database.tuple.PushSettingsTuple
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -88,27 +89,36 @@ class SettingRepositoryImpl(
         }
     }
 
-    override suspend fun updateMatchPush(matchPush: Boolean) {
-        withContext(ioDispatcher) {
+    override suspend fun saveMatchPush(matchPush: Boolean): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
             settingDAO.updateMatchPush(matchPush)
             val response = postPushSettings(matchPush, null, null)
             if (response.isSuccess()) settingDAO.syncMatchPush()
+            return@withContext response
         }
     }
 
-    override suspend fun updateClickedPush(clickedPush: Boolean) {
-        withContext(ioDispatcher) {
+    override suspend fun saveClickedPush(clickedPush: Boolean): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
             settingDAO.updateClickedPush(clickedPush)
             val response = postPushSettings(null, clickedPush, null)
             if (response.isSuccess()) settingDAO.syncClickedPush()
+            return@withContext response
         }
     }
 
-    override suspend fun updateChatMessagePush(chatMessagePush: Boolean) {
-        withContext(ioDispatcher) {
+    override suspend fun saveChatMessagePush(chatMessagePush: Boolean): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
             settingDAO.updateChatMessagePush(chatMessagePush)
             val response = postPushSettings(null, null, chatMessagePush)
             if (response.isSuccess()) settingDAO.syncChatMessagePush()
+            return@withContext response
+        }
+    }
+
+    override suspend fun getSetting(): Setting {
+        return withContext(ioDispatcher) {
+            return@withContext getSettingOrDefault()
         }
     }
 
@@ -128,6 +138,14 @@ class SettingRepositoryImpl(
 
     override fun getEmailFlow(): Flow<String?> {
         return settingDAO.findEmailFlow()
+    }
+
+    override suspend fun getPushSettingsFlow(): Flow<PushSettingsTuple> {
+        return withContext(ioDispatcher) {
+            getSettingOrDefault()
+            return@withContext settingDAO.findPushSettingsFlow()
+        }
+
     }
 
     private fun getSettingOrDefault(): Setting {

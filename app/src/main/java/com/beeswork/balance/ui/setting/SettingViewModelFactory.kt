@@ -1,15 +1,16 @@
-package com.beeswork.balance.ui.setting.push
+package com.beeswork.balance.ui.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
+import com.beeswork.balance.ui.setting.push.PushSettingViewModel
 
-class PushSettingViewModelFactory(
+class SettingViewModelFactory(
     private val settingRepository: SettingRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return PushSettingViewModel(settingRepository) as T
+        return SettingViewModel(settingRepository) as T
     }
 }

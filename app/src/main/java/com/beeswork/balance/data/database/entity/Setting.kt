@@ -7,14 +7,13 @@ import org.threeten.bp.OffsetDateTime
 @Entity(tableName = "setting")
 data class Setting(
     val email: String? = null,
-    val emailSynced: Boolean = false,
-    val matchPush: Boolean = false,
-    val matchPushSynced: Boolean = false,
-    val clickedPush: Boolean = false,
-    val clickedPushSynced: Boolean = false,
-    val chatMessagePush: Boolean = false,
-    val chatMessagePushSynced: Boolean = false,
-    val synced: Boolean = false,
+    val emailSynced: Boolean = true,
+    val matchPush: Boolean = true,
+    val matchPushSynced: Boolean = true,
+    val clickedPush: Boolean = true,
+    val clickedPushSynced: Boolean = true,
+    val chatMessagePush: Boolean = true,
+    val chatMessagePushSynced: Boolean = true,
 
     @PrimaryKey
     val id: Int = ID

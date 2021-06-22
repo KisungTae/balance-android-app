@@ -69,6 +69,7 @@ import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profile.ProfileViewModelFactory
+import com.beeswork.balance.ui.setting.SettingViewModelFactory
 import com.beeswork.balance.ui.setting.email.EmailSettingViewModelFactory
 import com.beeswork.balance.ui.setting.push.PushSettingViewModelFactory
 import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameViewModelFactory
@@ -276,6 +277,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
         bind() from provider { EmailSettingViewModelFactory(instance()) }
         bind() from provider { PushSettingViewModelFactory(instance()) }
+        bind() from provider { SettingViewModelFactory(instance()) }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
@@ -448,3 +450,4 @@ class BalanceApplication : Application(), KodeinAware {
 //           if not syched, then display error message saying you need to sync first before saving about or photos.
 //      126. check profile validation like about >= 500 characters,
 //      127. check fmc notiication with pushsettngs
+//      128. when delete app and reisntall, need to chekc settings and fetch settings from server

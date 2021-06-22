@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Setting
+import com.beeswork.balance.data.database.tuple.PushSettingsTuple
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,6 +16,10 @@ interface SettingDAO {
 
     @Query("select * from setting where id = ${Setting.ID}")
     fun findById(): Setting?
+
+
+    @Query("select count() from setting")
+    fun count(): Int
 
     @Query("select email from setting where id = ${Setting.ID}")
     fun findEmailFlow(): Flow<String?>
@@ -40,4 +45,15 @@ interface SettingDAO {
     @Query("update setting set chatMessagePushSynced = 1 where id = ${Setting.ID}")
     fun syncChatMessagePush()
 
+    @Query("update setting set matchPushSynced = :matchPushSynced where id = ${Setting.ID}")
+    fun updateMatchPushSynced(matchPushSynced: Boolean)
+
+    @Query("update setting set chatMessagePushSynced = :clickedPushSynced where id = ${Setting.ID}")
+    fun updateClickedPushSynced(clickedPushSynced: Boolean)
+
+    @Query("update setting set chatMessagePushSynced = :chatMessagePushSynced where id = ${Setting.ID}")
+    fun updateChatMessageSynced(chatMessagePushSynced: Boolean)
+
+    @Query("select matchPush, clickedPush, chatMessagePush from setting where id = ${Setting.ID}")
+    fun findPushSettingsFlow(): Flow<PushSettingsTuple>
 }
