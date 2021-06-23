@@ -70,6 +70,7 @@
                 android:layout_height="@dimen/spin_kit_small_size"
                 android:layout_marginEnd="5dp"
                 android:background="@color/Transparent"
+                android:visibility="invisible"
                 app:SpinKit_Color="@color/Grey" />
 
 
@@ -105,6 +106,7 @@
                 android:layout_height="@dimen/spin_kit_small_size"
                 android:layout_marginEnd="5dp"
                 android:background="@color/Transparent"
+                android:visibility="invisible"
                 app:SpinKit_Color="@color/Grey" />
 
 
@@ -139,6 +141,7 @@
                 android:layout_height="@dimen/spin_kit_small_size"
                 android:layout_marginEnd="5dp"
                 android:background="@color/Transparent"
+                android:visibility="invisible"
                 app:SpinKit_Color="@color/Grey" />
 
             <androidx.appcompat.widget.SwitchCompat

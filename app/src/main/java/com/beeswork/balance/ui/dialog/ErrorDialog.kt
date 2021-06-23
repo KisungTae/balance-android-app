@@ -48,21 +48,6 @@ class ErrorDialog(
         binding.tvErrorDialogTitle.text = errorTitle ?: resources.getString(R.string.error_title_generic)
     }
 
-//    private fun setupErrorMessage() {
-//        errorMessage?.let { message ->
-//            binding.tvErrorDialogMessage.visibility = View.VISIBLE
-//            binding.tvErrorDialogMessage.text = message
-//        } ?: kotlin.run {
-//            safeLet(error, context) { e, c ->
-//                val resourceId = resources.getIdentifier(e, "string", c.packageName)
-//                if (resourceId > 0) binding.tvErrorDialogMessage.text = getString(resourceId)
-//                else binding.tvErrorDialogMessage.visibility = View.GONE
-//            } ?: kotlin.run {
-//                binding.tvErrorDialogMessage.visibility = View.GONE
-//            }
-//        }
-//    }
-
     private fun setupRetryListener() {
         onRetryListener?.let {
             binding.btnErrorDialogRetry.setOnClickListener {

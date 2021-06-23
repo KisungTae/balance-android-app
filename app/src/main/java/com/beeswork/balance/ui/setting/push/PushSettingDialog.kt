@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
@@ -43,29 +44,43 @@ class PushSettingDialog : BaseDialog(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-//        setupListeners()
+        setupListeners()
         observePushSettings()
-//        observeSavePushSettings()
+        observeSavePushSettings()
     }
 
     private fun observeSavePushSettings() {
         viewModel.saveMatchPushLiveData.observe(viewLifecycleOwner) {
-            onObserveSavePushSettings(it, binding.skvMatchPushLoading)
+            onObserveSavePushSettings(it, binding.skvMatchPushLoading, binding.scMatchPush)
         }
         viewModel.saveClickedPushLiveData.observe(viewLifecycleOwner) {
-            onObserveSavePushSettings(it, binding.skvClickedPushLoading)
+            onObserveSavePushSettings(it, binding.skvClickedPushLoading, binding.scClickedPush)
         }
         viewModel.saveChatMessagePushLiveData.observe(viewLifecycleOwner) {
-            onObserveSavePushSettings(it, binding.skvChatMessagePushLoading)
+            onObserveSavePushSettings(it, binding.skvChatMessagePushLoading, binding.scChatMessagePush)
         }
     }
 
-    private fun onObserveSavePushSettings(resource: Resource<EmptyResponse>, loadingView: SpinKitView) {
+    private fun onObserveSavePushSettings(
+        resource: Resource<EmptyResponse>,
+        loadingView: SpinKitView,
+        switchCompat: SwitchCompat
+    ) {
         when {
-            resource.isSuccess() -> binding.skvMatchPushLoading.visibility = View.INVISIBLE
-            resource.isLoading() -> binding.skvMatchPushLoading.visibility = View.VISIBLE
+            resource.isSuccess() -> {
+                println("resource.isSuccess()")
+                switchCompat.isEnabled = true
+                loadingView.visibility = View.INVISIBLE
+            }
+            resource.isLoading() -> {
+                println("resource.isLoading()")
+                switchCompat.isEnabled = false
+                loadingView.visibility = View.VISIBLE
+            }
             resource.isError() -> {
-                binding.skvMatchPushLoading.visibility = View.INVISIBLE
+                println("resource.isError()")
+                switchCompat.isEnabled = true
+                loadingView.visibility = View.INVISIBLE
                 showErrorDialog(
                     resource.error,
                     getString(R.string.error_title_save_push_setting),

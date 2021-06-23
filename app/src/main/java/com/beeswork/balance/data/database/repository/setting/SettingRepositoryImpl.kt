@@ -78,8 +78,7 @@ class SettingRepositoryImpl(
 
     override suspend fun fetchEmail() {
         withContext(ioDispatcher) {
-            val setting = getSettingOrDefault()
-            if (!setting.emailSynced) {
+            if (!settingDAO.findById().emailSynced) {
                 val response = settingRDS.getEmail(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken()
@@ -91,34 +90,40 @@ class SettingRepositoryImpl(
 
     override suspend fun saveMatchPush(matchPush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
+            if (settingDAO.findMatchPush() == matchPush) return@withContext Resource.success(EmptyResponse())
             settingDAO.updateMatchPush(matchPush)
             val response = postPushSettings(matchPush, null, null)
             if (response.isSuccess()) settingDAO.syncMatchPush()
+            else if (response.isError()) settingDAO.revertMatchPush()
             return@withContext response
         }
     }
 
     override suspend fun saveClickedPush(clickedPush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
+            if (settingDAO.findClickedPush() == clickedPush) return@withContext Resource.success(EmptyResponse())
             settingDAO.updateClickedPush(clickedPush)
             val response = postPushSettings(null, clickedPush, null)
             if (response.isSuccess()) settingDAO.syncClickedPush()
+            else if (response.isError()) settingDAO.revertClickedPush()
             return@withContext response
         }
     }
 
     override suspend fun saveChatMessagePush(chatMessagePush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
+            if (settingDAO.findChatMessagePush() == chatMessagePush) return@withContext Resource.success(EmptyResponse())
             settingDAO.updateChatMessagePush(chatMessagePush)
             val response = postPushSettings(null, null, chatMessagePush)
             if (response.isSuccess()) settingDAO.syncChatMessagePush()
+            else if (response.isError()) settingDAO.revertChatMessagePush()
             return@withContext response
         }
     }
 
     override suspend fun getSetting(): Setting {
         return withContext(ioDispatcher) {
-            return@withContext getSettingOrDefault()
+            return@withContext settingDAO.findById()
         }
     }
 
@@ -142,17 +147,13 @@ class SettingRepositoryImpl(
 
     override suspend fun getPushSettingsFlow(): Flow<PushSettingsTuple> {
         return withContext(ioDispatcher) {
-            getSettingOrDefault()
             return@withContext settingDAO.findPushSettingsFlow()
         }
-
     }
 
-    private fun getSettingOrDefault(): Setting {
-        return settingDAO.findById() ?: kotlin.run {
-            val setting = Setting()
-            settingDAO.insert(setting)
-            setting
+    override suspend fun prepopulateSetting() {
+        withContext(ioDispatcher) {
+            if (!settingDAO.exist()) settingDAO.insert(Setting())
         }
     }
 }

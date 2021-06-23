@@ -52,6 +52,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         setupWebSocketEventObserver()
         setupUnreadMatchCountObserver()
         setupClickCountObserver()
+        viewModel.prepopulate()
     }
 
     private suspend fun setupClickCountObserver() {

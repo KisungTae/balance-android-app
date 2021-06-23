@@ -15,11 +15,10 @@ interface SettingDAO {
     fun insert(setting: Setting)
 
     @Query("select * from setting where id = ${Setting.ID}")
-    fun findById(): Setting?
+    fun findById(): Setting
 
-
-    @Query("select count() from setting")
-    fun count(): Int
+    @Query("select count() > 0 from setting where id = ${Setting.ID}")
+    fun exist(): Boolean
 
     @Query("select email from setting where id = ${Setting.ID}")
     fun findEmailFlow(): Flow<String?>
@@ -45,14 +44,23 @@ interface SettingDAO {
     @Query("update setting set chatMessagePushSynced = 1 where id = ${Setting.ID}")
     fun syncChatMessagePush()
 
-    @Query("update setting set matchPushSynced = :matchPushSynced where id = ${Setting.ID}")
-    fun updateMatchPushSynced(matchPushSynced: Boolean)
+    @Query("update setting set matchPushSynced = 1, matchPush = case when matchPush == 1 then 0 else 1 end where id = 0")
+    fun revertMatchPush()
 
-    @Query("update setting set chatMessagePushSynced = :clickedPushSynced where id = ${Setting.ID}")
-    fun updateClickedPushSynced(clickedPushSynced: Boolean)
+    @Query("update setting set clickedPushSynced = 1, clickedPush = case when clickedPush == 1 then 0 else 1 end where id = 0")
+    fun revertClickedPush()
 
-    @Query("update setting set chatMessagePushSynced = :chatMessagePushSynced where id = ${Setting.ID}")
-    fun updateChatMessageSynced(chatMessagePushSynced: Boolean)
+    @Query("update setting set chatMessagePushSynced = 1, chatMessagePush = case when chatMessagePush == 1 then 0 else 1 end where id = 0")
+    fun revertChatMessagePush()
+
+    @Query("select matchPush from setting where id = ${Setting.ID}")
+    fun findMatchPush(): Boolean
+
+    @Query("select clickedPush from setting where id = ${Setting.ID}")
+    fun findClickedPush(): Boolean
+
+    @Query("select chatMessagePush from setting where id = ${Setting.ID}")
+    fun findChatMessagePush(): Boolean
 
     @Query("select matchPush, clickedPush, chatMessagePush from setting where id = ${Setting.ID}")
     fun findPushSettingsFlow(): Flow<PushSettingsTuple>

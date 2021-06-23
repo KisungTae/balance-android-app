@@ -12,4 +12,5 @@ interface SwipeRepository {
     suspend fun saveSwipeFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int)
     suspend fun fetchCards(): Resource<FetchCardsDTO>
     suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>>
+    suspend fun prepopulateSwipeFilter()
 }

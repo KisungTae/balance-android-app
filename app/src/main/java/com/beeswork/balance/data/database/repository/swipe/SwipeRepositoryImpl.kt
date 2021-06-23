@@ -22,7 +22,7 @@ class SwipeRepositoryImpl(
 
     override suspend fun getSwipeFilter(): SwipeFilter {
         return withContext(ioDispatcher) {
-            return@withContext getSwipeFilterOrDefault()
+            return@withContext swipeFilterDAO.findById()
         }
     }
 
@@ -38,17 +38,9 @@ class SwipeRepositoryImpl(
         }
     }
 
-    private fun getSwipeFilterOrDefault(): SwipeFilter {
-        return swipeFilterDAO.findById() ?: kotlin.run {
-            val swipeFilter = SwipeFilter()
-            swipeFilterDAO.insert(swipeFilter)
-            swipeFilter
-        }
-    }
-
     override suspend fun fetchCards(): Resource<FetchCardsDTO> {
         return withContext(ioDispatcher) {
-            val swipeFilter = getSwipeFilterOrDefault()
+            val swipeFilter = swipeFilterDAO.findById()
             val response = swipeRDS.fetchCards(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -78,6 +70,12 @@ class SwipeRepositoryImpl(
                 preferenceProvider.getIdentityToken(),
                 swipedId
             )
+        }
+    }
+
+    override suspend fun prepopulateSwipeFilter() {
+        withContext(ioDispatcher) {
+            if (!swipeFilterDAO.exist()) swipeFilterDAO.insert(SwipeFilter())
         }
     }
 

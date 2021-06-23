@@ -18,4 +18,5 @@ interface SettingRepository {
     suspend fun getSetting(): Setting
     fun getEmailFlow(): Flow<String?>
     suspend fun getPushSettingsFlow(): Flow<PushSettingsTuple>
+    suspend fun prepopulateSetting()
 }
