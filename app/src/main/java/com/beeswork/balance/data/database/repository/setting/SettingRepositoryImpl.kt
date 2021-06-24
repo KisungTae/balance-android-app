@@ -90,7 +90,6 @@ class SettingRepositoryImpl(
 
     override suspend fun saveMatchPush(matchPush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            if (settingDAO.findMatchPush() == matchPush) return@withContext Resource.success(EmptyResponse())
             settingDAO.updateMatchPush(matchPush)
             val response = postPushSettings(matchPush, null, null)
             if (response.isSuccess()) settingDAO.syncMatchPush()
@@ -101,7 +100,6 @@ class SettingRepositoryImpl(
 
     override suspend fun saveClickedPush(clickedPush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            if (settingDAO.findClickedPush() == clickedPush) return@withContext Resource.success(EmptyResponse())
             settingDAO.updateClickedPush(clickedPush)
             val response = postPushSettings(null, clickedPush, null)
             if (response.isSuccess()) settingDAO.syncClickedPush()
@@ -112,7 +110,6 @@ class SettingRepositoryImpl(
 
     override suspend fun saveChatMessagePush(chatMessagePush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            if (settingDAO.findChatMessagePush() == chatMessagePush) return@withContext Resource.success(EmptyResponse())
             settingDAO.updateChatMessagePush(chatMessagePush)
             val response = postPushSettings(null, null, chatMessagePush)
             if (response.isSuccess()) settingDAO.syncChatMessagePush()
@@ -155,5 +152,51 @@ class SettingRepositoryImpl(
         withContext(ioDispatcher) {
             if (!settingDAO.exist()) settingDAO.insert(Setting())
         }
+    }
+
+    override suspend fun getMatchPush(): Boolean {
+        return withContext(ioDispatcher) {
+            return@withContext settingDAO.findMatchPush()
+        }
+    }
+
+    override suspend fun getClickedPush(): Boolean {
+        return withContext(ioDispatcher) {
+            return@withContext settingDAO.findClickedPush()
+        }
+    }
+
+    override suspend fun getChatMessagePush(): Boolean {
+        return withContext(ioDispatcher) {
+            return@withContext settingDAO.findChatMessagePush()
+        }
+    }
+
+    override suspend fun syncPushSettings(
+        matchPush: Boolean?,
+        clickedPush: Boolean?,
+        chatMessagePush: Boolean?
+    ): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            return@withContext settingRDS.postPushSettings(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                matchPush,
+                clickedPush,
+                chatMessagePush
+            )
+        }
+    }
+
+    override suspend fun syncMatchPush() {
+        withContext(ioDispatcher) { settingDAO.syncMatchPush() }
+    }
+
+    override suspend fun syncClickedPush() {
+        withContext(ioDispatcher) { settingDAO.syncClickedPush() }
+    }
+
+    override suspend fun syncChatMessagePush() {
+        withContext(ioDispatcher) { settingDAO.syncChatMessagePush() }
     }
 }

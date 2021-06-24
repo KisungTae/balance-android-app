@@ -259,7 +259,7 @@ class ChatFragment : BaseFragment(),
 //        }
     }
 
-    override fun onDismissErrorDialog() {
+    override fun onDismissErrorDialog(id: UUID?) {
         popBackStack(MainViewPagerFragment.TAG)
     }
 

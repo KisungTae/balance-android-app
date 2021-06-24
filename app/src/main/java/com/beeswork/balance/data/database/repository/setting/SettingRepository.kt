@@ -19,4 +19,18 @@ interface SettingRepository {
     fun getEmailFlow(): Flow<String?>
     suspend fun getPushSettingsFlow(): Flow<PushSettingsTuple>
     suspend fun prepopulateSetting()
+    suspend fun getMatchPush(): Boolean
+    suspend fun getClickedPush(): Boolean
+    suspend fun getChatMessagePush(): Boolean
+    suspend fun syncPushSettings(
+        matchPush: Boolean?,
+        clickedPush: Boolean?,
+        chatMessagePush: Boolean?
+    ): Resource<EmptyResponse>
+
+
+    suspend fun syncMatchPush()
+    suspend fun syncClickedPush()
+    suspend fun syncChatMessagePush()
+
 }

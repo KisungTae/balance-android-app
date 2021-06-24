@@ -11,6 +11,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogErrorBinding
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseDialog
+import java.util.*
 
 class ErrorDialog(
     private val error: String?,
@@ -18,8 +19,18 @@ class ErrorDialog(
     private val errorMessage: String?,
     private val requestCode: Int?,
     private val onRetryListener: OnRetryListener?,
-    private val onDismissListener: OnDismissListener?
+    private val onDismissListener: OnDismissListener?,
+    private val id: UUID? = null
 ) : BaseDialog() {
+
+    constructor(
+        error: String?,
+        errorTitle: String?,
+        errorMessage: String?,
+        onDismissListener: OnDismissListener?,
+        id: UUID?
+    ) : this(error, errorTitle, errorMessage, null, null, onDismissListener, id)
+
 
     private lateinit var binding: DialogErrorBinding
 
@@ -59,9 +70,13 @@ class ErrorDialog(
         }
     }
 
+    fun isErrorEqualTo(error: String?): Boolean {
+        return this.error == error
+    }
+
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismissListener?.onDismissErrorDialog()
+        onDismissListener?.onDismissErrorDialog(id)
     }
 
     companion object {
@@ -73,7 +88,7 @@ class ErrorDialog(
     }
 
     interface OnDismissListener {
-        fun onDismissErrorDialog()
+        fun onDismissErrorDialog(id: UUID?)
     }
 
 }
