@@ -11,7 +11,8 @@ interface SettingRepository {
     suspend fun saveLocation(latitude: Double, longitude: Double)
     suspend fun syncLocation()
     suspend fun saveEmail(email: String): Resource<EmptyResponse>
-    suspend fun fetchEmail()
+    suspend fun fetchEmail(): Resource<String>
+    suspend fun getEmailSynced(): Boolean
     suspend fun saveMatchPush(matchPush: Boolean): Resource<EmptyResponse>
     suspend fun saveClickedPush(clickedPush: Boolean): Resource<EmptyResponse>
     suspend fun saveChatMessagePush(chatMessagePush: Boolean): Resource<EmptyResponse>

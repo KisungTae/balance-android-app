@@ -19,6 +19,9 @@ class EmailSettingViewModel(
     private val _saveEmailLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val saveEmailLiveData: LiveData<Resource<EmptyResponse>> get() = _saveEmailLiveData
 
+    private val _fetchEmailLiveData = MutableLiveData<Resource<String>>()
+    val fetchEmailLiveData: LiveData<Resource<String>> get() = _fetchEmailLiveData
+
     fun saveEmail(email: String) {
         viewModelScope.launch {
             _saveEmailLiveData.postValue(Resource.loading())
@@ -30,6 +33,9 @@ class EmailSettingViewModel(
     }
 
     fun fetchEmail() {
-        viewModelScope.launch { settingRepository.fetchEmail() }
+        viewModelScope.launch {
+            _fetchEmailLiveData.postValue(Resource.loading())
+            _fetchEmailLiveData.postValue(settingRepository.fetchEmail())
+        }
     }
 }

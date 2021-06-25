@@ -31,6 +31,14 @@ class ErrorDialog(
         id: UUID?
     ) : this(error, errorTitle, errorMessage, null, null, onDismissListener, id)
 
+    constructor(
+        error: String?,
+        errorTitle: String?,
+        errorMessage: String?,
+        requestCode: Int?,
+        onRetryListener: OnRetryListener?
+    ) : this(error, errorTitle, errorMessage, requestCode, onRetryListener, null)
+
 
     private lateinit var binding: DialogErrorBinding
 

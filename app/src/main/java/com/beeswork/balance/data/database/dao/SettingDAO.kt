@@ -26,6 +26,12 @@ interface SettingDAO {
     @Query("update setting set email = :email, emailSynced = 1 where id = ${Setting.ID}")
     fun syncEmail(email: String)
 
+    @Query("update setting set emailSynced = :emailSynced where id = ${Setting.ID}")
+    fun updateEmailSynced(emailSynced: Boolean)
+
+    @Query("select emailSynced from setting where id = ${Setting.ID}")
+    fun findEmailSynced(): Boolean
+
     @Query("update setting set matchPush = :matchPush, matchPushSynced = 0 where id = ${Setting.ID}")
     fun updateMatchPush(matchPush: Boolean)
 

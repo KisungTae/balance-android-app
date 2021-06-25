@@ -28,20 +28,19 @@ class PushSettingViewModel(
             val setting = settingRepository.getSetting()
             if (setting.matchPushSynced && setting.clickedPushSynced && setting.chatMessagePushSynced) return@launch
 
-            if (!setting.matchPushSynced) _saveMatchPushLiveData.postValue(Resource.loading())
-            if (!setting.clickedPushSynced) _saveClickedPushLiveData.postValue(Resource.loading())
-            if (!setting.chatMessagePushSynced) _saveChatMessagePushLiveData.postValue(Resource.loading())
+            val matchPush = if (setting.matchPushSynced) null else setting.matchPush
+            val clickedPush = if (setting.clickedPushSynced) null else setting.clickedPush
+            val chatMessagePush = if (setting.clickedPushSynced) null else setting.chatMessagePush
 
-            val response = settingRepository.syncPushSettings(
-                setting.matchPush,
-                setting.clickedPush,
-                setting.chatMessagePush
-            )
+            matchPush?.let { _saveMatchPushLiveData.postValue(Resource.loading()) }
+            clickedPush?.let { _saveClickedPushLiveData.postValue(Resource.loading()) }
+            chatMessagePush?.let { _saveChatMessagePushLiveData.postValue(Resource.loading()) }
 
-            if (!setting.matchPushSynced) _saveMatchPushLiveData.postValue(response)
-            if (!setting.clickedPushSynced) _saveClickedPushLiveData.postValue(response)
-            if (!setting.chatMessagePushSynced) _saveChatMessagePushLiveData.postValue(response)
+            val response = settingRepository.syncPushSettings(matchPush, clickedPush, chatMessagePush)
 
+            matchPush?.let { _saveMatchPushLiveData.postValue(response) }
+            clickedPush?.let { _saveClickedPushLiveData.postValue(response) }
+            chatMessagePush?.let { _saveChatMessagePushLiveData.postValue(response) }
         }
     }
 
@@ -73,15 +72,15 @@ class PushSettingViewModel(
     }
 
     fun test() {
-        _syncPushSettingsLiveData.postValue(Resource.loading())
-        viewModelScope.launch {
-            delay(2000)
-            _saveMatchPushLiveData.postValue(Resource.error("err"))
-            delay(2000)
-            _saveClickedPushLiveData.postValue(Resource.error("err"))
-            delay(2000)
-            _saveChatMessagePushLiveData.postValue(Resource.error("err"))
-        }
+//        _syncPushSettingsLiveData.postValue(Resource.loading())
+//        viewModelScope.launch {
+//            delay(2000)
+//            _saveMatchPushLiveData.postValue(Resource.error("err"))
+//            delay(2000)
+//            _saveClickedPushLiveData.postValue(Resource.error("err"))
+//            delay(2000)
+//            _saveChatMessagePushLiveData.postValue(Resource.error("err"))
+//        }
     }
 
 }

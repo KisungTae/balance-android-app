@@ -70,8 +70,7 @@
                     android:layout_marginEnd="5dp"
                     android:id="@+id/tvSettingEmail"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="c0go233@gmail.com" />
+                    android:layout_height="wrap_content"/>
 
                 <ImageView
                     android:layout_width="24dp"

@@ -33,10 +33,14 @@
             android:textStyle="bold" />
 
         <ImageButton
+            android:id="@+id/btnEmailSettingRefresh"
             android:layout_width="@dimen/tool_bar_menu_item_btn_size"
             android:layout_height="@dimen/tool_bar_menu_item_btn_size"
             android:background="@color/BackgroundWhite"
-            android:contentDescription="@string/profile_save_icon_description" />
+            android:contentDescription="@string/refresh_button_icon_description"
+            android:src="@drawable/ic_refresh"
+            android:visibility="invisible"
+            app:tint="@color/GreyDark" />
 
     </LinearLayout>
 

@@ -29,7 +29,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
     private val viewModelFactory: SettingViewModelFactory by instance()
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentSettingBinding.inflate(inflater)
         return binding.root
     }
@@ -38,6 +38,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SettingViewModel::class.java)
         bindUI()
+        viewModel.fetchEmail()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -47,6 +48,9 @@ class SettingFragment : BaseFragment(), KodeinAware {
         }
         binding.btnSettingNotification.setOnClickListener {
             PushSettingDialog().show(childFragmentManager, PushSettingDialog.TAG)
+        }
+        viewModel.email.await().observe(viewLifecycleOwner) { email ->
+            email?.let { _email -> binding.tvSettingEmail.text = _email }
         }
     }
 

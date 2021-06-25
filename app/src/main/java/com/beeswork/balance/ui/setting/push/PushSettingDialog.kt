@@ -29,6 +29,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
 
     private val viewModelFactory: PushSettingViewModelFactory by instance()
     private val errorDialogs = mutableMapOf<UUID, ErrorDialog>()
+    private var pushSettingsInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,15 +50,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     private fun bindUI() = lifecycleScope.launch {
         setupListeners()
         observeSavePushSettings()
-        observeSyncPushSettings()
-        viewModel.syncPushSettings()
         observePushSettings()
-    }
-
-    private fun observeSyncPushSettings() {
-        viewModel.syncPushSettingsLiveData.observe(viewLifecycleOwner) {
-            if (it.isLoading()) return@observe
-        }
     }
 
     private fun observeSavePushSettings() {
@@ -95,7 +88,6 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     }
 
     private fun showErrorDialog(resource: Resource<EmptyResponse>) {
-        println("showErrorDialog")
         for (errorDialog in errorDialogs.values) {
             if (errorDialog.isErrorEqualTo(resource.error)) return
         }
@@ -116,14 +108,16 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
             binding.scMatchPush.isChecked = pushSettings.matchPush
             binding.scClickedPush.isChecked = pushSettings.clickedPush
             binding.scChatMessagePush.isChecked = pushSettings.chatMessagePush
+
+            if (!pushSettingsInitialized) {
+                viewModel.syncPushSettings()
+                pushSettingsInitialized = true
+            }
         }
     }
 
     private fun setupListeners() {
-        binding.btnNotificationSettingBack.setOnClickListener {
-            viewModel.test()
-            //            dismiss()
-        }
+        binding.btnNotificationSettingBack.setOnClickListener { dismiss() }
         binding.scMatchPush.setOnCheckedChangeListener { _, checked -> viewModel.saveMatchPush(checked) }
         binding.scClickedPush.setOnCheckedChangeListener { _, checked -> viewModel.saveClickedPush(checked) }
         binding.scChatMessagePush.setOnCheckedChangeListener { _, checked -> viewModel.saveChatMessagePush(checked) }

@@ -10,13 +10,15 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogEmailSettingBinding
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.common.BaseDialog
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class EmailSettingDialog : BaseDialog(), KodeinAware {
+class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
 
@@ -43,9 +45,32 @@ class EmailSettingDialog : BaseDialog(), KodeinAware {
 
     private fun bindUI() = lifecycleScope.launch {
         setupListeners()
+        observeFetchEmailLiveData()
         viewModel.fetchEmail()
         observeSaveEmailLiveData()
-        observeEmailLiveData()
+//        observeEmailLiveData()
+    }
+
+    private fun observeFetchEmailLiveData() {
+        viewModel.fetchEmailLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> showLoading()
+                it.isSuccess() -> {
+                    hideLoading()
+                    binding.btnEmailSettingRefresh.visibility = View.INVISIBLE
+                    it.data?.let { email -> binding.etEmailSettingEmail.setText(email) }
+                }
+                it.isError() -> {
+                    hideLoading()
+                    binding.btnEmailSettingRefresh.visibility = View.VISIBLE
+                    val errorTitle = getString(R.string.error_title_fetch_email)
+                    ErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_EMAIL, this).show(
+                        childFragmentManager,
+                        ErrorDialog.TAG
+                    )
+                }
+            }
+        }
     }
 
     private suspend fun observeEmailLiveData() {
@@ -93,9 +118,17 @@ class EmailSettingDialog : BaseDialog(), KodeinAware {
         binding.btnEmailSettingSave.setOnClickListener {
             viewModel.saveEmail(binding.etEmailSettingEmail.text.toString())
         }
+        binding.btnEmailSettingRefresh.setOnClickListener { viewModel.fetchEmail() }
     }
 
     companion object {
         const val TAG = "emailSettingDialog"
+
+    }
+
+    override fun onRetry(requestCode: Int?) {
+        when (requestCode) {
+            RequestCode.FETCH_EMAIL -> viewModel.fetchEmail()
+        }
     }
 }

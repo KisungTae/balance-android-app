@@ -72,21 +72,32 @@ class SettingRepositoryImpl(
                 email
             )
             if (response.isSuccess()) settingDAO.syncEmail(email)
+            else if (response.isError()) settingDAO.updateEmailSynced(true)
             return@withContext response
         }
     }
 
-    override suspend fun fetchEmail() {
-        withContext(ioDispatcher) {
-            if (!settingDAO.findById().emailSynced) {
+    override suspend fun fetchEmail(): Resource<String> {
+        return withContext(ioDispatcher) {
+            val setting = settingDAO.findById()
+            if (setting.emailSynced) return@withContext Resource.success(setting.email)
+            else {
                 val response = settingRDS.getEmail(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken()
                 )
-                response.data?.let { email -> settingDAO.syncEmail(email) }
+                if (response.isSuccess()) response.data?.let { email -> settingDAO.syncEmail(email) }
+                return@withContext response
             }
         }
     }
+
+    override suspend fun getEmailSynced(): Boolean {
+        return withContext(ioDispatcher) {
+            return@withContext settingDAO.findEmailSynced()
+        }
+    }
+
 
     override suspend fun saveMatchPush(matchPush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
@@ -178,13 +189,23 @@ class SettingRepositoryImpl(
         chatMessagePush: Boolean?
     ): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            return@withContext settingRDS.postPushSettings(
+            val response = settingRDS.postPushSettings(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
                 matchPush,
                 clickedPush,
                 chatMessagePush
             )
+            if (response.isError()) {
+                matchPush?.let { settingDAO.revertMatchPush() }
+                clickedPush?.let { settingDAO.revertClickedPush() }
+                chatMessagePush?.let { settingDAO.revertChatMessagePush() }
+            } else if (response.isSuccess()) {
+                matchPush?.let { settingDAO.syncMatchPush() }
+                clickedPush?.let { settingDAO.syncClickedPush() }
+                chatMessagePush?.let { settingDAO.syncChatMessagePush() }
+            }
+            return@withContext response
         }
     }
 
