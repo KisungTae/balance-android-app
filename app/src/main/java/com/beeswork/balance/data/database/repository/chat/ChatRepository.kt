@@ -12,6 +12,7 @@ interface ChatRepository {
     val chatMessageInvalidationFlow: Flow<ChatMessageInvalidation>
     val chatMessageReceiptFlow: Flow<Resource<EmptyResponse>>
 
+    suspend fun deleteChatMessages()
     suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String)
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
     suspend fun resendChatMessage(key: Long, swipedId: UUID)

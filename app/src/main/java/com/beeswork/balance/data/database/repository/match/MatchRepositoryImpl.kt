@@ -215,6 +215,10 @@ class MatchRepositoryImpl(
         }
     }
 
+    override suspend fun deleteMatches() {
+        withContext(ioDispatcher) { matchDAO.deleteAll() }
+    }
+
 
     //  TODO: remove me
     private fun createDummyChatMessages() {

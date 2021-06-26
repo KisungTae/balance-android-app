@@ -43,6 +43,10 @@ class ClickRepositoryImpl(
         awaitClose {  }
     }
 
+    override suspend fun deleteClicks() {
+        withContext(ioDispatcher) { clickDAO.deleteAll() }
+    }
+
 
     init {
         collectClickFlow()

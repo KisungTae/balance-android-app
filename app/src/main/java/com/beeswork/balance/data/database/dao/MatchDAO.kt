@@ -48,4 +48,7 @@ interface MatchDAO {
     @Query("select count(unread) from `match` where unread = 1 or active = 0")
     fun countUnread(): Flow<Int>
 
+    @Query("delete from `match`")
+    fun deleteAll()
+
 }

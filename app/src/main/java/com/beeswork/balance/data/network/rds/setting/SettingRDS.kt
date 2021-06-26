@@ -6,6 +6,12 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 interface SettingRDS {
+
+    suspend fun deleteAccount(
+        accountId: UUID?,
+        identityToken: UUID?
+    ): Resource<EmptyResponse>
+
     suspend fun postPushSettings(
         accountId: UUID?,
         identityToken: UUID?,

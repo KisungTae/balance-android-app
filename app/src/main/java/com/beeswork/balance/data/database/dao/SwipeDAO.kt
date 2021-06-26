@@ -12,4 +12,7 @@ interface SwipeDAO {
 
     @Query("select count(*) > 0 from swipe where swipedId = :swipedId")
     fun existBySwipedId(swipedId: UUID): Boolean
+
+    @Query("delete from swipe")
+    fun deleteAll()
 }

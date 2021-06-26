@@ -8,6 +8,7 @@ import com.beeswork.balance.internal.constant.Gender
 import java.util.*
 
 interface SwipeRepository {
+    suspend fun deleteSwipes()
     suspend fun getSwipeFilter(): SwipeFilter
     suspend fun saveSwipeFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int)
     suspend fun fetchCards(): Resource<FetchCardsDTO>

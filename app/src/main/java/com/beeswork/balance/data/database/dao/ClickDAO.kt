@@ -37,4 +37,7 @@ interface ClickDAO {
 
     @Query("select 1 from click")
     fun invalidation(): Flow<Boolean>
+
+    @Query("delete from click")
+    fun deleteAll()
 }

@@ -18,6 +18,9 @@ class ProfileRepositoryImpl(
     private val profileRDS: ProfileRDS,
     private val ioDispatcher: CoroutineDispatcher
 ) : ProfileRepository {
+    override suspend fun deleteProfile() {
+        withContext(ioDispatcher) { profileDAO.deleteAll() }
+    }
 
     override suspend fun fetchProfile(): Profile? {
         return withContext(ioDispatcher) {

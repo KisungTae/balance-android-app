@@ -231,6 +231,16 @@ class PhotoRepositoryImpl(
         }
     }
 
+    override suspend fun deletePhotos() {
+        withContext(ioDispatcher) {
+            val photos = photoDAO.findAll(100)
+            photos.forEach { photo ->
+                photoDAO.deletePhoto(photo.key)
+                deletePhoto(photo.uri)
+            }
+        }
+    }
+
 
     override suspend fun test() {
         withContext(ioDispatcher) {

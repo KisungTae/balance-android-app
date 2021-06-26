@@ -100,6 +100,11 @@ class PreferenceProviderImpl(
         return preferences.getString(PROFILE_PHOTO_KEY, null)
     }
 
+    override fun delete() {
+        editor.clear().commit()
+    }
+
+
     companion object {
 
         const val MATCH_FETCHED_AT = "matchFetchedAt"

@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.beeswork.balance.data.database.entity.Location
 import com.beeswork.balance.data.database.entity.Setting
+import com.beeswork.balance.data.database.tuple.LocationTuple
 import com.beeswork.balance.data.database.tuple.PushSettingsTuple
 import kotlinx.coroutines.flow.Flow
 
@@ -70,4 +72,10 @@ interface SettingDAO {
 
     @Query("select matchPush, clickedPush, chatMessagePush from setting where id = ${Setting.ID}")
     fun findPushSettingsFlow(): Flow<PushSettingsTuple>
+
+    @Query("select latitude, longitude from location where id = ${Location.ID}")
+    fun findLocationFlow(): Flow<LocationTuple>
+
+    @Query("delete from setting")
+    fun deleteAll()
 }

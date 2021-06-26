@@ -61,6 +61,10 @@ class ChatRepositoryImpl(
         awaitClose {}
     }
 
+    override suspend fun deleteChatMessages() {
+        withContext(ioDispatcher) { chatMessageDAO.deleteAll() }
+    }
+
     init {
         collectChatMessageReceiptFlow()
         collectChatMessageFlow()

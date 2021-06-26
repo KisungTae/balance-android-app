@@ -24,6 +24,7 @@
     <string name="error_title_save_email">이메일을 저장하지 못했습니다</string>
     <string name="error_title_save_push_setting">알람설정을 저장하지 못했습니다</string>
     <string name="error_title_fetch_email">이메일을 가져오지 못했습니다</string>
+    <string name="error_title_delete_account">계정을 삭제하지 못했습니다</string>
 
 
     <string name="error_message_bad_request">유효하지 않은 요청입니다</string>
@@ -186,4 +187,6 @@
     <string name="clicked_notification_label">좋아요 알람</string>
     <string name="chat_message_notification_label">채팅메세지 알람</string>
     <string name="refresh_button_icon_description">refresh button icon</string>
+    <string name="delete_account_button_text">Delete Account</string>
+    <string name="log_out_button_text">Log out</string>
 </resources>

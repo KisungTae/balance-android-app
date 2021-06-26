@@ -12,6 +12,7 @@ data class Location(
     val synced: Boolean,
     val updatedAt: OffsetDateTime,
 
+
     @PrimaryKey
     val id: Int = ID
 ) {

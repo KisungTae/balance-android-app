@@ -17,4 +17,6 @@ interface PreferenceProvider {
     fun getMatchFetchedAt(): OffsetDateTime
     fun getClickFetchedAt(): OffsetDateTime
     fun getProfilePhotoKey(): String?
+
+    fun delete()
 }

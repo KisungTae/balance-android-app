@@ -22,4 +22,7 @@ interface SwipeFilterDAO {
 
     @Query("select count() > 0 from swipeFilter where id = ${SwipeFilter.ID}")
     fun exist(): Boolean
+
+    @Query("delete from swipeFilter")
+    fun deleteAll()
 }

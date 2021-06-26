@@ -11,7 +11,7 @@ import org.threeten.bp.OffsetDateTime
 interface LocationDAO {
 
     @Query("select * from location where id = ${Location.ID}")
-    fun findById(): Location?
+    fun findById(): Location
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(location: Location)
@@ -19,5 +19,9 @@ interface LocationDAO {
     @Query("update location set synced = 1 where id = ${Location.ID} and updatedAt = :updatedAt")
     fun sync(updatedAt: OffsetDateTime)
 
+    @Query("select count() > 0 from location where id = ${Location.ID}")
+    fun exist(): Boolean
 
+    @Query("delete from location")
+    fun deleteAll()
 }

@@ -22,5 +22,6 @@ interface ProfileDAO {
     @Query("update profile set synced = 1 where id = ${Profile.ID}")
     fun sync()
 
-
+    @Query("delete from profile")
+    fun deleteAll()
 }

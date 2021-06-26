@@ -19,6 +19,12 @@ class SwipeRepositoryImpl(
     private val swipeRDS: SwipeRDS,
     private val ioDispatcher: CoroutineDispatcher
 ) : SwipeRepository {
+    override suspend fun deleteSwipes() {
+        withContext(ioDispatcher) {
+            swipeDAO.deleteAll()
+            swipeFilterDAO.deleteAll()
+        }
+    }
 
     override suspend fun getSwipeFilter(): SwipeFilter {
         return withContext(ioDispatcher) {

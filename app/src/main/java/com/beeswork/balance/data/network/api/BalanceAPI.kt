@@ -27,6 +27,9 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("account/delete")
+    suspend fun deleteAccount(@Body deleteAccountBody: DeleteAccountBody): Response<EmptyResponse>
+
     @POST("setting/push")
     suspend fun postPushSettings(@Body postPushSettingsBody: PostPushSettingsBody): Response<EmptyResponse>
 

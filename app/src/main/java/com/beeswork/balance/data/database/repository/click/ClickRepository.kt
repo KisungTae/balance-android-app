@@ -10,6 +10,7 @@ interface ClickRepository {
 
     val newClickFlow: Flow<Click>
 
+    suspend fun deleteClicks()
     suspend fun saveClickFromFCMPush(clickDTO: ClickDTO)
     suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click>
     suspend fun fetchClicks(): Resource<EmptyResponse>

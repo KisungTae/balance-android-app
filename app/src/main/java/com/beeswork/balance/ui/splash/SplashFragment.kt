@@ -21,7 +21,8 @@ class SplashFragment : Fragment() {
         //TODO: check login
 
 //        Handler().postDelayed({findNavController().navigate(R.id.action_splashFragment_to_mainViewPagerFragment)}, 3000)
-        findNavController().navigate(R.id.action_splashFragment_to_mainViewPagerFragment)
+//        findNavController().navigate(R.id.action_splashFragment_to_mainViewPagerFragment)
+        findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
         return inflater.inflate(R.layout.fragment_splash, container, false)
     }
 }

@@ -26,7 +26,7 @@ abstract class BaseFragment : Fragment() {
         } ?: true
     }
 
-    private fun popToLoginFragment(errorMessage: String?): Boolean {
+    protected fun popToLoginFragment(errorMessage: String?): Boolean {
         val loginFragment = LoginFragment()
         val arguments = Bundle()
         errorMessage?.let { arguments.putString(BundleKey.ERROR_MESSAGE, it) }

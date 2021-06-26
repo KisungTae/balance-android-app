@@ -263,7 +263,15 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { ClickViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeBalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
-        bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), instance(), instance()) }
+        bind() from provider {
+            MainViewPagerViewModelFactory(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
         bind() from provider { AccountViewModelFactory(instance()) }
         bind() from provider {
             ProfileViewModelFactory(
@@ -277,7 +285,17 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
         bind() from provider { EmailSettingViewModelFactory(instance()) }
         bind() from provider { PushSettingViewModelFactory(instance()) }
-        bind() from provider { SettingViewModelFactory(instance()) }
+        bind() from provider {
+            SettingViewModelFactory(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
@@ -451,3 +469,4 @@ class BalanceApplication : Application(), KodeinAware {
 //      126. check profile validation like about >= 500 characters,
 //      127. check fmc notiication with pushsettngs
 //      128. when delete app and reisntall, need to chekc settings and fetch settings from server
+//      129. implement contact us and privacy & conditions

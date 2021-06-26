@@ -1,11 +1,10 @@
 package com.beeswork.balance.data.database.repository.setting
 
-import com.beeswork.balance.data.database.dao.FCMTokenDAO
-import com.beeswork.balance.data.database.dao.LocationDAO
-import com.beeswork.balance.data.database.dao.SettingDAO
+import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.FCMToken
 import com.beeswork.balance.data.database.entity.Location
 import com.beeswork.balance.data.database.entity.Setting
+import com.beeswork.balance.data.database.tuple.LocationTuple
 import com.beeswork.balance.data.database.tuple.PushSettingsTuple
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -23,6 +22,15 @@ class SettingRepositoryImpl(
     private val settingDAO: SettingDAO,
     private val ioDispatcher: CoroutineDispatcher
 ) : SettingRepository {
+
+    override suspend fun deleteSettings() {
+        withContext(ioDispatcher) {
+            fcmTokenDAO.deleteAll()
+            locationDAO.deleteAll()
+            settingDAO.deleteAll()
+            preferenceProvider.delete()
+        }
+    }
 
     override suspend fun saveFCMToken(token: String) {
         withContext(Dispatchers.IO) {
@@ -219,5 +227,24 @@ class SettingRepositoryImpl(
 
     override suspend fun syncChatMessagePush() {
         withContext(ioDispatcher) { settingDAO.syncChatMessagePush() }
+    }
+
+    override fun getLocationFlow(): Flow<LocationTuple?> {
+        return settingDAO.findLocationFlow()
+    }
+
+    override suspend fun deleteAccount(): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val response = settingRDS.deleteAccount(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken()
+            )
+            if (response.isSuccess()) {
+
+            }
+            return@withContext response
+        }
+
+
     }
 }

@@ -50,7 +50,7 @@ class SwipeFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
-        viewModel.fetchCards()
+//        viewModel.fetchCards()
     }
 
     private fun bindUI() = lifecycleScope.launch {

@@ -1,12 +1,14 @@
 package com.beeswork.balance.data.database.repository.setting
 
 import com.beeswork.balance.data.database.entity.Setting
+import com.beeswork.balance.data.database.tuple.LocationTuple
 import com.beeswork.balance.data.database.tuple.PushSettingsTuple
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import kotlinx.coroutines.flow.Flow
 
 interface SettingRepository {
+    suspend fun deleteSettings()
     suspend fun saveFCMToken(token: String)
     suspend fun saveLocation(latitude: Double, longitude: Double)
     suspend fun syncLocation()
@@ -33,5 +35,6 @@ interface SettingRepository {
     suspend fun syncMatchPush()
     suspend fun syncClickedPush()
     suspend fun syncChatMessagePush()
-
+    fun getLocationFlow(): Flow<LocationTuple?>
+    suspend fun deleteAccount(): Resource<EmptyResponse>
 }

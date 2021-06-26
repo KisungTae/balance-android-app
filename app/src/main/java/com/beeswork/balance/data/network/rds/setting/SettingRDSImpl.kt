@@ -12,6 +12,12 @@ class SettingRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), SettingRDS {
 
+    override suspend fun deleteAccount(accountId: UUID?, identityToken: UUID?): Resource<EmptyResponse> {
+        return getResult {
+            balanceAPI.deleteAccount(DeleteAccountBody(accountId, identityToken))
+        }
+    }
+
     override suspend fun postPushSettings(
         accountId: UUID?,
         identityToken: UUID?,
