@@ -30,9 +30,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
 
     private lateinit var binding: FragmentSettingBinding
     private lateinit var viewModel: SettingViewModel
-
     private val viewModelFactory: SettingViewModelFactory by instance()
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentSettingBinding.inflate(inflater)

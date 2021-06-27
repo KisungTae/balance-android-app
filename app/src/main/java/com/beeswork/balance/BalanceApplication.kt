@@ -16,6 +16,8 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepositoryImpl
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepositoryImpl
+import com.beeswork.balance.data.database.repository.login.LoginRepository
+import com.beeswork.balance.data.database.repository.login.LoginRepositoryImpl
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
@@ -65,6 +67,7 @@ import com.beeswork.balance.ui.account.AccountViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.click.ClickViewModelFactory
+import com.beeswork.balance.ui.login.LoginViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
@@ -72,6 +75,7 @@ import com.beeswork.balance.ui.profile.ProfileViewModelFactory
 import com.beeswork.balance.ui.setting.SettingViewModelFactory
 import com.beeswork.balance.ui.setting.email.EmailSettingViewModelFactory
 import com.beeswork.balance.ui.setting.push.PushSettingViewModelFactory
+import com.beeswork.balance.ui.splash.SplashViewModelFactory
 import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameViewModelFactory
 import com.beeswork.balance.ui.swipe.filter.SwipeFilterDialogViewModelFactory
 import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
@@ -241,6 +245,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
+        bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), Dispatchers.IO) }
 
         // StompClient
         bind() from singleton { StompClientImpl(applicationScope, instance(), instance()) }
@@ -296,6 +301,9 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
+        bind() from provider { SplashViewModelFactory(instance()) }
+        bind() from provider { LoginViewModelFactory(instance()) }
+
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }

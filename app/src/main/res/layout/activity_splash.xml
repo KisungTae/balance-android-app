@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/Primary"
     android:gravity="center"
-    tools:context=".ui.splash.SplashFragment">
+    tools:context=".ui.splash.SplashActivity">
 
     <TextView
         android:textSize="30sp"
