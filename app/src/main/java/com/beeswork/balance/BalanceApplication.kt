@@ -478,3 +478,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      127. check fmc notiication with pushsettngs
 //      128. when delete app and reisntall, need to chekc settings and fetch settings from server
 //      129. implement contact us and privacy & conditions
+
+
+// google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

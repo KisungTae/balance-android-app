@@ -189,4 +189,5 @@
     <string name="refresh_button_icon_description">refresh button icon</string>
     <string name="delete_account_button_text">Delete Account</string>
     <string name="log_out_button_text">Log out</string>
+    <string name="server_client_id">345572935231-j12sr8v32ngttr24lfpuvfe7djt24312.apps.googleusercontent.com</string>
 </resources>

@@ -32,6 +32,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
             val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
             try {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
+                viewModel.socialLogin()
                 println("${account.email} - ${account.id} - ${account.displayName} - ${account.idToken}")
 
                 // Signed in successfully, show authenticated UI.
@@ -65,7 +66,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
 
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("345572935231-j12sr8v32ngttr24lfpuvfe7djt24312.apps.googleusercontent.com")
+            .requestIdToken(getString(R.string.server_client_id))
             .requestEmail()
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)

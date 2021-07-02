@@ -6,4 +6,12 @@ import com.beeswork.balance.data.database.repository.login.LoginRepository
 class LoginViewModel(
     private val loginRepository: LoginRepository
 ): ViewModel() {
+
+    fun login() {
+
+    }
+
+    fun socialLogin(accessToken: String) {
+
+    }
 }
