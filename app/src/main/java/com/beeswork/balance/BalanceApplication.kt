@@ -32,6 +32,8 @@ import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
 import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.rds.click.ClickRDSImpl
+import com.beeswork.balance.data.network.rds.login.LoginRDS
+import com.beeswork.balance.data.network.rds.login.LoginRDSImpl
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDSImpl
 import com.beeswork.balance.data.network.rds.photo.PhotoRDS
@@ -141,6 +143,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance()) }
         bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance()) }
         bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance()) }
+        bind<LoginRDS>() with singleton { LoginRDSImpl(instance()) }
 
 
 
@@ -245,7 +248,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
-        bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), Dispatchers.IO) }
+        bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), instance(), Dispatchers.IO) }
 
         // StompClient
         bind() from singleton { StompClientImpl(applicationScope, instance(), instance()) }

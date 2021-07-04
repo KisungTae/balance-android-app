@@ -32,11 +32,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
             val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
             try {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
-                viewModel.socialLogin()
-                println("${account.email} - ${account.id} - ${account.displayName} - ${account.idToken}")
-
-                // Signed in successfully, show authenticated UI.
-//                updateUI(account)
+                viewModel.socialLogin(account.id, account.idToken)
             } catch (e: ApiException) {
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -55,6 +51,13 @@ class LoginActivity : BaseActivity(), KodeinAware {
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
         bind()
         setupGoogleSignIn()
+        observeLoginLiveData()
+    }
+
+    private fun observeLoginLiveData() {
+        viewModel.loginLiveData.observe(this) {
+
+        }
     }
 
     private fun bind() = lifecycleScope.launch {

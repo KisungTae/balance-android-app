@@ -42,6 +42,8 @@ class ExceptionCode {
 
         const val INVALID_EMAIL_EXCEPTION = "invalid_email_exception"
 
+        const val INVALID_SOCIAL_LOGIN_EXCEPTION = "invalid_social_login_exception"
+
     }
 
 }

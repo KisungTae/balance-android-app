@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
@@ -26,6 +27,9 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @POST("login/social")
+    suspend fun socialLogin(@Body socialLoginBody: SocialLoginBody): Response<LoginDTO>
 
     @POST("account/delete")
     suspend fun deleteAccount(@Body deleteAccountBody: DeleteAccountBody): Response<EmptyResponse>
