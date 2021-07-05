@@ -8,6 +8,7 @@ import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -23,10 +24,10 @@ class LoginViewModel(
 
     }
 
-    fun socialLogin(loginId: String?, accessToken: String?) {
+    fun socialLogin(loginId: String?, accessToken: String?, loginType: LoginType) {
         safeLet(loginId, accessToken) { _loginId, _accessToken ->
             viewModelScope.launch {
-                _loginLiveData.postValue(loginRepository.socialLogin(_loginId, _accessToken))
+                _loginLiveData.postValue(loginRepository.socialLogin(_loginId, _accessToken, loginType))
             }
         } ?: kotlin.run {
             _loginLiveData.postValue(Resource.error(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION))

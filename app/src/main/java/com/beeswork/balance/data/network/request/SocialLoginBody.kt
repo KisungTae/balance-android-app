@@ -1,10 +1,10 @@
 package com.beeswork.balance.data.network.request
 
+import com.beeswork.balance.internal.constant.LoginType
 import java.util.*
 
 data class SocialLoginBody(
-    val accountId: UUID?,
-    val identityToken: UUID?,
     val loginId: String,
-    val accessToken: String
+    val accessToken: String,
+    val loginType: LoginType
 )

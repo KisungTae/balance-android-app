@@ -16,18 +16,19 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-
-    override fun putAccountId(accountId: UUID?) {
-        accountId?.let {
-            editor.putString(ACCOUNT_ID, accountId.toString())
-        }
+    override fun putAccessToken(accessToken: String) {
+        editor.putString(ACCESS_TOKEN, accessToken)
         editor.apply()
     }
 
-    override fun putIdentityTokenId(identityToken: UUID?) {
-        identityToken?.let {
-            editor.putString(ACCOUNT_ID, identityToken.toString())
-        }
+
+    override fun putAccountId(accountId: UUID) {
+        editor.putString(ACCOUNT_ID, accountId.toString())
+        editor.apply()
+    }
+
+    override fun putIdentityTokenId(identityToken: UUID) {
+        editor.putString(ACCOUNT_ID, identityToken.toString())
         editor.apply()
     }
 
@@ -50,6 +51,9 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
+    override fun getAccessToken(): String? {
+        return preferences.getString(ACCESS_TOKEN, null)
+    }
 
 
     override fun getAccountId(): UUID? {
@@ -107,6 +111,7 @@ class PreferenceProviderImpl(
 
     companion object {
 
+        const val ACCESS_TOKEN = "accessToken"
         const val MATCH_FETCHED_AT = "matchFetchedAt"
         const val CLICK_FETCHED_AT = "clickFetchedAt"
         const val ACCOUNT_ID = "accountId"

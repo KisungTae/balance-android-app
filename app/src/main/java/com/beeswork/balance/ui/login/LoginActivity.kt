@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivityLoginBinding
+import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.ui.common.BaseActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -32,7 +33,8 @@ class LoginActivity : BaseActivity(), KodeinAware {
             val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
             try {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
-                viewModel.socialLogin(account.id, account.idToken)
+                viewModel.socialLogin(account.id, account.idToken, LoginType.GOOGLE)
+
             } catch (e: ApiException) {
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.

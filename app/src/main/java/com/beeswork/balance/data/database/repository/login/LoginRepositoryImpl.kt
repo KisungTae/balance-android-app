@@ -4,6 +4,7 @@ import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
+import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -14,17 +15,13 @@ class LoginRepositoryImpl(
     private val loginRDS: LoginRDS,
     private val ioDispatcher: CoroutineDispatcher
 ) : LoginRepository {
-    override suspend fun socialLogin(loginId: String, accessToken: String): Resource<LoginDTO> {
+    override suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
-            val response = loginRDS.socialLogin(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                loginId,
-                accessToken
-            )
+            val response = loginRDS.socialLogin(loginId, accessToken, loginType)
             if (response.isSuccess()) response.data?.let { data ->
-                println("data: ================")
-                println(data)
+                preferenceProvider.putAccountId(data.accountId)
+                preferenceProvider.putIdentityTokenId(data.identityToken)
+                preferenceProvider.putAccessToken(data.accessToken)
             }
             return@withContext response
         }
