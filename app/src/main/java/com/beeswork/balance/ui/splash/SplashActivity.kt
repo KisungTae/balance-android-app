@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivitySplashBinding
 import com.beeswork.balance.ui.common.BaseActivity
-import com.beeswork.balance.ui.login.LoginActivity
+import com.beeswork.balance.ui.loginactivity.LoginActivity
 import com.beeswork.balance.ui.mainactivity.MainActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware

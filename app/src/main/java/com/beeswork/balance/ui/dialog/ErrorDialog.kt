@@ -26,6 +26,12 @@ class ErrorDialog(
     constructor(
         error: String?,
         errorTitle: String?,
+        errorMessage: String?
+    ) : this(error, errorTitle, errorMessage, null, null, null)
+
+    constructor(
+        error: String?,
+        errorTitle: String?,
         errorMessage: String?,
         onDismissListener: OnDismissListener?,
         id: UUID?

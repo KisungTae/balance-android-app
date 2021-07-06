@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.login
+package com.beeswork.balance.ui.loginactivity
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.FragmentAccountBinding
 import com.beeswork.balance.databinding.FragmentLoginBinding
 
 class LoginFragment : Fragment() {

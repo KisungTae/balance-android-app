@@ -1,24 +1,31 @@
-package com.beeswork.balance.ui.login
+package com.beeswork.balance.ui.loginactivity
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.ActivityLoginBinding
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.ui.common.BaseActivity
+import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.mainactivity.MainActivity
+import com.beeswork.balance.ui.stepprofileactivity.StepProfileActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Status
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
+import java.lang.RuntimeException
 
 
 class LoginActivity : BaseActivity(), KodeinAware {
@@ -34,13 +41,8 @@ class LoginActivity : BaseActivity(), KodeinAware {
             try {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.socialLogin(account.id, account.idToken, LoginType.GOOGLE)
-
             } catch (e: ApiException) {
-                // The ApiException status code indicates the detailed failure reason.
-                // Please refer to the GoogleSignInStatusCodes class reference for more information.
-//                Log.w(TAG, "signInResult:failed code=" + e.statusCode)
-//                updateUI(null)
-                println("google signin error: ${e.localizedMessage}")
+                showError(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION, null)
             }
         }
     }
@@ -58,16 +60,43 @@ class LoginActivity : BaseActivity(), KodeinAware {
 
     private fun observeLoginLiveData() {
         viewModel.loginLiveData.observe(this) {
-
+            when (it.status) {
+                Resource.Status.ERROR -> showError(it.error, it.errorMessage)
+                Resource.Status.SUCCESS -> it.data?.let { data ->
+                    if (data.profileExists) moveToMainActivity()
+                    else moveToStepProfileActivity()
+                }
+                else -> println()
+            }
         }
+    }
+
+    private fun moveToMainActivity() {
+        moveToActivity(Intent(this@LoginActivity, MainActivity::class.java))
+    }
+
+    private fun moveToStepProfileActivity() {
+        moveToActivity(Intent(this@LoginActivity, StepProfileActivity::class.java))
+    }
+
+    private fun moveToActivity(intent: Intent) {
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+        this@LoginActivity.finish()
+    }
+
+    private fun showError(error: String?, errorMessage: String?) {
+        val errorTitle = getString(R.string.error_title_login)
+        ErrorDialog(error, errorTitle, errorMessage).show(supportFragmentManager, ErrorDialog.TAG)
     }
 
     private fun bind() = lifecycleScope.launch {
         binding.btnGoogleSignIn.setOnClickListener {
-            val signInIntent = mGoogleSignInClient.signInIntent
-            signInWithGoogleActivityResult.launch(signInIntent)
+            signInWithGoogleActivityResult.launch(mGoogleSignInClient.signInIntent)
         }
     }
+
+    // refresh token, validate jwt token in splahsactivity, logout, check if login with different account, then remove data
 
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -76,12 +105,4 @@ class LoginActivity : BaseActivity(), KodeinAware {
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
     }
-
-    override fun onStart() {
-        super.onStart()
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-//      TODO: check if account == null, then no signed in user, but not null then signed in user
-    }
-
-
 }

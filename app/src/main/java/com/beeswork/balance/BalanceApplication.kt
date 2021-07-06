@@ -69,7 +69,7 @@ import com.beeswork.balance.ui.account.AccountViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.click.ClickViewModelFactory
-import com.beeswork.balance.ui.login.LoginViewModelFactory
+import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory

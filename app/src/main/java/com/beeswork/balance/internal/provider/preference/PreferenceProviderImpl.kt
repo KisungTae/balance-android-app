@@ -3,8 +3,7 @@ package com.beeswork.balance.internal.provider.preference
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.beeswork.balance.data.database.converter.OffsetDateTimeConverter
-import com.beeswork.balance.internal.exception.AccountIdNotFoundException
-import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
+import com.beeswork.balance.internal.constant.LoginType
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
@@ -16,8 +15,13 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-    override fun putAccessToken(accessToken: String) {
-        editor.putString(ACCESS_TOKEN, accessToken)
+    override fun putLoginType(loginType: LoginType) {
+        editor.putInt(LOGIN_TYPE, loginType.ordinal)
+        editor.apply()
+    }
+
+    override fun putJwtToken(jwtToken: String) {
+        editor.putString(ACCESS_TOKEN, jwtToken)
         editor.apply()
     }
 
@@ -51,7 +55,13 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
-    override fun getAccessToken(): String? {
+    override fun getLoginType(): LoginType? {
+        val loginTypeOrdinal = preferences.getInt(LOGIN_TYPE, -1)
+        return if (loginTypeOrdinal == -1) null
+        else LoginType.values()[loginTypeOrdinal]
+    }
+
+    override fun getJwtToken(): String? {
         return preferences.getString(ACCESS_TOKEN, null)
     }
 
@@ -110,7 +120,7 @@ class PreferenceProviderImpl(
 
 
     companion object {
-
+        const val LOGIN_TYPE = "loginType"
         const val ACCESS_TOKEN = "accessToken"
         const val MATCH_FETCHED_AT = "matchFetchedAt"
         const val CLICK_FETCHED_AT = "clickFetchedAt"

@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.login
+package com.beeswork.balance.ui.loginactivity
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +11,6 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class LoginViewModel(
     private val loginRepository: LoginRepository

@@ -1,9 +1,8 @@
-package com.beeswork.balance.ui.login
+package com.beeswork.balance.ui.loginactivity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.login.LoginRepository
-import com.beeswork.balance.ui.splash.SplashViewModel
 
 class LoginViewModelFactory(
     private val loginRepository: LoginRepository

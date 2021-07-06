@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.profileviewpager
+package com.beeswork.balance.ui.stepprofileactivity
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

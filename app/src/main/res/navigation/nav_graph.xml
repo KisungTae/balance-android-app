@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.beeswork.balance.ui.login.LoginFragment"
+        android:name="com.beeswork.balance.ui.loginactivity.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -48,7 +48,7 @@
         tools:layout="@layout/fragment_main_view_pager" />
     <fragment
         android:id="@+id/profileViewPagerFragment"
-        android:name="com.beeswork.balance.ui.profileviewpager.ProfileViewPagerFragment"
+        android:name="com.beeswork.balance.ui.stepprofileactivity.ProfileViewPagerFragment"
         android:label="fragment_profile_view_pager"
         tools:layout="@layout/fragment_profile_view_pager" >
         <action

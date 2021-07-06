@@ -3,15 +3,11 @@ package com.beeswork.balance.ui.common
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.navigation.fragment.findNavController
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.login.LoginFragment
-import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
-import java.lang.Exception
+import com.beeswork.balance.ui.loginactivity.LoginFragment
 
 abstract class BaseFragment : Fragment() {
 

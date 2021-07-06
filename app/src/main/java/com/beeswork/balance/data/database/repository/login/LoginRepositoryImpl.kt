@@ -7,7 +7,6 @@ import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 class LoginRepositoryImpl(
@@ -21,7 +20,8 @@ class LoginRepositoryImpl(
             if (response.isSuccess()) response.data?.let { data ->
                 preferenceProvider.putAccountId(data.accountId)
                 preferenceProvider.putIdentityTokenId(data.identityToken)
-                preferenceProvider.putAccessToken(data.accessToken)
+                preferenceProvider.putJwtToken(data.jwtToken)
+                preferenceProvider.putLoginType(loginType)
             }
             return@withContext response
         }
