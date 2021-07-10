@@ -9,7 +9,7 @@ import com.beeswork.balance.data.database.entity.*
 
 @Database(
     entities = [Match::class, ChatMessage::class, Swipe::class, FCMToken::class,
-        Click::class, Profile::class, Location::class, Photo::class, SwipeFilter::class, Setting::class],
+        Click::class, Profile::class, Location::class, Photo::class, SwipeFilter::class, Setting::class, FetchInfo::class],
     version = 1
 )
 @TypeConverters(
@@ -32,6 +32,7 @@ abstract class BalanceDatabase : RoomDatabase() {
     abstract fun photoDAO(): PhotoDAO
     abstract fun swipeFilterDAO(): SwipeFilterDAO
     abstract fun settingDAO(): SettingDAO
+    abstract fun fetchInfoDAO(): FetchInfoDAO
 
     companion object {
 

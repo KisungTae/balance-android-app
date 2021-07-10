@@ -11,6 +11,7 @@ data class MatchDomain(
     val unmatched: Boolean,
     val name: String,
     val profilePhotoKey: String?,
+    val deleted: Boolean,
     val updatedAt: ZonedDateTime?,
     val unread: Boolean,
     val recentChatMessage: String

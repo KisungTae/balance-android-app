@@ -14,11 +14,13 @@ class MatchMapperImpl : MatchMapper {
     override fun toMatch(matchDTO: MatchDTO): Match {
         return Match(
             matchDTO.chatId,
+            matchDTO.swiperId,
             matchDTO.swipedId,
             matchDTO.active,
             matchDTO.unmatched,
             matchDTO.name,
             matchDTO.profilePhotoKey,
+            matchDTO.deleted,
             matchDTO.createdAt
         )
     }
@@ -31,6 +33,7 @@ class MatchMapperImpl : MatchMapper {
             match.unmatched,
             match.name,
             match.profilePhotoKey,
+            match.deleted,
             match.updatedAt?.atZoneSameInstant(ZoneId.systemDefault()),
             match.unread,
             match.recentChatMessage

@@ -130,6 +130,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
         bind() from singleton { instance<BalanceDatabase>().swipeFilterDAO() }
         bind() from singleton { instance<BalanceDatabase>().settingDAO() }
+        bind() from singleton { instance<BalanceDatabase>().fetchInfoDAO() }
 
         // API
         bind() from singleton { BalanceAPI(instance()) }
@@ -481,6 +482,13 @@ class BalanceApplication : Application(), KodeinAware {
 //      127. check fmc notiication with pushsettngs
 //      128. when delete app and reisntall, need to chekc settings and fetch settings from server
 //      129. implement contact us and privacy & conditions
-
+//      130. when login, send fcm token together so that server can update the accounts with the same token, and only the logged in account receives fcm push notification
+//      131. when logout update the account fcm token in the server so that no push notificaation will be received to the log out account
+//      132. swipe from click, and it should cost more than normal swipe
+//      133. mainviewpagerfragment all logics move to --> mainactivity
+//      134. profile, photo, not synced should send a request to server or just fetch the data from the server and sync with the server
+//      135. getName, profilephotoeky, token, logintyep should be change in preferenceProvider
+//      136. when logged in, then check if exists, profile, fetchInfo, photo,,....swipefilter
+//      137. when logged in go to mainActivity then send token to be saved in the server
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

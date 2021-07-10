@@ -56,7 +56,7 @@ class ClickFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
-//        viewModel.fetchClicks()
+        viewModel.fetchClicks()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -142,7 +142,7 @@ class ClickFragment : BaseFragment(),
     }
 
     override fun onFragmentSelected() {
-//        viewModel.fetchClicks()
+        viewModel.fetchClicks()
     }
 
     override fun onSelectClick(position: Int) {

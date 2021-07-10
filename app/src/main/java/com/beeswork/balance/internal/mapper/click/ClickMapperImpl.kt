@@ -6,7 +6,14 @@ import com.beeswork.balance.ui.click.ClickDomain
 
 class ClickMapperImpl : ClickMapper {
     override fun toClick(clickDTO: ClickDTO): Click {
-        return Click(clickDTO.swiperId, clickDTO.name, clickDTO.profilePhotoKey, clickDTO.updatedAt)
+        return Click(
+            clickDTO.swiperId,
+            clickDTO.swipedId,
+            clickDTO.name,
+            clickDTO.deleted,
+            clickDTO.profilePhotoKey,
+            clickDTO.updatedAt
+        )
     }
 
     override fun toClickDomain(click: Click): ClickDomain {

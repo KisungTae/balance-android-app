@@ -70,7 +70,7 @@ class MatchPagingDataAdapter(
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
             setupProfilePicture(matchDomain.swipedId, matchDomain.profilePhotoKey)
-            setupTextColor(matchDomain.unmatched)
+            setupTextColor(matchDomain)
         }
 
         private fun formatUpdatedAt(updatedAt: ZonedDateTime?): String {
@@ -100,8 +100,8 @@ class MatchPagingDataAdapter(
 //                .into(binding.ivMatchProfilePicture)
         }
 
-        private fun setupTextColor(unmatched: Boolean) {
-            val colorCode = if (unmatched) R.color.TextGrey else R.color.TextBlack
+        private fun setupTextColor(matchDomain: MatchDomain) {
+            val colorCode = if (matchDomain.unmatched || matchDomain.deleted) R.color.TextGrey else R.color.TextBlack
             val textColor = context.getColor(colorCode)
             binding.tvMatchName.setTextColor(textColor)
             binding.tvMatchRecentChatMessage.setTextColor(textColor)
@@ -109,7 +109,7 @@ class MatchPagingDataAdapter(
         }
 
         private fun getRecentChatMessage(matchDomain: MatchDomain): String {
-            return if (matchDomain.unmatched) context.getString(R.string.recent_chat_message_invalid_match)
+            return if (matchDomain.unmatched || matchDomain.deleted) context.getString(R.string.recent_chat_message_invalid_match)
             else if (!matchDomain.active) context.getString(R.string.recent_chat_message_new_match)
             else matchDomain.recentChatMessage
         }

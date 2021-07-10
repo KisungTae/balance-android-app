@@ -16,11 +16,13 @@ data class Match(
     @PrimaryKey
     val chatId: Long,
 
+    var swiperId: UUID?,
     val swipedId: UUID,
     var active: Boolean,
     var unmatched: Boolean,
     var name: String,
     var profilePhotoKey: String?,
+    val deleted: Boolean,
     var updatedAt: OffsetDateTime?,
     var unread: Boolean = false,
     var recentChatMessage: String = "",

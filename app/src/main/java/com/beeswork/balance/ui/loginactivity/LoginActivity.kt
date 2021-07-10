@@ -2,6 +2,8 @@ package com.beeswork.balance.ui.loginactivity
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
+import android.telephony.TelephonyManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -20,12 +22,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Status
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
-import java.lang.RuntimeException
 
 
 class LoginActivity : BaseActivity(), KodeinAware {
@@ -49,13 +49,14 @@ class LoginActivity : BaseActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
-        bind()
-        setupGoogleSignIn()
-        observeLoginLiveData()
+        moveToMainActivity()
+//        window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
+//        binding = ActivityLoginBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
+//        viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
+//        bind()
+//        setupGoogleSignIn()
+//        observeLoginLiveData()
     }
 
     private fun observeLoginLiveData() {
