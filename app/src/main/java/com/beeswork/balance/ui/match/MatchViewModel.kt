@@ -12,6 +12,8 @@ import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import org.threeten.bp.OffsetDateTime
 
 
 class MatchViewModel(
@@ -43,10 +45,11 @@ class MatchViewModel(
     }
 
     fun fetchMatches() {
-        viewModelScope.safeLaunch(_fetchMatchesLiveData) {
+        viewModelScope.launch {
+            val fetchedAt = OffsetDateTime.now()
             val response = matchRepository.fetchMatches()
             response.data?.let { data ->
-                chatRepository.saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs, data.fetchedAt)
+                chatRepository.saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs, fetchedAt)
             }
             _fetchMatchesLiveData.postValue(response.toEmptyResponse())
         }

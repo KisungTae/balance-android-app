@@ -7,6 +7,8 @@ import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Location
 import com.beeswork.balance.data.database.entity.Setting
 import com.beeswork.balance.data.database.entity.SwipeFilter
+import com.beeswork.balance.internal.constant.Gender
+import java.util.*
 
 @Dao
 interface SwipeFilterDAO {
@@ -14,15 +16,18 @@ interface SwipeFilterDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(swipeFilter: SwipeFilter)
 
-    @Query("select * from swipeFilter where id = ${SwipeFilter.ID}")
-    fun findById(): SwipeFilter
+    @Query("select * from swipeFilter where accountId = :accountId")
+    fun findById(accountId: UUID?): SwipeFilter
 
-    @Query("update swipeFilter set pageIndex = :pageIndex where id = ${SwipeFilter.ID}")
-    fun updatePageIndex(pageIndex: Int)
+    @Query("update swipeFilter set pageIndex = :pageIndex where accountId = :accountId")
+    fun updatePageIndex(accountId: UUID?, pageIndex: Int)
 
-    @Query("select count() > 0 from swipeFilter where id = ${SwipeFilter.ID}")
-    fun exist(): Boolean
+    @Query("select count() > 0 from swipeFilter where accountId = :accountId")
+    fun existByAccountId(accountId: UUID?): Boolean
 
-    @Query("delete from swipeFilter")
-    fun deleteAll()
+    @Query("delete from swipeFilter where accountId = :accountId")
+    fun deleteAll(accountId: UUID?)
+
+    @Query("update swipeFilter set gender = :gender, minAge = :minAge, maxAge = :maxAge, distance = :distance where accountId = :accountId")
+    fun update(accountId: UUID?, gender: Boolean, minAge: Int, maxAge: Int, distance: Int)
 }

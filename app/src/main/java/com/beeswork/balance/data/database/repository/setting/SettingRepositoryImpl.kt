@@ -1,9 +1,7 @@
 package com.beeswork.balance.data.database.repository.setting
 
 import com.beeswork.balance.data.database.dao.*
-import com.beeswork.balance.data.database.entity.FCMToken
-import com.beeswork.balance.data.database.entity.Location
-import com.beeswork.balance.data.database.entity.Setting
+import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.tuple.LocationTuple
 import com.beeswork.balance.data.database.tuple.PushSettingsTuple
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
@@ -20,6 +18,7 @@ class SettingRepositoryImpl(
     private val locationDAO: LocationDAO,
     private val settingRDS: SettingRDS,
     private val settingDAO: SettingDAO,
+    private val fetchInfoDAO: FetchInfoDAO,
     private val ioDispatcher: CoroutineDispatcher
 ) : SettingRepository {
 
@@ -240,11 +239,20 @@ class SettingRepositoryImpl(
                 preferenceProvider.getIdentityToken()
             )
             if (response.isSuccess()) {
-
+                //TODO: implement when success
             }
             return@withContext response
         }
 
 
+    }
+
+    override suspend fun prepopulateFetchInfo() {
+        withContext(ioDispatcher) {
+            val accountId = preferenceProvider.getAccountId()
+            if (!fetchInfoDAO.existByAccountId(accountId)) accountId?.let { _accountId ->
+                fetchInfoDAO.insert(FetchInfo(_accountId))
+            }
+        }
     }
 }

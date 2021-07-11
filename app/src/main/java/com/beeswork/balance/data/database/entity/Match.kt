@@ -22,7 +22,6 @@ data class Match(
     var unmatched: Boolean,
     var name: String,
     var profilePhotoKey: String?,
-    val deleted: Boolean,
     var updatedAt: OffsetDateTime?,
     var unread: Boolean = false,
     var recentChatMessage: String = "",

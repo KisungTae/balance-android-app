@@ -21,46 +21,47 @@ class SwipeRepositoryImpl(
 ) : SwipeRepository {
     override suspend fun deleteSwipes() {
         withContext(ioDispatcher) {
-            swipeDAO.deleteAll()
-            swipeFilterDAO.deleteAll()
+            swipeDAO.deleteAll(preferenceProvider.getAccountId())
+            swipeFilterDAO.deleteAll(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun getSwipeFilter(): SwipeFilter {
         return withContext(ioDispatcher) {
-            return@withContext swipeFilterDAO.findById()
+            return@withContext swipeFilterDAO.findById(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun saveSwipeFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int) {
         withContext(ioDispatcher) {
-            val swipeFilter = SwipeFilter(
+            swipeFilterDAO.update(
+                preferenceProvider.getAccountId(),
                 gender,
                 if (minAge < SwipeFilter.MIN_AGE) SwipeFilter.MIN_AGE else minAge,
                 if (maxAge > SwipeFilter.MAX_AGE) SwipeFilter.MAX_AGE else maxAge,
                 if (distance < SwipeFilter.MIN_DISTANCE || distance > SwipeFilter.MAX_DISTANCE) SwipeFilter.MAX_DISTANCE else distance
             )
-            swipeFilterDAO.insert(swipeFilter)
         }
     }
 
     override suspend fun fetchCards(): Resource<FetchCardsDTO> {
         return withContext(ioDispatcher) {
-            val swipeFilter = swipeFilterDAO.findById()
+            val accountId = preferenceProvider.getAccountId()
+            val swipeFilter = swipeFilterDAO.findById(accountId)
             val response = swipeRDS.fetchCards(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
-                yearFromAge(swipeFilter.minAge),
-                yearFromAge(swipeFilter.maxAge),
+                swipeFilter.minAge,
+                swipeFilter.maxAge,
                 swipeFilter.gender,
-                swipeFilter.distance * METER_UNIT,
+                swipeFilter.distance,
                 swipeFilter.pageIndex
             )
             response.data?.let { data ->
                 savePageIndex(swipeFilter.pageIndex, data.reset)
                 val cardDTOs = data.cardDTOs
                 for (i in cardDTOs.size - 1 downTo 0) {
-                    if (swipeDAO.existBySwipedId(cardDTOs[i].accountId))
+                    if (swipeDAO.existBySwipedId(accountId, cardDTOs[i].accountId))
                         cardDTOs.removeAt(i)
                 }
                 cardDTOs.shuffle()
@@ -81,24 +82,18 @@ class SwipeRepositoryImpl(
 
     override suspend fun prepopulateSwipeFilter() {
         withContext(ioDispatcher) {
-            if (!swipeFilterDAO.exist()) swipeFilterDAO.insert(SwipeFilter())
+            val accountId = preferenceProvider.getAccountId()
+            if (!swipeFilterDAO.existByAccountId(accountId)) accountId?.let { _accountId ->
+                swipeFilterDAO.insert(SwipeFilter(_accountId))
+            }
         }
-    }
-
-    private fun yearFromAge(age: Int): Int {
-        if (age == SwipeFilter.MAX_AGE) return 0
-        return Calendar.getInstance().get(Calendar.YEAR) - age + 1
     }
 
     private suspend fun savePageIndex(currentPageIndex: Int, reset: Boolean) {
         withContext(ioDispatcher) {
             var pageIndex = if (reset) 0 else currentPageIndex
             pageIndex++
-            swipeFilterDAO.updatePageIndex(pageIndex)
+            swipeFilterDAO.updatePageIndex(preferenceProvider.getAccountId(), pageIndex)
         }
-    }
-
-    companion object {
-        const val METER_UNIT = 1000
     }
 }

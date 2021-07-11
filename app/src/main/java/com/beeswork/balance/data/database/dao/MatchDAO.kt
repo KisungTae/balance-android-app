@@ -24,14 +24,14 @@ interface MatchDAO {
     @Query("select * from `match` where chatId = :chatId")
     fun findById(chatId: Long?): Match?
 
-    @Query("select count(swipedId) > 0 from `match` where swipedId = :swipedId")
-    fun existBySwipedId(swipedId: UUID): Boolean
+    @Query("select count(swipedId) > 0 from `match` where swiperId = :accountId and swipedId = :swipedId")
+    fun existBySwipedId(accountId: UUID?, swipedId: UUID): Boolean
 
-    @Query("select * from `match` where name like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
+    @Query("select * from `match` where swiperId = :accountId and name like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
+    fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
 
-    @Query("select * from `match` order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int): List<Match>
+    @Query("select * from `match` where swiperId = :accountId order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
+    fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select unmatched from `match` where chatId = :chatId")
     fun findUnmatched(chatId: Long): Boolean
@@ -45,10 +45,10 @@ interface MatchDAO {
     @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', profilePhotoKey = null, active = 1 where chatId = :chatId")
     fun updateAsUnmatched(chatId: Long?)
 
-    @Query("select count(unread) from `match` where unread = 1 or active = 0")
-    fun countUnread(): Flow<Int>
+    @Query("select count(unread) from `match` where swiperId = :accountId and unread = 1 or active = 0")
+    fun countUnread(accountId: UUID?): Flow<Int>
 
-    @Query("delete from `match`")
-    fun deleteAll()
+    @Query("delete from `match` where swiperId = :accountId")
+    fun deleteAll(accountId: UUID?)
 
 }

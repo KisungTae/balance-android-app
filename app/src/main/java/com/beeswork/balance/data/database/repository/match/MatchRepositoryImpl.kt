@@ -33,6 +33,7 @@ class MatchRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val clickDAO: ClickDAO,
     private val swipeDAO: SwipeDAO,
+    private val fetchInfoDAO: FetchInfoDAO,
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
@@ -59,39 +60,44 @@ class MatchRepositoryImpl(
 
     private fun collectMatchFlow() {
         stompClient.matchFlow.onEach { matchDTO ->
-            saveMatchAndOffer(matchMapper.toMatch(matchDTO))
+            saveMatchAndNotify(matchMapper.toMatch(matchDTO))
         }.launchIn(applicationScope)
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
         return withContext(ioDispatcher) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition)
+            return@withContext matchDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match> {
         return withContext(ioDispatcher) {
-            return@withContext matchDAO.findAllPaged(loadSize, startPosition, "%${searchKeyword}%")
+            return@withContext matchDAO.findAllPaged(
+                preferenceProvider.getAccountId(),
+                loadSize,
+                startPosition,
+                "%${searchKeyword}%"
+            )
         }
     }
 
     override suspend fun fetchMatches(): Resource<ListMatchesDTO> {
         return withContext(ioDispatcher) {
-            val fetchedAt = OffsetDateTime.now()
+            val accountId = preferenceProvider.getAccountId()
             val response = matchRDS.listMatches(
-                preferenceProvider.getAccountId(),
+                accountId,
                 preferenceProvider.getIdentityToken(),
-                preferenceProvider.getMatchFetchedAt()
+                fetchInfoDAO.findMatchFetchedAt(accountId)
             )
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
                     data.matchDTOs?.forEach { matchDTO ->
-                        saveMatch(matchMapper.toMatch(matchDTO))
+                        val match = matchMapper.toMatch(matchDTO)
+                        match.swiperId = accountId
+                        saveMatch(match)
                     }
                 }
-                preferenceProvider.putMatchFetchedAt(data.fetchedAt)
-                data.matchDTOs = null
-                data.fetchedAt = fetchedAt
+                fetchInfoDAO.updateMatchFetchedAt(accountId, data.fetchedAt)
             }
             return@withContext response
         }
@@ -99,8 +105,9 @@ class MatchRepositoryImpl(
 
     private fun saveMatch(match: Match) {
         updateMatch(match)
-        swipeDAO.insert(Swipe(match.swipedId))
-        clickDAO.deleteBySwiperId(match.swipedId)
+        val accountId = preferenceProvider.getAccountId()
+        swipeDAO.insert(Swipe(match.swipedId, accountId))
+        clickDAO.deleteBySwiperId(accountId, match.swipedId)
         matchDAO.insert(match)
     }
 
@@ -177,13 +184,14 @@ class MatchRepositoryImpl(
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
         withContext(Dispatchers.IO) {
-            saveMatchAndOffer(matchMapper.toMatch(matchDTO))
+            saveMatchAndNotify(matchMapper.toMatch(matchDTO))
         }
     }
 
-    private fun saveMatchAndOffer(match: Match) {
+    private fun saveMatchAndNotify(match: Match) {
         saveMatch(match)
-        newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
+        if (match.swiperId == preferenceProvider.getAccountId())
+            newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
     }
 
     override fun getMatchInvalidation(): Flow<Boolean> {
@@ -191,7 +199,7 @@ class MatchRepositoryImpl(
     }
 
     override fun getUnreadMatchCount(): Flow<Int> {
-        return matchDAO.countUnread()
+        return matchDAO.countUnread(preferenceProvider.getAccountId())
     }
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType> {
@@ -205,9 +213,8 @@ class MatchRepositoryImpl(
             response.data?.let { matchDTO ->
                 when (matchDTO.pushType) {
                     PushType.MATCHED -> saveMatch(matchMapper.toMatch(matchDTO))
-                    PushType.CLICKED -> swipeDAO.insert(Swipe(swipedId))
-                    else -> {
-                    }
+                    PushType.CLICKED -> swipeDAO.insert(Swipe(swipedId, preferenceProvider.getAccountId()))
+                    else -> println()
                 }
                 return@withContext response.mapData(matchDTO.pushType)
             }
@@ -216,7 +223,7 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun deleteMatches() {
-        withContext(ioDispatcher) { matchDAO.deleteAll() }
+        withContext(ioDispatcher) { matchDAO.deleteAll(preferenceProvider.getAccountId()) }
     }
 
 
@@ -225,25 +232,25 @@ class MatchRepositoryImpl(
         val messages = mutableListOf<ChatMessage>()
         var count = 1L
         var now = OffsetDateTime.now()
-        val chatId = matchDAO.findAllPaged(100, 0)[0].chatId
+//        val chatId = matchDAO.findAllPaged(100, 0)[0].chatId
 
         for (i in 1..10) {
             val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
 //            messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, null))
             count++
         }
-
-        for (i in 0..100) {
-            var createdAt = now.plusMinutes(Random.nextInt(10).toLong())
-            for (j in 0..Random.nextInt(10)) {
-                if ((Random.nextInt(3) + 1) % 3 == 0) createdAt = createdAt.plusMinutes(Random.nextInt(10).toLong())
-                val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
-                messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, createdAt, count))
-                count++
-            }
-            now = now.plusDays(1)
-        }
-        chatMessageDAO.insert(messages)
+//
+//        for (i in 0..100) {
+//            var createdAt = now.plusMinutes(Random.nextInt(10).toLong())
+//            for (j in 0..Random.nextInt(10)) {
+//                if ((Random.nextInt(3) + 1) % 3 == 0) createdAt = createdAt.plusMinutes(Random.nextInt(10).toLong())
+//                val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
+//                messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, createdAt, count))
+//                count++
+//            }
+//            now = now.plusDays(1)
+//        }
+//        chatMessageDAO.insert(messages)
     }
 
 

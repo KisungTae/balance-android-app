@@ -30,6 +30,7 @@ class ClickRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
     private val clickMapper: ClickMapper,
     private val stompClient: StompClient,
+    private val balanceDatabase: BalanceDatabase,
     private val applicationScope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher
 ) : ClickRepository {
@@ -55,15 +56,15 @@ class ClickRepositoryImpl(
     }
 
     private fun collectClickFlow() {
-        stompClient.clickFlow.onEach { clickDTO -> saveClick(clickDTO) }.launchIn(applicationScope)
+        stompClient.clickFlow.onEach { clickDTO -> saveClickAndNotify(clickDTO) }.launchIn(applicationScope)
     }
 
-    override suspend fun saveClickFromFCMPush(clickDTO: ClickDTO) {
-        withContext(Dispatchers.IO) { saveClick(clickDTO) }
+    override suspend fun saveClick(clickDTO: ClickDTO) {
+        withContext(Dispatchers.IO) { saveClickAndNotify(clickDTO) }
     }
 
-    private fun saveClick(clickDTO: ClickDTO) {
-        if (matchDAO.existBySwipedId(clickDTO.swiperId)) return
+    private fun saveClickAndNotify(clickDTO: ClickDTO) {
+        if (matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) return
         val click = clickMapper.toClick(clickDTO)
         clickDAO.insert(click)
         if (click.swipedId == preferenceProvider.getAccountId())
@@ -72,7 +73,7 @@ class ClickRepositoryImpl(
 
     override suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click> {
         return withContext(ioDispatcher) {
-            return@withContext clickDAO.findAllPaged(loadSize, startPosition, preferenceProvider.getAccountId())
+            return@withContext clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
 
@@ -86,20 +87,20 @@ class ClickRepositoryImpl(
             )
 
             response.data?.let { data ->
-                val clicks = mutableListOf<Click>()
                 var clickFetchedAt = OffsetDateTime.MIN
-                for (clickDTO in data) {
-                    if (clickDTO.deleted)
-                        clickDAO.deleteBySwiperId(clickDTO.swiperId)
-                    else if (!matchDAO.existBySwipedId(clickDTO.swiperId)) {
-                        val click = clickMapper.toClick(clickDTO)
-                        click.swipedId = accountId
-                        clickDAO.insert(click)
+                balanceDatabase.runInTransaction {
+                    data.forEach { clickDTO ->
+                        if (clickDTO.deleted)
+                            clickDAO.deleteBySwiperId(accountId, clickDTO.swiperId)
+                        else if (!matchDAO.existBySwipedId(accountId, clickDTO.swiperId)) {
+                            val click = clickMapper.toClick(clickDTO)
+                            click.swipedId = accountId
+                            clickDAO.insert(click)
+                        }
+                        if (clickDTO.updatedAt.isAfter(clickFetchedAt))
+                            clickFetchedAt = clickDTO.updatedAt
                     }
-                    if (clickDTO.updatedAt.isAfter(clickFetchedAt))
-                        clickFetchedAt = clickDTO.updatedAt
                 }
-                clickDAO.insert(clicks)
                 if (clickFetchedAt.isAfter(OffsetDateTime.MIN))
                     fetchInfoDAO.updateClickFetchedAt(accountId, clickFetchedAt)
             }
@@ -113,6 +114,10 @@ class ClickRepositoryImpl(
 
     override fun getClickCount(): Flow<Int> {
         return clickDAO.count(preferenceProvider.getAccountId())
+    }
+
+    private fun saveDefaultFetchInfo() {
+
     }
 
     override fun test() {

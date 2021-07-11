@@ -10,6 +10,7 @@ import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class ClickViewModel(
     private val clickRepository: ClickRepository,
@@ -43,7 +44,8 @@ class ClickViewModel(
     }
 
     fun fetchClicks() {
-        viewModelScope.safeLaunch(_fetchClicks) {
+        viewModelScope.launch {
+            _fetchClicks.postValue(Resource.loading())
             _fetchClicks.postValue(clickRepository.fetchClicks())
         }
     }

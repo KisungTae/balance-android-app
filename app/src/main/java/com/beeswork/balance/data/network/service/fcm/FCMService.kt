@@ -43,7 +43,7 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
         when (pushType) {
             PushType.CLICKED -> scope.safeLaunch<Any>(null) {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                clickRepository.saveClickFromFCMPush(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
+                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
             }
             PushType.MATCHED -> scope.safeLaunch<Any>(null) {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)

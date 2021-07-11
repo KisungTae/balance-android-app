@@ -13,7 +13,6 @@ data class Click(
 
     var swipedId: UUID?,
     val name: String,
-    val deleted: Boolean,
     var profilePhotoKey: String,
     var updatedAt: OffsetDateTime
 )

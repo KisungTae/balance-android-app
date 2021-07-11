@@ -37,4 +37,6 @@ interface SettingRepository {
     suspend fun syncChatMessagePush()
     fun getLocationFlow(): Flow<LocationTuple?>
     suspend fun deleteAccount(): Resource<EmptyResponse>
+    suspend fun prepopulateFetchInfo()
+
 }

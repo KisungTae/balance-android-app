@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentClickBinding
 import com.beeswork.balance.databinding.SnackBarNewClickBinding
 import com.beeswork.balance.internal.constant.RequestCode
@@ -56,7 +57,6 @@ class ClickFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
-        viewModel.fetchClicks()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -65,6 +65,7 @@ class ClickFragment : BaseFragment(),
         setupFetchClicksObserver()
         setupNewClickLiveDataObserver()
         setupClickPagingDataObserver()
+        binding.btnClickRefresh.setOnClickListener { viewModel.fetchClicks() }
     }
 
     private suspend fun setupNewClickLiveDataObserver() {
@@ -101,13 +102,23 @@ class ClickFragment : BaseFragment(),
 
     private fun setupFetchClicksObserver() {
         viewModel.fetchClicks.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) showErrorDialog(
-                it.error,
-                getString(R.string.fetch_clicks_exception_title),
-                it.errorMessage,
-                RequestCode.FETCH_CLICKS,
-                this@ClickFragment
-            )
+            when (it.status) {
+                Resource.Status.SUCCESS -> {
+                    binding.btnClickRefresh.visibility = View.GONE
+                    binding.skvClickLoading.visibility = View.INVISIBLE
+                }
+                Resource.Status.LOADING -> {
+                    binding.btnClickRefresh.visibility = View.GONE
+                    binding.skvClickLoading.visibility = View.VISIBLE
+                }
+                Resource.Status.ERROR -> {
+                    validateAccount(it.error, it.errorMessage)
+                    binding.btnClickRefresh.visibility = View.VISIBLE
+                    binding.skvClickLoading.visibility = View.GONE
+                    val errorTitle = getString(R.string.fetch_clicks_exception_title)
+                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CLICKS, this@ClickFragment)
+                }
+            }
         }
     }
 
@@ -163,7 +174,6 @@ class ClickFragment : BaseFragment(),
         when (requestCode) {
             RequestCode.FETCH_CLICKS -> viewModel.fetchClicks()
         }
-
     }
 
 }

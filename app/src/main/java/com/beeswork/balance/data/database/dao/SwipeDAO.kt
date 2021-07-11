@@ -10,9 +10,9 @@ interface SwipeDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(swipe: Swipe)
 
-    @Query("select count(*) > 0 from swipe where swipedId = :swipedId")
-    fun existBySwipedId(swipedId: UUID): Boolean
+    @Query("select count(*) > 0 from swipe where swiperId = :accountId and swipedId = :swipedId")
+    fun existBySwipedId(accountId: UUID?, swipedId: UUID): Boolean
 
-    @Query("delete from swipe")
-    fun deleteAll()
+    @Query("delete from swipe where swiperId = :accountId")
+    fun deleteAll(accountId: UUID?)
 }

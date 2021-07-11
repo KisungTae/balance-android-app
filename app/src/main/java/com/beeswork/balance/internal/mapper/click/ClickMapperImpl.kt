@@ -10,7 +10,6 @@ class ClickMapperImpl : ClickMapper {
             clickDTO.swiperId,
             clickDTO.swipedId,
             clickDTO.name,
-            clickDTO.deleted,
             clickDTO.profilePhotoKey,
             clickDTO.updatedAt
         )

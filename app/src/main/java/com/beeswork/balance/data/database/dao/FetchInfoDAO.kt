@@ -26,4 +26,7 @@ interface FetchInfoDAO {
 
     @Query("select matchFetchedAt from fetchInfo where accountId = :accountId")
     fun findMatchFetchedAt(accountId: UUID?): OffsetDateTime
+
+    @Query("select count(*) > 0 from fetchInfo where accountId =:accountId")
+    fun existByAccountId(accountId: UUID?): Boolean
 }

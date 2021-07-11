@@ -185,11 +185,13 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 Dispatchers.IO
             )
         }
         bind<ClickRepository>() with singleton {
             ClickRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -218,6 +220,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -306,7 +309,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { SplashViewModelFactory(instance()) }
-        bind() from provider { LoginViewModelFactory(instance()) }
+        bind() from provider { LoginViewModelFactory(instance(), instance(), instance()) }
 
 
         // Interceptor
@@ -489,6 +492,10 @@ class BalanceApplication : Application(), KodeinAware {
 //      134. profile, photo, not synced should send a request to server or just fetch the data from the server and sync with the server
 //      135. getName, profilephotoeky, token, logintyep should be change in preferenceProvider
 //      136. when logged in, then check if exists, profile, fetchInfo, photo,,....swipefilter
-//      137. when logged in go to mainActivity then send token to be saved in the server
+//      137. when logged in go to mainActivity then send token and location to be saved in the server
+//      138. when received fcm, if app is open, then connectToStomp
+//      139. name and profilePhotoKey should be from database not preferece
+//      140. locaiton manager and listeners check
+//      141. need I am interested in famle in stepProfile then update swipefilter
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth
