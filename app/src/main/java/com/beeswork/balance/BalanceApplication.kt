@@ -497,5 +497,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      139. name and profilePhotoKey should be from database not preferece
 //      140. locaiton manager and listeners check
 //      141. need I am interested in famle in stepProfile then update swipefilter
+//      142. if location is not allowed then show error in swipe fragment
+//      143. photos, profile, setting if empty then fetch from server, and functions in repository should return Resource so that clicent can know that fetch is failed or not
+//      144. email should be in the login response?
+
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

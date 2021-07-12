@@ -8,6 +8,7 @@ import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.swipe.card.CardDomain
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 
 class SwipeViewModel(
     private val swipeRepository: SwipeRepository,
@@ -22,17 +23,17 @@ class SwipeViewModel(
     private var fetchingCards = false
 
     fun fetchCards() {
-        viewModelScope.safeLaunch(_fetchCards, { fetchingCards = false }) {
-            if (!fetchingCards) {
-                fetchingCards = true
-                _fetchCards.postValue(Resource.loading())
-                settingRepository.syncLocation()
-                val response = swipeRepository.fetchCards().let {
-                    it.mapData(it.data?.cardDTOs?.map { cardDTO -> cardMapper.toCardDomain(cardDTO) })
-                }
-                fetchingCards = false
-                _fetchCards.postValue(response)
+        viewModelScope.launch {
+            if (fetchingCards) return@launch
+
+            fetchingCards = true
+            _fetchCards.postValue(Resource.loading())
+            settingRepository.syncLocation()
+            val response = swipeRepository.fetchCards().let {
+                it.mapData(it.data?.cardDTOs?.map { cardDTO -> cardMapper.toCardDomain(cardDTO) })
             }
+            fetchingCards = false
+            _fetchCards.postValue(response)
         }
 
     }

@@ -4,10 +4,12 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.beeswork.balance.data.database.entity.Click
 import com.beeswork.balance.data.database.entity.FetchInfo
+import com.beeswork.balance.data.network.response.Resource
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 import java.util.*
+
 
 @Dao
 interface FetchInfoDAO {
@@ -29,4 +31,10 @@ interface FetchInfoDAO {
 
     @Query("select count(*) > 0 from fetchInfo where accountId =:accountId")
     fun existByAccountId(accountId: UUID?): Boolean
+
+    @Query("update fetchInfo set fetchMatchesStatus = :status where accountId = :accountId")
+    fun updateFetchMatchesStatus(accountId: UUID?, status: Resource.Status)
+
+    @Query("select fetchMatchesStatus from fetchInfo where accountId = :accountId")
+    fun findFetchMatchesStatusAsFlow(accountId: UUID?): Flow<Resource.Status>
 }

@@ -6,59 +6,72 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tbClick"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:background="@color/BackgroundWhite"
+        app:contentInsetStart="0dp">
 
-        <View
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <com.beeswork.balance.ui.common.GradientTextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/click_tool_bar_title"
-            android:textAlignment="center"
-            android:textSize="@dimen/tool_bar_title_large_text_size"
-            android:textStyle="bold"
-            app:endColor="@color/TextWhite"
-            app:startColor="@color/Primary" />
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/skvClickLoading"
+            <View
                 android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-                android:gravity="center">
+                android:layout_height="@dimen/tool_bar_menu_item_btn_size" />
 
-                <com.github.ybq.android.spinkit.SpinKitView
-                    style="@style/SpinKitView.Large.Circle"
-                    android:layout_width="@dimen/spin_kit_small_size"
-                    android:layout_height="@dimen/spin_kit_small_size"
-                    android:layout_gravity="center"
-                    app:SpinKit_Color="@color/GreyDark" />
+            <com.beeswork.balance.ui.common.GradientTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/click_tool_bar_title"
+                android:textAlignment="center"
+                android:textSize="@dimen/tool_bar_title_large_text_size"
+                android:textStyle="bold"
+                app:endColor="@color/TextWhite"
+                app:startColor="@color/Primary" />
 
-            </LinearLayout>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            <ImageButton
-                android:id="@+id/btnClickRefresh"
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-                android:background="@color/white"
-                android:contentDescription="@string/refresh_button_icon_description"
-                android:src="@drawable/ic_refresh" />
+                <LinearLayout
+                    android:id="@+id/skvClickLoading"
+                    android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                    android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                    android:gravity="center"
+                    android:visibility="invisible">
 
-        </FrameLayout>
+                    <com.github.ybq.android.spinkit.SpinKitView
+                        style="@style/SpinKitView.Large.Circle"
+                        android:layout_width="@dimen/spin_kit_small_size"
+                        android:layout_height="@dimen/spin_kit_small_size"
+                        android:layout_gravity="center"
+                        app:SpinKit_Color="@color/GreyDark" />
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/btnClickRefresh"
+                    android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                    android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                    android:background="@color/white"
+                    android:contentDescription="@string/refresh_button_icon_description"
+                    android:src="@drawable/ic_refresh"
+                    android:visibility="gone" />
+
+            </FrameLayout>
 
 
-    </LinearLayout>
+        </LinearLayout>
+
+
+    </androidx.appcompat.widget.Toolbar>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvClick"

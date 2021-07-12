@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.match.MatchProfileTuple
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
@@ -55,6 +56,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MatchViewModel::class.java)
         bindUI()
+        viewModel.fetchMatches()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -133,6 +135,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
         binding.btnMatchSearchClose.setOnClickListener { hideSearchToolBar() }
         binding.etMatchSearch.addTextChangedListener { search(it.toString()) }
+        binding.btnMatchRefresh.setOnClickListener { viewModel.fetchMatches() }
     }
 
     private fun search(keyword: String) {
@@ -159,8 +162,28 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     private fun setupFetchMatchesLiveDataObserver() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            if (it.isError() && validateAccount(it.error, it.errorMessage))
-                showErrorDialog(it.error, errorTitle(), it.errorMessage, RequestCode.FETCH_MATCHES, this@MatchFragment)
+            when (it.status) {
+                Resource.Status.SUCCESS -> {
+                    binding.btnMatchRefresh.visibility = View.GONE
+                    binding.skvMatchLoading.visibility = View.INVISIBLE
+                }
+                Resource.Status.LOADING -> {
+                    binding.btnMatchRefresh.visibility = View.GONE
+                    binding.skvMatchLoading.visibility = View.VISIBLE
+                }
+                Resource.Status.ERROR -> {
+                    binding.btnMatchRefresh.visibility = View.VISIBLE
+                    binding.skvMatchLoading.visibility = View.GONE
+                    validateAccount(it.error, it.errorMessage)
+                    showErrorDialog(
+                        it.error,
+                        errorTitle(),
+                        it.errorMessage,
+                        RequestCode.FETCH_MATCHES,
+                        this@MatchFragment
+                    )
+                }
+            }
         })
     }
 
@@ -196,8 +219,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     override fun onFragmentSelected() {
-        println("onFragmentSelected")
-//        viewModel.fetchMatches()
+        viewModel.fetchMatches()
     }
 }
 

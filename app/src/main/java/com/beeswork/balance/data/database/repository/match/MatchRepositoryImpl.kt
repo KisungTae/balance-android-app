@@ -84,11 +84,13 @@ class MatchRepositoryImpl(
     override suspend fun fetchMatches(): Resource<ListMatchesDTO> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
+            fetchInfoDAO.updateFetchMatchesStatus(preferenceProvider.getAccountId(), Resource.Status.LOADING)
             val response = matchRDS.listMatches(
                 accountId,
                 preferenceProvider.getIdentityToken(),
                 fetchInfoDAO.findMatchFetchedAt(accountId)
             )
+            fetchInfoDAO.updateFetchMatchesStatus(preferenceProvider.getAccountId(), response.status)
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
                     data.matchDTOs?.forEach { matchDTO ->
@@ -297,19 +299,3 @@ class MatchRepositoryImpl(
         }
     }
 }
-
-
-// 698F2EB63FEF4EE39C7D3E527740548E
-
-// 698f2eb6-3fef-4ee3-9c7d-3e527740548e
-
-
-//insert into click values ('44D7C228F6704FE78302CDFD7FDAA912', '',	'2021-05-05T03:04:58.941Z')
-//insert into click values ('698F2EB63FEF4EE39C7D3E527740548E', '',	'2021-05-05T14:02:55.728Z')
-//insert into click values ('825850302F0E4BE5BBF1BBCCE26D0408', '',	'2021-05-05T03:04:58.941Z')
-//insert into click values ('CD4F05BF11924F1690C7F97B46584BA6', '',	'2021-05-05T03:04:58.941Z')
-
-//1	825850302F0E4BE5BBF1BBCCE26D0408
-//2	698F2EB63FEF4EE39C7D3E527740548E
-//3	CD4F05BF11924F1690C7F97B46584BA6
-//4	44D7C228F6704FE78302CDFD7FDAA912

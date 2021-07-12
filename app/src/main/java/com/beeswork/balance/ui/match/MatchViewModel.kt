@@ -34,6 +34,8 @@ class MatchViewModel(
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
+    private var fetchingMatches = false
+
     fun initMatchPagingData(searchKeyword: String): LiveData<PagingData<MatchDomain>> {
         return Pager(
             pagingConfig,
@@ -46,11 +48,16 @@ class MatchViewModel(
 
     fun fetchMatches() {
         viewModelScope.launch {
+            if (fetchingMatches) return@launch
+
+            fetchingMatches = true
             val fetchedAt = OffsetDateTime.now()
+            _fetchMatchesLiveData.postValue(Resource.loading())
             val response = matchRepository.fetchMatches()
             response.data?.let { data ->
                 chatRepository.saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs, fetchedAt)
             }
+            fetchingMatches = false
             _fetchMatchesLiveData.postValue(response.toEmptyResponse())
         }
     }

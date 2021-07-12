@@ -21,21 +21,64 @@
             android:background="@color/BackgroundWhite"
             app:contentInsetStart="0dp">
 
-            <ImageButton
-                android:id="@+id/btnChatBack"
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-                android:background="@color/BackgroundWhite"
-                android:contentDescription="@string/back_button_description"
-                android:src="@drawable/ic_baseline_arrow_back_ios" />
-
-            <TextView
-                android:id="@+id/tvChatSwipedName"
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="@dimen/tool_bar_title_medium_text_size"
-                android:textStyle="bold" />
+                android:layout_height="match_parent">
+
+                <ImageButton
+                    android:id="@+id/btnChatBack"
+                    android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                    android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                    android:background="@color/BackgroundWhite"
+                    android:contentDescription="@string/back_button_description"
+                    android:src="@drawable/ic_baseline_arrow_back_ios" />
+
+                <TextView
+                    android:id="@+id/tvChatSwipedName"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/tool_bar_title_medium_text_size"
+                    android:textStyle="bold" />
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/skvChatLoading"
+                        android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                        android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                        android:gravity="center"
+                        android:visibility="invisible">
+
+                        <com.github.ybq.android.spinkit.SpinKitView
+                            style="@style/SpinKitView.Large.Circle"
+                            android:layout_width="@dimen/spin_kit_small_size"
+                            android:layout_height="@dimen/spin_kit_small_size"
+                            android:layout_gravity="center"
+                            app:SpinKit_Color="@color/GreyDark" />
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnChatRefresh"
+                        android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                        android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                        android:background="@color/white"
+                        android:contentDescription="@string/refresh_button_icon_description"
+                        android:src="@drawable/ic_refresh"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+
+
+            </LinearLayout>
+
+
 
         </androidx.appcompat.widget.Toolbar>
 

@@ -42,4 +42,12 @@ class LoginViewModel(
             _loginLiveData.postValue(Resource.error(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION))
         }
     }
+
+//  TODO: remove me
+    fun mockSocialLogin() {
+        viewModelScope.launch {
+            settingRepository.prepopulateFetchInfo()
+            swipeRepository.prepopulateSwipeFilter()
+        }
+    }
 }

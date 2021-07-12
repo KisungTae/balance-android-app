@@ -29,6 +29,7 @@ class ClickViewModel(
     private val _fetchClicks = MutableLiveData<Resource<EmptyResponse>>()
     val fetchClicks: LiveData<Resource<EmptyResponse>> get() = _fetchClicks
 
+    private var fetchingClicks = false
 
     fun initClickPagingData(): LiveData<PagingData<ClickDomain>> {
         return Pager(
@@ -45,7 +46,10 @@ class ClickViewModel(
 
     fun fetchClicks() {
         viewModelScope.launch {
+            if (fetchingClicks) return@launch
+            fetchingClicks = true
             _fetchClicks.postValue(Resource.loading())
+            fetchingClicks = false
             _fetchClicks.postValue(clickRepository.fetchClicks())
         }
     }
