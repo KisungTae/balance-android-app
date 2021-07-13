@@ -16,7 +16,7 @@ interface MatchRepository {
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
-    suspend fun fetchMatches(): Resource<ListMatchesDTO>
+    suspend fun fetchMatches(): Resource<EmptyResponse>
     suspend fun synchronizeMatch(chatId: Long)
     suspend fun isUnmatched(chatId: Long): Boolean
     suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse>

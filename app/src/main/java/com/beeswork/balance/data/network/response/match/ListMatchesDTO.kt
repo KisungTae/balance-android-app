@@ -5,7 +5,5 @@ import org.threeten.bp.OffsetDateTime
 
 data class ListMatchesDTO(
     val fetchedAt: OffsetDateTime,
-    val matchDTOs: List<MatchDTO>?,
-    val sentChatMessageDTOs: List<ChatMessageDTO>?,
-    val receivedChatMessageDTOs: List<ChatMessageDTO>?
+    val matchDTOs: List<MatchDTO>?
 )

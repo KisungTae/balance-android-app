@@ -49,8 +49,8 @@ class ClickViewModel(
             if (fetchingClicks) return@launch
             fetchingClicks = true
             _fetchClicks.postValue(Resource.loading())
-            fetchingClicks = false
             _fetchClicks.postValue(clickRepository.fetchClicks())
+            fetchingClicks = false
         }
     }
 

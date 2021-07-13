@@ -81,16 +81,15 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun fetchMatches(): Resource<ListMatchesDTO> {
+    override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
+            println("fetchMatches()!!!!!!!!!!")
             val accountId = preferenceProvider.getAccountId()
-            fetchInfoDAO.updateFetchMatchesStatus(preferenceProvider.getAccountId(), Resource.Status.LOADING)
             val response = matchRDS.listMatches(
                 accountId,
                 preferenceProvider.getIdentityToken(),
                 fetchInfoDAO.findMatchFetchedAt(accountId)
             )
-            fetchInfoDAO.updateFetchMatchesStatus(preferenceProvider.getAccountId(), response.status)
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
                     data.matchDTOs?.forEach { matchDTO ->
@@ -101,7 +100,7 @@ class MatchRepositoryImpl(
                 }
                 fetchInfoDAO.updateMatchFetchedAt(accountId, data.fetchedAt)
             }
-            return@withContext response
+            return@withContext response.toEmptyResponse()
         }
     }
 
@@ -119,10 +118,16 @@ class MatchRepositoryImpl(
                 match.updatedAt = it.updatedAt
                 match.recentChatMessage = it.recentChatMessage
                 match.active = it.active
+                chatMessageDAO.findMostRecentAfter(match.chatId, match.lastReadChatMessageId)?.let { chatMessage ->
+                    match.recentChatMessage = chatMessage.body
+                    match.updatedAt = chatMessage.createdAt
+                    match.active = true
+                }
+                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageId)
             }
-            match.unread = it.unread
             match.lastReadChatMessageId = it.lastReadChatMessageId
         }
+
     }
 
     override suspend fun synchronizeMatch(chatId: Long) {

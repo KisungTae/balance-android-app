@@ -11,6 +11,7 @@ import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
@@ -35,6 +36,7 @@ class MatchViewModel(
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 
     private var fetchingMatches = false
+    private var fetchingChatMessages = false
 
     fun initMatchPagingData(searchKeyword: String): LiveData<PagingData<MatchDomain>> {
         return Pager(
@@ -51,14 +53,27 @@ class MatchViewModel(
             if (fetchingMatches) return@launch
 
             fetchingMatches = true
-            val fetchedAt = OffsetDateTime.now()
             _fetchMatchesLiveData.postValue(Resource.loading())
-            val response = matchRepository.fetchMatches()
-            response.data?.let { data ->
-                chatRepository.saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs, fetchedAt)
-            }
+            val result = async { matchRepository.fetchMatches() }
+            _fetchMatchesLiveData.postValue(result.await())
+
+//            val response = matchRepository.fetchMatches()
+//            _fetchMatchesLiveData.postValue(response)
+
+            chatRepository.fetchChatMessages()
+            println("after fetch matches()!!!!!!!!!!!!!!!!!!!!!!!")
             fetchingMatches = false
-            _fetchMatchesLiveData.postValue(response.toEmptyResponse())
+        }
+    }
+
+    fun fetchChatMessages() {
+        viewModelScope.launch {
+            if (fetchingChatMessages) return@launch
+
+            fetchingChatMessages = true
+            chatRepository.fetchChatMessages()
+            println("after fetch chat messages() !!!!!!!!!!!!!!!!!!!!!!!")
+            fetchingChatMessages = false
         }
     }
 

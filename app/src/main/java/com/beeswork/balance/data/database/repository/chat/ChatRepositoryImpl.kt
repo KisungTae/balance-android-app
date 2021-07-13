@@ -152,17 +152,34 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun saveChatMessages(
-        sentChatMessagesDTOs: List<ChatMessageDTO>?,
-        receivedChatMessageDTOs: List<ChatMessageDTO>?,
-        fetchedAt: OffsetDateTime
-    ) {
-        withContext(ioDispatcher) {
-            val chatIds = saveChatMessages(sentChatMessagesDTOs, receivedChatMessageDTOs)
-            balanceDatabase.runInTransaction { chatIds.forEach { chatId -> updateMatchOnNewChatMessage(chatId) } }
-            chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
-            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+//    override suspend fun saveChatMessages(
+//        sentChatMessagesDTOs: List<ChatMessageDTO>?,
+//        receivedChatMessageDTOs: List<ChatMessageDTO>?,
+//        fetchedAt: OffsetDateTime
+//    ) {
+//        withContext(ioDispatcher) {
+//            val chatIds = saveChatMessages(sentChatMessagesDTOs, receivedChatMessageDTOs)
+//            balanceDatabase.runInTransaction { chatIds.forEach { chatId -> updateMatchOnNewChatMessage(chatId) } }
+//            chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
+//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+//        }
+//    }
+
+    override suspend fun fetchChatMessages(): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            println("fetchChatMessages()!!!!!!!!!!!!")
+            val fetchedAt = OffsetDateTime.now()
+            val response = chatRDS.listChatMessages(preferenceProvider.getAccountId(), preferenceProvider.getIdentityToken())
+            response.data?.let { data ->
+                val chatIds = saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
+                balanceDatabase.runInTransaction { chatIds.forEach { chatId -> updateMatchOnNewChatMessage(chatId) } }
+                chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
+                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+            }
+            return@withContext response.toEmptyResponse()
         }
+
+
     }
 
     private fun saveChatMessages(
@@ -221,8 +238,8 @@ class ChatRepositoryImpl(
                 match.recentChatMessage = chatMessage.body
                 match.updatedAt = chatMessage.createdAt
                 match.active = true
+                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageId)
             }
-            match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageId)
             matchDAO.insert(match)
         }
     }
