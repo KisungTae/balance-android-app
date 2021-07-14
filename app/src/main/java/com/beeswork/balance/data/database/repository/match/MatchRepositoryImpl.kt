@@ -83,13 +83,13 @@ class MatchRepositoryImpl(
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            println("fetchMatches()!!!!!!!!!!")
             val accountId = preferenceProvider.getAccountId()
             val response = matchRDS.listMatches(
                 accountId,
                 preferenceProvider.getIdentityToken(),
                 fetchInfoDAO.findMatchFetchedAt(accountId)
             )
+
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
                     data.matchDTOs?.forEach { matchDTO ->
@@ -201,11 +201,11 @@ class MatchRepositoryImpl(
             newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
     }
 
-    override fun getMatchInvalidation(): Flow<Boolean> {
+    override fun getMatchInvalidationFlow(): Flow<Boolean> {
         return matchDAO.invalidation()
     }
 
-    override fun getUnreadMatchCount(): Flow<Int> {
+    override fun getUnreadMatchCountFlow(): Flow<Int> {
         return matchDAO.countUnread(preferenceProvider.getAccountId())
     }
 

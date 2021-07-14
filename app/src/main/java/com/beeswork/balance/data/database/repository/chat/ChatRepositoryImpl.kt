@@ -5,6 +5,8 @@ import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.common.ResourceListener
+import com.beeswork.balance.data.database.dao.FetchInfoDAO
+import com.beeswork.balance.data.database.entity.FetchInfo
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -18,6 +20,7 @@ import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,6 +32,7 @@ import kotlin.random.Random
 class ChatRepositoryImpl(
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
+    private val fetchInfoDAO: FetchInfoDAO,
     private val chatRDS: ChatRDS,
     private val chatMessageMapper: ChatMessageMapper,
     private val stompClient: StompClient,
@@ -167,19 +171,24 @@ class ChatRepositoryImpl(
 
     override suspend fun fetchChatMessages(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            println("fetchChatMessages()!!!!!!!!!!!!")
             val fetchedAt = OffsetDateTime.now()
-            val response = chatRDS.listChatMessages(preferenceProvider.getAccountId(), preferenceProvider.getIdentityToken())
+            val accountId = preferenceProvider.getAccountId()
+            fetchInfoDAO.updateFetchChatMessagesStatus(accountId, Resource.Status.LOADING)
+            val response = chatRDS.listChatMessages(accountId, preferenceProvider.getIdentityToken())
+
             response.data?.let { data ->
                 val chatIds = saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
                 balanceDatabase.runInTransaction { chatIds.forEach { chatId -> updateMatchOnNewChatMessage(chatId) } }
                 chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
                 chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
             }
+            fetchInfoDAO.updateFetchChatMessagesStatus(accountId, response.status)
             return@withContext response.toEmptyResponse()
         }
+    }
 
-
+    override fun getFetchChatMessageStatusFlow(): Flow<Resource.Status> {
+        return fetchInfoDAO.findFetchChatMessagesStatusAsFlow(preferenceProvider.getAccountId())
     }
 
     private fun saveChatMessages(

@@ -7,7 +7,6 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.util.lazyDeferred
-import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -19,7 +18,7 @@ class ClickViewModel(
 ) : ViewModel() {
 
     val clickInvalidation by lazyDeferred {
-        clickRepository.getClickInvalidation().asLiveData()
+        clickRepository.getClickInvalidationFlow().asLiveData()
     }
 
     val newClickLiveData by lazyDeferred {

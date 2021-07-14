@@ -32,9 +32,9 @@ interface FetchInfoDAO {
     @Query("select count(*) > 0 from fetchInfo where accountId =:accountId")
     fun existByAccountId(accountId: UUID?): Boolean
 
-    @Query("update fetchInfo set fetchMatchesStatus = :status where accountId = :accountId")
-    fun updateFetchMatchesStatus(accountId: UUID?, status: Resource.Status)
+    @Query("update fetchInfo set fetchChatMessagesStatus = :status where accountId = :accountId")
+    fun updateFetchChatMessagesStatus(accountId: UUID?, status: Resource.Status)
 
-    @Query("select fetchMatchesStatus from fetchInfo where accountId = :accountId")
-    fun findFetchMatchesStatusAsFlow(accountId: UUID?): Flow<Resource.Status>
+    @Query("select fetchChatMessagesStatus from fetchInfo where accountId = :accountId")
+    fun findFetchChatMessagesStatusAsFlow(accountId: UUID?): Flow<Resource.Status>
 }

@@ -14,5 +14,6 @@ class RequestCode {
         const val FETCH_PHOTOS = 10
         const val SAVE_ABOUT = 11
         const val FETCH_EMAIL = 12
+        const val FETCH_CHAT_MESSAGES = 13
     }
 }

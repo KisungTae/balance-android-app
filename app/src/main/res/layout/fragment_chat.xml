@@ -35,6 +35,10 @@
                     android:contentDescription="@string/back_button_description"
                     android:src="@drawable/ic_baseline_arrow_back_ios" />
 
+                <View
+                    android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                    android:layout_height="@dimen/tool_bar_menu_item_btn_size"/>
+
                 <TextView
                     android:id="@+id/tvChatSwipedName"
                     android:layout_width="0dp"

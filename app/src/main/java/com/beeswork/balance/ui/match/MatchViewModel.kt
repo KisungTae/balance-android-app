@@ -8,13 +8,8 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.lazyDeferred
-import com.beeswork.balance.internal.util.safeLaunch
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import org.threeten.bp.OffsetDateTime
 
 
 class MatchViewModel(
@@ -25,7 +20,7 @@ class MatchViewModel(
 ) : ViewModel() {
 
     val matchInvalidation by lazyDeferred {
-        matchRepository.getMatchInvalidation().asLiveData()
+        matchRepository.getMatchInvalidationFlow().asLiveData()
     }
 
     val newMatchLiveData by lazyDeferred {
@@ -34,6 +29,9 @@ class MatchViewModel(
 
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
+
+    private val _fetchChatMessagesLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val fetchChatMessagesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchChatMessagesLiveData
 
     private var fetchingMatches = false
     private var fetchingChatMessages = false
@@ -50,30 +48,21 @@ class MatchViewModel(
 
     fun fetchMatches() {
         viewModelScope.launch {
-            if (fetchingMatches) return@launch
-
-            fetchingMatches = true
             _fetchMatchesLiveData.postValue(Resource.loading())
-            val result = async { matchRepository.fetchMatches() }
-            _fetchMatchesLiveData.postValue(result.await())
 
-//            val response = matchRepository.fetchMatches()
-//            _fetchMatchesLiveData.postValue(response)
+            if (!fetchingMatches) launch {
+                fetchingMatches = true
+                val response = matchRepository.fetchMatches()
+                _fetchMatchesLiveData.postValue(response)
+                fetchingMatches = false
+            }
 
-            chatRepository.fetchChatMessages()
-            println("after fetch matches()!!!!!!!!!!!!!!!!!!!!!!!")
-            fetchingMatches = false
-        }
-    }
-
-    fun fetchChatMessages() {
-        viewModelScope.launch {
-            if (fetchingChatMessages) return@launch
-
-            fetchingChatMessages = true
-            chatRepository.fetchChatMessages()
-            println("after fetch chat messages() !!!!!!!!!!!!!!!!!!!!!!!")
-            fetchingChatMessages = false
+            if (!fetchingChatMessages) launch {
+                fetchingChatMessages = true
+                val response = chatRepository.fetchChatMessages()
+                _fetchChatMessagesLiveData.postValue(response)
+                fetchingChatMessages = false
+            }
         }
     }
 

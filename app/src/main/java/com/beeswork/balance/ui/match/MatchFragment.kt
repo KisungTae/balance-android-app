@@ -62,19 +62,29 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private fun bindUI() = lifecycleScope.launch {
         setupMatchRecyclerView()
         setupToolBars()
-        setupMatchInvalidationObserver()
-        setupFetchMatchesLiveDataObserver()
-        setupNewMatchLiveDataObserver()
+        observeMatchInvalidation()
+        observeFetchMatchesLiveData()
+        observeNewMatchLiveData()
+        observeFetchChatMessagesLiveData()
         search("")
     }
 
-    private suspend fun setupNewMatchLiveDataObserver() {
+    private fun observeFetchChatMessagesLiveData() {
+        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+                val errorTitle = getString(R.string.error_title_fetch_chat_messages)
+                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this)
+            }
+        }
+    }
+
+    private suspend fun observeNewMatchLiveData() {
         viewModel.newMatchLiveData.await().observe(viewLifecycleOwner) {
             showNewMatchSnackBar(it)
         }
     }
 
-    private suspend fun setupMatchInvalidationObserver() {
+    private suspend fun observeMatchInvalidation() {
         viewModel.matchInvalidation.await().observe(viewLifecycleOwner) {
             matchPagingRefreshAdapter.refresh()
         }
@@ -160,7 +170,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         return true
     }
 
-    private fun setupFetchMatchesLiveDataObserver() {
+    private fun observeFetchMatchesLiveData() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
@@ -175,24 +185,14 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
                     binding.btnMatchRefresh.visibility = View.VISIBLE
                     binding.skvMatchLoading.visibility = View.GONE
                     validateAccount(it.error, it.errorMessage)
-                    showErrorDialog(
-                        it.error,
-                        errorTitle(),
-                        it.errorMessage,
-                        RequestCode.FETCH_MATCHES,
-                        this@MatchFragment
-                    )
+                    val errorTitle = getString(R.string.error_title_fetch_matches)
+                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_MATCHES, this)
                 }
             }
         })
     }
 
-    private fun errorTitle(): String {
-        val currentFragment = activity?.supportFragmentManager?.fragments?.lastOrNull()?.javaClass
-        val resourceId = if (currentFragment == ChatFragment::class.java) R.string.error_title_fetch_chat_messages
-        else R.string.error_title_fetch_matches
-        return getString(resourceId)
-    }
+
 
     override fun onClick(position: Int) {
         val chatFragment = ChatFragment()

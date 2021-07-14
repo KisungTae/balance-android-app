@@ -108,11 +108,11 @@ class ClickRepositoryImpl(
         }
     }
 
-    override fun getClickInvalidation(): Flow<Boolean> {
+    override fun getClickInvalidationFlow(): Flow<Boolean> {
         return clickDAO.invalidation()
     }
 
-    override fun getClickCount(): Flow<Int> {
+    override fun getClickCountFlow(): Flow<Int> {
         return clickDAO.count(preferenceProvider.getAccountId())
     }
 

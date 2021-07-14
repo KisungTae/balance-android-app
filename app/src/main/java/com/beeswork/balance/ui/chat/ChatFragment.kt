@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.*
@@ -24,7 +24,6 @@ import com.beeswork.balance.ui.dialog.ConfirmDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.ReportDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
-import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import org.kodein.di.KodeinAware
@@ -91,20 +90,51 @@ class ChatFragment : BaseFragment(),
         unmatched: Boolean
     ) = lifecycleScope.launch {
         setupChatRecyclerView()
-        setupChatMessageInvalidationObserver()
+        observeChatMessageInvalidation()
         setupBackPressedDispatcherCallback()
         setupToolBar(swipedName)
         setupSendBtnListener()
         setupEmoticonBtnListener()
-        setupSendChatMessageMediatorLiveDataObserver()
+        observeSendChatMessageMediatorLiveData()
         setupProfilePhoto(swipedId, swipedProfilePhotoKey)
         if (unmatched) setupAsUnmatched()
-        setupReportMatchLiveDataObserver()
-        setupUnmatchLiveDataObserver()
-        setupChatMessagePagingDataObserver()
+        observeReportMatchLiveData()
+        observeUnmatchLiveData()
+        observeChatMessagePagingData()
+        observeFetchChatMessagesLiveData()
+        observeFetchChatMessagesStatusLiveData()
     }
 
-    private fun setupUnmatchLiveDataObserver() {
+    private suspend fun observeFetchChatMessagesStatusLiveData() {
+        viewModel.fetchChatMessagesStatusLiveData.await().observe(viewLifecycleOwner) {
+            when (it) {
+                Resource.Status.SUCCESS -> {
+                    binding.btnChatRefresh.visibility = View.GONE
+                    binding.skvChatLoading.visibility = View.INVISIBLE
+                }
+                Resource.Status.LOADING -> {
+                    binding.btnChatRefresh.visibility = View.GONE
+                    binding.skvChatLoading.visibility = View.VISIBLE
+                }
+                Resource.Status.ERROR -> {
+                    binding.btnChatRefresh.visibility = View.VISIBLE
+                    binding.skvChatLoading.visibility = View.GONE
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun observeFetchChatMessagesLiveData() {
+        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+                val errorTitle = getString(R.string.error_title_fetch_chat_messages)
+                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this)
+            }
+        }
+    }
+
+    private fun observeUnmatchLiveData() {
         viewModel.unmatchLiveData.observe(viewLifecycleOwner, {
             when {
                 it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
@@ -126,7 +156,7 @@ class ChatFragment : BaseFragment(),
         binding.llChatLoading.visibility = View.GONE
     }
 
-    private fun setupReportMatchLiveDataObserver() {
+    private fun observeReportMatchLiveData() {
         viewModel.reportMatchLiveData.observe(viewLifecycleOwner, {
             when {
                 it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
@@ -144,7 +174,7 @@ class ChatFragment : BaseFragment(),
         return childFragmentManager.findFragmentByTag(ReportDialog.TAG)?.let { return@let it as ReportDialog }
     }
 
-    private fun setupSendChatMessageMediatorLiveDataObserver() {
+    private fun observeSendChatMessageMediatorLiveData() {
         viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
             val errorTitle = getString(R.string.error_title_send_chat_message)
             if (it.isError() && validateAccount(it.error, it.errorMessage)) {
@@ -154,18 +184,18 @@ class ChatFragment : BaseFragment(),
         })
     }
 
-    private fun setupChatMessageInvalidationObserver() {
-        viewModel.chatMessageInvalidationLiveData.observe(viewLifecycleOwner, {
+    private suspend fun observeChatMessageInvalidation() {
+        viewModel.chatMessageInvalidationLiveData.await().observe(viewLifecycleOwner, {
             when (it.type) {
                 ChatMessageInvalidation.Type.SEND -> {
                     binding.etChatMessageBody.setText("")
                     if (binding.rvChat.canScrollVertically(1)) chatMessagePagingRefreshAdapter.refresh()
-                    else setupChatMessagePagingDataObserver()
+                    else observeChatMessagePagingData()
                 }
                 ChatMessageInvalidation.Type.RECEIVED -> {
                     if (binding.rvChat.canScrollVertically(1)) it.body?.let { body ->
                         showNewChatMessageSnackBar(body)
-                    } else setupChatMessagePagingDataObserver()
+                    } else observeChatMessagePagingData()
                 }
                 else -> chatMessagePagingRefreshAdapter.refresh()
             }
@@ -182,7 +212,7 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private fun setupChatMessagePagingDataObserver() {
+    private fun observeChatMessagePagingData() {
         chatMessagePagingObserveJob?.cancel()
         registerAdapterDataObserver()
         chatMessagePagingObserveJob = lifecycleScope.launch {
@@ -222,6 +252,7 @@ class ChatFragment : BaseFragment(),
             }
         }
         binding.btnChatBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
+        binding.btnChatRefresh.setOnClickListener { viewModel.fetchChatMessages() }
     }
 
     private fun showMoreMenu(): Boolean {
@@ -288,7 +319,7 @@ class ChatFragment : BaseFragment(),
         val snackBar = SnackBarHelper.make(binding.clChatSnackBarPlaceHolder, 0, 0, snackBarBinding.root)
         snackBarBinding.tvSnackBarNewChatMessage.text = body
         snackBarBinding.llSnackBarChatMessage.setOnClickListener {
-            setupChatMessagePagingDataObserver()
+            observeChatMessagePagingData()
             newChatMessageSnackBar?.dismiss()
         }
         snackBar.addCallback(object : Snackbar.Callback() {
@@ -326,6 +357,7 @@ class ChatFragment : BaseFragment(),
         when (requestCode) {
             RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
             RequestCode.UNMATCH -> onUnmatch()
+            RequestCode.FETCH_CHAT_MESSAGES -> viewModel.fetchChatMessages()
         }
     }
 }

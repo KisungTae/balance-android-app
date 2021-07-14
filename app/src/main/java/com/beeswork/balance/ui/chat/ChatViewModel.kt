@@ -11,6 +11,7 @@ import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
+import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filter
@@ -28,9 +29,15 @@ class ChatViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val chatMessageInvalidationLiveData = chatRepository.chatMessageInvalidationFlow.filter {
-        it.type == ChatMessageInvalidation.Type.FETCHED || it.chatId == chatId
-    }.asLiveData()
+    val chatMessageInvalidationLiveData by lazyDeferred {
+        chatRepository.chatMessageInvalidationFlow.filter {
+            it.type == ChatMessageInvalidation.Type.FETCHED || it.chatId == chatId
+        }.asLiveData()
+    }
+
+    val fetchChatMessagesStatusLiveData by lazyDeferred {
+        chatRepository.getFetchChatMessageStatusFlow().asLiveData()
+    }
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
@@ -41,6 +48,9 @@ class ChatViewModel(
 
     private val _unmatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val unmatchLiveData: LiveData<Resource<EmptyResponse>> get() = _unmatchLiveData
+
+    private val _fetchChatMessagesLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val fetchChatMessagesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchChatMessagesLiveData
 
     init {
         sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
@@ -121,7 +131,7 @@ class ChatViewModel(
     }
 
     fun unmatch() {
-        viewModelScope.safeLaunch(_unmatchLiveData) {
+        viewModelScope.launch {
             _unmatchLiveData.postValue(Resource.loading())
             val response = matchRepository.unmatch(chatId, swipedId)
             _unmatchLiveData.postValue(response)
@@ -129,10 +139,16 @@ class ChatViewModel(
     }
 
     fun reportMatch(reportReason: ReportReason, description: String) {
-        viewModelScope.safeLaunch(_reportMatchLiveData) {
+        viewModelScope.launch {
             _reportMatchLiveData.postValue(Resource.loading())
             val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
             _reportMatchLiveData.postValue(response)
+        }
+    }
+
+    fun fetchChatMessages() {
+        viewModelScope.launch {
+            _fetchChatMessagesLiveData.postValue(chatRepository.fetchChatMessages())
         }
     }
 

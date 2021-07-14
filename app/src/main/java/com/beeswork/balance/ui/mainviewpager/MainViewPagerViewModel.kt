@@ -7,7 +7,6 @@ import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
-import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.util.lazyDeferred
 import kotlinx.coroutines.launch
@@ -23,11 +22,11 @@ class MainViewPagerViewModel(
     val webSocketEventLiveData = stompClient.webSocketEventLiveData
 
     val unreadMatchCount by lazyDeferred {
-        matchRepository.getUnreadMatchCount().asLiveData()
+        matchRepository.getUnreadMatchCountFlow().asLiveData()
     }
 
     val clickCount by lazyDeferred {
-        clickRepository.getClickCount().asLiveData()
+        clickRepository.getClickCountFlow().asLiveData()
     }
 
     fun connectStomp() {
