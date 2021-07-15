@@ -101,38 +101,10 @@ class ChatFragment : BaseFragment(),
         observeReportMatchLiveData()
         observeUnmatchLiveData()
         observeChatMessagePagingData()
-        observeFetchChatMessagesLiveData()
-        observeFetchChatMessagesStatusLiveData()
     }
 
-    private suspend fun observeFetchChatMessagesStatusLiveData() {
-        viewModel.fetchChatMessagesStatusLiveData.await().observe(viewLifecycleOwner) {
-            when (it) {
-                Resource.Status.SUCCESS -> {
-                    binding.btnChatRefresh.visibility = View.GONE
-                    binding.skvChatLoading.visibility = View.INVISIBLE
-                }
-                Resource.Status.LOADING -> {
-                    binding.btnChatRefresh.visibility = View.GONE
-                    binding.skvChatLoading.visibility = View.VISIBLE
-                }
-                Resource.Status.ERROR -> {
-                    binding.btnChatRefresh.visibility = View.VISIBLE
-                    binding.skvChatLoading.visibility = View.GONE
-                }
-                else -> {}
-            }
-        }
-    }
 
-    private fun observeFetchChatMessagesLiveData() {
-        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
-                val errorTitle = getString(R.string.error_title_fetch_chat_messages)
-                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this)
-            }
-        }
-    }
+
 
     private fun observeUnmatchLiveData() {
         viewModel.unmatchLiveData.observe(viewLifecycleOwner, {
@@ -252,7 +224,6 @@ class ChatFragment : BaseFragment(),
             }
         }
         binding.btnChatBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
-        binding.btnChatRefresh.setOnClickListener { viewModel.fetchChatMessages() }
     }
 
     private fun showMoreMenu(): Boolean {
@@ -357,7 +328,6 @@ class ChatFragment : BaseFragment(),
         when (requestCode) {
             RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
             RequestCode.UNMATCH -> onUnmatch()
-            RequestCode.FETCH_CHAT_MESSAGES -> viewModel.fetchChatMessages()
         }
     }
 }

@@ -173,7 +173,6 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val fetchedAt = OffsetDateTime.now()
             val accountId = preferenceProvider.getAccountId()
-            fetchInfoDAO.updateFetchChatMessagesStatus(accountId, Resource.Status.LOADING)
             val response = chatRDS.listChatMessages(accountId, preferenceProvider.getIdentityToken())
 
             response.data?.let { data ->
@@ -182,14 +181,10 @@ class ChatRepositoryImpl(
                 chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
                 chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
             }
-            fetchInfoDAO.updateFetchChatMessagesStatus(accountId, response.status)
             return@withContext response.toEmptyResponse()
         }
     }
 
-    override fun getFetchChatMessageStatusFlow(): Flow<Resource.Status> {
-        return fetchInfoDAO.findFetchChatMessagesStatusAsFlow(preferenceProvider.getAccountId())
-    }
 
     private fun saveChatMessages(
         sentChatMessageDTOs: List<ChatMessageDTO>?,

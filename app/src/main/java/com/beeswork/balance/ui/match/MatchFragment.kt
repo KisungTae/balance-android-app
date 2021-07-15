@@ -44,6 +44,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private var newMatchSnackBar: Snackbar? = null
     private val preferenceProvider: PreferenceProvider by instance()
 
+    private var fetchMatchesStatus = Resource.Status.SUCCESS
+    private var fetchChatMessagesStatus = Resource.Status.SUCCESS
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,6 +60,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         viewModel = ViewModelProvider(this, viewModelFactory).get(MatchViewModel::class.java)
         bindUI()
         viewModel.fetchMatches()
+        viewModel.fetchChatMessages()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -69,14 +73,6 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         search("")
     }
 
-    private fun observeFetchChatMessagesLiveData() {
-        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
-                val errorTitle = getString(R.string.error_title_fetch_chat_messages)
-                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this)
-            }
-        }
-    }
 
     private suspend fun observeNewMatchLiveData() {
         viewModel.newMatchLiveData.await().observe(viewLifecycleOwner) {
@@ -145,7 +141,10 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
         binding.btnMatchSearchClose.setOnClickListener { hideSearchToolBar() }
         binding.etMatchSearch.addTextChangedListener { search(it.toString()) }
-        binding.btnMatchRefresh.setOnClickListener { viewModel.fetchMatches() }
+        binding.btnMatchRefresh.setOnClickListener {
+            if (fetchMatchesStatus == Resource.Status.ERROR) viewModel.fetchMatches()
+            if (fetchChatMessagesStatus == Resource.Status.ERROR) viewModel.fetchChatMessages()
+        }
     }
 
     private fun search(keyword: String) {
@@ -170,28 +169,40 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         return true
     }
 
+    private fun updateRefreshBtn() {
+        if (fetchMatchesStatus == Resource.Status.LOADING || fetchChatMessagesStatus == Resource.Status.LOADING) {
+            binding.btnMatchRefresh.visibility = View.GONE
+            binding.skvMatchLoading.visibility = View.VISIBLE
+        } else if (fetchMatchesStatus == Resource.Status.ERROR || fetchChatMessagesStatus == Resource.Status.ERROR) {
+            binding.btnMatchRefresh.visibility = View.VISIBLE
+            binding.skvMatchLoading.visibility = View.GONE
+        } else {
+            binding.btnMatchRefresh.visibility = View.GONE
+            binding.skvMatchLoading.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun observeFetchChatMessagesLiveData() {
+        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
+            fetchChatMessagesStatus = it.status
+            updateRefreshBtn()
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+                val errorTitle = getString(R.string.error_title_fetch_chat_messages)
+                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this)
+            }
+        }
+    }
+
     private fun observeFetchMatchesLiveData() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-                    binding.btnMatchRefresh.visibility = View.GONE
-                    binding.skvMatchLoading.visibility = View.INVISIBLE
-                }
-                Resource.Status.LOADING -> {
-                    binding.btnMatchRefresh.visibility = View.GONE
-                    binding.skvMatchLoading.visibility = View.VISIBLE
-                }
-                Resource.Status.ERROR -> {
-                    binding.btnMatchRefresh.visibility = View.VISIBLE
-                    binding.skvMatchLoading.visibility = View.GONE
-                    validateAccount(it.error, it.errorMessage)
-                    val errorTitle = getString(R.string.error_title_fetch_matches)
-                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_MATCHES, this)
-                }
+            fetchMatchesStatus = it.status
+            updateRefreshBtn()
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+                val errorTitle = getString(R.string.error_title_fetch_matches)
+                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_MATCHES, this)
             }
         })
     }
-
 
 
     override fun onClick(position: Int) {
@@ -213,6 +224,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         requestCode?.let {
             when (it) {
                 RequestCode.FETCH_MATCHES -> viewModel.fetchMatches()
+                RequestCode.FETCH_CHAT_MESSAGES -> viewModel.fetchChatMessages()
             }
         }
 
@@ -220,6 +232,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     override fun onFragmentSelected() {
         viewModel.fetchMatches()
+        viewModel.fetchChatMessages()
     }
 }
 

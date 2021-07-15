@@ -19,7 +19,7 @@ interface ChatRepository {
     suspend fun deleteChatMessage(chatId: Long, key: Long)
     suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO)
     suspend fun fetchChatMessages(): Resource<EmptyResponse>
-    fun getFetchChatMessageStatusFlow(): Flow<Resource.Status>
+
 
     fun test()
 }

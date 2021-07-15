@@ -35,10 +35,6 @@ class ChatViewModel(
         }.asLiveData()
     }
 
-    val fetchChatMessagesStatusLiveData by lazyDeferred {
-        chatRepository.getFetchChatMessageStatusFlow().asLiveData()
-    }
-
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
     val sendChatMessageMediatorLiveData = MediatorLiveData<Resource<EmptyResponse>>()
@@ -48,9 +44,6 @@ class ChatViewModel(
 
     private val _unmatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val unmatchLiveData: LiveData<Resource<EmptyResponse>> get() = _unmatchLiveData
-
-    private val _fetchChatMessagesLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val fetchChatMessagesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchChatMessagesLiveData
 
     init {
         sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
@@ -143,12 +136,6 @@ class ChatViewModel(
             _reportMatchLiveData.postValue(Resource.loading())
             val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
             _reportMatchLiveData.postValue(response)
-        }
-    }
-
-    fun fetchChatMessages() {
-        viewModelScope.launch {
-            _fetchChatMessagesLiveData.postValue(chatRepository.fetchChatMessages())
         }
     }
 

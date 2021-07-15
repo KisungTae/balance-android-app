@@ -48,16 +48,20 @@ class MatchViewModel(
 
     fun fetchMatches() {
         viewModelScope.launch {
-            _fetchMatchesLiveData.postValue(Resource.loading())
-
             if (!fetchingMatches) launch {
+                _fetchMatchesLiveData.postValue(Resource.loading())
                 fetchingMatches = true
                 val response = matchRepository.fetchMatches()
                 _fetchMatchesLiveData.postValue(response)
                 fetchingMatches = false
             }
+        }
+    }
 
+    fun fetchChatMessages() {
+        viewModelScope.launch {
             if (!fetchingChatMessages) launch {
+                _fetchChatMessagesLiveData.postValue(Resource.loading())
                 fetchingChatMessages = true
                 val response = chatRepository.fetchChatMessages()
                 _fetchChatMessagesLiveData.postValue(response)
