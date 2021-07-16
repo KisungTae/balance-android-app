@@ -285,7 +285,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
-        bind() from provider { AccountViewModelFactory(instance()) }
+        bind() from provider { AccountViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {
             ProfileViewModelFactory(
                 instance(),
@@ -501,6 +501,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      142. if location is not allowed then show error in swipe fragment
 //      143. photos, profile, setting if empty then fetch from server, and functions in repository should return Resource so that clicent can know that fetch is failed or not
 //      144. email should be in the login response?
+//      145. when logged in check proifle and setting if null then fetch but quitely
 
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

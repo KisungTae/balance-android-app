@@ -1,7 +1,6 @@
 package com.beeswork.balance.data.database.repository.photo
 
 import android.net.Uri
-import android.nfc.tech.MifareUltralight
 import android.webkit.MimeTypeMap
 import com.beeswork.balance.data.database.dao.PhotoDAO
 import com.beeswork.balance.data.database.entity.Photo
@@ -14,7 +13,6 @@ import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
@@ -22,7 +20,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import java.io.IOException
-import java.lang.Exception
 import java.util.*
 
 class PhotoRepositoryImpl(
@@ -36,7 +33,7 @@ class PhotoRepositoryImpl(
     override suspend fun fetchPhotos(): Resource<List<Photo>> {
         return withContext(ioDispatcher) {
 //            if (photoDAO.existsBySynced(false) || photoDAO.count() <= 0) {
-            if (photoDAO.count() <= 0) {
+            if (photoDAO.count(preferenceProvider.getAccountId()) <= 0) {
                 val response = photoRDS.listPhotos(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken()
@@ -50,12 +47,12 @@ class PhotoRepositoryImpl(
 //                }
 //                return@withContext response.mapData(listOf<Photo>())
             }
-            return@withContext Resource.success(photoDAO.findAll(4))
+            return@withContext Resource.success(photoDAO.findAll(preferenceProvider.getAccountId(), 4))
         }
     }
 
     override fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>> {
-        return photoDAO.findAllAsFlow(maxPhotoCount)
+        return photoDAO.findAllAsFlow(preferenceProvider.getAccountId(), maxPhotoCount)
     }
 
     override suspend fun uploadPhoto(
@@ -146,16 +143,17 @@ class PhotoRepositoryImpl(
             photo?.status = PhotoStatus.UPLOADING
             photo
         } ?: kotlin.run {
-            val sequence = (photoDAO.findLastSequence() ?: 0) + 1
+            val sequence = (photoDAO.findLastSequence(preferenceProvider.getAccountId()) ?: 0) + 1
             val newPhotoKey = UUID.randomUUID().toString() + "." + extension
-            Photo(newPhotoKey, PhotoStatus.UPLOADING, photoUri, sequence, sequence, uploaded = false, saved = false)
+            val accountId = preferenceProvider.getAccountId()
+            Photo(newPhotoKey, accountId, PhotoStatus.UPLOADING, photoUri, sequence, sequence, false, false)
         }
     }
 
 
-    override suspend fun loadPhotos(maxPhotoCount: Int): List<Photo> {
+    override suspend fun listPhotos(maxPhotoCount: Int): List<Photo> {
         return withContext(ioDispatcher) {
-            return@withContext photoDAO.findAll(maxPhotoCount)
+            return@withContext photoDAO.findAll(preferenceProvider.getAccountId(), maxPhotoCount)
         }
     }
 
@@ -198,7 +196,10 @@ class PhotoRepositoryImpl(
 
     override suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val photos = photoDAO.findAll(PhotoConstant.MAX_PHOTO_COUNT).toMutableList()
+            val photos = photoDAO.findAll(
+                preferenceProvider.getAccountId(),
+                PhotoConstant.MAX_PHOTO_COUNT
+            ).toMutableList()
 
             for (i in photos.size - 1 downTo 0) {
                 val photo = photos[i]
@@ -233,12 +234,16 @@ class PhotoRepositoryImpl(
 
     override suspend fun deletePhotos() {
         withContext(ioDispatcher) {
-            val photos = photoDAO.findAll(100)
+            val photos = photoDAO.findAll(preferenceProvider.getAccountId(), Int.MAX_VALUE)
             photos.forEach { photo ->
                 photoDAO.deletePhoto(photo.key)
                 deletePhoto(photo.uri)
             }
         }
+    }
+
+    override fun getProfilePhotoKeyFlow(): Flow<String?> {
+        return photoDAO.findProfilePhotoKeyAsFlow(preferenceProvider.getAccountId())
     }
 
 

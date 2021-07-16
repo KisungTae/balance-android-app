@@ -300,7 +300,7 @@ class BalanceRepositoryImpl(
 //  ##################################### PHOTO ##################################### //
 //  ################################################################################# //
 
-    override suspend fun fetchPhotos(): Resource<List<Photo>> {
+//    override suspend fun fetchPhotos(): Resource<List<Photo>> {
 //        if (photoDAO.existsBySynced(false) || photoDAO.count() == 0) {
 //            val accountId = preferenceProvider.getAccountId().toString()
 //            val identityToken = preferenceProvider.getAccountId().toString()
@@ -318,8 +318,8 @@ class BalanceRepositoryImpl(
 //                photoDAO.insert(photos)
 //            }
 //        }
-        return Resource.success(photoDAO.findAll(5))
-    }
+//        return Resource.success(photoDAO.findAll(5))
+//    }
 
 
 //    override suspend fun uploadPhoto(

@@ -18,14 +18,14 @@ interface PhotoDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(photos: List<Photo>)
 
-    @Query("select * from photo order by sequence limit :maxPhotoCount")
-    fun findAllAsFlow(maxPhotoCount: Int): Flow<List<Photo>>
+    @Query("select * from photo where accountId = :accountId order by sequence limit :maxPhotoCount")
+    fun findAllAsFlow(accountId: UUID?, maxPhotoCount: Int): Flow<List<Photo>>
 
-    @Query("select sequence from photo order by sequence desc limit 1")
-    fun findLastSequence(): Int?
+    @Query("select sequence from photo where accountId = :accountId order by sequence desc limit 1")
+    fun findLastSequence(accountId: UUID?): Int?
 
-    @Query("select * from photo order by sequence limit :maxPhotoCount")
-    fun findAll(maxPhotoCount: Int): List<Photo>
+    @Query("select * from photo where accountId = :accountId order by sequence limit :maxPhotoCount")
+    fun findAll(accountId: UUID?, maxPhotoCount: Int): List<Photo>
 
     @Query("select * from photo where `key` = :key")
     fun findByKey(key: String): Photo?
@@ -42,28 +42,12 @@ interface PhotoDAO {
     @Query("delete from photo where `key` = :photoKey")
     fun deletePhoto(photoKey: String)
 
-
-
-//    @Query("update photo set synced = :synced where `key` = :photoKey")
-//    fun sync(photoKey: String, synced: Boolean)
-
-//    @Query("select exists (select * from photo where synced = :synced)")
-//    fun existsBySynced(synced: Boolean): Boolean
-
-    @Query("select count(*) from photo")
-    fun count(): Int
-
-//    @Query("delete from photo where `key` not in (:photoIds)")
-//    fun deletePhotosNotIn(photoIds: List<String>)
-
-
+    @Query("select count(*) from photo where accountId = :accountId")
+    fun count(accountId: UUID?): Int
 
     @Query("update photo set sequence = :sequence where `key` = :photoKey")
     fun updateSequence(photoKey: String, sequence: Int)
 
-//    @Query("select `key` from photo order by sequence limit 1")
-//    fun findFirstPhotoKey(): String?
-
-
-
+    @Query("select `key` from photo where accountId = :accountId order by sequence limit 1")
+    fun findProfilePhotoKeyAsFlow(accountId: UUID?): Flow<String?>
 }

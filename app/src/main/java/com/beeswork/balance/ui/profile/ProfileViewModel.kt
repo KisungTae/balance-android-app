@@ -125,7 +125,7 @@ class ProfileViewModel(
 
     fun syncPhotos() {
         viewModelScope.launch(Dispatchers.Default) {
-            val photos = photoRepository.loadPhotos(MAX_PHOTO_COUNT)
+            val photos = photoRepository.listPhotos(MAX_PHOTO_COUNT)
             val photoSequences = mutableMapOf<String, Int>()
             photos.forEach { photo ->
                 when (photo.status) {

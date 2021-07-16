@@ -13,10 +13,11 @@ interface PhotoRepository {
     suspend fun fetchPhotos(): Resource<List<Photo>>
     fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>>
     suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String, photoKey: String?): Resource<EmptyResponse>
-    suspend fun loadPhotos(maxPhotoCount: Int): List<Photo>
+    suspend fun listPhotos(maxPhotoCount: Int): List<Photo>
     suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse>
     suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus)
     suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse>
     suspend fun deletePhotos()
+    fun getProfilePhotoKeyFlow(): Flow<String?>
     suspend fun test()
 }

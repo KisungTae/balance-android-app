@@ -204,7 +204,6 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         })
     }
 
-
     override fun onClick(position: Int) {
         val chatFragment = ChatFragment()
         val arguments = Bundle()

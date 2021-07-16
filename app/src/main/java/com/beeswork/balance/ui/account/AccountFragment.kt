@@ -11,13 +11,9 @@ import com.beeswork.balance.databinding.FragmentAccountBinding
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
-import com.beeswork.balance.ui.click.ClickViewModel
-import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.common.BaseFragment
-import com.beeswork.balance.ui.common.ScopeFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
-import com.beeswork.balance.ui.profile.ProfileDialog
 import com.beeswork.balance.ui.profile.ProfileFragment
 import com.beeswork.balance.ui.setting.SettingFragment
 import com.bumptech.glide.Glide
@@ -51,9 +47,27 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-        setupEmailLiveDataObserver()
-        setupAccountInfo()
+        observeEmailLiveData()
+        observeNameLiveData()
+        observeProfilePhotoLiveData()
         setupListeners()
+    }
+
+    private suspend fun observeProfilePhotoLiveData() {
+        viewModel.profilePhotoKeyLiveData.await().observe(viewLifecycleOwner) {
+            val profilePhotoKey = EndPoint.ofPhoto(preferenceProvider.getAccountId(), it)
+            Glide.with(requireContext())
+                .load(R.drawable.person4)
+                .apply(GlideHelper.profilePhotoGlideOptions())
+                .circleCrop()
+                .into(binding.ivAccountProfile)
+        }
+    }
+
+    private suspend fun observeNameLiveData() {
+        viewModel.nameLiveData.await().observe(viewLifecycleOwner) {
+            binding.tvAccountName.text = it ?: ""
+        }
     }
 
     private fun setupListeners() {
@@ -66,20 +80,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         }
     }
 
-    private fun setupAccountInfo() {
-//        val profilePhotoKey = EndPoint.ofPhoto(
-//            preferenceProvider.getAccountId(),
-//            preferenceProvider.getProfilePhotoKey()
-//        )
-        Glide.with(requireContext())
-            .load(R.drawable.person4)
-            .apply(GlideHelper.profilePhotoGlideOptions())
-            .circleCrop()
-            .into(binding.ivAccountProfile)
-        binding.tvAccountName.text = preferenceProvider.getName()
-    }
-
-    private suspend fun setupEmailLiveDataObserver() {
+    private suspend fun observeEmailLiveData() {
         viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
             binding.tvAccountEmail.text = email ?: ""
         }

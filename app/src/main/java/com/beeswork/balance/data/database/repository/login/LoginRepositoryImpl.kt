@@ -21,7 +21,6 @@ class LoginRepositoryImpl(
                 preferenceProvider.putAccountId(data.accountId)
                 preferenceProvider.putIdentityTokenId(data.identityToken)
                 preferenceProvider.putJwtToken(data.jwtToken)
-                preferenceProvider.putLoginType(loginType)
             }
             return@withContext response
         }

@@ -10,18 +10,11 @@ interface PreferenceProvider {
     fun putJwtToken(jwtToken: String)
     fun putAccountId(accountId: UUID)
     fun putIdentityTokenId(identityToken: UUID)
-    fun putName(name: String)
-    fun putMatchFetchedAt(updatedAt: OffsetDateTime?)
-    fun putClickFetchedAt(updatedAt: OffsetDateTime?)
 
-    fun getLoginType(): LoginType?
+    fun getLoginType(): LoginType
     fun getJwtToken(): String?
     fun getAccountId(): UUID?
     fun getIdentityToken(): UUID?
-    fun getName(): String
-    fun getMatchFetchedAt(): OffsetDateTime
-    fun getClickFetchedAt(): OffsetDateTime
-    fun getProfilePhotoKey(): String?
 
     fun delete()
 }

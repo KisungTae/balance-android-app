@@ -16,8 +16,7 @@ class PreferenceProviderImpl(
     private val editor = preferences.edit()
 
     override fun putLoginType(loginType: LoginType) {
-        editor.putInt(LOGIN_TYPE, loginType.ordinal)
-        editor.apply()
+        TODO("Not yet implemented")
     }
 
     override fun putJwtToken(jwtToken: String) {
@@ -36,30 +35,10 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
-    override fun putName(name: String) {
-        editor.putString(NAME, name)
-        editor.apply()
+    override fun getLoginType(): LoginType {
+        TODO("Not yet implemented")
     }
 
-    override fun putMatchFetchedAt(updatedAt: OffsetDateTime?) {
-        updatedAt?.let {
-            editor.putString(MATCH_FETCHED_AT, OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt))
-        }
-        editor.apply()
-    }
-
-    override fun putClickFetchedAt(updatedAt: OffsetDateTime?) {
-        updatedAt?.let {
-            editor.putString(CLICK_FETCHED_AT, OffsetDateTimeConverter.fromOffsetDateTimeNonNull(updatedAt))
-        }
-        editor.apply()
-    }
-
-    override fun getLoginType(): LoginType? {
-        val loginTypeOrdinal = preferences.getInt(LOGIN_TYPE, -1)
-        return if (loginTypeOrdinal == -1) null
-        else LoginType.values()[loginTypeOrdinal]
-    }
 
     override fun getJwtToken(): String? {
         return preferences.getString(ACCESS_TOKEN, null)
@@ -89,47 +68,14 @@ class PreferenceProviderImpl(
         return preferences.getString(IDENTITY_TOKEN, identityToken)?.let { UUID.fromString(it) }
     }
 
-    override fun getName(): String {
-//      TODO: remove Michael
-        return preferences.getString(NAME, "Michael") ?: ""
-    }
-
-    override fun getMatchFetchedAt(): OffsetDateTime {
-        preferences.getString(MATCH_FETCHED_AT, DEFAULT_FETCHED_AT)?.let {
-            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(it)
-        } ?: kotlin.run {
-            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(DEFAULT_FETCHED_AT)
-        }
-    }
-
-    override fun getClickFetchedAt(): OffsetDateTime {
-        preferences.getString(CLICK_FETCHED_AT, DEFAULT_FETCHED_AT)?.let {
-            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(it)
-        } ?: kotlin.run {
-            return OffsetDateTimeConverter.toOffsetDateTimeNonNull(DEFAULT_FETCHED_AT)
-        }
-    }
-
-    override fun getProfilePhotoKey(): String? {
-        return preferences.getString(PROFILE_PHOTO_KEY, null)
-    }
-
     override fun delete() {
         editor.clear().commit()
     }
 
 
     companion object {
-        const val LOGIN_TYPE = "loginType"
         const val ACCESS_TOKEN = "accessToken"
-        const val MATCH_FETCHED_AT = "matchFetchedAt"
-        const val CLICK_FETCHED_AT = "clickFetchedAt"
         const val ACCOUNT_ID = "accountId"
         const val IDENTITY_TOKEN = "identityToken"
-        const val PROFILE_PHOTO_KEY = "profilePhotoKey"
-        const val NAME = "name"
-
-        const val DEFAULT_FETCHED_AT = "2020-01-01T10:06:26.032+11:00"
-
     }
 }

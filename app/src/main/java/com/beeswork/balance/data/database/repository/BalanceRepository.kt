@@ -38,7 +38,7 @@ interface BalanceRepository {
 
 
     // photo
-    suspend fun fetchPhotos(): Resource<List<Photo>>
+//    suspend fun fetchPhotos(): Resource<List<Photo>>
 //    suspend fun uploadPhoto(
 //        photoKey: String,
 //        photoExtension: String,
