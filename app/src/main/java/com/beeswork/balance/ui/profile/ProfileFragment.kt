@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +19,6 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -57,6 +58,9 @@ class ProfileFragment : BaseFragment(),
     private lateinit var viewModel: ProfileViewModel
     private lateinit var binding: FragmentProfileBinding
     private lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
+
+    private var fetchPhotosStatus = Resource.Status.SUCCESS
+    private var fetchProfileStatus = Resource.Status.SUCCESS
 
     private val requestGalleryPermission = registerForActivityResult(RequestPermission()) { granted ->
         if (granted) selectPhotoFromGallery()
@@ -104,65 +108,59 @@ class ProfileFragment : BaseFragment(),
         viewModel.syncPhotos()
     }
 
-    private fun observeDeletePhotoLiveData() {
-        viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) showErrorDialog(
-                it.error,
-                getString(R.string.error_title_delete_photo),
-                it.errorMessage
-            )
+    private fun observeFetchProfileLiveData() {
+        viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
+            fetchProfileStatus = it.status
+            updateRefreshBtn()
+
+            if (it.isSuccess()) setupProfile(it.data)
+            else if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+                val errorTitle = getString(R.string.error_title_fetch_profile)
+                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_PROFILE, this)
+            }
         }
     }
 
-    private fun observeOrderPhotosLiveData() {
-        viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) showErrorDialog(
-                it.error,
-                getString(R.string.error_title_order_photos),
-                it.errorMessage
-            )
-        }
-    }
-
-    private fun observeSyncPhotosLiveData() {
-        viewModel.syncPhotosLiveData.observe(viewLifecycleOwner) {
-            if (it) observePhotosLiveData()
-        }
-    }
-
-    private fun observeUploadPhotoLiveData() {
-        viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError()
-                && validateAccount(it.error, it.errorMessage)
-                && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
-            ) showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
-        }
-    }
-
-    private fun observePhotosLiveData() {
-        viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
-            photoPickerRecyclerViewAdapter.submit(it)
+    private fun setupProfile(profileDomain: ProfileDomain?) {
+        profileDomain?.let { _profileDomain ->
+            binding.tvProfileName.text = _profileDomain.name
+            binding.tvProfileDateOfBirth.text = _profileDomain.birth.format(DateTimePattern.ofDate())
+            binding.tvProfileHeight.text = _profileDomain.height?.toString() ?: ""
+            binding.etProfileAbout.setText(_profileDomain.about)
+            when (_profileDomain.gender) {
+                Gender.FEMALE -> setupGender(binding.tvProfileGenderFemale, R.drawable.sh_radio_button_left_checked)
+                else -> setupGender(binding.tvProfileGenderMale, R.drawable.sh_radio_button_right_checked)
+            }
         }
     }
 
     private fun observeSaveAboutLiveData() {
         viewModel.saveAboutLiveData.observe(viewLifecycleOwner) {
             when {
-                it.isLoading() -> showLoading()
+                it.isLoading() -> {
+                    hideFieldErrors()
+                    showLoading()
+                }
                 it.isError() && validateAccount(it.error, it.errorMessage) -> showSaveAboutError(it)
                 it.isSuccess() -> showSaveAboutSuccessToast()
             }
         }
     }
 
+    private fun setupGender(textView: TextView, backgroundId: Int) {
+        textView.background = ContextCompat.getDrawable(requireContext(), backgroundId)
+        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.Primary))
+    }
+
     private fun showSaveAboutSuccessToast() {
-        binding.btnProfileSave.visibility = View.VISIBLE
-        binding.spvProfileLoading.visibility = View.GONE
+        showSaveBtn()
+        hideFieldErrors()
         Toast.makeText(requireContext(), getString(R.string.save_about_success_message), Toast.LENGTH_SHORT).show()
+        popBackStack(MainViewPagerFragment.TAG)
     }
 
     private fun showSaveAboutError(resource: Resource<EmptyResponse>) {
-        hideLoading()
+        showSaveBtn()
         var errorMessage = resource.errorMessage
         resource.fieldErrorMessages?.let { fieldErrorMessages ->
             for ((key, value) in fieldErrorMessages) {
@@ -188,13 +186,71 @@ class ProfileFragment : BaseFragment(),
 
     private fun showLoading() {
         binding.btnProfileSave.visibility = View.GONE
-        binding.spvProfileLoading.visibility = View.VISIBLE
+        binding.btnProfileRefresh.visibility = View.GONE
+        binding.skvProfileRefreshLoading.visibility = View.VISIBLE
     }
 
-    private fun hideLoading() {
+    private fun showSaveBtn() {
         binding.btnProfileSave.visibility = View.VISIBLE
-        binding.spvProfileLoading.visibility = View.GONE
+        binding.skvProfileRefreshLoading.visibility = View.GONE
+        binding.btnProfileRefresh.visibility = View.GONE
     }
+
+    private fun showRefreshBtn() {
+        binding.btnProfileRefresh.visibility = View.VISIBLE
+        binding.skvProfileRefreshLoading.visibility = View.GONE
+        binding.btnProfileSave.visibility = View.GONE
+    }
+
+    private fun updateRefreshBtn() {
+        if (fetchProfileStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.LOADING) showLoading()
+        else if (fetchProfileStatus == Resource.Status.ERROR || fetchPhotosStatus == Resource.Status.ERROR) showRefreshBtn()
+        else showSaveBtn()
+    }
+
+
+    private fun observeDeletePhotoLiveData() {
+        viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage))
+                showErrorDialog(it.error, getString(R.string.error_title_delete_photo), it.errorMessage)
+        }
+    }
+
+    private fun observeOrderPhotosLiveData() {
+        viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) {
+            if (it.isError() && validateAccount(it.error, it.errorMessage))
+                showErrorDialog(it.error, getString(R.string.error_title_order_photos), it.errorMessage)
+        }
+    }
+
+    private fun observeSyncPhotosLiveData() {
+        viewModel.syncPhotosLiveData.observe(viewLifecycleOwner) {
+            if (it) observePhotosLiveData()
+        }
+    }
+
+    private fun observeUploadPhotoLiveData() {
+        viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
+            if (it.isError()
+                && validateAccount(it.error, it.errorMessage)
+                && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
+            ) showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
+        }
+    }
+
+    private fun observePhotosLiveData() {
+        viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
+            photoPickerRecyclerViewAdapter.submit(it)
+        }
+    }
+
+    private fun saveAbout(): Boolean {
+        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
+        val about = binding.etProfileAbout.text.toString()
+        viewModel.saveAbout(height, about)
+        return true
+    }
+
 
     private fun setupListeners() {
         binding.llProfileHeightWrapper.setOnClickListener {
@@ -205,30 +261,11 @@ class ProfileFragment : BaseFragment(),
             ProfileBalanceGameDialog().show(childFragmentManager, ProfileBalanceGameDialog.TAG)
         }
         binding.btnProfileRefresh.setOnClickListener {
-            if (it.visibility == View.VISIBLE) {
-//                viewModel.fetchPhotos()
-                it.visibility = View.INVISIBLE
-            }
+            if (fetchProfileStatus == Resource.Status.ERROR) viewModel.fetchProfile()
+            if (fetchPhotosStatus == Resource.Status.ERROR) viewModel.fetchPhotos()
         }
     }
 
-    private fun observeFetchProfileLiveData() {
-        viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
-            binding.tvProfileName.text = it.name
-            binding.tvProfileDateOfBirth.text = it.birth.format(DateTimePattern.ofDate())
-            binding.tvProfileHeight.text = it.height?.toString() ?: ""
-            binding.etProfileAbout.setText(it.about)
-            when (it.gender) {
-                Gender.FEMALE -> setupGender(binding.tvProfileGenderFemale, R.drawable.sh_radio_button_left_checked)
-                else -> setupGender(binding.tvProfileGenderMale, R.drawable.sh_radio_button_right_checked)
-            }
-        }
-    }
-
-    private fun setupGender(textView: TextView, backgroundId: Int) {
-        textView.background = ContextCompat.getDrawable(requireContext(), backgroundId)
-        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.Primary))
-    }
 
     private fun setupPhotoPickerRecyclerView() {
         photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(
@@ -239,7 +276,7 @@ class ProfileFragment : BaseFragment(),
         binding.rvPhotoPicker.adapter = photoPickerRecyclerViewAdapter
         binding.rvPhotoPicker.layoutManager = object : GridLayoutManager(
             requireContext(),
-            ProfileDialog.PHOTO_PICKER_GALLERY_COLUMN_NUM
+            PHOTO_PICKER_NUM_OF_COLUMNS
         ) {
             override fun canScrollVertically(): Boolean = false
             override fun canScrollHorizontally(): Boolean = false
@@ -276,12 +313,6 @@ class ProfileFragment : BaseFragment(),
         binding.btnProfileBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
     }
 
-    private fun saveAbout(): Boolean {
-        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
-        val about = binding.etProfileAbout.text.toString()
-        viewModel.saveAbout(height, about)
-        return true
-    }
 
     private suspend fun test() {
         repeat(1000) {
@@ -297,7 +328,8 @@ class ProfileFragment : BaseFragment(),
     override fun onRetry(requestCode: Int?) {
         when (requestCode) {
             RequestCode.SAVE_ABOUT -> saveAbout()
-//            RequestCode.FETCH_PHOTOS -> viewModel.fetchPhotos()
+            RequestCode.FETCH_PROFILE -> viewModel.fetchProfile()
+            RequestCode.FETCH_PHOTOS -> viewModel.fetchPhotos()
         }
     }
 
@@ -436,5 +468,6 @@ class ProfileFragment : BaseFragment(),
     companion object {
         private const val CAPTURED_PHOTO_NAME = "capturedPhoto.jpg"
         private const val FILE_PROVIDER_SUFFIX = ".fileProvider"
+        private const val PHOTO_PICKER_NUM_OF_COLUMNS = 3
     }
 }

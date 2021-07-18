@@ -2,8 +2,6 @@ package com.beeswork.balance.ui.mainactivity
 
 import android.Manifest
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -15,18 +13,10 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentManager
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.fragment.NavHostFragment
-import com.beeswork.balance.R
-import com.beeswork.balance.data.database.repository.BalanceRepository
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.ui.dialog.ClickedDialog
-import com.beeswork.balance.ui.dialog.NewMatchDialog
-import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.google.android.gms.location.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -39,7 +29,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
 //    private lateinit var broadcastReceiver: BroadcastReceiver
     private val preferenceProvider: PreferenceProvider by instance()
-    private val balanceRepository: BalanceRepository by instance()
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,17 +80,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
         val notificationType = intent!!.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
         val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
-
-        when (notificationType) {
-//            NotificationType.MATCH -> NewMatchDialog("", photoKey).show(
-//                supportFragmentManager,
-//                NewMatchDialog.TAG
-//            )
-            NotificationType.CLICKED -> ClickedDialog(photoKey).show(
-                supportFragmentManager,
-                ClickedDialog.TAG
-            )
-        }
     }
 
     private fun setupLocationManager() {

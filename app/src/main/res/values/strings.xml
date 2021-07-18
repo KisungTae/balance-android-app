@@ -7,6 +7,7 @@
 
     <string name="error_title_generic">에러</string>
     <string name="error_title_chat_id_not_found">유효하지 않은 채팅입니다.</string>
+    <string name="error_title_fetch_profile">프로필을 가져오지 못했습니다</string>
     <string name="error_title_fetch_matches">매치정보를 가져오는데 실패했습니다</string>
     <string name="error_title_fetch_chat_messages">채팅 메세지를 가져오는데 실패했습니다</string>
     <string name="error_title_send_chat_message">채팅 메세지를 전송하지 못했습니다</string>

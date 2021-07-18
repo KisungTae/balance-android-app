@@ -6,12 +6,8 @@ import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptorImpl
-import com.beeswork.balance.data.network.rds.BalanceRDS
-import com.beeswork.balance.data.network.rds.BalanceRDSImpl
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
-import com.beeswork.balance.data.database.repository.BalanceRepository
-import com.beeswork.balance.data.database.repository.BalanceRepositoryImpl
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepositoryImpl
 import com.beeswork.balance.data.database.repository.click.ClickRepository
@@ -146,11 +142,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance()) }
         bind<LoginRDS>() with singleton { LoginRDSImpl(instance()) }
 
-
-
-        bind<BalanceRDS>() with singleton { BalanceRDSImpl(instance()) }
-
-
         // Repository
         bind<SwipeRepository>() with singleton {
             SwipeRepositoryImpl(
@@ -172,6 +163,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind<ProfileRepository>() with singleton {
             ProfileRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -237,22 +229,6 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
 
-
-        bind<BalanceRepository>() with singleton {
-            BalanceRepositoryImpl(
-                instance(),
-                instance(),
-                instance(),
-                instance(),
-                instance(),
-                instance(),
-                instance(),
-                instance(),
-                instance(),
-                instance(),
-                instance()
-            )
-        }
         bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), instance(), Dispatchers.IO) }
 
         // StompClient
@@ -502,6 +478,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      143. photos, profile, setting if empty then fetch from server, and functions in repository should return Resource so that clicent can know that fetch is failed or not
 //      144. email should be in the login response?
 //      145. when logged in check proifle and setting if null then fetch but quitely
+//      146. implement random question for profileBalanceGameDialog
+//      147. when logged in, if no swipefilter then ask users what gender they want to see
+//      148. loginDTO should return profile and photos when the profile.enabled = false which means step Profile has not finished
 
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

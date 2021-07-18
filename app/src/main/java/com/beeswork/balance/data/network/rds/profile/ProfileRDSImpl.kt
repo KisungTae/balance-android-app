@@ -6,12 +6,17 @@ import com.beeswork.balance.data.network.request.PostAnswersBody
 import com.beeswork.balance.data.network.request.SaveAboutBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import java.util.*
 
 class ProfileRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ProfileRDS {
+
+    override suspend fun fetchProfile(accountId: UUID?, identityToken: UUID?): Resource<ProfileDTO> {
+        return getResult { balanceAPI.fetchProfile(accountId, identityToken) }
+    }
 
     override suspend fun saveQuestions(
         accountId: UUID?,

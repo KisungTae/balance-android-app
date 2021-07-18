@@ -13,15 +13,6 @@ class Resource<out T>(
     var hasBeenHandled = false
         private set
 
-    fun getContentIfNotHandledOrReturnNull(): T? {
-        return if (hasBeenHandled) {
-            null
-        } else {
-            hasBeenHandled = true
-            data
-        }
-    }
-
     fun isSuccess(): Boolean {
         return this.status == Status.SUCCESS
     }

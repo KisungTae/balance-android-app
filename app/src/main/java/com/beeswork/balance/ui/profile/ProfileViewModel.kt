@@ -27,8 +27,8 @@ class ProfileViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val _fetchProfileLiveData = MutableLiveData<ProfileDomain>()
-    val fetchProfileLiveData: LiveData<ProfileDomain> get() = _fetchProfileLiveData
+    private val _fetchProfileLiveData = MutableLiveData<Resource<ProfileDomain>>()
+    val fetchProfileLiveData: LiveData<Resource<ProfileDomain>> get() = _fetchProfileLiveData
 
     private val _saveAboutLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val saveAboutLiveData: LiveData<Resource<EmptyResponse>> get() = _saveAboutLiveData
@@ -50,10 +50,17 @@ class ProfileViewModel(
 
     fun fetchProfile() {
         viewModelScope.launch {
-            profileRepository.fetchProfile()?.let { profile ->
-                if (!profile.synced) saveAbout(profile.height, profile.about)
-                _fetchProfileLiveData.postValue(profileMapper.toProfileDomain(profile))
-            }
+            _fetchProfileLiveData.postValue(Resource.loading())
+            val response = profileRepository.fetchProfile()
+            response.data?.let { profile ->
+                _fetchProfileLiveData.postValue(response.mapData(profileMapper.toProfileDomain(profile)))
+            } ?: _fetchProfileLiveData.postValue(response.mapData(null))
+        }
+    }
+
+    fun fetchPhotos() {
+        viewModelScope.launch {
+
         }
     }
 

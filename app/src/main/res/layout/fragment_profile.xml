@@ -23,11 +23,6 @@
             android:contentDescription="@string/back_button_description"
             android:src="@drawable/ic_baseline_arrow_back_ios" />
 
-        <ImageButton
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:background="@color/BackgroundWhite" />
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -38,18 +33,35 @@
             android:textSize="@dimen/tool_bar_title_medium_text_size"
             android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/btnProfileRefresh"
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:background="@color/BackgroundWhite"
-            android:contentDescription="@string/back_button_description"
-            android:src="@drawable/ic_refresh"
-            android:visibility="invisible" />
-
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/skvProfileRefreshLoading"
+                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:gravity="center"
+                android:visibility="invisible">
+
+                <com.github.ybq.android.spinkit.SpinKitView
+                    style="@style/SpinKitView.Large.Circle"
+                    android:layout_width="@dimen/spin_kit_small_size"
+                    android:layout_height="@dimen/spin_kit_small_size"
+                    android:layout_gravity="center"
+                    app:SpinKit_Color="@color/GreyDark" />
+
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnProfileRefresh"
+                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:background="@color/BackgroundWhite"
+                android:contentDescription="@string/back_button_description"
+                android:src="@drawable/ic_refresh"
+                android:visibility="invisible" />
 
             <ImageButton
                 android:id="@+id/btnProfileSave"
@@ -59,16 +71,6 @@
                 android:contentDescription="@string/profile_save_icon_description"
                 android:src="@drawable/ic_baseline_done_24" />
 
-            <com.github.ybq.android.spinkit.SpinKitView
-                android:id="@+id/spvProfileLoading"
-                style="@style/SpinKitView.Circle"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:layout_margin="12dp"
-                android:background="@color/Transparent"
-                android:visibility="gone"
-                app:SpinKit_Color="@color/GreyDark" />
 
         </FrameLayout>
 

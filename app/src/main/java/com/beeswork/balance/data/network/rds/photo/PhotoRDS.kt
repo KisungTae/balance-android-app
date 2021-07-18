@@ -41,7 +41,7 @@ interface PhotoRDS {
         photoKey: String
     ): Resource<EmptyResponse>
 
-    suspend fun listPhotos(
+    suspend fun fetchPhotos(
         accountId: UUID?,
         identityToken: UUID?
     ): Resource<List<PhotoDTO>>

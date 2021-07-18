@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
+import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,7 @@ class ProfileRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
     private val profileDAO: ProfileDAO,
     private val profileRDS: ProfileRDS,
+    private val profileMapper: ProfileMapper,
     private val ioDispatcher: CoroutineDispatcher
 ) : ProfileRepository {
 
@@ -21,9 +23,23 @@ class ProfileRepositoryImpl(
         withContext(ioDispatcher) { profileDAO.deleteById(preferenceProvider.getAccountId()) }
     }
 
-    override suspend fun fetchProfile(): Profile? {
+    override suspend fun fetchProfile(): Resource<Profile> {
         return withContext(ioDispatcher) {
-            return@withContext profileDAO.findById(preferenceProvider.getAccountId())
+            val profile = profileDAO.findById(preferenceProvider.getAccountId())
+
+            if (profile == null || !profile.synced) {
+                val response = profileRDS.fetchProfile(
+                    preferenceProvider.getAccountId(),
+                    preferenceProvider.getIdentityToken()
+                )
+
+                response.data?.let { profileDTO ->
+                    val fetchedProfile = profileMapper.toProfile(profileDTO)
+                    profileDAO.insert(fetchedProfile)
+                    return@withContext response.mapData(fetchedProfile)
+                } ?: return@withContext response.mapData(null)
+            }
+            return@withContext Resource.success(profile)
         }
     }
 

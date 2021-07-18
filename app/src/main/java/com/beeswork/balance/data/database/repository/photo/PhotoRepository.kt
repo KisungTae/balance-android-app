@@ -10,7 +10,7 @@ import java.io.File
 import java.util.*
 
 interface PhotoRepository {
-    suspend fun fetchPhotos(): Resource<List<Photo>>
+    suspend fun fetchPhotos(): Resource<EmptyResponse>
     fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>>
     suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String, photoKey: String?): Resource<EmptyResponse>
     suspend fun listPhotos(maxPhotoCount: Int): List<Photo>

@@ -30,24 +30,22 @@ class PhotoRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : PhotoRepository {
 
-    override suspend fun fetchPhotos(): Resource<List<Photo>> {
+    override suspend fun fetchPhotos(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-//            if (photoDAO.existsBySynced(false) || photoDAO.count() <= 0) {
             if (photoDAO.count(preferenceProvider.getAccountId()) <= 0) {
-                val response = photoRDS.listPhotos(
+                val response = photoRDS.fetchPhotos(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken()
                 )
-//                response.data?.let { photoDTOs ->
-//                    val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(photoDTO) }
-//                    photos.forEach { photo -> photo.synced = true }
-//                    photos.sortedBy { photo -> photo.sequence }
-//                    photoDAO.insert(photos)
-//                    return@withContext response.mapData(photos)
-//                }
-//                return@withContext response.mapData(listOf<Photo>())
+                response.data?.let { photoDTOs ->
+                    val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(photoDTO) }
+                    photos.forEach { photo -> photo.synced = true }
+                    photos.sortedBy { photo -> photo.sequence }
+                    photoDAO.insert(photos)
+                }
+                return@withContext response.toEmptyResponse()
             }
-            return@withContext Resource.success(photoDAO.findAll(preferenceProvider.getAccountId(), 4))
+            return@withContext Resource.success(EmptyResponse())
         }
     }
 

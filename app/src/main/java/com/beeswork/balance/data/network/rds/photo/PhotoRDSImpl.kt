@@ -66,7 +66,7 @@ class PhotoRDSImpl(
         }
     }
 
-    override suspend fun listPhotos(accountId: UUID?, identityToken: UUID?): Resource<List<PhotoDTO>> {
+    override suspend fun fetchPhotos(accountId: UUID?, identityToken: UUID?): Resource<List<PhotoDTO>> {
         return getResult {
             balanceAPI.listPhotos(accountId, identityToken)
         }

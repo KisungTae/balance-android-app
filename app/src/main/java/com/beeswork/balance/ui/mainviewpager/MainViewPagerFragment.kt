@@ -14,7 +14,6 @@ import com.beeswork.balance.internal.constant.FragmentTabPosition
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.dialog.FetchErrorDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -81,7 +80,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
                 RequestCode.CONNECT_TO_WEB_SOCKET,
                 this@MainViewPagerFragment,
                 null
-            ).show(childFragmentManager, FetchErrorDialog.TAG)
+            ).show(childFragmentManager, ErrorDialog.TAG)
         }
     }
 

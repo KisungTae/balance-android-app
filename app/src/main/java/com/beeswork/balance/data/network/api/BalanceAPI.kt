@@ -12,6 +12,7 @@ import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
+import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
@@ -28,6 +29,12 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @GET("profile")
+    suspend fun fetchProfile(
+        @Query(value = "accountId") accountId: UUID?,
+        @Query(value = "identityToken") identityToken: UUID?
+    ): Response<ProfileDTO>
 
     @GET("chat/message/list")
     suspend fun listChatMessages(
@@ -172,12 +179,12 @@ interface BalanceAPI {
     suspend fun fetchQuestions(
         @Query(value = "accountId") accountId: String,
         @Query(value = "identityToken") identityToken: String
-    ): Response<List<QuestionResponse>>
+    ): Response<List<QuestionDTO>>
 
     @GET("/question/random")
     suspend fun fetchRandomQuestion(
         @Query(value = "questionIds") questionIds: List<Int>
-    ): Response<QuestionResponse>
+    ): Response<QuestionDTO>
 
     @POST("/account/answers")
     suspend fun postAnswers(@Body postAnswersBody: PostAnswersBody): Response<EmptyResponse>

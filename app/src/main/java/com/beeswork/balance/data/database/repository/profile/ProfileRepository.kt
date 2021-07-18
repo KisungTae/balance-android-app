@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
     suspend fun deleteProfile()
-    suspend fun fetchProfile(): Profile?
+    suspend fun fetchProfile(): Resource<Profile>
     suspend fun saveAbout(height: Int?, about: String): Resource<EmptyResponse>
     suspend fun fetchQuestions(): Resource<List<QuestionDTO>>
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
