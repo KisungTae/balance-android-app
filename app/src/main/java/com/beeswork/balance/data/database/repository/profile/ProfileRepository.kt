@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
+    fun getProfileFlow(): Flow<Profile?>
     suspend fun deleteProfile()
     suspend fun fetchProfile(): Resource<Profile>
     suspend fun saveAbout(height: Int?, about: String): Resource<EmptyResponse>

@@ -13,8 +13,8 @@ interface PreferenceProvider {
 
     fun getLoginType(): LoginType
     fun getJwtToken(): String?
-    fun getAccountId(): UUID?
-    fun getIdentityToken(): UUID?
+    fun getAccountId(): UUID
+    fun getIdentityToken(): UUID
 
     fun delete()
 }

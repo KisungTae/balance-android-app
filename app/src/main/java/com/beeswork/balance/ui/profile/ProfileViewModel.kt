@@ -4,6 +4,7 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.*
 import com.beeswork.balance.data.database.entity.Photo
+import com.beeswork.balance.data.database.entity.Profile
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
@@ -12,6 +13,7 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
+import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.profile.photo.PhotoPicker
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +35,8 @@ class ProfileViewModel(
     private val _saveAboutLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val saveAboutLiveData: LiveData<Resource<EmptyResponse>> get() = _saveAboutLiveData
 
-    private val _fetchPhotosLiveData = MutableLiveData<Resource<List<PhotoPicker>>>()
-    val fetchPhotosLiveData: LiveData<Resource<List<PhotoPicker>>> get() = _fetchPhotosLiveData
+    private val _fetchPhotosLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val fetchPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchPhotosLiveData
 
     private val _uploadPhotoLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val uploadPhotoLiveData: LiveData<Resource<EmptyResponse>> get() = _uploadPhotoLiveData
@@ -48,6 +50,13 @@ class ProfileViewModel(
     private val _syncPhotosLiveData = MutableLiveData<Boolean>()
     val syncPhotosLiveData: LiveData<Boolean> get() = _syncPhotosLiveData
 
+    fun fetchPhotos() {
+        viewModelScope.safeLaunch(_fetchPhotosLiveData) {
+            _fetchPhotosLiveData.postValue(Resource.loading())
+            _fetchPhotosLiveData.postValue(photoRepository.fetchPhotos())
+        }
+    }
+
     fun fetchProfile() {
         viewModelScope.launch {
             _fetchProfileLiveData.postValue(Resource.loading())
@@ -58,11 +67,7 @@ class ProfileViewModel(
         }
     }
 
-    fun fetchPhotos() {
-        viewModelScope.launch {
 
-        }
-    }
 
     fun saveAbout(height: Int?, about: String) {
         viewModelScope.launch {

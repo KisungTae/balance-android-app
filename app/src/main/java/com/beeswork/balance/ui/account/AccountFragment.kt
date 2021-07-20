@@ -43,6 +43,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AccountViewModel::class.java)
+        observeViewModel(viewModel)
         bindUI()
     }
 
@@ -71,8 +72,12 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun setupListeners() {
+        viewModel.fetchQuestionsLiveData.observe(viewLifecycleOwner) {
+            println(it.data)
+        }
         binding.llAccountEditProfile.setOnClickListener {
-            moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+            viewModel.fetchQuestions()
+//            moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
         binding.llAccountChargePoint.setOnClickListener { }
         binding.llAccountSetting.setOnClickListener {

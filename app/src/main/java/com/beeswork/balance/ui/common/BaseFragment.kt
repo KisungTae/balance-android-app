@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.ui.account.BaseViewModel
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.loginactivity.LoginFragment
 
@@ -20,6 +21,12 @@ abstract class BaseFragment : Fragment() {
                 else -> true
             }
         } ?: true
+    }
+
+    protected fun observeViewModel(baseViewModel: BaseViewModel) {
+        baseViewModel.invalidAccountExceptionLiveData.observe(viewLifecycleOwner) {
+            println("invalidAccountExceptionLiveData!!!!!!!")
+        }
     }
 
     protected fun popToLoginFragment(errorMessage: String?): Boolean {

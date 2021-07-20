@@ -44,6 +44,8 @@ class ExceptionCode {
 
         const val INVALID_SOCIAL_LOGIN_EXCEPTION = "invalid_social_login_exception"
 
+        const val ACCOUNT_IDENTITY_NOT_FOUND_EXCEPTION = "account_identity_not_found_exception"
+
     }
 
 }

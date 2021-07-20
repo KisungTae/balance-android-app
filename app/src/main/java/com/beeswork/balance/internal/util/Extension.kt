@@ -52,13 +52,8 @@ fun <T> CoroutineScope.safeLaunch(
 ): Job {
     val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         when (throwable) {
-            is SocketTimeoutException -> callBack?.postValue(Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION))
-            is NoInternetConnectivityException -> callBack?.postValue(Resource.error(ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION))
-            is ConnectException -> callBack?.postValue(Resource.error(ExceptionCode.CONNECT_EXCEPTION))
-            is UnknownHostException -> {
-                println("UnknownHostException thronw")
-                callBack?.postValue(Resource.error(ExceptionCode.UNKNOWN_HOST_EXCEPTION))
-            }
+            is AccountIdNotFoundException, is IdentityTokenNotFoundException ->
+                callBack?.postValue(Resource.error(ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION))
             else -> throw throwable
         }
         finallyBody?.invoke()
@@ -66,6 +61,20 @@ fun <T> CoroutineScope.safeLaunch(
 
     return this.launch(coroutineExceptionHandler) {
         launchBody.invoke()
+    }
+}
+
+fun <T> CoroutineScope.testLaunch(body: (Resource<T>) -> Unit, final: suspend () -> Resource<T>) {
+    this.launch {
+        val response = final.invoke()
+        body.invoke(response)
+    }
+}
+
+fun <T> CoroutineScope.testLaunch2(final: suspend () -> Resource<T>, body: (Resource<T>) -> Unit) {
+    this.launch {
+        val response = final.invoke()
+        body.invoke(response)
     }
 }
 

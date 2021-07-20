@@ -19,13 +19,13 @@ interface PhotoDAO {
     fun insert(photos: List<Photo>)
 
     @Query("select * from photo where accountId = :accountId order by sequence limit :maxPhotoCount")
-    fun findAllAsFlow(accountId: UUID?, maxPhotoCount: Int): Flow<List<Photo>>
+    fun findAllAsFlow(accountId: UUID, maxPhotoCount: Int): Flow<List<Photo>>
 
     @Query("select sequence from photo where accountId = :accountId order by sequence desc limit 1")
-    fun findLastSequence(accountId: UUID?): Int?
+    fun findLastSequence(accountId: UUID): Int?
 
     @Query("select * from photo where accountId = :accountId order by sequence limit :maxPhotoCount")
-    fun findAll(accountId: UUID?, maxPhotoCount: Int): List<Photo>
+    fun findAll(accountId: UUID, maxPhotoCount: Int): List<Photo>
 
     @Query("select * from photo where `key` = :key")
     fun findByKey(key: String): Photo?
@@ -43,11 +43,11 @@ interface PhotoDAO {
     fun deletePhoto(photoKey: String)
 
     @Query("select count(*) from photo where accountId = :accountId")
-    fun count(accountId: UUID?): Int
+    fun count(accountId: UUID): Int
 
     @Query("update photo set sequence = :sequence where `key` = :photoKey")
     fun updateSequence(photoKey: String, sequence: Int)
 
     @Query("select `key` from photo where accountId = :accountId order by sequence limit 1")
-    fun findProfilePhotoKeyAsFlow(accountId: UUID?): Flow<String?>
+    fun findProfilePhotoKeyAsFlow(accountId: UUID): Flow<String?>
 }

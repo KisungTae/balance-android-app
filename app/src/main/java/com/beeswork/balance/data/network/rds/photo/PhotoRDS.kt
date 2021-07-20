@@ -11,14 +11,14 @@ import java.util.*
 interface PhotoRDS {
 
     suspend fun orderPhotos(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoSequences: Map<String, Int>
     ): Resource<EmptyResponse>
 
     suspend fun savePhoto(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoKey: String,
         sequence: Int
     ): Resource<EmptyResponse>
@@ -30,19 +30,19 @@ interface PhotoRDS {
     ): Resource<EmptyResponse>
 
     suspend fun getPreSignedURL(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoKey: String
     ): Resource<PreSignedURLDTO>
 
     suspend fun deletePhoto(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoKey: String
     ): Resource<EmptyResponse>
 
     suspend fun fetchPhotos(
-        accountId: UUID?,
-        identityToken: UUID?
+        accountId: UUID,
+        identityToken: UUID
     ): Resource<List<PhotoDTO>>
 }

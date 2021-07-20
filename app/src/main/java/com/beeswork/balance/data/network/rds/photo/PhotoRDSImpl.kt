@@ -18,8 +18,8 @@ class PhotoRDSImpl(
 ) : BaseRDS(), PhotoRDS {
 
     override suspend fun orderPhotos(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoSequences: Map<String, Int>
     ): Resource<EmptyResponse> {
         return getResult { balanceAPI.orderPhotos(OrderPhotosBody(accountId, identityToken, photoSequences)) }
@@ -27,8 +27,8 @@ class PhotoRDSImpl(
 
 
     override suspend fun savePhoto(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoKey: String,
         sequence: Int
     ): Resource<EmptyResponse> {
@@ -46,8 +46,8 @@ class PhotoRDSImpl(
     }
 
     override suspend fun getPreSignedURL(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoKey: String
     ): Resource<PreSignedURLDTO> {
         return getResult {
@@ -57,8 +57,8 @@ class PhotoRDSImpl(
 
 
     override suspend fun deletePhoto(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         photoKey: String
     ): Resource<EmptyResponse> {
         return getResult {
@@ -66,9 +66,9 @@ class PhotoRDSImpl(
         }
     }
 
-    override suspend fun fetchPhotos(accountId: UUID?, identityToken: UUID?): Resource<List<PhotoDTO>> {
+    override suspend fun fetchPhotos(accountId: UUID, identityToken: UUID): Resource<List<PhotoDTO>> {
         return getResult {
-            balanceAPI.listPhotos(accountId, identityToken)
+            balanceAPI.fetchPhotos(accountId, identityToken)
         }
     }
 }

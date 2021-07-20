@@ -13,9 +13,9 @@ data class Photo(
     @PrimaryKey
     val key: String,
 
-    val accountId: UUID?,
+    val accountId: UUID,
     var status: PhotoStatus,
-    var uri: Uri,
+    var uri: Uri?,
     var sequence: Int,
     var oldSequence: Int,
     var uploaded: Boolean,

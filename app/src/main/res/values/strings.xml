@@ -63,6 +63,7 @@
     <string name="chat_message_out_of_size_exception">채팅메세지가 맥스를 초과했습니다</string>
     <string name="fetch_matches_exception">매치정보를 가져오는데 실패했습니다</string>
     <string name="fetch_chat_messages_exception">채팅 메세지를 가져오는데 실패했습니다</string>
+    <string name="account_identity_not_found_exception">로그인 정보가 정확하지않습니다. 다시 로그인 해주세요</string>
 
 
 

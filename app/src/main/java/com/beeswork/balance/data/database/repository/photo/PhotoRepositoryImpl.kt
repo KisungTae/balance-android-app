@@ -32,15 +32,12 @@ class PhotoRepositoryImpl(
 
     override suspend fun fetchPhotos(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            if (photoDAO.count(preferenceProvider.getAccountId()) <= 0) {
-                val response = photoRDS.fetchPhotos(
-                    preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken()
-                )
+            val accountId = preferenceProvider.getAccountId()
+            if (photoDAO.count(accountId) <= 0) {
+                val response = photoRDS.fetchPhotos(accountId, preferenceProvider.getIdentityToken())
                 response.data?.let { photoDTOs ->
-                    val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(photoDTO) }
-                    photos.forEach { photo -> photo.synced = true }
-                    photos.sortedBy { photo -> photo.sequence }
+//                  TODO: check if photo already in database then update not insert
+                    val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(accountId, photoDTO) }
                     photoDAO.insert(photos)
                 }
                 return@withContext response.toEmptyResponse()
@@ -173,9 +170,9 @@ class PhotoRepositoryImpl(
         }
     }
 
-    private fun deletePhoto(photoUri: Uri) {
+    private fun deletePhoto(photoUri: Uri?) {
         try {
-            photoUri.path?.let { path ->
+            photoUri?.path?.let { path ->
                 val file = File(path)
                 if (file.exists()) file.delete()
             }

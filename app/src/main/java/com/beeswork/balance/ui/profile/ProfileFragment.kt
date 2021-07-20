@@ -90,7 +90,7 @@ class ProfileFragment : BaseFragment(),
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
         bindUI()
 //        viewModel.test()
-//        viewModel.fetchPhotos()
+        viewModel.fetchPhotos()
         viewModel.fetchProfile()
 
     }
@@ -105,8 +105,13 @@ class ProfileFragment : BaseFragment(),
         observeSyncPhotosLiveData()
         observeOrderPhotosLiveData()
         observeDeletePhotoLiveData()
+        observeFetchPhotosLiveData()
         viewModel.syncPhotos()
     }
+
+
+
+
 
     private fun observeFetchProfileLiveData() {
         viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
@@ -206,6 +211,18 @@ class ProfileFragment : BaseFragment(),
         if (fetchProfileStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.LOADING) showLoading()
         else if (fetchProfileStatus == Resource.Status.ERROR || fetchPhotosStatus == Resource.Status.ERROR) showRefreshBtn()
         else showSaveBtn()
+    }
+
+    private fun observeFetchPhotosLiveData() {
+        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
+            fetchPhotosStatus = it.status
+            updateRefreshBtn()
+
+            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+                val errorTitle = getString(R.string.error_title_fetch_photos)
+                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_PHOTOS, this)
+            }
+        }
     }
 
 

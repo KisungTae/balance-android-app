@@ -3,17 +3,18 @@ package com.beeswork.balance.internal.mapper.profile
 import com.beeswork.balance.data.database.entity.Profile
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.ui.profile.ProfileDomain
+import java.util.*
 
 class ProfileMapperImpl : ProfileMapper {
-    override fun toProfile(profileDTO: ProfileDTO): Profile {
+    override fun toProfile(accountId: UUID, synced: Boolean, profileDTO: ProfileDTO): Profile {
         return Profile(
-            profileDTO.accountId,
+            accountId,
             profileDTO.name,
             profileDTO.birth,
             profileDTO.gender,
             profileDTO.height,
             profileDTO.about,
-            true
+            synced
         )
     }
 

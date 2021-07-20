@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 
@@ -19,22 +20,25 @@ class ProfileRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : ProfileRepository {
 
+    override fun getProfileFlow(): Flow<Profile?> {
+        return profileDAO.findAsFlow(preferenceProvider.getAccountId())
+    }
+
+
     override suspend fun deleteProfile() {
         withContext(ioDispatcher) { profileDAO.deleteById(preferenceProvider.getAccountId()) }
     }
 
     override suspend fun fetchProfile(): Resource<Profile> {
         return withContext(ioDispatcher) {
-            val profile = profileDAO.findById(preferenceProvider.getAccountId())
+            val accountId = preferenceProvider.getAccountId()
+            val profile = profileDAO.findById(accountId)
 
             if (profile == null || !profile.synced) {
-                val response = profileRDS.fetchProfile(
-                    preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken()
-                )
+                val response = profileRDS.fetchProfile(accountId, preferenceProvider.getIdentityToken())
 
                 response.data?.let { profileDTO ->
-                    val fetchedProfile = profileMapper.toProfile(profileDTO)
+                    val fetchedProfile = profileMapper.toProfile(accountId, true, profileDTO)
                     profileDAO.insert(fetchedProfile)
                     return@withContext response.mapData(fetchedProfile)
                 } ?: return@withContext response.mapData(null)
