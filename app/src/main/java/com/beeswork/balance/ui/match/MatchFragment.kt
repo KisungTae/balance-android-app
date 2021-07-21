@@ -59,8 +59,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MatchViewModel::class.java)
         bindUI()
-        viewModel.fetchMatches()
-        viewModel.fetchChatMessages()
+//        viewModel.fetchMatches()
+//        viewModel.fetchChatMessages()
     }
 
     private fun bindUI() = lifecycleScope.launch {

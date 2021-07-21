@@ -66,6 +66,7 @@ import com.beeswork.balance.ui.chat.ChatViewModelFactory
 import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.click.ClickViewModelFactory
 import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
+import com.beeswork.balance.ui.mainactivity.MainViewModelFactory
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
@@ -255,9 +256,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider {
             MainViewPagerViewModelFactory(
                 instance(),
-                instance(),
-                instance(),
-                instance(),
                 instance()
             )
         }
@@ -287,6 +285,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SplashViewModelFactory(instance()) }
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance()) }
+        bind() from provider { MainViewModelFactory(instance()) }
 
 
         // Interceptor

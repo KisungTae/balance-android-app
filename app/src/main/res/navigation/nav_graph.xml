@@ -5,56 +5,8 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/mainViewPagerFragment">
     <fragment
-        android:id="@+id/splashFragment"
-        android:name="com.beeswork.balance.ui.splash.SplashFragment"
-        android:label="fragment_splash"
-        tools:layout="@layout/activity_splash" >
-        <action
-            android:id="@+id/action_splashFragment_to_profileViewPagerFragment"
-            app:destination="@id/profileViewPagerFragment"
-            app:popUpTo="@id/splashFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_splashFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/splashFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_splashFragment_to_mainViewPagerFragment"
-            app:destination="@id/mainViewPagerFragment"
-            app:popUpTo="@id/splashFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.beeswork.balance.ui.loginactivity.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
-        <action
-            android:id="@+id/action_loginFragment_to_profileViewPagerFragment"
-            app:destination="@id/profileViewPagerFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_loginFragment_to_mainViewPagerFragment"
-            app:destination="@id/mainViewPagerFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
-    <fragment
         android:id="@+id/mainViewPagerFragment"
         android:name="com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment"
         android:label="fragment_main_view_pager"
         tools:layout="@layout/fragment_main_view_pager" />
-    <fragment
-        android:id="@+id/profileViewPagerFragment"
-        android:name="com.beeswork.balance.ui.stepprofileactivity.ProfileViewPagerFragment"
-        android:label="fragment_profile_view_pager"
-        tools:layout="@layout/fragment_profile_view_pager" >
-        <action
-            android:id="@+id/action_profileViewPagerFragment_to_mainViewPagerFragment"
-            app:destination="@id/mainViewPagerFragment"
-            app:popUpTo="@id/profileViewPagerFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
 </navigation>

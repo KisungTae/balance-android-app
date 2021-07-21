@@ -11,7 +11,7 @@
     <string name="error_title_fetch_matches">매치정보를 가져오는데 실패했습니다</string>
     <string name="error_title_fetch_chat_messages">채팅 메세지를 가져오는데 실패했습니다</string>
     <string name="error_title_send_chat_message">채팅 메세지를 전송하지 못했습니다</string>
-    <string name="error_title_web_socket_disconnected">서버에 연결할수없습니다</string>
+    <string name="error_title_web_socket_disconnected">서버 연결에러</string>
     <string name="error_title_report">신고요청을 실패했습니다</string>
     <string name="error_title_fetch_question">밸런스 질문을 가져오지 못했습니다</string>
     <string name="error_title_save_question">밸런스 질문을 저장하지 못했습니다</string>

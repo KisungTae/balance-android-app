@@ -1,6 +1,5 @@
-package com.beeswork.balance.ui.mainviewpager
+package com.beeswork.balance.ui.mainactivity
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.click.ClickRepository
@@ -9,22 +8,22 @@ import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.account.BaseViewModel
 import kotlinx.coroutines.launch
 
-class MainViewPagerViewModel(
-    private val matchRepository: MatchRepository,
-    private val clickRepository: ClickRepository
-) : ViewModel() {
+class MainViewModel(
+    private val stompClient: StompClient
+) : BaseViewModel() {
 
-    val unreadMatchCount by lazyDeferred {
-        matchRepository.getUnreadMatchCountFlow().asLiveData()
+    //  TODO: change livedata to channel consumeAsFlow, and validateAccount() in onEach()
+    val webSocketEventLiveData = stompClient.webSocketEventLiveData
+
+    fun connectStomp() {
+        stompClient.connect()
     }
 
-    val clickCount by lazyDeferred {
-        clickRepository.getClickCountFlow().asLiveData()
+    fun disconnectStomp() {
+        stompClient.disconnect()
     }
-
-
-
 
 }

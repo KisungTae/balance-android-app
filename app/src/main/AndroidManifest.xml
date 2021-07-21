@@ -35,14 +35,22 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".ui.splash.SplashActivity">
+        <activity android:name=".ui.splash.SplashActivity"/>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+
+        <activity android:name=".ui.mainactivity.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.mainactivity.MainActivity" />
+<!--        <activity android:name=".ui.mainactivity.MainActivity" />-->
+
         <activity android:name=".ui.loginactivity.LoginActivity"/>
         <activity android:name=".ui.stepprofileactivity.StepProfileActivity"/>
 

@@ -1,14 +1,11 @@
 package com.beeswork.balance.ui.common
 
-import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
-import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.ui.account.BaseViewModel
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.loginactivity.LoginFragment
 
 abstract class BaseFragment : Fragment() {
 
@@ -23,22 +20,31 @@ abstract class BaseFragment : Fragment() {
         } ?: true
     }
 
-    protected fun observeViewModel(baseViewModel: BaseViewModel) {
-        baseViewModel.invalidAccountExceptionLiveData.observe(viewLifecycleOwner) {
-            println("invalidAccountExceptionLiveData!!!!!!!")
+    protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
+        baseViewModel.exceptionLiveData.observe(viewLifecycleOwner) {
+            when (it.error) {
+                ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION,
+                ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
+                ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> {
+                    val baseActivity = activity as BaseActivity
+                    baseActivity.moveToLoginActivity()
+                    println("invalidAccountExceptionLiveData!!!!!!!")
+                }
+            }
+
         }
     }
 
     protected fun popToLoginFragment(errorMessage: String?): Boolean {
-        val loginFragment = LoginFragment()
-        val arguments = Bundle()
-        errorMessage?.let { arguments.putString(BundleKey.ERROR_MESSAGE, it) }
-
-        activity?.supportFragmentManager?.let {
-            if (it.backStackEntryCount > 0)
-                it.popBackStack(it.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-            it.beginTransaction().replace(R.id.fcvMain, loginFragment).commit()
-        }
+//        val loginFragment = LoginFragment()
+//        val arguments = Bundle()
+//        errorMessage?.let { arguments.putString(BundleKey.ERROR_MESSAGE, it) }
+//
+//        activity?.supportFragmentManager?.let {
+//            if (it.backStackEntryCount > 0)
+//                it.popBackStack(it.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+//            it.beginTransaction().replace(R.id.fcvMain, loginFragment).commit()
+//        }
         return false
     }
 

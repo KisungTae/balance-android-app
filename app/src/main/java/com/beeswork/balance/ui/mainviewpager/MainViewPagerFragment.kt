@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.internal.constant.FragmentTabPosition
 import com.beeswork.balance.internal.constant.RequestCode
@@ -21,7 +22,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 
-class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryListener {
+class MainViewPagerFragment : BaseFragment(), KodeinAware {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MainViewPagerViewModelFactory by instance()
@@ -42,16 +43,13 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewPagerViewModel::class.java)
         bindUI()
-//        viewModel.connectStomp()
     }
 
     private fun bindUI() = lifecycleScope.launch {
         setupViewPager()
         setupViewPagerTab()
-        setupWebSocketEventObserver()
         setupUnreadMatchCountObserver()
         setupClickCountObserver()
-        viewModel.prepopulate()
     }
 
     private suspend fun setupClickCountObserver() {
@@ -69,19 +67,6 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
     private fun showBadgeWithCount(position: Int, count: Int) {
         if (count > 0) showTabBadge(position, count)
         else hideTabBadge(position)
-    }
-
-    private fun setupWebSocketEventObserver() {
-        viewModel.webSocketEventLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) ErrorDialog(
-                it.error,
-                getString(R.string.error_title_web_socket_disconnected),
-                it.errorMessage,
-                RequestCode.CONNECT_TO_WEB_SOCKET,
-                this@MainViewPagerFragment,
-                null
-            ).show(childFragmentManager, ErrorDialog.TAG)
-        }
     }
 
     private fun setupViewPager() {
@@ -117,16 +102,6 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
         tabLayoutMediator.attach()
     }
 
-    override fun onResume() {
-        super.onResume()
-//        viewModel.connectStomp()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        viewModel.disconnectStomp()
-    }
-
     private fun showTabBadge(position: Int, count: Int?) {
         binding.tlMain.getTabAt(position)?.let {
             val badge = it.orCreateBadge
@@ -140,14 +115,6 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, ErrorDialog.OnRetryLi
     private fun hideTabBadge(position: Int) {
         binding.tlMain.getTabAt(position)?.let { tab ->
             tab.badge?.let { badgeDrawable -> badgeDrawable.isVisible = false }
-        }
-    }
-
-    override fun onRetry(requestCode: Int?) {
-        requestCode?.let {
-            when (it) {
-                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
-            }
         }
     }
 

@@ -68,7 +68,6 @@ class ChatFragment : BaseFragment(),
                 arguments.getLong(BundleKey.CHAT_ID),
                 swipedId
             )
-
             viewModel = ViewModelProvider(
                 this,
                 viewModelFactory(chatViewModelFactoryParameter)

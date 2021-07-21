@@ -26,10 +26,9 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: AccountViewModelFactory by instance()
-    private val preferenceProvider: PreferenceProvider by instance()
-
     private lateinit var viewModel: AccountViewModel
     private lateinit var binding: FragmentAccountBinding
+    private val preferenceProvider: PreferenceProvider by instance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +42,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AccountViewModel::class.java)
-        observeViewModel(viewModel)
+        observeExceptionLiveData(viewModel)
         bindUI()
     }
 
@@ -72,14 +71,17 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun setupListeners() {
+//      TODO: remove me
         viewModel.fetchQuestionsLiveData.observe(viewLifecycleOwner) {
             println(it.data)
         }
         binding.llAccountEditProfile.setOnClickListener {
-            viewModel.fetchQuestions()
-//            moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+            moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
-        binding.llAccountChargePoint.setOnClickListener { }
+        binding.llAccountChargePoint.setOnClickListener {
+            //          TODO: remove me
+            viewModel.fetchQuestions()
+        }
         binding.llAccountSetting.setOnClickListener {
             moveToFragment(SettingFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }

@@ -3,57 +3,102 @@ package com.beeswork.balance.ui.mainactivity
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
+import com.beeswork.balance.R
+import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
+import com.beeswork.balance.ui.common.BaseActivity
+import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerAdapter
 import com.google.android.gms.location.*
+import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
 
-class MainActivity : AppCompatActivity(), KodeinAware {
+class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
+
+    //    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
+//    private lateinit var broadcastReceiver: BroadcastReceiver
 
     override val kodein by closestKodein()
-    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-//    private lateinit var broadcastReceiver: BroadcastReceiver
-    private val preferenceProvider: PreferenceProvider by instance()
     private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: MainViewModel
+    private val viewModelFactory: MainViewModelFactory by instance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        println("onCreate main activity")
         super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        bindUI()
 //        setupBroadcastReceiver()
 //        setupLocationManager()
 
     }
 
+    private fun bindUI() = lifecycleScope.launch {
+        setupWebSocketEventObserver()
+    }
+
+    private fun setupWebSocketEventObserver() {
+        viewModel.webSocketEventLiveData.observe(this) {
+            when (it.type) {
+                WebSocketEvent.Type.ERROR -> showWebSocketError(it.error, it.errorMessage)
+                else -> println()
+            }
+        }
+    }
+
+    private fun showWebSocketError(error: String?, errorMessage: String?) {
+        val errorTitle = getString(R.string.error_title_web_socket_disconnected)
+        ErrorDialog(error, errorTitle, errorMessage, RequestCode.CONNECT_TO_WEB_SOCKET, this, null).show(
+            supportFragmentManager,
+            ErrorDialog.TAG
+        )
+    }
+
+    override fun onRetry(requestCode: Int?) {
+        requestCode?.let {
+            when (it) {
+                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-
-        val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
-        if (type != null) onReceiveFCMNotification(intent)
-
-        val filter = IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
+//        viewModel.connectStomp()
+//        val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
+//        if (type != null) onReceiveFCMNotification(intent)
+//
+//        val filter = IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
 //        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter)
     }
 
     override fun onPause() {
 //        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
         super.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+//        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {
@@ -103,7 +148,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun bindLocationManager() {
-        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
+//        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
     }
 
     private fun requestLocationPermission() {
@@ -157,6 +202,8 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             if (imm != null) imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
+
+
 
 }
 
