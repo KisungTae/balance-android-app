@@ -30,12 +30,11 @@ class AccountViewModel(
     private val _fetchQuestionsLiveData = MutableLiveData<Resource<List<QuestionDTO>>>()
     val fetchQuestionsLiveData: LiveData<Resource<List<QuestionDTO>>> get() = _fetchQuestionsLiveData
 
+//  TODO: remove me
     fun fetchQuestions() {
         viewModelScopeSafeLaunch {
             _fetchQuestionsLiveData.postValue(Resource.loading())
-            val response = profileRepository.fetchQuestions()
-            validateAccount(response)
-            _fetchQuestionsLiveData.postValue(response)
+            _fetchQuestionsLiveData.postValue(profileRepository.fetchQuestions())
         }
     }
 

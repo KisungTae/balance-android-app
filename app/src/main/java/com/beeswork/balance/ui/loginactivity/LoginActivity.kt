@@ -11,8 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.ActivityLoginBinding
+import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
@@ -52,7 +54,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 
-        viewModel.mockSocialLogin()
+//        viewModel.mockSocialLogin()
 //        moveToMainActivity()
         window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -60,6 +62,11 @@ class LoginActivity : BaseActivity(), KodeinAware {
 //        bind()
 //        setupGoogleSignIn()
 //        observeLoginLiveData()
+        val error = intent.getStringExtra(BundleKey.ERROR)
+        val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
+
+        println("from login activity error: $error")
+        println("from login activity error message: $errorMessage")
     }
 
     private fun observeLoginLiveData() {
@@ -76,17 +83,11 @@ class LoginActivity : BaseActivity(), KodeinAware {
     }
 
     private fun moveToMainActivity() {
-        moveToActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        finishToActivity(Intent(this@LoginActivity, MainActivity::class.java))
     }
 
     private fun moveToStepProfileActivity() {
-        moveToActivity(Intent(this@LoginActivity, StepProfileActivity::class.java))
-    }
-
-    private fun moveToActivity(intent: Intent) {
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
-        this@LoginActivity.finish()
+        finishToActivity(Intent(this@LoginActivity, StepProfileActivity::class.java))
     }
 
     private fun showError(error: String?, errorMessage: String?) {

@@ -4,8 +4,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.*
 import com.beeswork.balance.ui.account.BaseViewModel
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
 
@@ -22,16 +24,13 @@ abstract class BaseFragment : Fragment() {
 
     protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
         baseViewModel.exceptionLiveData.observe(viewLifecycleOwner) {
-            when (it.error) {
-                ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION,
-                ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
-                ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> {
-                    val baseActivity = activity as BaseActivity
-                    baseActivity.moveToLoginActivity()
-                    println("invalidAccountExceptionLiveData!!!!!!!")
-                }
+            when (it) {
+                is AccountIdNotFoundException -> (activity as MainActivity).moveToLoginActivity(it.error, null)
+                is IdentityTokenNotFoundException -> (activity as MainActivity).moveToLoginActivity(it.error, null)
+                is AccountNotFoundException -> (activity as MainActivity).moveToLoginActivity(null, it.message)
+                is AccountDeletedException -> (activity as MainActivity).moveToLoginActivity(null, it.message)
+                is AccountBlockedException -> (activity as MainActivity).moveToLoginActivity(null, it.message)
             }
-
         }
     }
 

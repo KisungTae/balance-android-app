@@ -21,6 +21,7 @@ import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.loginactivity.LoginActivity
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerAdapter
 import com.google.android.gms.location.*
 import com.google.android.material.tabs.TabLayoutMediator

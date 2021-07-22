@@ -4,7 +4,7 @@ import com.beeswork.balance.data.network.response.ErrorResponse
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.exception.NoInternetConnectivityException
+import com.beeswork.balance.internal.exception.*
 import com.google.gson.Gson
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
@@ -52,6 +52,12 @@ abstract class BaseRDS {
                 return Resource.error(error, message)
             } else {
                 val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
+
+                when (errorResponse.error) {
+                    ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION -> throw AccountNotFoundException(errorResponse.message)
+                    ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION -> throw AccountBlockedException(errorResponse.message)
+                    ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> throw AccountDeletedException(errorResponse.message)
+                }
                 return Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
             }
 

@@ -35,15 +35,10 @@ class SplashActivity : BaseActivity(), KodeinAware {
     private fun bind() = lifecycleScope.launch {
         viewModel.loginLiveData.observe(this@SplashActivity) {
             when {
-                it.isSuccess() -> moveToActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                it.isError() -> moveToActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                it.isSuccess() -> finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                it.isError() -> finishToActivity(Intent(this@SplashActivity, LoginActivity::class.java))
             }
         }
     }
 
-    private fun moveToActivity(intent: Intent) {
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
-        this@SplashActivity.finish()
-    }
 }

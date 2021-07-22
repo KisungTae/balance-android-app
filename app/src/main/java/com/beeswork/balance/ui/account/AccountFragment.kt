@@ -55,7 +55,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     private suspend fun observeProfilePhotoLiveData() {
         viewModel.profilePhotoKeyLiveData.await().observe(viewLifecycleOwner) {
-            val profilePhotoKey = EndPoint.ofPhoto(preferenceProvider.getAccountId(), it)
+//            val profilePhotoKey = EndPoint.ofPhoto(preferenceProvider.getAccountId(), it)
             Glide.with(requireContext())
                 .load(R.drawable.person4)
                 .apply(GlideHelper.profilePhotoGlideOptions())
