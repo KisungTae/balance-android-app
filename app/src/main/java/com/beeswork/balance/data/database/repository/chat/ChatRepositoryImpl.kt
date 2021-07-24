@@ -82,7 +82,12 @@ class ChatRepositoryImpl(
                     chatMessageDTO.chatId
                 ) else onChatMessageSent(chatMessageDTO)
             } ?: chatMessageDAO.updateStatusByKey(chatMessageDTO.key, ChatMessageStatus.ERROR)
-            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceipt(chatMessageDTO.chatId))
+
+            chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
+                val chatId = chatMessageDAO.findChatIdByKey(chatMessageDTO.key)
+                val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
+                _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
+            }
         }.launchIn(applicationScope)
     }
 

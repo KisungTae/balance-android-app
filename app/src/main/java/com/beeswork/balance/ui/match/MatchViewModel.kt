@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -17,7 +18,7 @@ class MatchViewModel(
     private val chatRepository: ChatRepository,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
-) : ViewModel() {
+) : BaseViewModel() {
 
     val matchInvalidation by lazyDeferred {
         matchRepository.getMatchInvalidationFlow().asLiveData()
@@ -47,7 +48,7 @@ class MatchViewModel(
     }
 
     fun fetchMatches() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             if (!fetchingMatches) launch {
                 _fetchMatchesLiveData.postValue(Resource.loading())
                 fetchingMatches = true
@@ -59,8 +60,8 @@ class MatchViewModel(
     }
 
     fun fetchChatMessages() {
-        viewModelScope.launch {
-            if (!fetchingChatMessages) launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
+            if (!fetchingChatMessages) launch(coroutineExceptionHandler) {
                 _fetchChatMessagesLiveData.postValue(Resource.loading())
                 fetchingChatMessages = true
                 val response = chatRepository.fetchChatMessages()

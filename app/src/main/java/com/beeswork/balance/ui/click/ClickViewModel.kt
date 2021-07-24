@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ class ClickViewModel(
     private val clickRepository: ClickRepository,
     private val clickMapper: ClickMapper,
     private val defaultDispatcher: CoroutineDispatcher
-) : ViewModel() {
+) : BaseViewModel() {
 
     val clickInvalidation by lazyDeferred {
         clickRepository.getClickInvalidationFlow().asLiveData()
@@ -44,12 +45,13 @@ class ClickViewModel(
     }
 
     fun fetchClicks() {
-        viewModelScope.launch {
-            if (fetchingClicks) return@launch
-            fetchingClicks = true
-            _fetchClicks.postValue(Resource.loading())
-            _fetchClicks.postValue(clickRepository.fetchClicks())
-            fetchingClicks = false
+        viewModelScope.launch(coroutineExceptionHandler) {
+            if (!fetchingClicks) {
+                fetchingClicks = true
+                _fetchClicks.postValue(Resource.loading())
+                _fetchClicks.postValue(clickRepository.fetchClicks())
+                fetchingClicks = false
+            }
         }
     }
 

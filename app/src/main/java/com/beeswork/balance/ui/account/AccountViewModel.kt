@@ -4,10 +4,8 @@ import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
-import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.BaseViewModel
 
 class AccountViewModel(
     private val settingRepository: SettingRepository,
@@ -15,7 +13,7 @@ class AccountViewModel(
     private val profileRepository: ProfileRepository
 ): BaseViewModel() {
 
-    val emailLiveData by lazyDeferred {
+    val emailLiveData by viewModelLazyDeferred {
         settingRepository.getEmailFlow().asLiveData()
     }
 
@@ -26,16 +24,4 @@ class AccountViewModel(
     val nameLiveData by lazyDeferred {
         profileRepository.getNameFlow().asLiveData()
     }
-
-    private val _fetchQuestionsLiveData = MutableLiveData<Resource<List<QuestionDTO>>>()
-    val fetchQuestionsLiveData: LiveData<Resource<List<QuestionDTO>>> get() = _fetchQuestionsLiveData
-
-//  TODO: remove me
-    fun fetchQuestions() {
-        viewModelScopeSafeLaunch {
-            _fetchQuestionsLiveData.postValue(Resource.loading())
-            _fetchQuestionsLiveData.postValue(profileRepository.fetchQuestions())
-        }
-    }
-
 }

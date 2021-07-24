@@ -56,6 +56,7 @@ class ClickFragment : BaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
+        observeExceptionLiveData(viewModel)
         bindUI()
 //        viewModel.fetchClicks()
     }
@@ -117,7 +118,6 @@ class ClickFragment : BaseFragment(),
                     binding.skvClickLoading.visibility = View.VISIBLE
                 }
                 Resource.Status.ERROR -> {
-                    validateAccount(it.error, it.errorMessage)
                     binding.btnClickRefresh.visibility = View.VISIBLE
                     binding.skvClickLoading.visibility = View.GONE
                     val errorTitle = getString(R.string.fetch_clicks_exception_title)

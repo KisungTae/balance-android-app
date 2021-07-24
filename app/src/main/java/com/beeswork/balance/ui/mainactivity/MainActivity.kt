@@ -13,7 +13,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.databinding.ActivityMainBinding
@@ -21,10 +20,7 @@ import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.loginactivity.LoginActivity
-import com.beeswork.balance.ui.mainviewpager.MainViewPagerAdapter
 import com.google.android.gms.location.*
-import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -50,17 +46,23 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         bindUI()
 //        setupBroadcastReceiver()
 //        setupLocationManager()
-
     }
 
     private fun bindUI() = lifecycleScope.launch {
         setupWebSocketEventObserver()
     }
 
-    private fun setupWebSocketEventObserver() {
-        viewModel.webSocketEventLiveData.observe(this) {
+    private suspend fun setupWebSocketEventObserver() {
+        viewModel.webSocketEventLiveData.await().observe(this) {
             when (it.type) {
-                WebSocketEvent.Type.ERROR -> showWebSocketError(it.error, it.errorMessage)
+                WebSocketEvent.Type.ERROR -> {
+                    when (it.error) {
+                        ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
+                        ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION,
+                        ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> moveToLoginActivity(it.error, it.errorMessage)
+                        else -> showWebSocketError(it.error, it.errorMessage)
+                    }
+                }
                 else -> println()
             }
         }
@@ -84,7 +86,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override fun onResume() {
         super.onResume()
-//        viewModel.connectStomp()
+        viewModel.connectStomp()
 //        val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
 //        if (type != null) onReceiveFCMNotification(intent)
 //
@@ -203,8 +205,6 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
             if (imm != null) imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
-
-
 
 }
 

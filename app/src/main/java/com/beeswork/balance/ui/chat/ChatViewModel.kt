@@ -13,6 +13,7 @@ import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.internal.util.safeLaunch
+import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -27,7 +28,7 @@ class ChatViewModel(
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
     private val defaultDispatcher: CoroutineDispatcher
-) : ViewModel() {
+) : BaseViewModel() {
 
     val chatMessageInvalidationLiveData by lazyDeferred {
         chatRepository.chatMessageInvalidationFlow.filter {
@@ -94,11 +95,11 @@ class ChatViewModel(
     }
 
     fun synchronizeMatch() {
-        viewModelScope.launch { matchRepository.synchronizeMatch(chatId) }
+        viewModelScope.launch(coroutineExceptionHandler) { matchRepository.synchronizeMatch(chatId) }
     }
 
     fun sendChatMessage(body: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             val bodySize = body.toByteArray().size
             when {
                 matchRepository.isUnmatched(chatId) -> _sendChatMessageLiveData.postValue(
@@ -116,15 +117,15 @@ class ChatViewModel(
     }
 
     fun deleteChatMessage(key: Long) {
-        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
+        viewModelScope.launch(coroutineExceptionHandler) { chatRepository.deleteChatMessage(chatId, key) }
     }
 
     fun resendChatMessage(key: Long) {
-        viewModelScope.launch { chatRepository.resendChatMessage(key, swipedId) }
+        viewModelScope.launch(coroutineExceptionHandler) { chatRepository.resendChatMessage(key, swipedId) }
     }
 
     fun unmatch() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _unmatchLiveData.postValue(Resource.loading())
             val response = matchRepository.unmatch(chatId, swipedId)
             _unmatchLiveData.postValue(response)
@@ -132,7 +133,7 @@ class ChatViewModel(
     }
 
     fun reportMatch(reportReason: ReportReason, description: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _reportMatchLiveData.postValue(Resource.loading())
             val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
             _reportMatchLiveData.postValue(response)

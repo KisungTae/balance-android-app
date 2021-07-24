@@ -11,6 +11,7 @@ import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 
 class SettingViewModel(
@@ -21,7 +22,7 @@ class SettingViewModel(
     private val photoRepository: PhotoRepository,
     private val swipeRepository: SwipeRepository,
     private val profileRepository: ProfileRepository
-): ViewModel() {
+): BaseViewModel() {
 
     private val _deleteAccountLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val deleteAccountLiveData: LiveData<Resource<EmptyResponse>> get() = _deleteAccountLiveData

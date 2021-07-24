@@ -14,6 +14,7 @@ import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.profile.photo.PhotoPicker
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,7 @@ class ProfileViewModel(
     private val photoMapper: PhotoMapper,
     private val profileMapper: ProfileMapper,
     private val defaultDispatcher: CoroutineDispatcher
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _fetchProfileLiveData = MutableLiveData<Resource<ProfileDomain>>()
     val fetchProfileLiveData: LiveData<Resource<ProfileDomain>> get() = _fetchProfileLiveData

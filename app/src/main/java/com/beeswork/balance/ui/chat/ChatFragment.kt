@@ -72,6 +72,7 @@ class ChatFragment : BaseFragment(),
                 this,
                 viewModelFactory(chatViewModelFactoryParameter)
             ).get(ChatViewModel::class.java)
+            observeExceptionLiveData(viewModel)
 
             bindUI(
                 swipedId,
@@ -103,14 +104,12 @@ class ChatFragment : BaseFragment(),
     }
 
 
-
-
     private fun observeUnmatchLiveData() {
         viewModel.unmatchLiveData.observe(viewLifecycleOwner, {
             when {
                 it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 it.isLoading() -> showLoading()
-                it.isError() && validateAccount(it.error, it.errorMessage) -> {
+                it.isError() -> {
                     hideLoading()
                     val errorTitle = getString(R.string.error_title_report)
                     showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
@@ -132,7 +131,7 @@ class ChatFragment : BaseFragment(),
             when {
                 it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 it.isLoading() -> getReportDialog()?.showLoading()
-                it.isError() && validateAccount(it.error, it.errorMessage) -> {
+                it.isError() -> {
                     getReportDialog()?.hideLoading()
                     val errorTitle = getString(R.string.error_title_report)
                     showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
@@ -148,7 +147,7 @@ class ChatFragment : BaseFragment(),
     private fun observeSendChatMessageMediatorLiveData() {
         viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
             val errorTitle = getString(R.string.error_title_send_chat_message)
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+            if (it.isError()) {
                 if (it.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) setupAsUnmatched()
                 showErrorDialog(it.error, errorTitle, it.errorMessage)
             }

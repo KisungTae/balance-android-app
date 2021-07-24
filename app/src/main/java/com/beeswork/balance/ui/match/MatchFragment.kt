@@ -58,6 +58,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MatchViewModel::class.java)
+        observeExceptionLiveData(viewModel)
         bindUI()
 //        viewModel.fetchMatches()
 //        viewModel.fetchChatMessages()
@@ -186,7 +187,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
             fetchChatMessagesStatus = it.status
             updateRefreshBtn()
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+            if (it.isError()) {
                 val errorTitle = getString(R.string.error_title_fetch_chat_messages)
                 showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this)
             }
@@ -197,7 +198,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
             fetchMatchesStatus = it.status
             updateRefreshBtn()
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+            if (it.isError()) {
                 val errorTitle = getString(R.string.error_title_fetch_matches)
                 showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_MATCHES, this)
             }
@@ -230,8 +231,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     override fun onFragmentSelected() {
-//        viewModel.fetchMatches()
-//        viewModel.fetchChatMessages()
+        viewModel.fetchMatches()
+        viewModel.fetchChatMessages()
     }
 }
 

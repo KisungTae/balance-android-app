@@ -14,6 +14,8 @@ import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepositoryImpl
 import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.login.LoginRepositoryImpl
+import com.beeswork.balance.data.database.repository.main.MainRepository
+import com.beeswork.balance.data.database.repository.main.MainRepositoryImpl
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepositoryImpl
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
@@ -144,6 +146,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<LoginRDS>() with singleton { LoginRDSImpl(instance()) }
 
         // Repository
+        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), Dispatchers.IO) }
+
         bind<SwipeRepository>() with singleton {
             SwipeRepositoryImpl(
                 instance(),
@@ -480,6 +484,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      146. implement random question for profileBalanceGameDialog
 //      147. when logged in, if no swipefilter then ask users what gender they want to see
 //      148. loginDTO should return profile and photos when the profile.enabled = false which means step Profile has not finished
-
+//      149. check what happends when sending message fails is it error or
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

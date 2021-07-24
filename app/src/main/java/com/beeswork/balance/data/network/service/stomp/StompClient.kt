@@ -9,7 +9,7 @@ import java.util.*
 
 interface StompClient {
 
-    val webSocketEventLiveData: LiveData<WebSocketEvent>
+    val webSocketEventFlow: Flow<WebSocketEvent>
     val chatMessageReceiptFlow: Flow<ChatMessageDTO>
     val chatMessageFlow: Flow<ChatMessageDTO>
     val matchFlow: Flow<MatchDTO>

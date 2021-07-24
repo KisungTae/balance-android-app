@@ -88,6 +88,7 @@ class ProfileFragment : BaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
+        observeExceptionLiveData(viewModel)
         bindUI()
 //        viewModel.test()
         viewModel.fetchPhotos()
@@ -119,7 +120,7 @@ class ProfileFragment : BaseFragment(),
             updateRefreshBtn()
 
             if (it.isSuccess()) setupProfile(it.data)
-            else if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+            else if (it.isError()) {
                 val errorTitle = getString(R.string.error_title_fetch_profile)
                 showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_PROFILE, this)
             }
@@ -146,7 +147,7 @@ class ProfileFragment : BaseFragment(),
                     hideFieldErrors()
                     showLoading()
                 }
-                it.isError() && validateAccount(it.error, it.errorMessage) -> showSaveAboutError(it)
+                it.isError() -> showSaveAboutError(it)
                 it.isSuccess() -> showSaveAboutSuccessToast()
             }
         }
@@ -218,7 +219,7 @@ class ProfileFragment : BaseFragment(),
             fetchPhotosStatus = it.status
             updateRefreshBtn()
 
-            if (it.isError() && validateAccount(it.error, it.errorMessage)) {
+            if (it.isError()) {
                 val errorTitle = getString(R.string.error_title_fetch_photos)
                 showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_PHOTOS, this)
             }
@@ -228,14 +229,14 @@ class ProfileFragment : BaseFragment(),
 
     private fun observeDeletePhotoLiveData() {
         viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage))
+            if (it.isError())
                 showErrorDialog(it.error, getString(R.string.error_title_delete_photo), it.errorMessage)
         }
     }
 
     private fun observeOrderPhotosLiveData() {
         viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && validateAccount(it.error, it.errorMessage))
+            if (it.isError())
                 showErrorDialog(it.error, getString(R.string.error_title_order_photos), it.errorMessage)
         }
     }
@@ -248,10 +249,8 @@ class ProfileFragment : BaseFragment(),
 
     private fun observeUploadPhotoLiveData() {
         viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError()
-                && validateAccount(it.error, it.errorMessage)
-                && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
-            ) showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
+            if (it.isError() && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
+                showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
         }
     }
 

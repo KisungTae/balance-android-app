@@ -51,4 +51,7 @@ interface ChatMessageDAO {
     @Query("delete from chatMessage")
     fun deleteAll()
 
+    @Query("select chatId from chatMessage where `key` = :key")
+    fun findChatIdByKey(key: Long?): Long?
+
 }

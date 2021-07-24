@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAccountBinding
-import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.ui.common.BaseFragment
@@ -71,17 +70,10 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun setupListeners() {
-//      TODO: remove me
-        viewModel.fetchQuestionsLiveData.observe(viewLifecycleOwner) {
-            println(it.data)
-        }
         binding.llAccountEditProfile.setOnClickListener {
             moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
-        binding.llAccountChargePoint.setOnClickListener {
-            //          TODO: remove me
-            viewModel.fetchQuestions()
-        }
+        binding.llAccountChargePoint.setOnClickListener {}
         binding.llAccountSetting.setOnClickListener {
             moveToFragment(SettingFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }

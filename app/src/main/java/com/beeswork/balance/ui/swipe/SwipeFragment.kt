@@ -49,6 +49,7 @@ class SwipeFragment : BaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
+        observeExceptionLiveData(viewModel)
         bindUI()
 //        viewModel.fetchCards()
     }
@@ -64,7 +65,7 @@ class SwipeFragment : BaseFragment(),
         viewModel.fetchCards.observe(viewLifecycleOwner) {
             when {
                 it.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE)
-                it.isError() && validateAccount(it.error, it.errorMessage) -> {
+                it.isError() -> {
                     val errorTitle = getString(R.string.fetch_card_exception_title)
                     showErrorDialog(it.error, errorTitle, it.errorMessage)
                     showLayouts(View.GONE, View.GONE, View.VISIBLE)

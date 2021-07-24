@@ -1,50 +1,29 @@
 package com.beeswork.balance.ui.common
 
+import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.*
-import com.beeswork.balance.ui.account.BaseViewModel
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
-
-    protected fun validateAccount(error: String?, errorMessage: String?): Boolean {
-        return error?.let {
-            return when (it) {
-                ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION,
-                ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
-                ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> popToLoginFragment(errorMessage)
-                else -> true
-            }
-        } ?: true
+    protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
+        baseViewModel.exceptionLiveData.observe(viewLifecycleOwner) { exception -> catchException(exception) }
     }
 
-    protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
-        baseViewModel.exceptionLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                is AccountIdNotFoundException -> (activity as MainActivity).moveToLoginActivity(it.error, null)
-                is IdentityTokenNotFoundException -> (activity as MainActivity).moveToLoginActivity(it.error, null)
-                is AccountNotFoundException -> (activity as MainActivity).moveToLoginActivity(null, it.message)
-                is AccountDeletedException -> (activity as MainActivity).moveToLoginActivity(null, it.message)
-                is AccountBlockedException -> (activity as MainActivity).moveToLoginActivity(null, it.message)
-            }
+    private fun catchException(throwable: Throwable) {
+        when (throwable) {
+            is AccountNotFoundException -> (activity as BaseActivity).moveToLoginActivity(null, throwable.message)
+            is AccountDeletedException -> (activity as BaseActivity).moveToLoginActivity(null, throwable.message)
+            is AccountBlockedException -> (activity as BaseActivity).moveToLoginActivity(null, throwable.message)
+            else -> throw throwable
         }
     }
 
-    protected fun popToLoginFragment(errorMessage: String?): Boolean {
-//        val loginFragment = LoginFragment()
-//        val arguments = Bundle()
-//        errorMessage?.let { arguments.putString(BundleKey.ERROR_MESSAGE, it) }
-//
-//        activity?.supportFragmentManager?.let {
-//            if (it.backStackEntryCount > 0)
-//                it.popBackStack(it.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-//            it.beginTransaction().replace(R.id.fcvMain, loginFragment).commit()
-//        }
-        return false
+    protected fun moveToLoginActivity() {
+        (activity as BaseActivity).moveToLoginActivity(null, null)
     }
 
     protected fun moveToFragment(toFragment: Fragment, fromFragmentId: Int, fromFragmentTag: String) {

@@ -23,8 +23,4 @@ class MainViewPagerViewModel(
     val clickCount by lazyDeferred {
         clickRepository.getClickCountFlow().asLiveData()
     }
-
-
-
-
 }

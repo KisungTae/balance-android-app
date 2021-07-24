@@ -13,14 +13,7 @@ import androidx.annotation.LayoutRes
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.exception.AccountIdNotFoundException
-import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
-import com.beeswork.balance.internal.exception.NoInternetConnectivityException
-import com.beeswork.balance.ui.dialog.ReportDialog
 import kotlinx.coroutines.*
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
@@ -51,11 +44,11 @@ fun <T> CoroutineScope.safeLaunch(
     launchBody: suspend () -> Unit
 ): Job {
     val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        when (throwable) {
-            is AccountIdNotFoundException, is IdentityTokenNotFoundException ->
-                callBack?.postValue(Resource.error(ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION))
-            else -> throw throwable
-        }
+//        when (throwable) {
+//            is AccountIdNotFoundException, is IdentityTokenNotFoundException ->
+//                callBack?.postValue(Resource.error(ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION))
+//            else -> throw throwable
+//        }
         finallyBody?.invoke()
     }
 
