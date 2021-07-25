@@ -27,15 +27,15 @@ class SettingViewModel(
     private val _deleteAccountLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val deleteAccountLiveData: LiveData<Resource<EmptyResponse>> get() = _deleteAccountLiveData
 
-    val email by lazyDeferred { settingRepository.getEmailFlow().asLiveData() }
-    val location by lazyDeferred { settingRepository.getLocationFlow().asLiveData() }
+    val email by viewModelLazyDeferred { settingRepository.getEmailFlow().asLiveData() }
+    val location by viewModelLazyDeferred { settingRepository.getLocationFlow().asLiveData() }
 
     fun fetchEmail() {
-        viewModelScope.launch { settingRepository.fetchEmail() }
+        viewModelScope.launch(coroutineExceptionHandler) { settingRepository.fetchEmail() }
     }
 
     fun deleteAccount() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _deleteAccountLiveData.postValue(Resource.loading())
             val response = settingRepository.deleteAccount()
             if (response.isSuccess()) {

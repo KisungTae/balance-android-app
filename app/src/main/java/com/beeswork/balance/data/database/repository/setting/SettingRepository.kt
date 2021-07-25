@@ -8,6 +8,9 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import kotlinx.coroutines.flow.Flow
 
 interface SettingRepository {
+
+    suspend fun fetchSetting(): Resource<EmptyResponse>
+
     suspend fun deleteSettings()
     suspend fun saveFCMToken(token: String)
     suspend fun saveLocation(latitude: Double, longitude: Double)

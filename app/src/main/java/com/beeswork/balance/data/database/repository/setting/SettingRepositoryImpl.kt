@@ -22,6 +22,10 @@ class SettingRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : SettingRepository {
 
+    override suspend fun fetchSetting(): Resource<EmptyResponse> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun deleteSettings() {
         withContext(ioDispatcher) {
             fcmTokenDAO.deleteAll()

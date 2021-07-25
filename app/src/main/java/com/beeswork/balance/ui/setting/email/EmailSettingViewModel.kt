@@ -7,14 +7,16 @@ import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.AccountNotFoundException
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 
 class EmailSettingViewModel(
     private val settingRepository: SettingRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
-    val emailLiveData by lazyDeferred { settingRepository.getEmailFlow().asLiveData() }
+    val emailLiveData by viewModelLazyDeferred { settingRepository.getEmailFlow().asLiveData() }
 
     private val _saveEmailLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val saveEmailLiveData: LiveData<Resource<EmptyResponse>> get() = _saveEmailLiveData
@@ -23,7 +25,7 @@ class EmailSettingViewModel(
     val fetchEmailLiveData: LiveData<Resource<String>> get() = _fetchEmailLiveData
 
     fun saveEmail(email: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _saveEmailLiveData.postValue(Resource.loading())
             val emailValid = email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
             val response = if (emailValid) settingRepository.saveEmail(email)
@@ -33,7 +35,7 @@ class EmailSettingViewModel(
     }
 
     fun fetchEmail() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _fetchEmailLiveData.postValue(Resource.loading())
             _fetchEmailLiveData.postValue(settingRepository.fetchEmail())
         }

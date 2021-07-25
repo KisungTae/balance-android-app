@@ -15,7 +15,7 @@ interface StompClient {
     val matchFlow: Flow<MatchDTO>
     val clickFlow: Flow<ClickDTO>
 
-    fun connect()
-    fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String)
-    fun disconnect()
+    suspend fun connect()
+    suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String)
+    suspend fun disconnect()
 }

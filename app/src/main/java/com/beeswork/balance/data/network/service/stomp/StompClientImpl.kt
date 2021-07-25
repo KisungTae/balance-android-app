@@ -15,6 +15,7 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
@@ -49,7 +50,6 @@ class StompClientImpl(
 
     private var webSocketEventChannel = Channel<WebSocketEvent>()
     override val webSocketEventFlow = webSocketEventChannel.consumeAsFlow()
-
 
     init {
         applicationScope.launch {
@@ -97,7 +97,7 @@ class StompClientImpl(
         applicationScope.launch { webSocketEventChannel.send(WebSocketEvent.error(error, null)) }
     }
 
-    override fun connect() {
+    override suspend fun connect() {
         if (socketStatus == SocketStatus.CLOSED) {
             socketStatus = SocketStatus.CONNECTING
             socket = okHttpClient.newWebSocket(Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build(), this)
@@ -135,23 +135,15 @@ class StompClientImpl(
             stompFrame.getReceiptId()?.let { receiptId ->
                 val chatMessageDTO = ChatMessageDTO(receiptId)
                 chatMessageReceiptChannel.send(chatMessageDTO)
-            } ?: kotlin.run {
-                val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
-                webSocketEventChannel.send(webSocketEvent)
             }
+            val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
+            webSocketEventChannel.send(webSocketEvent)
         }
     }
 
-    override fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
-        applicationScope.launch {
-
-
-
-        }
-
+    override suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
         if (socketStatus == SocketStatus.CLOSED) connect()
-        while (socketStatus == SocketStatus.CONNECTING) {
-        }
+        if (socketStatus == SocketStatus.CONNECTING) delay(CONNECTING_DELAY)
 
         if (socketStatus == SocketStatus.OPEN) {
             val headers = mutableMapOf<String, String>()
@@ -161,13 +153,11 @@ class StompClientImpl(
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             val chatMessageDTO = ChatMessageDTO(chatId, body, preferenceProvider.getAccountId(), swipedId)
             val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
-            applicationScope.launch { outgoing.send(stompFrame.compile()) }
-        } else if (socketStatus == SocketStatus.CLOSED) {
-            applicationScope.launch { chatMessageReceiptChannel.send(ChatMessageDTO(key, chatId)) }
-        }
+            outgoing.send(stompFrame.compile())
+        } else chatMessageReceiptChannel.send(ChatMessageDTO(key, chatId))
     }
 
-    override fun disconnect() {
+    override suspend fun disconnect() {
         socket?.close(1000, null)
     }
 
@@ -196,6 +186,7 @@ class StompClientImpl(
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_HEART_BEAT = "0,0"
+        private const val CONNECTING_DELAY = 5000L
     }
 
     enum class SocketStatus {

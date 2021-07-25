@@ -24,7 +24,7 @@ class SwipeViewModel(
     private var fetchingCards = false
 
     fun fetchCards() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             if (fetchingCards) return@launch
 
             fetchingCards = true

@@ -18,11 +18,11 @@ class ClickViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val clickInvalidation by lazyDeferred {
+    val clickInvalidation by viewModelLazyDeferred {
         clickRepository.getClickInvalidationFlow().asLiveData()
     }
 
-    val newClickLiveData by lazyDeferred {
+    val newClickLiveData by viewModelLazyDeferred {
         clickRepository.newClickFlow.map { clickMapper.toClickDomain(it) }.asLiveData()
     }
 

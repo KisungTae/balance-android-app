@@ -10,14 +10,16 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.internal.util.safeLaunch
+import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.profile.balancegame.QuestionDomain
+import kotlinx.coroutines.launch
 import java.util.*
 
 class SwipeBalanceGameViewModel(
     private val swipeRepository: SwipeRepository,
     private val matchRepository: MatchRepository,
     private val questionMapper: QuestionMapper
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _swipeLiveData = MutableLiveData<Resource<List<QuestionDomain>>>()
     val swipeLiveData: LiveData<Resource<List<QuestionDomain>>> get() = _swipeLiveData
@@ -26,14 +28,14 @@ class SwipeBalanceGameViewModel(
     val clickLiveData: LiveData<Resource<PushType>> = _clickLiveData
 
     fun click(swipedId: UUID, answers: Map<Int, Boolean>) {
-        viewModelScope.safeLaunch(_clickLiveData) {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _clickLiveData.postValue(Resource.loading())
             _clickLiveData.postValue(matchRepository.click(swipedId, answers))
         }
     }
 
     fun swipe(swipedId: UUID) {
-        viewModelScope.safeLaunch(_swipeLiveData) {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _swipeLiveData.postValue(Resource.loading())
             val response = swipeRepository.swipe(swipedId).let {
                 it.mapData(it.data?.map { questionDTO -> questionMapper.toQuestionDomain(questionDTO) })

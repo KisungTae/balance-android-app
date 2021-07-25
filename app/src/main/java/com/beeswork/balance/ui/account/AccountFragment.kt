@@ -42,6 +42,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AccountViewModel::class.java)
         observeExceptionLiveData(viewModel)
+
         bindUI()
     }
 
@@ -73,7 +74,8 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         binding.llAccountEditProfile.setOnClickListener {
             moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
-        binding.llAccountChargePoint.setOnClickListener {}
+        binding.llAccountChargePoint.setOnClickListener {
+        }
         binding.llAccountSetting.setOnClickListener {
             moveToFragment(SettingFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }

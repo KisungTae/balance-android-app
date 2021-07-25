@@ -30,7 +30,7 @@ class ChatViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val chatMessageInvalidationLiveData by lazyDeferred {
+    val chatMessageInvalidationLiveData by viewModelLazyDeferred {
         chatRepository.chatMessageInvalidationFlow.filter {
             it.type == ChatMessageInvalidation.Type.FETCHED || it.chatId == chatId
         }.asLiveData()
@@ -137,6 +137,12 @@ class ChatViewModel(
             _reportMatchLiveData.postValue(Resource.loading())
             val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
             _reportMatchLiveData.postValue(response)
+        }
+    }
+
+    fun connectStomp() {
+        viewModelScope.launch {
+            chatRepository.connectStomp()
         }
     }
 

@@ -485,5 +485,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      147. when logged in, if no swipefilter then ask users what gender they want to see
 //      148. loginDTO should return profile and photos when the profile.enabled = false which means step Profile has not finished
 //      149. check what happends when sending message fails is it error or
+//      150. if profile does exists when logged in, then create default setting as well
+//      151. what if social login blocked, like my google account blocked, then I can't login, there should be a way to change login tyep
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

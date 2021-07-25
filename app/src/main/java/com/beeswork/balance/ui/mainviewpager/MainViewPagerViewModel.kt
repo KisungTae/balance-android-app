@@ -9,18 +9,19 @@ import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 
 class MainViewPagerViewModel(
     private val matchRepository: MatchRepository,
     private val clickRepository: ClickRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
-    val unreadMatchCount by lazyDeferred {
+    val unreadMatchCount by viewModelLazyDeferred {
         matchRepository.getUnreadMatchCountFlow().asLiveData()
     }
 
-    val clickCount by lazyDeferred {
+    val clickCount by viewModelLazyDeferred {
         clickRepository.getClickCountFlow().asLiveData()
     }
 }

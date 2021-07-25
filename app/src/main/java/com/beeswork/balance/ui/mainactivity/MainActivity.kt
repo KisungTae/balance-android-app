@@ -101,7 +101,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override fun onStop() {
         super.onStop()
-//        viewModel.disconnectStomp()
+        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {

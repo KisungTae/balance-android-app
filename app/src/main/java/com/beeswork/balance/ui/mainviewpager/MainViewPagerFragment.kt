@@ -42,6 +42,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewPagerViewModel::class.java)
+        observeExceptionLiveData(viewModel)
         bindUI()
     }
 

@@ -5,14 +5,15 @@ import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PushSettingViewModel(
     private val settingRepository: SettingRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
-    val pushSettings by lazyDeferred { settingRepository.getPushSettingsFlow().asLiveData() }
+    val pushSettings by viewModelLazyDeferred { settingRepository.getPushSettingsFlow().asLiveData() }
 
     private val _saveMatchPushLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val saveMatchPushLiveData: LiveData<Resource<EmptyResponse>> get() = _saveMatchPushLiveData
@@ -24,7 +25,7 @@ class PushSettingViewModel(
     val saveChatMessagePushLiveData: LiveData<Resource<EmptyResponse>> get() = _saveChatMessagePushLiveData
 
     fun syncPushSettings() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             val setting = settingRepository.getSetting()
             if (setting.matchPushSynced && setting.clickedPushSynced && setting.chatMessagePushSynced) return@launch
 
@@ -45,7 +46,7 @@ class PushSettingViewModel(
     }
 
     fun saveMatchPush(matchPush: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             if (settingRepository.getMatchPush() != matchPush) {
                 _saveMatchPushLiveData.postValue(Resource.loading())
                 _saveMatchPushLiveData.postValue(settingRepository.saveMatchPush(matchPush))
@@ -54,7 +55,7 @@ class PushSettingViewModel(
     }
 
     fun saveClickedPush(clickedPush: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             if (settingRepository.getClickedPush() != clickedPush) {
                 _saveClickedPushLiveData.postValue(Resource.loading())
                 _saveClickedPushLiveData.postValue(settingRepository.saveClickedPush(clickedPush))
@@ -63,7 +64,7 @@ class PushSettingViewModel(
     }
 
     fun saveChatMessagePush(chatMessagePush: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             if (settingRepository.getChatMessagePush() != chatMessagePush) {
                 _saveChatMessagePushLiveData.postValue(Resource.loading())
                 _saveChatMessagePushLiveData.postValue(settingRepository.saveChatMessagePush(chatMessagePush))

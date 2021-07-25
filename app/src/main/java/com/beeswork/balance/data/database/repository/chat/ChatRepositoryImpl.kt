@@ -120,7 +120,7 @@ class ChatRepositoryImpl(
         }
     }
 
-    private fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
+    private suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
         chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
         stompClient.sendChatMessage(key, chatId, swipedId, body)
     }
@@ -187,6 +187,12 @@ class ChatRepositoryImpl(
                 chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
             }
             return@withContext response.toEmptyResponse()
+        }
+    }
+
+    override suspend fun connectStomp() {
+        withContext(ioDispatcher) {
+            stompClient.connect()
         }
     }
 

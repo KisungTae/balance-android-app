@@ -80,6 +80,7 @@ class ChatFragment : BaseFragment(),
                 arguments.getString(BundleKey.SWIPED_PROFILE_PHOTO_KEY),
                 arguments.getBoolean(BundleKey.UNMATCHED)
             )
+            viewModel.connectStomp()
         } ?: showErrorDialog(getString(R.string.error_title_chat_id_not_found), "", this)
     }
 
@@ -327,6 +328,11 @@ class ChatFragment : BaseFragment(),
             RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
             RequestCode.UNMATCH -> onUnmatch()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.connectStomp()
     }
 }
 

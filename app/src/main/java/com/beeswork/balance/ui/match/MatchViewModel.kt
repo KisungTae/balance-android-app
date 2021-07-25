@@ -20,11 +20,11 @@ class MatchViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val matchInvalidation by lazyDeferred {
+    val matchInvalidation by viewModelLazyDeferred {
         matchRepository.getMatchInvalidationFlow().asLiveData()
     }
 
-    val newMatchLiveData by lazyDeferred {
+    val newMatchLiveData by viewModelLazyDeferred {
         matchRepository.newMatchFlow.asLiveData()
     }
 

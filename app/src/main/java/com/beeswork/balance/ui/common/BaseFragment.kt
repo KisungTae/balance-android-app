@@ -9,21 +9,26 @@ import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
+
     protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
         baseViewModel.exceptionLiveData.observe(viewLifecycleOwner) { exception -> catchException(exception) }
     }
 
     private fun catchException(throwable: Throwable) {
         when (throwable) {
-            is AccountNotFoundException -> (activity as BaseActivity).moveToLoginActivity(null, throwable.message)
-            is AccountDeletedException -> (activity as BaseActivity).moveToLoginActivity(null, throwable.message)
-            is AccountBlockedException -> (activity as BaseActivity).moveToLoginActivity(null, throwable.message)
+            is AccountNotFoundException,
+            is AccountDeletedException,
+            is AccountBlockedException -> moveToLoginActivity(null, throwable.message)
             else -> throw throwable
         }
     }
 
+    private fun moveToLoginActivity(error: String?, errorMessage: String?) {
+        if (activity is MainActivity) (activity as MainActivity).moveToLoginActivity(error, errorMessage)
+    }
+
     protected fun moveToLoginActivity() {
-        (activity as BaseActivity).moveToLoginActivity(null, null)
+        moveToLoginActivity(null, null)
     }
 
     protected fun moveToFragment(toFragment: Fragment, fromFragmentId: Int, fromFragmentTag: String) {
