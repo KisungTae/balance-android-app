@@ -15,14 +15,9 @@ interface SettingRepository {
     suspend fun saveFCMToken(token: String)
     suspend fun saveLocation(latitude: Double, longitude: Double)
     suspend fun syncLocation()
-    suspend fun saveEmail(email: String): Resource<EmptyResponse>
-    suspend fun fetchEmail(): Resource<String>
-    suspend fun getEmailSynced(): Boolean
     suspend fun saveMatchPush(matchPush: Boolean): Resource<EmptyResponse>
     suspend fun saveClickedPush(clickedPush: Boolean): Resource<EmptyResponse>
     suspend fun saveChatMessagePush(chatMessagePush: Boolean): Resource<EmptyResponse>
-    suspend fun getSetting(): Setting
-    fun getEmailFlow(): Flow<String?>
     suspend fun getPushSettingsFlow(): Flow<PushSettingsTuple>
     suspend fun prepopulateSetting()
     suspend fun getMatchPush(): Boolean
@@ -33,7 +28,6 @@ interface SettingRepository {
         clickedPush: Boolean?,
         chatMessagePush: Boolean?
     ): Resource<EmptyResponse>
-
 
     suspend fun syncMatchPush()
     suspend fun syncClickedPush()

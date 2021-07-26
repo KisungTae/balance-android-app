@@ -28,6 +28,9 @@ class LoginViewModel(
 
     }
 
+//  TODO: save accountId and identityToken
+//  TODO: save email with loginType and accountId
+//
     fun socialLogin(loginId: String?, accessToken: String?, loginType: LoginType) {
         safeLet(loginId, accessToken) { _loginId, _accessToken ->
             viewModelScope.launch {
@@ -35,6 +38,7 @@ class LoginViewModel(
                 if (response.isSuccess()) {
                     settingRepository.prepopulateFetchInfo()
                     swipeRepository.prepopulateSwipeFilter()
+//                    loginRepository.saveEmail()
                 }
                 _loginLiveData.postValue(loginRepository.socialLogin(_loginId, _accessToken, loginType))
             }
@@ -48,6 +52,7 @@ class LoginViewModel(
         viewModelScope.launch {
             settingRepository.prepopulateFetchInfo()
             swipeRepository.prepopulateSwipeFilter()
+            loginRepository.saveEmail("test@gmail.com", LoginType.GOOGLE)
         }
     }
 }

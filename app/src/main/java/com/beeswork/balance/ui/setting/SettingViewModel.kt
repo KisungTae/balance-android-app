@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.setting
 import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepository
+import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
@@ -21,17 +22,20 @@ class SettingViewModel(
     private val matchRepository: MatchRepository,
     private val photoRepository: PhotoRepository,
     private val swipeRepository: SwipeRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val loginRepository: LoginRepository
 ): BaseViewModel() {
 
     private val _deleteAccountLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val deleteAccountLiveData: LiveData<Resource<EmptyResponse>> get() = _deleteAccountLiveData
 
-    val email by viewModelLazyDeferred { settingRepository.getEmailFlow().asLiveData() }
-    val location by viewModelLazyDeferred { settingRepository.getLocationFlow().asLiveData() }
+    val emailLiveData by viewModelLazyDeferred { loginRepository.getEmailFlow().asLiveData() }
+    val locationLiveData by viewModelLazyDeferred { settingRepository.getLocationFlow().asLiveData() }
 
     fun fetchEmail() {
-        viewModelScope.launch(coroutineExceptionHandler) { settingRepository.fetchEmail() }
+        viewModelScope.launch(coroutineExceptionHandler) {
+            loginRepository.fetchEmail()
+        }
     }
 
     fun deleteAccount() {
@@ -46,6 +50,7 @@ class SettingViewModel(
                 photoRepository.deletePhotos()
                 swipeRepository.deleteSwipes()
                 profileRepository.deleteProfile()
+                loginRepository.deleteLogin()
             }
             _deleteAccountLiveData.postValue(response)
         }

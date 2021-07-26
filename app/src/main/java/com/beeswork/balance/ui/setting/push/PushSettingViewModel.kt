@@ -26,22 +26,22 @@ class PushSettingViewModel(
 
     fun syncPushSettings() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            val setting = settingRepository.getSetting()
-            if (setting.matchPushSynced && setting.clickedPushSynced && setting.chatMessagePushSynced) return@launch
-
-            val matchPush = if (setting.matchPushSynced) null else setting.matchPush
-            val clickedPush = if (setting.clickedPushSynced) null else setting.clickedPush
-            val chatMessagePush = if (setting.clickedPushSynced) null else setting.chatMessagePush
-
-            matchPush?.let { _saveMatchPushLiveData.postValue(Resource.loading()) }
-            clickedPush?.let { _saveClickedPushLiveData.postValue(Resource.loading()) }
-            chatMessagePush?.let { _saveChatMessagePushLiveData.postValue(Resource.loading()) }
-
-            val response = settingRepository.syncPushSettings(matchPush, clickedPush, chatMessagePush)
-
-            matchPush?.let { _saveMatchPushLiveData.postValue(response) }
-            clickedPush?.let { _saveClickedPushLiveData.postValue(response) }
-            chatMessagePush?.let { _saveChatMessagePushLiveData.postValue(response) }
+//            val setting = settingRepository.getSetting()
+//            if (setting.matchPushSynced && setting.clickedPushSynced && setting.chatMessagePushSynced) return@launch
+//
+//            val matchPush = if (setting.matchPushSynced) null else setting.matchPush
+//            val clickedPush = if (setting.clickedPushSynced) null else setting.clickedPush
+//            val chatMessagePush = if (setting.clickedPushSynced) null else setting.chatMessagePush
+//
+//            matchPush?.let { _saveMatchPushLiveData.postValue(Resource.loading()) }
+//            clickedPush?.let { _saveClickedPushLiveData.postValue(Resource.loading()) }
+//            chatMessagePush?.let { _saveChatMessagePushLiveData.postValue(Resource.loading()) }
+//
+//            val response = settingRepository.syncPushSettings(matchPush, clickedPush, chatMessagePush)
+//
+//            matchPush?.let { _saveMatchPushLiveData.postValue(response) }
+//            clickedPush?.let { _saveClickedPushLiveData.postValue(response) }
+//            chatMessagePush?.let { _saveChatMessagePushLiveData.postValue(response) }
         }
     }
 

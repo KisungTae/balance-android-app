@@ -8,14 +8,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSettingBinding
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.beeswork.balance.ui.setting.email.EmailSettingDialog
 import com.beeswork.balance.ui.setting.push.PushSettingDialog
-import com.beeswork.balance.ui.setting.push.PushSettingViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -67,13 +65,13 @@ class SettingFragment : BaseFragment(), KodeinAware {
     }
 
     private suspend fun observeEmailLiveData() {
-        viewModel.email.await().observe(viewLifecycleOwner) { email ->
+        viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
             email?.let { _email -> binding.tvSettingEmail.text = _email }
         }
     }
 
     private suspend fun observeLocationLiveData() {
-        viewModel.location.await().observe(viewLifecycleOwner) { location ->
+        viewModel.locationLiveData.await().observe(viewLifecycleOwner) { location ->
             location?.let { _location ->
                 val geoCoder = Geocoder(requireContext(), Locale.getDefault())
                 val address = geoCoder.getFromLocation(_location.latitude, _location.longitude, 1)

@@ -54,19 +54,19 @@ class LoginActivity : BaseActivity(), KodeinAware {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 
-//        viewModel.mockSocialLogin()
-//        moveToMainActivity()
-        window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        viewModel.mockSocialLogin()
+        moveToMainActivity()
+//        window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
+//        binding = ActivityLoginBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
 //        bind()
 //        setupGoogleSignIn()
 //        observeLoginLiveData()
-        val error = intent.getStringExtra(BundleKey.ERROR)
-        val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
+//        val error = intent.getStringExtra(BundleKey.ERROR)
+//        val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
 
-        println("from login activity error: $error")
-        println("from login activity error message: $errorMessage")
+//        println("from login activity error: $error")
+//        println("from login activity error message: $errorMessage")
     }
 
     private fun observeLoginLiveData() {

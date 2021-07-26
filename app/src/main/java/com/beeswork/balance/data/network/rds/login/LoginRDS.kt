@@ -6,6 +6,12 @@ import com.beeswork.balance.internal.constant.LoginType
 import java.util.*
 
 interface LoginRDS {
+
+    suspend fun fetchEmail(
+        accountId: UUID,
+        identityToken: UUID
+    ): Resource<String>
+
     suspend fun socialLogin(
         loginId: String,
         accessToken: String,

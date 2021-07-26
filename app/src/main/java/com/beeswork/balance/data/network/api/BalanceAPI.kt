@@ -14,6 +14,7 @@ import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
+import com.beeswork.balance.data.network.response.setting.SettingDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.gson.GsonProvider
@@ -29,6 +30,12 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @GET("setting")
+    suspend fun getSetting(
+        @Query(value = "accountId") accountId: UUID,
+        @Query(value = "identityToken") identityToken: UUID
+    ): Response<SettingDTO>
 
     @GET("profile")
     suspend fun fetchProfile(

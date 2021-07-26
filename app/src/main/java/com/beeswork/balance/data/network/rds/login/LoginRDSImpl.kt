@@ -11,6 +11,13 @@ import java.util.*
 class LoginRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), LoginRDS {
+
+    override suspend fun fetchEmail(accountId: UUID, identityToken: UUID): Resource<String> {
+        return getResult {
+            balanceAPI.getEmail(accountId, identityToken)
+        }
+    }
+
     override suspend fun socialLogin(
         loginId: String,
         accessToken: String,

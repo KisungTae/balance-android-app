@@ -7,6 +7,7 @@ import com.beeswork.balance.data.database.tuple.PushSettingsTuple
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.mapper.setting.SettingMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -19,11 +20,26 @@ class SettingRepositoryImpl(
     private val settingRDS: SettingRDS,
     private val settingDAO: SettingDAO,
     private val fetchInfoDAO: FetchInfoDAO,
+    private val settingMapper: SettingMapper,
     private val ioDispatcher: CoroutineDispatcher
 ) : SettingRepository {
 
     override suspend fun fetchSetting(): Resource<EmptyResponse> {
-        TODO("Not yet implemented")
+        return withContext(ioDispatcher) {
+            val accountId = preferenceProvider.getAccountId()
+            val isSynced = settingDAO.isSynced(accountId) ?: false
+            if (isSynced) {
+                val response = settingRDS.fetchSetting(
+                    preferenceProvider.getAccountId(),
+                    preferenceProvider.getIdentityToken()
+                )
+                response.data?.let { settingDTO ->
+                    val setting = settingMapper.toSetting(accountId, settingDTO, true)
+                    settingDAO.insert(setting)
+                }
+                return@withContext response.toEmptyResponse()
+            } else return@withContext Resource.success(EmptyResponse())
+        }
     }
 
     override suspend fun deleteSettings() {
@@ -75,76 +91,37 @@ class SettingRepositoryImpl(
         }
     }
 
-    override suspend fun saveEmail(email: String): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
-            val response = settingRDS.postEmail(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                email
-            )
-            if (response.isSuccess()) settingDAO.syncEmail(email)
-            else if (response.isError()) settingDAO.updateEmailSynced(true)
-            return@withContext response
-        }
-    }
-
-    override suspend fun fetchEmail(): Resource<String> {
-        return withContext(ioDispatcher) {
-            val setting = settingDAO.findById()
-            if (setting.emailSynced) return@withContext Resource.success(setting.email)
-            else {
-                val response = settingRDS.getEmail(
-                    preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken()
-                )
-                if (response.isSuccess()) response.data?.let { email -> settingDAO.syncEmail(email) }
-                return@withContext response
-            }
-        }
-    }
-
-    override suspend fun getEmailSynced(): Boolean {
-        return withContext(ioDispatcher) {
-            return@withContext settingDAO.findEmailSynced()
-        }
-    }
-
 
     override suspend fun saveMatchPush(matchPush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            settingDAO.updateMatchPush(matchPush)
+//            settingDAO.updateMatchPush(matchPush)
             val response = postPushSettings(matchPush, null, null)
-            if (response.isSuccess()) settingDAO.syncMatchPush()
-            else if (response.isError()) settingDAO.revertMatchPush()
+//            if (response.isSuccess()) settingDAO.syncMatchPush()
+//            else if (response.isError()) settingDAO.revertMatchPush()
             return@withContext response
         }
     }
 
     override suspend fun saveClickedPush(clickedPush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            settingDAO.updateClickedPush(clickedPush)
+//            settingDAO.updateClickedPush(clickedPush)
             val response = postPushSettings(null, clickedPush, null)
-            if (response.isSuccess()) settingDAO.syncClickedPush()
-            else if (response.isError()) settingDAO.revertClickedPush()
+//            if (response.isSuccess()) settingDAO.syncClickedPush()
+//            else if (response.isError()) settingDAO.revertClickedPush()
             return@withContext response
         }
     }
 
     override suspend fun saveChatMessagePush(chatMessagePush: Boolean): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            settingDAO.updateChatMessagePush(chatMessagePush)
+//            settingDAO.updateChatMessagePush(chatMessagePush)
             val response = postPushSettings(null, null, chatMessagePush)
-            if (response.isSuccess()) settingDAO.syncChatMessagePush()
-            else if (response.isError()) settingDAO.revertChatMessagePush()
+//            if (response.isSuccess()) settingDAO.syncChatMessagePush()
+//            else if (response.isError()) settingDAO.revertChatMessagePush()
             return@withContext response
         }
     }
 
-    override suspend fun getSetting(): Setting {
-        return withContext(ioDispatcher) {
-            return@withContext settingDAO.findById()
-        }
-    }
 
     private suspend fun postPushSettings(
         matchPush: Boolean?,
@@ -160,37 +137,36 @@ class SettingRepositoryImpl(
         )
     }
 
-    override fun getEmailFlow(): Flow<String?> {
-        return settingDAO.findEmailFlow()
-    }
-
     override suspend fun getPushSettingsFlow(): Flow<PushSettingsTuple> {
         return withContext(ioDispatcher) {
-            return@withContext settingDAO.findPushSettingsFlow()
+            return@withContext settingDAO.findPushSettingsFlow(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun prepopulateSetting() {
         withContext(ioDispatcher) {
-            if (!settingDAO.exist()) settingDAO.insert(Setting())
+//            if (!settingDAO.exist()) settingDAO.insert(Setting())
         }
     }
 
     override suspend fun getMatchPush(): Boolean {
         return withContext(ioDispatcher) {
-            return@withContext settingDAO.findMatchPush()
+//            return@withContext settingDAO.findMatchPush()
+            return@withContext true
         }
     }
 
     override suspend fun getClickedPush(): Boolean {
         return withContext(ioDispatcher) {
-            return@withContext settingDAO.findClickedPush()
+//            return@withContext settingDAO.findClickedPush()
+            return@withContext true
         }
     }
 
     override suspend fun getChatMessagePush(): Boolean {
         return withContext(ioDispatcher) {
-            return@withContext settingDAO.findChatMessagePush()
+//            return@withContext settingDAO.findChatMessagePush()
+            return@withContext true
         }
     }
 
@@ -207,29 +183,29 @@ class SettingRepositoryImpl(
                 clickedPush,
                 chatMessagePush
             )
-            if (response.isError()) {
-                matchPush?.let { settingDAO.revertMatchPush() }
-                clickedPush?.let { settingDAO.revertClickedPush() }
-                chatMessagePush?.let { settingDAO.revertChatMessagePush() }
-            } else if (response.isSuccess()) {
-                matchPush?.let { settingDAO.syncMatchPush() }
-                clickedPush?.let { settingDAO.syncClickedPush() }
-                chatMessagePush?.let { settingDAO.syncChatMessagePush() }
-            }
+//            if (response.isError()) {
+//                matchPush?.let { settingDAO.revertMatchPush() }
+//                clickedPush?.let { settingDAO.revertClickedPush() }
+//                chatMessagePush?.let { settingDAO.revertChatMessagePush() }
+//            } else if (response.isSuccess()) {
+//                matchPush?.let { settingDAO.syncMatchPush() }
+//                clickedPush?.let { settingDAO.syncClickedPush() }
+//                chatMessagePush?.let { settingDAO.syncChatMessagePush() }
+//            }
             return@withContext response
         }
     }
 
     override suspend fun syncMatchPush() {
-        withContext(ioDispatcher) { settingDAO.syncMatchPush() }
+//        withContext(ioDispatcher) { settingDAO.syncMatchPush() }
     }
 
     override suspend fun syncClickedPush() {
-        withContext(ioDispatcher) { settingDAO.syncClickedPush() }
+//        withContext(ioDispatcher) { settingDAO.syncClickedPush() }
     }
 
     override suspend fun syncChatMessagePush() {
-        withContext(ioDispatcher) { settingDAO.syncChatMessagePush() }
+//        withContext(ioDispatcher) { settingDAO.syncChatMessagePush() }
     }
 
     override fun getLocationFlow(): Flow<LocationTuple?> {

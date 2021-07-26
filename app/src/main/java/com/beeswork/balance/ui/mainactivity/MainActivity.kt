@@ -86,7 +86,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override fun onResume() {
         super.onResume()
-        viewModel.connectStomp()
+//        viewModel.connectStomp()
 //        val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
 //        if (type != null) onReceiveFCMNotification(intent)
 //

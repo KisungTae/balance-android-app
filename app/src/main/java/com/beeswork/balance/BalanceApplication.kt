@@ -130,6 +130,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().swipeFilterDAO() }
         bind() from singleton { instance<BalanceDatabase>().settingDAO() }
         bind() from singleton { instance<BalanceDatabase>().fetchInfoDAO() }
+        bind() from singleton { instance<BalanceDatabase>().loginDAO() }
 
         // API
         bind() from singleton { BalanceAPI(instance()) }
@@ -146,6 +147,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<LoginRDS>() with singleton { LoginRDSImpl(instance()) }
 
         // Repository
+
+
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), Dispatchers.IO) }
 
         bind<SwipeRepository>() with singleton {
@@ -177,6 +180,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind<SettingRepository>() with singleton {
             SettingRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -234,7 +238,14 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
 
-        bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), instance(), Dispatchers.IO) }
+        bind<LoginRepository>() with singleton {
+            LoginRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.IO
+            )
+        }
 
         // StompClient
         bind() from singleton { StompClientImpl(applicationScope, instance(), instance()) }
@@ -263,7 +274,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
-        bind() from provider { AccountViewModelFactory(instance(), instance(), instance()) }
+        bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider {
             ProfileViewModelFactory(
                 instance(),
@@ -278,6 +289,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { PushSettingViewModelFactory(instance()) }
         bind() from provider {
             SettingViewModelFactory(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -487,5 +499,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      149. check what happends when sending message fails is it error or
 //      150. if profile does exists when logged in, then create default setting as well
 //      151. what if social login blocked, like my google account blocked, then I can't login, there should be a way to change login tyep
+//      152, when logged, save the email, and login type to Login
+//      153. rds and balanceapi check UUID? to UUID
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

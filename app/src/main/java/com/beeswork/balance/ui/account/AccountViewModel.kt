@@ -1,6 +1,7 @@
 package com.beeswork.balance.ui.account
 
 import androidx.lifecycle.*
+import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
@@ -12,11 +13,12 @@ import kotlinx.coroutines.launch
 class AccountViewModel(
     private val settingRepository: SettingRepository,
     private val photoRepository: PhotoRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val loginRepository: LoginRepository
 ) : BaseViewModel() {
 
     val emailLiveData by viewModelLazyDeferred {
-        settingRepository.getEmailFlow().asLiveData()
+        loginRepository.getEmailFlow().asLiveData()
     }
 
     val profilePhotoKeyLiveData by lazyDeferred {
@@ -28,7 +30,7 @@ class AccountViewModel(
     }
 
     fun fetchEmail() {
-        viewModelScope.launch(coroutineExceptionHandler) { settingRepository.fetchEmail() }
+        viewModelScope.launch(coroutineExceptionHandler) { loginRepository.fetchEmail() }
     }
 
     fun fetchSetting() {

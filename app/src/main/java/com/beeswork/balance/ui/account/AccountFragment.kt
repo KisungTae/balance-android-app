@@ -42,7 +42,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AccountViewModel::class.java)
         observeExceptionLiveData(viewModel)
-
+        viewModel.fetchEmail()
         bindUI()
     }
 
@@ -83,7 +83,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     private suspend fun observeEmailLiveData() {
         viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
-            binding.tvAccountEmail.text = email ?: ""
+            binding.tvAccountEmail.text = email
         }
     }
 

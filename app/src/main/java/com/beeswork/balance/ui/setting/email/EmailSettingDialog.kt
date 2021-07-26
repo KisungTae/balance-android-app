@@ -59,7 +59,6 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
                 it.isSuccess() -> {
                     hideLoading()
                     binding.btnEmailSettingRefresh.visibility = View.INVISIBLE
-                    it.data?.let { email -> binding.etEmailSettingEmail.setText(email) }
                 }
                 it.isError() -> {
                     hideLoading()
@@ -76,8 +75,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
 
     private suspend fun observeEmailLiveData() {
         viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
-            if (binding.etEmailSettingEmail.text.toString() != email)
-                binding.etEmailSettingEmail.setText(email)
+            binding.etEmailSettingEmail.setText(email)
         }
     }
 
