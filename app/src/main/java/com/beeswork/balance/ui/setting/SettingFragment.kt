@@ -45,9 +45,15 @@ class SettingFragment : BaseFragment(), KodeinAware {
 
     private fun bindUI() = lifecycleScope.launch {
         setupListeners()
-        observeLocationLiveData()
         observeEmailLiveData()
+        observeLocationLiveData()
         observeDeleteAccountLiveData()
+    }
+
+    private suspend fun observeEmailLiveData() {
+        viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
+            binding.tvSettingEmail.text = email
+        }
     }
 
     private fun observeDeleteAccountLiveData() {
@@ -64,11 +70,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
         }
     }
 
-    private suspend fun observeEmailLiveData() {
-        viewModel.emailLiveData.await().observe(viewLifecycleOwner) { email ->
-            email?.let { _email -> binding.tvSettingEmail.text = _email }
-        }
-    }
+
 
     private suspend fun observeLocationLiveData() {
         viewModel.locationLiveData.await().observe(viewLifecycleOwner) { location ->

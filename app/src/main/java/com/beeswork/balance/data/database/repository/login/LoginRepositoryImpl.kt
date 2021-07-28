@@ -26,19 +26,32 @@ class LoginRepositoryImpl(
         }
     }
 
-    override suspend fun fetchEmail(): Resource<EmptyResponse> {
+    override suspend fun saveEmail(email: String): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val isSynced = loginDAO.isSynced(preferenceProvider.getAccountId()) ?: false
-            if (!isSynced) {
-                val response = loginRDS.fetchEmail(
-                    preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken()
-                )
-                response.data?.let { email ->
-                    loginDAO.updateEmail(preferenceProvider.getAccountId(), email)
-                }
-                return@withContext response.toEmptyResponse()
-            } else return@withContext Resource.success(EmptyResponse())
+            val accountId = preferenceProvider.getAccountId()
+            loginDAO.updateSynced(accountId, false)
+            val response = loginRDS.saveEmail(accountId, preferenceProvider.getIdentityToken(), email)
+            if (response.isSuccess()) loginDAO.updateEmail(accountId, email)
+            else loginDAO.updateSynced(accountId, true)
+            return@withContext response
+        }
+    }
+
+    override suspend fun getEmail(): String? {
+        return withContext(ioDispatcher) {
+            return@withContext loginDAO.findEmail(preferenceProvider.getAccountId())
+        }
+    }
+
+
+    override suspend fun fetchEmail(): Resource<String> {
+        return withContext(ioDispatcher) {
+            val response = loginRDS.fetchEmail(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken()
+            )
+            if (response.isSuccess()) loginDAO.updateEmail(preferenceProvider.getAccountId(), response.data)
+            return@withContext response
         }
     }
 
@@ -65,9 +78,22 @@ class LoginRepositoryImpl(
         }
     }
 
+    override suspend fun isEmailSynced(): Boolean {
+        return withContext(ioDispatcher) {
+            return@withContext loginDAO.isSynced(preferenceProvider.getAccountId()) ?: false
+        }
+    }
+
+    override suspend fun getLoginType(): LoginType {
+        return withContext(ioDispatcher) {
+            return@withContext loginDAO.findLoginType(preferenceProvider.getAccountId())
+        }
+    }
+
     override fun getEmailFlow(): Flow<String?> {
         return loginDAO.findEmailAsFlow(preferenceProvider.getAccountId())
     }
+
 
 
 }

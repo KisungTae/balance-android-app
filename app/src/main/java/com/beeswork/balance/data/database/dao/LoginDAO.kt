@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Login
+import com.beeswork.balance.internal.constant.LoginType
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -21,7 +22,7 @@ interface LoginDAO {
     fun findByAccountId(accountId: UUID): Login?
 
     @Query("update login set email = :email, synced = 1 where accountId = :accountId")
-    fun updateEmail(accountId: UUID, email: String)
+    fun updateEmail(accountId: UUID, email: String?)
 
     @Query("update login set synced = :synced where accountId = :accountId")
     fun updateSynced(accountId: UUID, synced: Boolean)
@@ -32,5 +33,12 @@ interface LoginDAO {
     @Query("select synced from login where accountId = :accountId")
     fun isSynced(accountId: UUID): Boolean?
 
+    @Query("select * from login where accountId = :accountId")
+    fun findAsFlow(accountId: UUID): Flow<Login>
 
+    @Query("select email from login where accountId = :accountId")
+    fun findEmail(accountId: UUID): String?
+
+    @Query("select type from login where accountId = :accountId")
+    fun findLoginType(accountId: UUID): LoginType
 }

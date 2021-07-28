@@ -57,6 +57,8 @@ import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapperImpl
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.internal.mapper.profile.QuestionMapperImpl
+import com.beeswork.balance.internal.mapper.setting.LoginMapper
+import com.beeswork.balance.internal.mapper.setting.LoginMapperImpl
 import com.beeswork.balance.internal.mapper.setting.SettingMapper
 import com.beeswork.balance.internal.mapper.setting.SettingMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
@@ -113,6 +115,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ProfileMapper>() with singleton { ProfileMapperImpl() }
         bind<SettingMapper>() with singleton { SettingMapperImpl() }
         bind<PhotoMapper>() with singleton { PhotoMapperImpl() }
+        bind<LoginMapper>() with singleton { LoginMapperImpl() }
 
 
         // Database
@@ -285,7 +288,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
-        bind() from provider { EmailSettingViewModelFactory(instance()) }
+        bind() from provider { EmailSettingViewModelFactory(instance(), instance()) }
         bind() from provider { PushSettingViewModelFactory(instance()) }
         bind() from provider {
             SettingViewModelFactory(
@@ -501,5 +504,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      151. what if social login blocked, like my google account blocked, then I can't login, there should be a way to change login tyep
 //      152, when logged, save the email, and login type to Login
 //      153. rds and balanceapi check UUID? to UUID
+//      154. should I change callback flow in matchrepository and charrepository to something else?
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

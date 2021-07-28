@@ -37,26 +37,14 @@
             android:layout_marginEnd="20dp"
             android:contentDescription="@string/account_profile_photo_description" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvAccountName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginBottom="3dp"
+            android:textSize="@dimen/text_large_size"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvAccountName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:textSize="@dimen/text_large_size"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvAccountEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/TextGrey" />
-
-        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

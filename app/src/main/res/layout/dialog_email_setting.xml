@@ -32,15 +32,31 @@
             android:textSize="@dimen/tool_bar_title_medium_text_size"
             android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/btnEmailSettingRefresh"
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-            android:background="@color/BackgroundWhite"
-            android:contentDescription="@string/refresh_button_icon_description"
-            android:src="@drawable/ic_refresh"
-            android:visibility="invisible"
-            app:tint="@color/GreyDark" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/btnEmailSettingRefresh"
+                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:background="@color/BackgroundWhite"
+                android:contentDescription="@string/refresh_button_icon_description"
+                android:src="@drawable/ic_refresh"
+                android:visibility="invisible"
+                app:tint="@color/GreyDark" />
+
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvEmailSettingLoading"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/spin_kit_small_size"
+                android:layout_height="@dimen/spin_kit_small_size"
+                android:layout_margin="12dp"
+                app:SpinKit_Color="@color/GreyDark" />
+
+        </FrameLayout>
+
 
     </LinearLayout>
 
@@ -57,14 +73,6 @@
             android:layout_marginBottom="5dp"
             android:text="@string/email_label" />
 
-        <TextView
-            android:id="@+id/tvEmailSettingError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:textColor="@color/WarningRed"
-            android:visibility="gone" />
-
         <EditText
             android:id="@+id/etEmailSettingEmail"
             android:layout_width="match_parent"
@@ -78,38 +86,16 @@
             android:textColor="@color/TextBlack"
             android:textCursorDrawable="@drawable/sh_edit_text_cursor" />
 
-        <FrameLayout
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnEmailSettingSave"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnEmailSettingSave"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/sh_round_box_thin_border"
-                android:text="@string/save_btn_text"
-                android:textColor="@color/Primary"
-                android:textSize="@dimen/text_medium_size" />
-
-            <LinearLayout
-                android:id="@+id/llEmailSettingLoading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/sh_round_box_thin_border"
-                android:gravity="center"
-                android:padding="12dp">
-
-                <com.github.ybq.android.spinkit.SpinKitView
-                    style="@style/SpinKitView.Large.Circle"
-                    android:layout_width="@dimen/spin_kit_small_size"
-                    android:layout_height="@dimen/spin_kit_small_size"
-                    app:SpinKit_Color="@color/Primary" />
-
-            </LinearLayout>
-
-
-        </FrameLayout>
+            android:layout_height="wrap_content"
+            android:background="@drawable/sh_round_box"
+            android:backgroundTint="@color/Primary"
+            android:text="@string/save_btn_text"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_medium_size" />
 
     </LinearLayout>
 

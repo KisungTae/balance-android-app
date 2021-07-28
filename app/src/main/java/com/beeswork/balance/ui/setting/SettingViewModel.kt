@@ -34,8 +34,12 @@ class SettingViewModel(
 
     fun fetchEmail() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            loginRepository.fetchEmail()
+            if (!loginRepository.isEmailSynced()) loginRepository.fetchEmail()
         }
+    }
+
+    fun fetchSetting() {
+        viewModelScope.launch(coroutineExceptionHandler) { settingRepository.fetchSetting() }
     }
 
     fun deleteAccount() {

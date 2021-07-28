@@ -15,6 +15,10 @@ enum class LoginType {
     GOOGLE,
     FACEBOOK;
 
+    fun isEmailEditable(): Boolean {
+        return this == KAKAO || this == FACEBOOK
+    }
+
     internal class Serializer : JsonSerializer<LoginType?> {
         override fun serialize(src: LoginType?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement? {
             return safeLet(src, context) { s, c ->
