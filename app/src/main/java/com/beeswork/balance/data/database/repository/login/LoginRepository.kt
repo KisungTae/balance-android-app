@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LoginRepository {
     suspend fun saveEmail(email: String?, loginType: LoginType)
-    suspend fun saveEmail(email: String): Resource<EmptyResponse>
+    suspend fun saveEmail(email: String): Resource<String>
     suspend fun getEmail(): String?
     suspend fun fetchEmail(): Resource<String>
     suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO>

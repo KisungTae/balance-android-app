@@ -51,41 +51,5 @@ abstract class BaseFragment : Fragment() {
             FragmentManager.POP_BACK_STACK_INCLUSIVE
         )
     }
-
-    protected fun showErrorDialog(
-        errorTitle: String,
-        errorMessage: String?,
-        onDismissListener: ErrorDialog.OnDismissListener
-    ) {
-        ErrorDialog(null, errorTitle, errorMessage, null, null, onDismissListener).show(
-            childFragmentManager,
-            ErrorDialog.TAG
-        )
-    }
-
-    protected fun showErrorDialog(
-        error: String?,
-        errorTitle: String,
-        errorMessage: String?,
-        requestCode: Int,
-        retryListener: ErrorDialog.OnRetryListener
-    ) {
-        ErrorDialog(error, errorTitle, errorMessage, requestCode, retryListener, null).show(
-            childFragmentManager,
-            ErrorDialog.TAG
-        )
-    }
-
-    protected fun showErrorDialog(
-        error: String?,
-        errorTitle: String,
-        errorMessage: String?,
-    ) {
-        ErrorDialog(error, errorTitle, errorMessage, null, null, null).show(
-            childFragmentManager,
-            ErrorDialog.TAG
-        )
-    }
 }
 
-// TODO: remove access token when pop to login fragment

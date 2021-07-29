@@ -26,14 +26,18 @@ class LoginRepositoryImpl(
         }
     }
 
-    override suspend fun saveEmail(email: String): Resource<EmptyResponse> {
+    override suspend fun saveEmail(email: String): Resource<String> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             loginDAO.updateSynced(accountId, false)
             val response = loginRDS.saveEmail(accountId, preferenceProvider.getIdentityToken(), email)
-            if (response.isSuccess()) loginDAO.updateEmail(accountId, email)
-            else loginDAO.updateSynced(accountId, true)
-            return@withContext response
+            if (response.isSuccess()) {
+                loginDAO.updateEmail(accountId, email)
+                return@withContext response.mapData(null)
+            } else {
+                loginDAO.updateSynced(accountId, true)
+                return@withContext response.mapData(loginDAO.findEmail(accountId))
+            }
         }
     }
 

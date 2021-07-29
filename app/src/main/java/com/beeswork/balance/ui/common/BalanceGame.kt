@@ -79,7 +79,9 @@ abstract class BalanceGame : BaseDialog() {
         balanceGameErrorBinding.btnBalanceGameDialogSave.visibility = saveBtn
         balanceGameErrorBinding.tvBalanceGameDialogErrorTitle.text = errorTitle
         balanceGameErrorBinding.tvBalanceGameDialogErrorMessage.text = errorMessage
-        setupErrorMessage(error, errorMessage, balanceGameErrorBinding.tvBalanceGameDialogErrorMessage)
+
+//        TODO: check setupErrorMessage
+//        setupErrorMessage(error, errorMessage, balanceGameErrorBinding.tvBalanceGameDialogErrorMessage)
     }
 
     protected fun showLayouts(balanceGame: Int, loading: Int, error: Int) {

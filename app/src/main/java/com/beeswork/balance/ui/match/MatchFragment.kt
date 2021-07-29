@@ -187,22 +187,26 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
             fetchChatMessagesStatus = it.status
             updateRefreshBtn()
-            if (it.isError()) {
-                val errorTitle = getString(R.string.error_title_fetch_chat_messages)
-                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this)
-            }
+            if (it.isError()) showFetchChatMessagesError(it.error, it.errorMessage)
         }
+    }
+
+    private fun showFetchChatMessagesError(error: String?, errorMessage: String?) {
+        val errorTitle = getString(R.string.error_title_fetch_chat_messages)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this, childFragmentManager)
     }
 
     private fun observeFetchMatchesLiveData() {
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
             fetchMatchesStatus = it.status
             updateRefreshBtn()
-            if (it.isError()) {
-                val errorTitle = getString(R.string.error_title_fetch_matches)
-                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_MATCHES, this)
-            }
+            if (it.isError()) showFetchMatchesError(it.error, it.errorMessage)
         })
+    }
+
+    private fun showFetchMatchesError(error: String?, errorMessage: String?) {
+        val errorTitle = getString(R.string.error_title_fetch_matches)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_MATCHES, this, childFragmentManager)
     }
 
     override fun onClick(position: Int) {

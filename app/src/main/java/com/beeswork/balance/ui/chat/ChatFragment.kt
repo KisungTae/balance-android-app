@@ -81,7 +81,11 @@ class ChatFragment : BaseFragment(),
                 arguments.getBoolean(BundleKey.UNMATCHED)
             )
             viewModel.connectStomp()
-        } ?: showErrorDialog(getString(R.string.error_title_chat_id_not_found), "", this)
+        } ?: kotlin.run {
+            val errorTitle = getString(R.string.error_title_open_chat)
+            val errorMessage = getString(R.string.error_title_chat_id_not_found)
+            ErrorDialog.show(errorTitle, errorMessage, this, childFragmentManager)
+        }
     }
 
     private fun bindUI(
@@ -110,13 +114,15 @@ class ChatFragment : BaseFragment(),
             when {
                 it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 it.isLoading() -> showLoading()
-                it.isError() -> {
-                    hideLoading()
-                    val errorTitle = getString(R.string.error_title_report)
-                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
-                }
+                it.isError() -> showUnmatchError(it.error, it.errorMessage)
             }
         })
+    }
+
+    private fun showUnmatchError(error: String?, errorMessage: String?) {
+        hideLoading()
+        val errorTitle = getString(R.string.error_title_report)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.REPORT_MATCH, this, childFragmentManager)
     }
 
     private fun showLoading() {
@@ -132,13 +138,15 @@ class ChatFragment : BaseFragment(),
             when {
                 it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 it.isLoading() -> getReportDialog()?.showLoading()
-                it.isError() -> {
-                    getReportDialog()?.hideLoading()
-                    val errorTitle = getString(R.string.error_title_report)
-                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.REPORT_MATCH, this)
-                }
+                it.isError() -> showReportMatchError(it.error, it.errorMessage)
             }
         })
+    }
+
+    private fun showReportMatchError(error: String?, errorMessage: String?) {
+        getReportDialog()?.hideLoading()
+        val errorTitle = getString(R.string.error_title_report)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.REPORT_MATCH, this, childFragmentManager)
     }
 
     private fun getReportDialog(): ReportDialog? {
@@ -147,10 +155,10 @@ class ChatFragment : BaseFragment(),
 
     private fun observeSendChatMessageMediatorLiveData() {
         viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
-            val errorTitle = getString(R.string.error_title_send_chat_message)
             if (it.isError()) {
                 if (it.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) setupAsUnmatched()
-                showErrorDialog(it.error, errorTitle, it.errorMessage)
+                val errorTitle = getString(R.string.error_title_send_chat_message)
+                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
             }
         })
     }

@@ -30,6 +30,7 @@ class SettingViewModel(
     val deleteAccountLiveData: LiveData<Resource<EmptyResponse>> get() = _deleteAccountLiveData
 
     val emailLiveData by viewModelLazyDeferred { loginRepository.getEmailFlow().asLiveData() }
+
     val locationLiveData by viewModelLazyDeferred { settingRepository.getLocationFlow().asLiveData() }
 
     fun fetchEmail() {

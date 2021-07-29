@@ -21,17 +21,15 @@ class EmailSettingViewModel(
     private val loginMapper: LoginMapper
 ) : BaseViewModel() {
 
-    private val _saveEmailLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val saveEmailLiveData: LiveData<Resource<EmptyResponse>> get() = _saveEmailLiveData
-
-    private val _fetchEmailLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val fetchEmailLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchEmailLiveData
-
-    private val _emailLiveData = MutableLiveData<Resource<String>>()
-    val emailLiveData: LiveData<Resource<String>> get() = _emailLiveData
+    private val _fetchEmailLiveData = MutableLiveData<Resource<String>>()
+    val fetchEmailLiveData: LiveData<Resource<String>> get() = _fetchEmailLiveData
 
     private val _loginTypeLiveData = MutableLiveData<LoginType>()
     val loginTypeLiveData: LiveData<LoginType> get() = _loginTypeLiveData
+
+    private val _saveEmailLiveData = MutableLiveData<Resource<String>>()
+    val saveEmailLiveData: LiveData<Resource<String>> get() = _saveEmailLiveData
+
 
     fun fetchLoginType() {
         viewModelScope.launch { _loginTypeLiveData.postValue(loginRepository.getLoginType()) }
@@ -40,20 +38,26 @@ class EmailSettingViewModel(
     fun saveEmail(email: String) {
         viewModelScope.launch(coroutineExceptionHandler) {
             _saveEmailLiveData.postValue(Resource.loading())
-            val isEmailValid = email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-            if (isEmailValid) {
+            if (isEmailValid(email)) {
                 val response = loginRepository.saveEmail(email)
                 _saveEmailLiveData.postValue(response)
-            } else _saveEmailLiveData.postValue(Resource.error(ExceptionCode.INVALID_EMAIL_EXCEPTION))
+            } else {
+                val response = Resource.errorWithData(loginRepository.getEmail(), ExceptionCode.INVALID_EMAIL_EXCEPTION)
+                _saveEmailLiveData.postValue(response)
+            }
         }
+    }
+
+    private fun isEmailValid(email: String): Boolean {
+        return email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     fun fetchEmail() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            _emailLiveData.postValue(Resource.success(loginRepository.getEmail()))
+            _fetchEmailLiveData.postValue(Resource.success(loginRepository.getEmail()))
             if (!loginRepository.isEmailSynced()) {
-                _emailLiveData.postValue(Resource.loading())
-                _emailLiveData.postValue(loginRepository.fetchEmail())
+                _fetchEmailLiveData.postValue(Resource.loading())
+                _fetchEmailLiveData.postValue(loginRepository.fetchEmail())
             }
         }
     }

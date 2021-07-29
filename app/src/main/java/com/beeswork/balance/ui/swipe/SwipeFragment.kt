@@ -11,6 +11,7 @@ import com.beeswork.balance.internal.constant.*
 
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameDialog
 import com.beeswork.balance.ui.swipe.card.CardStackAdapter
 import com.beeswork.balance.ui.swipe.filter.SwipeFilterDialog
@@ -67,7 +68,7 @@ class SwipeFragment : BaseFragment(),
                 it.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE)
                 it.isError() -> {
                     val errorTitle = getString(R.string.fetch_card_exception_title)
-                    showErrorDialog(it.error, errorTitle, it.errorMessage)
+                    ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
                     showLayouts(View.GONE, View.GONE, View.VISIBLE)
                 }
                 else -> {

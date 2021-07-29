@@ -9,10 +9,6 @@ class Resource<out T>(
     val errorMessage: String?,
     val fieldErrorMessages: Map<String, String>?
 ) {
-
-    var hasBeenHandled = false
-        private set
-
     fun isSuccess(): Boolean {
         return this.status == Status.SUCCESS
     }
@@ -58,19 +54,17 @@ class Resource<out T>(
             return Resource(Status.ERROR, null, error, errorMessage, fieldErrorMessages)
         }
 
-        fun <T> error(
-            error: String?,
-            errorMessage: String?,
-        ): Resource<T> {
+        fun <T> error(error: String?, errorMessage: String?): Resource<T> {
             return Resource(Status.ERROR, null, error, errorMessage, null)
         }
 
-        fun <T> error(
-            error: String,
-        ): Resource<T> {
+        fun <T> error(error: String): Resource<T> {
             return Resource(Status.ERROR, null, error, null, null)
         }
 
+        fun <T> errorWithData(data: T?, error: String): Resource<T> {
+            return Resource(Status.ERROR, data, error, null, null)
+        }
 
         fun <T> loading(): Resource<T> {
             return Resource(Status.LOADING, null, null, null, null)

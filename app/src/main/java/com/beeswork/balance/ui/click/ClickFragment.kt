@@ -117,14 +117,16 @@ class ClickFragment : BaseFragment(),
                     binding.btnClickRefresh.visibility = View.GONE
                     binding.skvClickLoading.visibility = View.VISIBLE
                 }
-                Resource.Status.ERROR -> {
-                    binding.btnClickRefresh.visibility = View.VISIBLE
-                    binding.skvClickLoading.visibility = View.GONE
-                    val errorTitle = getString(R.string.fetch_clicks_exception_title)
-                    showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_CLICKS, this@ClickFragment)
-                }
+                Resource.Status.ERROR -> showFetchClickError(it.error, it.errorMessage)
             }
         }
+    }
+
+    private fun showFetchClickError(error: String?, errorMessage: String?) {
+        binding.btnClickRefresh.visibility = View.VISIBLE
+        binding.skvClickLoading.visibility = View.GONE
+        val errorTitle = getString(R.string.fetch_clicks_exception_title)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_CLICKS, this, childFragmentManager)
     }
 
     private fun setupClickPagingDataObserver() {

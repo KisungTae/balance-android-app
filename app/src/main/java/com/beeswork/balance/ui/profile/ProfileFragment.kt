@@ -111,20 +111,19 @@ class ProfileFragment : BaseFragment(),
     }
 
 
-
-
-
     private fun observeFetchProfileLiveData() {
         viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
             fetchProfileStatus = it.status
             updateRefreshBtn()
 
             if (it.isSuccess()) setupProfile(it.data)
-            else if (it.isError()) {
-                val errorTitle = getString(R.string.error_title_fetch_profile)
-                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_PROFILE, this)
-            }
+            else if (it.isError()) showFetchProfileError(it.error, it.errorMessage)
         }
+    }
+
+    private fun showFetchProfileError(error: String?, errorMessage: String?) {
+        val errorTitle = getString(R.string.error_title_fetch_profile)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PROFILE, this, childFragmentManager)
     }
 
     private fun setupProfile(profileDomain: ProfileDomain?) {
@@ -179,7 +178,7 @@ class ProfileFragment : BaseFragment(),
             hideFieldErrors()
         }
         val errorTitle = getString(R.string.error_title_save_about)
-        showErrorDialog(resource.error, errorTitle, errorMessage, RequestCode.SAVE_ABOUT, this)
+        ErrorDialog.show(resource.error, errorTitle, errorMessage, RequestCode.SAVE_ABOUT, this, childFragmentManager)
     }
 
     private fun hideFieldErrors() {
@@ -218,26 +217,31 @@ class ProfileFragment : BaseFragment(),
         viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
             fetchPhotosStatus = it.status
             updateRefreshBtn()
-
-            if (it.isError()) {
-                val errorTitle = getString(R.string.error_title_fetch_photos)
-                showErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_PHOTOS, this)
-            }
+            if (it.isError()) showFetchPhotosError(it.error, it.errorMessage)
         }
+    }
+
+    private fun showFetchPhotosError(error: String?, errorMessage: String?) {
+        val errorTitle = getString(R.string.error_title_fetch_photos)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PHOTOS, this, childFragmentManager)
     }
 
 
     private fun observeDeletePhotoLiveData() {
         viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError())
-                showErrorDialog(it.error, getString(R.string.error_title_delete_photo), it.errorMessage)
+            if (it.isError()) {
+                val errorTitle = getString(R.string.error_title_delete_photo)
+                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+            }
         }
     }
 
     private fun observeOrderPhotosLiveData() {
         viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) {
-            if (it.isError())
-                showErrorDialog(it.error, getString(R.string.error_title_order_photos), it.errorMessage)
+            if (it.isError()) {
+                val errorTitle = getString(R.string.error_title_order_photos)
+                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+            }
         }
     }
 
@@ -249,8 +253,10 @@ class ProfileFragment : BaseFragment(),
 
     private fun observeUploadPhotoLiveData() {
         viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
-                showErrorDialog(it.error, getString(R.string.error_title_add_photo), it.errorMessage)
+            if (it.isError() && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION) {
+                val errorTitle = getString(R.string.error_title_add_photo)
+                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+            }
         }
     }
 
@@ -399,11 +405,11 @@ class ProfileFragment : BaseFragment(),
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == Activity.RESULT_OK) viewModel.uploadPhoto(result.uri, null)
-                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) showErrorDialog(
-                    getString(R.string.error_title_crop_image),
-                    result.error.localizedMessage ?: "",
-                    null
-                )
+                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    val errorTitle = getString(R.string.error_title_crop_image)
+                    val errorMessage = result.error.localizedMessage ?: ""
+                    ErrorDialog.show(null, errorTitle, errorMessage, childFragmentManager)
+                }
                 deleteCapturedPhoto()
             }
         }

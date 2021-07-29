@@ -30,27 +30,4 @@ open class BaseDialog : DialogFragment() {
     private fun moveToLoginActivity(error: String?, errorMessage: String?) {
         if (activity is MainActivity) (activity as MainActivity).moveToLoginActivity(error, errorMessage)
     }
-
-    protected fun setupErrorMessage(error: String?, errorMessage: String?, errorMessageTextView: TextView) {
-        errorMessageTextView.text = getErrorMessage(error, errorMessage)
-        errorMessageTextView.visibility = View.VISIBLE
-    }
-
-    private fun getErrorMessage(error: String?, errorMessage: String?): String {
-        return errorMessage ?: kotlin.run {
-            safeLet(error, context) { e, c ->
-                val resourceId = resources.getIdentifier(e, "string", c.packageName)
-                if (resourceId > 0) return@safeLet getString(resourceId)
-                else return@safeLet getString(R.string.error_message_generic)
-            } ?: getString(R.string.error_message_generic)
-        }
-    }
-
-    protected fun showErrorDialog(
-        error: String?,
-        errorTitle: String,
-        errorMessage: String?,
-    ) {
-        ErrorDialog(error, errorTitle, errorMessage, null, null, null).show(childFragmentManager, ErrorDialog.TAG)
-    }
 }

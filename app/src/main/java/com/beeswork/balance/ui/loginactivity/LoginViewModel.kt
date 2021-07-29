@@ -52,7 +52,7 @@ class LoginViewModel(
         viewModelScope.launch {
             settingRepository.prepopulateFetchInfo()
             swipeRepository.prepopulateSwipeFilter()
-            loginRepository.saveEmail("test@gmail.com", LoginType.GOOGLE)
+            loginRepository.saveEmail("test@gmail.com", LoginType.KAKAO)
         }
     }
 }

@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSettingBinding
 import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.beeswork.balance.ui.setting.email.EmailSettingDialog
 import com.beeswork.balance.ui.setting.push.PushSettingDialog
@@ -64,7 +65,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
                 it.isError() -> {
                     binding.llSettingLoading.visibility = View.GONE
                     val errorTitle = getString(R.string.error_title_delete_account)
-                    showErrorDialog(it.error, errorTitle, it.errorMessage)
+                    ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
                 }
             }
         }

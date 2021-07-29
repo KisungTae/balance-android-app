@@ -9,8 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.DialogEmailSettingBinding
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.common.BaseDialog
@@ -28,6 +28,8 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
     private lateinit var viewModel: EmailSettingViewModel
 
     private val viewModelFactory: EmailSettingViewModelFactory by instance()
+
+    private var loginType: LoginType? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,48 +55,68 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
         observeLoginTypeLiveData()
         observeFetchEmailLiveData()
         observeSaveEmailLiveData()
-        observeEmailLiveData()
     }
 
     private fun observeLoginTypeLiveData() {
-        viewModel.loginTypeLiveData.observe(viewLifecycleOwner) { loginType ->
-            if (!loginType.isEmailEditable()) setAsNotEditable()
+        viewModel.loginTypeLiveData.observe(viewLifecycleOwner) { _loginType ->
+            loginType = _loginType
+            if (!_loginType.isEmailEditable()) disableEdit()
         }
     }
 
-    private fun observeEmailLiveData() {
-        viewModel.emailLiveData.observe(viewLifecycleOwner) {
-
+    private fun observeFetchEmailLiveData() {
+        viewModel.fetchEmailLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> {
+                    disableEdit()
+                    showLoading()
+                }
+                it.isSuccess() -> showFetchEmailSuccess(it.data)
+                it.isError() -> showFetchEmailError(it.error, it.errorMessage)
+            }
         }
     }
 
-    private fun setAsNotEditable() {
-//        binding.etEmailSettingEmail.isEnabled = false
-//        binding.etEmailSettingEmail.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
-//        binding.btnEmailSettingSave.isEnabled = false
+    private fun showFetchEmailSuccess(email: String?) {
+        hideLoadingAndRefreshBtn()
+        enableEdit()
+        binding.etEmailSettingEmail.setText(email)
+    }
+
+    private fun showFetchEmailError(error: String?, errorMessage: String?) {
+        showRefreshBtn()
+        disableEdit()
+        val errorTitle = getString(R.string.error_title_fetch_email)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_EMAIL, this, childFragmentManager)
     }
 
     private fun observeSaveEmailLiveData() {
         viewModel.saveEmailLiveData.observe(viewLifecycleOwner) {
             when {
-                it.isLoading() -> showLoading()
+                it.isLoading() -> {
+                    disableEdit()
+                    showLoading()
+                }
                 it.isSuccess() -> showSaveEmailSuccess()
-                it.isError() -> showSaveEmailError(it.error, it.errorMessage)
+                it.isError() -> showSaveEmailError(it.data, it.error, it.errorMessage)
                 else -> println()
             }
         }
     }
 
-    private fun showSaveEmailError(error: String?, errorMessage: String?) {
-        val errorTitle = getString(R.string.error_title_save_email)
-        showErrorDialog(error, errorTitle, errorMessage)
-        hideLoading()
-    }
-
     private fun showSaveEmailSuccess() {
         val message = getString(R.string.save_email_success_message)
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-        hideLoading()
+        enableEdit()
+        hideLoadingAndRefreshBtn()
+    }
+
+    private fun showSaveEmailError(email: String?, error: String?, errorMessage: String?) {
+        enableEdit()
+        val errorTitle = getString(R.string.error_title_save_email)
+        ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
+        hideLoadingAndRefreshBtn()
+        email?.let { _email -> binding.etEmailSettingEmail.setText(_email) }
     }
 
     private fun showLoading() {
@@ -102,7 +124,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
         binding.skvEmailSettingLoading.visibility = View.VISIBLE
     }
 
-    private fun hideLoading() {
+    private fun hideLoadingAndRefreshBtn() {
         binding.btnEmailSettingRefresh.visibility = View.INVISIBLE
         binding.skvEmailSettingLoading.visibility = View.GONE
     }
@@ -112,37 +134,20 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
         binding.skvEmailSettingLoading.visibility = View.GONE
     }
 
-    private fun observeFetchEmailLiveData() {
-        viewModel.fetchEmailLiveData.observe(viewLifecycleOwner) {
-            when {
-                it.isLoading() -> showLoading()
-                it.isSuccess() -> {
-                    hideLoading()
-                    binding.btnEmailSettingRefresh.visibility = View.INVISIBLE
-                }
-                it.isError() -> {
-                    hideLoading()
-                    binding.btnEmailSettingRefresh.visibility = View.VISIBLE
-                    val errorTitle = getString(R.string.error_title_fetch_email)
-                    ErrorDialog(it.error, errorTitle, it.errorMessage, RequestCode.FETCH_EMAIL, this).show(
-                        childFragmentManager,
-                        ErrorDialog.TAG
-                    )
-                }
-            }
+
+    private fun disableEdit() {
+        binding.etEmailSettingEmail.isEnabled = false
+        binding.etEmailSettingEmail.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
+        binding.btnEmailSettingSave.isEnabled = false
+    }
+
+    private fun enableEdit() {
+        if (loginType?.isEmailEditable() != false) {
+            binding.etEmailSettingEmail.isEnabled = true
+            binding.etEmailSettingEmail.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextBlack))
+            binding.btnEmailSettingSave.isEnabled = true
         }
     }
-
-
-
-
-    private fun showFetchEmailError() {
-
-    }
-
-
-
-
 
     private fun setupListeners() {
         binding.btnEmailSettingBack.setOnClickListener { dismiss() }

@@ -505,5 +505,9 @@ class BalanceApplication : Application(), KodeinAware {
 //      152, when logged, save the email, and login type to Login
 //      153. rds and balanceapi check UUID? to UUID
 //      154. should I change callback flow in matchrepository and charrepository to something else?
+//      155. separate balancegame dialogs out to just two different dialogs without base BalanceGame and check the show error, show different refresh button based on error if fetch then show fetch button if save then save button hide fetch button
+//      156. consider the pagination on matches and clickers
+//      157. // TODO: remove access token when pop to login fragment
+
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth
