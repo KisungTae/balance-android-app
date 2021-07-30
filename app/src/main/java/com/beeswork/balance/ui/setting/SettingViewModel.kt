@@ -40,7 +40,7 @@ class SettingViewModel(
     }
 
     fun fetchSetting() {
-        viewModelScope.launch(coroutineExceptionHandler) { settingRepository.fetchSetting() }
+        viewModelScope.launch(coroutineExceptionHandler) { settingRepository.fetchSettings() }
     }
 
     fun deleteAccount() {

@@ -16,6 +16,6 @@ class RequestCode {
         const val FETCH_EMAIL = 12
         const val FETCH_CHAT_MESSAGES = 13
         const val FETCH_PROFILE = 14
-        const val SAVE_EMAIL = 15
+        const val FETCH_PUSH_SETTING = 15
     }
 }

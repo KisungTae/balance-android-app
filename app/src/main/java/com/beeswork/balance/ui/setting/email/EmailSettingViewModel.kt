@@ -1,24 +1,15 @@
 package com.beeswork.balance.ui.setting.email
 
-import android.view.View
 import androidx.lifecycle.*
-import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.login.LoginRepository
-import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
-import com.beeswork.balance.internal.exception.AccountNotFoundException
-import com.beeswork.balance.internal.mapper.setting.LoginMapper
-import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class EmailSettingViewModel(
-    private val loginRepository: LoginRepository,
-    private val loginMapper: LoginMapper
+    private val loginRepository: LoginRepository
 ) : BaseViewModel() {
 
     private val _fetchEmailLiveData = MutableLiveData<Resource<String>>()

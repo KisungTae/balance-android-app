@@ -27,6 +27,7 @@
     <string name="error_title_fetch_email">이메일을 가져오지 못했습니다</string>
     <string name="error_title_delete_account">계정을 삭제하지 못했습니다</string>
     <string name="error_title_open_chat">계정을 삭제하지 못했습니다</string>
+    <string name="error_title_fetch_push_setting">알람세팅정보를 가져오지 못했습니다</string>
 
 
     <string name="error_message_bad_request">유효하지 않은 요청입니다</string>

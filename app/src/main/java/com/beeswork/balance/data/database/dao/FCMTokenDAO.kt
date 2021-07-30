@@ -14,7 +14,4 @@ interface FCMTokenDAO {
 
     @Query("update fcmToken set posted = 1 where id = ${FCMToken.ID}")
     fun sync()
-
-    @Query("delete from fcmToken")
-    fun deleteAll()
 }

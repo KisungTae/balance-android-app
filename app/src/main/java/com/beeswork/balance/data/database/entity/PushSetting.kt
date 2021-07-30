@@ -6,7 +6,7 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 @Entity(tableName = "setting")
-data class Setting(
+data class PushSetting(
 
     @PrimaryKey
     val accountId: UUID,

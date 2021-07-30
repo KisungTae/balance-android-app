@@ -57,6 +57,10 @@ class SettingFragment : BaseFragment(), KodeinAware {
         }
     }
 
+
+
+
+
     private fun observeDeleteAccountLiveData() {
         viewModel.deleteAccountLiveData.observe(viewLifecycleOwner) {
             when {

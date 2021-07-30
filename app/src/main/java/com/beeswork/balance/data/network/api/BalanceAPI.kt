@@ -3,7 +3,6 @@ package com.beeswork.balance.data.network.api
 import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.converter.EnumConverterFactory
 import com.beeswork.balance.data.network.request.*
-import com.beeswork.balance.data.network.response.*
 import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
@@ -14,7 +13,7 @@ import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
-import com.beeswork.balance.data.network.response.setting.SettingDTO
+import com.beeswork.balance.data.network.response.setting.PushSettingDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.gson.GsonProvider
@@ -31,11 +30,11 @@ import java.util.*
 
 interface BalanceAPI {
 
-    @GET("setting")
-    suspend fun getSetting(
+    @GET("setting/push")
+    suspend fun getPushSetting(
         @Query(value = "accountId") accountId: UUID,
         @Query(value = "identityToken") identityToken: UUID
-    ): Response<SettingDTO>
+    ): Response<PushSettingDTO>
 
     @GET("profile")
     suspend fun fetchProfile(

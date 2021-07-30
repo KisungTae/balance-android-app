@@ -92,7 +92,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
 
     private fun showError(error: String?, errorMessage: String?) {
         val errorTitle = getString(R.string.error_title_login)
-        ErrorDialog(error, errorTitle, errorMessage).show(supportFragmentManager, ErrorDialog.TAG)
+        ErrorDialog.show(error, errorTitle, errorMessage, supportFragmentManager)
     }
 
     private fun bind() = lifecycleScope.launch {

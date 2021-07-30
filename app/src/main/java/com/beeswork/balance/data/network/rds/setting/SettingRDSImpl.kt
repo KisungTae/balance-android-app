@@ -5,16 +5,16 @@ import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.response.setting.SettingDTO
+import com.beeswork.balance.data.network.response.setting.PushSettingDTO
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 class SettingRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), SettingRDS {
-    override suspend fun fetchSetting(accountId: UUID, identityToken: UUID): Resource<SettingDTO> {
+    override suspend fun fetchPushSetting(accountId: UUID, identityToken: UUID): Resource<PushSettingDTO> {
         return getResult {
-            balanceAPI.getSetting(accountId, identityToken)
+            balanceAPI.getPushSetting(accountId, identityToken)
         }
     }
 

@@ -11,6 +11,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.databinding.DialogPushSettingBinding
+import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.common.BaseDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.github.ybq.android.spinkit.SpinKitView
@@ -20,7 +21,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import java.util.*
 
-class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListener {
+class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListener, ErrorDialog.OnRetryListener {
 
     override val kodein by closestKodein()
 
@@ -50,78 +51,78 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
 
     private fun bindUI() = lifecycleScope.launch {
         setupListeners()
-        observeSavePushSettings()
-        observePushSettings()
+        observeFetchPushSettingLiveData()
     }
 
-    private fun observeSavePushSettings() {
-        viewModel.saveMatchPushLiveData.observe(viewLifecycleOwner) {
-            onObserveSavePushSettings(it, binding.skvMatchPushLoading, binding.scMatchPush)
-        }
-        viewModel.saveClickedPushLiveData.observe(viewLifecycleOwner) {
-            onObserveSavePushSettings(it, binding.skvClickedPushLoading, binding.scClickedPush)
-        }
-        viewModel.saveChatMessagePushLiveData.observe(viewLifecycleOwner) {
-            onObserveSavePushSettings(it, binding.skvChatMessagePushLoading, binding.scChatMessagePush)
-        }
-    }
-
-    private fun onObserveSavePushSettings(
-        resource: Resource<EmptyResponse>,
-        loadingView: SpinKitView,
-        switchCompat: SwitchCompat
-    ) {
-        when {
-            resource.isSuccess() -> {
-                switchCompat.isEnabled = true
-                loadingView.visibility = View.INVISIBLE
-            }
-            resource.isLoading() -> {
-                switchCompat.isEnabled = false
-                loadingView.visibility = View.VISIBLE
-            }
-            resource.isError() -> {
-                switchCompat.isEnabled = true
-                loadingView.visibility = View.INVISIBLE
-                showErrorDialog(resource)
+    private fun observeFetchPushSettingLiveData() {
+        viewModel.fetchPushSettingLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isSuccess() -> showFetchPushSettingSuccess(it.data)
+                it.isLoading() -> {
+                    disableEdit()
+                    showLoading()
+                }
+                it.isError() -> showFetchPushSettingError(it.error, it.errorMessage)
             }
         }
     }
 
-    private fun showErrorDialog(resource: Resource<EmptyResponse>) {
-        for (errorDialog in errorDialogs.values) {
-            if (errorDialog.isErrorEqualTo(resource.error)) return
-        }
-        val errorDialogId = UUID.randomUUID()
-        val errorDialog = ErrorDialog(
-            resource.error,
-            getString(R.string.error_title_save_push_setting),
-            resource.errorMessage,
-            this,
-            errorDialogId
-        )
-        errorDialogs[errorDialogId] = errorDialog
-        errorDialog.show(childFragmentManager, ErrorDialog.TAG)
+    private fun disableEdit() {
+        binding.scMatchPush.isEnabled = false
+        binding.scChatMessagePush.isEnabled = false
+        binding.scClickedPush.isEnabled = false
+        binding.scEmailPush.isEnabled = false
     }
 
-    private suspend fun observePushSettings() {
-        viewModel.pushSettings.await().observe(viewLifecycleOwner) { pushSettings ->
-            binding.scMatchPush.isChecked = pushSettings.matchPush
-            binding.scClickedPush.isChecked = pushSettings.clickedPush
-            binding.scChatMessagePush.isChecked = pushSettings.chatMessagePush
+    private fun enableEdit() {
+        binding.scMatchPush.isEnabled = true
+        binding.scChatMessagePush.isEnabled = true
+        binding.scClickedPush.isEnabled = true
+        binding.scEmailPush.isEnabled = true
+    }
 
-            if (!pushSettingsInitialized) {
-                viewModel.syncPushSettings()
-                pushSettingsInitialized = true
-            }
+    private fun showLoading() {
+        binding.btnPushSettingRefresh.visibility = View.GONE
+        binding.skvPushSettingLoading.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingAndRefreshBtn() {
+        binding.btnPushSettingRefresh.visibility = View.INVISIBLE
+        binding.skvPushSettingLoading.visibility = View.GONE
+    }
+
+    private fun showRefreshBtn() {
+        binding.btnPushSettingRefresh.visibility = View.VISIBLE
+        binding.skvPushSettingLoading.visibility = View.GONE
+    }
+
+    private fun showFetchPushSettingSuccess(pushSettingDomain: PushSettingDomain?) {
+        hideLoadingAndRefreshBtn()
+        enableEdit()
+
+    }
+
+    private fun setPushSetting(pushSettingDomain: PushSettingDomain?) {
+        pushSettingDomain?.let { _pushSettingDomain ->
+            binding.scMatchPush.isChecked = _pushSettingDomain.matchPush
+            binding.scEmailPush.isChecked = _pushSettingDomain.emailPush
+            binding.scClickedPush.isChecked = _pushSettingDomain.clickedPush
+            binding.scChatMessagePush.isChecked = _pushSettingDomain.chatMessagePush
         }
     }
+
+    private fun showFetchPushSettingError(error: String?, errorMessage: String?) {
+        showRefreshBtn()
+        disableEdit()
+        val errorTitle = getString(R.string.error_title_fetch_push_setting)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PUSH_SETTING, this, childFragmentManager)
+    }
+
 
     private fun setupListeners() {
         binding.btnNotificationSettingBack.setOnClickListener { dismiss() }
-        binding.scMatchPush.setOnCheckedChangeListener { _, checked -> viewModel.saveMatchPush(checked) }
-        binding.scClickedPush.setOnCheckedChangeListener { _, checked -> viewModel.saveClickedPush(checked) }
-        binding.scChatMessagePush.setOnCheckedChangeListener { _, checked -> viewModel.saveChatMessagePush(checked) }
+        binding.btnPushSettingSave.setOnClickListener {  }
+        binding.btnPushSettingRefresh.setOnClickListener {  }
     }
 
     companion object {
@@ -130,5 +131,11 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
 
     override fun onDismissErrorDialog(id: UUID?) {
         id?.let { _id -> errorDialogs.remove(_id) }
+    }
+
+    override fun onRetry(requestCode: Int?) {
+        when (requestCode) {
+            RequestCode.FETCH_PUSH_SETTING -> viewModel.fetchPushSetting()
+        }
     }
 }

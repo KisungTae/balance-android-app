@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.Location
+import com.beeswork.balance.data.database.tuple.LocationTuple
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 
 @Dao
@@ -22,6 +24,6 @@ interface LocationDAO {
     @Query("select count() > 0 from location where id = ${Location.ID}")
     fun exist(): Boolean
 
-    @Query("delete from location")
-    fun deleteAll()
+    @Query("select latitude, longitude from location where id = ${Location.ID}")
+    fun findLocationFlow(): Flow<LocationTuple>
 }

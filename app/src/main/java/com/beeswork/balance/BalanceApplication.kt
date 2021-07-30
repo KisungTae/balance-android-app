@@ -57,10 +57,8 @@ import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapperImpl
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.internal.mapper.profile.QuestionMapperImpl
-import com.beeswork.balance.internal.mapper.setting.LoginMapper
-import com.beeswork.balance.internal.mapper.setting.LoginMapperImpl
-import com.beeswork.balance.internal.mapper.setting.SettingMapper
-import com.beeswork.balance.internal.mapper.setting.SettingMapperImpl
+import com.beeswork.balance.internal.mapper.setting.PushSettingMapper
+import com.beeswork.balance.internal.mapper.setting.PushSettingMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.internal.mapper.swipe.CardMapperImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
@@ -113,9 +111,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<CardMapper>() with singleton { CardMapperImpl() }
         bind<QuestionMapper>() with singleton { QuestionMapperImpl() }
         bind<ProfileMapper>() with singleton { ProfileMapperImpl() }
-        bind<SettingMapper>() with singleton { SettingMapperImpl() }
+        bind<PushSettingMapper>() with singleton { PushSettingMapperImpl() }
         bind<PhotoMapper>() with singleton { PhotoMapperImpl() }
-        bind<LoginMapper>() with singleton { LoginMapperImpl() }
 
 
         // Database
@@ -288,8 +285,8 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
-        bind() from provider { EmailSettingViewModelFactory(instance(), instance()) }
-        bind() from provider { PushSettingViewModelFactory(instance()) }
+        bind() from provider { EmailSettingViewModelFactory(instance()) }
+        bind() from provider { PushSettingViewModelFactory(instance(), instance()) }
         bind() from provider {
             SettingViewModelFactory(
                 instance(),
@@ -507,7 +504,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      154. should I change callback flow in matchrepository and charrepository to something else?
 //      155. separate balancegame dialogs out to just two different dialogs without base BalanceGame and check the show error, show different refresh button based on error if fetch then show fetch button if save then save button hide fetch button
 //      156. consider the pagination on matches and clickers
-//      157. // TODO: remove access token when pop to login fragment
-
+//      157. remove access token when pop to login fragment
+//      158. create locationDomain instead of locationTuple
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth
