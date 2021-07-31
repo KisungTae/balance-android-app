@@ -6,6 +6,6 @@ import com.beeswork.balance.ui.profile.ProfileDomain
 import java.util.*
 
 interface ProfileMapper {
-    fun toProfile(accountId:UUID, synced: Boolean, profileDTO: ProfileDTO): Profile
+    fun toProfile(accountId:UUID, profileDTO: ProfileDTO): Profile
     fun toProfileDomain(profile: Profile): ProfileDomain
 }

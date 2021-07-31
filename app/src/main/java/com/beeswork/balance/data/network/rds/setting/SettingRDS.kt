@@ -14,29 +14,25 @@ interface SettingRDS {
     ): Resource<PushSettingDTO>
 
     suspend fun deleteAccount(
-        accountId: UUID?,
-        identityToken: UUID?
+        accountId: UUID,
+        identityToken: UUID
     ): Resource<EmptyResponse>
 
     suspend fun postPushSettings(
-        accountId: UUID?,
-        identityToken: UUID?,
-        matchPush: Boolean?,
-        clickedPush: Boolean?,
-        chatMessagePush: Boolean?
+        accountId: UUID,
+        identityToken: UUID,
+        matchPush: Boolean,
+        clickedPush: Boolean,
+        chatMessagePush: Boolean,
+        emailPush: Boolean
     ): Resource<EmptyResponse>
 
-    suspend fun postFCMToken(accountId: UUID?, identityToken: UUID?, token: String): Resource<EmptyResponse>
+    suspend fun postFCMToken(accountId: UUID, identityToken: UUID, token: String): Resource<EmptyResponse>
     suspend fun postLocation(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         latitude: Double,
         longitude: Double,
         updatedAt: OffsetDateTime
-    ): Resource<EmptyResponse>
-
-    suspend fun postSettings(
-        accountId: UUID?,
-        identityToken: UUID?
     ): Resource<EmptyResponse>
 }

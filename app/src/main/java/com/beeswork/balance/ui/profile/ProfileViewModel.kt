@@ -33,8 +33,8 @@ class ProfileViewModel(
     private val _fetchProfileLiveData = MutableLiveData<Resource<ProfileDomain>>()
     val fetchProfileLiveData: LiveData<Resource<ProfileDomain>> get() = _fetchProfileLiveData
 
-    private val _saveAboutLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val saveAboutLiveData: LiveData<Resource<EmptyResponse>> get() = _saveAboutLiveData
+    private val _saveAboutLiveData = MutableLiveData<Resource<ProfileDomain>>()
+    val saveAboutLiveData: LiveData<Resource<ProfileDomain>> get() = _saveAboutLiveData
 
     private val _fetchPhotosLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchPhotosLiveData
@@ -51,29 +51,44 @@ class ProfileViewModel(
     private val _syncPhotosLiveData = MutableLiveData<Boolean>()
     val syncPhotosLiveData: LiveData<Boolean> get() = _syncPhotosLiveData
 
-    fun fetchPhotos() {
-        viewModelScope.launch(coroutineExceptionHandler) {
-            _fetchPhotosLiveData.postValue(Resource.loading())
-            _fetchPhotosLiveData.postValue(photoRepository.fetchPhotos())
-        }
-    }
-
     fun fetchProfile() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            _fetchProfileLiveData.postValue(Resource.loading())
-            val response = profileRepository.fetchProfile()
-            response.data?.let { profile ->
-                _fetchProfileLiveData.postValue(response.mapData(profileMapper.toProfileDomain(profile)))
-            } ?: _fetchProfileLiveData.postValue(response.mapData(null))
+            val profile = profileRepository.getProfile()
+
+            profile?.let { _profile ->
+                val profileDomain = profileMapper.toProfileDomain(_profile)
+                _fetchProfileLiveData.postValue(Resource.success(profileDomain))
+            }
+
+            if (profile?.synced != true) {
+                _fetchProfileLiveData.postValue(Resource.loading())
+                val response = profileRepository.fetchProfile().map {
+                    it?.let { _profile -> profileMapper.toProfileDomain(_profile) }
+                }
+                _fetchProfileLiveData.postValue(response)
+            }
         }
     }
-
-
 
     fun saveAbout(height: Int?, about: String) {
         viewModelScope.launch(coroutineExceptionHandler) {
             _saveAboutLiveData.postValue(Resource.loading())
-            _saveAboutLiveData.postValue(profileRepository.saveAbout(height, about))
+            val response = profileRepository.saveAbout(height, about).map {
+                it?.let { profile -> profileMapper.toProfileDomain(profile) }
+            }
+            _saveAboutLiveData.postValue(response)
+        }
+    }
+
+
+
+
+
+
+    fun fetchPhotos() {
+        viewModelScope.launch(coroutineExceptionHandler) {
+            _fetchPhotosLiveData.postValue(Resource.loading())
+            _fetchPhotosLiveData.postValue(photoRepository.fetchPhotos())
         }
     }
 

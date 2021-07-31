@@ -37,22 +37,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:id="@+id/skvProfileRefreshLoading"
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-                android:gravity="center"
-                android:visibility="invisible">
 
-                <com.github.ybq.android.spinkit.SpinKitView
-                    style="@style/SpinKitView.Large.Circle"
-                    android:layout_width="@dimen/spin_kit_small_size"
-                    android:layout_height="@dimen/spin_kit_small_size"
-                    android:layout_gravity="center"
-                    app:SpinKit_Color="@color/GreyDark" />
+            <com.github.ybq.android.spinkit.SpinKitView
+                style="@style/SpinKitView.Large.Circle"
+                android:id="@+id/skvProfileLoading"
+                android:layout_margin="12dp"
+                android:layout_width="@dimen/spin_kit_small_size"
+                android:layout_height="@dimen/spin_kit_small_size"
+                android:layout_gravity="center"
+                app:SpinKit_Color="@color/GreyDark" />
 
-
-            </LinearLayout>
 
             <ImageButton
                 android:id="@+id/btnProfileRefresh"
@@ -62,15 +56,6 @@
                 android:contentDescription="@string/back_button_description"
                 android:src="@drawable/ic_refresh"
                 android:visibility="invisible" />
-
-            <ImageButton
-                android:id="@+id/btnProfileSave"
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
-                android:background="@color/BackgroundWhite"
-                android:contentDescription="@string/profile_save_icon_description"
-                android:src="@drawable/ic_baseline_done_24" />
-
 
         </FrameLayout>
 
@@ -116,7 +101,6 @@
                     android:background="@drawable/sh_round_box_thin_border"
                     android:padding="15dp"
                     android:textColor="@color/TextGrey" />
-
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -278,6 +262,17 @@
                         android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
 
                 </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:layout_marginBottom="40dp"
+                    android:id="@+id/btnProfileSave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/sh_round_box"
+                    android:backgroundTint="@color/Primary"
+                    android:text="@string/save_btn_text"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_medium_size" />
 
             </LinearLayout>
 

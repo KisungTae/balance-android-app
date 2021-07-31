@@ -21,6 +21,11 @@ class Resource<out T>(
         return this.status == Status.ERROR
     }
 
+    fun <R> map(block: (T?) -> R?): Resource<R> {
+        val newData = block.invoke(this.data)
+        return Resource(this.status, newData, this.error, this.errorMessage, this.fieldErrorMessages)
+    }
+
     fun <P> mapData(data: P?): Resource<P> {
         return Resource(this.status, data, this.error, this.errorMessage, this.fieldErrorMessages)
     }
@@ -44,6 +49,10 @@ class Resource<out T>(
     companion object {
         fun <T> success(data: T?): Resource<T> {
             return Resource(Status.SUCCESS, data, null, null, null)
+        }
+
+        fun <T> loadingWithData(data: T?): Resource<T> {
+            return Resource(Status.LOADING, data, null, null, null)
         }
 
         fun <T> error(

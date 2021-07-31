@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
-@Entity(tableName = "setting")
+@Entity(tableName = "pushSetting")
 data class PushSetting(
 
     @PrimaryKey

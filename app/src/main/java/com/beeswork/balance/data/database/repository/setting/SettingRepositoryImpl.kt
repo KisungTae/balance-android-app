@@ -37,14 +37,37 @@ class SettingRepositoryImpl(
             if (response.isSuccess()) response.data?.let { pushSettingDTO ->
                 val pushSetting = pushSettingMapper.toPushSetting(accountId, pushSettingDTO)
                 pushSettingDAO.insert(pushSetting)
-                return@withContext response.mapData(pushSetting)
+                return@withContext response.map { pushSetting }
             }
-            return@withContext response.mapData(null)
+            return@withContext response.map { null }
         }
     }
 
-    override suspend fun savePushSetting(): Resource<PushSetting> {
-        TODO("Not yet implemented")
+    override suspend fun savePushSetting(
+        matchPush: Boolean,
+        clickedPush: Boolean,
+        chatMessagePush: Boolean,
+        emailPush: Boolean
+    ): Resource<PushSetting> {
+        return withContext(ioDispatcher) {
+            val accountId = preferenceProvider.getAccountId()
+            pushSettingDAO.updateSynced(accountId, false)
+            val response = settingRDS.postPushSettings(
+                accountId,
+                preferenceProvider.getIdentityToken(),
+                matchPush,
+                clickedPush,
+                chatMessagePush,
+                emailPush
+            )
+            if (response.isSuccess()) {
+                pushSettingDAO.updatePushSettings(accountId, matchPush, clickedPush, chatMessagePush, emailPush)
+                return@withContext Resource.success(null)
+            } else {
+                pushSettingDAO.updateSynced(accountId, true)
+                return@withContext response.map { pushSettingDAO.findByAccountId(accountId) }
+            }
+        }
     }
 
     override suspend fun fetchSettings() {

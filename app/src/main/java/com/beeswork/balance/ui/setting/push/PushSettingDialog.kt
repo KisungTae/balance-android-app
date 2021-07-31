@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -30,7 +31,6 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
 
     private val viewModelFactory: PushSettingViewModelFactory by instance()
     private val errorDialogs = mutableMapOf<UUID, ErrorDialog>()
-    private var pushSettingsInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +47,41 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
         viewModel = ViewModelProvider(this, viewModelFactory).get(PushSettingViewModel::class.java)
         observeExceptionLiveData(viewModel)
         bindUI()
+        viewModel.fetchPushSetting()
     }
 
     private fun bindUI() = lifecycleScope.launch {
         setupListeners()
         observeFetchPushSettingLiveData()
+        observeSavePushSettingLiveData()
+    }
+
+    private fun observeSavePushSettingLiveData() {
+        viewModel.savePushSettingLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isSuccess() -> showSavePushSettingSuccess()
+                it.isLoading() -> {
+                    disableEdit()
+                    showLoading()
+                }
+                it.isError() -> showSavePushSettingError(it.data, it.error, it.errorMessage)
+            }
+        }
+    }
+
+    private fun showSavePushSettingSuccess() {
+        val message = getString(R.string.save_push_setting_success_message)
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        hideLoadingAndRefreshBtn()
+        enableEdit()
+    }
+
+    private fun showSavePushSettingError(pushSettingDomain: PushSettingDomain?, error: String?, errorMessage: String?) {
+        setPushSetting(pushSettingDomain)
+        enableEdit()
+        hideLoadingAndRefreshBtn()
+        val errorTitle = getString(R.string.error_title_save_push_setting)
+        ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
     }
 
     private fun observeFetchPushSettingLiveData() {
@@ -72,6 +102,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
         binding.scChatMessagePush.isEnabled = false
         binding.scClickedPush.isEnabled = false
         binding.scEmailPush.isEnabled = false
+        binding.btnPushSettingSave.isEnabled = false
     }
 
     private fun enableEdit() {
@@ -79,6 +110,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
         binding.scChatMessagePush.isEnabled = true
         binding.scClickedPush.isEnabled = true
         binding.scEmailPush.isEnabled = true
+        binding.btnPushSettingSave.isEnabled = true
     }
 
     private fun showLoading() {
@@ -99,7 +131,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     private fun showFetchPushSettingSuccess(pushSettingDomain: PushSettingDomain?) {
         hideLoadingAndRefreshBtn()
         enableEdit()
-
+        setPushSetting(pushSettingDomain)
     }
 
     private fun setPushSetting(pushSettingDomain: PushSettingDomain?) {
@@ -121,8 +153,15 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
 
     private fun setupListeners() {
         binding.btnNotificationSettingBack.setOnClickListener { dismiss() }
-        binding.btnPushSettingSave.setOnClickListener {  }
-        binding.btnPushSettingRefresh.setOnClickListener {  }
+        binding.btnPushSettingSave.setOnClickListener {
+            viewModel.savePushSetting(
+                binding.scMatchPush.isChecked,
+                binding.scClickedPush.isChecked,
+                binding.scChatMessagePush.isChecked,
+                binding.scEmailPush.isChecked
+            )
+        }
+        binding.btnPushSettingRefresh.setOnClickListener { viewModel.fetchPushSetting() }
     }
 
     companion object {

@@ -31,12 +31,13 @@ class LoginRepositoryImpl(
             val accountId = preferenceProvider.getAccountId()
             loginDAO.updateSynced(accountId, false)
             val response = loginRDS.saveEmail(accountId, preferenceProvider.getIdentityToken(), email)
+
             if (response.isSuccess()) {
                 loginDAO.updateEmail(accountId, email)
-                return@withContext response.mapData(null)
+                return@withContext response.map { null }
             } else {
                 loginDAO.updateSynced(accountId, true)
-                return@withContext response.mapData(loginDAO.findEmail(accountId))
+                return@withContext response.map { loginDAO.findEmail(accountId) }
             }
         }
     }

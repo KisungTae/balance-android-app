@@ -10,7 +10,12 @@ interface SettingRepository {
 
     suspend fun getPushSetting(): PushSetting?
     suspend fun fetchPushSetting(): Resource<PushSetting>
-    suspend fun savePushSetting(): Resource<PushSetting>
+    suspend fun savePushSetting(
+        matchPush: Boolean,
+        clickedPush: Boolean,
+        chatMessagePush: Boolean,
+        emailPush: Boolean
+    ): Resource<PushSetting>
 
     suspend fun fetchSettings()
     suspend fun deleteSettings()

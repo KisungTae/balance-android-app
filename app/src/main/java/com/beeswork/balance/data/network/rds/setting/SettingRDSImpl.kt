@@ -12,53 +12,49 @@ import java.util.*
 class SettingRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), SettingRDS {
+
     override suspend fun fetchPushSetting(accountId: UUID, identityToken: UUID): Resource<PushSettingDTO> {
         return getResult {
             balanceAPI.getPushSetting(accountId, identityToken)
         }
     }
 
-    override suspend fun deleteAccount(accountId: UUID?, identityToken: UUID?): Resource<EmptyResponse> {
+    override suspend fun deleteAccount(accountId: UUID, identityToken: UUID): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.deleteAccount(DeleteAccountBody(accountId, identityToken))
         }
     }
 
     override suspend fun postPushSettings(
-        accountId: UUID?,
-        identityToken: UUID?,
-        matchPush: Boolean?,
-        clickedPush: Boolean?,
-        chatMessagePush: Boolean?
+        accountId: UUID,
+        identityToken: UUID,
+        matchPush: Boolean,
+        clickedPush: Boolean,
+        chatMessagePush: Boolean,
+        emailPush: Boolean
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postPushSettings(
-                PostPushSettingsBody(accountId, identityToken, matchPush, clickedPush, chatMessagePush)
+                PostPushSettingsBody(accountId, identityToken, matchPush, clickedPush, chatMessagePush, emailPush)
             )
         }
     }
 
-    override suspend fun postFCMToken(accountId: UUID?, identityToken: UUID?, token: String): Resource<EmptyResponse> {
+    override suspend fun postFCMToken(accountId: UUID, identityToken: UUID, token: String): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postFCMToken(PostFCMTokenBody(accountId, identityToken, token))
         }
     }
 
     override suspend fun postLocation(
-        accountId: UUID?,
-        identityToken: UUID?,
+        accountId: UUID,
+        identityToken: UUID,
         latitude: Double,
         longitude: Double,
         updatedAt: OffsetDateTime
     ): Resource<EmptyResponse> {
         return getResult {
             balanceAPI.postLocation(PostLocationBody(accountId, identityToken, latitude, longitude, updatedAt))
-        }
-    }
-
-    override suspend fun postSettings(accountId: UUID?, identityToken: UUID?): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.postSettings(PostSettingsBody(accountId, identityToken))
         }
     }
 

@@ -8,7 +8,6 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 
@@ -20,10 +19,11 @@ class ProfileRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : ProfileRepository {
 
-    override fun getProfileFlow(): Flow<Profile?> {
-        return profileDAO.findAsFlow(preferenceProvider.getAccountId())
+    override suspend fun getProfile(): Profile? {
+        return withContext(ioDispatcher) {
+            return@withContext profileDAO.findByAccountId(preferenceProvider.getAccountId())
+        }
     }
-
 
     override suspend fun deleteProfile() {
         withContext(ioDispatcher) { profileDAO.deleteById(preferenceProvider.getAccountId()) }
@@ -32,32 +32,35 @@ class ProfileRepositoryImpl(
     override suspend fun fetchProfile(): Resource<Profile> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val profile = profileDAO.findById(accountId)
+            val response = profileRDS.fetchProfile(accountId, preferenceProvider.getIdentityToken())
 
-            if (profile == null || !profile.synced) {
-                val response = profileRDS.fetchProfile(accountId, preferenceProvider.getIdentityToken())
-
-                response.data?.let { profileDTO ->
-                    val fetchedProfile = profileMapper.toProfile(accountId, true, profileDTO)
-                    profileDAO.insert(fetchedProfile)
-                    return@withContext response.mapData(fetchedProfile)
-                } ?: return@withContext response.mapData(null)
+            if (response.isSuccess()) response.data?.let { profileDTO ->
+                val profile = profileMapper.toProfile(accountId, profileDTO)
+                profileDAO.insert(profile)
+                return@withContext response.map { profile }
             }
-            return@withContext Resource.success(profile)
+            return@withContext response.map { null }
         }
     }
 
-    override suspend fun saveAbout(height: Int?, about: String): Resource<EmptyResponse> {
+    override suspend fun saveAbout(height: Int?, about: String): Resource<Profile> {
         return withContext(ioDispatcher) {
-            profileDAO.updateAbout(preferenceProvider.getAccountId(), height, about)
+            val accountId = preferenceProvider.getAccountId()
+            profileDAO.updateSynced(accountId, false)
             val response = profileRDS.postAbout(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
                 height,
                 about
             )
-            if (response.isSuccess()) profileDAO.sync(preferenceProvider.getAccountId())
-            return@withContext response
+
+            if (response.isSuccess()) {
+                profileDAO.updateAbout(accountId, height, about)
+                return@withContext response.map { null }
+            } else {
+                profileDAO.updateSynced(accountId, true)
+                return@withContext response.map { profileDAO.findByAccountId(accountId) }
+            }
         }
     }
 

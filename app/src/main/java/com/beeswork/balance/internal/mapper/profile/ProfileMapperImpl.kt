@@ -6,7 +6,7 @@ import com.beeswork.balance.ui.profile.ProfileDomain
 import java.util.*
 
 class ProfileMapperImpl : ProfileMapper {
-    override fun toProfile(accountId: UUID, synced: Boolean, profileDTO: ProfileDTO): Profile {
+    override fun toProfile(accountId: UUID, profileDTO: ProfileDTO): Profile {
         return Profile(
             accountId,
             profileDTO.name,
@@ -14,7 +14,7 @@ class ProfileMapperImpl : ProfileMapper {
             profileDTO.gender,
             profileDTO.height,
             profileDTO.about,
-            synced
+            true
         )
     }
 
