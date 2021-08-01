@@ -197,4 +197,5 @@
     <string name="error_title_login">로그인을 하지못했습니다</string>
     <string name="invalid_social_login_exception">유효하지않은 소셜로그인 요청입니다</string>
     <string name="server_client_id">345572935231-j12sr8v32ngttr24lfpuvfe7djt24312.apps.googleusercontent.com</string>
+    <string name="fetching_photos_message">사진을 가져오고있습니다....</string>
 </resources>

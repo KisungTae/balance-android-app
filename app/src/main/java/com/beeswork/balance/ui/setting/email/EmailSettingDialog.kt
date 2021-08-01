@@ -70,6 +70,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
                 it.isLoading() -> {
                     disableEdit()
                     showLoading()
+                    binding.etEmailSettingEmail.setText(it.data)
                 }
                 it.isSuccess() -> showFetchEmailSuccess(it.data)
                 it.isError() -> showFetchEmailError(it.error, it.errorMessage)

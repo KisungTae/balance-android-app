@@ -28,4 +28,8 @@ class MainViewModel(
         viewModelScope.launch { mainRepository.disconnectStomp() }
     }
 
+    fun saveLocation(latitude: Double, longitude: Double) {
+        println("saveLocation $latitude - $longitude")
+    }
+
 }

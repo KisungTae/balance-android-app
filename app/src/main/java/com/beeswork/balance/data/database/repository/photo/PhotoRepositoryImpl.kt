@@ -10,9 +10,11 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PhotoConstant
 import com.beeswork.balance.internal.constant.PhotoStatus
+import com.beeswork.balance.internal.exception.AccountNotFoundException
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
@@ -30,13 +32,13 @@ class PhotoRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : PhotoRepository {
 
+    //  NOTE 1. because it only fetches when no photo is in database, it's okay to insert them all without checking duplicates
     override suspend fun fetchPhotos(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             if (photoDAO.count(accountId) <= 0) {
                 val response = photoRDS.fetchPhotos(accountId, preferenceProvider.getIdentityToken())
                 response.data?.let { photoDTOs ->
-//                  TODO: check if photo already in database then update not insert
                     val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(accountId, photoDTO) }
                     photoDAO.insert(photos)
                 }
@@ -145,7 +147,6 @@ class PhotoRepositoryImpl(
         }
     }
 
-
     override suspend fun listPhotos(maxPhotoCount: Int): List<Photo> {
         return withContext(ioDispatcher) {
             return@withContext photoDAO.findAll(preferenceProvider.getAccountId(), maxPhotoCount)
@@ -155,6 +156,8 @@ class PhotoRepositoryImpl(
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             photoDAO.findByKey(photoKey)?.let { photo ->
+                photoDAO.updateStatus(photoKey, PhotoStatus.DELETING)
+
                 val response = if (photo.uploaded || photo.saved) photoRDS.deletePhoto(
                     preferenceProvider.getAccountId(),
                     preferenceProvider.getIdentityToken(),
@@ -164,6 +167,9 @@ class PhotoRepositoryImpl(
                 if (response.isSuccess()) {
                     deletePhoto(photo.uri)
                     photoDAO.deletePhoto(photo.key)
+                } else {
+                    val photoStatus = if (photo.uploaded && photo.saved) PhotoStatus.DOWNLOADING else PhotoStatus.UPLOAD_ERROR
+                    photoDAO.updateStatus(photoKey, photoStatus)
                 }
                 return@withContext response
             } ?: return@withContext Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION)
@@ -198,9 +204,6 @@ class PhotoRepositoryImpl(
 
             for (i in photos.size - 1 downTo 0) {
                 val photo = photos[i]
-                if (photo.status != PhotoStatus.OCCUPIED)
-                    return@withContext Resource.error(ExceptionCode.PHOTO_NOT_ORDERABLE_EXCEPTION)
-
                 photoSequences[photo.key]?.let { sequence ->
                     if (photo.sequence != sequence) {
                         photo.status = PhotoStatus.ORDERING

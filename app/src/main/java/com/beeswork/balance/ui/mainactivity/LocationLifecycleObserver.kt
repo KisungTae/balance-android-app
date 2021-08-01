@@ -27,7 +27,7 @@ class LocationLifecycleObserver(
         lifecycleOwner.lifecycle.addObserver(this)
     }
 
-    private val locationRequest = LocationRequest().apply {
+    private val locationRequest = LocationRequest.create().apply {
         interval = LOCATION_REQUEST_INTERVAL
         fastestInterval = LOCATION_REQUEST_FASTEST_INTERVAL
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -36,14 +36,15 @@ class LocationLifecycleObserver(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun startLocationUpdates() {
-        if (ContextCompat.checkSelfPermission(context,
-                                              Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        val locationPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+        println("locationPermission $locationPermission")
+        if (locationPermission == PackageManager.PERMISSION_GRANTED)
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
-        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun removeLocationUpdates() {
+        println("removeLocationUpdates!!!!")
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 }

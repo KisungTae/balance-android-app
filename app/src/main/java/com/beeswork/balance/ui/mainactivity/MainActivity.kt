@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.mainactivity
 
 import android.Manifest
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -25,18 +27,25 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 
 class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
-    //    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-//    private lateinit var broadcastReceiver: BroadcastReceiver
+    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
+    private lateinit var broadcastReceiver: BroadcastReceiver
 
     override val kodein by closestKodein()
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     private val viewModelFactory: MainViewModelFactory by instance()
 
+    private val requestLocationPermission = registerForActivityResult(RequestPermission()) { granted ->
+        if (granted) bindLocationManager()
+        else println("location is not granted!!!!!!!!!!!!!!!")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +53,35 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         bindUI()
-//        setupBroadcastReceiver()
-//        setupLocationManager()
+        setupLocationManager()
+        setupBroadcastReceiver()
     }
+
+    private fun setupLocationManager() {
+        if (hasLocationPermission()) bindLocationManager()
+        else requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun bindLocationManager() {
+        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
+    }
+
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult?) {
+            locationResult?.let { _locationResult ->
+                val location = _locationResult.lastLocation
+                viewModel.saveLocation(location.latitude, location.longitude)
+            }
+        }
+    }
+
 
     private fun bindUI() = lifecycleScope.launch {
         setupWebSocketEventObserver()
@@ -69,11 +104,11 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
     }
 
     private fun showWebSocketError(error: String?, errorMessage: String?) {
-        val errorTitle = getString(R.string.error_title_web_socket_disconnected)
-        ErrorDialog(error, errorTitle, errorMessage, RequestCode.CONNECT_TO_WEB_SOCKET, this, null).show(
-            supportFragmentManager,
-            ErrorDialog.TAG
-        )
+//        val errorTitle = getString(R.string.error_title_web_socket_disconnected)
+//        ErrorDialog(error, errorTitle, errorMessage, RequestCode.CONNECT_TO_WEB_SOCKET, this, null).show(
+//            supportFragmentManager,
+//            ErrorDialog.TAG
+//        )
     }
 
     override fun onRetry(requestCode: Int?) {
@@ -86,6 +121,11 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override fun onResume() {
         super.onResume()
+        if (hasLocationPermission()) {
+            println("hasLocationPermission activity!!!!!!!!!!!!")
+        } else {
+            println("location permission no activity!!!!!!!!!!!!")
+        }
 //        viewModel.connectStomp()
 //        val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
 //        if (type != null) onReceiveFCMNotification(intent)
@@ -130,49 +170,6 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
     }
 
-    private fun setupLocationManager() {
-        if (hasLocationPermission()) bindLocationManager()
-        else requestLocationPermission()
-    }
-
-    private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult?) {
-            super.onLocationResult(locationResult)
-            val location = locationResult?.lastLocation
-//            if (location != null) balanceRepository.saveLocation(location.latitude, location.longitude)
-        }
-    }
-
-    private fun bindLocationManager() {
-//        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
-    }
-
-    private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            RequestCode.ACCESS_FINE_LOCATION
-        )
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == RequestCode.ACCESS_FINE_LOCATION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                bindLocationManager()
-        }
-    }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         val v: View? = currentFocus

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -87,9 +88,8 @@ class ProfileFragment : BaseFragment(),
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
         observeExceptionLiveData(viewModel)
         bindUI()
-//        viewModel.test()
-//        viewModel.fetchPhotos()
-        //        viewModel.syncPhotos()
+        viewModel.fetchPhotos()
+        viewModel.syncPhotos()
         viewModel.fetchProfile()
 
     }
@@ -99,147 +99,14 @@ class ProfileFragment : BaseFragment(),
         observeFetchProfileLiveData()
         observeSaveAboutLiveData()
         setupListeners()
-//        setupPhotoPickerRecyclerView()
-//        observeUploadPhotoLiveData()
-//        observeSyncPhotosLiveData()
-//        observeOrderPhotosLiveData()
-//        observeDeletePhotoLiveData()
-//        observeFetchPhotosLiveData()
-
-    }
-
-    private fun observeFetchProfileLiveData() {
-        viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
-            fetchProfileStatus = it.status
-            updateRefreshBtn()
-            when {
-                it.isSuccess() -> showFetchProfileSuccess(it.data)
-                it.isError() -> showFetchProfileError(it.error, it.errorMessage)
-                it.isLoading() -> disableProfileEdit()
-            }
-        }
-    }
-
-    private fun showFetchProfileSuccess(profileDomain: ProfileDomain?) {
-        enableProfileEdit()
-        setupProfile(profileDomain)
-    }
-
-    private fun showFetchProfileError(error: String?, errorMessage: String?) {
-        disableProfileEdit()
-        val errorTitle = getString(R.string.error_title_fetch_profile)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PROFILE, this, childFragmentManager)
-    }
-
-    private fun setupProfile(profileDomain: ProfileDomain?) {
-        profileDomain?.let { _profileDomain ->
-            binding.tvProfileName.text = _profileDomain.name
-            binding.tvProfileDateOfBirth.text = _profileDomain.birth.format(DateTimePattern.ofDate())
-            binding.tvProfileHeight.text = _profileDomain.height?.toString() ?: ""
-            binding.etProfileAbout.setText(_profileDomain.about)
-            when (_profileDomain.gender) {
-                Gender.FEMALE -> setupGender(binding.tvProfileGenderFemale, R.drawable.sh_radio_button_left_checked)
-                else -> setupGender(binding.tvProfileGenderMale, R.drawable.sh_radio_button_right_checked)
-            }
-        }
-    }
-
-    private fun observeSaveAboutLiveData() {
-        viewModel.saveAboutLiveData.observe(viewLifecycleOwner) {
-            when {
-                it.isLoading() -> {
-                    hideFieldErrors()
-                    disableProfileEdit()
-                    showLoading()
-                }
-                it.isError() -> showSaveAboutError(it.data, it.error, it.errorMessage, it.fieldErrorMessages)
-                it.isSuccess() -> showSaveAboutSuccess()
-            }
-        }
-    }
-
-    private fun setupGender(textView: TextView, backgroundId: Int) {
-        textView.background = ContextCompat.getDrawable(requireContext(), backgroundId)
-        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.Primary))
-    }
-
-    private fun showSaveAboutSuccess() {
-        hideLoadingAndRefreshBtn()
-        hideFieldErrors()
-        enableProfileEdit()
-        Toast.makeText(requireContext(), getString(R.string.save_about_success_message), Toast.LENGTH_SHORT).show()
-    }
-
-    private fun showSaveAboutError(
-        profileDomain: ProfileDomain?,
-        error: String?,
-        errorMessage: String?,
-        fieldErrorMessages: Map<String, String>?
-    ) {
-        enableProfileEdit()
-        hideLoadingAndRefreshBtn()
-
-        fieldErrorMessages?.let { _fieldErrorMessages ->
-            for ((key, value) in _fieldErrorMessages) {
-                val errorTextView = getErrorViewByTag(key)
-                errorTextView.text = value
-                errorTextView.visibility = View.VISIBLE
-            }
-        } ?: kotlin.run {
-            setupProfile(profileDomain)
-            hideFieldErrors()
-            val errorTitle = getString(R.string.error_title_save_about)
-            ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
-        }
-    }
-
-    private fun hideFieldErrors() {
-        binding.tvAboutError.visibility = View.GONE
-    }
-
-    private fun getErrorViewByTag(tag: String): TextView {
-        return binding.root.findViewWithTag("${tag}Error")
-    }
-
-    private fun saveAbout(): Boolean {
-        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
-        val about = binding.etProfileAbout.text.toString()
-        viewModel.saveAbout(height, about)
-        return true
-    }
-
-    private fun disableProfileEdit() {
-        binding.btnProfileSave.isEnabled = false
-        binding.etProfileAbout.isEnabled = false
-        binding.llProfileHeightWrapper.isClickable = false
-    }
-
-    private fun enableProfileEdit() {
-        binding.btnProfileSave.isEnabled = true
-        binding.etProfileAbout.isEnabled = true
-        binding.llProfileHeightWrapper.isClickable = true
-    }
+        observeFetchPhotosLiveData()
+        setupPhotoPickerRecyclerView()
+        observeSyncPhotosLiveData()
+        observeUploadPhotoLiveData()
+        observeOrderPhotosLiveData()
+        observeDeletePhotoLiveData()
 
 
-    private fun showLoading() {
-        binding.btnProfileRefresh.visibility = View.GONE
-        binding.skvProfileLoading.visibility = View.VISIBLE
-    }
-
-    private fun showRefreshBtn() {
-        binding.btnProfileRefresh.visibility = View.VISIBLE
-        binding.skvProfileLoading.visibility = View.GONE
-    }
-
-    private fun hideLoadingAndRefreshBtn() {
-        binding.btnProfileRefresh.visibility = View.INVISIBLE
-        binding.skvProfileLoading.visibility = View.GONE
-    }
-
-    private fun updateRefreshBtn() {
-        if (fetchProfileStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.LOADING) showLoading()
-        else if (fetchProfileStatus == Resource.Status.ERROR || fetchPhotosStatus == Resource.Status.ERROR) showRefreshBtn()
-        else hideLoadingAndRefreshBtn()
     }
 
 
@@ -330,6 +197,16 @@ class ProfileFragment : BaseFragment(),
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0
         ) {
+            override fun isLongPressDragEnabled(): Boolean {
+                val isSwipeable = photoPickerRecyclerViewAdapter.isSwipeable()
+                if (!isSwipeable) {
+                    val errorTitle = getString(R.string.error_title_order_photos)
+                    val errorMessage = getString(R.string.photo_not_orderable_exception)
+                    ErrorDialog.show(null, errorTitle, errorMessage, childFragmentManager)
+                }
+                return isSwipeable
+            }
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -358,13 +235,6 @@ class ProfileFragment : BaseFragment(),
         binding.btnProfileBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
     }
 
-
-    private suspend fun test() {
-        repeat(1000) {
-            println("ui lifecyclecope: $it")
-        }
-    }
-
     override fun onHeightChanged(height: Int) {
         binding.tvProfileHeight.text = height.toString()
     }
@@ -378,6 +248,13 @@ class ProfileFragment : BaseFragment(),
     }
 
     override fun onClickPhotoPicker(position: Int) {
+        if (fetchPhotosStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.ERROR) {
+            val message = getString(R.string.fetching_photos_message)
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            if (fetchPhotosStatus == Resource.Status.ERROR) viewModel.fetchPhotos()
+            return
+        }
+
         val photoPicker = photoPickerRecyclerViewAdapter.getPhotoPicker(position)
         when (photoPicker.status) {
             PhotoStatus.EMPTY -> UploadPhotoOptionDialog(this).show(childFragmentManager, UploadPhotoOptionDialog.TAG)
@@ -508,6 +385,145 @@ class ProfileFragment : BaseFragment(),
         val file = getCapturedPhotoFile()
         if (file.exists()) file.delete()
     }
+
+
+    private fun observeFetchProfileLiveData() {
+        viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
+            fetchProfileStatus = it.status
+            updateRefreshBtn()
+            when {
+                it.isSuccess() -> showFetchProfileSuccess(it.data)
+                it.isError() -> showFetchProfileError(it.error, it.errorMessage)
+                it.isLoading() -> {
+                    disableProfileEdit()
+                    setupProfile(it.data)
+                }
+            }
+        }
+    }
+
+    private fun showFetchProfileSuccess(profileDomain: ProfileDomain?) {
+        enableProfileEdit()
+        setupProfile(profileDomain)
+    }
+
+    private fun showFetchProfileError(error: String?, errorMessage: String?) {
+        disableProfileEdit()
+        val errorTitle = getString(R.string.error_title_fetch_profile)
+        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PROFILE, this, childFragmentManager)
+    }
+
+    private fun setupProfile(profileDomain: ProfileDomain?) {
+        profileDomain?.let { _profileDomain ->
+            binding.tvProfileName.text = _profileDomain.name
+            binding.tvProfileDateOfBirth.text = _profileDomain.birth.format(DateTimePattern.ofDate())
+            binding.tvProfileHeight.text = _profileDomain.height?.toString() ?: ""
+            binding.etProfileAbout.setText(_profileDomain.about)
+            when (_profileDomain.gender) {
+                Gender.FEMALE -> setupGender(binding.tvProfileGenderFemale, R.drawable.sh_radio_button_left_checked)
+                else -> setupGender(binding.tvProfileGenderMale, R.drawable.sh_radio_button_right_checked)
+            }
+        }
+    }
+
+    private fun observeSaveAboutLiveData() {
+        viewModel.saveAboutLiveData.observe(viewLifecycleOwner) {
+            when {
+                it.isLoading() -> {
+                    hideFieldErrors()
+                    disableProfileEdit()
+                    showLoading()
+                }
+                it.isError() -> showSaveAboutError(it.data, it.error, it.errorMessage, it.fieldErrorMessages)
+                it.isSuccess() -> showSaveAboutSuccess()
+            }
+        }
+    }
+
+    private fun setupGender(textView: TextView, backgroundId: Int) {
+        textView.background = ContextCompat.getDrawable(requireContext(), backgroundId)
+        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.Primary))
+    }
+
+    private fun showSaveAboutSuccess() {
+        hideLoadingAndRefreshBtn()
+        hideFieldErrors()
+        enableProfileEdit()
+        Toast.makeText(requireContext(), getString(R.string.save_about_success_message), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showSaveAboutError(
+        profileDomain: ProfileDomain?,
+        error: String?,
+        errorMessage: String?,
+        fieldErrorMessages: Map<String, String>?
+    ) {
+        enableProfileEdit()
+        hideLoadingAndRefreshBtn()
+
+        fieldErrorMessages?.let { _fieldErrorMessages ->
+            for ((key, value) in _fieldErrorMessages) {
+                val errorTextView = getErrorViewByTag(key)
+                errorTextView.text = value
+                errorTextView.visibility = View.VISIBLE
+            }
+        } ?: kotlin.run {
+            setupProfile(profileDomain)
+            hideFieldErrors()
+            val errorTitle = getString(R.string.error_title_save_about)
+            ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
+        }
+    }
+
+    private fun hideFieldErrors() {
+        binding.tvAboutError.visibility = View.GONE
+    }
+
+    private fun getErrorViewByTag(tag: String): TextView {
+        return binding.root.findViewWithTag("${tag}Error")
+    }
+
+    private fun saveAbout(): Boolean {
+        val height = binding.tvProfileHeight.text.toString().toIntOrNull()
+        val about = binding.etProfileAbout.text.toString()
+        viewModel.saveAbout(height, about)
+        return true
+    }
+
+    private fun disableProfileEdit() {
+        binding.btnProfileSave.isEnabled = false
+        binding.etProfileAbout.isEnabled = false
+        binding.llProfileHeightWrapper.isClickable = false
+    }
+
+    private fun enableProfileEdit() {
+        binding.btnProfileSave.isEnabled = true
+        binding.etProfileAbout.isEnabled = true
+        binding.llProfileHeightWrapper.isClickable = true
+    }
+
+
+    private fun showLoading() {
+        binding.btnProfileRefresh.visibility = View.GONE
+        binding.skvProfileLoading.visibility = View.VISIBLE
+    }
+
+    private fun showRefreshBtn() {
+        binding.btnProfileRefresh.visibility = View.VISIBLE
+        binding.skvProfileLoading.visibility = View.GONE
+    }
+
+    private fun hideLoadingAndRefreshBtn() {
+        binding.btnProfileRefresh.visibility = View.INVISIBLE
+        binding.skvProfileLoading.visibility = View.GONE
+    }
+
+    private fun updateRefreshBtn() {
+        if (fetchProfileStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.LOADING) showLoading()
+        else if (fetchProfileStatus == Resource.Status.ERROR || fetchPhotosStatus == Resource.Status.ERROR) showRefreshBtn()
+        else hideLoadingAndRefreshBtn()
+    }
+
 
     companion object {
         private const val CAPTURED_PHOTO_NAME = "capturedPhoto.jpg"

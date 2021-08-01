@@ -5,17 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.databinding.DialogPushSettingBinding
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.common.BaseDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.github.ybq.android.spinkit.SpinKitView
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -77,7 +73,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     }
 
     private fun showSavePushSettingError(pushSettingDomain: PushSettingDomain?, error: String?, errorMessage: String?) {
-        setPushSetting(pushSettingDomain)
+        setupPushSetting(pushSettingDomain)
         enableEdit()
         hideLoadingAndRefreshBtn()
         val errorTitle = getString(R.string.error_title_save_push_setting)
@@ -91,6 +87,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
                 it.isLoading() -> {
                     disableEdit()
                     showLoading()
+                    setupPushSetting(it.data)
                 }
                 it.isError() -> showFetchPushSettingError(it.error, it.errorMessage)
             }
@@ -131,10 +128,10 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     private fun showFetchPushSettingSuccess(pushSettingDomain: PushSettingDomain?) {
         hideLoadingAndRefreshBtn()
         enableEdit()
-        setPushSetting(pushSettingDomain)
+        setupPushSetting(pushSettingDomain)
     }
 
-    private fun setPushSetting(pushSettingDomain: PushSettingDomain?) {
+    private fun setupPushSetting(pushSettingDomain: PushSettingDomain?) {
         pushSettingDomain?.let { _pushSettingDomain ->
             binding.scMatchPush.isChecked = _pushSettingDomain.matchPush
             binding.scEmailPush.isChecked = _pushSettingDomain.emailPush

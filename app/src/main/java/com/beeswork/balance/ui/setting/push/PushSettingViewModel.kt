@@ -32,13 +32,14 @@ class PushSettingViewModel(
     fun fetchPushSetting() {
         viewModelScope.launch(coroutineExceptionHandler) {
             val pushSetting = settingRepository.getPushSetting()
-            pushSetting?.let { _pushSetting ->
-                val pushSettingDomain = pushSettingMapper.toPushSettingDomain(_pushSetting)
-                _fetchPushSettingLiveData.postValue(Resource.success(pushSettingDomain))
+            val pushSettingDomain = pushSetting?.let { _pushSetting ->
+                pushSettingMapper.toPushSettingDomain(_pushSetting)
             }
-
-            if (pushSetting?.synced != true) {
-                _fetchPushSettingLiveData.postValue(Resource.loading())
+            val isPushSettingSynced = pushSetting?.synced == true
+            if (isPushSettingSynced)
+                _fetchPushSettingLiveData.postValue(Resource.success(pushSettingDomain))
+            else {
+                _fetchPushSettingLiveData.postValue(Resource.loadingWithData(pushSettingDomain))
                 val response = settingRepository.fetchPushSetting().map {
                     it?.let { _pushSetting -> pushSettingMapper.toPushSettingDomain(_pushSetting) }
                 }

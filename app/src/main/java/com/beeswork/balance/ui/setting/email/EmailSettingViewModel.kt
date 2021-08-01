@@ -45,9 +45,11 @@ class EmailSettingViewModel(
 
     fun fetchEmail() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            _fetchEmailLiveData.postValue(Resource.success(loginRepository.getEmail()))
-            if (!loginRepository.isEmailSynced()) {
-                _fetchEmailLiveData.postValue(Resource.loading())
+            val email = loginRepository.getEmail()
+            if (loginRepository.isEmailSynced())
+                _fetchEmailLiveData.postValue(Resource.success(email))
+            else {
+                _fetchEmailLiveData.postValue(Resource.loadingWithData(email))
                 _fetchEmailLiveData.postValue(loginRepository.fetchEmail())
             }
         }

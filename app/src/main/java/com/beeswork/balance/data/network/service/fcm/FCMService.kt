@@ -32,7 +32,7 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override fun onNewToken(token: String) {
-        scope.safeLaunch<Any>(null) { settingRepository.saveFCMToken(token) }
+        scope.launch { settingRepository.saveFCMToken(token) }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -41,15 +41,15 @@ class FCMService : FirebaseMessagingService(), KodeinAware {
             PushType.valueOf(it)
         }
         when (pushType) {
-            PushType.CLICKED -> scope.safeLaunch<Any>(null) {
+            PushType.CLICKED -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
                 clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
             }
-            PushType.MATCHED -> scope.safeLaunch<Any>(null) {
+            PushType.MATCHED -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
                 matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
             }
-            PushType.CHAT_MESSAGE -> scope.safeLaunch<Any>(null) {
+            PushType.CHAT_MESSAGE -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
                 chatRepository.saveChatMessageReceived(GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java))
             }

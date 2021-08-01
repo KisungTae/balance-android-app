@@ -54,8 +54,8 @@ class LoginActivity : BaseActivity(), KodeinAware {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
 
-        viewModel.mockSocialLogin()
-        moveToMainActivity()
+//        viewModel.mockSocialLogin()
+//        moveToMainActivity()
 //        window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
 //        binding = ActivityLoginBinding.inflate(layoutInflater)
 //        setContentView(binding.root)

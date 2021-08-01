@@ -19,5 +19,5 @@ data class Photo(
     var sequence: Int,
     var oldSequence: Int,
     var uploaded: Boolean,
-    var saved: Boolean,
+    var saved: Boolean
 )

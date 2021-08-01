@@ -54,14 +54,13 @@ class ProfileViewModel(
     fun fetchProfile() {
         viewModelScope.launch(coroutineExceptionHandler) {
             val profile = profileRepository.getProfile()
+            val isProfileSynced = profile?.synced == true
+            val profileDomain = profile?.let { _profile -> profileMapper.toProfileDomain(_profile) }
 
-            profile?.let { _profile ->
-                val profileDomain = profileMapper.toProfileDomain(_profile)
+            if (isProfileSynced)
                 _fetchProfileLiveData.postValue(Resource.success(profileDomain))
-            }
-
-            if (profile?.synced != true) {
-                _fetchProfileLiveData.postValue(Resource.loading())
+            else {
+                _fetchProfileLiveData.postValue(Resource.loadingWithData(profileDomain))
                 val response = profileRepository.fetchProfile().map {
                     it?.let { _profile -> profileMapper.toProfileDomain(_profile) }
                 }
@@ -79,6 +78,8 @@ class ProfileViewModel(
             _saveAboutLiveData.postValue(response)
         }
     }
+
+
 
 
 
@@ -105,16 +106,18 @@ class ProfileViewModel(
     }
 
     fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
-        viewModelScope.launch(coroutineExceptionHandler) {
-            photoUri?.path?.let { path ->
-                val photoFile = File(path)
-                val extension = MimeTypeMap.getFileExtensionFromUrl(path)
-                if (validatePhoto(photoFile, extension)) {
-                    val response = photoRepository.uploadPhoto(photoFile, photoUri, extension, photoKey)
-                    _uploadPhotoLiveData.postValue(response)
-                } else photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.UPLOAD_ERROR) }
-            } ?: _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION))
-        }
+        viewModelScope.launch(coroutineExceptionHandler) { doUploadPhoto(photoUri, photoKey) }
+    }
+
+    private suspend fun doUploadPhoto(photoUri: Uri?, photoKey: String?) {
+        photoUri?.path?.let { path ->
+            val photoFile = File(path)
+            val extension = MimeTypeMap.getFileExtensionFromUrl(path)
+            if (validatePhoto(photoFile, extension)) {
+                val response = photoRepository.uploadPhoto(photoFile, photoUri, extension, photoKey)
+                _uploadPhotoLiveData.postValue(response)
+            } else photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.UPLOAD_ERROR) }
+        } ?: _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION))
     }
 
     private fun validatePhoto(photoFile: File, extension: String): Boolean {
@@ -147,25 +150,31 @@ class ProfileViewModel(
 
     fun orderPhotos(photoSequences: Map<String, Int>) {
         viewModelScope.launch(coroutineExceptionHandler) {
-            _orderPhotosLiveData.postValue(photoRepository.orderPhotos(photoSequences))
+            val response = photoRepository.orderPhotos(photoSequences)
+            _orderPhotosLiveData.postValue(response)
         }
     }
 
-//  TODO: check launch should be lauch() inside viewmodeScope otherwise it's not concurrent
     fun syncPhotos() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(defaultDispatcher + coroutineExceptionHandler) {
             val photos = photoRepository.listPhotos(MAX_PHOTO_COUNT)
             val photoSequences = mutableMapOf<String, Int>()
             photos.forEach { photo ->
                 when (photo.status) {
-                    PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> downloadPhoto(photo.key)
-                    PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> reuploadPhoto(photo)
-                    PhotoStatus.DELETING -> deletePhoto(photo.key)
+                    PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> launch {
+                        photoRepository.updatePhotoStatus(photo.key, PhotoStatus.DOWNLOADING)
+                    }
+                    PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> launch {
+                        doUploadPhoto(photo.uri, photo.key)
+                    }
+                    PhotoStatus.DELETING -> launch {
+                        _deletePhotoLiveData.postValue(photoRepository.deletePhoto(photo.key))
+                    }
                     PhotoStatus.ORDERING -> photoSequences[photo.key] = photo.sequence
                     else -> println("")
                 }
             }
-            if (photoSequences.isNotEmpty()) orderPhotos(photoSequences)
+            if (photoSequences.isNotEmpty()) launch { orderPhotos(photoSequences) }
             _syncPhotosLiveData.postValue(true)
         }
     }

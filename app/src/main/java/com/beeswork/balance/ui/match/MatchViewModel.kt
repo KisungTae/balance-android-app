@@ -61,7 +61,7 @@ class MatchViewModel(
 
     fun fetchChatMessages() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            if (!fetchingChatMessages) launch(coroutineExceptionHandler) {
+            if (!fetchingChatMessages) launch {
                 _fetchChatMessagesLiveData.postValue(Resource.loading())
                 fetchingChatMessages = true
                 val response = chatRepository.fetchChatMessages()

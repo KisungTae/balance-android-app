@@ -118,6 +118,13 @@ class PhotoPickerRecyclerViewAdapter(
         return photoPickerSequences
     }
 
+    fun isSwipeable(): Boolean {
+        photoPickers.forEach { photoPicker ->
+            if (photoPicker.status != PhotoStatus.OCCUPIED) return false
+        }
+        return true
+    }
+
     companion object {
         private const val PHOTO_PICKER_PAYLOAD = "photoPickerPayload"
     }
@@ -149,7 +156,7 @@ class PhotoPickerRecyclerViewAdapter(
                 PhotoStatus.UPLOAD_ERROR -> showUploadError(photoPicker.uri)
                 PhotoStatus.ORDERING -> showLoading()
                 PhotoStatus.OCCUPIED -> showOccupied()
-                else -> println()
+                PhotoStatus.DELETING -> showLoading()
             }
         }
 

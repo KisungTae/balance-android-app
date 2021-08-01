@@ -13,6 +13,7 @@ abstract class BaseViewModel : ViewModel() {
     val exceptionLiveData: LiveData<Throwable> get() = _exceptionLiveData
 
     protected val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        println("coroutineExceptionHandler!!!!!!!!!! from viewmodel")
         when (throwable) {
             is AccountNotFoundException,
             is AccountDeletedException,
