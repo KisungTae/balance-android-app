@@ -11,6 +11,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import java.lang.Exception
 
 const val LOCATION_REQUEST_INTERVAL = 5000L
 const val LOCATION_REQUEST_FASTEST_INTERVAL = 5000L

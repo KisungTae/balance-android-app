@@ -98,10 +98,25 @@ class SettingRepositoryImpl(
     override suspend fun saveLocation(latitude: Double, longitude: Double) {
         withContext(ioDispatcher) {
             val now = OffsetDateTime.now()
-            locationDAO.insert(Location(latitude, longitude, false, now))
+            locationDAO.insert(Location(latitude, longitude, false, now, true))
+
+//          TODO: should be async or some other coroutine
             syncLocation(latitude, longitude, now)
         }
     }
+
+    override suspend fun saveLocationPermissionResult(granted: Boolean) {
+        withContext(ioDispatcher) {
+            locationDAO.updateGranted(granted)
+        }
+    }
+
+    override suspend fun getLocationPermissionResultFlow(): Flow<Boolean?> {
+        return withContext(ioDispatcher) {
+            return@withContext locationDAO.findGrantedAsFlow()
+        }
+    }
+
 
     private suspend fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
         val response = settingRDS.postLocation(

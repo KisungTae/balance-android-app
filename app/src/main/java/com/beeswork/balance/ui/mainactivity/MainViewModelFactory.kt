@@ -11,11 +11,14 @@ import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModel
 
 class MainViewModelFactory(
-    private val mainRepository: MainRepository
+    private val mainRepository: MainRepository,
+    private val settingRepository: SettingRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return MainViewModel(mainRepository) as T
+        return MainViewModel(mainRepository, settingRepository) as T
     }
+
+
 }

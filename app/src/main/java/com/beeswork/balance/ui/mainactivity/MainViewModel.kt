@@ -3,13 +3,15 @@ package com.beeswork.balance.ui.mainactivity
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.main.MainRepository
+import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val mainRepository: MainRepository
+    private val mainRepository: MainRepository,
+    private val settingRepository: SettingRepository
 ) : BaseViewModel() {
 
     //  TODO: change livedata to channel consumeAsFlow, and validateAccount() in onEach()
@@ -29,7 +31,11 @@ class MainViewModel(
     }
 
     fun saveLocation(latitude: Double, longitude: Double) {
-        println("saveLocation $latitude - $longitude")
+        viewModelScope.launch { settingRepository.saveLocation(latitude, longitude) }
+    }
+
+    fun saveLocationPermissionResult(granted: Boolean) {
+        viewModelScope.launch { settingRepository.saveLocationPermissionResult(granted) }
     }
 
 }

@@ -177,6 +177,7 @@ class PhotoPickerRecyclerViewAdapter(
                 if (photoFile.exists()) path else EndPoint.ofPhoto(accountId, photoKey)
             } ?: EndPoint.ofPhoto(accountId, photoKey)
 
+            println("photo end point: $photoEndPoint")
             Glide.with(context).load(photoEndPoint)
                 .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toPx()))
                 .apply(GlideHelper.photoPickerGlideOptions())

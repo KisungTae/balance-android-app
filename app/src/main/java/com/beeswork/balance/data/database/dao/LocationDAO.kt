@@ -13,7 +13,7 @@ import org.threeten.bp.OffsetDateTime
 interface LocationDAO {
 
     @Query("select * from location where id = ${Location.ID}")
-    fun findById(): Location
+    fun findById(): Location?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(location: Location)
@@ -26,4 +26,10 @@ interface LocationDAO {
 
     @Query("select latitude, longitude from location where id = ${Location.ID}")
     fun findLocationFlow(): Flow<LocationTuple>
+
+    @Query("select granted from location")
+    fun findGrantedAsFlow(): Flow<Boolean?>
+
+    @Query("update location set granted = :granted")
+    fun updateGranted(granted: Boolean)
 }

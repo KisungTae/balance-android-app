@@ -88,6 +88,23 @@
 
         </LinearLayout>
 
+
+        <LinearLayout
+            android:id="@+id/llCardStackLocationNotPermitted"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location permission should be granted, please Setting > Location and allow "/>
+
+        </LinearLayout>
+
+
         <com.yuyakaido.android.cardstackview.CardStackView
             android:id="@+id/csvSwipe"
             android:layout_width="match_parent"
@@ -95,6 +112,8 @@
             android:clipToPadding="false"
             android:paddingHorizontal="10dp"
             android:visibility="gone" />
+
+
 
     </FrameLayout>
 

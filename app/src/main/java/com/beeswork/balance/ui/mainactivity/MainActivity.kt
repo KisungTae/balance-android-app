@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -30,12 +31,12 @@ import org.kodein.di.generic.instance
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 
 
 class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-    private lateinit var broadcastReceiver: BroadcastReceiver
 
     override val kodein by closestKodein()
     private lateinit var binding: ActivityMainBinding
@@ -44,7 +45,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private val requestLocationPermission = registerForActivityResult(RequestPermission()) { granted ->
         if (granted) bindLocationManager()
-        else println("location is not granted!!!!!!!!!!!!!!!")
+        else viewModel.saveLocationPermissionResult(false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,9 +53,8 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        bindUI()
         setupLocationManager()
-        setupBroadcastReceiver()
+        bindUI()
     }
 
     private fun setupLocationManager() {
@@ -82,13 +82,12 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         }
     }
 
-
     private fun bindUI() = lifecycleScope.launch {
         setupWebSocketEventObserver()
     }
 
     private suspend fun setupWebSocketEventObserver() {
-        viewModel.webSocketEventLiveData.await().observe(this) {
+        viewModel.webSocketEventLiveData.await().observeForever {
             when (it.type) {
                 WebSocketEvent.Type.ERROR -> {
                     when (it.error) {
@@ -121,27 +120,17 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override fun onResume() {
         super.onResume()
-        if (hasLocationPermission()) {
-            println("hasLocationPermission activity!!!!!!!!!!!!")
-        } else {
-            println("location permission no activity!!!!!!!!!!!!")
-        }
-//        viewModel.connectStomp()
-//        val type = intent.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
-//        if (type != null) onReceiveFCMNotification(intent)
-//
-//        val filter = IntentFilter(IntentAction.RECEIVED_FCM_NOTIFICATION)
-//        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter)
+        if (hasLocationPermission()) bindLocationManager()
+        else viewModel.saveLocationPermissionResult(false)
     }
 
     override fun onPause() {
-//        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
         super.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        viewModel.disconnectStomp()
+//        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {
@@ -153,22 +142,6 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 //            }
 //        }
 //    }
-
-    private fun setupBroadcastReceiver() {
-//        broadcastReceiver = object : BroadcastReceiver() {
-//            override fun onReceive(context: Context?, intent: Intent?) {
-//                when (intent?.action) {
-//                    IntentAction.RECEIVED_FCM_NOTIFICATION -> onReceiveFCMNotification(intent)
-//                }
-//            }
-//        }
-    }
-
-    private fun onReceiveFCMNotification(intent: Intent?) {
-
-        val notificationType = intent!!.getStringExtra(FCMDataKey.NOTIFICATION_TYPE)
-        val photoKey = intent.getStringExtra(FCMDataKey.PHOTO_KEY)
-    }
 
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

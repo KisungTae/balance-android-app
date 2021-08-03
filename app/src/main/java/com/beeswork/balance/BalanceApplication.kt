@@ -301,7 +301,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SplashViewModelFactory(instance()) }
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance()) }
-        bind() from provider { MainViewModelFactory(instance()) }
+        bind() from provider { MainViewModelFactory(instance(), instance()) }
 
 
         // Interceptor

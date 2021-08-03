@@ -1,7 +1,10 @@
 package com.beeswork.balance.ui.swipe
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -52,30 +55,42 @@ class SwipeFragment : BaseFragment(),
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         observeExceptionLiveData(viewModel)
         bindUI()
-//        viewModel.fetchCards()
     }
+
 
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
         setupSwipeCardStackView()
         setupFetchCardsLiveDataObserver()
+        observeLocationPermissionResultLiveData()
         binding.btnCardStackReload.setOnClickListener { viewModel.fetchCards() }
+    }
+
+    private suspend fun observeLocationPermissionResultLiveData() {
+        viewModel.locationPermissionResultLiveData.await().observe(viewLifecycleOwner) { granted ->
+            granted?.let { _granted ->
+                if (_granted) {
+                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+//                    viewModel.fetchCards()
+                } else showLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE)
+            }
+        }
     }
 
     private fun setupFetchCardsLiveDataObserver() {
         viewModel.fetchCards.observe(viewLifecycleOwner) {
             when {
-                it.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE)
+                it.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
                 it.isError() -> {
                     val errorTitle = getString(R.string.fetch_card_exception_title)
                     ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
-                    showLayouts(View.GONE, View.GONE, View.VISIBLE)
+                    showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
                 }
                 else -> {
                     it.data?.let { cardDomains ->
-                        if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE)
+                        if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
                         else {
-                            showLayouts(View.VISIBLE, View.GONE, View.GONE)
+                            showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
                             cardStackAdapter.submitCards(cardDomains)
                             binding.csvSwipe.visibility = View.VISIBLE
                         }
@@ -85,10 +100,11 @@ class SwipeFragment : BaseFragment(),
         }
     }
 
-    private fun showLayouts(loading: Int, empty: Int, error: Int) {
+    private fun showLayouts(loading: Int, empty: Int, error: Int, location: Int) {
         binding.llCardStackLoading.visibility = loading
         binding.llCardStackEmpty.visibility = empty
         binding.llCardStackError.visibility = error
+        binding.llCardStackLocationNotPermitted.visibility = location
     }
 
     private fun setupToolBar() {
@@ -132,6 +148,19 @@ class SwipeFragment : BaseFragment(),
                 SwipeBalanceGameDialog.TAG
             )
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+
+    private fun showLocationNotPermitScreen() {
+
+    }
+
+    private fun hideLocationNotPermittedScreen() {
+
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {
