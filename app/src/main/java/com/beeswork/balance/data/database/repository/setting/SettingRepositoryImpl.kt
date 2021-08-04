@@ -97,11 +97,30 @@ class SettingRepositoryImpl(
 
     override suspend fun saveLocation(latitude: Double, longitude: Double) {
         withContext(ioDispatcher) {
-            val now = OffsetDateTime.now()
-            locationDAO.insert(Location(latitude, longitude, false, now, true))
+            val updatedAt = OffsetDateTime.now()
+            locationDAO.insert(Location(latitude, longitude, false, updatedAt, true))
+            syncLocation(latitude, longitude, updatedAt)
+        }
+    }
 
-//          TODO: should be async or some other coroutine
-            syncLocation(latitude, longitude, now)
+    override suspend fun syncLocation() {
+        withContext(ioDispatcher) {
+            locationDAO.findById()?.let { location ->
+                if (!location.synced) syncLocation(location.latitude, location.longitude, location.updatedAt)
+            }
+        }
+    }
+
+    private fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
+            val response = settingRDS.postLocation(
+                preferenceProvider.getAccountId(),
+                preferenceProvider.getIdentityToken(),
+                latitude,
+                longitude,
+                updatedAt
+            )
+            if (response.isSuccess()) locationDAO.sync(updatedAt)
         }
     }
 
@@ -114,27 +133,6 @@ class SettingRepositoryImpl(
     override suspend fun getLocationPermissionResultFlow(): Flow<Boolean?> {
         return withContext(ioDispatcher) {
             return@withContext locationDAO.findGrantedAsFlow()
-        }
-    }
-
-
-    private suspend fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
-        val response = settingRDS.postLocation(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
-            latitude,
-            longitude,
-            updatedAt
-        )
-        if (response.isSuccess()) locationDAO.sync(updatedAt)
-    }
-
-    override suspend fun syncLocation() {
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-            locationDAO.findById()?.let { location ->
-                if (!location.synced)
-                    syncLocation(location.latitude, location.longitude, location.updatedAt)
-            }
         }
     }
 

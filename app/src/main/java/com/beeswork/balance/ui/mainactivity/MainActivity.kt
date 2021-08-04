@@ -32,6 +32,7 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
@@ -55,6 +56,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         setContentView(binding.root)
         setupLocationManager()
         bindUI()
+        viewModel.test()
     }
 
     private fun setupLocationManager() {

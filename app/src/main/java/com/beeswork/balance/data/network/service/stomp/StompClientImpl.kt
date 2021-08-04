@@ -77,12 +77,10 @@ class StompClientImpl(
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {}
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-        println("onClosing!!!!!!!!!")
         socketStatus = SocketStatus.CLOSED
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        println("onClosed!!!!!!!!!!!")
         socketStatus = SocketStatus.CLOSED
     }
 

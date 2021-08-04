@@ -13,9 +13,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import java.lang.Exception
 
-const val LOCATION_REQUEST_INTERVAL = 5000L
-const val LOCATION_REQUEST_FASTEST_INTERVAL = 5000L
-const val SMALLEST_DISPLACEMENT = 25f
+
 
 class LocationLifecycleObserver(
     lifecycleOwner: LifecycleOwner,
@@ -38,14 +36,18 @@ class LocationLifecycleObserver(
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun startLocationUpdates() {
         val locationPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-        println("locationPermission $locationPermission")
         if (locationPermission == PackageManager.PERMISSION_GRANTED)
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun removeLocationUpdates() {
-        println("removeLocationUpdates!!!!")
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+    companion object {
+        const val LOCATION_REQUEST_INTERVAL = 60000L
+        const val LOCATION_REQUEST_FASTEST_INTERVAL = 60000L
+        const val SMALLEST_DISPLACEMENT = 1000f
     }
 }

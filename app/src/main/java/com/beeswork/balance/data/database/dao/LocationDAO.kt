@@ -27,9 +27,9 @@ interface LocationDAO {
     @Query("select latitude, longitude from location where id = ${Location.ID}")
     fun findLocationFlow(): Flow<LocationTuple>
 
-    @Query("select granted from location")
+    @Query("select granted from location where id = ${Location.ID}")
     fun findGrantedAsFlow(): Flow<Boolean?>
 
-    @Query("update location set granted = :granted")
+    @Query("update location set granted = :granted where id = ${Location.ID}")
     fun updateGranted(granted: Boolean)
 }

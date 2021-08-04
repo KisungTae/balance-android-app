@@ -30,10 +30,9 @@ class SwipeViewModel(
     fun fetchCards() {
         viewModelScope.launch(coroutineExceptionHandler) {
             if (fetchingCards) return@launch
-
+            settingRepository.syncLocation()
             fetchingCards = true
             _fetchCards.postValue(Resource.loading())
-            settingRepository.syncLocation()
             val response = swipeRepository.fetchCards().let {
                 it.mapData(it.data?.cardDTOs?.map { cardDTO -> cardMapper.toCardDomain(cardDTO) })
             }

@@ -59,7 +59,7 @@
             android:theme="@style/Base.Theme.AppCompat" />
 
         <service
-            android:name="com.beeswork.balance.data.network.service.fcm.FCMService"
+            android:name="com.beeswork.balance.data.network.service.fcm.FCMServiceImpl"
             android:exported="false">
 
             <intent-filter>
