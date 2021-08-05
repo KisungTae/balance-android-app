@@ -5,8 +5,7 @@ import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.common.ResourceListener
-import com.beeswork.balance.data.database.dao.FetchInfoDAO
-import com.beeswork.balance.data.database.entity.FetchInfo
+import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -20,7 +19,6 @@ import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -32,14 +30,14 @@ import kotlin.random.Random
 class ChatRepositoryImpl(
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
-    private val fetchInfoDAO: FetchInfoDAO,
     private val chatRDS: ChatRDS,
     private val chatMessageMapper: ChatMessageMapper,
     private val stompClient: StompClient,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
+    private val fcmTokenDAO: FCMTokenDAO,
     private val applicationScope: CoroutineScope,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ChatRepository {
 
     private var chatMessageInvalidationListener: ChatMessageInvalidationListener? = null
@@ -71,8 +69,9 @@ class ChatRepositoryImpl(
 
     init {
         collectChatMessageReceiptFlow()
-        collectChatMessageFlow()
+        collectChatMessageFlowFromStomp()
     }
+
 
     private fun collectChatMessageReceiptFlow() {
         stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
@@ -91,7 +90,7 @@ class ChatRepositoryImpl(
         }.launchIn(applicationScope)
     }
 
-    private fun collectChatMessageFlow() {
+    private fun collectChatMessageFlowFromStomp() {
         stompClient.chatMessageFlow.onEach { chatMessageDTO ->
             saveChatMessageReceived(chatMessageMapper.toReceivedChatMessage(chatMessageDTO))
         }.launchIn(applicationScope)
@@ -149,6 +148,7 @@ class ChatRepositoryImpl(
 
     override suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO) {
         withContext(Dispatchers.IO) {
+            fcmTokenDAO.updateActive(true)
             saveChatMessageReceived(chatMessageMapper.toReceivedChatMessage(chatMessageDTO))
         }
     }

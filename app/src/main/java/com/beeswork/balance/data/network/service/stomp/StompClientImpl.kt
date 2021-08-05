@@ -36,16 +36,16 @@ class StompClientImpl(
     private var socketStatus = SocketStatus.CLOSED
     private var outgoing = Channel<String>()
 
-    private var chatMessageReceiptChannel = Channel<ChatMessageDTO>()
+    private var chatMessageReceiptChannel = Channel<ChatMessageDTO>(Channel.BUFFERED)
     override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
 
-    private var chatMessageChannel = Channel<ChatMessageDTO>()
+    private var chatMessageChannel = Channel<ChatMessageDTO>(Channel.BUFFERED)
     override val chatMessageFlow = chatMessageChannel.consumeAsFlow()
 
-    private var matchChannel = Channel<MatchDTO>()
+    private var matchChannel = Channel<MatchDTO>(Channel.BUFFERED)
     override val matchFlow = matchChannel.consumeAsFlow()
 
-    private var clickChannel = Channel<ClickDTO>()
+    private var clickChannel = Channel<ClickDTO>(Channel.BUFFERED)
     override val clickFlow = clickChannel.consumeAsFlow()
 
     private var webSocketEventChannel = Channel<WebSocketEvent>()

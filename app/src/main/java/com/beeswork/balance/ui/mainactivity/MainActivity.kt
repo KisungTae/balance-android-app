@@ -43,6 +43,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     private val viewModelFactory: MainViewModelFactory by instance()
+    private var onScreen = true
 
     private val requestLocationPermission = registerForActivityResult(RequestPermission()) { granted ->
         if (granted) bindLocationManager()
@@ -86,6 +87,14 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private fun bindUI() = lifecycleScope.launch {
         setupWebSocketEventObserver()
+        observeFCMTokenActiveLiveData()
+    }
+
+    private suspend fun observeFCMTokenActiveLiveData() {
+        viewModel.fcmTokenActive.await().observe(this) {
+//            if (onScreen) viewModel.connectStomp()
+            println("observeFCMTokenActiveLiveData $onScreen")
+        }
     }
 
     private suspend fun setupWebSocketEventObserver() {
@@ -124,10 +133,12 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         super.onResume()
         if (hasLocationPermission()) bindLocationManager()
         else viewModel.saveLocationPermissionResult(false)
+        onScreen = true
     }
 
     override fun onPause() {
         super.onPause()
+        onScreen = false
     }
 
     override fun onStop() {
