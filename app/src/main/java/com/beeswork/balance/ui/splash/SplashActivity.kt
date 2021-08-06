@@ -28,8 +28,10 @@ class SplashActivity : BaseActivity(), KodeinAware {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SplashViewModel::class.java)
-        bind()
-        viewModel.login()
+        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+
+//        bind()
+//        viewModel.login()
     }
 
     private fun bind() = lifecycleScope.launch {

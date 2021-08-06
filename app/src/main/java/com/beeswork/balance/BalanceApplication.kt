@@ -44,6 +44,8 @@ import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.rds.setting.SettingRDSImpl
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDSImpl
+import com.beeswork.balance.data.network.service.fcm.FCMService
+import com.beeswork.balance.data.network.service.fcm.FCMServiceImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -102,6 +104,8 @@ class BalanceApplication : Application(), KodeinAware {
 
     override val kodein = Kodein.lazy {
         import(androidXModule(this@BalanceApplication))
+
+        bind<FCMService>() with singleton { FCMServiceImpl() }
 
         // Mapper
         bind<MatchMapper>() with singleton { MatchMapperImpl() }
@@ -301,7 +305,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SplashViewModelFactory(instance()) }
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance()) }
-        bind() from provider { MainViewModelFactory(instance(), instance()) }
+        bind() from provider { MainViewModelFactory(instance(), instance(), instance()) }
 
 
         // Interceptor

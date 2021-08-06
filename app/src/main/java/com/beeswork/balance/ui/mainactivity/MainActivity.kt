@@ -57,7 +57,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         setContentView(binding.root)
         setupLocationManager()
         bindUI()
-        viewModel.test()
+//        viewModel.test()
     }
 
     private fun setupLocationManager() {
@@ -92,8 +92,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private suspend fun observeFCMTokenActiveLiveData() {
         viewModel.fcmTokenActive.await().observe(this) {
-//            if (onScreen) viewModel.connectStomp()
-            println("observeFCMTokenActiveLiveData $onScreen")
+            if (onScreen) viewModel.connectStomp()
         }
     }
 
@@ -131,8 +130,8 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     override fun onResume() {
         super.onResume()
-        if (hasLocationPermission()) bindLocationManager()
-        else viewModel.saveLocationPermissionResult(false)
+//        if (hasLocationPermission()) bindLocationManager()
+//        else viewModel.saveLocationPermissionResult(false)
         onScreen = true
     }
 

@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
+import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.constant.PushType
@@ -20,18 +21,21 @@ import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
 
-class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
+class FCMServiceImpl : FirebaseMessagingService(), FCMService, KodeinAware {
 
     override val kodein by closestKodein()
 
-    private val settingRepository: SettingRepository by instance()
-    private val matchRepository: MatchRepository by instance()
-    private val clickRepository: ClickRepository by instance()
-    private val chatRepository: ChatRepository by instance()
+//    private val settingRepository: SettingRepository by instance()
+//    private val matchRepository: MatchRepository by instance()
+//    private val clickRepository: ClickRepository by instance()
+//    private val chatRepository: ChatRepository by instance()
+
+
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onNewToken(token: String) {
-        scope.launch { settingRepository.saveFCMToken(token) }
+//        scope.launch { settingRepository.saveFCMToken(token) }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -39,23 +43,22 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
         val pushType = remoteMessage.data[StompHeader.PUSH_TYPE]?.let {
             PushType.valueOf(it)
         }
-        println("onMessageReceived $remoteMessage")
-        println("pushType: $pushType")
+        println("onMessageReceived: ${remoteMessage.data}")
+        println("pushtype: $pushType")
         when (pushType) {
-            PushType.CLICKED -> scope.launch {
-                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
-            }
-            PushType.MATCHED -> scope.launch {
-                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
-            }
-            PushType.CHAT_MESSAGE -> scope.launch {
-                println("PushType.CHAT_MESSAGE -> applicationScope.launch {")
-                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
+//            PushType.CLICKED -> scope.launch {
+//                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
+//                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
+//            }
+//            PushType.MATCHED -> scope.launch {
+//                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
+//                matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
+//            }
+//            PushType.CHAT_MESSAGE -> scope.launch {
+//                val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
 //                chatRepository.saveChatMessageReceived(GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java))
-            }
-            else -> {}
+//            }
+//            else -> {}
         }
     }
 

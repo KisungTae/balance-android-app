@@ -6,5 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface MainRepository {
     suspend fun connectStomp()
     suspend fun disconnectStomp()
-    fun getWebSocketEventFlow(): Flow<WebSocketEvent>
+//    fun getWebSocketEventFlow(): Flow<WebSocketEvent>
+
+    val webSocketEventFlow: Flow<WebSocketEvent>
 }
