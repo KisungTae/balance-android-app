@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.repository.click
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.ClickDAO
+import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.dao.FetchInfoDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.Click
@@ -30,6 +31,7 @@ class ClickRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
     private val clickMapper: ClickMapper,
     private val stompClient: StompClient,
+    private val fcmTokenDAO: FCMTokenDAO,
     private val balanceDatabase: BalanceDatabase,
     private val applicationScope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher
@@ -60,6 +62,7 @@ class ClickRepositoryImpl(
     }
 
     override suspend fun saveClick(clickDTO: ClickDTO) {
+        fcmTokenDAO.updateActive(true)
         withContext(Dispatchers.IO) { saveClickAndNotify(clickDTO) }
     }
 

@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import retrofit2.Response
+import java.lang.Exception
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -57,6 +58,7 @@ abstract class BaseRDS {
                     ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION -> throw AccountNotFoundException(errorResponse.message)
                     ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION -> throw AccountBlockedException(errorResponse.message)
                     ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> throw AccountDeletedException(errorResponse.message)
+                    ExceptionCode.REFRESH_TOKEN_EXPIRED_EXCEPTION -> throw RefreshTokenExpiredException(errorResponse.message)
                 }
                 return Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
             }

@@ -18,7 +18,8 @@ abstract class BaseFragment : Fragment() {
         when (throwable) {
             is AccountNotFoundException,
             is AccountDeletedException,
-            is AccountBlockedException -> moveToLoginActivity(null, throwable.message)
+            is AccountBlockedException,
+            is RefreshTokenExpiredException -> moveToLoginActivity(null, throwable.message)
             else -> throw throwable
         }
     }

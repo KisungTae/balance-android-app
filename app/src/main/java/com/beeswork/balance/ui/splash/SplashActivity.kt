@@ -28,14 +28,12 @@ class SplashActivity : BaseActivity(), KodeinAware {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SplashViewModel::class.java)
-        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+        bindUI()
 
-//        bind()
-//        viewModel.login()
     }
 
-    private fun bind() = lifecycleScope.launch {
-        viewModel.loginLiveData.observe(this@SplashActivity) {
+    private fun bindUI() = lifecycleScope.launch {
+        viewModel.validateLoginLiveData.observe(this@SplashActivity) {
             when {
                 it.isSuccess() -> finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
                 it.isError() -> finishToActivity(Intent(this@SplashActivity, LoginActivity::class.java))

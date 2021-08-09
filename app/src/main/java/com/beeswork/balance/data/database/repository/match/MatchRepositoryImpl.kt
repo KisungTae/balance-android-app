@@ -38,6 +38,7 @@ class MatchRepositoryImpl(
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
     private val stompClient: StompClient,
+    private val fcmTokenDAO: FCMTokenDAO,
     private val applicationScope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher
 ) : MatchRepository {
@@ -191,6 +192,7 @@ class MatchRepositoryImpl(
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
         withContext(Dispatchers.IO) {
+            fcmTokenDAO.updateActive(true)
             saveMatchAndNotify(matchMapper.toMatch(matchDTO))
         }
     }

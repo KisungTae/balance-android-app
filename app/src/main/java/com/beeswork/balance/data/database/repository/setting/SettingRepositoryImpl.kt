@@ -2,7 +2,6 @@ package com.beeswork.balance.data.database.repository.setting
 
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.tuple.LocationTuple
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -140,7 +139,7 @@ class SettingRepositoryImpl(
         }
     }
 
-    override fun getLocationFlow(): Flow<LocationTuple?> {
+    override fun getLocationFlow(): Flow<Location?> {
         return locationDAO.findLocationFlow()
     }
 

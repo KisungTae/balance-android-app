@@ -30,6 +30,11 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("login/refresh-token")
+    suspend fun loginWithRefreshToken(
+        @Body refreshAccessTokenBody: RefreshAccessTokenBody
+    ): Response<LoginDTO>
+
     @GET("setting/push")
     suspend fun getPushSetting(
         @Query(value = "accountId") accountId: UUID,

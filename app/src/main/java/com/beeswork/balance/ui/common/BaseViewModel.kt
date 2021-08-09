@@ -16,7 +16,8 @@ abstract class BaseViewModel : ViewModel() {
         when (throwable) {
             is AccountNotFoundException,
             is AccountDeletedException,
-            is AccountBlockedException -> _exceptionLiveData.postValue(throwable)
+            is AccountBlockedException,
+            is RefreshTokenExpiredException -> _exceptionLiveData.postValue(throwable)
             else -> throw throwable
         }
     }

@@ -11,8 +11,10 @@ import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.mapper.location.LocationMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SettingViewModel(
@@ -23,15 +25,20 @@ class SettingViewModel(
     private val photoRepository: PhotoRepository,
     private val swipeRepository: SwipeRepository,
     private val profileRepository: ProfileRepository,
-    private val loginRepository: LoginRepository
-): BaseViewModel() {
+    private val loginRepository: LoginRepository,
+    private val locationMapper: LocationMapper
+) : BaseViewModel() {
 
     private val _deleteAccountLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val deleteAccountLiveData: LiveData<Resource<EmptyResponse>> get() = _deleteAccountLiveData
 
     val emailLiveData by viewModelLazyDeferred { loginRepository.getEmailFlow().asLiveData() }
 
-    val locationLiveData by viewModelLazyDeferred { settingRepository.getLocationFlow().asLiveData() }
+    val locationLiveData by viewModelLazyDeferred {
+        settingRepository.getLocationFlow().map { location ->
+            location?.let { _location -> locationMapper.toLocationDomain(_location) }
+        }.asLiveData()
+    }
 
     fun fetchEmail() {
         viewModelScope.launch(coroutineExceptionHandler) {

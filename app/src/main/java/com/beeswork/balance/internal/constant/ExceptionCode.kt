@@ -46,6 +46,7 @@ class ExceptionCode {
 
         const val ACCOUNT_IDENTITY_NOT_FOUND_EXCEPTION = "account_identity_not_found_exception"
 
+        const val REFRESH_TOKEN_EXPIRED_EXCEPTION = "refresh.token.expired.exception"
     }
 
 }

@@ -17,5 +17,6 @@ interface LoginRepository {
     suspend fun deleteLogin()
     suspend fun isEmailSynced(): Boolean
     suspend fun getLoginType(): LoginType
+    suspend fun loginWithRefreshToken(): Resource<LoginDTO>
     fun getEmailFlow(): Flow<String?>
 }

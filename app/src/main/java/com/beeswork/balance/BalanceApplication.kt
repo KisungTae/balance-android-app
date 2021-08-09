@@ -44,7 +44,6 @@ import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.rds.setting.SettingRDSImpl
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDSImpl
-import com.beeswork.balance.data.network.service.fcm.FCMService
 import com.beeswork.balance.data.network.service.fcm.FCMServiceImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
@@ -53,6 +52,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
+import com.beeswork.balance.internal.mapper.location.LocationMapper
+import com.beeswork.balance.internal.mapper.location.LocationMapperImpl
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.photo.PhotoMapperImpl
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
@@ -105,10 +106,9 @@ class BalanceApplication : Application(), KodeinAware {
     override val kodein = Kodein.lazy {
         import(androidXModule(this@BalanceApplication))
 
-        bind<FCMService>() with singleton { FCMServiceImpl() }
-
         // Mapper
         bind<MatchMapper>() with singleton { MatchMapperImpl() }
+        bind<LocationMapper>() with singleton { LocationMapperImpl() }
         bind<ChatMessageMapper>() with singleton { ChatMessageMapperImpl() }
         bind<ClickMapper>() with singleton { ClickMapperImpl() }
         bind<SwipeFilterMapper>() with singleton { SwipeFilterMapperImpl() }
@@ -153,7 +153,7 @@ class BalanceApplication : Application(), KodeinAware {
         // Repository
 
 
-        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), Dispatchers.IO) }
+        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), Dispatchers.IO,  applicationScope) }
 
         bind<SwipeRepository>() with singleton {
             SwipeRepositoryImpl(
@@ -204,6 +204,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 applicationScope,
                 Dispatchers.IO
             )
@@ -226,6 +227,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -300,12 +302,13 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 instance()
             )
         }
         bind() from provider { SplashViewModelFactory(instance()) }
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance()) }
-        bind() from provider { MainViewModelFactory(instance(), instance(), instance()) }
+        bind() from provider { MainViewModelFactory(instance(), instance()) }
 
 
         // Interceptor
@@ -323,8 +326,6 @@ class BalanceApplication : Application(), KodeinAware {
 
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
-
-
 
 
     }

@@ -67,7 +67,7 @@ class LoginRepositoryImpl(
             if (response.isSuccess()) response.data?.let { data ->
                 preferenceProvider.putAccountId(data.accountId)
                 preferenceProvider.putIdentityTokenId(data.identityToken)
-                preferenceProvider.putJwtToken(data.jwtToken)
+                preferenceProvider.putJwtToken(data.accessToken)
             }
             return@withContext response
         }
@@ -92,6 +92,15 @@ class LoginRepositoryImpl(
     override suspend fun getLoginType(): LoginType {
         return withContext(ioDispatcher) {
             return@withContext loginDAO.findLoginType(preferenceProvider.getAccountId())
+        }
+    }
+
+    override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
+        return withContext(ioDispatcher) {
+
+            val response = loginRDS.loginWithRefreshToken()
+
+            return@withContext null
         }
     }
 

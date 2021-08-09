@@ -57,7 +57,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         setContentView(binding.root)
         setupLocationManager()
         bindUI()
-//        viewModel.test()
+        viewModel.connectStomp()
     }
 
     private fun setupLocationManager() {
@@ -133,16 +133,13 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 //        if (hasLocationPermission()) bindLocationManager()
 //        else viewModel.saveLocationPermissionResult(false)
         onScreen = true
+        viewModel.connectStomp()
     }
 
     override fun onPause() {
         super.onPause()
         onScreen = false
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        viewModel.disconnectStomp()
+        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {

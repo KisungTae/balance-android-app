@@ -57,10 +57,6 @@ class SettingFragment : BaseFragment(), KodeinAware {
         }
     }
 
-
-
-
-
     private fun observeDeleteAccountLiveData() {
         viewModel.deleteAccountLiveData.observe(viewLifecycleOwner) {
             when {
@@ -74,8 +70,6 @@ class SettingFragment : BaseFragment(), KodeinAware {
             }
         }
     }
-
-
 
     private suspend fun observeLocationLiveData() {
         viewModel.locationLiveData.await().observe(viewLifecycleOwner) { location ->

@@ -13,12 +13,16 @@ class SplashViewModel(
     private val loginRepository: LoginRepository
 ): ViewModel() {
 
-    private val _loginLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val loginLiveData: LiveData<Resource<EmptyResponse>> get() = _loginLiveData
+    private val _validateLoginLiveData = MutableLiveData<Resource<EmptyResponse>>()
+    val validateLoginLiveData: LiveData<Resource<EmptyResponse>> get() = _validateLoginLiveData
+
+    fun validateLogin() {
+
+    }
 
     fun login() {
         viewModelScope.launch {
-            _loginLiveData.postValue(loginRepository.login())
+            _validateLoginLiveData.postValue(loginRepository.login())
         }
     }
 }
