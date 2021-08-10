@@ -3,11 +3,27 @@ package com.beeswork.balance.ui.common
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.beeswork.balance.internal.constant.BundleKey
+import com.beeswork.balance.internal.exception.AccountBlockedException
+import com.beeswork.balance.internal.exception.AccountDeletedException
+import com.beeswork.balance.internal.exception.AccountNotFoundException
+import com.beeswork.balance.internal.exception.RefreshTokenExpiredException
 import com.beeswork.balance.ui.loginactivity.LoginActivity
-import com.beeswork.balance.ui.stepprofileactivity.StepProfileActivity
 
 abstract class BaseActivity: AppCompatActivity() {
 
+    protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
+        baseViewModel.exceptionLiveData.observe(this) { exception -> catchException(exception) }
+    }
+
+    private fun catchException(throwable: Throwable) {
+        when (throwable) {
+            is AccountNotFoundException,
+            is AccountDeletedException,
+            is AccountBlockedException,
+            is RefreshTokenExpiredException -> moveToLoginActivity(null, throwable.message)
+            else -> throw throwable
+        }
+    }
 
     fun finishToActivity(intent: Intent) {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP

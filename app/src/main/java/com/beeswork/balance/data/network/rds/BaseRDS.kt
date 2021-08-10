@@ -18,6 +18,8 @@ import java.util.*
 
 abstract class BaseRDS {
 
+
+
     protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
         try {
 //            val headers = response.headers()

@@ -52,7 +52,7 @@
         <activity android:name=".ui.mainactivity.MainActivity" />
 <!--        <activity android:name=".ui.splash.SplashActivity" />-->
         <activity android:name=".ui.loginactivity.LoginActivity" />
-        <activity android:name=".ui.stepprofileactivity.StepProfileActivity" />
+        <activity android:name=".ui.registeractivity.RegisterActivity" />
 
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"

@@ -10,6 +10,7 @@ import com.beeswork.balance.databinding.ActivitySplashBinding
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.loginactivity.LoginActivity
 import com.beeswork.balance.ui.mainactivity.MainActivity
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -28,14 +29,20 @@ class SplashActivity : BaseActivity(), KodeinAware {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SplashViewModel::class.java)
+        observeExceptionLiveData(viewModel)
         bindUI()
-
+        viewModel.loginWithRefreshToken()
     }
 
     private fun bindUI() = lifecycleScope.launch {
-        viewModel.validateLoginLiveData.observe(this@SplashActivity) {
+        viewModel.loginWithRefreshToken.observe(this@SplashActivity) {
             when {
-                it.isSuccess() -> finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                it.isSuccess() -> {
+                    if (it.data?.profileExists == true)
+                        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                    else
+                        finishToActivity(Intent(this@SplashActivity, RegisterActivity::class.java))
+                }
                 it.isError() -> finishToActivity(Intent(this@SplashActivity, LoginActivity::class.java))
             }
         }

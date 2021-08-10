@@ -54,6 +54,8 @@ import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
 import com.beeswork.balance.internal.mapper.location.LocationMapperImpl
+import com.beeswork.balance.internal.mapper.login.LoginMapper
+import com.beeswork.balance.internal.mapper.login.LoginMapperImpl
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.photo.PhotoMapperImpl
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
@@ -117,6 +119,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ProfileMapper>() with singleton { ProfileMapperImpl() }
         bind<PushSettingMapper>() with singleton { PushSettingMapperImpl() }
         bind<PhotoMapper>() with singleton { PhotoMapperImpl() }
+        bind<LoginMapper>() with singleton { LoginMapperImpl() }
 
 
         // Database
@@ -306,7 +309,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
-        bind() from provider { SplashViewModelFactory(instance()) }
+        bind() from provider { SplashViewModelFactory(instance(), instance()) }
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance()) }
 

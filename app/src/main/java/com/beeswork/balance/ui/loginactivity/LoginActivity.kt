@@ -2,23 +2,18 @@ package com.beeswork.balance.ui.loginactivity
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
-import android.telephony.TelephonyManager
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.ActivityLoginBinding
-import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
-import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
-import com.beeswork.balance.ui.stepprofileactivity.StepProfileActivity
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -28,7 +23,6 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
-import org.threeten.bp.OffsetDateTime
 
 
 class LoginActivity : BaseActivity(), KodeinAware {
@@ -87,7 +81,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
     }
 
     private fun moveToStepProfileActivity() {
-        finishToActivity(Intent(this@LoginActivity, StepProfileActivity::class.java))
+        finishToActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
     }
 
     private fun showError(error: String?, errorMessage: String?) {
