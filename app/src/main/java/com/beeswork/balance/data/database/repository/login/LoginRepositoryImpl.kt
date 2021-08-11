@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
@@ -67,7 +68,7 @@ class LoginRepositoryImpl(
             if (response.isSuccess()) response.data?.let { data ->
                 preferenceProvider.putAccountId(data.accountId)
                 preferenceProvider.putIdentityTokenId(data.identityToken)
-                preferenceProvider.putJwtToken(data.accessToken)
+                preferenceProvider.putAccessToken(data.accessToken)
             }
             return@withContext response
         }
@@ -97,18 +98,28 @@ class LoginRepositoryImpl(
 
     override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
+            println("refresh token: ${preferenceProvider.getRefreshToken()}")
+            preferenceProvider.getRefreshToken()?.let { refreshToken ->
 
-//            val response = loginRDS.loginWithRefreshToken()
-//
-//            return@withContext null
-            return@withContext Resource.success(null)
+                val response = loginRDS.loginWithRefreshToken(refreshToken)
+                println("response: ${response.status}")
+                println("response: ${response.data}")
+//                if (response.isSuccess()) response.data?.let { loginDTO ->
+//                    preferenceProvider.putTokens(
+//                        loginDTO.accountId,
+//                        loginDTO.identityToken,
+//                        loginDTO.accessToken,
+//                        loginDTO.refreshToken
+//                    )
+//                }
+                return@withContext response
+            } ?: return@withContext Resource.error(ExceptionCode.REFRESH_TOKEN_EXPIRED_EXCEPTION)
         }
     }
 
     override fun getEmailFlow(): Flow<String?> {
         return loginDAO.findEmailAsFlow(preferenceProvider.getAccountId())
     }
-
 
 
 }

@@ -13,12 +13,13 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-    override fun putLoginType(loginType: LoginType) {
-        TODO("Not yet implemented")
+    override fun putAccessToken(accessToken: String) {
+        editor.putString(ACCESS_TOKEN, accessToken)
+        editor.apply()
     }
 
-    override fun putJwtToken(jwtToken: String) {
-        editor.putString(ACCESS_TOKEN, jwtToken)
+    override fun putRefreshToken(refreshToken: String) {
+        editor.putString(REFRESH_TOKEN, refreshToken)
         editor.apply()
     }
 
@@ -33,13 +34,22 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
-    override fun getLoginType(): LoginType {
-        TODO("Not yet implemented")
+    override fun putTokens(accountId: UUID, identityToken: UUID, accessToken: String, refreshToken: String) {
+        editor.putString(ACCOUNT_ID, accountId.toString())
+        editor.putString(ACCOUNT_ID, identityToken.toString())
+        editor.putString(ACCESS_TOKEN, accessToken)
+        editor.putString(REFRESH_TOKEN, refreshToken)
+        editor.apply()
     }
 
 
-    override fun getJwtToken(): String? {
-        return preferences.getString(ACCESS_TOKEN, null)
+    override fun getAccessToken(): String? {
+        return preferences.getString(ACCESS_TOKEN, "add")
+    }
+
+    override fun getRefreshToken(): String? {
+//      TODO: remove default value
+        return preferences.getString(REFRESH_TOKEN, "add")
     }
 
 
@@ -86,6 +96,7 @@ class PreferenceProviderImpl(
 
     companion object {
         const val ACCESS_TOKEN = "accessToken"
+        const val REFRESH_TOKEN = "refreshToken"
         const val ACCOUNT_ID = "accountId"
         const val IDENTITY_TOKEN = "identityToken"
     }

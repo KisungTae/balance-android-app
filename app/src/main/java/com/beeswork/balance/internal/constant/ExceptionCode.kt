@@ -5,6 +5,8 @@ class ExceptionCode {
     companion object {
         const val EXCEPTION = "exception"
 
+        const val REFRESH_TOKEN_NOT_FOUND_EXCEPTION = "refresh_token_not_found_exception"
+
         const val NO_INTERNET_CONNECTIVITY_EXCEPTION = "no_internet_connectivity_exception"
         const val SOCKET_TIMEOUT_EXCEPTION = "socket_timeout_exception"
         const val CONNECT_EXCEPTION = "connect_exception"

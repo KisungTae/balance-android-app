@@ -15,9 +15,9 @@ class LoginRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), LoginRDS {
 
-    override suspend fun loginWithRefreshToken(accessToken: String, refreshToken: String): Resource<LoginDTO> {
+    override suspend fun loginWithRefreshToken(refreshToken: String): Resource<LoginDTO> {
         return getResult {
-            balanceAPI.loginWithRefreshToken(RefreshAccessTokenBody(accessToken, refreshToken))
+            balanceAPI.loginWithRefreshToken(RefreshAccessTokenBody(refreshToken))
         }
     }
 

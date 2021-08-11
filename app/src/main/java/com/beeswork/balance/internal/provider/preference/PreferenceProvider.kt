@@ -6,13 +6,15 @@ import java.util.*
 
 
 interface PreferenceProvider {
-    fun putLoginType(loginType: LoginType)
-    fun putJwtToken(jwtToken: String)
+    fun putAccessToken(accessToken: String)
+    fun putRefreshToken(refreshToken: String)
     fun putAccountId(accountId: UUID)
     fun putIdentityTokenId(identityToken: UUID)
+    fun putTokens(accountId: UUID, identityToken: UUID, accessToken: String, refreshToken: String)
 
-    fun getLoginType(): LoginType
-    fun getJwtToken(): String?
+
+    fun getAccessToken(): String?
+    fun getRefreshToken(): String?
     fun getAccountId(): UUID
     fun getIdentityToken(): UUID
 

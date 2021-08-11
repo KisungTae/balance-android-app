@@ -6,6 +6,8 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.*
 import com.google.gson.Gson
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import retrofit2.Response
@@ -17,8 +19,6 @@ import java.util.*
 
 
 abstract class BaseRDS {
-
-
 
     protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
         try {

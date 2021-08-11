@@ -44,7 +44,6 @@ import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.rds.setting.SettingRDSImpl
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDSImpl
-import com.beeswork.balance.data.network.service.fcm.FCMServiceImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -315,7 +314,9 @@ class BalanceApplication : Application(), KodeinAware {
 
 
         // Interceptor
-        bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
+        bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance(), instance()) }
+
+
 
         bind<OkHttpClient>() with singleton {
             OkHttpClient.Builder()

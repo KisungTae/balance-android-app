@@ -37,9 +37,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
-    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-
     override val kodein by closestKodein()
+    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     private val viewModelFactory: MainViewModelFactory by instance()
