@@ -3,11 +3,13 @@ package com.beeswork.balance.ui.loginactivity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.ActivityLoginBinding
+import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.ui.common.BaseActivity
@@ -39,7 +41,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.socialLogin(account.id, account.idToken, LoginType.GOOGLE)
             } catch (e: ApiException) {
-                showError(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION, null)
+                showLoginError(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION, null)
             }
         }
     }
@@ -47,29 +49,35 @@ class LoginActivity : BaseActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
+        window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        bind()
+        setupGoogleSignIn()
+        showInvalidAccountError()
+    }
 
-//        viewModel.mockSocialLogin()
-//        moveToMainActivity()
-//        window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
-//        binding = ActivityLoginBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//        bind()
-//        setupGoogleSignIn()
-//        observeLoginLiveData()
-//        val error = intent.getStringExtra(BundleKey.ERROR)
-//        val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
+    private fun bind() = lifecycleScope.launch {
+        binding.btnGoogleSignIn.setOnClickListener {
+            signInWithGoogleActivityResult.launch(mGoogleSignInClient.signInIntent)
+        }
+        observeLoginLiveData()
+    }
 
-//        println("from login activity error: $error")
-//        println("from login activity error message: $errorMessage")
+    private fun showInvalidAccountError() {
+        val error = intent.getStringExtra(BundleKey.ERROR)
+        val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
+        if (error != null || errorMessage != null)
+            showLoginError(error, errorMessage)
     }
 
     private fun observeLoginLiveData() {
         viewModel.loginLiveData.observe(this) {
             when (it.status) {
-                Resource.Status.ERROR -> showError(it.error, it.errorMessage)
-                Resource.Status.SUCCESS -> it.data?.let { data ->
-                    if (data.profileExists) moveToMainActivity()
-                    else moveToStepProfileActivity()
+                Resource.Status.ERROR -> showLoginError(it.error, it.errorMessage)
+                Resource.Status.SUCCESS -> it.data?.let { loginDomain ->
+                    if (loginDomain.profileExists) moveToMainActivity()
+                    else moveToRegisterActivity()
                 }
                 else -> println()
             }
@@ -80,20 +88,15 @@ class LoginActivity : BaseActivity(), KodeinAware {
         finishToActivity(Intent(this@LoginActivity, MainActivity::class.java))
     }
 
-    private fun moveToStepProfileActivity() {
+    private fun moveToRegisterActivity() {
         finishToActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
     }
 
-    private fun showError(error: String?, errorMessage: String?) {
+    private fun showLoginError(error: String?, errorMessage: String?) {
         val errorTitle = getString(R.string.error_title_login)
         ErrorDialog.show(error, errorTitle, errorMessage, supportFragmentManager)
     }
 
-    private fun bind() = lifecycleScope.launch {
-        binding.btnGoogleSignIn.setOnClickListener {
-            signInWithGoogleActivityResult.launch(mGoogleSignInClient.signInIntent)
-        }
-    }
 
     // refresh token, validate jwt token in splahsactivity, logout, check if login with different account, then remove data
 

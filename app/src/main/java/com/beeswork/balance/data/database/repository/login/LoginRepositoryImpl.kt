@@ -61,14 +61,17 @@ class LoginRepositoryImpl(
         }
     }
 
-
+// TODO: sync push token
     override suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
             val response = loginRDS.socialLogin(loginId, accessToken, loginType)
-            if (response.isSuccess()) response.data?.let { data ->
-                preferenceProvider.putAccountId(data.accountId)
-                preferenceProvider.putIdentityTokenId(data.identityToken)
-                preferenceProvider.putAccessToken(data.accessToken)
+            if (response.isSuccess()) response.data?.let { loginDTO ->
+                preferenceProvider.putTokens(
+                    loginDTO.accountId,
+                    loginDTO.identityToken,
+                    loginDTO.accessToken,
+                    loginDTO.refreshToken
+                )
             }
             return@withContext response
         }
@@ -98,20 +101,16 @@ class LoginRepositoryImpl(
 
     override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
-            println("refresh token: ${preferenceProvider.getRefreshToken()}")
             preferenceProvider.getRefreshToken()?.let { refreshToken ->
-
                 val response = loginRDS.loginWithRefreshToken(refreshToken)
-                println("response: ${response.status}")
-                println("response: ${response.data}")
-//                if (response.isSuccess()) response.data?.let { loginDTO ->
-//                    preferenceProvider.putTokens(
-//                        loginDTO.accountId,
-//                        loginDTO.identityToken,
-//                        loginDTO.accessToken,
-//                        loginDTO.refreshToken
-//                    )
-//                }
+                if (response.isSuccess()) response.data?.let { loginDTO ->
+                    preferenceProvider.putTokens(
+                        loginDTO.accountId,
+                        loginDTO.identityToken,
+                        loginDTO.accessToken,
+                        loginDTO.refreshToken
+                    )
+                }
                 return@withContext response
             } ?: return@withContext Resource.error(ExceptionCode.REFRESH_TOKEN_EXPIRED_EXCEPTION)
         }

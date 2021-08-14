@@ -30,14 +30,8 @@ class SplashActivity : BaseActivity(), KodeinAware {
         setContentView(binding.root)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SplashViewModel::class.java)
         observeExceptionLiveData(viewModel)
-//        bindUI()
-//        viewModel.loginWithRefreshToken()
-
-
-//      todo: remove me
-        binding.loginBtn.setOnClickListener {
-            viewModel.loginWithRefreshToken()
-        }
+        bindUI()
+        viewModel.loginWithRefreshToken()
     }
 
     private fun bindUI() = lifecycleScope.launch {

@@ -24,28 +24,6 @@ class ErrorDialog(
     private val id: UUID? = null
 ) : BaseDialog() {
 
-//    constructor(
-//        error: String?,
-//        errorTitle: String?,
-//        errorMessage: String?
-//    ) : this(error, errorTitle, errorMessage, null, null, null)
-//
-//    constructor(
-//        error: String?,
-//        errorTitle: String?,
-//        errorMessage: String?,
-//        onDismissListener: OnDismissListener?,
-//        id: UUID?
-//    ) : this(error, errorTitle, errorMessage, null, null, onDismissListener, id)
-//
-//    constructor(
-//        error: String?,
-//        errorTitle: String?,
-//        errorMessage: String?,
-//        requestCode: Int?,
-//        onRetryListener: OnRetryListener?
-//    ) : this(error, errorTitle, errorMessage, requestCode, onRetryListener, null)
-
     private lateinit var binding: DialogErrorBinding
 
     override fun onCreateView(
@@ -78,10 +56,6 @@ class ErrorDialog(
         } ?: kotlin.run {
             binding.btnErrorDialogRetry.visibility = View.GONE
         }
-    }
-
-    fun isErrorEqualTo(error: String?): Boolean {
-        return this.error == error
     }
 
     private fun getErrorMessage(error: String?, errorMessage: String?): String {

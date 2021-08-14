@@ -44,12 +44,11 @@ class PreferenceProviderImpl(
 
 
     override fun getAccessToken(): String? {
-        return preferences.getString(ACCESS_TOKEN, "add")
+        return preferences.getString(ACCESS_TOKEN, null)
     }
 
     override fun getRefreshToken(): String? {
-//      TODO: remove default value
-        return preferences.getString(REFRESH_TOKEN, "add")
+        return preferences.getString(REFRESH_TOKEN, null)
     }
 
 

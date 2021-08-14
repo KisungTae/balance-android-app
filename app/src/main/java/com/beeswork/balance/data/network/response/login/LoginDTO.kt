@@ -7,5 +7,6 @@ data class LoginDTO(
     val identityToken: UUID,
     val profileExists: Boolean,
     val accessToken: String,
-    val refreshToken: String
+    val refreshToken: String,
+    val email: String?
 )
