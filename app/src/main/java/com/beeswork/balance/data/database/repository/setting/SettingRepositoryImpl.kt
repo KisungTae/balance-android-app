@@ -84,7 +84,7 @@ class SettingRepositoryImpl(
 
     override suspend fun saveFCMToken(token: String) {
         withContext(Dispatchers.IO) {
-            fcmTokenDAO.insert(FCMToken(token, false, true))
+            fcmTokenDAO.insert(FCMToken(token, posted = false, active = true))
             val response = settingRDS.postFCMToken(
                 preferenceProvider.getAccountId(),
                 preferenceProvider.getIdentityToken(),
@@ -96,6 +96,19 @@ class SettingRepositoryImpl(
 
     override fun getFCMTokenActiveFlow(): Flow<Boolean> {
         return fcmTokenDAO.findActiveAsFlow()
+    }
+
+    override suspend fun syncFCMTokenAsync() {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
+            println("override suspend fun syncFCMTokenAsync")
+            fcmTokenDAO.findById()?.let { fcmToken ->
+                settingRDS.postFCMToken(
+                    preferenceProvider.getAccountId(),
+                    preferenceProvider.getIdentityToken(),
+                    fcmToken
+                )
+            }
+        }
     }
 
     override suspend fun saveLocation(latitude: Double, longitude: Double) {

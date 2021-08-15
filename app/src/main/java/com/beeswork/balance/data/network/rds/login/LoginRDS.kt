@@ -9,6 +9,7 @@ import java.util.*
 interface LoginRDS {
 
     suspend fun loginWithRefreshToken(
+        accountId: UUID,
         refreshToken: String
     ): Resource<LoginDTO>
 

@@ -61,7 +61,6 @@ class LoginRepositoryImpl(
         }
     }
 
-// TODO: sync push token
     override suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
             val response = loginRDS.socialLogin(loginId, accessToken, loginType)
@@ -102,7 +101,7 @@ class LoginRepositoryImpl(
     override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
             preferenceProvider.getRefreshToken()?.let { refreshToken ->
-                val response = loginRDS.loginWithRefreshToken(refreshToken)
+                val response = loginRDS.loginWithRefreshToken(preferenceProvider.getAccountId(), refreshToken)
                 if (response.isSuccess()) response.data?.let { loginDTO ->
                     preferenceProvider.putTokens(
                         loginDTO.accountId,

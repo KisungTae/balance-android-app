@@ -21,6 +21,7 @@ class ConnectivityInterceptorImpl(
         val accessToken = "${preferenceProvider.getAccessToken()}"
         val request = chain.request().newBuilder().addHeader(ACCESS_TOKEN, accessToken).build()
         return chain.proceed(request)
+//        return chain.proceed(chain.request())
     }
 
     private fun isOnline(): Boolean {

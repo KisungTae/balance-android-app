@@ -21,4 +21,7 @@ interface FCMTokenDAO {
 
     @Query("update fcmToken set active = :active where id = ${FCMToken.ID}")
     fun updateActive(active: Boolean)
+
+    @Query("select token from fcmToken where id = ${FCMToken.ID}")
+    fun findById(): String?
 }

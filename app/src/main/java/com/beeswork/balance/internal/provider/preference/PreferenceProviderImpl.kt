@@ -48,7 +48,8 @@ class PreferenceProviderImpl(
     }
 
     override fun getRefreshToken(): String? {
-        return preferences.getString(REFRESH_TOKEN, null)
+//        return preferences.getString(REFRESH_TOKEN, null)
+        return null
     }
 
 
