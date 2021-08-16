@@ -54,6 +54,7 @@ interface BalanceAPI {
     ): Response<ListChatMessagesDTO>
 
     @POST("login/social")
+    @Headers("${HttpHeader.NO_AUTHENTICATION}: true")
     suspend fun socialLogin(@Body socialLoginBody: SocialLoginBody): Response<LoginDTO>
 
     @POST("account/delete")
@@ -215,5 +216,7 @@ interface BalanceAPI {
                 .build()
                 .create(BalanceAPI::class.java)
         }
+
+        const val AV = "ddd"
     }
 }

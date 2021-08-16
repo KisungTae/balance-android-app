@@ -29,7 +29,6 @@ class SplashActivity : BaseActivity(), KodeinAware {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SplashViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
         viewModel.loginWithRefreshToken()
     }

@@ -100,7 +100,6 @@ class SettingRepositoryImpl(
 
     override suspend fun syncFCMTokenAsync() {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-            println("override suspend fun syncFCMTokenAsync")
             fcmTokenDAO.findById()?.let { fcmToken ->
                 settingRDS.postFCMToken(
                     preferenceProvider.getAccountId(),

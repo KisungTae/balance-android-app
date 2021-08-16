@@ -3,6 +3,7 @@ package com.beeswork.balance.data.network.interceptor
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.beeswork.balance.data.network.api.HttpHeader
 import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import okhttp3.Interceptor
@@ -11,17 +12,20 @@ import okhttp3.Response
 class ConnectivityInterceptorImpl(
     context: Context,
     private val preferenceProvider: PreferenceProvider
-): ConnectivityInterceptor {
+) : ConnectivityInterceptor {
 
     private val appContext = context.applicationContext
 
     override fun intercept(chain: Interceptor.Chain): Response {
         if (!isOnline()) throw NoInternetConnectivityException()
 
-        val accessToken = "${preferenceProvider.getAccessToken()}"
-        val request = chain.request().newBuilder().addHeader(ACCESS_TOKEN, accessToken).build()
+        var request = chain.request()
+        val noAuthentication = request.header(HttpHeader.NO_AUTHENTICATION).toBoolean()
+        if (!noAuthentication) {
+            val accessToken = "${preferenceProvider.getAccessToken()}"
+            request = chain.request().newBuilder().addHeader(ACCESS_TOKEN, accessToken).build()
+        }
         return chain.proceed(request)
-//        return chain.proceed(chain.request())
     }
 
     private fun isOnline(): Boolean {
