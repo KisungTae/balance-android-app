@@ -85,11 +85,7 @@ class MatchRepositoryImpl(
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = matchRDS.listMatches(
-                accountId,
-                preferenceProvider.getIdentityToken(),
-                fetchInfoDAO.findMatchFetchedAt(accountId)
-            )
+            val response = matchRDS.listMatches(accountId, fetchInfoDAO.findMatchFetchedAt(accountId))
 
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
@@ -154,11 +150,7 @@ class MatchRepositoryImpl(
 
     override suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val response = matchRDS.unmatch(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                swipedId
-            )
+            val response = matchRDS.unmatch(preferenceProvider.getAccountId(), swipedId)
             if (response.isSuccess()) unmatch(chatId)
             return@withContext response
         }
@@ -180,7 +172,6 @@ class MatchRepositoryImpl(
         return withContext(ioDispatcher) {
             val response = reportRDS.reportMatch(
                 preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
                 swipedId,
                 reportReason,
                 description
@@ -213,12 +204,7 @@ class MatchRepositoryImpl(
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType> {
         return withContext(ioDispatcher) {
-            val response = matchRDS.click(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                swipedId,
-                answers
-            )
+            val response = matchRDS.click(preferenceProvider.getAccountId(), swipedId, answers)
             response.data?.let { matchDTO ->
                 when (matchDTO.pushType) {
                     PushType.MATCHED -> saveMatch(matchMapper.toMatch(matchDTO))

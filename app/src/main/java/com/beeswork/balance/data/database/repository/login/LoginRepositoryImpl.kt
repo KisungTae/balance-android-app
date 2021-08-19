@@ -31,7 +31,7 @@ class LoginRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             loginDAO.updateSynced(accountId, false)
-            val response = loginRDS.saveEmail(accountId, preferenceProvider.getIdentityToken(), email)
+            val response = loginRDS.saveEmail(accountId, email)
 
             if (response.isSuccess()) {
                 loginDAO.updateEmail(accountId, email)
@@ -52,10 +52,7 @@ class LoginRepositoryImpl(
 
     override suspend fun fetchEmail(): Resource<String> {
         return withContext(ioDispatcher) {
-            val response = loginRDS.fetchEmail(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken()
-            )
+            val response = loginRDS.fetchEmail(preferenceProvider.getAccountId())
             if (response.isSuccess()) loginDAO.updateEmail(preferenceProvider.getAccountId(), response.data)
             return@withContext response
         }

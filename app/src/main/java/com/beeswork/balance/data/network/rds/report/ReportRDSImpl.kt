@@ -13,42 +13,20 @@ class ReportRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ReportRDS {
     override suspend fun reportProfile(
-        accountId: UUID?,
-        identityToken: UUID?,
-        reportedId: UUID?,
+        accountId: UUID,
+        reportedId: UUID,
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.reportProfile(
-                ReportBody(
-                    accountId,
-                    identityToken,
-                    reportedId,
-                    reportReason,
-                    description
-                )
-            )
-        }
+        return getResult { balanceAPI.reportProfile(ReportBody(accountId, reportedId, reportReason, description)) }
     }
 
     override suspend fun reportMatch(
-        accountId: UUID?,
-        identityToken: UUID?,
-        reportedId: UUID?,
+        accountId: UUID,
+        reportedId: UUID,
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.reportMatch(
-                ReportBody(
-                    accountId,
-                    identityToken,
-                    reportedId,
-                    reportReason,
-                    description
-                )
-            )
-        }
+        return getResult { balanceAPI.reportMatch(ReportBody(accountId, reportedId, reportReason, description)) }
     }
 }

@@ -2,7 +2,7 @@ package com.beeswork.balance.data.network.request
 
 import java.util.*
 
-data class UnmatchBody(
+data class SaveEmailBody(
     val accountId: UUID,
-    val swipedId: UUID
+    val email: String
 )

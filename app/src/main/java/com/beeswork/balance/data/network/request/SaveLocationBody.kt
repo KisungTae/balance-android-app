@@ -4,9 +4,8 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
-data class PostLocationBody(
-    val accountId: UUID?,
-    val identityToken: UUID?,
+data class SaveLocationBody(
+    val accountId: UUID,
     val latitude: Double,
     val longitude: Double,
     val updatedAt: OffsetDateTime

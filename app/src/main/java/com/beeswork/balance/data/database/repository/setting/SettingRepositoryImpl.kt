@@ -31,7 +31,7 @@ class SettingRepositoryImpl(
     override suspend fun fetchPushSetting(): Resource<PushSetting> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = settingRDS.fetchPushSetting(accountId, preferenceProvider.getIdentityToken())
+            val response = settingRDS.fetchPushSetting(accountId)
 
             if (response.isSuccess()) response.data?.let { pushSettingDTO ->
                 val pushSetting = pushSettingMapper.toPushSetting(accountId, pushSettingDTO)
@@ -51,9 +51,8 @@ class SettingRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             pushSettingDAO.updateSynced(accountId, false)
-            val response = settingRDS.postPushSettings(
+            val response = settingRDS.savePushSettings(
                 accountId,
-                preferenceProvider.getIdentityToken(),
                 matchPush,
                 clickedPush,
                 chatMessagePush,
@@ -85,11 +84,7 @@ class SettingRepositoryImpl(
     override suspend fun saveFCMToken(token: String) {
         withContext(Dispatchers.IO) {
             fcmTokenDAO.insert(FCMToken(token, posted = false, active = true))
-            val response = settingRDS.postFCMToken(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                token
-            )
+            val response = settingRDS.saveFCMToken(preferenceProvider.getAccountId(), token)
             if (response.isSuccess()) fcmTokenDAO.sync()
         }
     }
@@ -101,11 +96,7 @@ class SettingRepositoryImpl(
     override suspend fun syncFCMTokenAsync() {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
             fcmTokenDAO.findById()?.let { fcmToken ->
-                settingRDS.postFCMToken(
-                    preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken(),
-                    fcmToken
-                )
+                settingRDS.saveFCMToken(preferenceProvider.getAccountId(), fcmToken)
             }
         }
     }
@@ -128,9 +119,8 @@ class SettingRepositoryImpl(
 
     private fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-            val response = settingRDS.postLocation(
+            val response = settingRDS.saveLocation(
                 preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
                 latitude,
                 longitude,
                 updatedAt
@@ -157,10 +147,7 @@ class SettingRepositoryImpl(
 
     override suspend fun deleteAccount(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val response = settingRDS.deleteAccount(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken()
-            )
+            val response = settingRDS.deleteAccount(preferenceProvider.getAccountId())
             if (response.isSuccess()) {
                 //TODO: implement when success
             }

@@ -13,49 +13,45 @@ class SettingRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), SettingRDS {
 
-    override suspend fun fetchPushSetting(accountId: UUID, identityToken: UUID): Resource<PushSettingDTO> {
-        return getResult {
-            balanceAPI.getPushSetting(accountId, identityToken)
-        }
+    override suspend fun fetchPushSetting(accountId: UUID): Resource<PushSettingDTO> {
+        return getResult { balanceAPI.getPushSetting(accountId) }
     }
 
-    override suspend fun deleteAccount(accountId: UUID, identityToken: UUID): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.deleteAccount(DeleteAccountBody(accountId, identityToken))
-        }
+    override suspend fun deleteAccount(accountId: UUID): Resource<EmptyResponse> {
+        return getResult { balanceAPI.deleteAccount(DeleteAccountBody(accountId)) }
     }
 
-    override suspend fun postPushSettings(
+    override suspend fun savePushSettings(
         accountId: UUID,
-        identityToken: UUID,
         matchPush: Boolean,
         clickedPush: Boolean,
         chatMessagePush: Boolean,
         emailPush: Boolean
     ): Resource<EmptyResponse> {
         return getResult {
-            balanceAPI.postPushSettings(
-                PostPushSettingsBody(accountId, identityToken, matchPush, clickedPush, chatMessagePush, emailPush)
+            balanceAPI.savePushSettings(
+                SavePushSettingsBody(
+                    accountId,
+                    matchPush,
+                    clickedPush,
+                    chatMessagePush,
+                    emailPush
+                )
             )
         }
     }
 
-    override suspend fun postFCMToken(accountId: UUID, identityToken: UUID, token: String): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.postFCMToken(PostFCMTokenBody(accountId, identityToken, token))
-        }
+    override suspend fun saveFCMToken(accountId: UUID, token: String): Resource<EmptyResponse> {
+        return getResult { balanceAPI.saveFCMToken(SaveFCMTokenBody(accountId, token)) }
     }
 
-    override suspend fun postLocation(
+    override suspend fun saveLocation(
         accountId: UUID,
-        identityToken: UUID,
         latitude: Double,
         longitude: Double,
         updatedAt: OffsetDateTime
     ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.postLocation(PostLocationBody(accountId, identityToken, latitude, longitude, updatedAt))
-        }
+        return getResult { balanceAPI.saveLocation(SaveLocationBody(accountId, latitude, longitude, updatedAt)) }
     }
 
 }

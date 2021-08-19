@@ -4,6 +4,5 @@ import java.util.*
 
 data class OrderPhotosBody(
     val accountId: UUID,
-    val identityToken: UUID,
     val photoOrders: Map<String, Int>
 )

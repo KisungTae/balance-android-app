@@ -8,17 +8,15 @@ import java.util.*
 interface ReportRDS {
 
     suspend fun reportProfile(
-        accountId: UUID?,
-        identityToken: UUID?,
-        reportedId: UUID?,
+        accountId: UUID,
+        reportedId: UUID,
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse>
 
     suspend fun reportMatch(
-        accountId: UUID?,
-        identityToken: UUID?,
-        reportedId: UUID?,
+        accountId: UUID,
+        reportedId: UUID,
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse>

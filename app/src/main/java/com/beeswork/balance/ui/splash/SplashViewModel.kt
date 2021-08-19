@@ -37,10 +37,4 @@ class SplashViewModel(
             _loginWithRefreshToken.postValue(response)
         }
     }
-
-    fun login() {
-        viewModelScope.launch {
-
-        }
-    }
 }

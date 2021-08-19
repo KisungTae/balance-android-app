@@ -11,23 +11,11 @@ import java.util.*
 class ChatRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ChatRDS {
-    override suspend fun syncChatMessages(
-        accountId: UUID?,
-        identityToken: UUID?,
-        sentChatMessageIds: List<Long>,
-        receivedChatMessageIds: List<Long>
-    ) {
-        balanceAPI.syncChatMessages(
-            SyncChatMessagesBody(
-                accountId,
-                identityToken,
-                sentChatMessageIds,
-                receivedChatMessageIds
-            )
-        )
+    override suspend fun syncChatMessages(sentChatMessageIds: List<Long>, receivedChatMessageIds: List<Long>) {
+        balanceAPI.syncChatMessages(SyncChatMessagesBody(sentChatMessageIds, receivedChatMessageIds))
     }
 
-    override suspend fun listChatMessages(accountId: UUID?, identityToken: UUID?): Resource<ListChatMessagesDTO> {
-        return getResult { balanceAPI.listChatMessages(accountId, identityToken) }
+    override suspend fun listChatMessages(accountId: UUID): Resource<ListChatMessagesDTO> {
+        return getResult { balanceAPI.listChatMessages(accountId) }
     }
 }

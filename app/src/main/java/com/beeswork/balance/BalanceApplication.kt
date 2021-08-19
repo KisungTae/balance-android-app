@@ -518,5 +518,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      157. remove access token when pop to login fragment
 //      158. create locationDomain instead of locationTuple
 //      159. when received FCM notification, check if app background, if foregound, then check connectivity of websocket
+//      160. reportProfile() has not been implemented
+//      161. check balancequestion, fetch random questiosn,
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

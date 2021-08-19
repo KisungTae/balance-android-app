@@ -73,7 +73,6 @@ class ChatRepositoryImpl(
     }
 
 
-
     private fun collectChatMessageReceiptFlow() {
         stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
             chatMessageDTO.id?.let { id ->
@@ -179,7 +178,7 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val fetchedAt = OffsetDateTime.now()
             val accountId = preferenceProvider.getAccountId()
-            val response = chatRDS.listChatMessages(accountId, preferenceProvider.getIdentityToken())
+            val response = chatRDS.listChatMessages(accountId)
 
             response.data?.let { data ->
                 val chatIds = saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
@@ -236,12 +235,7 @@ class ChatRepositoryImpl(
     ) {
         if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-            chatRDS.syncChatMessages(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                sentChatMessageIds,
-                receivedChatMessageIds
-            )
+            chatRDS.syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
         }
     }
 

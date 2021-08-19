@@ -6,9 +6,5 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 interface ClickRDS {
-    suspend fun listClicks(
-        accountId: UUID?,
-        identityToken: UUID?,
-        fetchedAt: OffsetDateTime
-    ): Resource<List<ClickDTO>>
+    suspend fun listClicks(accountId: UUID, fetchedAt: OffsetDateTime): Resource<List<ClickDTO>>
 }

@@ -50,7 +50,6 @@ class SwipeRepositoryImpl(
             val swipeFilter = swipeFilterDAO.findById(accountId)
             val response = swipeRDS.fetchCards(
                 preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
                 swipeFilter.minAge,
                 swipeFilter.maxAge,
                 swipeFilter.gender,
@@ -72,20 +71,15 @@ class SwipeRepositoryImpl(
 
     override suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>> {
         return withContext(ioDispatcher) {
-            return@withContext swipeRDS.swipe(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                swipedId
-            )
+            return@withContext swipeRDS.swipe(preferenceProvider.getAccountId(), swipedId)
         }
     }
 
     override suspend fun prepopulateSwipeFilter() {
         withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            if (!swipeFilterDAO.existByAccountId(accountId)) accountId?.let { _accountId ->
-                swipeFilterDAO.insert(SwipeFilter(_accountId))
-            }
+            if (!swipeFilterDAO.existByAccountId(accountId))
+                swipeFilterDAO.insert(SwipeFilter(accountId))
         }
     }
 

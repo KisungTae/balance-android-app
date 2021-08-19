@@ -6,16 +6,6 @@ import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import java.util.*
 
 interface ChatRDS {
-
-    suspend fun syncChatMessages(
-        accountId: UUID?,
-        identityToken: UUID?,
-        sentChatMessageIds: List<Long>,
-        receivedChatMessageIds: List<Long>
-    )
-
-    suspend fun listChatMessages(
-        accountId: UUID?,
-        identityToken: UUID?
-    ): Resource<ListChatMessagesDTO>
+    suspend fun syncChatMessages(sentChatMessageIds: List<Long>, receivedChatMessageIds: List<Long>)
+    suspend fun listChatMessages(accountId: UUID): Resource<ListChatMessagesDTO>
 }

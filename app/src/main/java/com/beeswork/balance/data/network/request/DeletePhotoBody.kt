@@ -4,6 +4,5 @@ import java.util.*
 
 data class DeletePhotoBody(
     val accountId: UUID,
-    val identityToken: UUID,
     val photoKey: String
 )

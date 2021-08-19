@@ -32,7 +32,7 @@ class ProfileRepositoryImpl(
     override suspend fun fetchProfile(): Resource<Profile> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = profileRDS.fetchProfile(accountId, preferenceProvider.getIdentityToken())
+            val response = profileRDS.fetchProfile(accountId)
 
             if (response.isSuccess()) response.data?.let { profileDTO ->
                 val profile = profileMapper.toProfile(accountId, profileDTO)
@@ -47,12 +47,7 @@ class ProfileRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             profileDAO.updateSynced(accountId, false)
-            val response = profileRDS.postAbout(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                height,
-                about
-            )
+            val response = profileRDS.saveAbout(preferenceProvider.getAccountId(), height, about)
 
             if (response.isSuccess()) {
                 profileDAO.updateAbout(accountId, height, about)
@@ -66,20 +61,13 @@ class ProfileRepositoryImpl(
 
     override suspend fun fetchQuestions(): Resource<List<QuestionDTO>> {
         return withContext(ioDispatcher) {
-            return@withContext profileRDS.listQuestions(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken()
-            )
+            return@withContext profileRDS.listQuestions(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            return@withContext profileRDS.saveQuestions(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                answers
-            )
+            return@withContext profileRDS.saveQuestions(preferenceProvider.getAccountId(), answers)
         }
     }
 

@@ -22,8 +22,11 @@ class ConnectivityInterceptorImpl(
         var request = chain.request()
         val noAuthentication = request.header(HttpHeader.NO_AUTHENTICATION).toBoolean()
         if (!noAuthentication) {
-            val accessToken = "${preferenceProvider.getAccessToken()}"
-            request = chain.request().newBuilder().addHeader(ACCESS_TOKEN, accessToken).build()
+            request = chain.request()
+                .newBuilder()
+                .addHeader(HttpHeader.ACCESS_TOKEN, "${preferenceProvider.getAccessToken()}")
+                .addHeader(HttpHeader.IDENTITY_TOKEN, preferenceProvider.getIdentityToken().toString())
+                .build()
         }
         return chain.proceed(request)
     }
@@ -41,10 +44,4 @@ class ConnectivityInterceptorImpl(
             else -> false
         }
     }
-
-    companion object {
-        private const val ACCESS_TOKEN = "ACCESS-TOKEN"
-    }
-
-
 }

@@ -8,29 +8,20 @@ import java.util.*
 
 interface SettingRDS {
 
-    suspend fun fetchPushSetting(
-        accountId: UUID,
-        identityToken: UUID
-    ): Resource<PushSettingDTO>
+    suspend fun fetchPushSetting(accountId: UUID): Resource<PushSettingDTO>
+    suspend fun deleteAccount(accountId: UUID): Resource<EmptyResponse>
 
-    suspend fun deleteAccount(
+    suspend fun savePushSettings(
         accountId: UUID,
-        identityToken: UUID
-    ): Resource<EmptyResponse>
-
-    suspend fun postPushSettings(
-        accountId: UUID,
-        identityToken: UUID,
         matchPush: Boolean,
         clickedPush: Boolean,
         chatMessagePush: Boolean,
         emailPush: Boolean
     ): Resource<EmptyResponse>
 
-    suspend fun postFCMToken(accountId: UUID, identityToken: UUID, token: String): Resource<EmptyResponse>
-    suspend fun postLocation(
+    suspend fun saveFCMToken(accountId: UUID, token: String): Resource<EmptyResponse>
+    suspend fun saveLocation(
         accountId: UUID,
-        identityToken: UUID,
         latitude: Double,
         longitude: Double,
         updatedAt: OffsetDateTime

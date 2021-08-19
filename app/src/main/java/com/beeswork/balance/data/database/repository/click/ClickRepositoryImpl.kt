@@ -83,11 +83,7 @@ class ClickRepositoryImpl(
     override suspend fun fetchClicks(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = clickRDS.listClicks(
-                accountId,
-                preferenceProvider.getIdentityToken(),
-                fetchInfoDAO.findClickFetchedAt(accountId)
-            )
+            val response = clickRDS.listClicks(accountId, fetchInfoDAO.findClickFetchedAt(accountId))
 
             response.data?.let { data ->
                 var clickFetchedAt = OffsetDateTime.MIN

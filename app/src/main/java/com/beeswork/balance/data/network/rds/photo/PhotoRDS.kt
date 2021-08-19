@@ -10,18 +10,8 @@ import java.util.*
 
 interface PhotoRDS {
 
-    suspend fun orderPhotos(
-        accountId: UUID,
-        identityToken: UUID,
-        photoSequences: Map<String, Int>
-    ): Resource<EmptyResponse>
-
-    suspend fun savePhoto(
-        accountId: UUID,
-        identityToken: UUID,
-        photoKey: String,
-        sequence: Int
-    ): Resource<EmptyResponse>
+    suspend fun orderPhotos(accountId: UUID, photoSequences: Map<String, Int>): Resource<EmptyResponse>
+    suspend fun savePhoto(accountId: UUID, photoKey: String, sequence: Int): Resource<EmptyResponse>
 
     suspend fun uploadPhotoToS3(
         url: String,
@@ -29,20 +19,7 @@ interface PhotoRDS {
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse>
 
-    suspend fun getPreSignedURL(
-        accountId: UUID,
-        identityToken: UUID,
-        photoKey: String
-    ): Resource<PreSignedURLDTO>
-
-    suspend fun deletePhoto(
-        accountId: UUID,
-        identityToken: UUID,
-        photoKey: String
-    ): Resource<EmptyResponse>
-
-    suspend fun fetchPhotos(
-        accountId: UUID,
-        identityToken: UUID
-    ): Resource<List<PhotoDTO>>
+    suspend fun getPreSignedURL(accountId: UUID, photoKey: String): Resource<PreSignedURLDTO>
+    suspend fun deletePhoto(accountId: UUID, photoKey: String): Resource<EmptyResponse>
+    suspend fun fetchPhotos(accountId: UUID): Resource<List<PhotoDTO>>
 }

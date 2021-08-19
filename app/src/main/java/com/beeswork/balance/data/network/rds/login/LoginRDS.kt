@@ -8,25 +8,8 @@ import java.util.*
 
 interface LoginRDS {
 
-    suspend fun loginWithRefreshToken(
-        accountId: UUID,
-        refreshToken: String
-    ): Resource<LoginDTO>
-
-    suspend fun saveEmail(
-        accountId: UUID,
-        identityToken: UUID,
-        email: String
-    ): Resource<EmptyResponse>
-
-    suspend fun fetchEmail(
-        accountId: UUID,
-        identityToken: UUID
-    ): Resource<String>
-
-    suspend fun socialLogin(
-        loginId: String,
-        accessToken: String,
-        loginType: LoginType
-    ): Resource<LoginDTO>
+    suspend fun saveEmail(accountId: UUID, email: String): Resource<EmptyResponse>
+    suspend fun fetchEmail(accountId: UUID): Resource<String>
+    suspend fun loginWithRefreshToken(accountId: UUID, refreshToken: String): Resource<LoginDTO>
+    suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO>
 }

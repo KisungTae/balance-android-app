@@ -37,7 +37,7 @@ class PhotoRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             if (photoDAO.count(accountId) <= 0) {
-                val response = photoRDS.fetchPhotos(accountId, preferenceProvider.getIdentityToken())
+                val response = photoRDS.fetchPhotos(accountId)
                 response.data?.let { photoDTOs ->
                     val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(accountId, photoDTO) }
                     photoDAO.insert(photos)
@@ -73,12 +73,7 @@ class PhotoRepositoryImpl(
 
     private suspend fun uploadPhotoToS3(photoFile: File, photo: Photo, mimeType: String): Resource<EmptyResponse> {
         if (photo.uploaded) return Resource.success(EmptyResponse())
-
-        val getPreSignedURLResponse = photoRDS.getPreSignedURL(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
-            photo.key
-        )
+        val getPreSignedURLResponse = photoRDS.getPreSignedURL(preferenceProvider.getAccountId(), photo.key)
 
         if (getPreSignedURLResponse.isError()) {
             val photoAlreadyExists = getPreSignedURLResponse.error == ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
@@ -101,13 +96,7 @@ class PhotoRepositoryImpl(
             photoDAO.updateStatus(photo.key, PhotoStatus.OCCUPIED)
             return Resource.success(EmptyResponse())
         }
-
-        val savePhotoResponse = photoRDS.savePhoto(
-            preferenceProvider.getAccountId(),
-            preferenceProvider.getIdentityToken(),
-            photo.key,
-            photo.sequence
-        )
+        val savePhotoResponse = photoRDS.savePhoto(preferenceProvider.getAccountId(), photo.key, photo.sequence)
 
         if (savePhotoResponse.isError()) {
             val photoAlreadyExists = savePhotoResponse.error == ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
@@ -160,7 +149,6 @@ class PhotoRepositoryImpl(
 
                 val response = if (photo.uploaded || photo.saved) photoRDS.deletePhoto(
                     preferenceProvider.getAccountId(),
-                    preferenceProvider.getIdentityToken(),
                     photo.key
                 ) else Resource.success(EmptyResponse())
 
@@ -215,11 +203,7 @@ class PhotoRepositoryImpl(
             if (photos.size <= 0) return@withContext Resource.success(EmptyResponse())
 
             photoDAO.insert(photos)
-            val response = photoRDS.orderPhotos(
-                preferenceProvider.getAccountId(),
-                preferenceProvider.getIdentityToken(),
-                photoSequences
-            )
+            val response = photoRDS.orderPhotos(preferenceProvider.getAccountId(), photoSequences)
 
             photos.forEach { photo ->
                 photo.status = PhotoStatus.OCCUPIED

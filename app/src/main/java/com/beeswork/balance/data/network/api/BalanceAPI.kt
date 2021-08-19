@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.network.api
 
-import com.beeswork.balance.data.database.entity.Photo
 import com.beeswork.balance.data.network.converter.EnumConverterFactory
 import com.beeswork.balance.data.network.request.*
 import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
@@ -30,142 +29,50 @@ import java.util.*
 
 interface BalanceAPI {
 
-    @POST("login/refresh-token")
-    suspend fun loginWithRefreshToken(
-        @Body refreshAccessTokenBody: RefreshAccessTokenBody
-    ): Response<LoginDTO>
-
-    @GET("setting/push")
-    suspend fun getPushSetting(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "identityToken") identityToken: UUID
-    ): Response<PushSettingDTO>
-
-    @GET("profile")
-    suspend fun fetchProfile(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?
-    ): Response<ProfileDTO>
-
     @GET("chat/message/list")
-    suspend fun listChatMessages(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?
-    ): Response<ListChatMessagesDTO>
+    suspend fun listChatMessages(@Query(value = "accountId") accountId: UUID): Response<ListChatMessagesDTO>
+
+    @POST("chat/message/sync")
+    suspend fun syncChatMessages(@Body syncChatMessagesBody: SyncChatMessagesBody)
+
+
+    @GET("click/list")
+    suspend fun listClicks(
+        @Query(value = "accountId") accountId: UUID,
+        @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
+    ): Response<List<ClickDTO>>
+
 
     @POST("login/social")
     @Headers("${HttpHeader.NO_AUTHENTICATION}: true")
     suspend fun socialLogin(@Body socialLoginBody: SocialLoginBody): Response<LoginDTO>
 
-    @POST("account/delete")
-    suspend fun deleteAccount(@Body deleteAccountBody: DeleteAccountBody): Response<EmptyResponse>
+    @POST("login/refresh-token")
+    @Headers("${HttpHeader.NO_AUTHENTICATION}: true")
+    suspend fun loginWithRefreshToken(@Body refreshAccessTokenBody: RefreshAccessTokenBody): Response<LoginDTO>
 
-    @POST("setting/push")
-    suspend fun postPushSettings(@Body postPushSettingsBody: PostPushSettingsBody): Response<EmptyResponse>
-
-    @GET("login/email")
-    suspend fun getEmail(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?,
-    ): Response<String>
-
-    @POST("login/email")
-    suspend fun postEmail(@Body postEmailBody: PostEmailBody): Response<EmptyResponse>
-
-    @GET("photo/sign")
-    suspend fun getPreSignedURL(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "identityToken") identityToken: UUID,
-        @Query(value = "photoKey") photoKey: String
-    ): Response<PreSignedURLDTO>
-
-    @GET("photo/list")
-    suspend fun fetchPhotos(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "identityToken") identityToken: UUID
-    ): Response<List<PhotoDTO>>
-
-    @GET("account/question/list")
-    suspend fun listQuestions(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?
-    ): Response<List<QuestionDTO>>
-
-    @POST("profile/about")
-    suspend fun postAbout(@Body saveAboutBody: SaveAboutBody): Response<EmptyResponse>
-
-    @POST("setting")
-    suspend fun postSettings(@Body postSettingsBody: PostSettingsBody): Response<EmptyResponse>
-
-    @POST("swipe")
-    suspend fun swipe(@Body swipeBody: SwipeBody): Response<List<QuestionDTO>>
 
     @POST("click")
     suspend fun click(@Body clickBody: ClickBody): Response<MatchDTO>
 
-    @GET("click/list")
-    suspend fun listClicks(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?,
-        @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
-    ): Response<List<ClickDTO>>
-
     @POST("match/unmatch")
-    suspend fun unmatch(
-        @Body unmatchBody: UnmatchBody
-    ): Response<EmptyResponse>
-
-    @POST("report/profile")
-    suspend fun reportProfile(
-        @Body reportBody: ReportBody
-    ): Response<EmptyResponse>
-
-    @POST("report/match")
-    suspend fun reportMatch(
-        @Body reportBody: ReportBody
-    ): Response<EmptyResponse>
-
-    @POST("chat/message/sync")
-    suspend fun syncChatMessages(
-        @Body syncChatMessagesBody: SyncChatMessagesBody
-    )
+    suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<EmptyResponse>
 
     @GET("match/list")
     suspend fun listMatches(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?,
+        @Query(value = "accountId") accountId: UUID,
         @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
     ): Response<ListMatchesDTO>
 
-    @GET("profile/recommend")
-    suspend fun recommend(
-        @Query(value = "accountId") accountId: UUID?,
-        @Query(value = "identityToken") identityToken: UUID?,
-        @Query(value = "minAge") minAge: Int,
-        @Query(value = "maxAge") maxAge: Int,
-        @Query(value = "gender") gender: Boolean,
-        @Query(value = "distance") distance: Int,
-        @Query(value = "pageIndex") pageIndex: Int
-    ): Response<FetchCardsDTO>
 
-    @POST("profile/location")
-    suspend fun postLocation(
-        @Body postLocationBody: PostLocationBody
-    ): Response<EmptyResponse>
-
-    @POST("push-token/fcm")
-    suspend fun postFCMToken(@Body postFcmTokenBody: PostFCMTokenBody): Response<EmptyResponse>
-
+    @GET("photo/list")
+    suspend fun fetchPhotos(@Query(value = "accountId") accountId: UUID): Response<List<PhotoDTO>>
 
     @POST("photo/reorder")
-    suspend fun orderPhotos(
-        @Body orderPhotosBody: OrderPhotosBody
-    ): Response<EmptyResponse>
+    suspend fun orderPhotos(@Body orderPhotosBody: OrderPhotosBody): Response<EmptyResponse>
 
     @POST("photo/delete")
-    suspend fun deletePhoto(
-        @Body deletePhotoBody: DeletePhotoBody
-    ): Response<EmptyResponse>
+    suspend fun deletePhoto(@Body deletePhotoBody: DeletePhotoBody): Response<EmptyResponse>
 
     @POST
     @Multipart
@@ -176,37 +83,82 @@ interface BalanceAPI {
     ): Response<EmptyResponse>
 
     @POST("photo/save")
-    suspend fun savePhoto(
-        @Body savePhotoBody: SavePhotoBody
-    ): Response<EmptyResponse>
+    suspend fun savePhoto(@Body savePhotoBody: SavePhotoBody): Response<EmptyResponse>
 
-    @GET("/photo/list")
-    suspend fun fetchPhotos(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String
-    ): Response<List<Photo>>
+    @GET("photo/sign")
+    suspend fun getPreSignedURL(
+        @Query(value = "accountId") accountId: UUID,
+        @Query(value = "photoKey") photoKey: String
+    ): Response<PreSignedURLDTO>
 
 
-    @GET("/question/list")
-    suspend fun fetchQuestions(
-        @Query(value = "accountId") accountId: String,
-        @Query(value = "identityToken") identityToken: String
-    ): Response<List<QuestionDTO>>
+    @POST("profile/email")
+    suspend fun saveEmail(@Body saveEmailBody: SaveEmailBody): Response<EmptyResponse>
 
-    @GET("/question/random")
-    suspend fun fetchRandomQuestion(
-        @Query(value = "questionIds") questionIds: List<Int>
-    ): Response<QuestionDTO>
+    @GET("profile/email")
+    suspend fun getEmail(@Query(value = "accountId") accountId: UUID): Response<String>
+
+    @GET("profile")
+    suspend fun fetchProfile(@Query(value = "accountId") accountId: UUID): Response<ProfileDTO>
 
     @POST("/account/answers")
-    suspend fun postAnswers(@Body postAnswersBody: PostAnswersBody): Response<EmptyResponse>
+    suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
+
+    @GET("account/question/list")
+    suspend fun listQuestions(@Query(value = "accountId") accountId: UUID): Response<List<QuestionDTO>>
+
+    @POST("profile/about")
+    suspend fun postAbout(@Body saveAboutBody: SaveAboutBody): Response<EmptyResponse>
+
+
+    @POST("report/profile")
+    suspend fun reportProfile(@Body reportBody: ReportBody): Response<EmptyResponse>
+
+    @POST("report/match")
+    suspend fun reportMatch(@Body reportBody: ReportBody): Response<EmptyResponse>
+
+
+    @GET("setting/push")
+    suspend fun getPushSetting(@Query(value = "accountId") accountId: UUID): Response<PushSettingDTO>
+
+    @POST("account/delete")
+    suspend fun deleteAccount(@Body deleteAccountBody: DeleteAccountBody): Response<EmptyResponse>
+
+    @POST("setting/push")
+    suspend fun savePushSettings(@Body savePushSettingsBody: SavePushSettingsBody): Response<EmptyResponse>
+
+    @POST("push-token/fcm")
+    suspend fun saveFCMToken(@Body saveFcmTokenBody: SaveFCMTokenBody): Response<EmptyResponse>
+
+    @POST("profile/location")
+    suspend fun saveLocation(@Body saveLocationBody: SaveLocationBody): Response<EmptyResponse>
+
+
+    @POST("swipe")
+    suspend fun swipe(@Body swipeBody: SwipeBody): Response<List<QuestionDTO>>
+
+    @GET("profile/recommend")
+    suspend fun recommend(
+        @Query(value = "accountId") accountId: UUID,
+        @Query(value = "minAge") minAge: Int,
+        @Query(value = "maxAge") maxAge: Int,
+        @Query(value = "gender") gender: Boolean,
+        @Query(value = "distance") distance: Int,
+        @Query(value = "pageIndex") pageIndex: Int
+    ): Response<FetchCardsDTO>
+
+
+    @GET("/question/random/list")
+    suspend fun fetchRandomQuestions(): Response<List<QuestionDTO>>
+
+    @GET("/question/random")
+    suspend fun fetchRandomQuestion(@Query(value = "questionIds") questionIds: List<Int>): Response<QuestionDTO>
 
 
     companion object {
         operator fun invoke(
             okHttpClient: OkHttpClient
         ): BalanceAPI {
-
             return Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(EndPoint.ACCOUNT_SERVICE_ENDPOINT)
@@ -216,7 +168,5 @@ interface BalanceAPI {
                 .build()
                 .create(BalanceAPI::class.java)
         }
-
-        const val AV = "ddd"
     }
 }

@@ -17,22 +17,12 @@ class PhotoRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), PhotoRDS {
 
-    override suspend fun orderPhotos(
-        accountId: UUID,
-        identityToken: UUID,
-        photoSequences: Map<String, Int>
-    ): Resource<EmptyResponse> {
-        return getResult { balanceAPI.orderPhotos(OrderPhotosBody(accountId, identityToken, photoSequences)) }
+    override suspend fun orderPhotos(accountId: UUID, photoSequences: Map<String, Int>): Resource<EmptyResponse> {
+        return getResult { balanceAPI.orderPhotos(OrderPhotosBody(accountId, photoSequences)) }
     }
 
-
-    override suspend fun savePhoto(
-        accountId: UUID,
-        identityToken: UUID,
-        photoKey: String,
-        sequence: Int
-    ): Resource<EmptyResponse> {
-        return getResult { balanceAPI.savePhoto(SavePhotoBody(accountId, identityToken, photoKey, sequence)) }
+    override suspend fun savePhoto(accountId: UUID, photoKey: String, sequence: Int): Resource<EmptyResponse> {
+        return getResult { balanceAPI.savePhoto(SavePhotoBody(accountId, photoKey, sequence)) }
     }
 
     override suspend fun uploadPhotoToS3(
@@ -40,35 +30,18 @@ class PhotoRDSImpl(
         formData: Map<String, RequestBody>,
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.uploadPhotoToS3(url, formData, multipartBody)
-        }
+        return getResult { balanceAPI.uploadPhotoToS3(url, formData, multipartBody) }
     }
 
-    override suspend fun getPreSignedURL(
-        accountId: UUID,
-        identityToken: UUID,
-        photoKey: String
-    ): Resource<PreSignedURLDTO> {
-        return getResult {
-            balanceAPI.getPreSignedURL(accountId, identityToken, photoKey)
-        }
+    override suspend fun getPreSignedURL(accountId: UUID, photoKey: String): Resource<PreSignedURLDTO> {
+        return getResult { balanceAPI.getPreSignedURL(accountId, photoKey) }
     }
 
-
-    override suspend fun deletePhoto(
-        accountId: UUID,
-        identityToken: UUID,
-        photoKey: String
-    ): Resource<EmptyResponse> {
-        return getResult {
-            balanceAPI.deletePhoto(DeletePhotoBody(accountId, identityToken, photoKey))
-        }
+    override suspend fun deletePhoto(accountId: UUID, photoKey: String): Resource<EmptyResponse> {
+        return getResult { balanceAPI.deletePhoto(DeletePhotoBody(accountId, photoKey)) }
     }
 
-    override suspend fun fetchPhotos(accountId: UUID, identityToken: UUID): Resource<List<PhotoDTO>> {
-        return getResult {
-            balanceAPI.fetchPhotos(accountId, identityToken)
-        }
+    override suspend fun fetchPhotos(accountId: UUID): Resource<List<PhotoDTO>> {
+        return getResult { balanceAPI.fetchPhotos(accountId) }
     }
 }

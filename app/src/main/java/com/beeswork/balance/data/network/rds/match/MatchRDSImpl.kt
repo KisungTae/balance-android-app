@@ -16,32 +16,15 @@ class MatchRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), MatchRDS {
 
-    override suspend fun click(
-        accountId: UUID?,
-        identityToken: UUID?,
-        swipedId: UUID,
-        answers: Map<Int, Boolean>
-    ): Resource<MatchDTO> {
-        return getResult {
-            balanceAPI.click(ClickBody(accountId, identityToken, swipedId, answers))
-        }
+    override suspend fun click(accountId: UUID, swipedId: UUID, answers: Map<Int, Boolean>): Resource<MatchDTO> {
+        return getResult { balanceAPI.click(ClickBody(accountId, swipedId, answers)) }
     }
 
-    override suspend fun unmatch(accountId: UUID?, identityToken: UUID?, swipedId: UUID): Resource<EmptyResponse> {
-        return getResult { balanceAPI.unmatch(UnmatchBody(accountId, identityToken, swipedId)) }
+    override suspend fun unmatch(accountId: UUID, swipedId: UUID): Resource<EmptyResponse> {
+        return getResult { balanceAPI.unmatch(UnmatchBody(accountId, swipedId)) }
     }
 
-    override suspend fun listMatches(
-        accountId: UUID?,
-        identityToken: UUID?,
-        fetchedAt: OffsetDateTime
-    ): Resource<ListMatchesDTO> {
-        return getResult {
-            balanceAPI.listMatches(
-                accountId,
-                identityToken,
-                fetchedAt,
-            )
-        }
+    override suspend fun listMatches(accountId: UUID, fetchedAt: OffsetDateTime): Resource<ListMatchesDTO> {
+        return getResult { balanceAPI.listMatches(accountId, fetchedAt) }
     }
 }

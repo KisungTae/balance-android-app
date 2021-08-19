@@ -2,8 +2,7 @@ package com.beeswork.balance.data.network.request
 
 import java.util.*
 
-data class PostEmailBody(
+data class SaveFCMTokenBody(
     val accountId: UUID,
-    val identityToken: UUID,
-    val email: String
+    val token: String
 )
