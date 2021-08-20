@@ -2,18 +2,19 @@ package com.beeswork.balance.data.network.rds.profile
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
-import com.beeswork.balance.data.network.request.SaveAnswersBody
-import com.beeswork.balance.data.network.request.SaveEmailBody
-import com.beeswork.balance.data.network.request.SaveAboutBody
+import com.beeswork.balance.data.network.request.profile.SaveAnswersBody
+import com.beeswork.balance.data.network.request.profile.SaveAboutBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
 
 class ProfileRDSImpl(
-    private val balanceAPI: BalanceAPI
-) : BaseRDS(), ProfileRDS {
+    balanceAPI: BalanceAPI,
+    preferenceProvider: PreferenceProvider
+) : BaseRDS(balanceAPI, preferenceProvider), ProfileRDS {
 
     override suspend fun fetchProfile(accountId: UUID): Resource<ProfileDTO> {
         return getResult { balanceAPI.fetchProfile(accountId) }

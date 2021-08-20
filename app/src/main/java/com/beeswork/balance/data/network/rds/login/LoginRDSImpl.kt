@@ -2,18 +2,20 @@ package com.beeswork.balance.data.network.rds.login
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
-import com.beeswork.balance.data.network.request.RefreshAccessTokenBody
-import com.beeswork.balance.data.network.request.SaveEmailBody
-import com.beeswork.balance.data.network.request.SocialLoginBody
+import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
+import com.beeswork.balance.data.network.request.profile.SaveEmailBody
+import com.beeswork.balance.data.network.request.login.SocialLoginBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
 
 class LoginRDSImpl(
-    private val balanceAPI: BalanceAPI
-) : BaseRDS(), LoginRDS {
+    balanceAPI: BalanceAPI,
+    preferenceProvider: PreferenceProvider
+) : BaseRDS(balanceAPI, preferenceProvider), LoginRDS {
 
     override suspend fun saveEmail(accountId: UUID, email: String): Resource<EmptyResponse> {
         return getResult { balanceAPI.saveEmail(SaveEmailBody(accountId, email)) }

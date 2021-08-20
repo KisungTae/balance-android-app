@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network.request
+package com.beeswork.balance.data.network.request.setting
 
 import org.threeten.bp.OffsetDateTime
 import java.util.*

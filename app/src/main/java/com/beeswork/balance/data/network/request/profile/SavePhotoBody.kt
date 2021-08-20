@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network.request
+package com.beeswork.balance.data.network.request.profile
 
 import retrofit2.http.Query
 import java.util.*

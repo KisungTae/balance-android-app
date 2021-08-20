@@ -26,7 +26,8 @@ class RegisterActivity: BaseActivity(), KodeinAware {
         setContentView(binding.root)
         binding.btnTest.setOnClickListener {
             lifecycleScope.launch {
-                settingRepository.syncFCMTokenAsync()
+                val response = settingRepository.savePushSetting(false, false, false, false)
+                println("response: $response")
             }
 
         }

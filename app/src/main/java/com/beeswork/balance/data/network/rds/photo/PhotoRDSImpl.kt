@@ -2,20 +2,22 @@ package com.beeswork.balance.data.network.rds.photo
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
-import com.beeswork.balance.data.network.request.DeletePhotoBody
-import com.beeswork.balance.data.network.request.OrderPhotosBody
-import com.beeswork.balance.data.network.request.SavePhotoBody
+import com.beeswork.balance.data.network.request.profile.DeletePhotoBody
+import com.beeswork.balance.data.network.request.profile.OrderPhotosBody
+import com.beeswork.balance.data.network.request.profile.SavePhotoBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.util.*
 
 class PhotoRDSImpl(
-    private val balanceAPI: BalanceAPI
-) : BaseRDS(), PhotoRDS {
+    balanceAPI: BalanceAPI,
+    preferenceProvider: PreferenceProvider
+) : BaseRDS(balanceAPI, preferenceProvider), PhotoRDS {
 
     override suspend fun orderPhotos(accountId: UUID, photoSequences: Map<String, Int>): Resource<EmptyResponse> {
         return getResult { balanceAPI.orderPhotos(OrderPhotosBody(accountId, photoSequences)) }

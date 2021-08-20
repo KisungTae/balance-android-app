@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network.request
+package com.beeswork.balance.data.network.request.common
 
 import com.beeswork.balance.internal.constant.ReportReason
 import java.util.*

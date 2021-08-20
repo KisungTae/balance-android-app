@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.network.request
+package com.beeswork.balance.data.network.request.click
 
 import retrofit2.http.FieldMap
 import java.util.*

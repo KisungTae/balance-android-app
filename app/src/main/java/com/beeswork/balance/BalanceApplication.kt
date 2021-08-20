@@ -142,15 +142,15 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { BalanceAPI(instance()) }
 
         // RDS
-        bind<ReportRDS>() with singleton { ReportRDSImpl(instance()) }
-        bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
-        bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
-        bind<ClickRDS>() with singleton { ClickRDSImpl(instance()) }
-        bind<SettingRDS>() with singleton { SettingRDSImpl(instance()) }
-        bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance()) }
-        bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance()) }
-        bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance()) }
-        bind<LoginRDS>() with singleton { LoginRDSImpl(instance()) }
+        bind<ReportRDS>() with singleton { ReportRDSImpl(instance(), instance()) }
+        bind<ChatRDS>() with singleton { ChatRDSImpl(instance(), instance()) }
+        bind<MatchRDS>() with singleton { MatchRDSImpl(instance(), instance()) }
+        bind<ClickRDS>() with singleton { ClickRDSImpl(instance(), instance()) }
+        bind<SettingRDS>() with singleton { SettingRDSImpl(instance(), instance()) }
+        bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance(), instance()) }
+        bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance(), instance()) }
+        bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance(), instance()) }
+        bind<LoginRDS>() with singleton { LoginRDSImpl(instance(), instance()) }
 
         // Repository
 
@@ -519,6 +519,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      158. create locationDomain instead of locationTuple
 //      159. when received FCM notification, check if app background, if foregound, then check connectivity of websocket
 //      160. reportProfile() has not been implemented
-//      161. check balancequestion, fetch random questiosn,
+//      161. check balancequestion, fetch random questiosn, and seperate balancegame dialogs
+//      162. check chat in regards to security of spring boot
+
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

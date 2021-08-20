@@ -1,10 +1,13 @@
 package com.beeswork.balance.data.network.rds
 
+import com.beeswork.balance.data.network.api.BalanceAPI
+import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
 import com.beeswork.balance.data.network.response.ErrorResponse
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.*
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.google.gson.Gson
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -18,7 +21,10 @@ import java.net.UnknownHostException
 import java.util.*
 
 
-abstract class BaseRDS {
+abstract class BaseRDS(
+    protected val balanceAPI: BalanceAPI,
+    protected val preferenceProvider: PreferenceProvider
+) {
 
     protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
         try {
@@ -61,6 +67,18 @@ abstract class BaseRDS {
                     ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION -> throw AccountBlockedException(errorResponse.message)
                     ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> throw AccountDeletedException(errorResponse.message)
                     ExceptionCode.REFRESH_TOKEN_EXPIRED_EXCEPTION -> throw RefreshTokenExpiredException(errorResponse.message)
+                    ExceptionCode.EXPIRED_JWT_EXCEPTION -> {
+                        preferenceProvider.getRefreshToken()?.let { refreshToken ->
+                            val refreshAccessTokenBody = RefreshAccessTokenBody(preferenceProvider.getAccountId(), refreshToken)
+                            val refreshTokenResponse = balanceAPI.refreshAccessToken(refreshAccessTokenBody)
+                            if (response.isSuccessful) {
+
+
+                            } else {
+
+                            }
+                        }
+                    }
                 }
                 return Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
             }
@@ -74,6 +92,10 @@ abstract class BaseRDS {
         } catch (e: UnknownHostException) {
             return Resource.error(ExceptionCode.UNKNOWN_HOST_EXCEPTION)
         }
+    }
+
+    private suspend fun <T> refreshAccessToken(call: suspend () -> Response<T>): Resource<T> {
+
     }
 
 
