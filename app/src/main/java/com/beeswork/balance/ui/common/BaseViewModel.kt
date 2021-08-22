@@ -17,6 +17,7 @@ abstract class BaseViewModel : ViewModel() {
             is AccountNotFoundException,
             is AccountDeletedException,
             is AccountBlockedException,
+            is ExpiredJWTException,
             is RefreshTokenExpiredException -> _exceptionLiveData.postValue(throwable)
             else -> throw throwable
         }
@@ -28,18 +29,3 @@ abstract class BaseViewModel : ViewModel() {
         }
     }
 }
-
-//    protected fun <T> validateAccount(resource: Resource<T>): Boolean {
-//        return if (resource.isError()) resource.error?.let { error ->
-//            return when (error) {
-//                ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION,
-//                ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
-//                ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> {
-//                    _exceptionLiveData.postValue(resource.toEmptyResponse())
-//                    false
-//                }
-//                else -> true
-//            }
-//        } ?: true
-//        else true
-//    }

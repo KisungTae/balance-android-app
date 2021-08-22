@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Primary"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/register_name_label"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/register_name_description" />
+
+    <EditText
+        android:id="@+id/etRegisterName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:autofillHints="@string/register_name_hint"
+        android:background="@drawable/sh_round_box_thin_border"
+        android:hint="@string/register_name_hint"
+        android:inputType="text"
+        android:padding="15dp"
+        android:textCursorDrawable="@drawable/sh_edit_text_cursor" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnRegisterNameNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/sh_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
+        android:text="@string/button_next_label" />
+
+
+</LinearLayout>

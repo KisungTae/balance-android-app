@@ -3,10 +3,7 @@ package com.beeswork.balance.ui.common
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.exception.AccountBlockedException
-import com.beeswork.balance.internal.exception.AccountDeletedException
-import com.beeswork.balance.internal.exception.AccountNotFoundException
-import com.beeswork.balance.internal.exception.RefreshTokenExpiredException
+import com.beeswork.balance.internal.exception.*
 import com.beeswork.balance.ui.loginactivity.LoginActivity
 
 abstract class BaseActivity: AppCompatActivity() {
@@ -19,8 +16,9 @@ abstract class BaseActivity: AppCompatActivity() {
         when (throwable) {
             is AccountNotFoundException,
             is AccountDeletedException,
-            is AccountBlockedException,
-            is RefreshTokenExpiredException -> moveToLoginActivity(null, throwable.message)
+            is AccountBlockedException -> moveToLoginActivity(null, throwable.message)
+            is RefreshTokenExpiredException,
+            is ExpiredJWTException -> moveToLoginActivity(null, null)
             else -> throw throwable
         }
     }

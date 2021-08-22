@@ -75,11 +75,13 @@ class SwipeRepositoryImpl(
         }
     }
 
-    override suspend fun prepopulateSwipeFilter() {
+    override suspend fun prepopulateSwipeFilter(gender: Boolean?) {
         withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            if (!swipeFilterDAO.existByAccountId(accountId))
-                swipeFilterDAO.insert(SwipeFilter(accountId))
+            if (swipeFilterDAO.existByAccountId(accountId)) return@withContext
+            gender?.let { _gender ->
+                swipeFilterDAO.insert(SwipeFilter(accountId, Gender.getOppositeGender(_gender)))
+            } ?: kotlin.run { swipeFilterDAO.insert(SwipeFilter(accountId)) }
         }
     }
 

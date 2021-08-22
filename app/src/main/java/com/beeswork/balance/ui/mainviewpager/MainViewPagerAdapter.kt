@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
-import com.beeswork.balance.internal.constant.FragmentTabPosition
 import com.beeswork.balance.ui.account.AccountFragment
 import com.beeswork.balance.ui.click.ClickFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
@@ -20,15 +19,15 @@ class MainViewPagerAdapter(
     private val fragments = mutableListOf<Fragment>()
 
     override fun getItemCount(): Int {
-        return FragmentTabPosition.values().size
+        return MainViewPagerTabPosition.values().size
     }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            FragmentTabPosition.ACCOUNT.ordinal -> addToFragments(AccountFragment())
-            FragmentTabPosition.SWIPE.ordinal -> addToFragments(SwipeFragment())
-            FragmentTabPosition.CLICK.ordinal -> addToFragments(ClickFragment())
-            FragmentTabPosition.MATCH.ordinal -> addToFragments(MatchFragment())
+            MainViewPagerTabPosition.ACCOUNT.ordinal -> addToFragments(AccountFragment())
+            MainViewPagerTabPosition.SWIPE.ordinal -> addToFragments(SwipeFragment())
+            MainViewPagerTabPosition.CLICK.ordinal -> addToFragments(ClickFragment())
+            MainViewPagerTabPosition.MATCH.ordinal -> addToFragments(MatchFragment())
             else -> fragments[1]
         }
     }

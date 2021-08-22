@@ -77,6 +77,14 @@ import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.match.MatchViewModelFactory
 import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profile.ProfileViewModelFactory
+import com.beeswork.balance.ui.registeractivity.RegisterViewModelFactory
+import com.beeswork.balance.ui.registeractivity.about.AboutViewModelFactory
+import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateViewModelFactory
+import com.beeswork.balance.ui.registeractivity.gender.GenderViewModelFactory
+import com.beeswork.balance.ui.registeractivity.height.HeightViewModelFactory
+import com.beeswork.balance.ui.registeractivity.name.NameViewModelFactory
+import com.beeswork.balance.ui.registeractivity.photo.PhotoViewModelFactory
+import com.beeswork.balance.ui.registeractivity.registerfinish.RegisterFinishViewModelFactory
 import com.beeswork.balance.ui.setting.SettingViewModelFactory
 import com.beeswork.balance.ui.setting.email.EmailSettingViewModelFactory
 import com.beeswork.balance.ui.setting.push.PushSettingViewModelFactory
@@ -308,9 +316,21 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
-        bind() from provider { SplashViewModelFactory(instance(), instance()) }
+        bind() from provider { SplashViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance()) }
+        bind() from provider { RegisterViewModelFactory(instance(), instance()) }
+
+
+        bind() from provider { AboutViewModelFactory(instance()) }
+        bind() from provider { BirthDateViewModelFactory(instance()) }
+        bind() from provider { GenderViewModelFactory(instance()) }
+        bind() from provider { HeightViewModelFactory(instance()) }
+        bind() from provider { NameViewModelFactory(instance()) }
+        bind() from provider { PhotoViewModelFactory(instance()) }
+        bind() from provider { RegisterFinishViewModelFactory(instance()) }
+
+
 
 
         // Interceptor
@@ -521,6 +541,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      160. reportProfile() has not been implemented
 //      161. check balancequestion, fetch random questiosn, and seperate balancegame dialogs
 //      162. check chat in regards to security of spring boot
+//      163. put scrollbar in card on the top right
 
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

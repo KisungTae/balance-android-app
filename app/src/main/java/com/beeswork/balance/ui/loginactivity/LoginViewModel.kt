@@ -32,26 +32,17 @@ class LoginViewModel(
     val loginLiveData: LiveData<Resource<LoginDomain>> get() = _loginLiveData
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        println("coroutineExceptionHandler = CoroutineExceptionHandler ${throwable.javaClass.toString()}")
         _loginLiveData.postValue(Resource.error(null, throwable.message))
     }
 
-    fun login() {
-
-    }
-
-    //  TODO: save accountId and identityToken
-//  TODO: save email with loginType and accountId
-//  TODO: sync push token
     fun socialLogin(loginId: String?, accessToken: String?, loginType: LoginType) {
         safeLet(loginId, accessToken) { _loginId, _accessToken ->
             viewModelScope.launch(coroutineExceptionHandler) {
                 val response = loginRepository.socialLogin(_loginId, _accessToken, loginType)
-                if (response.isSuccess()) {
-//                    settingRepository.prepopulateFetchInfo()
-//                    swipeRepository.prepopulateSwipeFilter()
-//                    loginRepository.saveEmail(response.data?.email, loginType)
-//                    settingRepository.syncFCMTokenAsync()
+                if (response.isSuccess()) response.data?.let { loginDTO ->
+                    settingRepository.prepopulateFetchInfo()
+                    if (loginDTO.profileExists) swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
+                    settingRepository.syncFCMTokenAsync()
                 }
                 _loginLiveData.postValue(
                     response.let { it.mapData(it.data?.let { loginDTO -> loginMapper.toLoginDomain(loginDTO) }) }
@@ -59,15 +50,6 @@ class LoginViewModel(
             }
         } ?: kotlin.run {
             _loginLiveData.postValue(Resource.error(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION))
-        }
-    }
-
-    //  TODO: remove me
-    fun mockSocialLogin() {
-        viewModelScope.launch {
-            settingRepository.prepopulateFetchInfo()
-            swipeRepository.prepopulateSwipeFilter()
-            loginRepository.saveEmail("test@gmail.com", LoginType.KAKAO)
         }
     }
 }

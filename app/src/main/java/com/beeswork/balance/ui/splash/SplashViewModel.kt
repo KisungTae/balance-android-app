@@ -1,10 +1,13 @@
 package com.beeswork.balance.ui.splash
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.login.LoginRepository
+import com.beeswork.balance.data.database.repository.setting.SettingRepository
+import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.exception.AccountBlockedException
@@ -19,7 +22,9 @@ import kotlinx.coroutines.launch
 
 class SplashViewModel(
     private val loginRepository: LoginRepository,
-    private val loginMapper: LoginMapper
+    private val loginMapper: LoginMapper,
+    private val settingRepository: SettingRepository,
+    private val swipeRepository: SwipeRepository
 ): ViewModel() {
 
     private val _loginWithRefreshToken = MutableLiveData<Resource<LoginDomain>>()
@@ -31,10 +36,15 @@ class SplashViewModel(
 
     fun loginWithRefreshToken() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            val response = loginRepository.loginWithRefreshToken().let {
-                it.mapData(it.data?.let { loginDTO -> loginMapper.toLoginDomain(loginDTO) })
+            val response = loginRepository.loginWithRefreshToken()
+            if (response.isSuccess()) response.data?.let { loginDTO ->
+                settingRepository.prepopulateFetchInfo()
+                if (loginDTO.profileExists) swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
+                settingRepository.syncFCMTokenAsync()
             }
-            _loginWithRefreshToken.postValue(response)
+            _loginWithRefreshToken.postValue(
+                response.let { it.mapData(it.data?.let { loginDTO -> loginMapper.toLoginDomain(loginDTO) }) }
+            )
         }
     }
 }

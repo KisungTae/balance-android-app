@@ -20,9 +20,9 @@ class LoginRepositoryImpl(
     private val loginRDS: LoginRDS,
     private val ioDispatcher: CoroutineDispatcher
 ) : LoginRepository {
-    override suspend fun saveEmail(email: String?, loginType: LoginType) {
+    private suspend fun saveEmail(accountId: UUID, email: String?, loginType: LoginType) {
         withContext(ioDispatcher) {
-            val login = Login(preferenceProvider.getAccountId(), loginType, email, true)
+            val login = Login(accountId, loginType, email, true)
             loginDAO.insert(login)
         }
     }
@@ -62,6 +62,7 @@ class LoginRepositoryImpl(
         return withContext(ioDispatcher) {
             val response = loginRDS.socialLogin(loginId, accessToken, loginType)
             if (response.isSuccess()) response.data?.let { loginDTO ->
+                saveEmail(loginDTO.accountId, loginDTO.email, loginType)
                 preferenceProvider.putTokens(
                     loginDTO.accountId,
                     loginDTO.identityToken,

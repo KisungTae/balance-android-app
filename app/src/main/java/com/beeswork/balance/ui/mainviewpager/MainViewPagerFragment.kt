@@ -9,12 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
-import com.beeswork.balance.internal.constant.FragmentTabPosition
-import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.ui.common.BaseFragment
-import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -55,13 +51,13 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
 
     private suspend fun setupClickCountObserver() {
         viewModel.clickCount.await().observe(viewLifecycleOwner) { count ->
-            showBadgeWithCount(FragmentTabPosition.CLICK.ordinal, count)
+            showBadgeWithCount(MainViewPagerTabPosition.CLICK.ordinal, count)
         }
     }
 
     private suspend fun setupUnreadMatchCountObserver() {
         viewModel.unreadMatchCount.await().observe(viewLifecycleOwner) { count ->
-            showBadgeWithCount(FragmentTabPosition.MATCH.ordinal, count)
+            showBadgeWithCount(MainViewPagerTabPosition.MATCH.ordinal, count)
         }
     }
 
@@ -73,9 +69,9 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     private fun setupViewPager() {
         mainViewPagerAdapter = MainViewPagerAdapter(childFragmentManager, lifecycle)
         binding.vpMain.adapter = mainViewPagerAdapter
-        binding.vpMain.offscreenPageLimit = FragmentTabPosition.values().size
+        binding.vpMain.offscreenPageLimit = MainViewPagerTabPosition.values().size
         binding.vpMain.setPageTransformer(null)
-        binding.vpMain.setCurrentItem(FragmentTabPosition.SWIPE.ordinal, false)
+        binding.vpMain.setCurrentItem(MainViewPagerTabPosition.SWIPE.ordinal, false)
         binding.vpMain.isUserInputEnabled = false
         binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -94,10 +90,10 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
             false
         ) { tab, position ->
             when (position) {
-                FragmentTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_baseline_account_circle)
-                FragmentTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
-                FragmentTabPosition.CLICK.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
-                FragmentTabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
+                MainViewPagerTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_baseline_account_circle)
+                MainViewPagerTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
+                MainViewPagerTabPosition.CLICK.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
+                MainViewPagerTabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
             }
         }
         tabLayoutMediator.attach()

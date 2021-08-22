@@ -198,4 +198,9 @@
     <string name="invalid_social_login_exception">유효하지않은 소셜로그인 요청입니다</string>
     <string name="server_client_id">345572935231-j12sr8v32ngttr24lfpuvfe7djt24312.apps.googleusercontent.com</string>
     <string name="fetching_photos_message">사진을 가져오고있습니다....</string>
+    <string name="refresh_token_not_found_exception"></string>
+    <string name="register_name_label">이름을 입력해주세요</string>
+    <string name="register_name_description">한번 입력한 이름을 바꾸실수 없습니다. 정확히 입력해주세요</string>
+    <string name="button_next_label">다음</string>
+    <string name="register_name_hint"></string>
 </resources>
