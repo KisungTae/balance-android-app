@@ -2,6 +2,7 @@ package com.beeswork.balance.data.network.service.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.data.network.api.HttpHeader
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
@@ -57,14 +58,16 @@ class StompClientImpl(
         }
     }
 
-
     override fun onOpen(webSocket: WebSocket, response: Response) {
+        println("override fun onOpen(webSocket: WebSocket, response: Response) {")
+        println(response.toString())
         socketStatus = SocketStatus.OPEN
         connectToStomp()
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         val stompFrame = StompFrame.from(text)
+        println("override fun onMessage(webSocket: WebSocket, text: String): ${stompFrame.command}")
         when (stompFrame.command) {
             StompFrame.Command.CONNECTED -> subscribeToQueue()
             StompFrame.Command.MESSAGE -> onMessageFrameReceived(stompFrame)
@@ -77,14 +80,20 @@ class StompClientImpl(
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {}
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+        println("override fun onClosing(webSocket: WebSocket, code: Int, reason: String) ${reason}")
         socketStatus = SocketStatus.CLOSED
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        println("override fun onClosed: ${reason}")
         socketStatus = SocketStatus.CLOSED
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        println("override fun onFailure: ${t.localizedMessage}")
+        println("override fun onFailure: ${response.toString()}")
+        println("override fun onFailure: ${t.cause}")
+
         socketStatus = SocketStatus.CLOSED
         val error: String? = when (t) {
             is SocketTimeoutException -> ExceptionCode.SOCKET_TIMEOUT_EXCEPTION
@@ -98,11 +107,13 @@ class StompClientImpl(
     override suspend fun connect() {
         if (socketStatus == SocketStatus.CLOSED) {
             socketStatus = SocketStatus.CONNECTING
-            socket = okHttpClient.newWebSocket(Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build(), this)
+            val webSocketRequest = Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build()
+            socket = okHttpClient.newWebSocket(webSocketRequest, this)
         }
     }
 
     private fun onMessageFrameReceived(stompFrame: StompFrame) {
+        println()
         when (stompFrame.getPushType()) {
             PushType.CHAT_MESSAGE -> applicationScope.launch {
                 chatMessageChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java))
@@ -119,6 +130,7 @@ class StompClientImpl(
     }
 
     private fun onReceiptFrameReceived(stompFrame: StompFrame) {
+        println("onReceiptFrameReceived: $stompFrame")
         stompFrame.payload?.let {
             applicationScope.launch {
                 val chatMessageDTO = GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
@@ -130,25 +142,31 @@ class StompClientImpl(
 
     private fun onErrorFrameReceived(stompFrame: StompFrame) {
         applicationScope.launch {
+            println("onErrorFrameReceived: $stompFrame")
             stompFrame.getReceiptId()?.let { receiptId ->
                 val chatMessageDTO = ChatMessageDTO(receiptId)
                 chatMessageReceiptChannel.send(chatMessageDTO)
             }
             val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
             webSocketEventChannel.send(webSocketEvent)
+            disconnect()
         }
     }
 
     override suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
-        if (socketStatus == SocketStatus.CLOSED) connect()
+        if (socketStatus == SocketStatus.CLOSED) {
+            socket = null
+            connect()
+        }
         if (socketStatus == SocketStatus.CONNECTING) delay(CONNECTING_DELAY)
 
         if (socketStatus == SocketStatus.OPEN) {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
-            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken().toString()
             headers[StompHeader.RECEIPT] = key.toString()
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+            headers[HttpHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken().toString()
+            headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
             val chatMessageDTO = ChatMessageDTO(chatId, body, preferenceProvider.getAccountId(), swipedId)
             val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
             outgoing.send(stompFrame.compile())
@@ -164,6 +182,9 @@ class StompClientImpl(
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
             headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
+            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+            headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
+            headers[HttpHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()}"
             socket?.send(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
         }
     }
@@ -173,6 +194,9 @@ class StompClientImpl(
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
             headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken().toString()
+            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+            headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
+            headers[HttpHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()}"
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }
@@ -184,7 +208,7 @@ class StompClientImpl(
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_HEART_BEAT = "0,0"
-        private const val CONNECTING_DELAY = 5000L
+        private const val CONNECTING_DELAY = 10000L
     }
 
     enum class SocketStatus {
@@ -195,6 +219,9 @@ class StompClientImpl(
 
 }
 
+
+// TODO: when acceess token is null, then throw eception and implement catche xception in viewmodel
+// TODO: change "${preferenceProvider.getAccessToken()}" to if acess ntoken then throw exception
 
 // TODO: lifecycle event error and close socket in subscribe()
 // TODO: what happens when exception is thrown in onFrame()

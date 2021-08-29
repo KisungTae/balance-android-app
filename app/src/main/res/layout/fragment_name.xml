@@ -26,7 +26,7 @@
         android:autofillHints="@string/register_name_hint"
         android:background="@drawable/sh_round_box_thin_border"
         android:hint="@string/register_name_hint"
-        android:inputType="text"
+        android:inputType="text|textNoSuggestions|textVisiblePassword"
         android:padding="15dp"
         android:textCursorDrawable="@drawable/sh_edit_text_cursor" />
 

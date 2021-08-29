@@ -58,7 +58,7 @@ class ClickFragment : BaseFragment(),
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         observeExceptionLiveData(viewModel)
         bindUI()
-        viewModel.fetchClicks()
+//        viewModel.fetchClicks()
     }
 
     private fun bindUI() = lifecycleScope.launch {

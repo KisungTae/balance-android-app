@@ -4,12 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
@@ -70,7 +73,6 @@ fun <T> CoroutineScope.testLaunch2(final: suspend () -> Resource<T>, body: (Reso
         body.invoke(response)
     }
 }
-
 
 
 fun Context.hideKeyboard(view: View) {
@@ -135,3 +137,19 @@ fun <T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>> {
 
 
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+fun Activity.hideKeyboard(ev: MotionEvent) {
+    val v: View? = currentFocus
+    if (v != null && (ev.action == MotionEvent.ACTION_UP || ev.action == MotionEvent.ACTION_MOVE) && v is EditText &&
+        !v.javaClass.name.startsWith("android.webkit.")
+    ) {
+        val sourceCoordinates = IntArray(2)
+        v.getLocationOnScreen(sourceCoordinates)
+        val x: Float = ev.rawX + v.getLeft() - sourceCoordinates[0]
+        val y: Float = ev.rawY + v.getTop() - sourceCoordinates[1]
+        if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
+            val inputManager = (this.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager)
+            inputManager.hideSoftInputFromWindow(this.window.decorView.windowToken, 0)
+        }
+    }
+}

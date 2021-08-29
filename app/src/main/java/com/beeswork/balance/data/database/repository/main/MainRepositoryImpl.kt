@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.repository.main
 
 import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.data.network.service.stomp.WebSocketClient
 import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +12,7 @@ import kotlinx.coroutines.withContext
 
 class MainRepositoryImpl(
     private val stompClient: StompClient,
+    private val webSocketClient: WebSocketClient,
     private val ioDispatcher: CoroutineDispatcher,
     private val applicationScope: CoroutineScope
 ): MainRepository {
@@ -39,6 +41,7 @@ class MainRepositoryImpl(
 
     override suspend fun connectStomp() {
         withContext(ioDispatcher) {
+//            webSocketClient.connect()
             stompClient.connect()
         }
     }

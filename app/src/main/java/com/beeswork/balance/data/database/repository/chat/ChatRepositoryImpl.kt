@@ -32,7 +32,7 @@ class ChatRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val chatRDS: ChatRDS,
     private val chatMessageMapper: ChatMessageMapper,
-    private val stompClient: StompClient,
+//    private val stompClient: StompClient,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
     private val fcmTokenDAO: FCMTokenDAO,
@@ -74,26 +74,26 @@ class ChatRepositoryImpl(
 
 
     private fun collectChatMessageReceiptFlow() {
-        stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
-            chatMessageDTO.id?.let { id ->
-                if (id == StompHeader.UNMATCHED_RECEIPT_ID) onUnmatchedReceiptReceived(
-                    chatMessageDTO.key,
-                    chatMessageDTO.chatId
-                ) else onChatMessageSent(chatMessageDTO)
-            } ?: chatMessageDAO.updateStatusByKey(chatMessageDTO.key, ChatMessageStatus.ERROR)
-
-            chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
-                val chatId = chatMessageDAO.findChatIdByKey(chatMessageDTO.key)
-                val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
-                _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
-            }
-        }.launchIn(applicationScope)
+//        stompClient.chatMessageReceiptFlow.onEach { chatMessageDTO ->
+//            chatMessageDTO.id?.let { id ->
+//                if (id == StompHeader.UNMATCHED_RECEIPT_ID) onUnmatchedReceiptReceived(
+//                    chatMessageDTO.key,
+//                    chatMessageDTO.chatId
+//                ) else onChatMessageSent(chatMessageDTO)
+//            } ?: chatMessageDAO.updateStatusByKey(chatMessageDTO.key, ChatMessageStatus.ERROR)
+//
+//            chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
+//                val chatId = chatMessageDAO.findChatIdByKey(chatMessageDTO.key)
+//                val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
+//                _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
+//            }
+//        }.launchIn(applicationScope)
     }
 
     private fun collectChatMessageFlowFromStomp() {
-        stompClient.chatMessageFlow.onEach { chatMessageDTO ->
-            saveChatMessageReceived(chatMessageMapper.toReceivedChatMessage(chatMessageDTO))
-        }.launchIn(applicationScope)
+//        stompClient.chatMessageFlow.onEach { chatMessageDTO ->
+//            saveChatMessageReceived(chatMessageMapper.toReceivedChatMessage(chatMessageDTO))
+//        }.launchIn(applicationScope)
     }
 
     private fun onUnmatchedReceiptReceived(key: Long?, chatId: Long?) {
@@ -120,8 +120,8 @@ class ChatRepositoryImpl(
     }
 
     private suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
-        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
-        stompClient.sendChatMessage(key, chatId, swipedId, body)
+//        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
+//        stompClient.sendChatMessage(key, chatId, swipedId, body)
     }
 
     override suspend fun resendChatMessage(key: Long, swipedId: UUID) {
@@ -192,7 +192,7 @@ class ChatRepositoryImpl(
 
     override suspend fun connectStomp() {
         withContext(ioDispatcher) {
-            stompClient.connect()
+//            stompClient.connect()
         }
     }
 

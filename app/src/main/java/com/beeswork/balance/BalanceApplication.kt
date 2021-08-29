@@ -49,6 +49,8 @@ import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
+import com.beeswork.balance.data.network.service.stomp.WebSocketClient
+import com.beeswork.balance.data.network.service.stomp.WebSocketClientImpl
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
@@ -163,7 +165,7 @@ class BalanceApplication : Application(), KodeinAware {
         // Repository
 
 
-        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), Dispatchers.IO,  applicationScope) }
+        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), Dispatchers.IO,  applicationScope) }
 
         bind<SwipeRepository>() with singleton {
             SwipeRepositoryImpl(
@@ -229,7 +231,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
+//                instance(),
                 applicationScope,
                 Dispatchers.IO
             )
@@ -265,6 +267,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         // StompClient
         bind() from singleton { StompClientImpl(applicationScope, instance(), instance()) }
+        bind() from singleton { WebSocketClientImpl(applicationScope, instance()) }
 
         // Provider
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
@@ -335,6 +338,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance(), instance()) }
+
 
 
 
@@ -542,6 +546,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      161. check balancequestion, fetch random questiosn, and seperate balancegame dialogs
 //      162. check chat in regards to security of spring boot
 //      163. put scrollbar in card on the top right
+//      164. change timeout for request
+//      165. retrieve chat message when websocket disconnect and reconnect
 
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

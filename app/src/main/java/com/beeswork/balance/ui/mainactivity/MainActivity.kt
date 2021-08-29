@@ -31,6 +31,7 @@ import org.kodein.di.generic.instance
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.beeswork.balance.internal.util.hideKeyboard
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -54,9 +55,8 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupLocationManager()
+//        setupLocationManager()
         bindUI()
-        viewModel.connectStomp()
     }
 
     private fun setupLocationManager() {
@@ -91,7 +91,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private suspend fun observeFCMTokenActiveLiveData() {
         viewModel.fcmTokenActive.await().observe(this) {
-            if (onScreen) viewModel.connectStomp()
+//            if (onScreen) viewModel.connectStomp()
         }
     }
 
@@ -122,7 +122,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
     override fun onRetry(requestCode: Int?) {
         requestCode?.let {
             when (it) {
-                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
+//                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
             }
         }
     }
@@ -153,36 +153,10 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        val v: View? = currentFocus
-        if (v != null && (ev.action == MotionEvent.ACTION_UP || ev.action == MotionEvent.ACTION_MOVE) && v is EditText &&
-            !v.javaClass.name.startsWith("android.webkit.")
-        ) {
-            val sourceCoordinates = IntArray(2)
-            v.getLocationOnScreen(sourceCoordinates)
-            val x: Float = ev.rawX + v.getLeft() - sourceCoordinates[0]
-            val y: Float = ev.rawY + v.getTop() - sourceCoordinates[1]
-            if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
-                hideKeyboard(this)
-            }
-        }
+        this.hideKeyboard(ev)
         return super.dispatchTouchEvent(ev)
     }
 
-    private fun hideKeyboard(activity: Activity?) {
-        safeLet(activity, activity?.window) { a, w ->
-            (a.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-                a.window.decorView.windowToken,
-                0
-            )
-        }
-    }
-
-    fun hideKeyboard(view: View?) {
-        if (view != null) {
-            val imm: InputMethodManager = view.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            if (imm != null) imm.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-    }
 
 }
 

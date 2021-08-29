@@ -235,8 +235,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     override fun onFragmentSelected() {
-        viewModel.fetchMatches()
-        viewModel.fetchChatMessages()
+//        viewModel.fetchMatches()
+//        viewModel.fetchChatMessages()
     }
 }
 
