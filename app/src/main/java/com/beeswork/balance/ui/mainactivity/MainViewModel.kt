@@ -19,11 +19,6 @@ class MainViewModel(
         mainRepository.webSocketEventFlow.asLiveData()
     }
 
-    val fcmTokenActive by viewModelLazyDeferred {
-        settingRepository.getFCMTokenActiveFlow().asLiveData()
-    }
-
-
     fun connectStomp() {
         viewModelScope.launch { mainRepository.connectStomp() }
     }

@@ -10,12 +10,7 @@ import java.util.*
 interface StompClient {
 
     val webSocketEventFlow: Flow<WebSocketEvent>
-    val chatMessageReceiptFlow: Flow<ChatMessageDTO>
-    val chatMessageFlow: Flow<ChatMessageDTO>
-    val matchFlow: Flow<MatchDTO>
-    val clickFlow: Flow<ClickDTO>
 
     suspend fun connect()
-    suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String)
     suspend fun disconnect()
 }

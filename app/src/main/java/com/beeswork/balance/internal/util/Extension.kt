@@ -143,6 +143,7 @@ fun Activity.hideKeyboard(ev: MotionEvent) {
     if (v != null && (ev.action == MotionEvent.ACTION_UP || ev.action == MotionEvent.ACTION_MOVE) && v is EditText &&
         !v.javaClass.name.startsWith("android.webkit.")
     ) {
+        println("tag: ${v.tag}")
         val sourceCoordinates = IntArray(2)
         v.getLocationOnScreen(sourceCoordinates)
         val x: Float = ev.rawX + v.getLeft() - sourceCoordinates[0]

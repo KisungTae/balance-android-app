@@ -158,6 +158,8 @@
                     android:background="@drawable/sh_round_box_primary"
                     android:contentDescription="@string/chat_message_send_button_description"
                     android:padding="8dp"
+                    android:focusableInTouchMode="false"
+                    android:focusable="false"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_baseline_send_12" />
 

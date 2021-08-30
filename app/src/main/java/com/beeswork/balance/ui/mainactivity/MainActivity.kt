@@ -86,13 +86,6 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private fun bindUI() = lifecycleScope.launch {
         setupWebSocketEventObserver()
-        observeFCMTokenActiveLiveData()
-    }
-
-    private suspend fun observeFCMTokenActiveLiveData() {
-        viewModel.fcmTokenActive.await().observe(this) {
-//            if (onScreen) viewModel.connectStomp()
-        }
     }
 
     private suspend fun setupWebSocketEventObserver() {
@@ -153,7 +146,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        this.hideKeyboard(ev)
+//        this.hideKeyboard(ev)
         return super.dispatchTouchEvent(ev)
     }
 

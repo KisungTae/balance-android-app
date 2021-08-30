@@ -37,9 +37,6 @@ class MatchRepositoryImpl(
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
-    private val stompClient: StompClient,
-    private val fcmTokenDAO: FCMTokenDAO,
-    private val applicationScope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher
 ) : MatchRepository {
 
@@ -53,16 +50,6 @@ class MatchRepositoryImpl(
             }
         }
         awaitClose { }
-    }
-
-    init {
-        collectMatchFlow()
-    }
-
-    private fun collectMatchFlow() {
-        stompClient.matchFlow.onEach { matchDTO ->
-            saveMatchAndNotify(matchMapper.toMatch(matchDTO))
-        }.launchIn(applicationScope)
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
@@ -183,15 +170,11 @@ class MatchRepositoryImpl(
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
         withContext(Dispatchers.IO) {
-            fcmTokenDAO.updateActive(true)
-            saveMatchAndNotify(matchMapper.toMatch(matchDTO))
+            val match = matchMapper.toMatch(matchDTO)
+            saveMatch(match)
+            if (match.swiperId == preferenceProvider.getAccountId())
+                newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
         }
-    }
-
-    private fun saveMatchAndNotify(match: Match) {
-        saveMatch(match)
-        if (match.swiperId == preferenceProvider.getAccountId())
-            newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
     }
 
     override fun getMatchInvalidationFlow(): Flow<Boolean> {

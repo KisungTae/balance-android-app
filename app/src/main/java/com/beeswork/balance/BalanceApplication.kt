@@ -215,9 +215,6 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
-                instance(),
-                applicationScope,
                 Dispatchers.IO
             )
         }
@@ -230,9 +227,6 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
-//                instance(),
-                applicationScope,
                 Dispatchers.IO
             )
         }
@@ -249,9 +243,6 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
-                instance(),
-                applicationScope,
                 Dispatchers.IO
             )
         }
@@ -266,7 +257,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
 
         // StompClient
-        bind() from singleton { StompClientImpl(applicationScope, instance(), instance()) }
+        bind() from singleton { StompClientImpl(applicationScope, instance(), instance(), instance(), instance(), instance()) }
         bind() from singleton { WebSocketClientImpl(applicationScope, instance()) }
 
         // Provider
@@ -548,6 +539,7 @@ class BalanceApplication : Application(), KodeinAware {
 //      163. put scrollbar in card on the top right
 //      164. change timeout for request
 //      165. retrieve chat message when websocket disconnect and reconnect
+//      166. when reconnecting to webscoket, fetch chatMessage, matches, clicks as well
 
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

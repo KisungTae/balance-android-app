@@ -83,14 +83,10 @@ class SettingRepositoryImpl(
 
     override suspend fun saveFCMToken(token: String) {
         withContext(Dispatchers.IO) {
-            fcmTokenDAO.insert(FCMToken(token, posted = false, active = true))
+            fcmTokenDAO.insert(FCMToken(token, posted = false))
             val response = settingRDS.saveFCMToken(preferenceProvider.getAccountId(), token)
             if (response.isSuccess()) fcmTokenDAO.sync()
         }
-    }
-
-    override fun getFCMTokenActiveFlow(): Flow<Boolean> {
-        return fcmTokenDAO.findActiveAsFlow()
     }
 
     override suspend fun syncFCMTokenAsync() {

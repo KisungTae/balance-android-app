@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +19,7 @@ import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.SnackBarHelper
+import com.beeswork.balance.internal.util.hideKeyboard
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
@@ -188,6 +191,8 @@ class ChatFragment : BaseFragment(),
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
             viewModel.sendChatMessage(binding.etChatMessageBody.text.toString().trim())
+//            val inputManager = (activity?.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager)
+//            inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,0)
         }
     }
 

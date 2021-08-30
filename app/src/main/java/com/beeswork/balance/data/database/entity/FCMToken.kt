@@ -8,7 +8,6 @@ data class FCMToken(
 
     val token: String,
     val posted: Boolean,
-    val active: Boolean,
 
     @PrimaryKey
     val id: Int = ID

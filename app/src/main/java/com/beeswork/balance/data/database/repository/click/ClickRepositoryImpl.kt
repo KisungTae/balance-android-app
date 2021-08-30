@@ -30,10 +30,7 @@ class ClickRepositoryImpl(
     private val fetchInfoDAO: FetchInfoDAO,
     private val preferenceProvider: PreferenceProvider,
     private val clickMapper: ClickMapper,
-    private val stompClient: StompClient,
-    private val fcmTokenDAO: FCMTokenDAO,
     private val balanceDatabase: BalanceDatabase,
-    private val applicationScope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher
 ) : ClickRepository {
 
@@ -53,25 +50,15 @@ class ClickRepositoryImpl(
         withContext(ioDispatcher) { clickDAO.deleteAll(preferenceProvider.getAccountId()) }
     }
 
-    init {
-        collectClickFlow()
-    }
-
-    private fun collectClickFlow() {
-        stompClient.clickFlow.onEach { clickDTO -> saveClickAndNotify(clickDTO) }.launchIn(applicationScope)
-    }
-
     override suspend fun saveClick(clickDTO: ClickDTO) {
-        fcmTokenDAO.updateActive(true)
-        withContext(Dispatchers.IO) { saveClickAndNotify(clickDTO) }
-    }
-
-    private fun saveClickAndNotify(clickDTO: ClickDTO) {
-        if (matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) return
-        val click = clickMapper.toClick(clickDTO)
-        clickDAO.insert(click)
-        if (click.swipedId == preferenceProvider.getAccountId())
-            newClickFlowListener?.onReceive(click)
+        withContext(Dispatchers.IO) {
+            if (!matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
+                val click = clickMapper.toClick(clickDTO)
+                clickDAO.insert(click)
+                if (click.swipedId == preferenceProvider.getAccountId())
+                    newClickFlowListener?.onReceive(click)
+            }
+        }
     }
 
     override suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click> {

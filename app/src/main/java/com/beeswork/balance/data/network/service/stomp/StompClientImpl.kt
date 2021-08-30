@@ -2,8 +2,12 @@ package com.beeswork.balance.data.network.service.stomp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import com.beeswork.balance.data.database.repository.click.ClickRepository
+import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.api.HttpHeader
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
+import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.constant.EndPoint
@@ -19,6 +23,8 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
@@ -30,24 +36,15 @@ import java.util.*
 class StompClientImpl(
     private val applicationScope: CoroutineScope,
     private val okHttpClient: OkHttpClient,
+    private val chatRepository: ChatRepository,
+    private val clickRepository: ClickRepository,
+    private val matchRepository: MatchRepository,
     private val preferenceProvider: PreferenceProvider
 ) : StompClient, WebSocketListener() {
 
     private var socket: WebSocket? = null
     private var socketStatus = SocketStatus.CLOSED
     private var outgoing = Channel<String>()
-
-    private var chatMessageReceiptChannel = Channel<ChatMessageDTO>(Channel.BUFFERED)
-    override val chatMessageReceiptFlow = chatMessageReceiptChannel.consumeAsFlow()
-
-    private var chatMessageChannel = Channel<ChatMessageDTO>(Channel.BUFFERED)
-    override val chatMessageFlow = chatMessageChannel.consumeAsFlow()
-
-    private var matchChannel = Channel<MatchDTO>(Channel.BUFFERED)
-    override val matchFlow = matchChannel.consumeAsFlow()
-
-    private var clickChannel = Channel<ClickDTO>(Channel.BUFFERED)
-    override val clickFlow = clickChannel.consumeAsFlow()
 
     private var webSocketEventChannel = Channel<WebSocketEvent>()
     override val webSocketEventFlow = webSocketEventChannel.consumeAsFlow()
@@ -56,24 +53,25 @@ class StompClientImpl(
         applicationScope.launch {
             outgoing.consumeEach { socket?.send(it) }
         }
+
+        chatRepository.sendChatMessageFlow.onEach { chatMessageDTO ->
+            sendChatMessage(chatMessageDTO)
+        }.launchIn(applicationScope)
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        println("override fun onOpen(webSocket: WebSocket, response: Response) {")
-        println(response.toString())
         socketStatus = SocketStatus.OPEN
         connectToStomp()
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         val stompFrame = StompFrame.from(text)
-        println("override fun onMessage(webSocket: WebSocket, text: String): ${stompFrame.command}")
         when (stompFrame.command) {
             StompFrame.Command.CONNECTED -> subscribeToQueue()
             StompFrame.Command.MESSAGE -> onMessageFrameReceived(stompFrame)
             StompFrame.Command.RECEIPT -> onReceiptFrameReceived(stompFrame)
             StompFrame.Command.ERROR -> onErrorFrameReceived(stompFrame)
-            else -> println("stompframe.command when else here")
+            else -> {}
         }
     }
 
@@ -113,16 +111,18 @@ class StompClientImpl(
     }
 
     private fun onMessageFrameReceived(stompFrame: StompFrame) {
-        println()
         when (stompFrame.getPushType()) {
             PushType.CHAT_MESSAGE -> applicationScope.launch {
-                chatMessageChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java))
+                val chatMessageDTO = GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java)
+                chatRepository.saveChatMessageReceived(chatMessageDTO)
             }
             PushType.CLICKED -> applicationScope.launch {
-                clickChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java))
+                val clickDTO = GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java)
+                clickRepository.saveClick(clickDTO)
             }
             PushType.MATCHED -> applicationScope.launch {
-                matchChannel.send(GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java))
+                val matchDTO = GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java)
+                matchRepository.saveMatch(matchDTO)
             }
             else -> {
             }
@@ -130,22 +130,20 @@ class StompClientImpl(
     }
 
     private fun onReceiptFrameReceived(stompFrame: StompFrame) {
-        println("onReceiptFrameReceived: $stompFrame")
         stompFrame.payload?.let {
             applicationScope.launch {
-                val chatMessageDTO = GsonProvider.gson.fromJson(it, ChatMessageDTO::class.java)
-                chatMessageDTO.key = stompFrame.getReceiptId()
-                chatMessageReceiptChannel.send(chatMessageDTO)
+                val chatMessageReceiptDTO = GsonProvider.gson.fromJson(it, ChatMessageReceiptDTO::class.java)
+                chatMessageReceiptDTO.key = stompFrame.getReceiptId()
+                chatRepository.saveChatMessageReceipt(chatMessageReceiptDTO)
             }
         }
     }
 
     private fun onErrorFrameReceived(stompFrame: StompFrame) {
         applicationScope.launch {
-            println("onErrorFrameReceived: $stompFrame")
             stompFrame.getReceiptId()?.let { receiptId ->
-                val chatMessageDTO = ChatMessageDTO(receiptId)
-                chatMessageReceiptChannel.send(chatMessageDTO)
+                val chatMessageReceiptDTO = ChatMessageReceiptDTO(receiptId)
+                chatRepository.saveChatMessageReceipt(chatMessageReceiptDTO)
             }
             val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
             webSocketEventChannel.send(webSocketEvent)
@@ -153,7 +151,7 @@ class StompClientImpl(
         }
     }
 
-    override suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
+    private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO) {
         if (socketStatus == SocketStatus.CLOSED) {
             socket = null
             connect()
@@ -163,14 +161,15 @@ class StompClientImpl(
         if (socketStatus == SocketStatus.OPEN) {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
-            headers[StompHeader.RECEIPT] = key.toString()
+            headers[StompHeader.RECEIPT] = chatMessageDTO.key.toString()
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken().toString()
             headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
-            val chatMessageDTO = ChatMessageDTO(chatId, body, preferenceProvider.getAccountId(), swipedId)
             val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
             outgoing.send(stompFrame.compile())
-        } else chatMessageReceiptChannel.send(ChatMessageDTO(key, chatId))
+        } else {
+            chatRepository.saveChatMessageReceipt(ChatMessageReceiptDTO(chatMessageDTO.key))
+        }
     }
 
     override suspend fun disconnect() {

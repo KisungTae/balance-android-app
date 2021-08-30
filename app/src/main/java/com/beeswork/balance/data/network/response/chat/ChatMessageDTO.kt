@@ -24,4 +24,5 @@ data class ChatMessageDTO(
 
     constructor(key: Long?, chatId: Long?) : this(key, null, chatId, null, null, null, null)
     constructor(key: Long) : this(key, null, null, null, null, null, null)
+    constructor(key: Long, chatId: Long, accountId: UUID, recipientId: UUID, body: String): this(key, null, chatId, body, null, accountId, recipientId)
 }

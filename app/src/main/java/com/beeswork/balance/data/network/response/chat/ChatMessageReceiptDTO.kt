@@ -8,6 +8,7 @@ data class ChatMessageReceiptDTO(
     val id: Long?,
     val chatId: Long?,
     val createdAt: OffsetDateTime?,
-    val sent: Boolean,
     val error: String?
-)
+) {
+    constructor(key: Long?) : this(key, null, null, null, null)
+}
