@@ -160,7 +160,7 @@ class ClickFragment : BaseFragment(),
     }
 
     override fun onFragmentSelected() {
-        viewModel.fetchClicks()
+//        viewModel.fetchClicks()
     }
 
     override fun onSelectClick(position: Int) {

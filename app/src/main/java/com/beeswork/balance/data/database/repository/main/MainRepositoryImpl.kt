@@ -41,8 +41,8 @@ class MainRepositoryImpl(
 
     override suspend fun connectStomp() {
         withContext(ioDispatcher) {
-//            webSocketClient.connect()
-            stompClient.connect()
+            webSocketClient.connect()
+//            stompClient.connect()
         }
     }
 

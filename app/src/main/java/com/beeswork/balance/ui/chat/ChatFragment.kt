@@ -191,6 +191,7 @@ class ChatFragment : BaseFragment(),
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
             viewModel.sendChatMessage(binding.etChatMessageBody.text.toString().trim())
+            binding.etChatMessageBody.requestFocus()
 //            val inputManager = (activity?.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager)
 //            inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,0)
         }
