@@ -8,6 +8,6 @@ Once they match, they can continue to have conversation.
 - Upload and edit photos, short bios, and their interests
 
 # Tech stacks
-Language: Kotlin \
-Design pattern: MVVM \
-Others: Coroutine, Firebase Cloud Messaging
+- Language: Kotlin \
+- Design pattern: MVVM \
+- Others: Coroutine, Firebase Cloud Messaging
