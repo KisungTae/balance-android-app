@@ -17,7 +17,7 @@ abstract class BaseActivity: AppCompatActivity() {
             is AccountNotFoundException,
             is AccountDeletedException,
             is AccountBlockedException -> moveToLoginActivity(null, throwable.message)
-            is RefreshTokenExpiredException,
+            is InvalidRefreshTokenException,
             is ExpiredJWTException -> moveToLoginActivity(null, null)
             else -> throw throwable
         }

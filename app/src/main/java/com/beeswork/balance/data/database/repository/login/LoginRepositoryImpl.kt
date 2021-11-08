@@ -109,7 +109,7 @@ class LoginRepositoryImpl(
                     )
                 }
                 return@withContext response
-            } ?: return@withContext Resource.error(ExceptionCode.REFRESH_TOKEN_EXPIRED_EXCEPTION)
+            } ?: return@withContext Resource.error(ExceptionCode.INVALID_REFRESH_TOKEN_EXCEPTION)
         }
     }
 

@@ -37,7 +37,7 @@ class SplashActivity : BaseActivity(), KodeinAware {
         viewModel.loginWithRefreshToken.observe(this@SplashActivity) {
             when {
                 it.isSuccess() -> {
-//                    TODO: remove me
+////                    TODO: remove me
                         finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
 //                    if (it.data?.profileExists == true)
 //                        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))

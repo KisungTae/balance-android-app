@@ -31,7 +31,8 @@ abstract class BaseRDS(
             if (response.headers()[HttpHeader.CONTENT_TYPE] == APPLICATION_XML) return@sendRequest handleXmlException(response)
             else {
                 val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                throwInvalidAccountException(errorResponse.error, errorResponse.message)
+                validateAccount(errorResponse.error, errorResponse.message)
+
                 if (errorResponse.error == ExceptionCode.EXPIRED_JWT_EXCEPTION) {
 
                     val beforeRefreshToken = preferenceProvider.getRefreshToken()
@@ -59,8 +60,8 @@ abstract class BaseRDS(
             if (response.isSuccessful) Resource.success(response.body())
             else {
                 val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                throwInvalidAccountException(errorResponse.error, errorResponse.message)
-                throwAccessTokenException(errorResponse.error, errorResponse.message)
+                validateAccount(errorResponse.error, errorResponse.message)
+                validateAccessAndRefreshToken(errorResponse.error, errorResponse.message)
                 Resource.error(errorResponse.error, errorResponse.message)
             }
         }
@@ -109,7 +110,7 @@ abstract class BaseRDS(
         return Resource.error(error, message)
     }
 
-    private fun throwInvalidAccountException(error: String?, errorMessage: String?) {
+    private fun validateAccount(error: String?, errorMessage: String?) {
         when (error) {
             ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION -> throw AccountNotFoundException(errorMessage)
             ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION -> throw AccountBlockedException(errorMessage)
@@ -117,9 +118,9 @@ abstract class BaseRDS(
         }
     }
 
-    private fun throwAccessTokenException(error: String?, errorMessage: String?) {
+    private fun validateAccessAndRefreshToken(error: String?, errorMessage: String?) {
         when (error) {
-            ExceptionCode.REFRESH_TOKEN_EXPIRED_EXCEPTION -> throw RefreshTokenExpiredException(errorMessage)
+            ExceptionCode.INVALID_REFRESH_TOKEN_EXCEPTION -> throw InvalidRefreshTokenException(errorMessage)
             ExceptionCode.EXPIRED_JWT_EXCEPTION -> throw ExpiredJWTException(errorMessage)
         }
     }

@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.splash
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,13 +8,7 @@ import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.exception.AccountBlockedException
-import com.beeswork.balance.internal.exception.AccountDeletedException
-import com.beeswork.balance.internal.exception.AccountNotFoundException
-import com.beeswork.balance.internal.exception.RefreshTokenExpiredException
 import com.beeswork.balance.internal.mapper.login.LoginMapper
-import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.loginactivity.LoginDomain
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch

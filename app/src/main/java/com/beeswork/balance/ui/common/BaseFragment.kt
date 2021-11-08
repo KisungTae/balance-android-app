@@ -1,11 +1,9 @@
 package com.beeswork.balance.ui.common
 
-import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.exception.*
-import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
@@ -19,7 +17,7 @@ abstract class BaseFragment : Fragment() {
             is AccountNotFoundException,
             is AccountDeletedException,
             is AccountBlockedException -> moveToLoginActivity(null, throwable.message)
-            is RefreshTokenExpiredException,
+            is InvalidRefreshTokenException,
             is ExpiredJWTException -> moveToLoginActivity(null, null)
             else -> throw throwable
         }

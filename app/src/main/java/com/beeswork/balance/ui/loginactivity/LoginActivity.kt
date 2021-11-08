@@ -53,8 +53,11 @@ class LoginActivity : BaseActivity(), KodeinAware {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         bind()
-        setupGoogleSignIn()
-        showInvalidAccountError()
+        moveToMainActivity()
+
+//      TODO: comment in again
+//        setupGoogleSignIn()
+//        showInvalidAccountError()
     }
 
     private fun bind() = lifecycleScope.launch {
