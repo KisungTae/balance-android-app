@@ -99,7 +99,7 @@ class LoginRepositoryImpl(
     override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
             preferenceProvider.getRefreshToken()?.let { refreshToken ->
-                val response = loginRDS.loginWithRefreshToken(preferenceProvider.getAccountId(), refreshToken)
+                val response = loginRDS.loginWithRefreshToken(preferenceProvider.getAccountIdOrThrow(), refreshToken)
                 if (response.isSuccess()) response.data?.let { loginDTO ->
                     preferenceProvider.putTokens(
                         loginDTO.accountId,

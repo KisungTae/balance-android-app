@@ -6,7 +6,7 @@ import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.exception.*
 import com.beeswork.balance.ui.loginactivity.LoginActivity
 
-abstract class BaseActivity: AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
         baseViewModel.exceptionLiveData.observe(this) { exception -> catchException(exception) }
@@ -18,6 +18,8 @@ abstract class BaseActivity: AppCompatActivity() {
             is AccountDeletedException,
             is AccountBlockedException -> moveToLoginActivity(null, throwable.message)
             is InvalidRefreshTokenException,
+            is AccountIdNotFoundException,
+            is IdentityTokenNotFoundException,
             is ExpiredJWTException -> moveToLoginActivity(null, null)
             else -> throw throwable
         }

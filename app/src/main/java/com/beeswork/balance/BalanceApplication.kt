@@ -540,6 +540,8 @@ class BalanceApplication : Application(), KodeinAware {
 //      164. change timeout for request
 //      165. retrieve chat message when websocket disconnect and reconnect
 //      166. when reconnecting to webscoket, fetch chatMessage, matches, clicks as well
-
+//      167. add authentication exceptions to baseActiviy and BaseViewModel
+//      168. add release sha1 to google firebase and google cloud
+//      169. refactor getAccountId to getAccountIdOrThrow
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

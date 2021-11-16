@@ -17,6 +17,8 @@ abstract class BaseViewModel : ViewModel() {
             is AccountNotFoundException,
             is AccountDeletedException,
             is AccountBlockedException,
+            is AccountIdNotFoundException,
+            is IdentityTokenNotFoundException,
             is ExpiredJWTException,
             is InvalidRefreshTokenException -> _exceptionLiveData.postValue(throwable)
             else -> throw throwable

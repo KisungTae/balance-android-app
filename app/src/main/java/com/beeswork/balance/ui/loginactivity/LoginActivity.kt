@@ -12,6 +12,7 @@ import com.beeswork.balance.databinding.ActivityLoginBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
@@ -53,11 +54,8 @@ class LoginActivity : BaseActivity(), KodeinAware {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         bind()
-        moveToMainActivity()
-
-//      TODO: comment in again
-//        setupGoogleSignIn()
-//        showInvalidAccountError()
+        setupGoogleSignIn()
+        showInvalidAccountError()
     }
 
     private fun bind() = lifecycleScope.launch {
@@ -70,8 +68,9 @@ class LoginActivity : BaseActivity(), KodeinAware {
     private fun showInvalidAccountError() {
         val error = intent.getStringExtra(BundleKey.ERROR)
         val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
-        if (error != null || errorMessage != null)
-            showLoginError(error, errorMessage)
+        safeLet(error, errorMessage) { _error, _errorMessage ->
+            showLoginError(_error, _errorMessage)
+        }
     }
 
     private fun observeLoginLiveData() {
@@ -100,9 +99,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
         ErrorDialog.show(error, errorTitle, errorMessage, supportFragmentManager)
     }
 
-
     // refresh token, validate jwt token in splahsactivity, logout, check if login with different account, then remove data
-
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.server_client_id))

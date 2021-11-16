@@ -17,6 +17,8 @@ interface PreferenceProvider {
     fun getRefreshToken(): String?
     fun getAccountId(): UUID
     fun getIdentityToken(): UUID
+    fun getAccountIdOrThrow(): UUID
+    fun getIdentityTokenOrThrow(): UUID
 
     fun delete()
 }

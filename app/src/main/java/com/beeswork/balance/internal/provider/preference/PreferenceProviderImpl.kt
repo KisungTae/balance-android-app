@@ -2,7 +2,8 @@ package com.beeswork.balance.internal.provider.preference
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
 import java.util.*
 
 class PreferenceProviderImpl(
@@ -58,6 +59,22 @@ class PreferenceProviderImpl(
 
     override fun getIdentityToken(): UUID {
         return UUID.fromString(preferences.getString(IDENTITY_TOKEN, null)!!)
+    }
+
+    override fun getAccountIdOrThrow(): UUID {
+        val accountIdInString = preferences.getString(ACCOUNT_ID, null)
+        accountIdInString?.let { _accountIdInString ->
+            val accountId = UUID.fromString(_accountIdInString)
+            return accountId ?: throw AccountIdNotFoundException()
+        } ?: throw AccountIdNotFoundException()
+    }
+
+    override fun getIdentityTokenOrThrow(): UUID {
+        val identityTokenInString = preferences.getString(ACCOUNT_ID, null)
+        identityTokenInString?.let { _identityTokenInString ->
+            val identityToken = UUID.fromString(_identityTokenInString)
+            return identityToken ?: throw IdentityTokenNotFoundException()
+        } ?: throw IdentityTokenNotFoundException()
     }
 
     override fun delete() {
