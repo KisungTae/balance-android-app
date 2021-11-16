@@ -63,7 +63,7 @@ class LoginRepositoryImpl(
             val response = loginRDS.socialLogin(loginId, accessToken, loginType)
             if (response.isSuccess()) response.data?.let { loginDTO ->
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
-                preferenceProvider.putTokens(
+                preferenceProvider.putLoginInfo(
                     loginDTO.accountId,
                     loginDTO.identityToken,
                     loginDTO.accessToken,
@@ -101,7 +101,7 @@ class LoginRepositoryImpl(
             preferenceProvider.getRefreshToken()?.let { refreshToken ->
                 val response = loginRDS.loginWithRefreshToken(preferenceProvider.getAccountIdOrThrow(), refreshToken)
                 if (response.isSuccess()) response.data?.let { loginDTO ->
-                    preferenceProvider.putTokens(
+                    preferenceProvider.putLoginInfo(
                         loginDTO.accountId,
                         loginDTO.identityToken,
                         loginDTO.accessToken,

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Balance</string>
+    <string name="app_name">WECLICK</string>
     <string name="app_name_capital">WECLICK</string>
 
     <string name="error_message_generic">에러가 발생했습니다</string>
@@ -196,7 +196,6 @@
     <string name="log_out_button_text">Log out</string>
     <string name="error_title_login">로그인을 하지못했습니다</string>
     <string name="invalid_social_login_exception">유효하지않은 소셜로그인 요청입니다</string>
-    <string name="server_client_id">345572935231-j12sr8v32ngttr24lfpuvfe7djt24312.apps.googleusercontent.com</string>
     <string name="fetching_photos_message">사진을 가져오고있습니다....</string>
     <string name="refresh_token_not_found_exception"></string>
     <string name="register_name_label">이름을 입력해주세요</string>

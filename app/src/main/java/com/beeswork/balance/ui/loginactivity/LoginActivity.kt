@@ -55,17 +55,21 @@ class LoginActivity : BaseActivity(), KodeinAware {
         setContentView(binding.root)
         bind()
         setupGoogleSignIn()
-        showInvalidAccountError()
+
+//      TODO: remove me
+        mGoogleSignInClient.signOut()
+
+        showLoginErrorMessage()
     }
 
     private fun bind() = lifecycleScope.launch {
+        observeLoginLiveData()
         binding.btnGoogleSignIn.setOnClickListener {
             signInWithGoogleActivityResult.launch(mGoogleSignInClient.signInIntent)
         }
-        observeLoginLiveData()
     }
 
-    private fun showInvalidAccountError() {
+    private fun showLoginErrorMessage() {
         val error = intent.getStringExtra(BundleKey.ERROR)
         val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
         safeLet(error, errorMessage) { _error, _errorMessage ->
@@ -99,7 +103,6 @@ class LoginActivity : BaseActivity(), KodeinAware {
         ErrorDialog.show(error, errorTitle, errorMessage, supportFragmentManager)
     }
 
-    // refresh token, validate jwt token in splahsactivity, logout, check if login with different account, then remove data
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.server_client_id))

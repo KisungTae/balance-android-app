@@ -35,11 +35,11 @@ class PreferenceProviderImpl(
         editor.apply()
     }
 
-    override fun putTokens(accountId: UUID, identityToken: UUID, accessToken: String, refreshToken: String) {
+    override fun putLoginInfo(accountId: UUID, identityToken: UUID, accessToken: String, refreshToken: String?) {
         editor.putString(ACCOUNT_ID, accountId.toString())
         editor.putString(IDENTITY_TOKEN, identityToken.toString())
         editor.putString(ACCESS_TOKEN, accessToken)
-        editor.putString(REFRESH_TOKEN, refreshToken)
+        refreshToken?.let { _refreshToken -> editor.putString(REFRESH_TOKEN, _refreshToken) }
         editor.apply()
     }
 

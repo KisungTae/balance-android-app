@@ -34,7 +34,7 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onNewToken(token: String) {
-        scope.launch { settingRepository.saveFCMToken(token) }
+//        scope.launch { settingRepository.saveFCMToken(token) }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
