@@ -9,6 +9,10 @@ import kotlinx.coroutines.*
 
 abstract class BaseViewModel : ViewModel() {
 
+//  TODO: AccountNotFound, AccountDeletedException, AccountBlockedException
+//        ExpiredJWTException, InvalidRefreshTokenException, InvalidJWTTokenException
+//        RefreshTokenNotFoundException, AccessTokenNotFoundException
+
     private val _exceptionLiveData = MutableLiveData<Throwable>()
     val exceptionLiveData: LiveData<Throwable> get() = _exceptionLiveData
 
@@ -29,5 +33,9 @@ abstract class BaseViewModel : ViewModel() {
         return lazy {
             viewModelScope.async(start = CoroutineStart.LAZY) { block.invoke(this) }
         }
+    }
+
+    fun lambdaTest() {
+
     }
 }

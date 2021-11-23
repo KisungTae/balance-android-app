@@ -42,7 +42,7 @@ import java.util.*
 interface BalanceAPI {
 
     @GET("chat/message/list")
-    suspend fun listChatMessages(@Query(value = "accountId") accountId: UUID): Response<ListChatMessagesDTO>
+    suspend fun listChatMessages(): Response<ListChatMessagesDTO>
 
     @POST("chat/message/sync")
     suspend fun syncChatMessages(@Body syncChatMessagesBody: SyncChatMessagesBody)

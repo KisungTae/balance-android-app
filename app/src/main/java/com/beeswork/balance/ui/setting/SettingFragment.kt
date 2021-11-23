@@ -41,7 +41,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
         viewModel = ViewModelProvider(this, viewModelFactory).get(SettingViewModel::class.java)
         observeExceptionLiveData(viewModel)
         bindUI()
-        viewModel.fetchEmail()
+//        viewModel.fetchEmail()
     }
 
     private fun bindUI() = lifecycleScope.launch {

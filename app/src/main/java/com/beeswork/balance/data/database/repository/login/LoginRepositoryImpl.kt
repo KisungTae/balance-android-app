@@ -9,6 +9,7 @@ import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -65,7 +66,6 @@ class LoginRepositoryImpl(
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
                 preferenceProvider.putLoginInfo(
                     loginDTO.accountId,
-                    loginDTO.identityToken,
                     loginDTO.accessToken,
                     loginDTO.refreshToken
                 )
@@ -98,18 +98,23 @@ class LoginRepositoryImpl(
 
     override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
-            preferenceProvider.getRefreshToken()?.let { refreshToken ->
-                val response = loginRDS.loginWithRefreshToken(preferenceProvider.getAccountIdOrThrow(), refreshToken)
-                if (response.isSuccess()) response.data?.let { loginDTO ->
-                    preferenceProvider.putLoginInfo(
-                        loginDTO.accountId,
-                        loginDTO.identityToken,
-                        loginDTO.accessToken,
-                        loginDTO.refreshToken
-                    )
-                }
-                return@withContext response
-            } ?: return@withContext Resource.error(ExceptionCode.INVALID_REFRESH_TOKEN_EXCEPTION)
+            val accessToken = preferenceProvider.getAccessToken()
+            val refreshToken = preferenceProvider.getRefreshToken()
+
+            if (accessToken == null)
+                return@withContext Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
+            if (refreshToken == null)
+                return@withContext Resource.error(ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION)
+
+            val response = loginRDS.loginWithRefreshToken(refreshToken, accessToken)
+            if (response.isSuccess()) response.data?.let { loginDTO ->
+                preferenceProvider.putLoginInfo(
+                    loginDTO.accountId,
+                    loginDTO.accessToken,
+                    loginDTO.refreshToken ?: refreshToken
+                )
+            }
+            return@withContext response
         }
     }
 

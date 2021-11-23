@@ -5,7 +5,6 @@ import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.data.database.common.ResourceListener
-import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.entity.Match
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -14,11 +13,8 @@ import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
-import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
@@ -76,6 +72,7 @@ class ChatRepositoryImpl(
         }
     }
 
+//  TODO: accountId to accessToken
     private suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
         val chatMessageDTO = ChatMessageDTO(key, chatId, preferenceProvider.getAccountId(), swipedId, body)
         sendChatMessageChanel.send(chatMessageDTO)
@@ -151,8 +148,7 @@ class ChatRepositoryImpl(
     override suspend fun fetchChatMessages(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val fetchedAt = OffsetDateTime.now()
-            val accountId = preferenceProvider.getAccountId()
-            val response = chatRDS.listChatMessages(accountId)
+            val response = chatRDS.listChatMessages()
 
             response.data?.let { data ->
                 val chatIds = saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)

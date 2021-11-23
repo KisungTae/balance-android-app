@@ -37,10 +37,13 @@ class SplashActivity : BaseActivity(), KodeinAware {
         viewModel.loginWithRefreshToken.observe(this@SplashActivity) {
             when {
                 it.isSuccess() -> {
-                    if (it.data?.profileExists == true)
-                        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                    else
-                        finishToActivity(Intent(this@SplashActivity, RegisterActivity::class.java))
+                    // TODO: remove me and comment in
+                    finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+
+//                    if (it.data?.profileExists == true)
+//                        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+//                    else
+//                        finishToActivity(Intent(this@SplashActivity, RegisterActivity::class.java))
                 }
                 it.isError() -> finishToActivity(Intent(this@SplashActivity, LoginActivity::class.java))
             }

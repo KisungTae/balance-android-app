@@ -32,9 +32,9 @@ class SplashViewModel(
         viewModelScope.launch(coroutineExceptionHandler) {
             val response = loginRepository.loginWithRefreshToken()
             if (response.isSuccess()) response.data?.let { loginDTO ->
-                settingRepository.prepopulateFetchInfo()
-                if (loginDTO.profileExists) swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
-                settingRepository.syncFCMTokenAsync()
+//                settingRepository.prepopulateFetchInfo()
+//                if (loginDTO.profileExists) swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
+//                settingRepository.syncFCMTokenAsync()
             }
             _loginWithRefreshToken.postValue(
                 response.let { it.mapData(it.data?.let { loginDTO -> loginMapper.toLoginDomain(loginDTO) }) }

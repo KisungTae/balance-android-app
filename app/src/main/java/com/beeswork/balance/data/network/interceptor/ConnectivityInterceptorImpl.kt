@@ -24,8 +24,8 @@ class ConnectivityInterceptorImpl(
         if (!noAuthentication) {
             request = chain.request()
                 .newBuilder()
-                .addHeader(HttpHeader.ACCESS_TOKEN, "${preferenceProvider.getAccessToken()}")
-                .addHeader(HttpHeader.IDENTITY_TOKEN, preferenceProvider.getIdentityToken().toString())
+                .addHeader(HttpHeader.ACCESS_TOKEN, preferenceProvider.getAccessTokenOrThrow())
+                .addHeader(HttpHeader.IDENTITY_TOKEN, preferenceProvider.getIdentityTokenOrThrow().toString())
                 .build()
         }
         return chain.proceed(request)

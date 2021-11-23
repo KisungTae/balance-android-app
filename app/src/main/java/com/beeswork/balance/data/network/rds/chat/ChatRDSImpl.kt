@@ -17,7 +17,7 @@ class ChatRDSImpl(
         balanceAPI.syncChatMessages(SyncChatMessagesBody(sentChatMessageIds, receivedChatMessageIds))
     }
 
-    override suspend fun listChatMessages(accountId: UUID): Resource<ListChatMessagesDTO> {
-        return getResult { balanceAPI.listChatMessages(accountId) }
+    override suspend fun listChatMessages(): Resource<ListChatMessagesDTO> {
+        return getResult { balanceAPI.listChatMessages() }
     }
 }

@@ -55,10 +55,6 @@ class LoginActivity : BaseActivity(), KodeinAware {
         setContentView(binding.root)
         bind()
         setupGoogleSignIn()
-
-//      TODO: remove me
-        mGoogleSignInClient.signOut()
-
         showLoginErrorMessage()
     }
 
@@ -82,8 +78,11 @@ class LoginActivity : BaseActivity(), KodeinAware {
             when (it.status) {
                 Resource.Status.ERROR -> showLoginError(it.error, it.errorMessage)
                 Resource.Status.SUCCESS -> it.data?.let { loginDomain ->
-                    if (loginDomain.profileExists) moveToMainActivity()
-                    else moveToRegisterActivity()
+                    //todo: remove me
+                    moveToMainActivity()
+
+//                    if (loginDomain.profileExists) moveToMainActivity()
+//                    else moveToRegisterActivity()
                 }
                 else -> println()
             }
