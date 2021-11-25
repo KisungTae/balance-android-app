@@ -77,21 +77,21 @@ class SwipeFragment : BaseFragment(),
     }
 
     private fun setupFetchCardsLiveDataObserver() {
-        viewModel.fetchCards.observe(viewLifecycleOwner) {
+        viewModel.fetchCards.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                it.isError() -> {
-                    val errorTitle = getString(R.string.fetch_card_exception_title)
-                    ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
-                    showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
-                }
-                else -> it.data?.let { cardDomains ->
+                resource.isSuccess() -> resource.data?.let { cardDomains ->
                     if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
                     else {
                         showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
                         cardStackAdapter.submitCards(cardDomains)
                         binding.csvSwipe.visibility = View.VISIBLE
                     }
+                }
+                resource.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                resource.isError() && validateLoginFromResource(resource) -> {
+                    val errorTitle = getString(R.string.fetch_card_exception_title)
+                    ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
+                    showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
                 }
             }
         }

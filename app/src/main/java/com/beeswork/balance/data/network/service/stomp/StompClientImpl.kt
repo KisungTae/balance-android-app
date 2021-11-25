@@ -163,7 +163,6 @@ class StompClientImpl(
             headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
             headers[StompHeader.RECEIPT] = chatMessageDTO.key.toString()
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-//            headers[HttpHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken().toString()
             headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
             val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
             outgoing.send(stompFrame.compile())
@@ -183,7 +182,6 @@ class StompClientImpl(
             headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
-//            headers[HttpHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()}"
             socket?.send(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
         }
     }
@@ -192,10 +190,8 @@ class StompClientImpl(
         applicationScope.launch {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
-//            headers[StompHeader.IDENTITY_TOKEN] = preferenceProvider.getIdentityToken().toString()
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
-//            headers[HttpHeader.IDENTITY_TOKEN] = "${preferenceProvider.getIdentityToken()}"
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }

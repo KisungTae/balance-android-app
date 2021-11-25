@@ -54,21 +54,21 @@ class ProfileBalanceGameDialog : BalanceGame(), KodeinAware {
     }
 
     private fun setupSaveAnswersLiveDataObserver() {
-        viewModel.saveAnswersLiveData.observe(viewLifecycleOwner) {
+        viewModel.saveAnswersLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> showLoading(getString(R.string.balance_game_saving_answers_text))
-                it.isError() -> showSaveError(it.error, it.errorMessage)
-                it.isSuccess() -> dismiss()
+                resource.isSuccess() -> dismiss()
+                resource.isLoading() -> showLoading(getString(R.string.balance_game_saving_answers_text))
+                resource.isError() && validateLoginFromResource(resource) -> showSaveError(resource.error, resource.errorMessage)
             }
         }
     }
 
     private fun setupFetchQuestionsLiveDataObserver() {
-        viewModel.fetchQuestionsLiveData.observe(viewLifecycleOwner) {
+        viewModel.fetchQuestionsLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
-                it.isError() -> showFetchQuestionsError(it.error, it.errorMessage)
-                it.isSuccess() -> it.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
+                resource.isSuccess() -> resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
+                resource.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
+                resource.isError() && validateLoginFromResource(resource) -> showFetchQuestionsError(resource.error, resource.errorMessage)
             }
         }
     }

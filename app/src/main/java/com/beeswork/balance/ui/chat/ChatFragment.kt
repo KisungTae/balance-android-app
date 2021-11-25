@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -14,12 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
-import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.SnackBarHelper
-import com.beeswork.balance.internal.util.hideKeyboard
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
@@ -112,11 +108,11 @@ class ChatFragment : BaseFragment(),
 
 
     private fun observeUnmatchLiveData() {
-        viewModel.unmatchLiveData.observe(viewLifecycleOwner, {
+        viewModel.unmatchLiveData.observe(viewLifecycleOwner, { resource ->
             when {
-                it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
-                it.isLoading() -> showLoading()
-                it.isError() -> showUnmatchError(it.error, it.errorMessage)
+                resource.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
+                resource.isLoading() -> showLoading()
+                resource.isError() && validateLoginFromResource(resource) -> showUnmatchError(resource.error, resource.errorMessage)
             }
         })
     }
@@ -136,11 +132,11 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun observeReportMatchLiveData() {
-        viewModel.reportMatchLiveData.observe(viewLifecycleOwner, {
+        viewModel.reportMatchLiveData.observe(viewLifecycleOwner, { resource ->
             when {
-                it.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
-                it.isLoading() -> getReportDialog()?.showLoading()
-                it.isError() -> showReportMatchError(it.error, it.errorMessage)
+                resource.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
+                resource.isLoading() -> getReportDialog()?.showLoading()
+                resource.isError() && validateLoginFromResource(resource) -> showReportMatchError(resource.error, resource.errorMessage)
             }
         })
     }
@@ -156,25 +152,25 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun observeSendChatMessageMediatorLiveData() {
-        viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, {
-            if (it.isError()) {
-                if (it.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) setupAsUnmatched()
+        viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, { resource ->
+            if (resource.isError() && validateLoginFromResource(resource)) {
+                if (resource.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) setupAsUnmatched()
                 val errorTitle = getString(R.string.error_title_send_chat_message)
-                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
             }
         })
     }
 
     private suspend fun observeChatMessageInvalidation() {
-        viewModel.chatMessageInvalidationLiveData.await().observe(viewLifecycleOwner, {
-            when (it.type) {
+        viewModel.chatMessageInvalidationLiveData.await().observe(viewLifecycleOwner, { resource ->
+            when (resource.type) {
                 ChatMessageInvalidation.Type.SEND -> {
                     binding.etChatMessageBody.setText("")
                     if (binding.rvChat.canScrollVertically(1)) chatMessagePagingRefreshAdapter.refresh()
                     else observeChatMessagePagingData()
                 }
                 ChatMessageInvalidation.Type.RECEIVED -> {
-                    if (binding.rvChat.canScrollVertically(1)) it.body?.let { body ->
+                    if (binding.rvChat.canScrollVertically(1)) resource.body?.let { body ->
                         showNewChatMessageSnackBar(body)
                     } else observeChatMessagePagingData()
                 }

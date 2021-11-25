@@ -110,10 +110,10 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun observeFetchPhotosLiveData() {
-        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) {
-            fetchPhotosStatus = it.status
+        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) { resource ->
+            fetchPhotosStatus = resource.status
             updateRefreshBtn()
-            if (it.isError()) showFetchPhotosError(it.error, it.errorMessage)
+            if (resource.isError() && validateLoginFromResource(resource)) showFetchPhotosError(resource.error, resource.errorMessage)
         }
     }
 
@@ -124,19 +124,19 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun observeDeletePhotoLiveData() {
-        viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError()) {
+        viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) { resource ->
+            if (resource.isError() && validateLoginFromResource(resource)) {
                 val errorTitle = getString(R.string.error_title_delete_photo)
-                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
             }
         }
     }
 
     private fun observeOrderPhotosLiveData() {
-        viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) {
-            if (it.isError()) {
+        viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) { resource ->
+            if (resource.isError() && validateLoginFromResource(resource)) {
                 val errorTitle = getString(R.string.error_title_order_photos)
-                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
             }
         }
     }
@@ -148,10 +148,12 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun observeUploadPhotoLiveData() {
-        viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) {
-            if (it.isError() && it.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION) {
+        viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) { resource ->
+            if (resource.isError()
+                && resource.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
+                && validateLoginFromResource(resource)) {
                 val errorTitle = getString(R.string.error_title_add_photo)
-                ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
             }
         }
     }
@@ -387,16 +389,16 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun observeFetchProfileLiveData() {
-        viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) {
-            fetchProfileStatus = it.status
+        viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) { resource ->
+            fetchProfileStatus = resource.status
             updateRefreshBtn()
             when {
-                it.isSuccess() -> showFetchProfileSuccess(it.data)
-                it.isError() -> showFetchProfileError(it.error, it.errorMessage)
-                it.isLoading() -> {
+                resource.isSuccess() -> showFetchProfileSuccess(resource.data)
+                resource.isLoading() -> {
                     disableProfileEdit()
-                    setupProfile(it.data)
+                    setupProfile(resource.data)
                 }
+                resource.isError() && validateLoginFromResource(resource) -> showFetchProfileError(resource.error, resource.errorMessage)
             }
         }
     }
@@ -426,15 +428,17 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun observeSaveAboutLiveData() {
-        viewModel.saveAboutLiveData.observe(viewLifecycleOwner) {
+        viewModel.saveAboutLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> {
+                resource.isLoading() -> {
                     hideFieldErrors()
                     disableProfileEdit()
                     showLoading()
                 }
-                it.isError() -> showSaveAboutError(it.data, it.error, it.errorMessage, it.fieldErrorMessages)
-                it.isSuccess() -> showSaveAboutSuccess()
+                resource.isSuccess() -> showSaveAboutSuccess()
+                resource.isError() && validateLoginFromResource(resource) -> {
+                    showSaveAboutError(resource.data, resource.error, resource.errorMessage, resource.fieldErrorMessages)
+                }
             }
         }
     }

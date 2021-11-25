@@ -64,21 +64,21 @@ class SwipeBalanceGameDialog(
     }
 
     private fun setupSwipeLiveDataObserver() {
-        viewModel.swipeLiveData.observe(viewLifecycleOwner) {
+        viewModel.swipeLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
-                it.isError() -> showFetchQuestionsError(it.error, it.errorMessage)
-                it.isSuccess() -> it.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
+                resource.isSuccess() -> resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
+                resource.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
+                resource.isError() && validateLoginFromResource(resource) -> {
+                    showFetchQuestionsError(resource.error, resource.errorMessage)
+                }
             }
         }
     }
 
     private fun setupClickLiveDataObserver() {
-        viewModel.clickLiveData.observe(viewLifecycleOwner) {
+        viewModel.clickLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> showLoading(getString(R.string.balance_game_checking_text))
-                it.isError() -> showSaveError(it.error, it.errorMessage)
-                it.isSuccess() -> it.data?.let { pushType ->
+                resource.isSuccess() -> resource.data?.let { pushType ->
                     when (pushType) {
                         PushType.MISSED -> {
                             showLayouts(View.GONE, View.GONE, View.GONE)
@@ -89,6 +89,8 @@ class SwipeBalanceGameDialog(
                         else -> println("")
                     }
                 }
+                resource.isLoading() -> showLoading(getString(R.string.balance_game_checking_text))
+                resource.isError() -> showSaveError(resource.error, resource.errorMessage)
             }
         }
     }

@@ -52,14 +52,16 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     }
 
     private fun observeSavePushSettingLiveData() {
-        viewModel.savePushSettingLiveData.observe(viewLifecycleOwner) {
+        viewModel.savePushSettingLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isSuccess() -> showSavePushSettingSuccess()
-                it.isLoading() -> {
+                resource.isSuccess() -> showSavePushSettingSuccess()
+                resource.isLoading() -> {
                     disableEdit()
                     showLoading()
                 }
-                it.isError() -> showSavePushSettingError(it.data, it.error, it.errorMessage)
+                resource.isError() && validateLoginFromResource(resource) -> {
+                    showSavePushSettingError(resource.data, resource.error, resource.errorMessage)
+                }
             }
         }
     }

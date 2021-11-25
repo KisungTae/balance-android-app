@@ -57,14 +57,14 @@ class SettingFragment : BaseFragment(), KodeinAware {
     }
 
     private fun observeDeleteAccountLiveData() {
-        viewModel.deleteAccountLiveData.observe(viewLifecycleOwner) {
+        viewModel.deleteAccountLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> binding.llSettingLoading.visibility = View.VISIBLE
-                it.isSuccess() -> moveToLoginActivity(null, null)
-                it.isError() -> {
+                resource.isSuccess() -> moveToLoginActivity(null, null)
+                resource.isLoading() -> binding.llSettingLoading.visibility = View.VISIBLE
+                resource.isError() && validateLoginFromResource(resource) -> {
                     binding.llSettingLoading.visibility = View.GONE
                     val errorTitle = getString(R.string.error_title_delete_account)
-                    ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
+                    ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
                 }
             }
         }

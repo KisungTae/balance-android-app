@@ -183,10 +183,11 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     private fun observeFetchChatMessagesLiveData() {
-        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) {
-            fetchChatMessagesStatus = it.status
+        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) { resource ->
+            fetchChatMessagesStatus = resource.status
             updateRefreshBtn()
-            if (it.isError()) showFetchChatMessagesError(it.error, it.errorMessage)
+            if (resource.isError() && validateLoginFromResource(resource))
+                showFetchChatMessagesError(resource.error, resource.errorMessage)
         }
     }
 
@@ -196,10 +197,11 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     private fun observeFetchMatchesLiveData() {
-        viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, {
-            fetchMatchesStatus = it.status
+        viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, { resource ->
+            fetchMatchesStatus = resource.status
             updateRefreshBtn()
-            if (it.isError()) showFetchMatchesError(it.error, it.errorMessage)
+            if (resource.isError() && validateLoginFromResource(resource))
+                showFetchMatchesError(resource.error, resource.errorMessage)
         })
     }
 

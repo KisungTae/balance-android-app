@@ -13,7 +13,6 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
@@ -40,32 +39,6 @@ fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any, R : Any> safeLet(
     return if (p1 != null && p2 != null && p3 != null && p4 != null) block(p1, p2, p3, p4) else null
 }
 
-
-fun <T> CoroutineScope.safeLaunch(
-    callBack: MutableLiveData<Resource<T>>?,
-    finallyBody: (() -> Unit)? = null,
-    launchBody: suspend () -> Unit
-): Job {
-    val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-//        when (throwable) {
-//            is AccountIdNotFoundException, is IdentityTokenNotFoundException ->
-//                callBack?.postValue(Resource.error(ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION))
-//            else -> throw throwable
-//        }
-        finallyBody?.invoke()
-    }
-
-    return this.launch(coroutineExceptionHandler) {
-        launchBody.invoke()
-    }
-}
-
-fun <T> CoroutineScope.testLaunch(body: (Resource<T>) -> Unit, final: suspend () -> Resource<T>) {
-    this.launch {
-        val response = final.invoke()
-        body.invoke(response)
-    }
-}
 
 fun <T> CoroutineScope.testLaunch2(final: suspend () -> Resource<T>, body: (Resource<T>) -> Unit) {
     this.launch {

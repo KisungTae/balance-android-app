@@ -106,17 +106,19 @@ class ClickFragment : BaseFragment(),
     }
 
     private fun setupFetchClicksObserver() {
-        viewModel.fetchClicks.observe(viewLifecycleOwner) {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
+        viewModel.fetchClicks.observe(viewLifecycleOwner) { resource ->
+            when {
+                resource.isSuccess() -> {
                     binding.btnClickRefresh.visibility = View.GONE
                     binding.skvClickLoading.visibility = View.INVISIBLE
                 }
-                Resource.Status.LOADING -> {
+                resource.isLoading() -> {
                     binding.btnClickRefresh.visibility = View.GONE
                     binding.skvClickLoading.visibility = View.VISIBLE
                 }
-                Resource.Status.ERROR -> showFetchClickError(it.error, it.errorMessage)
+                resource.isError() && validateLoginFromResource(resource) -> {
+                    showFetchClickError(resource.error, resource.errorMessage)
+                }
             }
         }
     }

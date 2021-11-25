@@ -10,7 +10,7 @@ interface PreferenceProvider {
 
     fun getAccessToken(): String?
     fun getRefreshToken(): String?
-    fun getAccountId(): UUID
+    fun getAccountId(): UUID?
 
     fun delete()
 }

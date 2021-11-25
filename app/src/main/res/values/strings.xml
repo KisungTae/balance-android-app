@@ -26,7 +26,7 @@
     <string name="error_title_save_push_setting">알람설정을 저장하지 못했습니다</string>
     <string name="error_title_fetch_email">이메일을 가져오지 못했습니다</string>
     <string name="error_title_delete_account">계정을 삭제하지 못했습니다</string>
-    <string name="error_title_open_chat">계정을 삭제하지 못했습니다</string>
+    <string name="error_title_open_chat">채팅을 열지 못했습니다</string>
     <string name="error_title_fetch_push_setting">알람세팅정보를 가져오지 못했습니다</string>
 
 

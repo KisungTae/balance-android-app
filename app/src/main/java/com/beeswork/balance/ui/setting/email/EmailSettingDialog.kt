@@ -64,15 +64,15 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
     }
 
     private fun observeFetchEmailLiveData() {
-        viewModel.fetchEmailLiveData.observe(viewLifecycleOwner) {
+        viewModel.fetchEmailLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> {
+                resource.isSuccess() -> showFetchEmailSuccess(resource.data)
+                resource.isLoading() -> {
                     disableEdit()
                     showLoading()
-                    binding.etEmailSettingEmail.setText(it.data)
+                    binding.etEmailSettingEmail.setText(resource.data)
                 }
-                it.isSuccess() -> showFetchEmailSuccess(it.data)
-                it.isError() -> showFetchEmailError(it.error, it.errorMessage)
+                resource.isError() && validateLoginFromResource(resource) -> showFetchEmailError(resource.error, resource.errorMessage)
             }
         }
     }
@@ -91,15 +91,16 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
     }
 
     private fun observeSaveEmailLiveData() {
-        viewModel.saveEmailLiveData.observe(viewLifecycleOwner) {
+        viewModel.saveEmailLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isLoading() -> {
+                resource.isSuccess() -> showSaveEmailSuccess()
+                resource.isLoading() -> {
                     disableEdit()
                     showLoading()
                 }
-                it.isSuccess() -> showSaveEmailSuccess()
-                it.isError() -> showSaveEmailError(it.data, it.error, it.errorMessage)
-                else -> println()
+                resource.isError() && validateLoginFromResource(resource) -> {
+                    showSaveEmailError(resource.data, resource.error, resource.errorMessage)
+                }
             }
         }
     }

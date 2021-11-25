@@ -4,7 +4,6 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.*
 import com.beeswork.balance.data.database.entity.Photo
-import com.beeswork.balance.data.database.entity.Profile
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
@@ -13,11 +12,9 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
-import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.profile.photo.PhotoPicker
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File

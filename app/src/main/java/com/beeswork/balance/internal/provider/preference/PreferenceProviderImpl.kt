@@ -2,6 +2,7 @@ package com.beeswork.balance.internal.provider.preference
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.beeswork.balance.internal.util.Converter
 import java.util.*
 
 class PreferenceProviderImpl(
@@ -39,12 +40,10 @@ class PreferenceProviderImpl(
         return preferences.getString(REFRESH_TOKEN, null)
     }
 
-    override fun getAccountId(): UUID {
-//        preferences.getString(ACCOUNT_ID, null)?.let { accountId ->
-//            return Converter.toUUID(accountId)
-//        } ?: return null
-
-        return UUID.randomUUID()
+    override fun getAccountId(): UUID? {
+        preferences.getString(ACCOUNT_ID, null)?.let { accountId ->
+            return Converter.toUUID(accountId)
+        } ?: return null
     }
 
     override fun delete() {
@@ -55,6 +54,5 @@ class PreferenceProviderImpl(
         const val ACCESS_TOKEN = "accessToken"
         const val REFRESH_TOKEN = "refreshToken"
         const val ACCOUNT_ID = "accountId"
-        const val IDENTITY_TOKEN = "identityToken"
     }
 }
