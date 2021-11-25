@@ -95,11 +95,11 @@ class ChatViewModel(
     }
 
     fun synchronizeMatch() {
-        viewModelScope.launch(coroutineExceptionHandler) { matchRepository.synchronizeMatch(chatId) }
+        viewModelScope.launch { matchRepository.synchronizeMatch(chatId) }
     }
 
     fun sendChatMessage(body: String) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             val bodySize = body.toByteArray().size
             when {
                 matchRepository.isUnmatched(chatId) -> _sendChatMessageLiveData.postValue(
@@ -117,15 +117,15 @@ class ChatViewModel(
     }
 
     fun deleteChatMessage(key: Long) {
-        viewModelScope.launch(coroutineExceptionHandler) { chatRepository.deleteChatMessage(chatId, key) }
+        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
     }
 
     fun resendChatMessage(key: Long) {
-        viewModelScope.launch(coroutineExceptionHandler) { chatRepository.resendChatMessage(key, swipedId) }
+        viewModelScope.launch { chatRepository.resendChatMessage(key, swipedId) }
     }
 
     fun unmatch() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _unmatchLiveData.postValue(Resource.loading())
             val response = matchRepository.unmatch(chatId, swipedId)
             _unmatchLiveData.postValue(response)
@@ -133,7 +133,7 @@ class ChatViewModel(
     }
 
     fun reportMatch(reportReason: ReportReason, description: String) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _reportMatchLiveData.postValue(Resource.loading())
             val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
             _reportMatchLiveData.postValue(response)

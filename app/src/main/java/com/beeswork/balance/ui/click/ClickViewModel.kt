@@ -45,7 +45,7 @@ class ClickViewModel(
     }
 
     fun fetchClicks() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             if (!fetchingClicks) {
                 fetchingClicks = true
                 _fetchClicks.postValue(Resource.loading())

@@ -75,7 +75,6 @@ class ChatFragment : BaseFragment(),
                 this,
                 viewModelFactory(chatViewModelFactoryParameter)
             ).get(ChatViewModel::class.java)
-            observeExceptionLiveData(viewModel)
 
             bindUI(
                 swipedId,

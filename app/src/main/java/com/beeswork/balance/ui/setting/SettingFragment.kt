@@ -39,7 +39,6 @@ class SettingFragment : BaseFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SettingViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
 //        viewModel.fetchEmail()
     }
@@ -61,7 +60,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
         viewModel.deleteAccountLiveData.observe(viewLifecycleOwner) {
             when {
                 it.isLoading() -> binding.llSettingLoading.visibility = View.VISIBLE
-                it.isSuccess() -> moveToLoginActivity()
+                it.isSuccess() -> moveToLoginActivity(null, null)
                 it.isError() -> {
                     binding.llSettingLoading.visibility = View.GONE
                     val errorTitle = getString(R.string.error_title_delete_account)

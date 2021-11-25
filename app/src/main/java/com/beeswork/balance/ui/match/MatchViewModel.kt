@@ -48,7 +48,7 @@ class MatchViewModel(
     }
 
     fun fetchMatches() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             if (!fetchingMatches) launch {
                 _fetchMatchesLiveData.postValue(Resource.loading())
                 fetchingMatches = true
@@ -60,7 +60,7 @@ class MatchViewModel(
     }
 
     fun fetchChatMessages() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             if (!fetchingChatMessages) launch {
                 _fetchChatMessagesLiveData.postValue(Resource.loading())
                 fetchingChatMessages = true

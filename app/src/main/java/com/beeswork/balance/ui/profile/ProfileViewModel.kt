@@ -52,7 +52,7 @@ class ProfileViewModel(
     val syncPhotosLiveData: LiveData<Boolean> get() = _syncPhotosLiveData
 
     fun fetchProfile() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             val profile = profileRepository.getProfile()
             val isProfileSynced = profile?.synced == true
             val profileDomain = profile?.let { _profile -> profileMapper.toProfileDomain(_profile) }
@@ -70,7 +70,7 @@ class ProfileViewModel(
     }
 
     fun saveAbout(height: Int?, about: String) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _saveAboutLiveData.postValue(Resource.loading())
             val response = profileRepository.saveAbout(height, about).map {
                 it?.let { profile -> profileMapper.toProfileDomain(profile) }
@@ -87,7 +87,7 @@ class ProfileViewModel(
 
 
     fun fetchPhotos() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _fetchPhotosLiveData.postValue(Resource.loading())
             _fetchPhotosLiveData.postValue(photoRepository.fetchPhotos())
         }
@@ -106,7 +106,7 @@ class ProfileViewModel(
     }
 
     fun uploadPhoto(photoUri: Uri?, photoKey: String?) {
-        viewModelScope.launch(coroutineExceptionHandler) { doUploadPhoto(photoUri, photoKey) }
+        viewModelScope.launch { doUploadPhoto(photoUri, photoKey) }
     }
 
     private suspend fun doUploadPhoto(photoUri: Uri?, photoKey: String?) {
@@ -137,26 +137,26 @@ class ProfileViewModel(
     }
 
     fun onDownloadPhotoError(photoKey: String?) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.DOWNLOAD_ERROR) }
         }
     }
 
     fun onDownloadPhotoSuccess(photoKey: String?) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.OCCUPIED) }
         }
     }
 
     fun orderPhotos(photoSequences: Map<String, Int>) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             val response = photoRepository.orderPhotos(photoSequences)
             _orderPhotosLiveData.postValue(response)
         }
     }
 
     fun syncPhotos() {
-        viewModelScope.launch(defaultDispatcher + coroutineExceptionHandler) {
+        viewModelScope.launch(defaultDispatcher) {
             val photos = photoRepository.listPhotos(MAX_PHOTO_COUNT)
             val photoSequences = mutableMapOf<String, Int>()
             photos.forEach { photo ->
@@ -180,13 +180,13 @@ class ProfileViewModel(
     }
 
     fun downloadPhoto(photoKey: String?) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.DOWNLOADING) }
         }
     }
 
     fun deletePhoto(photoKey: String?) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             photoKey?.let { key -> _deletePhotoLiveData.postValue(photoRepository.deletePhoto(key)) }
         }
     }

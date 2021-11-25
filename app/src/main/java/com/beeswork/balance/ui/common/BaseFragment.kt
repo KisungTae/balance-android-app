@@ -3,32 +3,21 @@ package com.beeswork.balance.ui.common
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.exception.*
+import com.beeswork.balance.internal.util.Validator
 import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
 
-    protected fun observeExceptionLiveData(baseViewModel: BaseViewModel) {
-        baseViewModel.exceptionLiveData.observe(viewLifecycleOwner) { exception -> catchException(exception) }
+    protected fun validateLoginFromResponse(response: Resource<Any>): Boolean {
+        if (Validator.validateLogin(response.error)) return true
+        moveToLoginActivity(response.error, response.errorMessage)
+        return false
     }
 
-    private fun catchException(throwable: Throwable) {
-        when (throwable) {
-            is AccountNotFoundException,
-            is AccountDeletedException,
-            is AccountBlockedException -> moveToLoginActivity(null, throwable.message)
-            is InvalidRefreshTokenException,
-            is ExpiredJWTException -> moveToLoginActivity(null, null)
-            else -> throw throwable
-        }
-    }
-
-    private fun moveToLoginActivity(error: String?, errorMessage: String?) {
+    protected fun moveToLoginActivity(error: String?, errorMessage: String?) {
         if (activity is MainActivity) (activity as MainActivity).moveToLoginActivity(error, errorMessage)
-    }
-
-    protected fun moveToLoginActivity() {
-        moveToLoginActivity(null, null)
     }
 
     protected fun moveToFragment(toFragment: Fragment, fromFragmentId: Int, fromFragmentTag: String) {

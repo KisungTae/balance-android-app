@@ -86,7 +86,6 @@ class ProfileFragment : BaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
         viewModel.fetchPhotos()
         viewModel.syncPhotos()

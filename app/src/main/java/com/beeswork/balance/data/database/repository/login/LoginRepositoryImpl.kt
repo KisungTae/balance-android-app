@@ -9,7 +9,6 @@ import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -66,9 +65,11 @@ class LoginRepositoryImpl(
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
                 preferenceProvider.putLoginInfo(
                     loginDTO.accountId,
-                    loginDTO.accessToken,
-                    loginDTO.refreshToken
+                    loginDTO.accessToken
                 )
+                loginDTO.refreshToken?.let { refreshToken ->
+                    preferenceProvider.putRefreshToken(refreshToken)
+                }
             }
             return@withContext response
         }
@@ -99,14 +100,12 @@ class LoginRepositoryImpl(
     override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
             val accessToken = preferenceProvider.getAccessToken()
+            if (accessToken.isNullOrBlank()) return@withContext Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
+
             val refreshToken = preferenceProvider.getRefreshToken()
+            if (refreshToken.isNullOrBlank()) return@withContext Resource.error(ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION)
 
-            if (accessToken == null)
-                return@withContext Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
-            if (refreshToken == null)
-                return@withContext Resource.error(ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION)
-
-            val response = loginRDS.loginWithRefreshToken(refreshToken, accessToken)
+            val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken)
             if (response.isSuccess()) response.data?.let { loginDTO ->
                 preferenceProvider.putLoginInfo(
                     loginDTO.accountId,

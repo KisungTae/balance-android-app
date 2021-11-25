@@ -41,17 +41,17 @@ class SettingViewModel(
     }
 
     fun fetchEmail() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             if (!loginRepository.isEmailSynced()) loginRepository.fetchEmail()
         }
     }
 
     fun fetchSetting() {
-        viewModelScope.launch(coroutineExceptionHandler) { settingRepository.fetchSettings() }
+        viewModelScope.launch { settingRepository.fetchSettings() }
     }
 
     fun deleteAccount() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _deleteAccountLiveData.postValue(Resource.loading())
             val response = settingRepository.deleteAccount()
             if (response.isSuccess()) {

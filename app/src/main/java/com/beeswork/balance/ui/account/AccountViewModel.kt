@@ -27,10 +27,10 @@ class AccountViewModel(
     }
 
     fun fetchProfile() {
-        viewModelScope.launch(coroutineExceptionHandler) { profileRepository.fetchProfile() }
+        viewModelScope.launch { profileRepository.fetchProfile() }
     }
 
     fun fetchPhotos() {
-        viewModelScope.launch(coroutineExceptionHandler) { photoRepository.fetchPhotos() }
+        viewModelScope.launch { photoRepository.fetchPhotos() }
     }
 }

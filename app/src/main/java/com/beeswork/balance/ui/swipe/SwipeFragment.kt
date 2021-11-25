@@ -53,7 +53,6 @@ class SwipeFragment : BaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
     }
 
@@ -86,14 +85,12 @@ class SwipeFragment : BaseFragment(),
                     ErrorDialog.show(it.error, errorTitle, it.errorMessage, childFragmentManager)
                     showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
                 }
-                else -> {
-                    it.data?.let { cardDomains ->
-                        if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                        else {
-                            showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                            cardStackAdapter.submitCards(cardDomains)
-                            binding.csvSwipe.visibility = View.VISIBLE
-                        }
+                else -> it.data?.let { cardDomains ->
+                    if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                    else {
+                        showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                        cardStackAdapter.submitCards(cardDomains)
+                        binding.csvSwipe.visibility = View.VISIBLE
                     }
                 }
             }

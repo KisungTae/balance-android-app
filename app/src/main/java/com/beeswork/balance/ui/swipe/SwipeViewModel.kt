@@ -9,6 +9,7 @@ import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.swipe.card.CardDomain
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
 class SwipeViewModel(
@@ -27,8 +28,13 @@ class SwipeViewModel(
 
     private var fetchingCards = false
 
+//    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+//        fetchingCards = false
+//        throw throwable
+//    }
+
     fun fetchCards() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             if (fetchingCards) return@launch
             settingRepository.syncLocation()
             fetchingCards = true

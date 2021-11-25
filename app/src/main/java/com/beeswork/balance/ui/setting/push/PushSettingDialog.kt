@@ -41,7 +41,6 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(PushSettingViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
         viewModel.fetchPushSetting()
     }

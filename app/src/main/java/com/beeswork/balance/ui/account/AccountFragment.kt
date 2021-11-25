@@ -41,7 +41,6 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AccountViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
     }
 

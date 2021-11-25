@@ -8,6 +8,7 @@ class ExceptionCode {
         const val REFRESH_TOKEN_NOT_FOUND_EXCEPTION = "refresh_token_not_found_exception"
         const val ACCESS_TOKEN_NOT_FOUND_EXCEPTION = "access_token_not_found_exception"
         const val EXPIRED_JWT_EXCEPTION = "expired.jwt.exception"
+        const val INVALID_JWT_TOKEN_EXCEPTION = "invalid.jwt.token.exception"
 
         const val NO_INTERNET_CONNECTIVITY_EXCEPTION = "no_internet_connectivity_exception"
         const val SOCKET_TIMEOUT_EXCEPTION = "socket_timeout_exception"

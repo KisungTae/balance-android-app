@@ -27,7 +27,7 @@ class EmailSettingViewModel(
     }
 
     fun saveEmail(email: String) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _saveEmailLiveData.postValue(Resource.loading())
             if (isEmailValid(email)) {
                 val response = loginRepository.saveEmail(email)
@@ -44,7 +44,7 @@ class EmailSettingViewModel(
     }
 
     fun fetchEmail() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             val email = loginRepository.getEmail()
             if (loginRepository.isEmailSynced())
                 _fetchEmailLiveData.postValue(Resource.success(email))

@@ -44,7 +44,6 @@ class ProfileBalanceGameDialog : BalanceGame(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileBalanceGameViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
         viewModel.fetchQuestions()
     }

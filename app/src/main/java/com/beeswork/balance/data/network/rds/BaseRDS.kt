@@ -31,8 +31,6 @@ abstract class BaseRDS(
             if (response.headers()[HttpHeader.CONTENT_TYPE] == APPLICATION_XML) return@sendRequest handleXmlException(response)
             else {
                 val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                validateAccount(errorResponse.error, errorResponse.message)
-
                 if (errorResponse.error == ExceptionCode.EXPIRED_JWT_EXCEPTION) {
 
                     val beforeRefreshToken = preferenceProvider.getRefreshToken()
@@ -40,7 +38,7 @@ abstract class BaseRDS(
 
                     if (refreshAccessTokenResponse.isSuccess()) refreshAccessTokenResponse.data?.let { refreshAccessTokenDTO ->
                         preferenceProvider.putRefreshToken(refreshAccessTokenDTO.refreshToken)
-                        preferenceProvider.putAccessToken(refreshAccessTokenDTO.accessToken)
+//                        preferenceProvider.putAccessToken(refreshAccessTokenDTO.accessToken)
                         return@sendRequest getResultWithoutRefreshAccessToken(call)
                     } else {
                         val afterRefreshToken = preferenceProvider.getRefreshToken()
@@ -60,7 +58,6 @@ abstract class BaseRDS(
             if (response.isSuccessful) Resource.success(response.body())
             else {
                 val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                validateAccount(errorResponse.error, errorResponse.message)
                 validateAccessAndRefreshToken(errorResponse.error, errorResponse.message)
                 Resource.error(errorResponse.error, errorResponse.message)
             }
@@ -70,17 +67,21 @@ abstract class BaseRDS(
 
     private suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO> {
         return sendRequest {
-            preferenceProvider.getRefreshToken()?.let { refreshToken ->
-                val refreshAccessTokenBody = RefreshAccessTokenBody(preferenceProvider.getAccountId(), refreshToken)
-                val response = balanceAPI.refreshAccessToken(refreshAccessTokenBody)
-                if (response.isSuccessful) return@sendRequest Resource.success(response.body())
-                else {
-                    val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                    return@sendRequest Resource.error(errorResponse.error, errorResponse.message)
-                }
-            } ?: Resource.error(ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION)
-        }
+            val accessToken = preferenceProvider.getAccessToken()
+            if (accessToken.isNullOrBlank()) return@sendRequest Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
 
+            val refreshToken = preferenceProvider.getRefreshToken()
+            if (refreshToken.isNullOrBlank()) return@sendRequest Resource.error(ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION)
+
+            val refreshAccessTokenBody = RefreshAccessTokenBody(accessToken, refreshToken)
+            val response = balanceAPI.refreshAccessToken(refreshAccessTokenBody)
+
+            if (response.isSuccessful) return@sendRequest Resource.success(response.body())
+            else {
+                val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
+                return@sendRequest Resource.error(errorResponse.error, errorResponse.message)
+            }
+        }
     }
 
     private fun <T> handleXmlException(response: Response<T>): Resource<T> {
@@ -110,14 +111,6 @@ abstract class BaseRDS(
         return Resource.error(error, message)
     }
 
-    private fun validateAccount(error: String?, errorMessage: String?) {
-        when (error) {
-            ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION -> throw AccountNotFoundException(errorMessage)
-            ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION -> throw AccountBlockedException(errorMessage)
-            ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> throw AccountDeletedException(errorMessage)
-        }
-    }
-
     private fun validateAccessAndRefreshToken(error: String?, errorMessage: String?) {
         when (error) {
             ExceptionCode.INVALID_REFRESH_TOKEN_EXCEPTION -> throw InvalidRefreshTokenException(errorMessage)
@@ -137,6 +130,8 @@ abstract class BaseRDS(
             Resource.error(ExceptionCode.CONNECT_EXCEPTION)
         } catch (e: UnknownHostException) {
             Resource.error(ExceptionCode.UNKNOWN_HOST_EXCEPTION)
+        } catch (e: AccessTokenNotFoundException) {
+            Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
         }
     }
 

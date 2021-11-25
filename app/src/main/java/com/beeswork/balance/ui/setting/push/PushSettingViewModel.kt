@@ -20,7 +20,7 @@ class PushSettingViewModel(
     val savePushSettingLiveData: LiveData<Resource<PushSettingDomain>> get() = _savePushSettingLiveData
 
     fun savePushSetting(matchPush: Boolean, clickedPush: Boolean, chatMessagePush: Boolean, emailPush: Boolean) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _savePushSettingLiveData.postValue(Resource.loading())
             val response = settingRepository.savePushSetting(matchPush, clickedPush, chatMessagePush, emailPush).map {
                 it?.let { _pushSetting -> pushSettingMapper.toPushSettingDomain(_pushSetting) }
@@ -30,7 +30,7 @@ class PushSettingViewModel(
     }
 
     fun fetchPushSetting() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             val pushSetting = settingRepository.getPushSetting()
             val pushSettingDomain = pushSetting?.let { _pushSetting ->
                 pushSettingMapper.toPushSettingDomain(_pushSetting)

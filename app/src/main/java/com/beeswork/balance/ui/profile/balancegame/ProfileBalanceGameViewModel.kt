@@ -24,7 +24,7 @@ class ProfileBalanceGameViewModel(
     val saveAnswersLiveData: LiveData<Resource<EmptyResponse>> = _saveAnswersLiveData
 
     fun fetchQuestions() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _fetchQuestionsLiveData.postValue(Resource.loading())
             val response = profileRepository.fetchQuestions().let {
                 it.mapData(it.data?.map { questionDTO -> questionMapper.toQuestionDomain(questionDTO) })
@@ -34,7 +34,7 @@ class ProfileBalanceGameViewModel(
     }
 
     fun saveQuestions(answers: Map<Int, Boolean>) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _saveAnswersLiveData.postValue(Resource.loading())
             _saveAnswersLiveData.postValue(profileRepository.saveAnswers(answers))
         }

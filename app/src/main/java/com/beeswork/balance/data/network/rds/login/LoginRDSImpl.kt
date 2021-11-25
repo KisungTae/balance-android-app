@@ -25,8 +25,8 @@ class LoginRDSImpl(
         return getResult { balanceAPI.getEmail(accountId) }
     }
 
-    override suspend fun loginWithRefreshToken(refreshToken: String, accessToken: String): Resource<LoginDTO> {
-        return getResult { balanceAPI.loginWithRefreshToken(RefreshAccessTokenBody(accountId, refreshToken)) }
+    override suspend fun loginWithRefreshToken(accessToken: String, refreshToken: String): Resource<LoginDTO> {
+        return getResult { balanceAPI.loginWithRefreshToken(RefreshAccessTokenBody(accessToken, refreshToken)) }
     }
 
     override suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> {

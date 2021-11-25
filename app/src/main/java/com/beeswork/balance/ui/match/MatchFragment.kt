@@ -58,7 +58,6 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MatchViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
 //        viewModel.fetchMatches()
 //        viewModel.fetchChatMessages()

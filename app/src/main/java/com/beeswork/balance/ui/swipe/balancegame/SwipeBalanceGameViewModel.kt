@@ -28,14 +28,14 @@ class SwipeBalanceGameViewModel(
     val clickLiveData: LiveData<Resource<PushType>> = _clickLiveData
 
     fun click(swipedId: UUID, answers: Map<Int, Boolean>) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _clickLiveData.postValue(Resource.loading())
             _clickLiveData.postValue(matchRepository.click(swipedId, answers))
         }
     }
 
     fun swipe(swipedId: UUID) {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             _swipeLiveData.postValue(Resource.loading())
             val response = swipeRepository.swipe(swipedId).let {
                 it.mapData(it.data?.map { questionDTO -> questionMapper.toQuestionDomain(questionDTO) })

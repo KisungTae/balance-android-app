@@ -29,7 +29,7 @@ class SplashViewModel(
 //    }
 
     fun loginWithRefreshToken() {
-        viewModelScope.launch(coroutineExceptionHandler) {
+        viewModelScope.launch {
             val response = loginRepository.loginWithRefreshToken()
             if (response.isSuccess()) response.data?.let { loginDTO ->
 //                settingRepository.prepopulateFetchInfo()

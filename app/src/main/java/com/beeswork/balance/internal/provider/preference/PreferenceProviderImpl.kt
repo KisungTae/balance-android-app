@@ -2,11 +2,6 @@ package com.beeswork.balance.internal.provider.preference
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.beeswork.balance.internal.exception.AccessTokenNotFoundException
-import com.beeswork.balance.internal.exception.AccountIdNotFoundException
-import com.beeswork.balance.internal.exception.IdentityTokenNotFoundException
-import com.beeswork.balance.internal.util.Converter
-import java.lang.RuntimeException
 import java.util.*
 
 class PreferenceProviderImpl(
@@ -17,9 +12,14 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-    override fun putLoginInfo(accessToken: String, refreshToken: String) {
-        editor.putString(ACCESS_TOKEN, accessToken)
+    override fun putRefreshToken(refreshToken: String) {
         editor.putString(REFRESH_TOKEN, refreshToken)
+        editor.apply()
+    }
+
+    override fun putLoginInfo(accountId: UUID, accessToken: String) {
+        editor.putString(ACCESS_TOKEN, accountId.toString())
+        editor.putString(REFRESH_TOKEN, accessToken)
         editor.apply()
     }
 

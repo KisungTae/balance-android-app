@@ -56,7 +56,6 @@ class ClickFragment : BaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
-        observeExceptionLiveData(viewModel)
         bindUI()
 //        viewModel.fetchClicks()
     }
