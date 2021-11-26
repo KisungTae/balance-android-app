@@ -8,7 +8,6 @@ import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
-import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 

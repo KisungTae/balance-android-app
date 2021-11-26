@@ -15,20 +15,18 @@ class ReportRDSImpl(
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), ReportRDS {
     override suspend fun reportProfile(
-        accountId: UUID,
         reportedId: UUID,
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse> {
-        return getResult { balanceAPI.reportProfile(ReportBody(accountId, reportedId, reportReason, description)) }
+        return getResult { balanceAPI.reportProfile(ReportBody(reportedId, reportReason, description)) }
     }
 
     override suspend fun reportMatch(
-        accountId: UUID,
         reportedId: UUID,
         reportReason: ReportReason,
         description: String
     ): Resource<EmptyResponse> {
-        return getResult { balanceAPI.reportMatch(ReportBody(accountId, reportedId, reportReason, description)) }
+        return getResult { balanceAPI.reportMatch(ReportBody(reportedId, reportReason, description)) }
     }
 }

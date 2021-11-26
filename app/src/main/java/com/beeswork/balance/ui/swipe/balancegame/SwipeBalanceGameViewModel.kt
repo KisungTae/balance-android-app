@@ -9,7 +9,6 @@ import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
-import com.beeswork.balance.internal.util.safeLaunch
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.profile.balancegame.QuestionDomain
 import kotlinx.coroutines.launch

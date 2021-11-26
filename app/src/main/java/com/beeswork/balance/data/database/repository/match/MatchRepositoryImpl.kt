@@ -14,6 +14,7 @@ import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PushType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -72,7 +73,9 @@ class MatchRepositoryImpl(
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = matchRDS.listMatches(accountId, fetchInfoDAO.findMatchFetchedAt(accountId))
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+
+            val response = matchRDS.listMatches(fetchInfoDAO.findMatchFetchedAt(accountId))
 
             response.data?.let { data ->
                 balanceDatabase.runInTransaction {
@@ -89,11 +92,12 @@ class MatchRepositoryImpl(
     }
 
     private fun saveMatch(match: Match) {
-        updateMatch(match)
-        val accountId = preferenceProvider.getAccountId()
-        swipeDAO.insert(Swipe(match.swipedId, accountId))
-        clickDAO.deleteBySwiperId(accountId, match.swipedId)
-        matchDAO.insert(match)
+        preferenceProvider.getAccountId()?.let { accountId ->
+            updateMatch(match)
+            swipeDAO.insert(Swipe(match.swipedId, accountId))
+            clickDAO.deleteBySwiperId(accountId, match.swipedId)
+            matchDAO.insert(match)
+        }
     }
 
     private fun updateMatch(match: Match) {
@@ -137,7 +141,7 @@ class MatchRepositoryImpl(
 
     override suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val response = matchRDS.unmatch(preferenceProvider.getAccountId(), swipedId)
+            val response = matchRDS.unmatch(swipedId)
             if (response.isSuccess()) unmatch(chatId)
             return@withContext response
         }
@@ -157,12 +161,7 @@ class MatchRepositoryImpl(
         description: String
     ): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val response = reportRDS.reportMatch(
-                preferenceProvider.getAccountId(),
-                swipedId,
-                reportReason,
-                description
-            )
+            val response = reportRDS.reportMatch(swipedId, reportReason, description)
             if (response.isSuccess()) unmatch(chatId)
             return@withContext response
         }
@@ -187,11 +186,14 @@ class MatchRepositoryImpl(
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType> {
         return withContext(ioDispatcher) {
-            val response = matchRDS.click(preferenceProvider.getAccountId(), swipedId, answers)
+            val accountId = preferenceProvider.getAccountId()
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+
+            val response = matchRDS.click(swipedId, answers)
             response.data?.let { matchDTO ->
                 when (matchDTO.pushType) {
                     PushType.MATCHED -> saveMatch(matchMapper.toMatch(matchDTO))
-                    PushType.CLICKED -> swipeDAO.insert(Swipe(swipedId, preferenceProvider.getAccountId()))
+                    PushType.CLICKED -> swipeDAO.insert(Swipe(swipedId, accountId))
                     else -> println()
                 }
                 return@withContext response.mapData(matchDTO.pushType)

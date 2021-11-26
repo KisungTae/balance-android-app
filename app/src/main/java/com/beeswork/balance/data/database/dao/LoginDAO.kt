@@ -16,7 +16,7 @@ interface LoginDAO {
     fun insert(login: Login)
 
     @Query("select email from login where accountId = :accountId")
-    fun findEmailAsFlow(accountId: UUID): Flow<String?>
+    fun findEmailAsFlow(accountId: UUID?): Flow<String?>
 
     @Query("select * from login where accountId = :accountId")
     fun findByAccountId(accountId: UUID): Login?
@@ -28,17 +28,17 @@ interface LoginDAO {
     fun updateSynced(accountId: UUID, synced: Boolean)
 
     @Query("delete from login where accountId = :accountId")
-    fun deleteByAccountId(accountId: UUID)
+    fun deleteByAccountId(accountId: UUID?)
 
     @Query("select synced from login where accountId = :accountId")
-    fun isSynced(accountId: UUID): Boolean?
+    fun isSynced(accountId: UUID?): Boolean?
 
     @Query("select * from login where accountId = :accountId")
     fun findAsFlow(accountId: UUID): Flow<Login>
 
     @Query("select email from login where accountId = :accountId")
-    fun findEmail(accountId: UUID): String?
+    fun findEmail(accountId: UUID?): String?
 
     @Query("select type from login where accountId = :accountId")
-    fun findLoginType(accountId: UUID): LoginType
+    fun findLoginType(accountId: UUID?): LoginType?
 }

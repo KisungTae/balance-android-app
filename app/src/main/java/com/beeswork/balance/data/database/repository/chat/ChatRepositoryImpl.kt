@@ -74,9 +74,9 @@ class ChatRepositoryImpl(
 
 //  TODO: accountId to accessToken
     private suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
-        val chatMessageDTO = ChatMessageDTO(key, chatId, preferenceProvider.getAccountId(), swipedId, body)
-        sendChatMessageChanel.send(chatMessageDTO)
-        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
+//        val chatMessageDTO = ChatMessageDTO(key, chatId, preferenceProvider.getAccountId(), swipedId, body)
+//        sendChatMessageChanel.send(chatMessageDTO)
+//        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
     }
 
     override suspend fun resendChatMessage(key: Long, swipedId: UUID) {

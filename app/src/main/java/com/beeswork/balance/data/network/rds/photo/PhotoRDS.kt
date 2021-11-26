@@ -6,12 +6,11 @@ import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.util.*
 
 interface PhotoRDS {
 
-    suspend fun orderPhotos(accountId: UUID, photoSequences: Map<String, Int>): Resource<EmptyResponse>
-    suspend fun savePhoto(accountId: UUID, photoKey: String, sequence: Int): Resource<EmptyResponse>
+    suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse>
+    suspend fun savePhoto(photoKey: String, sequence: Int): Resource<EmptyResponse>
 
     suspend fun uploadPhotoToS3(
         url: String,
@@ -19,7 +18,7 @@ interface PhotoRDS {
         multipartBody: MultipartBody.Part
     ): Resource<EmptyResponse>
 
-    suspend fun getPreSignedURL(accountId: UUID, photoKey: String): Resource<PreSignedURLDTO>
-    suspend fun deletePhoto(accountId: UUID, photoKey: String): Resource<EmptyResponse>
-    suspend fun fetchPhotos(accountId: UUID): Resource<List<PhotoDTO>>
+    suspend fun getPreSignedURL(photoKey: String): Resource<PreSignedURLDTO>
+    suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse>
+    suspend fun fetchPhotos(): Resource<List<PhotoDTO>>
 }

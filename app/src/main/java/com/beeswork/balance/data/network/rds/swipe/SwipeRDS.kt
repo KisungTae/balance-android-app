@@ -9,17 +9,7 @@ import java.util.*
 
 interface SwipeRDS {
 
-    suspend fun fetchCards(
-        accountId: UUID,
-        minAge: Int,
-        maxAge: Int,
-        gender: Boolean,
-        distance: Int,
-        pageIndex: Int
-    ): Resource<FetchCardsDTO>
+    suspend fun fetchCards(minAge: Int, maxAge: Int, gender: Boolean, distance: Int, pageIndex: Int): Resource<FetchCardsDTO>
 
-    suspend fun swipe(
-        accountId: UUID,
-        swipedId: UUID
-    ): Resource<List<QuestionDTO>>
+    suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>>
 }

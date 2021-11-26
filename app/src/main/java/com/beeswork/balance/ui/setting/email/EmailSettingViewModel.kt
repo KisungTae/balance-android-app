@@ -15,8 +15,8 @@ class EmailSettingViewModel(
     private val _fetchEmailLiveData = MutableLiveData<Resource<String>>()
     val fetchEmailLiveData: LiveData<Resource<String>> get() = _fetchEmailLiveData
 
-    private val _loginTypeLiveData = MutableLiveData<LoginType>()
-    val loginTypeLiveData: LiveData<LoginType> get() = _loginTypeLiveData
+    private val _loginTypeLiveData = MutableLiveData<LoginType?>()
+    val loginTypeLiveData: LiveData<LoginType?> get() = _loginTypeLiveData
 
     private val _saveEmailLiveData = MutableLiveData<Resource<String>>()
     val saveEmailLiveData: LiveData<Resource<String>> get() = _saveEmailLiveData

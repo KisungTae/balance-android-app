@@ -12,5 +12,5 @@ data class Swipe(
     @PrimaryKey
     val swipedId: UUID,
 
-    val swiperId: UUID?
+    val swiperId: UUID
 )

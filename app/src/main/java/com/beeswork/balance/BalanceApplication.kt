@@ -544,5 +544,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      168. add release sha1 to google firebase and google cloud
 //      169. refactor getAccountId to getAccountIdOrThrow
 //      170. add validateLoginFromResoruce for websocket in mainActivity
+//      171. check and re-implement line 75 in ChatRepositoryImpl
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

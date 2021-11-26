@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.setting.PushSettingMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -31,7 +32,9 @@ class SettingRepositoryImpl(
     override suspend fun fetchPushSetting(): Resource<PushSetting> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = settingRDS.fetchPushSetting(accountId)
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+
+            val response = settingRDS.fetchPushSetting()
 
             if (response.isSuccess()) response.data?.let { pushSettingDTO ->
                 val pushSetting = pushSettingMapper.toPushSetting(accountId, pushSettingDTO)
@@ -50,9 +53,10 @@ class SettingRepositoryImpl(
     ): Resource<PushSetting> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+
             pushSettingDAO.updateSynced(accountId, false)
             val response = settingRDS.savePushSettings(
-                accountId,
                 matchPush,
                 clickedPush,
                 chatMessagePush,
@@ -75,8 +79,7 @@ class SettingRepositoryImpl(
 
     override suspend fun deleteSettings() {
         withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-            pushSettingDAO.delete(accountId)
+            pushSettingDAO.delete(preferenceProvider.getAccountId())
             preferenceProvider.delete()
         }
     }
@@ -94,7 +97,7 @@ class SettingRepositoryImpl(
     override suspend fun syncFCMTokenAsync() {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
             fcmTokenDAO.findById()?.let { fcmToken ->
-                settingRDS.saveFCMToken(preferenceProvider.getAccountId(), fcmToken)
+                settingRDS.saveFCMToken(fcmToken)
             }
         }
     }
@@ -118,7 +121,6 @@ class SettingRepositoryImpl(
     private fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
             val response = settingRDS.saveLocation(
-                preferenceProvider.getAccountId(),
                 latitude,
                 longitude,
                 updatedAt
@@ -145,7 +147,7 @@ class SettingRepositoryImpl(
 
     override suspend fun deleteAccount(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val response = settingRDS.deleteAccount(preferenceProvider.getAccountId())
+            val response = settingRDS.deleteAccount()
             if (response.isSuccess()) {
                 //TODO: implement when success
             }
@@ -156,7 +158,7 @@ class SettingRepositoryImpl(
     override suspend fun prepopulateFetchInfo() {
         withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            if (!fetchInfoDAO.existByAccountId(accountId))
+            if (!fetchInfoDAO.existByAccountId(accountId) && accountId != null)
                 fetchInfoDAO.insert(FetchInfo(accountId))
         }
     }

@@ -30,15 +30,17 @@ class LoginRepositoryImpl(
     override suspend fun saveEmail(email: String): Resource<String> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            loginDAO.updateSynced(accountId, false)
-            val response = loginRDS.saveEmail(accountId, email)
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
 
-            if (response.isSuccess()) {
+            loginDAO.updateSynced(accountId, false)
+            val resource = loginRDS.saveEmail(email)
+
+            if (resource.isSuccess()) {
                 loginDAO.updateEmail(accountId, email)
-                return@withContext response.map { null }
+                return@withContext resource.map { null }
             } else {
                 loginDAO.updateSynced(accountId, true)
-                return@withContext response.map { loginDAO.findEmail(accountId) }
+                return@withContext resource.map { loginDAO.findEmail(accountId) }
             }
         }
     }
@@ -52,9 +54,11 @@ class LoginRepositoryImpl(
 
     override suspend fun fetchEmail(): Resource<String> {
         return withContext(ioDispatcher) {
-            val response = loginRDS.fetchEmail(preferenceProvider.getAccountId())
-            if (response.isSuccess()) loginDAO.updateEmail(preferenceProvider.getAccountId(), response.data)
-            return@withContext response
+            val accountId = preferenceProvider.getAccountId()
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val resource = loginRDS.fetchEmail()
+            if (resource.isSuccess()) loginDAO.updateEmail(accountId, resource.data)
+            return@withContext resource
         }
     }
 
@@ -91,7 +95,7 @@ class LoginRepositoryImpl(
         }
     }
 
-    override suspend fun getLoginType(): LoginType {
+    override suspend fun getLoginType(): LoginType? {
         return withContext(ioDispatcher) {
             return@withContext loginDAO.findLoginType(preferenceProvider.getAccountId())
         }

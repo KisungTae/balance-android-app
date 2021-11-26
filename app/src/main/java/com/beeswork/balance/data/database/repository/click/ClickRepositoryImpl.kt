@@ -2,24 +2,20 @@ package com.beeswork.balance.data.database.repository.click
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.ClickDAO
-import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.dao.FetchInfoDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.Click
-import com.beeswork.balance.data.database.entity.FetchInfo
 import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
@@ -70,9 +66,11 @@ class ClickRepositoryImpl(
     override suspend fun fetchClicks(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = clickRDS.listClicks(accountId, fetchInfoDAO.findClickFetchedAt(accountId))
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
 
-            response.data?.let { data ->
+            val resource = clickRDS.listClicks(fetchInfoDAO.findClickFetchedAt(accountId))
+
+            resource.data?.let { data ->
                 var clickFetchedAt = OffsetDateTime.MIN
                 balanceDatabase.runInTransaction {
                     data.forEach { clickDTO ->
@@ -90,7 +88,7 @@ class ClickRepositoryImpl(
                 if (clickFetchedAt.isAfter(OffsetDateTime.MIN))
                     fetchInfoDAO.updateClickFetchedAt(accountId, clickFetchedAt)
             }
-            return@withContext response.toEmptyResponse()
+            return@withContext resource.toEmptyResponse()
         }
     }
 

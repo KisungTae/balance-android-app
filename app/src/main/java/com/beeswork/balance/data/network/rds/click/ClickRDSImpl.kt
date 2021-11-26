@@ -12,7 +12,7 @@ class ClickRDSImpl(
     balanceAPI: BalanceAPI,
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), ClickRDS {
-    override suspend fun listClicks(accountId: UUID, fetchedAt: OffsetDateTime): Resource<List<ClickDTO>> {
-        return getResult { balanceAPI.listClicks(accountId, fetchedAt) }
+    override suspend fun listClicks(fetchedAt: OffsetDateTime): Resource<List<ClickDTO>> {
+        return getResult { balanceAPI.listClicks(fetchedAt) }
     }
 }

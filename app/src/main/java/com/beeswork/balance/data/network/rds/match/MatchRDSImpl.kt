@@ -18,15 +18,15 @@ class MatchRDSImpl(
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), MatchRDS {
 
-    override suspend fun click(accountId: UUID, swipedId: UUID, answers: Map<Int, Boolean>): Resource<MatchDTO> {
-        return getResult { balanceAPI.click(ClickBody(accountId, swipedId, answers)) }
+    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<MatchDTO> {
+        return getResult { balanceAPI.click(ClickBody(swipedId, answers)) }
     }
 
-    override suspend fun unmatch(accountId: UUID, swipedId: UUID): Resource<EmptyResponse> {
-        return getResult { balanceAPI.unmatch(UnmatchBody(accountId, swipedId)) }
+    override suspend fun unmatch(swipedId: UUID): Resource<EmptyResponse> {
+        return getResult { balanceAPI.unmatch(UnmatchBody(swipedId)) }
     }
 
-    override suspend fun listMatches(accountId: UUID, fetchedAt: OffsetDateTime): Resource<ListMatchesDTO> {
-        return getResult { balanceAPI.listMatches(accountId, fetchedAt) }
+    override suspend fun listMatches(fetchedAt: OffsetDateTime): Resource<ListMatchesDTO> {
+        return getResult { balanceAPI.listMatches(fetchedAt) }
     }
 }

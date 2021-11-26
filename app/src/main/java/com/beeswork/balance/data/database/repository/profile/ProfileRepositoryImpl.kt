@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -32,8 +33,9 @@ class ProfileRepositoryImpl(
     override suspend fun fetchProfile(): Resource<Profile> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val response = profileRDS.fetchProfile(accountId)
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
 
+            val response = profileRDS.fetchProfile()
             if (response.isSuccess()) response.data?.let { profileDTO ->
                 val profile = profileMapper.toProfile(accountId, profileDTO)
                 profileDAO.insert(profile)
@@ -46,8 +48,10 @@ class ProfileRepositoryImpl(
     override suspend fun saveAbout(height: Int?, about: String): Resource<Profile> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+
             profileDAO.updateSynced(accountId, false)
-            val response = profileRDS.saveAbout(preferenceProvider.getAccountId(), height, about)
+            val response = profileRDS.saveAbout(height, about)
 
             if (response.isSuccess()) {
                 profileDAO.updateAbout(accountId, height, about)
@@ -61,13 +65,13 @@ class ProfileRepositoryImpl(
 
     override suspend fun fetchQuestions(): Resource<List<QuestionDTO>> {
         return withContext(ioDispatcher) {
-            return@withContext profileRDS.listQuestions(preferenceProvider.getAccountId())
+            return@withContext profileRDS.listQuestions()
         }
     }
 
     override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            return@withContext profileRDS.saveQuestions(preferenceProvider.getAccountId(), answers)
+            return@withContext profileRDS.saveQuestions(answers)
         }
     }
 

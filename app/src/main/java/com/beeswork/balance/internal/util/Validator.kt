@@ -15,7 +15,8 @@ class Validator {
                 ExceptionCode.INVALID_REFRESH_TOKEN_EXCEPTION,
                 ExceptionCode.INVALID_JWT_TOKEN_EXCEPTION,
                 ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION,
-                ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION -> false
+                ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION,
+                ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION -> false
                 else -> true
             }
         }

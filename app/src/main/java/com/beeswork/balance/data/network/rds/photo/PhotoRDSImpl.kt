@@ -19,12 +19,12 @@ class PhotoRDSImpl(
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), PhotoRDS {
 
-    override suspend fun orderPhotos(accountId: UUID, photoSequences: Map<String, Int>): Resource<EmptyResponse> {
-        return getResult { balanceAPI.orderPhotos(OrderPhotosBody(accountId, photoSequences)) }
+    override suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse> {
+        return getResult { balanceAPI.orderPhotos(OrderPhotosBody(photoSequences)) }
     }
 
-    override suspend fun savePhoto(accountId: UUID, photoKey: String, sequence: Int): Resource<EmptyResponse> {
-        return getResult { balanceAPI.savePhoto(SavePhotoBody(accountId, photoKey, sequence)) }
+    override suspend fun savePhoto(photoKey: String, sequence: Int): Resource<EmptyResponse> {
+        return getResult { balanceAPI.savePhoto(SavePhotoBody(photoKey, sequence)) }
     }
 
     override suspend fun uploadPhotoToS3(
@@ -35,15 +35,15 @@ class PhotoRDSImpl(
         return getResult { balanceAPI.uploadPhotoToS3(url, formData, multipartBody) }
     }
 
-    override suspend fun getPreSignedURL(accountId: UUID, photoKey: String): Resource<PreSignedURLDTO> {
-        return getResult { balanceAPI.getPreSignedURL(accountId, photoKey) }
+    override suspend fun getPreSignedURL(photoKey: String): Resource<PreSignedURLDTO> {
+        return getResult { balanceAPI.getPreSignedURL(photoKey) }
     }
 
-    override suspend fun deletePhoto(accountId: UUID, photoKey: String): Resource<EmptyResponse> {
-        return getResult { balanceAPI.deletePhoto(DeletePhotoBody(accountId, photoKey)) }
+    override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
+        return getResult { balanceAPI.deletePhoto(DeletePhotoBody(photoKey)) }
     }
 
-    override suspend fun fetchPhotos(accountId: UUID): Resource<List<PhotoDTO>> {
-        return getResult { balanceAPI.fetchPhotos(accountId) }
+    override suspend fun fetchPhotos(): Resource<List<PhotoDTO>> {
+        return getResult { balanceAPI.fetchPhotos() }
     }
 }

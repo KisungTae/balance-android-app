@@ -8,7 +8,6 @@ import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
 import com.beeswork.balance.data.network.request.login.SocialLoginBody
 import com.beeswork.balance.data.network.request.match.UnmatchBody
 import com.beeswork.balance.data.network.request.profile.*
-import com.beeswork.balance.data.network.request.setting.DeleteAccountBody
 import com.beeswork.balance.data.network.request.setting.SaveFCMTokenBody
 import com.beeswork.balance.data.network.request.setting.SaveLocationBody
 import com.beeswork.balance.data.network.request.setting.SavePushSettingsBody
@@ -49,10 +48,7 @@ interface BalanceAPI {
 
 
     @GET("click/list")
-    suspend fun listClicks(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
-    ): Response<List<ClickDTO>>
+    suspend fun listClicks(@Query(value = "fetchedAt") fetchedAt: OffsetDateTime): Response<List<ClickDTO>>
 
 
     @POST("login/social")
@@ -75,14 +71,11 @@ interface BalanceAPI {
     suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<EmptyResponse>
 
     @GET("match/list")
-    suspend fun listMatches(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "fetchedAt") fetchedAt: OffsetDateTime
-    ): Response<ListMatchesDTO>
+    suspend fun listMatches(@Query(value = "fetchedAt") fetchedAt: OffsetDateTime): Response<ListMatchesDTO>
 
 
     @GET("photo/list")
-    suspend fun fetchPhotos(@Query(value = "accountId") accountId: UUID): Response<List<PhotoDTO>>
+    suspend fun fetchPhotos(): Response<List<PhotoDTO>>
 
     @POST("photo/reorder")
     suspend fun orderPhotos(@Body orderPhotosBody: OrderPhotosBody): Response<EmptyResponse>
@@ -102,26 +95,23 @@ interface BalanceAPI {
     suspend fun savePhoto(@Body savePhotoBody: SavePhotoBody): Response<EmptyResponse>
 
     @GET("photo/sign")
-    suspend fun getPreSignedURL(
-        @Query(value = "accountId") accountId: UUID,
-        @Query(value = "photoKey") photoKey: String
-    ): Response<PreSignedURLDTO>
+    suspend fun getPreSignedURL(@Query(value = "photoKey") photoKey: String): Response<PreSignedURLDTO>
 
 
     @POST("profile/email")
     suspend fun saveEmail(@Body saveEmailBody: SaveEmailBody): Response<EmptyResponse>
 
     @GET("profile/email")
-    suspend fun getEmail(@Query(value = "accountId") accountId: UUID): Response<String>
+    suspend fun getEmail(): Response<String>
 
     @GET("profile")
-    suspend fun fetchProfile(@Query(value = "accountId") accountId: UUID): Response<ProfileDTO>
+    suspend fun fetchProfile(): Response<ProfileDTO>
 
     @POST("/account/answers")
     suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
 
     @GET("account/question/list")
-    suspend fun listQuestions(@Query(value = "accountId") accountId: UUID): Response<List<QuestionDTO>>
+    suspend fun listQuestions(): Response<List<QuestionDTO>>
 
     @POST("profile/about")
     suspend fun postAbout(@Body saveAboutBody: SaveAboutBody): Response<EmptyResponse>
@@ -135,10 +125,10 @@ interface BalanceAPI {
 
 
     @GET("setting/push")
-    suspend fun getPushSetting(@Query(value = "accountId") accountId: UUID): Response<PushSettingDTO>
+    suspend fun getPushSetting(): Response<PushSettingDTO>
 
     @POST("account/delete")
-    suspend fun deleteAccount(@Body deleteAccountBody: DeleteAccountBody): Response<EmptyResponse>
+    suspend fun deleteAccount(): Response<EmptyResponse>
 
     @POST("setting/push")
     suspend fun savePushSettings(@Body savePushSettingsBody: SavePushSettingsBody): Response<EmptyResponse>
@@ -155,7 +145,6 @@ interface BalanceAPI {
 
     @GET("profile/recommend")
     suspend fun recommend(
-        @Query(value = "accountId") accountId: UUID,
         @Query(value = "minAge") minAge: Int,
         @Query(value = "maxAge") maxAge: Int,
         @Query(value = "gender") gender: Boolean,

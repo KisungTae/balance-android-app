@@ -6,18 +6,6 @@ import com.beeswork.balance.internal.constant.ReportReason
 import java.util.*
 
 interface ReportRDS {
-
-    suspend fun reportProfile(
-        accountId: UUID,
-        reportedId: UUID,
-        reportReason: ReportReason,
-        description: String
-    ): Resource<EmptyResponse>
-
-    suspend fun reportMatch(
-        accountId: UUID,
-        reportedId: UUID,
-        reportReason: ReportReason,
-        description: String
-    ): Resource<EmptyResponse>
+    suspend fun reportProfile(reportedId: UUID, reportReason: ReportReason, description: String): Resource<EmptyResponse>
+    suspend fun reportMatch(reportedId: UUID, reportReason: ReportReason, description: String): Resource<EmptyResponse>
 }

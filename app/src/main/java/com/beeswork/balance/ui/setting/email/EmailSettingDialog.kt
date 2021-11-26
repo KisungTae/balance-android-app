@@ -57,9 +57,9 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
     }
 
     private fun observeLoginTypeLiveData() {
-        viewModel.loginTypeLiveData.observe(viewLifecycleOwner) { _loginType ->
-            loginType = _loginType
-            if (!_loginType.isEmailEditable()) disableEdit()
+        viewModel.loginTypeLiveData.observe(viewLifecycleOwner) { loginType ->
+            this.loginType = loginType
+            if (loginType != null && !loginType.isEmailEditable()) disableEdit()
         }
     }
 

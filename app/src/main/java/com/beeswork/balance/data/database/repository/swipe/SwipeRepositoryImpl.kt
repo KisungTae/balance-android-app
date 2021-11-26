@@ -49,7 +49,6 @@ class SwipeRepositoryImpl(
             val accountId = preferenceProvider.getAccountId()
             val swipeFilter = swipeFilterDAO.findById(accountId)
             val response = swipeRDS.fetchCards(
-                preferenceProvider.getAccountId(),
                 swipeFilter.minAge,
                 swipeFilter.maxAge,
                 swipeFilter.gender,
@@ -71,17 +70,16 @@ class SwipeRepositoryImpl(
 
     override suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>> {
         return withContext(ioDispatcher) {
-            return@withContext swipeRDS.swipe(preferenceProvider.getAccountId(), swipedId)
+            return@withContext swipeRDS.swipe(swipedId)
         }
     }
 
-    override suspend fun prepopulateSwipeFilter(gender: Boolean?) {
+    override suspend fun prepopulateSwipeFilter(gender: Boolean) {
         withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-            if (swipeFilterDAO.existByAccountId(accountId)) return@withContext
-            gender?.let { _gender ->
-                swipeFilterDAO.insert(SwipeFilter(accountId, Gender.getOppositeGender(_gender)))
-            } ?: kotlin.run { swipeFilterDAO.insert(SwipeFilter(accountId)) }
+            preferenceProvider.getAccountId()?.let { accountId ->
+                if (!swipeFilterDAO.existByAccountId(accountId))
+                    swipeFilterDAO.insert(SwipeFilter(accountId, Gender.getOppositeGender(gender)))
+            }
         }
     }
 

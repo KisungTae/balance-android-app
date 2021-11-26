@@ -9,7 +9,7 @@ import java.util.*
 
 
 interface MatchRDS {
-    suspend fun click(accountId: UUID, swipedId: UUID, answers: Map<Int, Boolean>): Resource<MatchDTO>
-    suspend fun unmatch(accountId: UUID, swipedId: UUID): Resource<EmptyResponse>
-    suspend fun listMatches(accountId: UUID, fetchedAt: OffsetDateTime): Resource<ListMatchesDTO>
+    suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<MatchDTO>
+    suspend fun unmatch(swipedId: UUID): Resource<EmptyResponse>
+    suspend fun listMatches(fetchedAt: OffsetDateTime): Resource<ListMatchesDTO>
 }

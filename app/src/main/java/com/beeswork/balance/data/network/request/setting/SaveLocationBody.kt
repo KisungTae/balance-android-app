@@ -5,7 +5,6 @@ import java.util.*
 
 
 data class SaveLocationBody(
-    val accountId: UUID,
     val latitude: Double,
     val longitude: Double,
     val updatedAt: OffsetDateTime

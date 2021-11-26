@@ -17,12 +17,12 @@ class LoginRDSImpl(
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), LoginRDS {
 
-    override suspend fun saveEmail(accountId: UUID, email: String): Resource<EmptyResponse> {
-        return getResult { balanceAPI.saveEmail(SaveEmailBody(accountId, email)) }
+    override suspend fun saveEmail(email: String): Resource<EmptyResponse> {
+        return getResult { balanceAPI.saveEmail(SaveEmailBody(email)) }
     }
 
-    override suspend fun fetchEmail(accountId: UUID): Resource<String> {
-        return getResult { balanceAPI.getEmail(accountId) }
+    override suspend fun fetchEmail(): Resource<String> {
+        return getResult { balanceAPI.getEmail() }
     }
 
     override suspend fun loginWithRefreshToken(accessToken: String, refreshToken: String): Resource<LoginDTO> {

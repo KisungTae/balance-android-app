@@ -16,20 +16,20 @@ class ProfileRDSImpl(
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), ProfileRDS {
 
-    override suspend fun fetchProfile(accountId: UUID): Resource<ProfileDTO> {
-        return getResult { balanceAPI.fetchProfile(accountId) }
+    override suspend fun fetchProfile(): Resource<ProfileDTO> {
+        return getResult { balanceAPI.fetchProfile() }
     }
 
-    override suspend fun saveQuestions(accountId: UUID, answers: Map<Int, Boolean>): Resource<EmptyResponse> {
-        return getResult { balanceAPI.saveAnswers(SaveAnswersBody(accountId, answers)) }
+    override suspend fun saveQuestions(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
+        return getResult { balanceAPI.saveAnswers(SaveAnswersBody(answers)) }
     }
 
-    override suspend fun listQuestions(accountId: UUID): Resource<List<QuestionDTO>> {
-        return getResult { balanceAPI.listQuestions(accountId) }
+    override suspend fun listQuestions(): Resource<List<QuestionDTO>> {
+        return getResult { balanceAPI.listQuestions() }
     }
 
-    override suspend fun saveAbout(accountId: UUID, height: Int?, about: String): Resource<EmptyResponse> {
-        return getResult { balanceAPI.postAbout(SaveAboutBody(accountId, height, about)) }
+    override suspend fun saveAbout(height: Int?, about: String): Resource<EmptyResponse> {
+        return getResult { balanceAPI.postAbout(SaveAboutBody(height, about)) }
     }
 
 

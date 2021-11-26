@@ -15,17 +15,16 @@ class SwipeRDSImpl(
 ) : BaseRDS(balanceAPI, preferenceProvider), SwipeRDS {
 
     override suspend fun fetchCards(
-        accountId: UUID,
         minAge: Int,
         maxAge: Int,
         gender: Boolean,
         distance: Int,
         pageIndex: Int
     ): Resource<FetchCardsDTO> {
-        return getResult { balanceAPI.recommend(accountId, minAge, maxAge, gender, distance, pageIndex) }
+        return getResult { balanceAPI.recommend(minAge, maxAge, gender, distance, pageIndex) }
     }
 
-    override suspend fun swipe(accountId: UUID, swipedId: UUID): Resource<List<QuestionDTO>> {
-        return getResult { balanceAPI.swipe(SwipeBody(accountId, swipedId)) }
+    override suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>> {
+        return getResult { balanceAPI.swipe(SwipeBody(swipedId)) }
     }
 }
