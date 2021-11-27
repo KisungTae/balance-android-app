@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.network.rds
 
+import androidx.room.util.StringUtil
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.api.HttpHeader
 import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
@@ -30,24 +31,22 @@ abstract class BaseRDS(
             if (response.isSuccessful) return@sendRequest Resource.success(response.body())
             if (response.headers()[HttpHeader.CONTENT_TYPE] == APPLICATION_XML) return@sendRequest handleXmlException(response)
             else {
-                val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                if (errorResponse.error == ExceptionCode.EXPIRED_JWT_EXCEPTION) {
+                val errorResponse = convertToErrorResponse(response)
 
-                    val beforeRefreshToken = preferenceProvider.getRefreshToken()
-                    val refreshAccessTokenResponse = refreshAccessToken()
+                println("================== error response ==================")
+                println(errorResponse.error)
 
-                    if (refreshAccessTokenResponse.isSuccess()) refreshAccessTokenResponse.data?.let { refreshAccessTokenDTO ->
-                        preferenceProvider.putRefreshToken(refreshAccessTokenDTO.refreshToken)
-//                        preferenceProvider.putAccessToken(refreshAccessTokenDTO.accessToken)
-                        return@sendRequest getResultWithoutRefreshAccessToken(call)
-                    } else {
-                        val afterRefreshToken = preferenceProvider.getRefreshToken()
-                        if (refreshAccessTokenResponse.error == ExceptionCode.REFRESH_TOKEN_KEY_NOT_FOUND_EXCEPTION
-                            && !beforeRefreshToken.equals(afterRefreshToken)
-                        ) return@sendRequest getResultWithoutRefreshAccessToken(call)
-                    }
+                if (errorResponse.error != ExceptionCode.EXPIRED_JWT_EXCEPTION) return@sendRequest errorResponse
+
+                val refreshAccessTokenResponse = refreshAccessToken()
+                if (refreshAccessTokenResponse.isSuccess()) refreshAccessTokenResponse.data?.let { refreshAccessTokenDTO ->
+                    println("refresh access token success")
+                    println(refreshAccessTokenDTO.refreshToken)
+                    println(refreshAccessTokenDTO.accessToken)
+                    preferenceProvider.putValidLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
+                    return@sendRequest getResultWithoutRefreshAccessToken(call)
                 }
-                return@sendRequest Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
+                return@sendRequest refreshAccessTokenResponse.map { null }
             }
         }
     }
@@ -56,12 +55,13 @@ abstract class BaseRDS(
         return sendRequest {
             val response = call()
             if (response.isSuccessful) Resource.success(response.body())
-            else {
-                val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                validateAccessAndRefreshToken(errorResponse.error, errorResponse.message)
-                Resource.error(errorResponse.error, errorResponse.message)
-            }
+            else convertToErrorResponse(response)
         }
+    }
+
+    private fun <T> convertToErrorResponse(response: Response<T>): Resource<T> {
+        val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
+        return Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
     }
 
 
@@ -77,10 +77,7 @@ abstract class BaseRDS(
             val response = balanceAPI.refreshAccessToken(refreshAccessTokenBody)
 
             if (response.isSuccessful) return@sendRequest Resource.success(response.body())
-            else {
-                val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-                return@sendRequest Resource.error(errorResponse.error, errorResponse.message)
-            }
+            else convertToErrorResponse(response)
         }
     }
 
@@ -110,14 +107,6 @@ abstract class BaseRDS(
         }
         return Resource.error(error, message)
     }
-
-    private fun validateAccessAndRefreshToken(error: String?, errorMessage: String?) {
-        when (error) {
-            ExceptionCode.INVALID_REFRESH_TOKEN_EXCEPTION -> throw InvalidRefreshTokenException(errorMessage)
-            ExceptionCode.EXPIRED_JWT_EXCEPTION -> throw ExpiredJWTException(errorMessage)
-        }
-    }
-
 
     private suspend fun <T> sendRequest(block: suspend () -> Resource<T>): Resource<T> {
         return try {

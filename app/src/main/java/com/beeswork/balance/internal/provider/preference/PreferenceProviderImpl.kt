@@ -13,24 +13,12 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-    override fun putRefreshToken(refreshToken: String) {
-        editor.putString(REFRESH_TOKEN, refreshToken)
+    override fun putValidLoginInfo(accountId: UUID?, accessToken: String?, refreshToken: String?) {
+        if (accountId != null) editor.putString(ACCOUNT_ID, accountId.toString())
+        if (!accessToken.isNullOrBlank()) editor.putString(ACCESS_TOKEN, accessToken)
+        if (!refreshToken.isNullOrBlank()) editor.putString(REFRESH_TOKEN, refreshToken)
         editor.apply()
     }
-
-    override fun putLoginInfo(accountId: UUID, accessToken: String) {
-        editor.putString(ACCESS_TOKEN, accountId.toString())
-        editor.putString(REFRESH_TOKEN, accessToken)
-        editor.apply()
-    }
-
-    override fun putLoginInfo(accountId: UUID, accessToken: String, refreshToken: String) {
-        editor.putString(ACCOUNT_ID, accountId.toString())
-        editor.putString(ACCESS_TOKEN, accessToken)
-        editor.putString(REFRESH_TOKEN, refreshToken)
-        editor.apply()
-    }
-
 
     override fun getAccessToken(): String? {
         return preferences.getString(ACCESS_TOKEN, null)

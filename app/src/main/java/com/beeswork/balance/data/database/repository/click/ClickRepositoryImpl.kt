@@ -68,9 +68,9 @@ class ClickRepositoryImpl(
             val accountId = preferenceProvider.getAccountId()
                 ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
 
-            val resource = clickRDS.listClicks(fetchInfoDAO.findClickFetchedAt(accountId))
+            val response = clickRDS.listClicks(fetchInfoDAO.findClickFetchedAt(accountId))
 
-            resource.data?.let { data ->
+            response.data?.let { data ->
                 var clickFetchedAt = OffsetDateTime.MIN
                 balanceDatabase.runInTransaction {
                     data.forEach { clickDTO ->
@@ -88,7 +88,7 @@ class ClickRepositoryImpl(
                 if (clickFetchedAt.isAfter(OffsetDateTime.MIN))
                     fetchInfoDAO.updateClickFetchedAt(accountId, clickFetchedAt)
             }
-            return@withContext resource.toEmptyResponse()
+            return@withContext response.toEmptyResponse()
         }
     }
 

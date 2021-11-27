@@ -33,14 +33,14 @@ class LoginRepositoryImpl(
                 ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
 
             loginDAO.updateSynced(accountId, false)
-            val resource = loginRDS.saveEmail(email)
+            val response = loginRDS.saveEmail(email)
 
-            if (resource.isSuccess()) {
+            if (response.isSuccess()) {
                 loginDAO.updateEmail(accountId, email)
-                return@withContext resource.map { null }
+                return@withContext response.map { null }
             } else {
                 loginDAO.updateSynced(accountId, true)
-                return@withContext resource.map { loginDAO.findEmail(accountId) }
+                return@withContext response.map { loginDAO.findEmail(accountId) }
             }
         }
     }
@@ -56,9 +56,9 @@ class LoginRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
                 ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
-            val resource = loginRDS.fetchEmail()
-            if (resource.isSuccess()) loginDAO.updateEmail(accountId, resource.data)
-            return@withContext resource
+            val response = loginRDS.fetchEmail()
+            if (response.isSuccess()) loginDAO.updateEmail(accountId, response.data)
+            return@withContext response
         }
     }
 
@@ -67,13 +67,7 @@ class LoginRepositoryImpl(
             val response = loginRDS.socialLogin(loginId, accessToken, loginType)
             if (response.isSuccess()) response.data?.let { loginDTO ->
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
-                preferenceProvider.putLoginInfo(
-                    loginDTO.accountId,
-                    loginDTO.accessToken
-                )
-                loginDTO.refreshToken?.let { refreshToken ->
-                    preferenceProvider.putRefreshToken(refreshToken)
-                }
+                preferenceProvider.putValidLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
             }
             return@withContext response
         }
@@ -111,11 +105,7 @@ class LoginRepositoryImpl(
 
             val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken)
             if (response.isSuccess()) response.data?.let { loginDTO ->
-                preferenceProvider.putLoginInfo(
-                    loginDTO.accountId,
-                    loginDTO.accessToken,
-                    loginDTO.refreshToken ?: refreshToken
-                )
+                preferenceProvider.putValidLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
             }
             return@withContext response
         }
@@ -124,6 +114,4 @@ class LoginRepositoryImpl(
     override fun getEmailFlow(): Flow<String?> {
         return loginDAO.findEmailAsFlow(preferenceProvider.getAccountId())
     }
-
-
 }
