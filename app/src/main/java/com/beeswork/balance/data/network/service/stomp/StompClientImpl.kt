@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
+import retrofit2.http.Headers
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.*
@@ -71,7 +72,8 @@ class StompClientImpl(
             StompFrame.Command.MESSAGE -> onMessageFrameReceived(stompFrame)
             StompFrame.Command.RECEIPT -> onReceiptFrameReceived(stompFrame)
             StompFrame.Command.ERROR -> onErrorFrameReceived(stompFrame)
-            else -> {}
+            else -> {
+            }
         }
     }
 
@@ -105,7 +107,11 @@ class StompClientImpl(
     override suspend fun connect() {
         if (socketStatus == SocketStatus.CLOSED) {
             socketStatus = SocketStatus.CONNECTING
-            val webSocketRequest = Request.Builder().url(EndPoint.WEB_SOCKET_ENDPOINT).build()
+
+            val webSocketRequest = Request.Builder()
+                .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
+                .url(EndPoint.WEB_SOCKET_ENDPOINT)
+                .build()
             socket = okHttpClient.newWebSocket(webSocketRequest, this)
         }
     }

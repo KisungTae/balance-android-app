@@ -52,15 +52,15 @@ interface BalanceAPI {
 
 
     @POST("login/social")
-    @Headers("${HttpHeader.NO_AUTHENTICATION}: true")
+    @Headers("${HttpHeader.NO_AUTHENTICATION}: ${true}")
     suspend fun socialLogin(@Body socialLoginBody: SocialLoginBody): Response<LoginDTO>
 
     @POST("login/refresh-token")
-    @Headers("${HttpHeader.NO_AUTHENTICATION}: true")
+    @Headers("${HttpHeader.NO_AUTHENTICATION}: ${true}")
     suspend fun loginWithRefreshToken(@Body refreshAccessTokenBody: RefreshAccessTokenBody): Response<LoginDTO>
 
     @POST("login/access-token/refresh")
-    @Headers("${HttpHeader.NO_AUTHENTICATION}: true")
+    @Headers("${HttpHeader.NO_AUTHENTICATION}: ${true}")
     suspend fun refreshAccessToken(@Body refreshAccessTokenBody: RefreshAccessTokenBody): Response<RefreshAccessTokenDTO>
 
 

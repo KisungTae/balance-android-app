@@ -32,17 +32,10 @@ abstract class BaseRDS(
             if (response.headers()[HttpHeader.CONTENT_TYPE] == APPLICATION_XML) return@sendRequest handleXmlException(response)
             else {
                 val errorResponse = convertToErrorResponse(response)
-
-                println("================== error response ==================")
-                println(errorResponse.error)
-
                 if (errorResponse.error != ExceptionCode.EXPIRED_JWT_EXCEPTION) return@sendRequest errorResponse
 
                 val refreshAccessTokenResponse = refreshAccessToken()
                 if (refreshAccessTokenResponse.isSuccess()) refreshAccessTokenResponse.data?.let { refreshAccessTokenDTO ->
-                    println("refresh access token success")
-                    println(refreshAccessTokenDTO.refreshToken)
-                    println(refreshAccessTokenDTO.accessToken)
                     preferenceProvider.putValidLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
                     return@sendRequest getResultWithoutRefreshAccessToken(call)
                 }

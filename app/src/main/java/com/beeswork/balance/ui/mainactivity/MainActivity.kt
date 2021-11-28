@@ -125,6 +125,7 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 //        if (hasLocationPermission()) bindLocationManager()
 //        else viewModel.saveLocationPermissionResult(false)
         onScreen = true
+        println("onresume viewModel.connectStomp()")
         viewModel.connectStomp()
     }
 
