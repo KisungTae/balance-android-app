@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.request.login.SocialLoginBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
+import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
@@ -33,6 +34,8 @@ class LoginRDSImpl(
         return getResult { balanceAPI.socialLogin(SocialLoginBody(loginId, accessToken, loginType)) }
     }
 
-
+    override suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO> {
+        return super.doRefreshAccessToken()
+    }
 
 }

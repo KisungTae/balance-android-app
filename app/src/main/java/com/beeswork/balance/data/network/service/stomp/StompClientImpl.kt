@@ -147,6 +147,11 @@ class StompClientImpl(
 
     private fun onErrorFrameReceived(stompFrame: StompFrame) {
         applicationScope.launch {
+            if (stompFrame.getError()?.equals(ExceptionCode.EXPIRED_JWT_EXCEPTION) == true) {
+                
+            }
+
+
             stompFrame.getReceiptId()?.let { receiptId ->
                 val chatMessageReceiptDTO = ChatMessageReceiptDTO(receiptId)
                 chatRepository.saveChatMessageReceipt(chatMessageReceiptDTO)

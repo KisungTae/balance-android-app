@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.entity.Login
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
+import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.internal.constant.LoginType
 import kotlinx.coroutines.flow.Flow
 
@@ -17,5 +18,6 @@ interface LoginRepository {
     suspend fun isEmailSynced(): Boolean
     suspend fun getLoginType(): LoginType?
     suspend fun loginWithRefreshToken(): Resource<LoginDTO>
+    suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO>
     fun getEmailFlow(): Flow<String?>
 }

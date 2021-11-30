@@ -115,9 +115,11 @@ class ChatRepositoryImpl(
         chatMessageReceiptDTO.id?.let { id ->
             onChatMessageSent(chatMessageReceiptDTO.key, id, chatMessageReceiptDTO.createdAt)
         } ?: kotlin.run {
-            if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION)
+            if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
                 onUnmatchedReceiptReceived(chatMessageReceiptDTO.key, chatMessageReceiptDTO.chatId)
-            else chatMessageDAO.updateStatusByKey(chatMessageReceiptDTO.key, ChatMessageStatus.ERROR)
+            } else {
+                chatMessageDAO.updateStatusByKey(chatMessageReceiptDTO.key, ChatMessageStatus.ERROR)
+            }
         }
 
         chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->

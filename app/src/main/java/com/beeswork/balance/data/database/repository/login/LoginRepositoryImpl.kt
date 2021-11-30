@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
+import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -108,6 +109,12 @@ class LoginRepositoryImpl(
                 preferenceProvider.putValidLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
             }
             return@withContext response
+        }
+    }
+
+    override suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO> {
+        return withContext(ioDispatcher) {
+            return@withContext loginRDS.refreshAccessToken()
         }
     }
 

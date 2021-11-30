@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.network.rds
 
-import androidx.room.util.StringUtil
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.api.HttpHeader
 import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
@@ -34,7 +33,7 @@ abstract class BaseRDS(
                 val errorResponse = convertToErrorResponse(response)
                 if (errorResponse.error != ExceptionCode.EXPIRED_JWT_EXCEPTION) return@sendRequest errorResponse
 
-                val refreshAccessTokenResponse = refreshAccessToken()
+                val refreshAccessTokenResponse = doRefreshAccessToken()
                 if (refreshAccessTokenResponse.isSuccess()) refreshAccessTokenResponse.data?.let { refreshAccessTokenDTO ->
                     preferenceProvider.putValidLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
                     return@sendRequest getResultWithoutRefreshAccessToken(call)
@@ -58,7 +57,7 @@ abstract class BaseRDS(
     }
 
 
-    private suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO> {
+    protected suspend fun doRefreshAccessToken(): Resource<RefreshAccessTokenDTO> {
         return sendRequest {
             val accessToken = preferenceProvider.getAccessToken()
             if (accessToken.isNullOrBlank()) return@sendRequest Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
