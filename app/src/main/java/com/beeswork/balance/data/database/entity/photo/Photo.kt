@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.database.entity
+package com.beeswork.balance.data.database.entity.photo
 
 import android.net.Uri
 import androidx.room.Entity

@@ -1,7 +1,6 @@
 package com.beeswork.balance.data.database.converter
 
 import androidx.room.TypeConverter
-import com.beeswork.balance.data.database.entity.ChatMessage
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 
 object ChatMessageStatusConverter {

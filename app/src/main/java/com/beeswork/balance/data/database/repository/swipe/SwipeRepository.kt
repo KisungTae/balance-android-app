@@ -1,6 +1,6 @@
 package com.beeswork.balance.data.database.repository.swipe
 
-import com.beeswork.balance.data.database.entity.SwipeFilter
+import com.beeswork.balance.data.database.entity.swipe.SwipeFilter
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO

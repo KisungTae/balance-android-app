@@ -2,8 +2,6 @@ package com.beeswork.balance.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.internal.util.DateHelper
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 

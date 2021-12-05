@@ -1,6 +1,6 @@
 package com.beeswork.balance.data.database.repository.click
 
-import com.beeswork.balance.data.database.entity.Click
+import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.click.ClickDTO

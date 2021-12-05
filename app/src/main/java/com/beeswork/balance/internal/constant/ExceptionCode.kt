@@ -54,6 +54,23 @@ class ExceptionCode {
 
         const val INVALID_REFRESH_TOKEN_EXCEPTION = "invalid.refresh.token.exception"
         const val REFRESH_TOKEN_KEY_NOT_FOUND_EXCEPTION = "refresh.token.key.not.found.exception"
+
+
+        fun isLoginException(error: String?): Boolean {
+            return when (error) {
+                null -> false
+                ACCOUNT_NOT_FOUND_EXCEPTION,
+                ACCOUNT_DELETED_EXCEPTION,
+                ACCOUNT_BLOCKED_EXCEPTION,
+                EXPIRED_JWT_EXCEPTION,
+                INVALID_REFRESH_TOKEN_EXCEPTION,
+                INVALID_JWT_TOKEN_EXCEPTION,
+                ACCESS_TOKEN_NOT_FOUND_EXCEPTION,
+                REFRESH_TOKEN_NOT_FOUND_EXCEPTION,
+                ACCOUNT_ID_NOT_FOUND_EXCEPTION -> true
+                else -> false
+            }
+        }
     }
 
 }

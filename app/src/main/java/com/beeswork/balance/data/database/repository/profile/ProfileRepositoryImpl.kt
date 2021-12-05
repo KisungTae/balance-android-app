@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.database.repository.profile
 
 import com.beeswork.balance.data.database.dao.ProfileDAO
-import com.beeswork.balance.data.database.entity.Profile
+import com.beeswork.balance.data.database.entity.profile.Profile
 import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse

@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.database.entity
+package com.beeswork.balance.data.database.entity.match
 
 import androidx.room.Entity
 import androidx.room.Ignore

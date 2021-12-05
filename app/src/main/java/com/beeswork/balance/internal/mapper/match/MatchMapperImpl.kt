@@ -1,9 +1,9 @@
 package com.beeswork.balance.internal.mapper.match
 
-import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.match.MatchDomain
-import com.beeswork.balance.data.database.repository.match.MatchProfileTuple
+import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 import org.threeten.bp.ZoneId
 
 class MatchMapperImpl : MatchMapper {

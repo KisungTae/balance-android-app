@@ -1,10 +1,7 @@
 package com.beeswork.balance.ui.swipe
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -88,7 +85,7 @@ class SwipeFragment : BaseFragment(),
                     }
                 }
                 resource.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                resource.isError() && validateLoginFromResource(resource) -> {
+                resource.isError() && validateLogin(resource) -> {
                     val errorTitle = getString(R.string.fetch_card_exception_title)
                     ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
                     showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)

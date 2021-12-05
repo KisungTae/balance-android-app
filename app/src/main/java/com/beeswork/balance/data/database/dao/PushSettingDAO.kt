@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.beeswork.balance.data.database.entity.PushSetting
+import com.beeswork.balance.data.database.entity.setting.PushSetting
 import java.util.*
 
 @Dao

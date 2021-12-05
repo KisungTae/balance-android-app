@@ -1,9 +1,9 @@
 package com.beeswork.balance.data.database.repository.match
 
-import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.match.Match
+import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.ReportReason

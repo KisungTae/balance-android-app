@@ -34,6 +34,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.beeswork.balance.internal.util.hideKeyboard
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
 import com.google.firebase.messaging.FirebaseMessaging
+import java.util.*
 
 
 class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
@@ -89,17 +90,12 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
     }
 
     private suspend fun setupWebSocketEventObserver() {
-        viewModel.webSocketEventLiveData.await().observeForever {
-            when (it.type) {
-                WebSocketEvent.Type.ERROR -> {
-                    when (it.error) {
-                        ExceptionCode.ACCOUNT_NOT_FOUND_EXCEPTION,
-                        ExceptionCode.ACCOUNT_BLOCKED_EXCEPTION,
-                        ExceptionCode.ACCOUNT_DELETED_EXCEPTION -> moveToLoginActivity(it.error, it.errorMessage)
-                        else -> showWebSocketError(it.error, it.errorMessage)
-                    }
+        viewModel.webSocketEventLiveData.await().observeForever { webSocketEvent ->
+            when {
+                webSocketEvent.isError() && validateLogin(webSocketEvent) -> {
+                    // TODO: show error message saying reconnect in a few seconds automatically
+
                 }
-                else -> println()
             }
         }
     }

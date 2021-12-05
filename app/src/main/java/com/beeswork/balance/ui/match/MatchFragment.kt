@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.repository.match.MatchProfileTuple
+import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewMatchBinding
@@ -134,10 +134,14 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private fun setupToolBars() {
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.miMatchSearch -> showSearchToolBar()
-                else -> false
-            }
+            //TODO: remove me
+            println("ddd")
+            viewModel.testFunction()
+            false
+//            when (it.itemId) {
+//                R.id.miMatchSearch -> showSearchToolBar()
+//                else -> false
+//            }
         }
         binding.btnMatchSearchClose.setOnClickListener { hideSearchToolBar() }
         binding.etMatchSearch.addTextChangedListener { search(it.toString()) }
@@ -186,7 +190,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) { resource ->
             fetchChatMessagesStatus = resource.status
             updateRefreshBtn()
-            if (resource.isError() && validateLoginFromResource(resource))
+            if (resource.isError() && validateLogin(resource))
                 showFetchChatMessagesError(resource.error, resource.errorMessage)
         }
     }
@@ -200,7 +204,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, { resource ->
             fetchMatchesStatus = resource.status
             updateRefreshBtn()
-            if (resource.isError() && validateLoginFromResource(resource))
+            if (resource.isError() && validateLogin(resource))
                 showFetchMatchesError(resource.error, resource.errorMessage)
         })
     }

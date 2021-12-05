@@ -2,7 +2,7 @@ package com.beeswork.balance.ui.match
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 
 class MatchPagingSource(

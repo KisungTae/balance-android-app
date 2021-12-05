@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.database.repository.login
 
-import com.beeswork.balance.data.database.entity.Login
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO

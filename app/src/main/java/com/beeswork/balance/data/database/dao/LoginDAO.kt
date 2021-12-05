@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.beeswork.balance.data.database.entity.Login
+import com.beeswork.balance.data.database.entity.login.Login
 import com.beeswork.balance.internal.constant.LoginType
 import kotlinx.coroutines.flow.Flow
 import java.util.*

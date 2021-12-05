@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.database.repository.setting
 
-import com.beeswork.balance.data.database.entity.Location
-import com.beeswork.balance.data.database.entity.PushSetting
+import com.beeswork.balance.data.database.entity.setting.Location
+import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import kotlinx.coroutines.flow.Flow

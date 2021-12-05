@@ -2,7 +2,7 @@ package com.beeswork.balance.ui.click
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.beeswork.balance.data.database.entity.Click
+import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 
 class ClickPagingSource(

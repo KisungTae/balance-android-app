@@ -34,8 +34,7 @@ abstract class BaseRDS(
                 if (errorResponse.error != ExceptionCode.EXPIRED_JWT_EXCEPTION) return@sendRequest errorResponse
 
                 val refreshAccessTokenResponse = doRefreshAccessToken()
-                if (refreshAccessTokenResponse.isSuccess()) refreshAccessTokenResponse.data?.let { refreshAccessTokenDTO ->
-                    preferenceProvider.putValidLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
+                if (refreshAccessTokenResponse.isSuccess()) {
                     return@sendRequest getResultWithoutRefreshAccessToken(call)
                 }
                 return@sendRequest refreshAccessTokenResponse.map { null }
@@ -68,8 +67,15 @@ abstract class BaseRDS(
             val refreshAccessTokenBody = RefreshAccessTokenBody(accessToken, refreshToken)
             val response = balanceAPI.refreshAccessToken(refreshAccessTokenBody)
 
-            if (response.isSuccessful) return@sendRequest Resource.success(response.body())
-            else convertToErrorResponse(response)
+            return@sendRequest if (response.isSuccessful) {
+                val resource = Resource.success(response.body())
+                resource.data?.let { refreshAccessTokenDTO ->
+                    preferenceProvider.putValidLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
+                }
+                resource
+            } else {
+                convertToErrorResponse(response)
+            }
         }
     }
 

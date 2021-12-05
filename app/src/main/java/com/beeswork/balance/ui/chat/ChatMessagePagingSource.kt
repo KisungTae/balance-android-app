@@ -2,9 +2,8 @@ package com.beeswork.balance.ui.chat
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
-import com.beeswork.balance.data.database.repository.match.MatchRepository
 
 class ChatMessagePagingSource(
     private val chatRepository: ChatRepository,

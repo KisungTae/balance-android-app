@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.database.entity
+package com.beeswork.balance.data.database.entity.chat
 
 import androidx.room.*
 import com.beeswork.balance.internal.constant.ChatMessageStatus

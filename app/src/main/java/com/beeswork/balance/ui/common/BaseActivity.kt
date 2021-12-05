@@ -3,13 +3,24 @@ package com.beeswork.balance.ui.common
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.exception.*
-import com.beeswork.balance.internal.util.Validator
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.ui.loginactivity.LoginActivity
-import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseActivity : AppCompatActivity() {
+
+    protected fun validateLogin(webSocketEvent: WebSocketEvent): Boolean {
+        return validateLogin(webSocketEvent.error, webSocketEvent.errorMessage)
+    }
+
+    private fun validateLogin(error: String?, errorMessage: String?): Boolean {
+        if (ExceptionCode.isLoginException(error)) {
+            moveToLoginActivity(error, errorMessage)
+            return false
+        }
+        return true
+    }
 
     fun finishToActivity(intent: Intent) {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP

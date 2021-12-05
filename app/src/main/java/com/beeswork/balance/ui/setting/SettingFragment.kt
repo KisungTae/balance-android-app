@@ -61,7 +61,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
             when {
                 resource.isSuccess() -> moveToLoginActivity(null, null)
                 resource.isLoading() -> binding.llSettingLoading.visibility = View.VISIBLE
-                resource.isError() && validateLoginFromResource(resource) -> {
+                resource.isError() && validateLogin(resource) -> {
                     binding.llSettingLoading.visibility = View.GONE
                     val errorTitle = getString(R.string.error_title_delete_account)
                     ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)

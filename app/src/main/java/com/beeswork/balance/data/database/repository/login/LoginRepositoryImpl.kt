@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.database.repository.login
 
 import com.beeswork.balance.data.database.dao.LoginDAO
-import com.beeswork.balance.data.database.entity.Login
+import com.beeswork.balance.data.database.entity.login.Login
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse

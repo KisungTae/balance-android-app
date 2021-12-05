@@ -3,7 +3,7 @@ package com.beeswork.balance.ui.profile
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.*
-import com.beeswork.balance.data.database.entity.Photo
+import com.beeswork.balance.data.database.entity.photo.Photo
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource

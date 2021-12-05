@@ -2,6 +2,9 @@ package com.beeswork.balance.data.database.repository.setting
 
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
+import com.beeswork.balance.data.database.entity.FetchInfo
+import com.beeswork.balance.data.database.entity.setting.Location
+import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse

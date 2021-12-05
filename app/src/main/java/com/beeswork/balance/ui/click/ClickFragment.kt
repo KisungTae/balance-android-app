@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentClickBinding
 import com.beeswork.balance.databinding.SnackBarNewClickBinding
 import com.beeswork.balance.internal.constant.RequestCode
@@ -116,7 +115,7 @@ class ClickFragment : BaseFragment(),
                     binding.btnClickRefresh.visibility = View.GONE
                     binding.skvClickLoading.visibility = View.VISIBLE
                 }
-                resource.isError() && validateLoginFromResource(resource) -> {
+                resource.isError() && validateLogin(resource) -> {
                     showFetchClickError(resource.error, resource.errorMessage)
                 }
             }

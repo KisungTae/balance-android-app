@@ -58,7 +58,7 @@ class ProfileBalanceGameDialog : BalanceGame(), KodeinAware {
             when {
                 resource.isSuccess() -> dismiss()
                 resource.isLoading() -> showLoading(getString(R.string.balance_game_saving_answers_text))
-                resource.isError() && validateLoginFromResource(resource) -> showSaveError(resource.error, resource.errorMessage)
+                resource.isError() && validateLogin(resource) -> showSaveError(resource.error, resource.errorMessage)
             }
         }
     }
@@ -68,7 +68,7 @@ class ProfileBalanceGameDialog : BalanceGame(), KodeinAware {
             when {
                 resource.isSuccess() -> resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
                 resource.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
-                resource.isError() && validateLoginFromResource(resource) -> showFetchQuestionsError(resource.error, resource.errorMessage)
+                resource.isError() && validateLogin(resource) -> showFetchQuestionsError(resource.error, resource.errorMessage)
             }
         }
     }

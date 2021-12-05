@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -113,7 +112,7 @@ class ProfileFragment : BaseFragment(),
         viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) { resource ->
             fetchPhotosStatus = resource.status
             updateRefreshBtn()
-            if (resource.isError() && validateLoginFromResource(resource)) showFetchPhotosError(resource.error, resource.errorMessage)
+            if (resource.isError() && validateLogin(resource)) showFetchPhotosError(resource.error, resource.errorMessage)
         }
     }
 
@@ -125,7 +124,7 @@ class ProfileFragment : BaseFragment(),
 
     private fun observeDeletePhotoLiveData() {
         viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) { resource ->
-            if (resource.isError() && validateLoginFromResource(resource)) {
+            if (resource.isError() && validateLogin(resource)) {
                 val errorTitle = getString(R.string.error_title_delete_photo)
                 ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
             }
@@ -134,7 +133,7 @@ class ProfileFragment : BaseFragment(),
 
     private fun observeOrderPhotosLiveData() {
         viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) { resource ->
-            if (resource.isError() && validateLoginFromResource(resource)) {
+            if (resource.isError() && validateLogin(resource)) {
                 val errorTitle = getString(R.string.error_title_order_photos)
                 ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
             }
@@ -151,7 +150,7 @@ class ProfileFragment : BaseFragment(),
         viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) { resource ->
             if (resource.isError()
                 && resource.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
-                && validateLoginFromResource(resource)) {
+                && validateLogin(resource)) {
                 val errorTitle = getString(R.string.error_title_add_photo)
                 ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
             }
@@ -398,7 +397,7 @@ class ProfileFragment : BaseFragment(),
                     disableProfileEdit()
                     setupProfile(resource.data)
                 }
-                resource.isError() && validateLoginFromResource(resource) -> showFetchProfileError(resource.error, resource.errorMessage)
+                resource.isError() && validateLogin(resource) -> showFetchProfileError(resource.error, resource.errorMessage)
             }
         }
     }
@@ -436,7 +435,7 @@ class ProfileFragment : BaseFragment(),
                     showLoading()
                 }
                 resource.isSuccess() -> showSaveAboutSuccess()
-                resource.isError() && validateLoginFromResource(resource) -> {
+                resource.isError() && validateLogin(resource) -> {
                     showSaveAboutError(resource.data, resource.error, resource.errorMessage, resource.fieldErrorMessages)
                 }
             }

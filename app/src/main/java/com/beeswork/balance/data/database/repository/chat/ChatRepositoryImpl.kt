@@ -3,9 +3,9 @@ package com.beeswork.balance.data.database.repository.chat
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
-import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.common.ResourceListener
-import com.beeswork.balance.data.database.entity.Match
+import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
@@ -72,25 +72,35 @@ class ChatRepositoryImpl(
         }
     }
 
-//  TODO: accountId to accessToken
+    //  TODO: accountId to accessToken
     private suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
-//        val chatMessageDTO = ChatMessageDTO(key, chatId, preferenceProvider.getAccountId(), swipedId, body)
-//        sendChatMessageChanel.send(chatMessageDTO)
-//        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
-    }
-
-    override suspend fun resendChatMessage(key: Long, swipedId: UUID) {
-        withContext(ioDispatcher) {
-            chatMessageDAO.findByKey(key)?.let { chatMessage ->
-                chatMessageDAO.updateStatusByKey(chatMessage.key, ChatMessageStatus.SENDING)
-                sendChatMessage(chatMessage.key, chatMessage.chatId, swipedId, chatMessage.body)
-            }
+        val accountId = preferenceProvider.getAccountId()
+        if (accountId == null) {
+            // TODO: postValue of this error so that it goes to login activity
+        } else {
+            val chatMessageDTO = ChatMessageDTO(key, chatId, accountId, swipedId, body)
+            sendChatMessageChanel.send(chatMessageDTO)
+            //        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
         }
     }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
         return withContext(ioDispatcher) {
             return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
+        }
+    }
+
+    override suspend fun resendChatMessage(key: Long?) {
+        withContext(ioDispatcher) {
+            chatMessageDAO.findChatMessageToSendTupleByKey(key)?.let { chatMessageToSendTuple ->
+                chatMessageDAO.updateStatusByKey(chatMessageToSendTuple.key, ChatMessageStatus.SENDING)
+                sendChatMessage(
+                    chatMessageToSendTuple.key,
+                    chatMessageToSendTuple.chatId,
+                    chatMessageToSendTuple.swipedId,
+                    chatMessageToSendTuple.body
+                )
+            }
         }
     }
 

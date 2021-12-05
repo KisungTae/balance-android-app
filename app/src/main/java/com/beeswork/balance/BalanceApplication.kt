@@ -257,7 +257,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
 
         // StompClient
-        bind() from singleton { StompClientImpl(applicationScope, instance(), instance(), instance(), instance(), instance()) }
+        bind() from singleton { StompClientImpl(applicationScope, instance(), instance(), instance(), instance(), instance(), instance()) }
         bind() from singleton { WebSocketClientImpl(applicationScope, instance()) }
 
         // Provider
@@ -545,5 +545,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      169. refactor getAccountId to getAccountIdOrThrow
 //      170. add validateLoginFromResoruce for websocket in mainActivity
 //      171. check and re-implement line 75 in ChatRepositoryImpl
+//      172. delete swipes, don't save them locally, what if users remove the app and download all the siwpes? does not make sense and swipe() on server alrady checks if it's clicked or matched
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

@@ -119,7 +119,7 @@ class ChatViewModel(
     }
 
     fun resendChatMessage(key: Long) {
-        viewModelScope.launch { chatRepository.resendChatMessage(key, swipedId) }
+        viewModelScope.launch { chatRepository.resendChatMessage(key) }
     }
 
     fun unmatch() {

@@ -59,7 +59,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
                     disableEdit()
                     showLoading()
                 }
-                resource.isError() && validateLoginFromResource(resource) -> {
+                resource.isError() && validateLogin(resource) -> {
                     showSavePushSettingError(resource.data, resource.error, resource.errorMessage)
                 }
             }

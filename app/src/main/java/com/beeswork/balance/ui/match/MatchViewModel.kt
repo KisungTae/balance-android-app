@@ -6,11 +6,15 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.match.MatchDTO
+import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.threeten.bp.OffsetDateTime
+import java.util.*
 
 
 class MatchViewModel(
@@ -72,7 +76,22 @@ class MatchViewModel(
     }
 
     fun testFunction() {
-        matchRepository.testFunction()
+        viewModelScope.launch {
+//            matchRepository.saveMatch(
+//                MatchDTO(
+//                    PushType.MATCHED,
+//                    1,
+//                    UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"),
+//                    UUID.randomUUID(),
+//                    false,
+//                    false,
+//                    "Michael",
+//                    "key",
+//                    OffsetDateTime.now()
+//                )
+//            )
+//            chatRepository.sendChatMessage(1, UUID.randomUUID(), "test")
+        }
     }
 
     companion object {

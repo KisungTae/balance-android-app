@@ -68,7 +68,7 @@ class SwipeBalanceGameDialog(
             when {
                 resource.isSuccess() -> resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
                 resource.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
-                resource.isError() && validateLoginFromResource(resource) -> {
+                resource.isError() && validateLogin(resource) -> {
                     showFetchQuestionsError(resource.error, resource.errorMessage)
                 }
             }

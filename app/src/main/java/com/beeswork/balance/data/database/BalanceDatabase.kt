@@ -5,6 +5,17 @@ import androidx.room.*
 import com.beeswork.balance.data.database.converter.*
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
+import com.beeswork.balance.data.database.entity.chat.ChatMessage
+import com.beeswork.balance.data.database.entity.click.Click
+import com.beeswork.balance.data.database.entity.login.Login
+import com.beeswork.balance.data.database.entity.match.Match
+import com.beeswork.balance.data.database.entity.photo.Photo
+import com.beeswork.balance.data.database.entity.profile.Profile
+import com.beeswork.balance.data.database.entity.setting.FCMToken
+import com.beeswork.balance.data.database.entity.FetchInfo
+import com.beeswork.balance.data.database.entity.setting.Location
+import com.beeswork.balance.data.database.entity.setting.PushSetting
+import com.beeswork.balance.data.database.entity.swipe.SwipeFilter
 
 
 @Database(

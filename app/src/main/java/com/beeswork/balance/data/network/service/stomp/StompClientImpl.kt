@@ -1,9 +1,8 @@
 package com.beeswork.balance.data.network.service.stomp
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.click.ClickRepository
+import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.api.HttpHeader
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
@@ -21,14 +20,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
-import retrofit2.http.Headers
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.*
@@ -40,12 +37,18 @@ class StompClientImpl(
     private val chatRepository: ChatRepository,
     private val clickRepository: ClickRepository,
     private val matchRepository: MatchRepository,
+    private val loginRepository: LoginRepository,
     private val preferenceProvider: PreferenceProvider
 ) : StompClient, WebSocketListener() {
 
     private var socket: WebSocket? = null
     private var socketStatus = SocketStatus.CLOSED
     private var outgoing = Channel<String>()
+    private var missedMessageIds: Queue<Long> = LinkedList()
+
+    private var refreshAccessToken = false
+    private var disconnectedByUser = false
+    private var reconnect = false
 
     private var webSocketEventChannel = Channel<WebSocketEvent>()
     override val webSocketEventFlow = webSocketEventChannel.consumeAsFlow()
@@ -68,13 +71,25 @@ class StompClientImpl(
     override fun onMessage(webSocket: WebSocket, text: String) {
         val stompFrame = StompFrame.from(text)
         when (stompFrame.command) {
-            StompFrame.Command.CONNECTED -> subscribeToQueue()
+            StompFrame.Command.CONNECTED -> {
+                // TODO: clear missedMessages
+                sendMissedMessages()
+                subscribeToQueue()
+            }
             StompFrame.Command.MESSAGE -> onMessageFrameReceived(stompFrame)
             StompFrame.Command.RECEIPT -> onReceiptFrameReceived(stompFrame)
             StompFrame.Command.ERROR -> onErrorFrameReceived(stompFrame)
             else -> {
             }
         }
+    }
+
+    private fun sendMissedMessages() {
+//        while (missedMessages.size > 0) {
+//            applicationScope.launch {
+//                chatRepository.resendChatMessage(missedMessages.poll())
+//            }
+//        }
     }
 
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {}
@@ -85,8 +100,9 @@ class StompClientImpl(
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        println("override fun onClosed: ${reason}")
+        println("override fun onClosed reason: ${reason}")
         socketStatus = SocketStatus.CLOSED
+        scheduleConnect()
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -146,43 +162,46 @@ class StompClientImpl(
     }
 
     private fun onErrorFrameReceived(stompFrame: StompFrame) {
+        val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
+        refreshAccessToken = stompFrame.getError() == ExceptionCode.EXPIRED_JWT_EXCEPTION
+        reconnect = !ExceptionCode.isLoginException(stompFrame.getError())
+
+        stompFrame.getReceiptId()?.let { receiptId ->
+            missedMessageIds.add(receiptId)
+        }
+
         applicationScope.launch {
-            if (stompFrame.getError()?.equals(ExceptionCode.EXPIRED_JWT_EXCEPTION) == true) {
-                
-            }
-
-
-            stompFrame.getReceiptId()?.let { receiptId ->
-                val chatMessageReceiptDTO = ChatMessageReceiptDTO(receiptId)
-                chatRepository.saveChatMessageReceipt(chatMessageReceiptDTO)
-            }
-            val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
             webSocketEventChannel.send(webSocketEvent)
-            disconnect()
+            socket?.close(1000, null)
         }
     }
 
     private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO) {
-        if (socketStatus == SocketStatus.CLOSED) {
-            socket = null
-            connect()
-        }
-        if (socketStatus == SocketStatus.CONNECTING) delay(CONNECTING_DELAY)
+        println("${chatMessageDTO.key} starts delay")
+        delay(10000)
+        println("${chatMessageDTO.key} ends delay")
 
-        if (socketStatus == SocketStatus.OPEN) {
-            val headers = mutableMapOf<String, String>()
-            headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
-            headers[StompHeader.RECEIPT] = chatMessageDTO.key.toString()
-            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-            headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
-            val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
-            outgoing.send(stompFrame.compile())
-        } else {
-            chatRepository.saveChatMessageReceipt(ChatMessageReceiptDTO(chatMessageDTO.key))
-        }
+//        if (socketStatus == SocketStatus.CLOSED) {
+//            socket = null
+//            connect()
+//        }
+//        if (socketStatus == SocketStatus.CONNECTING) delay(CONNECTING_DELAY)
+//
+//        if (socketStatus == SocketStatus.OPEN) {
+//            val headers = mutableMapOf<String, String>()
+//            headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
+//            headers[StompHeader.RECEIPT] = chatMessageDTO.key.toString()
+//            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+//            headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
+//            val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
+//            outgoing.send(stompFrame.compile())
+//        } else {
+//            chatRepository.saveChatMessageReceipt(ChatMessageReceiptDTO(chatMessageDTO.key))
+//        }
     }
 
     override suspend fun disconnect() {
+        reconnect = false
         socket?.close(1000, null)
     }
 
@@ -211,10 +230,25 @@ class StompClientImpl(
         return "/queue/${id?.toString()}"
     }
 
+    private fun scheduleConnect() {
+        if (reconnect) applicationScope.launch {
+            delay(CONNECTING_DELAY)
+            if (refreshAccessToken) {
+                val response = loginRepository.refreshAccessToken()
+                if (response.isError()) {
+                    webSocketEventChannel.send(WebSocketEvent.error(response.error, response.errorMessage))
+                    return@launch
+                }
+            }
+            connect()
+        }
+    }
+
+
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_HEART_BEAT = "0,0"
-        private const val CONNECTING_DELAY = 10000L
+        private const val CONNECTING_DELAY = 2000L
     }
 
     enum class SocketStatus {

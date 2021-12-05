@@ -1,7 +1,6 @@
 package com.beeswork.balance.ui.setting.push
 
 import androidx.lifecycle.*
-import com.beeswork.balance.data.database.entity.PushSetting
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.mapper.setting.PushSettingMapper

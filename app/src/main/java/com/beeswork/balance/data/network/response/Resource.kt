@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.network.response
 
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.ExceptionCode
 
 class Resource<out T>(
     val status: Status,

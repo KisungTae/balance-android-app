@@ -4,7 +4,7 @@ import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.dao.ClickDAO
 import com.beeswork.balance.data.database.dao.FetchInfoDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
-import com.beeswork.balance.data.database.entity.Click
+import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse

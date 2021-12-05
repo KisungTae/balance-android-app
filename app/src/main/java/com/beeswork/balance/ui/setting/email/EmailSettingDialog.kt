@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.DialogEmailSettingBinding
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.constant.RequestCode
@@ -72,7 +71,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
                     showLoading()
                     binding.etEmailSettingEmail.setText(resource.data)
                 }
-                resource.isError() && validateLoginFromResource(resource) -> showFetchEmailError(resource.error, resource.errorMessage)
+                resource.isError() && validateLogin(resource) -> showFetchEmailError(resource.error, resource.errorMessage)
             }
         }
     }
@@ -98,7 +97,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
                     disableEdit()
                     showLoading()
                 }
-                resource.isError() && validateLoginFromResource(resource) -> {
+                resource.isError() && validateLogin(resource) -> {
                     showSaveEmailError(resource.data, resource.error, resource.errorMessage)
                 }
             }

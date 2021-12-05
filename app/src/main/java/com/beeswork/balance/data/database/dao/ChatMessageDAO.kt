@@ -1,11 +1,11 @@
 package com.beeswork.balance.data.database.dao
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.room.*
-import com.beeswork.balance.data.database.entity.ChatMessage
+import com.beeswork.balance.data.database.entity.chat.ChatMessage
+import com.beeswork.balance.data.database.entity.chat.ChatMessageToSendTuple
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import org.threeten.bp.OffsetDateTime
+import java.util.*
 
 @Dao
 interface ChatMessageDAO {
@@ -53,5 +53,11 @@ interface ChatMessageDAO {
 
     @Query("select chatId from chatMessage where `key` = :key")
     fun findChatIdByKey(key: Long?): Long?
+
+//    @Query("select swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.`key` = :key")
+//    fun findSwipedIdByKey(key: Long?): UUID?
+
+    @Query("select c.`key`, m.chatId, c.body, m.swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.`key` = :key")
+    fun findChatMessageToSendTupleByKey(key: Long?): ChatMessageToSendTuple?
 
 }

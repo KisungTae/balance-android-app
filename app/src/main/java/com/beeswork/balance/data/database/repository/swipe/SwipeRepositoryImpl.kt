@@ -2,7 +2,7 @@ package com.beeswork.balance.data.database.repository.swipe
 
 import com.beeswork.balance.data.database.dao.SwipeDAO
 import com.beeswork.balance.data.database.dao.SwipeFilterDAO
-import com.beeswork.balance.data.database.entity.SwipeFilter
+import com.beeswork.balance.data.database.entity.swipe.SwipeFilter
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.profile.QuestionDTO

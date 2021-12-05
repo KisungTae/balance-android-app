@@ -1,12 +1,10 @@
 package com.beeswork.balance.data.database.dao
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.beeswork.balance.data.database.entity.Click
+import com.beeswork.balance.data.database.entity.click.Click
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 

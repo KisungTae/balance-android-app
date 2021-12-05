@@ -4,15 +4,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.internal.util.Validator
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
 
-    protected fun validateLoginFromResource(resource: Resource<Any>): Boolean {
-        if (Validator.validateLogin(resource.error)) return true
-        moveToLoginActivity(resource.error, resource.errorMessage)
-        return false
+    protected fun validateLogin(resource: Resource<Any>): Boolean {
+        if (ExceptionCode.isLoginException(resource.error)) {
+            moveToLoginActivity(resource.error, resource.errorMessage)
+            return false
+        }
+        return true
     }
 
     protected fun moveToLoginActivity(error: String?, errorMessage: String?) {

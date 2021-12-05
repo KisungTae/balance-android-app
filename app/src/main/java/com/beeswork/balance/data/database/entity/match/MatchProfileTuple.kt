@@ -1,4 +1,4 @@
-package com.beeswork.balance.data.database.repository.match
+package com.beeswork.balance.data.database.entity.match
 
 import java.util.*
 
