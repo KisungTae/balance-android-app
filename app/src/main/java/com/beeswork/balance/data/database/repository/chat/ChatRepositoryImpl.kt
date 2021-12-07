@@ -92,15 +92,26 @@ class ChatRepositoryImpl(
 
     override suspend fun resendChatMessage(key: Long?) {
         withContext(ioDispatcher) {
-            chatMessageDAO.findChatMessageToSendTupleByKey(key)?.let { chatMessageToSendTuple ->
-                chatMessageDAO.updateStatusByKey(chatMessageToSendTuple.key, ChatMessageStatus.SENDING)
-                sendChatMessage(
-                    chatMessageToSendTuple.key,
-                    chatMessageToSendTuple.chatId,
-                    chatMessageToSendTuple.swipedId,
-                    chatMessageToSendTuple.body
-                )
-            }
+//            chatMessageDAO.findChatMessageToSendTupleByKey(key)?.let { chatMessageToSendTuple ->
+//                chatMessageDAO.updateStatusByKey(chatMessageToSendTuple.key, ChatMessageStatus.SENDING)
+//                sendChatMessage(
+//                    chatMessageToSendTuple.key,
+//                    chatMessageToSendTuple.chatId,
+//                    chatMessageToSendTuple.swipedId,
+//                    chatMessageToSendTuple.body
+//                )
+//            }
+
+            //TODO: remove me
+            val chatMessageDTO = ChatMessageDTO(
+                Random.nextInt(100).toLong(),
+                Random.nextInt(100).toLong(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                ""
+            )
+            println("send chatMessageDTO: $chatMessageDTO")
+            sendChatMessageChanel.send(chatMessageDTO)
         }
     }
 

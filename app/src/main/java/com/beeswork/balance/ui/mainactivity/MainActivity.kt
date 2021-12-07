@@ -91,12 +91,20 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private suspend fun setupWebSocketEventObserver() {
         viewModel.webSocketEventLiveData.await().observeForever { webSocketEvent ->
-            when {
-                webSocketEvent.isError() && validateLogin(webSocketEvent) -> {
-                    // TODO: show error message saying reconnect in a few seconds automatically
-
-                }
+            if (webSocketEvent.isError()
+                && validateLogin(webSocketEvent)
+                && shouldShowWebSocketErrorMessage(webSocketEvent.error)
+            ) {
+                val errorTitle = getString(R.string.error_title_web_socket_disconnected)
+                ErrorDialog.show(webSocketEvent.error, errorTitle, webSocketEvent.errorMessage, supportFragmentManager)
             }
+        }
+    }
+
+    private fun shouldShowWebSocketErrorMessage(error: String?): Boolean {
+        return when (error) {
+            ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION -> true
+            else -> false
         }
     }
 

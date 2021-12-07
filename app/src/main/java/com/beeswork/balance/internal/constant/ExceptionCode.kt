@@ -1,5 +1,7 @@
 package com.beeswork.balance.internal.constant
 
+import com.beeswork.balance.internal.exception.NoInternetConnectivityException
+
 class ExceptionCode {
 
     companion object {
@@ -71,6 +73,14 @@ class ExceptionCode {
                 else -> false
             }
         }
+
+        fun getExceptionCodeFrom(exception: Throwable): String? {
+            return when (exception) {
+                is NoInternetConnectivityException -> NO_INTERNET_CONNECTIVITY_EXCEPTION
+                else -> null
+            }
+        }
+
     }
 
 }
