@@ -92,10 +92,7 @@ class StompClientImpl(
                 socket?.send(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
             }
         } ?: kotlin.run {
-            val webSocketEvent = WebSocketEvent.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
-            applicationScope.launch {
-                webSocketEventChannel.send(webSocketEvent)
-            }
+            sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
         }
     }
 
@@ -125,10 +122,7 @@ class StompClientImpl(
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         socketStatus = SocketStatus.CLOSED
-        val webSocketEvent = WebSocketEvent.error(ExceptionCode.getExceptionCodeFrom(t), null)
-        applicationScope.launch {
-            webSocketEventChannel.send(webSocketEvent)
-        }
+        sendErrorWebSocketEvent(ExceptionCode.getExceptionCodeFrom(t), null)
         if (t !is NoInternetConnectivityException) {
             scheduleConnect()
         }
@@ -185,13 +179,6 @@ class StompClientImpl(
     }
 
 
-
-
-
-
-
-
-
     private fun sendMissedMessages() {
         for (i in 1..10L) {
             missedMessageKeys.add(i)
@@ -203,8 +190,6 @@ class StompClientImpl(
             }
         }
     }
-
-
 
 
     private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO) {
@@ -248,12 +233,23 @@ class StompClientImpl(
 
 
     private fun subscribeToQueue() {
+        preferenceProvider.getAccountId()?.let { accountId ->
+            applicationScope.launch {
+                val headers = mutableMapOf<String, String>()
+                headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
+                headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+                headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
+                socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+            }
+        } ?: kotlin.run {
+            sendErrorWebSocketEvent(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION, null)
+        }
+    }
+
+    private fun sendErrorWebSocketEvent(error: String?, errorMessage: String?) {
+        val webSocketEvent = WebSocketEvent.error(error, errorMessage)
         applicationScope.launch {
-            val headers = mutableMapOf<String, String>()
-            headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
-            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-            headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
-            socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+            webSocketEventChannel.send(webSocketEvent)
         }
     }
 
@@ -281,7 +277,7 @@ class StompClientImpl(
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_HEART_BEAT = "0,0"
-        private const val SCHEDULE_CONNECT_DELAY = 10000L
+        private const val SCHEDULE_CONNECT_DELAY = 10000000L
     }
 
     enum class SocketStatus {
