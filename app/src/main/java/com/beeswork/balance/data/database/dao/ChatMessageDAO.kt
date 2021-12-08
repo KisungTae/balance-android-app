@@ -39,6 +39,9 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :status where `key` = :key")
     fun updateStatusByKey(key: Long?, status: ChatMessageStatus)
 
+    @Query("update chatMessage set status = :status where `key` in (:keys)")
+    fun updateStatusByKeys(keys: List<Long>, status: ChatMessageStatus)
+
     @Query("update chatMessage set status = :toStatus where status = :whereStatus and createdAt < :createdAt")
     fun updateStatusBefore(createdAt: OffsetDateTime, whereStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 

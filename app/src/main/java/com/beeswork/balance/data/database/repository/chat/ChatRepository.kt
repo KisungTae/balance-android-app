@@ -5,6 +5,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -22,6 +23,7 @@ interface ChatRepository {
     suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO)
     suspend fun fetchChatMessages(): Resource<EmptyResponse>
     suspend fun connectStomp()
+    suspend fun updateChatMessageStatus(chatMessageKeys: List<Long>, chatMessageStatus: ChatMessageStatus)
 
     fun test()
 }

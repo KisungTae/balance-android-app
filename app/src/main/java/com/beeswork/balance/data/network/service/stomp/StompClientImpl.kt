@@ -9,10 +9,7 @@ import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
-import com.beeswork.balance.internal.constant.EndPoint
-import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.constant.PushType
-import com.beeswork.balance.internal.constant.StompHeader
+import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -26,8 +23,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
-import java.net.ConnectException
-import java.net.SocketTimeoutException
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -45,7 +40,7 @@ class StompClientImpl(
     private var socket: WebSocket? = null
     private var socketStatus = SocketStatus.CLOSED
     private var outgoing = Channel<String>()
-    private var missedMessageKeys: Queue<Long> = ConcurrentLinkedQueue()
+    private var missedChatMessageKeys: Queue<Long> = ConcurrentLinkedQueue()
 
     private var refreshAccessToken = false
     private var disconnectedByUser = false
@@ -66,6 +61,10 @@ class StompClientImpl(
 
     override suspend fun connect() {
         disconnectedByUser = false
+        openWebSocketConnection()
+    }
+
+    private fun openWebSocketConnection() {
         if (socketStatus == SocketStatus.CLOSED) {
             socketStatus = SocketStatus.CONNECTING
             val webSocketRequest = Request.Builder()
@@ -82,7 +81,10 @@ class StompClientImpl(
     }
 
     private fun connectToStomp() {
-        preferenceProvider.getAccessToken()?.let { accessToken ->
+        val accessToken = preferenceProvider.getAccessToken()
+        if (accessToken.isNullOrBlank()) {
+            sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
+        } else {
             applicationScope.launch {
                 val headers = mutableMapOf<String, String>()
                 headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
@@ -91,8 +93,6 @@ class StompClientImpl(
                 headers[HttpHeader.ACCESS_TOKEN] = accessToken
                 socket?.send(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
             }
-        } ?: kotlin.run {
-            sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
         }
     }
 
@@ -109,22 +109,28 @@ class StompClientImpl(
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {}
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-        println("override fun onClosing(webSocket: WebSocket, code: Int, reason: String) ${reason}")
         socketStatus = SocketStatus.CLOSED
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-//      TODO: clear chatMessageKeys and update the status in database
-        println("override fun onClosed reason: ${reason}")
         socketStatus = SocketStatus.CLOSED
+        clearMissedChatMessageKeys()
         scheduleConnect()
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         socketStatus = SocketStatus.CLOSED
+        clearMissedChatMessageKeys()
         sendErrorWebSocketEvent(ExceptionCode.getExceptionCodeFrom(t), null)
         if (t !is NoInternetConnectivityException) {
             scheduleConnect()
+        }
+    }
+
+    private fun clearMissedChatMessageKeys() {
+        applicationScope.launch {
+            chatRepository.updateChatMessageStatus(missedChatMessageKeys.toList(), ChatMessageStatus.ERROR)
+            missedChatMessageKeys.clear()
         }
     }
 
@@ -164,47 +170,45 @@ class StompClientImpl(
     }
 
     private fun onErrorFrameReceived(stompFrame: StompFrame) {
-        val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
         refreshAccessToken = stompFrame.getError() == ExceptionCode.EXPIRED_JWT_EXCEPTION
         reconnect = !ExceptionCode.isLoginException(stompFrame.getError())
 
         stompFrame.getReceiptId()?.let { receiptId ->
-            missedMessageKeys.add(receiptId)
+            missedChatMessageKeys.add(receiptId)
         }
-
         applicationScope.launch {
-            webSocketEventChannel.send(webSocketEvent)
             socket?.close(1000, null)
+            val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
+            webSocketEventChannel.send(webSocketEvent)
         }
     }
 
-
     private fun sendMissedMessages() {
-        for (i in 1..10L) {
-            missedMessageKeys.add(i)
-        }
-
-        while (missedMessageKeys.size > 0) {
+        while (missedChatMessageKeys.size > 0) {
             applicationScope.launch {
-                chatRepository.resendChatMessage(missedMessageKeys.poll())
+                chatRepository.resendChatMessage(missedChatMessageKeys.poll())
             }
         }
     }
-
 
     private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO) {
         if (socketStatus == SocketStatus.STOMP_CONNECTED) {
-            applicationScope.launch {
-                val headers = mutableMapOf<String, String>()
-                headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
-                headers[StompHeader.RECEIPT] = chatMessageDTO.key.toString()
-                headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-                headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
-                val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
-                outgoing.send(stompFrame.compile())
+            val accessToken = preferenceProvider.getAccessToken()
+            if (accessToken.isNullOrBlank()) {
+                sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
+            } else {
+                applicationScope.launch {
+                    val headers = mutableMapOf<String, String>()
+                    headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
+                    headers[StompHeader.RECEIPT] = chatMessageDTO.key.toString()
+                    headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+                    headers[HttpHeader.ACCESS_TOKEN] = accessToken
+                    val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
+                    outgoing.send(stompFrame.compile())
+                }
             }
         } else {
-            missedMessageKeys.add(chatMessageDTO.key)
+            missedChatMessageKeys.add(chatMessageDTO.key)
         }
 
 //        if (socketStatus == SocketStatus.CLOSED) {
@@ -233,16 +237,24 @@ class StompClientImpl(
 
 
     private fun subscribeToQueue() {
-        preferenceProvider.getAccountId()?.let { accountId ->
-            applicationScope.launch {
-                val headers = mutableMapOf<String, String>()
-                headers[StompHeader.DESTINATION] = getDestination(preferenceProvider.getAccountId())
-                headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
-                headers[HttpHeader.ACCESS_TOKEN] = "${preferenceProvider.getAccessToken()}"
-                socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
-            }
-        } ?: kotlin.run {
+        val accountId = preferenceProvider.getAccountId()
+        if (accountId == null) {
             sendErrorWebSocketEvent(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION, null)
+            return
+        }
+
+        val accessToken = preferenceProvider.getAccessToken()
+        if (accessToken.isNullOrBlank()) {
+            sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
+            return
+        }
+
+        applicationScope.launch {
+            val headers = mutableMapOf<String, String>()
+            headers[StompHeader.DESTINATION] = QUEUE_PREFIX + accountId.toString()
+            headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
+            headers[HttpHeader.ACCESS_TOKEN] = accessToken
+            socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
         }
     }
 
@@ -251,10 +263,6 @@ class StompClientImpl(
         applicationScope.launch {
             webSocketEventChannel.send(webSocketEvent)
         }
-    }
-
-    private fun getDestination(id: UUID?): String {
-        return "/queue/${id?.toString()}"
     }
 
     private fun scheduleConnect() {
@@ -268,7 +276,7 @@ class StompClientImpl(
                         return@launch
                     }
                 }
-                connect()
+                openWebSocketConnection()
             }
         }
     }
@@ -278,6 +286,7 @@ class StompClientImpl(
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_HEART_BEAT = "0,0"
         private const val SCHEDULE_CONNECT_DELAY = 10000000L
+        private const val QUEUE_PREFIX = "/queue/"
     }
 
     enum class SocketStatus {
@@ -290,8 +299,6 @@ class StompClientImpl(
 }
 
 
-// TODO: when acceess token is null, then throw eception and implement catche xception in viewmodel
-// TODO: change "${preferenceProvider.getAccessToken()}" to if acess ntoken then throw exception
 
 // TODO: lifecycle event error and close socket in subscribe()
 // TODO: what happens when exception is thrown in onFrame()

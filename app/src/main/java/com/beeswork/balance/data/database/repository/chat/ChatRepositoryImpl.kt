@@ -189,6 +189,12 @@ class ChatRepositoryImpl(
         }
     }
 
+    override suspend fun updateChatMessageStatus(chatMessageKeys: List<Long>, chatMessageStatus: ChatMessageStatus) {
+        withContext(ioDispatcher) {
+            chatMessageDAO.updateStatusByKeys(chatMessageKeys, chatMessageStatus)
+        }
+    }
+
 
     private fun saveChatMessages(
         sentChatMessageDTOs: List<ChatMessageDTO>?,
