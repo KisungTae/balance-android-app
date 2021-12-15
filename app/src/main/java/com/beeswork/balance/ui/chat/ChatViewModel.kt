@@ -109,7 +109,9 @@ class ChatViewModel(
                 bodySize <= 0 -> _sendChatMessageLiveData.postValue(
                     Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
                 )
-                else -> chatRepository.sendChatMessage(chatId, swipedId, body)
+                else -> _sendChatMessageLiveData.postValue(
+                    chatRepository.sendChatMessage(chatId, swipedId, body)
+                )
             }
         }
     }
@@ -119,7 +121,7 @@ class ChatViewModel(
     }
 
     fun resendChatMessage(key: Long) {
-        viewModelScope.launch { chatRepository.resendChatMessage(key) }
+        viewModelScope.launch { _sendChatMessageLiveData.postValue(chatRepository.resendChatMessage(key)) }
     }
 
     fun unmatch() {

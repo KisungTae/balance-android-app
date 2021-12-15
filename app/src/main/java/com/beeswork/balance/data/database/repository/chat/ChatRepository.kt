@@ -15,9 +15,9 @@ interface ChatRepository {
     val sendChatMessageFlow: Flow<ChatMessageDTO>
 
     suspend fun deleteChatMessages()
-    suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String)
+    suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String): Resource<EmptyResponse>
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
-    suspend fun resendChatMessage(key: Long?)
+    suspend fun resendChatMessage(key: Long?): Resource<EmptyResponse>
     suspend fun deleteChatMessage(chatId: Long, key: Long)
     suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO)
     suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO)

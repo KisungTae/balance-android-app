@@ -63,24 +63,22 @@ class ChatRepositoryImpl(
         withContext(ioDispatcher) { chatMessageDAO.deleteAll() }
     }
 
-    override suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String) {
-        withContext(ioDispatcher) {
+    override suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val accountId = preferenceProvider.getAccountId()
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
             val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING)
             val key = chatMessageDAO.insert(chatMessage)
-            sendChatMessage(key, chatId, swipedId, body)
+            sendChatMessage(key, chatId, accountId, swipedId, body)
+            return@withContext Resource.success(EmptyResponse())
         }
     }
 
-    //  TODO: accountId to accessToken
-    private suspend fun sendChatMessage(key: Long, chatId: Long, swipedId: UUID, body: String) {
-        val accountId = preferenceProvider.getAccountId()
-        if (accountId == null) {
-            // TODO: postValue of this error so that it goes to login activity
-        } else {
-            val chatMessageDTO = ChatMessageDTO(key, chatId, accountId, swipedId, body)
-            sendChatMessageChanel.send(chatMessageDTO)
-            //        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
-        }
+    private suspend fun sendChatMessage(key: Long, chatId: Long, accountId: UUID, swipedId: UUID, body: String) {
+        val chatMessageDTO = ChatMessageDTO(key, chatId, accountId, swipedId, body)
+        sendChatMessageChanel.send(chatMessageDTO)
+        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
+        Resource.success(EmptyResponse())
     }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
@@ -89,28 +87,21 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun resendChatMessage(key: Long?) {
-        withContext(ioDispatcher) {
-//            chatMessageDAO.findChatMessageToSendTupleByKey(key)?.let { chatMessageToSendTuple ->
-//                chatMessageDAO.updateStatusByKey(chatMessageToSendTuple.key, ChatMessageStatus.SENDING)
-//                sendChatMessage(
-//                    chatMessageToSendTuple.key,
-//                    chatMessageToSendTuple.chatId,
-//                    chatMessageToSendTuple.swipedId,
-//                    chatMessageToSendTuple.body
-//                )
-//            }
-
-            //TODO: remove me
-            val chatMessageDTO = ChatMessageDTO(
-                Random.nextInt(100).toLong(),
-                Random.nextInt(100).toLong(),
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                ""
-            )
-            println("send chatMessageDTO: $chatMessageDTO")
-            sendChatMessageChanel.send(chatMessageDTO)
+    override suspend fun resendChatMessage(key: Long?): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val accountId = preferenceProvider.getAccountId()
+                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            chatMessageDAO.findChatMessageToSendTupleByKey(key)?.let { chatMessageToSendTuple ->
+                chatMessageDAO.updateStatusByKey(chatMessageToSendTuple.key, ChatMessageStatus.SENDING)
+                sendChatMessage(
+                    chatMessageToSendTuple.key,
+                    chatMessageToSendTuple.chatId,
+                    accountId,
+                    chatMessageToSendTuple.swipedId,
+                    chatMessageToSendTuple.body
+                )
+            }
+            return@withContext Resource.success(EmptyResponse())
         }
     }
 
