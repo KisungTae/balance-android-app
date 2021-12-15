@@ -4,10 +4,11 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
+import java.util.*
 
 data class ChatMessageDomain(
     val key: Long,
-    val id: Long?,
+    val id: UUID?,
     val body: String,
     var status: ChatMessageStatus,
     var isProcessed: Boolean,

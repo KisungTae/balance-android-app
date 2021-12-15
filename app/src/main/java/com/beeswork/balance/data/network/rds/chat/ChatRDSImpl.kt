@@ -13,7 +13,7 @@ class ChatRDSImpl(
     balanceAPI: BalanceAPI,
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), ChatRDS {
-    override suspend fun syncChatMessages(sentChatMessageIds: List<Long>, receivedChatMessageIds: List<Long>) {
+    override suspend fun syncChatMessages(sentChatMessageIds: List<UUID>, receivedChatMessageIds: List<UUID>) {
         balanceAPI.syncChatMessages(SyncChatMessagesBody(sentChatMessageIds, receivedChatMessageIds))
     }
 

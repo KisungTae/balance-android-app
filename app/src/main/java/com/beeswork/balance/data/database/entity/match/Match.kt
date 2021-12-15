@@ -25,5 +25,5 @@ data class Match(
     var updatedAt: OffsetDateTime?,
     var unread: Boolean = false,
     var recentChatMessage: String = "",
-    var lastReadChatMessageId: Long = 0
+    var lastReadChatMessageKey: Long = 0
 )

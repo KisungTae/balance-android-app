@@ -105,14 +105,14 @@ class MatchRepositoryImpl(
                 match.updatedAt = it.updatedAt
                 match.recentChatMessage = it.recentChatMessage
                 match.active = it.active
-                chatMessageDAO.findMostRecentAfter(match.chatId, match.lastReadChatMessageId)?.let { chatMessage ->
+                chatMessageDAO.findMostRecentAfter(match.chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
                     match.recentChatMessage = chatMessage.body
                     match.updatedAt = chatMessage.createdAt
                     match.active = true
                 }
-                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageId)
+                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
             }
-            match.lastReadChatMessageId = it.lastReadChatMessageId
+            match.lastReadChatMessageKey = it.lastReadChatMessageKey
         }
 
     }
@@ -121,8 +121,8 @@ class MatchRepositoryImpl(
         withContext(ioDispatcher) {
             balanceDatabase.runInTransaction {
                 matchDAO.findById(chatId)?.let { match ->
-                    chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageId)?.let { chatMessage ->
-                        match.lastReadChatMessageId = chatMessage.id
+                    chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
+                        match.lastReadChatMessageKey = chatMessage.key
                         match.recentChatMessage = chatMessage.body
                         match.unread = false
                         matchDAO.insert(match)

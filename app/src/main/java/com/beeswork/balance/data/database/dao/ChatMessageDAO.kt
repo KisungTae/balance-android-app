@@ -19,21 +19,21 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where `key` = :key")
     fun findByKey(key: Long?): ChatMessage?
 
-    @Query("select * from chatMessage where chatId = :chatId and id > :lastReadChatMessageId and status in (:statuses) order by id desc limit 1")
+    @Query("select * from chatMessage where chatId = :chatId and `key` > :lastReadChatMessageKey and status in (:statuses) order by id desc limit 1")
     fun findMostRecentAfter(
         chatId: Long,
-        lastReadChatMessageId: Long,
+        lastReadChatMessageKey: Long,
         statuses: List<ChatMessageStatus> = listOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED)
     ): ChatMessage?
 
-    @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and id > :lastReadChatMessageId limit 1")
+    @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and `key` > :lastReadChatMessageKey limit 1")
     fun existAfter(
         chatId: Long,
-        lastReadChatMessageId: Long,
+        lastReadChatMessageKey: Long,
         status: ChatMessageStatus = ChatMessageStatus.RECEIVED
     ): Boolean
 
-    @Query("select * from chatMessage where chatId = :chatId order by id desc, `key` desc limit :loadSize offset :startPosition")
+    @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, `key` desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
 
     @Query("update chatMessage set status = :status where `key` = :key")

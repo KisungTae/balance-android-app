@@ -18,7 +18,7 @@ class ChatMessageMapperImpl : ChatMessageMapper {
             chatMessageDTO.body,
             chatMessageDTO.createdAt
         ) { id, chatId, body, createdAt ->
-            return@safeLet ChatMessage(chatId, body, ChatMessageStatus.RECEIVED, createdAt, id)
+            return@safeLet ChatMessage(chatId, body, ChatMessageStatus.RECEIVED, id, createdAt)
         }
     }
 

@@ -20,7 +20,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
 import java.util.*
 import kotlin.random.Random
 
@@ -66,7 +65,7 @@ class ChatRepositoryImpl(
 
     override suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String) {
         withContext(ioDispatcher) {
-            val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, OffsetDateTime.now())
+            val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING)
             val key = chatMessageDAO.insert(chatMessage)
             sendChatMessage(key, chatId, swipedId, body)
         }
@@ -156,7 +155,7 @@ class ChatRepositoryImpl(
         chatMessageReceiptFlowListener?.onInvoke(Resource.error(ExceptionCode.MATCH_UNMATCHED_EXCEPTION))
     }
 
-    private fun onChatMessageSent(key: Long?, id: Long, createdAt: OffsetDateTime?) {
+    private fun onChatMessageSent(key: Long?, id: UUID, createdAt: OffsetDateTime?) {
         chatMessageDAO.findByKey(key)?.let { chatMessage ->
             createdAt?.let { _createdAt ->
                 chatMessage.id = id
@@ -201,14 +200,14 @@ class ChatRepositoryImpl(
         receivedChatMessageDTOs: List<ChatMessageDTO>?
     ): MutableSet<Long> {
         val chatIds = mutableSetOf<Long>()
-        val sentChatMessageIds = mutableListOf<Long>()
-        val receivedChatMessageIds = mutableListOf<Long>()
+        val sentChatMessageIds = mutableListOf<UUID>()
+        val receivedChatMessageIds = mutableListOf<UUID>()
         val newChatMessages = mutableListOf<ChatMessage>()
 
         receivedChatMessageDTOs?.forEach { chatMessageDTO ->
             chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
                 newChatMessages.add(chatMessage)
-                receivedChatMessageIds.add(chatMessage.id)
+                chatMessage.id?.let { id -> receivedChatMessageIds.add(id) }
                 chatIds.add(chatMessage.chatId)
             }
         }
@@ -221,7 +220,7 @@ class ChatRepositoryImpl(
                 newChatMessages.add(chatMessage)
                 chatIds.add(chatMessage.chatId)
             }
-            chatMessageDTO.id?.let { sentChatMessageIds.add(it) }
+            chatMessageDTO.id?.let { id -> sentChatMessageIds.add(id) }
         }
         syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
         chatMessageDAO.insert(newChatMessages)
@@ -229,8 +228,8 @@ class ChatRepositoryImpl(
     }
 
     private fun syncChatMessages(
-        sentChatMessageIds: List<Long>,
-        receivedChatMessageIds: List<Long>
+        sentChatMessageIds: List<UUID>,
+        receivedChatMessageIds: List<UUID>
     ) {
         if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
@@ -242,12 +241,12 @@ class ChatRepositoryImpl(
         matchDAO.findById(chatId)?.let { match ->
             if (!match.unmatched) chatMessageDAO.findMostRecentAfter(
                 match.chatId,
-                match.lastReadChatMessageId
+                match.lastReadChatMessageKey
             )?.let { chatMessage ->
                 match.recentChatMessage = chatMessage.body
                 match.updatedAt = chatMessage.createdAt
                 match.active = true
-                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageId)
+                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
             }
             matchDAO.insert(match)
         }
@@ -258,16 +257,16 @@ class ChatRepositoryImpl(
         val chatIds = matches.map { it.chatId }
         for (msg in sentChatMessages) {
             val randomIndex = Random.nextInt(0, chatIds.size - 1)
-            chatMessageDAO.insert(
-                ChatMessage(
-                    chatIds[randomIndex],
-                    "message-${Random.nextFloat()}",
-                    ChatMessageStatus.SENDING,
-                    OffsetDateTime.now(ZoneOffset.UTC),
-                    msg.key,
-                    msg.id,
-                )
-            )
+//            chatMessageDAO.insert(
+//                ChatMessage(
+//                    chatIds[randomIndex],
+//                    "message-${Random.nextFloat()}",
+//                    ChatMessageStatus.SENDING,
+//                    OffsetDateTime.now(ZoneOffset.UTC),
+//                    msg.key,
+//                    msg.id,
+//                )
+//            )
         }
     }
 

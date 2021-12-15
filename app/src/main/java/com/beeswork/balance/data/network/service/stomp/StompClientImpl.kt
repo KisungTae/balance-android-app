@@ -299,6 +299,5 @@ class StompClientImpl(
 }
 
 
-
 // TODO: lifecycle event error and close socket in subscribe()
 // TODO: what happens when exception is thrown in onFrame()

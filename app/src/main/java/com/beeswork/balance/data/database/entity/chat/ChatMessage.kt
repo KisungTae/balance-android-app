@@ -3,6 +3,7 @@ package com.beeswork.balance.data.database.entity.chat
 import androidx.room.*
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import org.threeten.bp.OffsetDateTime
+import java.util.*
 
 @Entity(
     tableName = "chatMessage",
@@ -18,12 +19,14 @@ data class ChatMessage(
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
-    var createdAt: OffsetDateTime,
-    var id: Long = Long.MAX_VALUE,
+    var id: UUID?,
+    var createdAt: OffsetDateTime = OffsetDateTime.MAX,
 
     @PrimaryKey(autoGenerate = true)
     val key: Long = 0
 ) {
+    constructor(chatId: Long, body: String, status: ChatMessageStatus) : this(chatId, body, status, null)
+
     fun isProcessed(): Boolean {
         return (status == ChatMessageStatus.RECEIVED || status == ChatMessageStatus.SENT)
     }
