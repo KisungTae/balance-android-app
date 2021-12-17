@@ -547,5 +547,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      171. check and re-implement line 75 in ChatRepositoryImpl
 //      172. delete swipes, don't save them locally, what if users remove the app and download all the siwpes? does not make sense and swipe() on server alrady checks if it's clicked or matched
 //      173. listeners to when online, then connect to websocket
+//      174. remove println()
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

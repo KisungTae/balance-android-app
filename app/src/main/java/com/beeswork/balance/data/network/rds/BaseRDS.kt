@@ -27,12 +27,19 @@ abstract class BaseRDS(
     protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
         return sendRequest {
             val response = call()
-            if (response.isSuccessful) return@sendRequest Resource.success(response.body())
-            if (response.headers()[HttpHeader.CONTENT_TYPE] == APPLICATION_XML) return@sendRequest handleXmlException(response)
-            else {
+            if (response.isSuccessful) {
+                return@sendRequest Resource.success(response.body())
+            }
+            if (response.headers()[HttpHeader.CONTENT_TYPE] == APPLICATION_XML) {
+                println("getResult xml")
+                return@sendRequest handleXmlException(response)
+            } else {
+                println("getResult else")
                 val errorResponse = convertToErrorResponse(response)
-                if (errorResponse.error != ExceptionCode.EXPIRED_JWT_EXCEPTION) return@sendRequest errorResponse
-
+                if (errorResponse.error != ExceptionCode.EXPIRED_JWT_TOKEN_EXCEPTION) {
+                    return@sendRequest errorResponse
+                }
+                println("after getResult convertoErrorResponse")
                 val refreshAccessTokenResponse = doRefreshAccessToken()
                 if (refreshAccessTokenResponse.isSuccess()) {
                     return@sendRequest getResultWithoutRefreshAccessToken(call)

@@ -87,6 +87,16 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private fun bindUI() = lifecycleScope.launch {
         setupWebSocketEventObserver()
+
+
+//        TODO: remove me
+        binding.connectBtn.setOnClickListener {
+            viewModel.connectStomp()
+        }
+
+        binding.disconnectBtn.setOnClickListener {
+            viewModel.disconnectStomp()
+        }
     }
 
     private suspend fun setupWebSocketEventObserver() {

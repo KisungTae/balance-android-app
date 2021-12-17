@@ -9,7 +9,7 @@ class ExceptionCode {
 
         const val REFRESH_TOKEN_NOT_FOUND_EXCEPTION = "refresh_token_not_found_exception"
         const val ACCESS_TOKEN_NOT_FOUND_EXCEPTION = "access_token_not_found_exception"
-        const val EXPIRED_JWT_EXCEPTION = "expired.jwt.exception"
+        const val EXPIRED_JWT_TOKEN_EXCEPTION = "expired.jwt.token.exception"
         const val INVALID_JWT_TOKEN_EXCEPTION = "invalid.jwt.token.exception"
 
         const val NO_INTERNET_CONNECTIVITY_EXCEPTION = "no_internet_connectivity_exception"
@@ -64,7 +64,7 @@ class ExceptionCode {
                 ACCOUNT_NOT_FOUND_EXCEPTION,
                 ACCOUNT_DELETED_EXCEPTION,
                 ACCOUNT_BLOCKED_EXCEPTION,
-                EXPIRED_JWT_EXCEPTION,
+                EXPIRED_JWT_TOKEN_EXCEPTION,
                 INVALID_REFRESH_TOKEN_EXCEPTION,
                 INVALID_JWT_TOKEN_EXCEPTION,
                 ACCESS_TOKEN_NOT_FOUND_EXCEPTION,
