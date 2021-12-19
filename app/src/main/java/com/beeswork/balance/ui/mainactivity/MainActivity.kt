@@ -140,13 +140,13 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 //        else viewModel.saveLocationPermissionResult(false)
         onScreen = true
         println("onresume viewModel.connectStomp()")
-        viewModel.connectStomp()
+//        viewModel.connectStomp()
     }
 
     override fun onPause() {
         super.onPause()
         onScreen = false
-        viewModel.disconnectStomp()
+//        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {

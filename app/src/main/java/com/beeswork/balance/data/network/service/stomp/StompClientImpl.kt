@@ -42,7 +42,7 @@ class StompClientImpl(
 
     private var refreshAccessToken = false
     private var disconnectedByUser = false
-    private var reconnect = false
+    private var reconnect = true
 
     private var webSocketEventChannel = Channel<WebSocketEvent>()
     override val webSocketEventFlow = webSocketEventChannel.consumeAsFlow()
@@ -63,19 +63,18 @@ class StompClientImpl(
     override suspend fun connect() {
         println("override suspend fun connect()")
         disconnectedByUser = false
-//        openWebSocketConnection()
+        connectWebSocket()
+    }
 
-
-        if (connectJob?.isActive != true) {
+    private fun connectWebSocket() {
+        if (connectJob?.isActive != true && socketStatus == SocketStatus.CLOSED) {
             connectJob = applicationScope.launch {
-                repeat(1000) {
-                    delay(SCHEDULE_CONNECT_DELAY)
-
+                repeat(RECONNECT_COUNT) {
                     if (socketStatus == SocketStatus.STOMP_CONNECTED || disconnectedByUser || !reconnect) {
                         cancel()
                     }
-
                     openWebSocketConnection()
+                    delay(RECONNECT_DELAY)
                 }
             }
             connectJob?.start()
@@ -83,46 +82,32 @@ class StompClientImpl(
     }
 
     private suspend fun openWebSocketConnection() {
-        println("private fun openWebSocketConnection()")
-        if (socketStatus == SocketStatus.CLOSED) {
-
-            if (refreshAccessToken) {
-                val response = loginRepository.refreshAccessToken()
-                refreshAccessToken = response.isError()
-
-                if (response.isSuccess()) {
-                    refreshAccessToken = false
-                }
-
-
-                if (ExceptionCode.isLoginException(response.error)) {
+        println("private suspend fun openWebSocketConnection()")
+        socketStatus = SocketStatus.CONNECTING
+        println("socketStatus = SocketStatus.CONNECTING")
+        if (refreshAccessToken) {
+            val response = loginRepository.refreshAccessToken()
+            if (response.isSuccess()) {
+                println("response.isSuccess()")
+                refreshAccessToken = false
+            } else if (response.isError()) {
+                println("response.isError()")
+                refreshAccessToken = true
+                if (ExceptionCode.isLoginException(response.error) || response.error == ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION) {
                     reconnect = false
-                    refreshAccessToken = true
-                } else if (ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION == response.error) {
-                    reconnect = false
+                    sendErrorWebSocketEvent(response.error, response.errorMessage)
                 } else {
                     reconnect = true
                 }
-
-                // login exception
-
-                // internet connection exception
-
-                // others
+                return
             }
-
-
-
-
-
-
-            socketStatus = SocketStatus.CONNECTING
-            val webSocketRequest = Request.Builder()
-                .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
-                .url(EndPoint.WEB_SOCKET_ENDPOINT)
-                .build()
-            socket = okHttpClient.newWebSocket(webSocketRequest, this)
         }
+
+        val webSocketRequest = Request.Builder()
+            .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
+            .url(EndPoint.WEB_SOCKET_ENDPOINT)
+            .build()
+        socket = okHttpClient.newWebSocket(webSocketRequest, this)
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -169,7 +154,7 @@ class StompClientImpl(
         println("override fun onClosed(webSocket: WebSocket, code: Int, reason: String)")
         socketStatus = SocketStatus.CLOSED
         clearMissedChatMessageKeys()
-        scheduleConnect()
+        connectWebSocket()
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -180,7 +165,7 @@ class StompClientImpl(
         if (t is NoInternetConnectivityException) {
             sendErrorWebSocketEvent(ExceptionCode.getExceptionCodeFrom(t), null)
         } else {
-            scheduleConnect()
+            connectWebSocket()
         }
     }
 
@@ -195,6 +180,7 @@ class StompClientImpl(
     private fun onConnectedFrameReceived() {
         println("private fun onConnectedFrameReceived()")
         socketStatus = SocketStatus.STOMP_CONNECTED
+        reconnect = false
         sendMissedMessages()
         subscribeToQueue()
     }
@@ -243,6 +229,7 @@ class StompClientImpl(
             }
             ExceptionCode.isLoginException(stompFrame.getError()) -> {
                 reconnect = false
+                refreshAccessToken = true
                 applicationScope.launch {
                     val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
                     webSocketEventChannel.send(webSocketEvent)
@@ -324,32 +311,13 @@ class StompClientImpl(
         }
     }
 
-    private fun scheduleConnect() {
-        println("private fun scheduleConnect()")
-        if (reconnect && !disconnectedByUser) {
-            applicationScope.launch {
-                delay(SCHEDULE_CONNECT_DELAY)
-//                if (refreshAccessToken) {
-//                    val response = loginRepository.refreshAccessToken()
-//
-//
-//                    // check login error if not then reconnect
-//                    println("loginRepository.refreshAccessToken() ${response.isSuccess()}")
-//                    if (response.isError()) {
-//                        webSocketEventChannel.send(WebSocketEvent.error(response.error, response.errorMessage))
-//                        return@launch
-//                    }
-//                }
-                openWebSocketConnection()
-            }
-        }
-    }
 
 
     companion object {
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_HEART_BEAT = "0,0"
-        private const val SCHEDULE_CONNECT_DELAY = 10000L
+        private const val RECONNECT_DELAY = 10000L
+        private const val RECONNECT_COUNT = 10000
         private const val QUEUE_PREFIX = "/queue/"
     }
 
