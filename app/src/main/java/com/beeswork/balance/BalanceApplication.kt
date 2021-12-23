@@ -548,5 +548,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      172. delete swipes, don't save them locally, what if users remove the app and download all the siwpes? does not make sense and swipe() on server alrady checks if it's clicked or matched
 //      173. listeners to when online, then connect to websocket
 //      174. remove println()
+//      175. increase the timeout for http request
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

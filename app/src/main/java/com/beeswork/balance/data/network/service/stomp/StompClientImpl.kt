@@ -23,6 +23,7 @@ import okhttp3.*
 import okio.ByteString
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 class StompClientImpl(
@@ -62,28 +63,41 @@ class StompClientImpl(
 
     override suspend fun connect() {
         println("override suspend fun connect()")
-        disconnectedByUser = false
-        connectWebSocket()
+        resetSocket()
+        connectWebSocket(0L)
     }
 
-    private fun connectWebSocket() {
-        if (connectJob?.isActive != true && socketStatus == SocketStatus.CLOSED) {
+    private fun resetSocket() {
+        disconnectedByUser = false
+        reconnect = true
+        refreshAccessToken = false
+        socket?.close(1000, null)
+        socketStatus = SocketStatus.CLOSED
+        connectJob?.cancel()
+        clearMissedChatMessageKeys()
+    }
+
+    private fun connectWebSocket(connectionDelay: Long) {
+        if (connectJob?.isActive != true && socketStatus == SocketStatus.CLOSED && reconnect && !disconnectedByUser) {
+            socketStatus = SocketStatus.CONNECTING
+            println("connectJob?.isCancelled ${connectJob?.isCancelled}")
+            println("connectJob?.isCompleted ${connectJob?.isCompleted}")
+            println("connectJob?.isActive ${connectJob?.isActive}")
+            println("(connectJob?.isActive != true)")
+
             connectJob = applicationScope.launch {
-                repeat(RECONNECT_COUNT) {
-                    if (socketStatus == SocketStatus.STOMP_CONNECTED || disconnectedByUser || !reconnect) {
-                        cancel()
-                    }
-                    openWebSocketConnection()
-                    delay(RECONNECT_DELAY)
-                }
+                println("connectJob = applicationScope.launch")
+                println("socketStatus: $socketStatus")
+                println("disconnectedByUser: $disconnectedByUser")
+                println("reconnect: $reconnect")
+                delay(connectionDelay)
+                openWebSocketConnection()
             }
             connectJob?.start()
         }
     }
 
     private suspend fun openWebSocketConnection() {
-        println("private suspend fun openWebSocketConnection()")
-        socketStatus = SocketStatus.CONNECTING
         println("socketStatus = SocketStatus.CONNECTING")
         if (refreshAccessToken) {
             val response = loginRepository.refreshAccessToken()
@@ -94,10 +108,8 @@ class StompClientImpl(
                 println("response.isError()")
                 refreshAccessToken = true
                 if (ExceptionCode.isLoginException(response.error) || response.error == ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION) {
-                    reconnect = false
+                    clearMissedChatMessageKeys()
                     sendErrorWebSocketEvent(response.error, response.errorMessage)
-                } else {
-                    reconnect = true
                 }
                 return
             }
@@ -147,25 +159,26 @@ class StompClientImpl(
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
         println("override fun onClosing(webSocket: WebSocket, code: Int, reason: String)")
-        socketStatus = SocketStatus.CLOSED
+        socket?.close(1000, null)
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         println("override fun onClosed(webSocket: WebSocket, code: Int, reason: String)")
         socketStatus = SocketStatus.CLOSED
-        clearMissedChatMessageKeys()
-        connectWebSocket()
+        if (!refreshAccessToken) {
+            clearMissedChatMessageKeys()
+        }
+        connectWebSocket(RECONNECT_DELAY)
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         println("override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?)")
         socketStatus = SocketStatus.CLOSED
         clearMissedChatMessageKeys()
-
         if (t is NoInternetConnectivityException) {
             sendErrorWebSocketEvent(ExceptionCode.getExceptionCodeFrom(t), null)
         } else {
-            connectWebSocket()
+            connectWebSocket(RECONNECT_DELAY)
         }
     }
 
@@ -180,7 +193,6 @@ class StompClientImpl(
     private fun onConnectedFrameReceived() {
         println("private fun onConnectedFrameReceived()")
         socketStatus = SocketStatus.STOMP_CONNECTED
-        reconnect = false
         sendMissedMessages()
         subscribeToQueue()
     }
@@ -215,17 +227,16 @@ class StompClientImpl(
     }
 
     private fun onErrorFrameReceived(stompFrame: StompFrame) {
-        println("private fun onErrorFrameReceived(stompFrame: StompFrame)")
+        println("private fun onErrorFrameReceived(stompFrame: StompFrame): ${stompFrame.getError()} - ${stompFrame.getErrorMessage()}")
         stompFrame.getReceiptId()?.let { receiptId ->
             println("missedChatMessageKeys.add(receiptId): $receiptId")
             missedChatMessageKeys.add(receiptId)
         }
 
         when {
-            stompFrame.getError() == ExceptionCode.EXPIRED_JWT_TOKEN_EXCEPTION -> {
+            stompFrame.getError() == ExceptionCode.EXPIRED_JWT_EXCEPTION -> {
                 println("stompFrame.getError() == ExceptionCode.EXPIRED_JWT_TOKEN_EXCEPTION")
                 refreshAccessToken = true
-                reconnect = true
             }
             ExceptionCode.isLoginException(stompFrame.getError()) -> {
                 reconnect = false
@@ -235,11 +246,7 @@ class StompClientImpl(
                     webSocketEventChannel.send(webSocketEvent)
                 }
             }
-            else -> {
-                reconnect = true
-            }
         }
-        socket?.close(1000, null)
     }
 
     private fun sendMissedMessages() {
@@ -276,7 +283,7 @@ class StompClientImpl(
     override suspend fun disconnect() {
         println("override suspend fun disconnect()")
         disconnectedByUser = true
-//        socket?.close(1000, null)
+        socket?.close(1000, null)
         connectJob?.cancel()
     }
 
@@ -317,7 +324,6 @@ class StompClientImpl(
         private const val SUPPORTED_VERSIONS = "1.1,1.2"
         private const val DEFAULT_HEART_BEAT = "0,0"
         private const val RECONNECT_DELAY = 10000L
-        private const val RECONNECT_COUNT = 10000
         private const val QUEUE_PREFIX = "/queue/"
     }
 

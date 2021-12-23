@@ -36,7 +36,7 @@ abstract class BaseRDS(
             } else {
                 println("getResult else")
                 val errorResponse = convertToErrorResponse(response)
-                if (errorResponse.error != ExceptionCode.EXPIRED_JWT_TOKEN_EXCEPTION) {
+                if (errorResponse.error != ExceptionCode.EXPIRED_JWT_EXCEPTION) {
                     return@sendRequest errorResponse
                 }
                 println("after getResult convertoErrorResponse")
