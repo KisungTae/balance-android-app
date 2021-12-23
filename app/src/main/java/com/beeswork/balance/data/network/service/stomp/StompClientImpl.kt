@@ -276,6 +276,7 @@ class StompClientImpl(
                 sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
             }
         } else {
+//            TODO: add some logic when socketStatus closed and update message to ERROR
             missedChatMessageKeys.add(chatMessageDTO.key)
         }
     }

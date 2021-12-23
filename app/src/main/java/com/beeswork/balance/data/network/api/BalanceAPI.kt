@@ -1,6 +1,8 @@
 package com.beeswork.balance.data.network.api
 
 import com.beeswork.balance.data.network.converter.EnumConverterFactory
+import com.beeswork.balance.data.network.request.chat.FetchedChatMessageBody
+import com.beeswork.balance.data.network.request.chat.ReceivedChatMessageBody
 import com.beeswork.balance.data.network.request.chat.SyncChatMessagesBody
 import com.beeswork.balance.data.network.request.click.ClickBody
 import com.beeswork.balance.data.network.request.common.ReportBody
@@ -39,6 +41,12 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @POST("chat/message/fetched")
+    suspend fun fetchedChatMessage(@Body fetchedChatMessageBody: FetchedChatMessageBody): Response<EmptyResponse>
+
+    @POST("chat/message/received")
+    suspend fun receivedChatMessage(@Body receivedChatMessageBody: ReceivedChatMessageBody): Response<EmptyResponse>
 
     @GET("chat/message/list")
     suspend fun listChatMessages(): Response<ListChatMessagesDTO>

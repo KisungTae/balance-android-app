@@ -78,7 +78,6 @@ class ChatRepositoryImpl(
         val chatMessageDTO = ChatMessageDTO(key, chatId, accountId, swipedId, body)
         sendChatMessageChanel.send(chatMessageDTO)
         chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatId))
-        Resource.success(EmptyResponse())
     }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
@@ -116,6 +115,12 @@ class ChatRepositoryImpl(
         withContext(Dispatchers.IO) {
             chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
                 chatMessageDAO.insert(chatMessage)
+
+                chatMessage.id?.let { chatMessageId ->
+                    CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
+                        chatRDS.receivedChatMessage(chatMessageId)
+                    }
+                }
                 updateMatchOnNewChatMessage(chatMessage.chatId)
                 chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceived(chatMessage.chatId, chatMessage.body))
             }
@@ -123,20 +128,23 @@ class ChatRepositoryImpl(
     }
 
     override suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO) {
-        chatMessageReceiptDTO.id?.let { id ->
-            onChatMessageSent(chatMessageReceiptDTO.key, id, chatMessageReceiptDTO.createdAt)
-        } ?: kotlin.run {
-            if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
-                onUnmatchedReceiptReceived(chatMessageReceiptDTO.key, chatMessageReceiptDTO.chatId)
-            } else {
-                chatMessageDAO.updateStatusByKey(chatMessageReceiptDTO.key, ChatMessageStatus.ERROR)
-            }
-        }
+        withContext(ioDispatcher) {
+            chatMessageReceiptDTO.id?.let { chatMessageId ->
+                onChatMessageSent(chatMessageReceiptDTO.key, chatMessageId, chatMessageReceiptDTO.createdAt)
 
-        chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
-            val chatId = chatMessageDAO.findChatIdByKey(chatMessageReceiptDTO.key)
-            val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
-            _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
+            } ?: kotlin.run {
+                if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
+                    onUnmatchedReceiptReceived(chatMessageReceiptDTO.key, chatMessageReceiptDTO.chatId)
+                } else {
+                    chatMessageDAO.updateStatusByKey(chatMessageReceiptDTO.key, ChatMessageStatus.ERROR)
+                }
+            }
+
+            chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
+                val chatId = chatMessageDAO.findChatIdByKey(chatMessageReceiptDTO.key)
+                val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
+                _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
+            }
         }
     }
 
@@ -156,6 +164,11 @@ class ChatRepositoryImpl(
                 updateMatchOnNewChatMessage(chatMessage.chatId)
             }
         }
+
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
+            chatRDS.fetchedChatMessage(id)
+        }
+
     }
 
     override suspend fun fetchChatMessages(): Resource<EmptyResponse> {
