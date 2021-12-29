@@ -57,10 +57,15 @@ interface ChatMessageDAO {
     @Query("select chatId from chatMessage where `key` = :key")
     fun findChatIdByKey(key: Long?): Long?
 
-//    @Query("select swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.`key` = :key")
-//    fun findSwipedIdByKey(key: Long?): UUID?
-
     @Query("select c.`key`, m.chatId, c.body, m.swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.`key` = :key")
     fun findChatMessageToSendTupleByKey(key: Long?): ChatMessageToSendTuple?
 
+    @Query("update chatMessage set status = :to where status = :from")
+    fun updateStatus(from: ChatMessageStatus, to: ChatMessageStatus)
+
 }
+
+
+
+//select * from chatmessage order by case when createdAt is null then 1 else createdAt end, `key` desc
+//insert into chatMessage values (12, 'ddd', 0, null, null, 4)

@@ -140,12 +140,6 @@ class ChatViewModel(
         }
     }
 
-    fun connectStomp() {
-        viewModelScope.launch {
-            chatRepository.connectStomp()
-        }
-    }
-
     fun test() {
         chatRepository.test()
     }

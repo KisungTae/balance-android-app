@@ -131,7 +131,6 @@ class ChatRepositoryImpl(
         withContext(ioDispatcher) {
             chatMessageReceiptDTO.id?.let { chatMessageId ->
                 onChatMessageSent(chatMessageReceiptDTO.key, chatMessageId, chatMessageReceiptDTO.createdAt)
-
             } ?: kotlin.run {
                 if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
                     onUnmatchedReceiptReceived(chatMessageReceiptDTO.key, chatMessageReceiptDTO.chatId)
@@ -178,7 +177,11 @@ class ChatRepositoryImpl(
 
             response.data?.let { data ->
                 val chatIds = saveChatMessages(data.sentChatMessageDTOs, data.receivedChatMessageDTOs)
-                balanceDatabase.runInTransaction { chatIds.forEach { chatId -> updateMatchOnNewChatMessage(chatId) } }
+                balanceDatabase.runInTransaction {
+                    chatIds.forEach { chatId ->
+                        updateMatchOnNewChatMessage(chatId)
+                    }
+                }
                 chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
                 chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
             }
@@ -186,18 +189,26 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun connectStomp() {
+    override suspend fun clearChatMessages() {
         withContext(ioDispatcher) {
-//            stompClient.connect()
+            chatMessageDAO.updateStatus(ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
+            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
         }
     }
 
-    override suspend fun updateChatMessageStatus(chatMessageKeys: List<Long>, chatMessageStatus: ChatMessageStatus) {
+    override suspend fun clearChatMessages(chatMessageKeys: List<Long>) {
         withContext(ioDispatcher) {
-            chatMessageDAO.updateStatusByKeys(chatMessageKeys, chatMessageStatus)
+            chatMessageDAO.updateStatusByKeys(chatMessageKeys, ChatMessageStatus.ERROR)
+            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
         }
     }
 
+    override suspend fun clearChatMessage(chatMessageKey: Long?) {
+        withContext(ioDispatcher) {
+            chatMessageDAO.updateStatusByKey(chatMessageKey, ChatMessageStatus.ERROR)
+            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+        }
+    }
 
     private fun saveChatMessages(
         sentChatMessageDTOs: List<ChatMessageDTO>?,

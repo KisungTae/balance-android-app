@@ -78,7 +78,6 @@ class ChatFragment : BaseFragment(),
                 arguments.getString(BundleKey.SWIPED_PROFILE_PHOTO_KEY),
                 arguments.getBoolean(BundleKey.UNMATCHED)
             )
-            viewModel.connectStomp()
         } ?: kotlin.run {
             val errorTitle = getString(R.string.error_title_open_chat)
             val errorMessage = getString(R.string.error_title_chat_id_not_found)
@@ -166,13 +165,20 @@ class ChatFragment : BaseFragment(),
             when (resource.type) {
                 ChatMessageInvalidation.Type.SEND -> {
                     binding.etChatMessageBody.setText("")
-                    if (binding.rvChat.canScrollVertically(1)) chatMessagePagingRefreshAdapter.refresh()
-                    else observeChatMessagePagingData()
+                    if (binding.rvChat.canScrollVertically(1)) {
+                        chatMessagePagingRefreshAdapter.refresh()
+                    } else {
+                        observeChatMessagePagingData()
+                    }
                 }
                 ChatMessageInvalidation.Type.RECEIVED -> {
-                    if (binding.rvChat.canScrollVertically(1)) resource.body?.let { body ->
-                        showNewChatMessageSnackBar(body)
-                    } else observeChatMessagePagingData()
+                    if (binding.rvChat.canScrollVertically(1)) {
+                        resource.body?.let { body ->
+                            showNewChatMessageSnackBar(body)
+                        }
+                    } else {
+                        observeChatMessagePagingData()
+                    }
                 }
                 else -> chatMessagePagingRefreshAdapter.refresh()
             }
@@ -337,11 +343,6 @@ class ChatFragment : BaseFragment(),
             RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
             RequestCode.UNMATCH -> onUnmatch()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.connectStomp()
     }
 }
 

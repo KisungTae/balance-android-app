@@ -11,6 +11,6 @@ interface StompClient {
 
     val webSocketEventFlow: Flow<WebSocketEvent>
 
-    suspend fun connect()
-    suspend fun disconnect()
+    fun connect()
+    fun disconnect()
 }
