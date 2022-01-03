@@ -16,8 +16,8 @@ interface ChatMessageDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(chatMessages: List<ChatMessage>)
 
-    @Query("select * from chatMessage where `key` = :key")
-    fun findByKey(key: Long?): ChatMessage?
+    @Query("select * from chatMessage where id = :id")
+    fun findById(id: UUID?): ChatMessage?
 
     @Query("select * from chatMessage where chatId = :chatId and `key` > :lastReadChatMessageKey and status in (:statuses) order by id desc limit 1")
     fun findMostRecentAfter(
@@ -36,11 +36,11 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, `key` desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
 
-    @Query("update chatMessage set status = :status where `key` = :key")
-    fun updateStatusByKey(key: Long?, status: ChatMessageStatus)
+    @Query("update chatMessage set status = :status where id = :id")
+    fun updateStatusById(id: UUID?, status: ChatMessageStatus)
 
-    @Query("update chatMessage set status = :status where `key` in (:keys)")
-    fun updateStatusByKeys(keys: List<Long>, status: ChatMessageStatus)
+    @Query("update chatMessage set status = :status where id in (:ids)")
+    fun updateStatusByIds(ids: List<UUID>, status: ChatMessageStatus)
 
     @Query("update chatMessage set status = :toStatus where status = :whereStatus and createdAt < :createdAt")
     fun updateStatusBefore(createdAt: OffsetDateTime, whereStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
@@ -54,11 +54,11 @@ interface ChatMessageDAO {
     @Query("delete from chatMessage")
     fun deleteAll()
 
-    @Query("select chatId from chatMessage where `key` = :key")
-    fun findChatIdByKey(key: Long?): Long?
+    @Query("select chatId from chatMessage where id = :id")
+    fun findChatIdById(id: UUID?): Long?
 
-    @Query("select c.`key`, m.chatId, c.body, m.swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.`key` = :key")
-    fun findChatMessageToSendTupleByKey(key: Long?): ChatMessageToSendTuple?
+    @Query("select c.id, m.chatId, c.body, m.swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.id = :id")
+    fun findChatMessageToSendTupleById(id: UUID?): ChatMessageToSendTuple?
 
     @Query("update chatMessage set status = :to where status = :from")
     fun updateStatus(from: ChatMessageStatus, to: ChatMessageStatus)

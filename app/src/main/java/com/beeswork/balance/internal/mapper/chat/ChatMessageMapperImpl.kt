@@ -1,6 +1,7 @@
 package com.beeswork.balance.internal.mapper.chat
 
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
+import com.beeswork.balance.data.database.entity.chat.ChatMessageToSendTuple
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.safeLet
@@ -22,15 +23,6 @@ class ChatMessageMapperImpl : ChatMessageMapper {
         }
     }
 
-    override fun toSentChatMessage(chatMessage: ChatMessage?, chatMessageDTO: ChatMessageDTO): ChatMessage? {
-        return safeLet(chatMessage, chatMessageDTO.id, chatMessageDTO.createdAt) { _chatMessage, id, createdAt ->
-            _chatMessage.id = id
-            _chatMessage.status = ChatMessageStatus.SENT
-            _chatMessage.createdAt = createdAt
-            return@safeLet _chatMessage
-        }
-    }
-
     override fun toDomain(chatMessage: ChatMessage): ChatMessageDomain {
         val createdAt = if (chatMessage.isProcessed()) {
             chatMessage.createdAt.atZoneSameInstant(ZoneId.systemDefault())
@@ -47,5 +39,20 @@ class ChatMessageMapperImpl : ChatMessageMapper {
             createdAt?.toLocalTime()?.truncatedTo(ChronoUnit.MINUTES)
         )
 
+    }
+
+    override fun toChatMessageDTO(chatMessage: ChatMessage, accountId: UUID, recipientId: UUID): ChatMessageDTO {
+        return ChatMessageDTO(chatMessage.id, chatMessage.chatId, chatMessage.body, null, accountId, recipientId)
+    }
+
+    override fun toChatMessageDTO(chatMessageToSendTuple: ChatMessageToSendTuple, accountId: UUID): ChatMessageDTO {
+        return ChatMessageDTO(
+            chatMessageToSendTuple.id,
+            chatMessageToSendTuple.chatId,
+            chatMessageToSendTuple.body,
+            null,
+            accountId,
+            chatMessageToSendTuple.swipedId
+        )
     }
 }

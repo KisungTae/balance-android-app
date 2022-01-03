@@ -10,12 +10,6 @@ class WebSocketState {
     private var webSocketStatus = WebSocketStatus.CLOSED
     private val mutex = Mutex()
 
-    suspend fun isConnectable(): Boolean {
-        mutex.withLock {
-            return webSocketStatus == WebSocketStatus.CLOSED && reconnect && !disconnectedByUser
-        }
-    }
-
     suspend fun isConnectableAndSetToConnecting(): Boolean {
         mutex.withLock {
             if (webSocketStatus == WebSocketStatus.CLOSED && reconnect && !disconnectedByUser) {
@@ -35,6 +29,12 @@ class WebSocketState {
     suspend fun isRefreshAccessToken(): Boolean {
         mutex.withLock {
             return refreshAccessToken
+        }
+    }
+
+    suspend fun isReconnect(): Boolean {
+        mutex.withLock {
+            return reconnect
         }
     }
 
@@ -59,28 +59,30 @@ class WebSocketState {
         }
     }
 
-    suspend fun willReconnect(): Boolean {
-        mutex.withLock {
-            return reconnect && !disconnectedByUser
-        }
-    }
-
-    suspend fun setDisconnectedByUser(disconnectedByUser: Boolean) {
-        mutex.withLock {
-            this.disconnectedByUser = disconnectedByUser
-        }
-    }
-
     suspend fun isClosed(): Boolean {
         mutex.withLock {
             return webSocketStatus == WebSocketStatus.CLOSED
         }
     }
 
-    suspend fun update(reconnect: Boolean, refreshAccessToken: Boolean) {
+    suspend fun update(reconnect: Boolean?, refreshAccessToken: Boolean?, disconnectedByUser: Boolean?, webSocketStatus: WebSocketStatus?) {
         mutex.withLock {
-            this.reconnect = reconnect
-            this.refreshAccessToken = refreshAccessToken
+            if (reconnect != null) {
+                this.reconnect = reconnect
+            }
+
+            if (refreshAccessToken != null) {
+                this.refreshAccessToken = refreshAccessToken
+            }
+
+            if (disconnectedByUser != null) {
+                this.disconnectedByUser = disconnectedByUser
+            }
+
+            if (webSocketStatus != null) {
+                this.webSocketStatus = webSocketStatus
+            }
+
         }
     }
 

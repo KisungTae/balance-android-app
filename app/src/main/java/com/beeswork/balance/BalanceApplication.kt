@@ -549,5 +549,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      173. listeners to when online, then connect to websocket
 //      174. remove println()
 //      175. increase the timeout for http request
+//      176. when stomp connected, fetch chatMessage because there might be chat messages have not been fetched during stomp off connection
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

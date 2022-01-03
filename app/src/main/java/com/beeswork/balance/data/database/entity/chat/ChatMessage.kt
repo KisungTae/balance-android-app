@@ -8,20 +8,18 @@ import java.util.*
 
 @Entity(
     tableName = "chatMessage",
-    indices = [Index(value = ["status"]), Index(value = ["createdAt", "key"])]
+    indices = [Index(value = ["status"]), Index(value = ["createdAt", "key"]), Index(value = ["id"])]
 )
 data class ChatMessage(
     val chatId: Long,
     val body: String,
     var status: ChatMessageStatus,
-    var id: UUID?,
+    var id: UUID,
     var createdAt: OffsetDateTime = OffsetDateTime.parse("9999-12-31T23:59:59.999Z"),
 
     @PrimaryKey(autoGenerate = true)
     val key: Long = 0
 ) {
-    constructor(chatId: Long, body: String, status: ChatMessageStatus) : this(chatId, body, status, null)
-
     fun isProcessed(): Boolean {
         return (status == ChatMessageStatus.RECEIVED || status == ChatMessageStatus.SENT)
     }

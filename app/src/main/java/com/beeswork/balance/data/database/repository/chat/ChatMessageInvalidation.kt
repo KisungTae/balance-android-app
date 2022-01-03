@@ -11,15 +11,15 @@ class ChatMessageInvalidation(
             return ChatMessageInvalidation(Type.RECEIPT, chatId, null)
         }
 
-        fun ofSend(chatId: Long): ChatMessageInvalidation {
+        fun ofSend(chatId: Long?): ChatMessageInvalidation {
             return ChatMessageInvalidation(Type.SEND, chatId, null)
         }
 
-        fun ofDelete(chatId: Long): ChatMessageInvalidation {
+        fun ofDelete(chatId: Long?): ChatMessageInvalidation {
             return ChatMessageInvalidation(Type.DELETED, chatId, null)
         }
 
-        fun ofReceived(chatId: Long, body: String): ChatMessageInvalidation {
+        fun ofReceived(chatId: Long?, body: String): ChatMessageInvalidation {
             return ChatMessageInvalidation(Type.RECEIVED, chatId, body)
         }
 

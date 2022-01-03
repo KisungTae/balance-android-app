@@ -29,8 +29,8 @@ class ChatViewModel(
 ) : BaseViewModel() {
 
     val chatMessageInvalidationLiveData by viewModelLazyDeferred {
-        chatRepository.chatMessageInvalidationFlow.filter {
-            it.type == ChatMessageInvalidation.Type.FETCHED || it.chatId == chatId
+        chatRepository.chatMessageInvalidationFlow.filter { chatMessageInvalidation ->
+            chatMessageInvalidation.type == ChatMessageInvalidation.Type.FETCHED || chatMessageInvalidation.chatId == chatId
         }.asLiveData()
     }
 
@@ -120,8 +120,8 @@ class ChatViewModel(
         viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
     }
 
-    fun resendChatMessage(key: Long) {
-        viewModelScope.launch { _sendChatMessageLiveData.postValue(chatRepository.resendChatMessage(key)) }
+    fun resendChatMessage(chatMessageId: UUID?) {
+        viewModelScope.launch { _sendChatMessageLiveData.postValue(chatRepository.resendChatMessage(chatMessageId)) }
     }
 
     fun unmatch() {

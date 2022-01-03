@@ -29,9 +29,7 @@ class PreferenceProviderImpl(
     }
 
     override fun getAccountId(): UUID? {
-        preferences.getString(ACCOUNT_ID, null)?.let { accountId ->
-            return Converter.toUUID(accountId)
-        } ?: return null
+        return Converter.toUUID(preferences.getString(ACCOUNT_ID, null))
     }
 
     override fun delete() {

@@ -37,7 +37,7 @@ class StompClientImpl(
 
     private var socket: WebSocket? = null
     private var outgoing = Channel<String>()
-    private var missedChatMessageKeys: Queue<Long> = ConcurrentLinkedQueue()
+    private var missedChatMessageKeys: Queue<UUID> = ConcurrentLinkedQueue()
 
     private var webSocketEventChannel = Channel<WebSocketEvent>()
     override val webSocketEventFlow = webSocketEventChannel.consumeAsFlow()
@@ -59,14 +59,16 @@ class StompClientImpl(
         applicationScope.launch {
             if (webSocketState.isClosed()) {
                 webSocketState.reset()
-                clearMissedChatMessageKeys()
-                connectWebSocket(0L)
+                chatRepository.clearChatMessages()
+                missedChatMessageKeys.clear()
             }
+            connectWebSocket(0L)
         }
     }
 
     private suspend fun connectWebSocket(connectionDelay: Long) {
         if (webSocketState.isConnectableAndSetToConnecting()) {
+            delay(connectionDelay)
             if (webSocketState.isRefreshAccessToken()) {
                 val response = loginRepository.refreshAccessToken()
                 if (response.isSuccess()) {
@@ -75,9 +77,8 @@ class StompClientImpl(
                 } else if (response.isError()) {
                     println("response.isError()")
                     webSocketState.setRefreshAccessToken(true)
-                    if (ExceptionCode.isLoginException(response.error)
-                        || response.error == ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION) {
-                        clearMissedChatMessageKeys()
+                    if (ExceptionCode.isLoginException(response.error) || response.error == ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION) {
+                        disconnect(false, null)
                         sendErrorWebSocketEvent(response.error, response.errorMessage)
                     }
                     return
@@ -90,50 +91,6 @@ class StompClientImpl(
                 .build()
             socket = okHttpClient.newWebSocket(webSocketRequest, this)
         }
-
-
-//        if (socketStatus == WebSocketStatus.CLOSED && reconnect && !disconnectedByUser) {
-//            socketStatus = WebSocketStatus.CONNECTING
-//            println("connectJob?.isCancelled ${connectJob?.isCancelled}")
-//            println("connectJob?.isCompleted ${connectJob?.isCompleted}")
-//            println("connectJob?.isActive ${connectJob?.isActive}")
-//            println("(connectJob?.isActive != true)")
-//
-//            connectJob = applicationScope.launch {
-//                println("connectJob = applicationScope.launch")
-//                println("socketStatus: $socketStatus")
-//                println("disconnectedByUser: $disconnectedByUser")
-//                println("reconnect: $reconnect")
-//                delay(connectionDelay)
-//                openWebSocketConnection()
-//            }
-//            connectJob?.start()
-//        }
-    }
-
-    private suspend fun openWebSocketConnection() {
-        println("socketStatus = SocketStatus.CONNECTING")
-//        if (refreshAccessToken) {
-//            val response = loginRepository.refreshAccessToken()
-//            if (response.isSuccess()) {
-//                println("response.isSuccess()")
-//                refreshAccessToken = false
-//            } else if (response.isError()) {
-//                println("response.isError()")
-//                refreshAccessToken = true
-//                if (ExceptionCode.isLoginException(response.error) || response.error == ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION) {
-//                    clearMissedChatMessageKeys()
-//                    sendErrorWebSocketEvent(response.error, response.errorMessage)
-//                }
-//                return
-//            }
-//        }
-//
-//        val webSocketRequest = Request.Builder()
-//            .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
-//            .url(EndPoint.WEB_SOCKET_ENDPOINT)
-//            .build()
-//        socket = okHttpClient.newWebSocket(webSocketRequest, this)
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -144,7 +101,7 @@ class StompClientImpl(
         }
     }
 
-    private fun connectToStomp() {
+    private suspend fun connectToStomp() {
         println("private fun connectToStomp()")
         preferenceProvider.getAccessToken()?.let { accessToken ->
             val headers = mutableMapOf<String, String>()
@@ -154,6 +111,7 @@ class StompClientImpl(
             headers[HttpHeader.ACCESS_TOKEN] = accessToken
             socket?.send(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
         } ?: kotlin.run {
+            disconnect(false, null)
             sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
         }
     }
@@ -175,6 +133,7 @@ class StompClientImpl(
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
         println("override fun onClosing(webSocket: WebSocket, code: Int, reason: String)")
+        println("onClosing code: $code")
         socket?.close(1000, null)
     }
 
@@ -182,7 +141,7 @@ class StompClientImpl(
         println("override fun onClosed(webSocket: WebSocket, code: Int, reason: String)")
         applicationScope.launch {
             webSocketState.setSocketStatus(WebSocketStatus.CLOSED)
-            if (!webSocketState.isRefreshAccessToken()) {
+            if (!webSocketState.isReconnect()) {
                 clearMissedChatMessageKeys()
             }
             connectWebSocket(RECONNECT_DELAY)
@@ -193,21 +152,19 @@ class StompClientImpl(
         println("override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?)")
         applicationScope.launch {
             webSocketState.setSocketStatus(WebSocketStatus.CLOSED)
-            clearMissedChatMessageKeys()
+            chatRepository.clearChatMessages()
+            missedChatMessageKeys.clear()
             if (t is NoInternetConnectivityException) {
+                webSocketState.setReconnect(false)
                 sendErrorWebSocketEvent(ExceptionCode.getExceptionCodeFrom(t), null)
-            } else {
-                connectWebSocket(RECONNECT_DELAY)
             }
+            connectWebSocket(RECONNECT_DELAY)
         }
     }
 
-    private fun clearMissedChatMessageKeys() {
-        println("private fun clearMissedChatMessageKeys()")
-        applicationScope.launch {
-            chatRepository.clearChatMessages(missedChatMessageKeys.toList())
-            missedChatMessageKeys.clear()
-        }
+    private suspend fun clearMissedChatMessageKeys() {
+        chatRepository.clearChatMessages(missedChatMessageKeys.toList())
+        missedChatMessageKeys.clear()
     }
 
     private suspend fun onConnectedFrameReceived() {
@@ -235,9 +192,8 @@ class StompClientImpl(
     }
 
     private suspend fun onReceiptFrameReceived(stompFrame: StompFrame) {
-        stompFrame.payload?.let {
-            val chatMessageReceiptDTO = GsonProvider.gson.fromJson(it, ChatMessageReceiptDTO::class.java)
-//                chatMessageReceiptDTO.key = stompFrame.getReceiptId()
+        stompFrame.payload?.let { payload ->
+            val chatMessageReceiptDTO = GsonProvider.gson.fromJson(payload, ChatMessageReceiptDTO::class.java)
             chatRepository.saveChatMessageReceipt(chatMessageReceiptDTO)
         }
     }
@@ -255,7 +211,7 @@ class StompClientImpl(
                 webSocketState.setRefreshAccessToken(true)
             }
             ExceptionCode.isLoginException(stompFrame.getError()) -> {
-                webSocketState.update(reconnect = false, refreshAccessToken = true)
+                webSocketState.update(false, true, null, null)
                 val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
                 webSocketEventChannel.send(webSocketEvent)
             }
@@ -279,20 +235,21 @@ class StompClientImpl(
             preferenceProvider.getAccessToken()?.let { accessToken ->
                 val headers = mutableMapOf<String, String>()
                 headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
-                headers[StompHeader.RECEIPT] = chatMessageDTO.key.toString()
+                headers[StompHeader.RECEIPT] = chatMessageDTO.id.toString()
                 headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
                 headers[HttpHeader.ACCESS_TOKEN] = accessToken
                 val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
                 outgoing.send(stompFrame.compile())
             } ?: kotlin.run {
-                chatRepository.clearChatMessage(chatMessageDTO.key)
+                disconnect(false, null)
+                chatRepository.clearChatMessage(chatMessageDTO.id)
                 sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
             }
         } else {
             if (webSocketState.isDisconnected()) {
-                chatRepository.clearChatMessage(chatMessageDTO.key)
+                chatRepository.clearChatMessage(chatMessageDTO.id)
             } else {
-                missedChatMessageKeys.add(chatMessageDTO.key)
+                missedChatMessageKeys.add(chatMessageDTO.id)
             }
         }
     }
@@ -300,11 +257,14 @@ class StompClientImpl(
     override fun disconnect() {
         println("override suspend fun disconnect()")
         applicationScope.launch {
-            webSocketState.setDisconnectedByUser(true)
-            socket?.close(1000, null)
+            disconnect(null, true)
         }
     }
 
+    private suspend fun disconnect(reconnect: Boolean?, disconnectedByUser: Boolean?) {
+        webSocketState.update(reconnect, null, disconnectedByUser, null)
+        socket?.close(1000, null)
+    }
 
     private fun subscribeToQueue() {
         println("private fun subscribeToQueue()")

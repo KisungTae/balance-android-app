@@ -4,11 +4,8 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 data class ChatMessageReceiptDTO(
-    var key: Long?,
     val id: UUID?,
     val chatId: Long?,
     val createdAt: OffsetDateTime?,
     val error: String?
-) {
-    constructor(key: Long?) : this(key, null, null, null, null)
-}
+)

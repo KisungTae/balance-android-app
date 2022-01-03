@@ -280,8 +280,8 @@ class ChatFragment : BaseFragment(),
     }
 
     override fun onResendChatMessage(position: Int) {
-        chatMessagePagingAdapter.getChatMessage(position)?.let {
-            viewModel.resendChatMessage(it.key)
+        chatMessagePagingAdapter.getChatMessage(position)?.let { chatMessageDomain ->
+            viewModel.resendChatMessage(chatMessageDomain.id)
         }
     }
 

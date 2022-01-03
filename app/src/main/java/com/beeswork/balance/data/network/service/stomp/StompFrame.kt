@@ -2,6 +2,7 @@ package com.beeswork.balance.data.network.service.stomp
 
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.StompHeader
+import com.beeswork.balance.internal.util.Converter
 import com.beeswork.balance.internal.util.safeLet
 import java.io.StringReader
 import java.util.*
@@ -45,10 +46,8 @@ data class StompFrame(
         }
     }
 
-    fun getReceiptId(): Long? {
-        return headers?.let {
-            it[StompHeader.RECEIPT_ID]?.toLongOrNull()
-        }
+    fun getReceiptId(): UUID? {
+        return Converter.toUUID(headers?.get(StompHeader.RECEIPT_ID))
     }
 
     fun getError(): String? {
