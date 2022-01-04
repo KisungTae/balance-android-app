@@ -100,11 +100,12 @@ class MatchRepositoryImpl(
     }
 
     private fun updateMatch(match: Match) {
-        matchDAO.findById(match.chatId)?.let {
+        matchDAO.findById(match.chatId)?.let { existingMatch ->
+            match.lastReadChatMessageKey = existingMatch.lastReadChatMessageKey
             if (!match.unmatched) {
-                match.updatedAt = it.updatedAt
-                match.recentChatMessage = it.recentChatMessage
-                match.active = it.active
+                match.updatedAt = existingMatch.updatedAt
+                match.recentChatMessage = existingMatch.recentChatMessage
+                match.active = existingMatch.active
                 chatMessageDAO.findMostRecentAfter(match.chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
                     match.recentChatMessage = chatMessage.body
                     match.updatedAt = chatMessage.createdAt
@@ -112,7 +113,6 @@ class MatchRepositoryImpl(
                 }
                 match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
             }
-            match.lastReadChatMessageKey = it.lastReadChatMessageKey
         }
 
     }
@@ -124,9 +124,9 @@ class MatchRepositoryImpl(
                     chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
                         match.lastReadChatMessageKey = chatMessage.key
                         match.recentChatMessage = chatMessage.body
-                        match.unread = false
-                        matchDAO.insert(match)
                     }
+                    match.unread = false
+                    matchDAO.insert(match)
                 }
             }
         }

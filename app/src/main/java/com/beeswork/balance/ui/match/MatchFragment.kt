@@ -134,20 +134,20 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private fun setupToolBars() {
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
         binding.tbMatch.setOnMenuItemClickListener {
-            //TODO: remove me
-            println("ddd")
-            viewModel.testFunction()
-            false
-//            when (it.itemId) {
-//                R.id.miMatchSearch -> showSearchToolBar()
-//                else -> false
-//            }
+            when (it.itemId) {
+                R.id.miMatchSearch -> showSearchToolBar()
+                else -> false
+            }
         }
         binding.btnMatchSearchClose.setOnClickListener { hideSearchToolBar() }
         binding.etMatchSearch.addTextChangedListener { search(it.toString()) }
         binding.btnMatchRefresh.setOnClickListener {
-            if (fetchMatchesStatus == Resource.Status.ERROR) viewModel.fetchMatches()
-            if (fetchChatMessagesStatus == Resource.Status.ERROR) viewModel.fetchChatMessages()
+            if (fetchMatchesStatus == Resource.Status.ERROR) {
+                viewModel.fetchMatches()
+            }
+            if (fetchChatMessagesStatus == Resource.Status.ERROR) {
+                viewModel.fetchChatMessages()
+            }
         }
     }
 

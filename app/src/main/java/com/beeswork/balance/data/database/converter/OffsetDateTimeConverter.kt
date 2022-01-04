@@ -19,19 +19,7 @@ object OffsetDateTimeConverter {
     @TypeConverter
     @JvmStatic
     fun fromOffsetDateTime(date: OffsetDateTime?): String? {
-
         return date?.format(formatter)
     }
-
-    fun toOffsetDateTimeNonNull(value: String): OffsetDateTime {
-        return formatter.parse(value, OffsetDateTime::from)
-    }
-
-    fun fromOffsetDateTimeNonNull(date: OffsetDateTime): String {
-        return date.format(formatter)
-    }
-
-
-
 
 }

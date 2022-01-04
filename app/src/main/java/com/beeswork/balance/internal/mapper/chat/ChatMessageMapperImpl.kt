@@ -24,7 +24,7 @@ class ChatMessageMapperImpl : ChatMessageMapper {
     }
 
     override fun toDomain(chatMessage: ChatMessage): ChatMessageDomain {
-        val createdAt = if (chatMessage.isProcessed()) {
+        val createdAt = if (chatMessage.status.isProcessed()) {
             chatMessage.createdAt.atZoneSameInstant(ZoneId.systemDefault())
         } else {
             null
@@ -34,7 +34,6 @@ class ChatMessageMapperImpl : ChatMessageMapper {
             chatMessage.id,
             chatMessage.body,
             chatMessage.status,
-            chatMessage.isProcessed(),
             createdAt?.toLocalDate(),
             createdAt?.toLocalTime()?.truncatedTo(ChronoUnit.MINUTES)
         )

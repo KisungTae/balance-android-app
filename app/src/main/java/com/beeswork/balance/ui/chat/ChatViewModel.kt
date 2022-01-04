@@ -62,24 +62,37 @@ class ChatViewModel(
             pagingData.map { chatMessage -> chatMessageMapper.toDomain(chatMessage) }
         }.map { pagingData ->
             var nullifyBeforeTimeCreatedAt = false
+            var showedProfilePicture = false
             pagingData.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
-                val beforeTimeCreatedAt = before?.timeCreatedAt
-                if (nullifyBeforeTimeCreatedAt) {
-                    before?.timeCreatedAt = null
-                    nullifyBeforeTimeCreatedAt = false
-                }
+//                val beforeTimeCreatedAt = before?.timeCreatedAt
+//                if (nullifyBeforeTimeCreatedAt) {
+//                    before?.timeCreatedAt = null
+//                    nullifyBeforeTimeCreatedAt = false
+//                }
+//
+//                if (after?.status?.isProcessed() == true
+//                    && after.status == before?.status
+//                    && after.dateCreatedAt == before.dateCreatedAt
+//                    && after.timeCreatedAt == beforeTimeCreatedAt
+//                ) {
+//                    before.showProfilePhoto = false
+//                    nullifyBeforeTimeCreatedAt = true
+//                }
 
-                if (after?.isProcessed == true
+//                var showedProfilePicture = false
+
+                if (after?.status?.isProcessed() == true
                     && after.status == before?.status
                     && after.dateCreatedAt == before.dateCreatedAt
-                    && after.timeCreatedAt == beforeTimeCreatedAt
+                    && after.timeCreatedAt == before.timeCreatedAt
                 ) {
-                    before.showProfilePhoto = false
-                    nullifyBeforeTimeCreatedAt = true
+                    before.timeCreatedAt = null
+                    after.showProfilePhoto = false
                 }
 
+
                 var separator: ChatMessageDomain? = null
-                if (before?.isProcessed == true
+                if (before?.status?.isProcessed() == true
                     && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)
                 ) {
                     separator = ChatMessageDomain.toSeparator(

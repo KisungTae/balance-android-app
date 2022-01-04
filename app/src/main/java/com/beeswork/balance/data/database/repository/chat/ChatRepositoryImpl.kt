@@ -199,10 +199,12 @@ class ChatRepositoryImpl(
         val newChatMessages = mutableListOf<ChatMessage>()
 
         receivedChatMessageDTOs?.forEach { chatMessageDTO ->
-            chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
-                newChatMessages.add(chatMessage)
-                receivedChatMessageIds.add(chatMessage.id)
-                chatIds.add(chatMessage.chatId)
+            if (!chatMessageDAO.existsById(chatMessageDTO.id)) {
+                chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
+                    newChatMessages.add(chatMessage)
+                    receivedChatMessageIds.add(chatMessage.id)
+                    chatIds.add(chatMessage.chatId)
+                }
             }
         }
 

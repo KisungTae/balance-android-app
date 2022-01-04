@@ -11,7 +11,6 @@ data class ChatMessageDomain(
     val id: UUID?,
     val body: String,
     var status: ChatMessageStatus,
-    var isProcessed: Boolean,
     var dateCreatedAt: LocalDate?,
     var timeCreatedAt: LocalTime?,
     var showProfilePhoto: Boolean = true
@@ -19,7 +18,7 @@ data class ChatMessageDomain(
     companion object {
         fun toSeparator(body: String?): ChatMessageDomain? {
             body?.let {
-                return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, false, null, null)
+                return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, null, null)
             } ?: return null
         }
     }

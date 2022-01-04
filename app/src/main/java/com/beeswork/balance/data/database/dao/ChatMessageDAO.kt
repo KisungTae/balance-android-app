@@ -19,7 +19,7 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where id = :id")
     fun findById(id: UUID?): ChatMessage?
 
-    @Query("select * from chatMessage where chatId = :chatId and `key` > :lastReadChatMessageKey and status in (:statuses) order by id desc limit 1")
+    @Query("select * from chatMessage where chatId = :chatId and `key` > :lastReadChatMessageKey and status in (:statuses) order by `key` desc limit 1")
     fun findMostRecentAfter(
         chatId: Long,
         lastReadChatMessageKey: Long,
@@ -62,6 +62,9 @@ interface ChatMessageDAO {
 
     @Query("update chatMessage set status = :to where status = :from")
     fun updateStatus(from: ChatMessageStatus, to: ChatMessageStatus)
+
+    @Query("select count(*) > 0 from chatMessage where id = :id")
+    fun existsById(id: UUID?): Boolean
 
 }
 

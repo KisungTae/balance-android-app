@@ -5,5 +5,9 @@ enum class ChatMessageStatus {
     SENT,
     RECEIVED,
     ERROR,
-    SEPARATOR
+    SEPARATOR,;
+
+    fun isProcessed(): Boolean {
+        return (this == RECEIVED || this == SENT)
+    }
 }

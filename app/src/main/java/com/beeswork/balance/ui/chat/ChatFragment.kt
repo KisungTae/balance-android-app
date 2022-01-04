@@ -99,7 +99,9 @@ class ChatFragment : BaseFragment(),
         setupEmoticonBtnListener()
         observeSendChatMessageMediatorLiveData()
         setupProfilePhoto(swipedId, swipedProfilePhotoKey)
-        if (unmatched) setupAsUnmatched()
+        if (unmatched) {
+            setupAsUnmatched()
+        }
         observeReportMatchLiveData()
         observeUnmatchLiveData()
         observeChatMessagePagingData()
