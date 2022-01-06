@@ -8,7 +8,6 @@ import android.widget.LinearLayout
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemChatMessageReceivedBinding
 import com.beeswork.balance.databinding.ItemChatMessageSentBinding
 import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
@@ -16,61 +15,53 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import org.threeten.bp.LocalTime
 
 
 class ChatMessagePagingAdapter(
-    private val chatMessageSentListener: ChatMessageSentListener
+    private val chatMessageSentListener: ChatMessageSentListener,
+    displayDensity: Float
 ) : PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
+
+    private val topMarginShort: Int = (displayDensity * 5).toInt()
+    private val topMarginMedium: Int = (displayDensity * 15).toInt()
+    private val topMarginLong: Int = (displayDensity * 30).toInt()
 
     private var profilePhotoEndPoint: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
-            ChatMessageStatus.SEPARATOR.ordinal -> SeparatorViewHolder(
-                ItemChatMessageSeparatorBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                ),
-                parent.context
-            )
-            ChatMessageStatus.RECEIVED.ordinal -> ReceivedViewHolder(
-                ItemChatMessageReceivedBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                ),
-                parent.context
-            )
-            else -> SentViewHolder(
-                ItemChatMessageSentBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                ),
-                parent.context,
-                chatMessageSentListener
-            )
+            ChatMessageStatus.SEPARATOR.ordinal -> {
+                SeparatorViewHolder(ItemChatMessageSeparatorBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            }
+            ChatMessageStatus.RECEIVED.ordinal -> {
+                ReceivedViewHolder(
+                    ItemChatMessageReceivedBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                    parent.context
+                )
+            }
+            else -> {
+                SentViewHolder(
+                    ItemChatMessageSentBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                    chatMessageSentListener
+                )
+            }
         }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        getItem(position)?.let {
+        getItem(position)?.let { chatMessageDomain ->
+            chatMessageDomain.topMargin = calculateTopMargin(holder.itemViewType, position)
             when (holder.itemViewType) {
-                ChatMessageStatus.SEPARATOR.ordinal -> (holder as SeparatorViewHolder).bind(
-                    it,
-                    marginTop(holder.itemViewType, position)
-                )
-                ChatMessageStatus.RECEIVED.ordinal -> (holder as ReceivedViewHolder).bind(
-                    it,
-                    marginTop(holder.itemViewType, position),
-                    profilePhotoEndPoint
-                )
-                else -> (holder as SentViewHolder).bind(it, marginTop(holder.itemViewType, position))
+                ChatMessageStatus.SEPARATOR.ordinal -> {
+                    (holder as SeparatorViewHolder).bind(chatMessageDomain)
+                }
+                ChatMessageStatus.RECEIVED.ordinal -> {
+                    (holder as ReceivedViewHolder).bind(chatMessageDomain, profilePhotoEndPoint)
+                }
+                else -> {
+                    (holder as SentViewHolder).bind(chatMessageDomain)
+                }
             }
         }
     }
@@ -82,7 +73,7 @@ class ChatMessagePagingAdapter(
                 ChatMessageStatus.RECEIVED -> ChatMessageStatus.RECEIVED.ordinal
                 else -> ChatMessageStatus.SENT.ordinal
             }
-        } ?: return ChatMessageStatus.SENT.ordinal
+        } ?: return ChatMessageStatus.SEPARATOR.ordinal
     }
 
     fun onProfilePhotoLoaded(profilePhotoEndPoint: String?) {
@@ -90,15 +81,16 @@ class ChatMessagePagingAdapter(
         notifyDataSetChanged()
     }
 
-    private fun marginTop(itemViewType: Int, position: Int): Int {
-        if (position == (itemCount - 1)) return MARGIN_LONG
-        val nextViewType = getItemViewType(position + 1)
-
+    private fun calculateTopMargin(itemViewType: Int, position: Int): Int {
+        if ((position + 1) == itemCount) {
+            return topMarginLong
+        }
+        val nextItemViewType = getItemViewType(position)
         return when {
-            itemViewType == ChatMessageStatus.SEPARATOR.ordinal -> MARGIN_LONG
-            nextViewType == ChatMessageStatus.SEPARATOR.ordinal -> MARGIN_LONG
-            itemViewType == nextViewType -> MARGIN_SHORT
-            else -> MARGIN_MEDIUM
+            itemViewType == ChatMessageStatus.SEPARATOR.ordinal -> topMarginLong
+            nextItemViewType == ChatMessageStatus.SEPARATOR.ordinal -> topMarginLong
+            itemViewType == nextItemViewType -> topMarginShort
+            else -> topMarginMedium
         }
     }
 
@@ -112,16 +104,9 @@ class ChatMessagePagingAdapter(
     }
 
     companion object {
-        private const val MARGIN_SHORT = 5
-        private const val MARGIN_MEDIUM = 15
-        private const val MARGIN_LONG = 30
-
         private val diffCallback = object : DiffUtil.ItemCallback<ChatMessageDomain>() {
-            override fun areItemsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean =
-                oldItem.id == newItem.id
-
-            override fun areContentsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean =
-                oldItem == newItem
+            override fun areItemsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean = oldItem.id == newItem.id
+            override fun areContentsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean = oldItem == newItem
         }
     }
 
@@ -129,14 +114,10 @@ class ChatMessagePagingAdapter(
         val root: LinearLayout
     ) : RecyclerView.ViewHolder(root) {
 
-        protected fun setMarginTop(root: LinearLayout, marginTop: Int, context: Context) {
+        protected fun setTopMargin(root: LinearLayout, topMargin: Int) {
             val marginLayoutParams = root.layoutParams as ViewGroup.MarginLayoutParams
-            marginLayoutParams.topMargin = (marginTop * context.resources.displayMetrics.density).toInt()
+            marginLayoutParams.topMargin = topMargin
             root.layoutParams = marginLayoutParams
-        }
-
-        protected fun formatTimeCreatedAt(timeCreatedAt: LocalTime?): String {
-            return timeCreatedAt?.format(DateTimePattern.ofTimeWithMeridiem()) ?: ""
         }
     }
 
@@ -146,14 +127,13 @@ class ChatMessagePagingAdapter(
     ) : ViewHolder(binding.root) {
 
         fun bind(
-            chatMessage: ChatMessageDomain,
-            marginTop: Int,
+            chatMessageDomain: ChatMessageDomain,
             profilePhotoEndPoint: String?,
         ) {
-            binding.tvChatMessageReceivedBody.text = chatMessage.body
-            binding.ivChatMessageReceivedProfilePhoto.visibility = if (chatMessage.showProfilePhoto) View.VISIBLE else View.INVISIBLE
-            binding.tvChatMessageReceivedCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
-            setMarginTop(binding.root, marginTop, context)
+            binding.tvChatMessageReceivedBody.text = chatMessageDomain.body
+            binding.ivChatMessageReceivedProfilePhoto.visibility = if (chatMessageDomain.showProfilePhoto) View.VISIBLE else View.INVISIBLE
+            binding.tvChatMessageReceivedCreatedAt.text = chatMessageDomain.formatTimeCreatedAt()
+            setTopMargin(binding.root, chatMessageDomain.topMargin)
             profilePhotoEndPoint?.let {
                 Glide.with(context)
                     .load(it)
@@ -165,27 +145,25 @@ class ChatMessagePagingAdapter(
 
     class SentViewHolder(
         private val binding: ItemChatMessageSentBinding,
-        private val context: Context,
         private val chatMessageSentListener: ChatMessageSentListener
     ) : ViewHolder(binding.root) {
 
         fun bind(
-            chatMessage: ChatMessageDomain,
-            marginTop: Int
+            chatMessageDomain: ChatMessageDomain
         ) {
-            binding.tvChatMessageSentBody.text = chatMessage.body
+            binding.tvChatMessageSentBody.text = chatMessageDomain.body
             binding.btnChatMessageSentResend.setOnClickListener {
                 chatMessageSentListener.onResendChatMessage(absoluteAdapterPosition)
             }
             binding.btnChatMessageSentDelete.setOnClickListener {
                 chatMessageSentListener.onDeleteChatMessage(absoluteAdapterPosition)
             }
-            setMarginTop(binding.root, marginTop, context)
-            when (chatMessage.status) {
+            setTopMargin(binding.root, chatMessageDomain.topMargin)
+            when (chatMessageDomain.status) {
                 ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
                 ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
                 else -> {
-                    binding.tvChatMessageSentCreatedAt.text = formatTimeCreatedAt(chatMessage.timeCreatedAt)
+                    binding.tvChatMessageSentCreatedAt.text = chatMessageDomain.formatTimeCreatedAt()
                     showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
                 }
             }
@@ -204,15 +182,11 @@ class ChatMessagePagingAdapter(
     }
 
     class SeparatorViewHolder(
-        private val binding: ItemChatMessageSeparatorBinding,
-        private val context: Context
+        private val binding: ItemChatMessageSeparatorBinding
     ) : ViewHolder(binding.root) {
-        fun bind(
-            chatMessage: ChatMessageDomain,
-            marginTop: Int,
-        ) {
-            binding.tvChatSeparatorTitle.text = chatMessage.body
-            setMarginTop(binding.root, marginTop, context)
+        fun bind(chatMessageDomain: ChatMessageDomain) {
+            binding.tvChatSeparatorTitle.text = chatMessageDomain.body
+            setTopMargin(binding.root, chatMessageDomain.topMargin)
         }
     }
 }

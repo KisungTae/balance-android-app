@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.chat
 
 import androidx.lifecycle.*
 import androidx.paging.*
+import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
@@ -59,47 +60,28 @@ class ChatViewModel(
             null,
             { ChatMessagePagingSource(chatRepository, chatId) }
         ).flow.cachedIn(viewModelScope).map { pagingData ->
-            pagingData.map { chatMessage -> chatMessageMapper.toDomain(chatMessage) }
-        }.map { pagingData ->
-            var nullifyBeforeTimeCreatedAt = false
-            var showedProfilePicture = false
-            pagingData.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
-//                val beforeTimeCreatedAt = before?.timeCreatedAt
-//                if (nullifyBeforeTimeCreatedAt) {
-//                    before?.timeCreatedAt = null
-//                    nullifyBeforeTimeCreatedAt = false
-//                }
-//
-//                if (after?.status?.isProcessed() == true
-//                    && after.status == before?.status
-//                    && after.dateCreatedAt == before.dateCreatedAt
-//                    && after.timeCreatedAt == beforeTimeCreatedAt
-//                ) {
-//                    before.showProfilePhoto = false
-//                    nullifyBeforeTimeCreatedAt = true
-//                }
-
-//                var showedProfilePicture = false
-
-                if (after?.status?.isProcessed() == true
-                    && after.status == before?.status
-                    && after.dateCreatedAt == before.dateCreatedAt
-                    && after.timeCreatedAt == before.timeCreatedAt
-                ) {
-                    before.timeCreatedAt = null
-                    after.showProfilePhoto = false
+            var prevChatMessageDomain: ChatMessageDomain? = null
+            pagingData.map { chatMessage ->
+                val chatMessageDomain = chatMessageMapper.toDomain(chatMessage)
+                if (prevChatMessageDomain != null) {
+                    if (chatMessageDomain.status.isProcessed()
+                        && chatMessageDomain.status == prevChatMessageDomain?.status
+                        && chatMessageDomain.dateCreatedAt == prevChatMessageDomain?.dateCreatedAt
+                        && chatMessageDomain.timeCreatedAt == prevChatMessageDomain?.timeCreatedAt
+                    ) {
+                        prevChatMessageDomain?.showProfilePhoto = false
+                        chatMessageDomain.showTime = false
+                    }
                 }
-
-
+                prevChatMessageDomain = chatMessageDomain
+                chatMessageDomain
+            }.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
                 var separator: ChatMessageDomain? = null
-                if (before?.status?.isProcessed() == true
-                    && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)
-                ) {
+                if (before?.status?.isProcessed() == true && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)) {
                     separator = ChatMessageDomain.toSeparator(
                         before.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
                     )
                 }
-                before?.dateCreatedAt = null
                 separator
             }
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
@@ -163,7 +145,7 @@ class ChatViewModel(
 
     companion object {
         private const val MAX_CHAT_MESSAGE_BODY_SIZE = 500
-        private const val CHAT_PAGE_SIZE = 80
+        private const val CHAT_PAGE_SIZE = 20
         private const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
         private const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 3 + CHAT_PAGE_SIZE
         private val pagingConfig = PagingConfig(

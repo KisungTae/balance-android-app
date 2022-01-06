@@ -1,6 +1,7 @@
 package com.beeswork.balance.ui.chat
 
 import com.beeswork.balance.internal.constant.ChatMessageStatus
+import com.beeswork.balance.internal.constant.DateTimePattern
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
@@ -13,8 +14,18 @@ data class ChatMessageDomain(
     var status: ChatMessageStatus,
     var dateCreatedAt: LocalDate?,
     var timeCreatedAt: LocalTime?,
-    var showProfilePhoto: Boolean = true
+    var showProfilePhoto: Boolean = true,
+    var showTime: Boolean = true,
+    var topMargin: Int = 0
 ) {
+    fun formatTimeCreatedAt(): String {
+        if (!showTime) {
+            return ""
+        }
+        return timeCreatedAt?.format(DateTimePattern.ofTimeWithMeridiem()) ?: ""
+    }
+
+
     companion object {
         fun toSeparator(body: String?): ChatMessageDomain? {
             body?.let {

@@ -206,7 +206,9 @@ class ChatFragment : BaseFragment(),
         chatMessagePagingObserveJob = lifecycleScope.launch {
             viewModel.initChatMessagePagingData().observe(viewLifecycleOwner) {
                 chatMessagePagingRefreshAdapter.reset()
-                lifecycleScope.launch { chatMessagePagingAdapter.submitData(it) }
+                lifecycleScope.launch {
+                    chatMessagePagingAdapter.submitData(it)
+                }
             }
         }
     }
@@ -248,7 +250,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun setupChatRecyclerView() {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter(this)
+        chatMessagePagingAdapter = ChatMessagePagingAdapter(this, resources.displayMetrics.density)
         binding.rvChat.adapter = chatMessagePagingAdapter
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL

@@ -278,11 +278,36 @@ class ChatRepositoryImpl(
 //    }
 
     override fun test() {
-//        invalidateChatMessages(
-//            ChatMessageInvalidation.Type.RECEIVED,
-//            352,
-//            "test chat message received"
-//        )
+        CoroutineScope(ioDispatcher).launch {
+            val today = OffsetDateTime.now()
+            val chatMessages = arrayListOf<ChatMessage>()
+
+            for (i in 0..30) {
+                var date = today.plusDays(i.toLong())
+
+                for (j in 0..Random.nextInt(0, 15)) {
+                    if (Random.nextBoolean()) {
+                        date = date.plusMinutes(Random.nextLong(0, 3))
+                    }
+
+                    if (Random.nextBoolean()) {
+                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.SENT, UUID.randomUUID(), date))
+                    } else {
+                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.RECEIVED, UUID.randomUUID(), date))
+                    }
+                }
+            }
+
+            for (i in 0..10) {
+                chatMessages.add(ChatMessage(12, "sending-$i", ChatMessageStatus.SENDING, UUID.randomUUID()))
+            }
+
+
+            chatMessageDAO.insert(chatMessages)
+        }
+
+
+
 
     }
 }
