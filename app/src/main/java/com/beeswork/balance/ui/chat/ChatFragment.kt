@@ -105,6 +105,9 @@ class ChatFragment : BaseFragment(),
         observeReportMatchLiveData()
         observeUnmatchLiveData()
         observeChatMessagePagingData()
+
+//        todo: remove me
+//        viewModel.test()
     }
 
 

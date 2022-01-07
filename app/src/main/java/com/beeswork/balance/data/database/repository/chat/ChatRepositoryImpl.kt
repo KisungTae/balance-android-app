@@ -202,10 +202,10 @@ class ChatRepositoryImpl(
             if (!chatMessageDAO.existsById(chatMessageDTO.id)) {
                 chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
                     newChatMessages.add(chatMessage)
-                    receivedChatMessageIds.add(chatMessage.id)
                     chatIds.add(chatMessage.chatId)
                 }
             }
+            chatMessageDTO.id?.let { id -> receivedChatMessageIds.add(id) }
         }
 
         sentChatMessageDTOs?.forEach { chatMessageDTO ->
@@ -213,6 +213,7 @@ class ChatRepositoryImpl(
                 chatMessage.createdAt = createdAt
                 chatMessage.status = ChatMessageStatus.SENT
                 newChatMessages.add(chatMessage)
+                chatIds.add(chatMessage.chatId)
             }
             chatMessageDTO.id?.let { id -> sentChatMessageIds.add(id) }
         }
@@ -279,32 +280,41 @@ class ChatRepositoryImpl(
 
     override fun test() {
         CoroutineScope(ioDispatcher).launch {
-            val today = OffsetDateTime.now()
             val chatMessages = arrayListOf<ChatMessage>()
-
-            for (i in 0..30) {
-                var date = today.plusDays(i.toLong())
-
-                for (j in 0..Random.nextInt(0, 15)) {
-                    if (Random.nextBoolean()) {
-                        date = date.plusMinutes(Random.nextLong(0, 3))
-                    }
-
-                    if (Random.nextBoolean()) {
-                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.SENT, UUID.randomUUID(), date))
-                    } else {
-                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.RECEIVED, UUID.randomUUID(), date))
-                    }
-                }
-            }
-
-            for (i in 0..10) {
-                chatMessages.add(ChatMessage(12, "sending-$i", ChatMessageStatus.SENDING, UUID.randomUUID()))
-            }
-
-
+            chatMessages.add(ChatMessage(12, "sent-1", ChatMessageStatus.SENDING, UUID.fromString("938249ad-0ffc-46cf-bd7d-dc4b28f1726b")))
+            chatMessages.add(ChatMessage(12, "sent-2", ChatMessageStatus.SENDING, UUID.fromString("cc00800c-e74f-4dac-bd9b-f0ef487e7d9f")))
+            chatMessages.add(ChatMessage(12, "sent-3", ChatMessageStatus.SENDING, UUID.fromString("05df0340-e581-4f23-a490-bcd8ced00553")))
             chatMessageDAO.insert(chatMessages)
         }
+
+
+//        CoroutineScope(ioDispatcher).launch {
+//            val today = OffsetDateTime.now()
+//            val chatMessages = arrayListOf<ChatMessage>()
+//
+//            for (i in 0..30) {
+//                var date = today.plusDays(i.toLong())
+//
+//                for (j in 0..Random.nextInt(0, 15)) {
+//                    if (Random.nextBoolean()) {
+//                        date = date.plusMinutes(Random.nextLong(0, 3))
+//                    }
+//
+//                    if (Random.nextBoolean()) {
+//                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.SENT, UUID.randomUUID(), date))
+//                    } else {
+//                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.RECEIVED, UUID.randomUUID(), date))
+//                    }
+//                }
+//            }
+//
+//            for (i in 0..10) {
+//                chatMessages.add(ChatMessage(12, "sending-$i", ChatMessageStatus.SENDING, UUID.randomUUID()))
+//            }
+//
+//
+//            chatMessageDAO.insert(chatMessages)
+//        }
 
 
 

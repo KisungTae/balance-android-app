@@ -145,7 +145,7 @@ class ChatViewModel(
 
     companion object {
         private const val MAX_CHAT_MESSAGE_BODY_SIZE = 500
-        private const val CHAT_PAGE_SIZE = 20
+        private const val CHAT_PAGE_SIZE = 80
         private const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
         private const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 3 + CHAT_PAGE_SIZE
         private val pagingConfig = PagingConfig(

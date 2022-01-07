@@ -51,7 +51,7 @@ class ChatMessagePagingAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let { chatMessageDomain ->
-            chatMessageDomain.topMargin = calculateTopMargin(holder.itemViewType, position)
+            chatMessageDomain.topMargin = calculateTopMargin(chatMessageDomain, position)
             when (holder.itemViewType) {
                 ChatMessageStatus.SEPARATOR.ordinal -> {
                     (holder as SeparatorViewHolder).bind(chatMessageDomain)
@@ -81,15 +81,16 @@ class ChatMessagePagingAdapter(
         notifyDataSetChanged()
     }
 
-    private fun calculateTopMargin(itemViewType: Int, position: Int): Int {
-        if ((position + 1) == itemCount) {
+    private fun calculateTopMargin(chatMessageDomain: ChatMessageDomain, position: Int): Int {
+        val nextPosition = position + 1
+        if (nextPosition == itemCount) {
             return topMarginLong
         }
-        val nextItemViewType = getItemViewType(position)
+        val nextChatMessageDomain = getItem(nextPosition)
         return when {
-            itemViewType == ChatMessageStatus.SEPARATOR.ordinal -> topMarginLong
-            nextItemViewType == ChatMessageStatus.SEPARATOR.ordinal -> topMarginLong
-            itemViewType == nextItemViewType -> topMarginShort
+            chatMessageDomain.status == ChatMessageStatus.SEPARATOR -> topMarginLong
+            nextChatMessageDomain?.status == ChatMessageStatus.SEPARATOR -> topMarginLong
+            chatMessageDomain.status == nextChatMessageDomain?.status -> topMarginShort
             else -> topMarginMedium
         }
     }

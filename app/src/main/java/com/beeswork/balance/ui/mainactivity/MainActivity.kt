@@ -44,7 +44,6 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     private val viewModelFactory: MainViewModelFactory by instance()
-    private var onScreen = true
 
     private val requestLocationPermission = registerForActivityResult(RequestPermission()) { granted ->
         if (granted) bindLocationManager()
@@ -87,16 +86,6 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private fun bindUI() = lifecycleScope.launch {
         setupWebSocketEventObserver()
-
-
-//        TODO: remove me
-        binding.connectBtn.setOnClickListener {
-            viewModel.connectStomp()
-        }
-
-        binding.disconnectBtn.setOnClickListener {
-            viewModel.disconnectStomp()
-        }
     }
 
     private suspend fun setupWebSocketEventObserver() {
@@ -118,19 +107,9 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         }
     }
 
-    private fun showWebSocketError(error: String?, errorMessage: String?) {
-//        val errorTitle = getString(R.string.error_title_web_socket_disconnected)
-//        ErrorDialog(error, errorTitle, errorMessage, RequestCode.CONNECT_TO_WEB_SOCKET, this, null).show(
-//            supportFragmentManager,
-//            ErrorDialog.TAG
-//        )
-    }
-
     override fun onRetry(requestCode: Int?) {
-        requestCode?.let {
-            when (it) {
-//                RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
-            }
+        when (requestCode) {
+            RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
         }
     }
 
@@ -138,15 +117,12 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
         super.onResume()
 //        if (hasLocationPermission()) bindLocationManager()
 //        else viewModel.saveLocationPermissionResult(false)
-        onScreen = true
-        println("onresume viewModel.connectStomp()")
-//        viewModel.connectStomp()
+        viewModel.connectStomp()
     }
 
     override fun onPause() {
         super.onPause()
-        onScreen = false
-//        viewModel.disconnectStomp()
+        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {
