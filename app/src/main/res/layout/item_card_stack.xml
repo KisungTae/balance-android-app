@@ -63,7 +63,7 @@
                             android:layout_marginEnd="10dp"
                             android:text="마이클리"
                             android:textColor="@color/TextWhite"
-                            android:textSize="@dimen/text_extra_large_size"
+                            android:textSize="@dimen/text_extra_large"
                             android:textStyle="bold" />
 
                         <TextView
@@ -72,7 +72,7 @@
                             android:layout_height="wrap_content"
                             android:text="26"
                             android:textColor="@color/TextWhite"
-                            android:textSize="@dimen/text_extra_large_size"
+                            android:textSize="@dimen/text_extra_large"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -86,7 +86,7 @@
                         android:maxLines="1"
                         android:text="I am Michael I am looking for a serious relationship"
                         android:textColor="@color/TextWhite"
-                        android:textSize="@dimen/text_large_size" />
+                        android:textSize="@dimen/text_large" />
                 </LinearLayout>
 
             </FrameLayout>
@@ -128,8 +128,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="3dp"
-                            android:text="172"
-                            android:textSize="@dimen/text_medium_size" />
+                            android:text="172" />
 
                         <TextView
                             android:layout_marginStart="3dp"
@@ -161,8 +160,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="3dp"
-                            android:text="10 km"
-                            android:textSize="@dimen/text_medium_size" />
+                            android:text="10 km" />
 
                     </LinearLayout>
 
@@ -190,8 +188,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="3dp"
-                            android:text="여성"
-                            android:textSize="@dimen/text_medium_size" />
+                            android:text="여성" />
                     </LinearLayout>
 
 
@@ -203,7 +200,7 @@
                     android:layout_marginBottom="10dp"
                     android:text="@string/card_stack_item_about_title"
                     android:textColor="@color/darkerGrey"
-                    android:textSize="@dimen/text_large_size" />
+                    android:textSize="@dimen/text_large" />
 
                 <TextView
                     android:id="@+id/tvCardStackItemAbout"
@@ -211,7 +208,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="50dp"
                     android:text="This is Michael. I am looking for a serious relationship. Please no hook up or node pictures. I don't want them. I like listening to music and watch movies in my free time"
-                    android:textSize="@dimen/text_large_size" />
+                    android:textSize="@dimen/text_large" />
 
                 <Button
                     android:layout_width="wrap_content"

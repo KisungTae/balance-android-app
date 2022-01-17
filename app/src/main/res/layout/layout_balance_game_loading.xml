@@ -11,8 +11,8 @@
 
     <com.github.ybq.android.spinkit.SpinKitView
         style="@style/SpinKitView.Large.Circle"
-        android:layout_width="@dimen/spin_kit_medium_size"
-        android:layout_height="@dimen/spin_kit_medium_size"
+        android:layout_width="@dimen/icon_medium"
+        android:layout_height="@dimen/icon_medium"
         android:layout_marginBottom="10dp"
         android:background="@color/Transparent"
         app:SpinKit_Color="@color/Primary" />

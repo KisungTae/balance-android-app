@@ -30,8 +30,8 @@
 
             <ImageButton
                 android:id="@+id/btnReportDialogBack"
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:layout_marginStart="10dp"
                 android:background="@color/Transparent"
                 android:contentDescription="@string/back_button_description"
@@ -43,12 +43,12 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textSize="@dimen/text_large_size"
+                android:textSize="@dimen/text_large"
                 android:textStyle="bold" />
 
             <ImageButton
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:layout_marginEnd="10dp"
                 android:background="@color/Transparent" />
 
@@ -86,8 +86,7 @@
             android:paddingBottom="10dp"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_submit_button_title"
-            android:textColor="@color/Primary"
-            android:textSize="@dimen/text_medium_size" />
+            android:textColor="@color/Primary"/>
 
     </LinearLayout>
 
@@ -107,7 +106,7 @@
             android:paddingTop="20dp"
             android:text="@string/report_dialog_head"
             android:textAlignment="center"
-            android:textSize="@dimen/text_large_size"
+            android:textSize="@dimen/text_large"
             android:textStyle="bold" />
 
         <TextView
@@ -125,8 +124,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_message_button_title"
-            android:textColor="@color/TextRed"
-            android:textSize="@dimen/text_medium_size" />
+            android:textColor="@color/TextRed" />
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -136,8 +134,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_photo_button_title"
-            android:textColor="@color/TextRed"
-            android:textSize="@dimen/text_medium_size" />
+            android:textColor="@color/TextRed"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogSpam"
@@ -146,8 +143,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_spam_button_title"
-            android:textColor="@color/TextRed"
-            android:textSize="@dimen/text_medium_size" />
+            android:textColor="@color/TextRed"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogBehaviour"
@@ -156,8 +152,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_behaviour_button_title"
-            android:textColor="@color/TextRed"
-            android:textSize="@dimen/text_medium_size" />
+            android:textColor="@color/TextRed"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogOther"
@@ -166,8 +161,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_other_button_title"
-            android:textColor="@color/TextRed"
-            android:textSize="@dimen/text_medium_size" />
+            android:textColor="@color/TextRed"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogClose"
@@ -178,8 +172,7 @@
             android:paddingBottom="10dp"
             android:stateListAnimator="@null"
             android:text="@string/dialog_close_btn_title"
-            android:textColor="@color/TextGrey"
-            android:textSize="@dimen/text_medium_size" />
+            android:textColor="@color/TextGrey"/>
     </LinearLayout>
 
     <LinearLayout
@@ -194,8 +187,8 @@
 
         <com.github.ybq.android.spinkit.SpinKitView
             style="@style/SpinKitView.Large.Circle"
-            android:layout_width="@dimen/spin_kit_medium_size"
-            android:layout_height="@dimen/spin_kit_medium_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:background="@color/Transparent"
             app:SpinKit_Color="@color/Primary" />
 

@@ -44,8 +44,8 @@
             android:visibility="gone" />
 
         <ImageView
-            android:layout_width="@dimen/photo_picker_icon_size"
-            android:layout_height="@dimen/photo_picker_icon_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:contentDescription="@string/add_icon_description"
             android:src="@drawable/ic_baseline_add"
@@ -55,8 +55,8 @@
         <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/spin_kit"
             style="@style/SpinKitView.Large.Circle"
-            android:layout_width="@dimen/photo_picker_icon_size"
-            android:layout_height="@dimen/photo_picker_icon_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:background="@color/Transparent"
             android:clickable="true"
@@ -65,8 +65,8 @@
             app:SpinKit_Color="@color/BackgroundWhite" />
 
         <ImageView
-            android:layout_width="@dimen/photo_picker_icon_size"
-            android:layout_height="@dimen/photo_picker_icon_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:clickable="false"
             android:contentDescription="@string/download_icon_description"
@@ -76,8 +76,8 @@
             app:tint="@color/white" />
 
         <ImageView
-            android:layout_width="@dimen/photo_picker_icon_size"
-            android:layout_height="@dimen/photo_picker_icon_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:clickable="false"
             android:contentDescription="@string/upload_icon_description"

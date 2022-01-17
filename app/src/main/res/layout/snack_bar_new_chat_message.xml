@@ -14,7 +14,7 @@
         android:layout_marginBottom="3dp"
         android:text="@string/snack_bar_title_new_chat_message"
         android:textColor="@color/TextGrey"
-        android:textSize="@dimen/text_small_size" />
+        android:textSize="@dimen/text_small" />
 
 
     <TextView
@@ -23,7 +23,6 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/TextBlack"
-        android:textSize="@dimen/text_medium_size" />
+        android:textColor="@color/TextBlack" />
 
 </LinearLayout>

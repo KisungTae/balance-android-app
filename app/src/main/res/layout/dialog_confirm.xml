@@ -13,8 +13,7 @@
         android:layout_marginEnd="10dp"
         android:background="@drawable/sh_top_round_box"
         android:backgroundTint="@color/BackgroundWhite"
-        android:textColor="@color/TextRed"
-        android:textSize="@dimen/text_medium_size" />
+        android:textColor="@color/TextRed" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnConfirmDialogClose"
@@ -26,8 +25,7 @@
         android:background="@drawable/sh_bottom_round_box"
         android:backgroundTint="@color/BackgroundWhite"
         android:text="@string/dialog_close_btn_title"
-        android:textColor="@color/TextGrey"
-        android:textSize="@dimen/text_medium_size" />
+        android:textColor="@color/TextGrey" />
 
 
 </LinearLayout>

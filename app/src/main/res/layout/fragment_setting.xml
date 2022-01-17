@@ -20,8 +20,8 @@
 
             <ImageButton
                 android:id="@+id/btnSettingBack"
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:background="@color/BackgroundWhite"
                 android:contentDescription="@string/back_button_description"
                 android:src="@drawable/ic_baseline_arrow_back_ios" />
@@ -33,12 +33,12 @@
                 android:gravity="center"
                 android:text="@string/setting_tool_bar_title"
                 android:textAlignment="center"
-                android:textSize="@dimen/tool_bar_title_medium_text_size"
+                android:textSize="@dimen/text_large"
                 android:textStyle="bold" />
 
             <ImageButton
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:background="@color/BackgroundWhite"
                 android:contentDescription="@string/profile_save_icon_description" />
 
@@ -267,8 +267,8 @@
 
         <com.github.ybq.android.spinkit.SpinKitView
             style="@style/SpinKitView.Large.Circle"
-            android:layout_width="@dimen/spin_kit_medium_size"
-            android:layout_height="@dimen/spin_kit_medium_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:background="@color/Transparent"
             app:SpinKit_Color="@color/white" />
 

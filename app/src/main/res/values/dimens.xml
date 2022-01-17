@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="tool_bar_title_large_text_size">24sp</dimen>
-    <dimen name="tool_bar_title_medium_text_size">16sp</dimen>
-    <dimen name="tool_bar_menu_item_btn_size">48dp</dimen>
-    <dimen name="photo_picker_icon_size">48dp</dimen>
-    <dimen name="chat_message_menu_btn_size">24dp</dimen>
-    <dimen name="profile_image_medium_size">39dp</dimen>
-    <dimen name="text_small_size">12sp</dimen>
-    <dimen name="text_medium_size">15sp</dimen>
-    <dimen name="text_large_size">17sp</dimen>
-    <dimen name="text_extra_large_size">22sp</dimen>
-    <dimen name="chat_message_text_view_max_width">220dp</dimen>
+    <dimen name="text_small">12sp</dimen>
+    <dimen name="text_large">16sp</dimen>
+    <dimen name="text_extra_large">22sp</dimen>
+    <dimen name="text_head">24sp</dimen>
+
+    <dimen name="icon_medium">48dp</dimen>
+    <dimen name="icon_small">24dp</dimen>
+
     <dimen name="snack_bar_top_padding">10dp</dimen>
     <dimen name="snack_bar_new_chat_message_bottom_padding">10dp</dimen>
-    <dimen name="item_click_round">10dp</dimen>
-    <dimen name="spin_kit_medium_size">48dp</dimen>
-    <dimen name="spin_kit_small_size">24dp</dimen>
+
+    <dimen name="chat_message_text_view_max_width">220dp</dimen>
+
+    <dimen name="image_chat_message_profile_picture">40dp</dimen>
 
 </resources>

@@ -37,8 +37,8 @@
 
         <ImageButton
             android:id="@+id/btnMatchSearchClose"
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:background="@color/Transparent"
             android:contentDescription="@string/search_bar_close_btn_description"
             android:src="@drawable/ic_baseline_close" />
@@ -58,13 +58,13 @@
             android:orientation="horizontal">
 
             <Button
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:visibility="invisible" />
 
             <Button
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:visibility="invisible" />
 
             <com.beeswork.balance.ui.common.GradientTextView
@@ -73,7 +73,7 @@
                 android:layout_weight="1"
                 android:text="@string/match_tool_bar_title"
                 android:textAlignment="center"
-                android:textSize="@dimen/tool_bar_title_large_text_size"
+                android:textSize="@dimen/text_head"
                 android:textStyle="bold"
                 app:endColor="@color/TextWhite"
                 app:startColor="@color/Primary" />
@@ -84,15 +84,15 @@
 
                 <LinearLayout
                     android:id="@+id/skvMatchLoading"
-                    android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                    android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                    android:layout_width="@dimen/icon_medium"
+                    android:layout_height="@dimen/icon_medium"
                     android:gravity="center"
                     android:visibility="invisible">
 
                     <com.github.ybq.android.spinkit.SpinKitView
                         style="@style/SpinKitView.Large.Circle"
-                        android:layout_width="@dimen/spin_kit_small_size"
-                        android:layout_height="@dimen/spin_kit_small_size"
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
                         android:layout_gravity="center"
                         app:SpinKit_Color="@color/GreyDark" />
 
@@ -100,8 +100,8 @@
 
                 <ImageButton
                     android:id="@+id/btnMatchRefresh"
-                    android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                    android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                    android:layout_width="@dimen/icon_medium"
+                    android:layout_height="@dimen/icon_medium"
                     android:background="@color/white"
                     android:contentDescription="@string/refresh_button_icon_description"
                     android:src="@drawable/ic_refresh"

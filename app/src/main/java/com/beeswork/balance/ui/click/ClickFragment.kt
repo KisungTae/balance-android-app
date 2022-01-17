@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -15,6 +17,7 @@ import com.beeswork.balance.databinding.SnackBarNewClickBinding
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
+import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
@@ -38,10 +41,12 @@ class ClickFragment : BaseFragment(),
     override val kodein by closestKodein()
     private val viewModelFactory: ClickViewModelFactory by instance()
     private lateinit var viewModel: ClickViewModel
-    private lateinit var clickPagingDataAdapter: ClickPagingDataAdapter
     private lateinit var clickPagingRefreshAdapter: PagingRefreshAdapter<ClickDomain, RecyclerView.ViewHolder>
     private lateinit var binding: FragmentClickBinding
     private var newClickSnackBar: Snackbar? = null
+    private val clickPagingDataAdapter by lazy { ClickPagingDataAdapter(this) }
+
+    private val footerLoadStateAdapter = BalanceLoadStateAdapter(clickPagingDataAdapter::retry)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,13 +57,17 @@ class ClickFragment : BaseFragment(),
         return binding.root
     }
 
+    @ExperimentalPagingApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
 //        viewModel.fetchClicks()
+//        viewModel.test()
+
     }
 
+    @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
         setupClickRecyclerView()
         setupClickInvalidationObserver()
@@ -129,9 +138,12 @@ class ClickFragment : BaseFragment(),
         ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_CLICKS, this, childFragmentManager)
     }
 
+    @ExperimentalPagingApi
     private fun setupClickPagingDataObserver() {
         viewModel.initClickPagingData().observe(viewLifecycleOwner) {
-            lifecycleScope.launch { clickPagingDataAdapter.submitData(it) }
+            lifecycleScope.launch {
+                clickPagingDataAdapter.submitData(it)
+            }
         }
     }
 
@@ -142,25 +154,38 @@ class ClickFragment : BaseFragment(),
     }
 
     private fun setupClickRecyclerView() {
-        clickPagingDataAdapter = ClickPagingDataAdapter(this)
-        val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, SPAN_COUNT)
+
+        clickPagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                println("clickPagingDataAdapter.itemCount ${clickPagingDataAdapter.itemCount}")
+                super.onItemRangeInserted(positionStart, itemCount)
+            }
+        })
+
+
+        binding.rvClick.adapter = clickPagingDataAdapter.withLoadStateFooter(
+            footer = footerLoadStateAdapter
+        )
+        val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, CLICK_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
+                if (position >= clickPagingDataAdapter.itemCount && footerLoadStateAdapter.itemCount > 0) {
+                    return FOOTER_SPAN_COUNT
+                }
                 return when (clickPagingDataAdapter.getItemViewType(position)) {
                     ClickDomain.Type.ITEM.ordinal -> ITEM_SPAN_COUNT
-                    ClickDomain.Type.HEADER.ordinal -> SPAN_COUNT
-                    else -> ITEM_SPAN_COUNT
+                    ClickDomain.Type.HEADER.ordinal -> HEADER_SPAN_COUNT
+                    else -> HEADER_SPAN_COUNT
                 }
             }
         }
-        binding.rvClick.itemAnimator = null
-        binding.rvClick.adapter = clickPagingDataAdapter
         binding.rvClick.layoutManager = gridLayoutManager
+        binding.rvClick.itemAnimator = null
         clickPagingRefreshAdapter = PagingRefreshAdapter(binding.rvClick, clickPagingDataAdapter)
     }
 
     override fun onFragmentSelected() {
-        viewModel.fetchClicks()
+//        viewModel.fetchClicks()
     }
 
     override fun onSelectClick(position: Int) {
@@ -173,8 +198,10 @@ class ClickFragment : BaseFragment(),
     }
 
     companion object {
-        const val SPAN_COUNT = 2
+        const val HEADER_SPAN_COUNT = 2
         const val ITEM_SPAN_COUNT = 1
+        const val FOOTER_SPAN_COUNT = 2
+        const val CLICK_PAGE_SPAN_COUNT = 2
     }
 
     override fun onRetry(requestCode: Int?) {
@@ -182,5 +209,12 @@ class ClickFragment : BaseFragment(),
             RequestCode.FETCH_CLICKS -> viewModel.fetchClicks()
         }
     }
+
+
+    override fun onResume() {
+        super.onResume()
+        clickPagingDataAdapter.refresh()
+    }
+
 
 }

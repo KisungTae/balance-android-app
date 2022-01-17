@@ -550,5 +550,6 @@ class BalanceApplication : Application(), KodeinAware {
 //      174. remove println()
 //      175. increase the timeout for http request
 //      176. when stomp connected, fetch chatMessage because there might be chat messages have not been fetched during stomp off connection
+//      177. sort out di
 
 // google signin refrene link; https://developers.google.com/identity/sign-in/android/backend-auth | https://developers.google.com/identity/sign-in/android/backend-auth

@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/ivChatMessageReceivedProfilePhoto"
-        android:layout_width="@dimen/profile_image_medium_size"
-        android:layout_height="@dimen/profile_image_medium_size"
+        android:layout_width="@dimen/image_chat_message_profile_picture"
+        android:layout_height="@dimen/image_chat_message_profile_picture"
         android:layout_gravity="top"
         android:contentDescription="@string/profile_image_description"
         android:src="@drawable/ic_baseline_account_circle" />
@@ -32,5 +32,5 @@
         android:layout_marginStart="5dp"
         android:gravity="bottom"
         android:textColor="@color/TextGrey"
-        android:textSize="@dimen/text_small_size" />
+        android:textSize="@dimen/text_small" />
 </LinearLayout>

@@ -59,6 +59,7 @@ class ClickRepositoryImpl(
 
     override suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click> {
         return withContext(ioDispatcher) {
+            delay(5000)
             return@withContext clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
@@ -107,15 +108,20 @@ class ClickRepositoryImpl(
     override fun test() {
 
         CoroutineScope(ioDispatcher).launch {
+
+
 //            clickDAO.insert(Click(UUID.fromString("698f2eb6-3fef-4ee3-9c7d-3e527740548e"), "new profile", OffsetDateTime.now()))
 //            clickDAO.insert(Click(UUID.fromString("cd4f05bf-1192-4f16-90c7-f97b46584ba6"), "new profile", OffsetDateTime.now()))
 //            clickDAO.insert(Click(UUID.fromString("82585030-2f0e-4be5-bbf1-bbcce26d0408"), "new profile", OffsetDateTime.now()))
 //            clickDAO.insert(Click(UUID.fromString("44d7c228-f670-4fe7-8302-cdfd7fdaa912"), "new profile", OffsetDateTime.now()))
-//            val clicks = mutableListOf<Click>()
-//            for (i in 0..1000) {
-//                clicks.add(Click(UUID.randomUUID(), "test", OffsetDateTime.now()))
-//            }
-//            clickDAO.insert(clicks)
+            val clicks = mutableListOf<Click>()
+            val accountId = preferenceProvider.getAccountId()
+            var now = OffsetDateTime.now()
+            for (i in 0..1000) {
+                now = now.plusMinutes(1)
+                clicks.add(Click(UUID.randomUUID(), accountId!!, "test-$i", "photo", OffsetDateTime.from(now)))
+            }
+            clickDAO.insert(clicks)
 
 //            clickDAO.insert(Click(UUID.randomUUID(), "", OffsetDateTime.now()))
         }

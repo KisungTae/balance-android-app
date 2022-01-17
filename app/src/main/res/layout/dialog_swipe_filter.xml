@@ -19,7 +19,7 @@
         android:paddingTop="20dp"
         android:text="@string/swipe_filter_dialog_title"
         android:textAlignment="center"
-        android:textSize="@dimen/text_large_size"
+        android:textSize="@dimen/text_large"
         android:textStyle="bold" />
 
     <LinearLayout

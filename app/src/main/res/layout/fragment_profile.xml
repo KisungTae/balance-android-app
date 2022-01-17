@@ -17,8 +17,8 @@
 
         <ImageButton
             android:id="@+id/btnProfileBack"
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:background="@color/BackgroundWhite"
             android:contentDescription="@string/back_button_description"
             android:src="@drawable/ic_baseline_arrow_back_ios" />
@@ -30,7 +30,7 @@
             android:gravity="center"
             android:text="@string/profile_tool_bar_title"
             android:textAlignment="center"
-            android:textSize="@dimen/tool_bar_title_medium_text_size"
+            android:textSize="@dimen/text_large"
             android:textStyle="bold" />
 
         <FrameLayout
@@ -42,16 +42,16 @@
                 style="@style/SpinKitView.Large.Circle"
                 android:id="@+id/skvProfileLoading"
                 android:layout_margin="12dp"
-                android:layout_width="@dimen/spin_kit_small_size"
-                android:layout_height="@dimen/spin_kit_small_size"
+                android:layout_width="@dimen/icon_small"
+                android:layout_height="@dimen/icon_small"
                 android:layout_gravity="center"
                 app:SpinKit_Color="@color/GreyDark" />
 
 
             <ImageButton
                 android:id="@+id/btnProfileRefresh"
-                android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-                android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:background="@color/BackgroundWhite"
                 android:contentDescription="@string/back_button_description"
                 android:src="@drawable/ic_refresh"
@@ -271,8 +271,7 @@
                     android:background="@drawable/sh_round_box"
                     android:backgroundTint="@color/Primary"
                     android:text="@string/save_btn_text"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_medium_size" />
+                    android:textColor="@color/white" />
 
             </LinearLayout>
 

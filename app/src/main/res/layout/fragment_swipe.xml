@@ -15,8 +15,8 @@
         app:contentInsetStart="0dp">
 
         <Button
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:visibility="invisible" />
 
         <com.beeswork.balance.ui.common.GradientTextView
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="@string/swipe_tool_bar_title"
             android:textAlignment="center"
-            android:textSize="@dimen/tool_bar_title_large_text_size"
+            android:textSize="@dimen/text_head"
             android:textStyle="bold"
             app:endColor="@color/TextWhite"
             app:startColor="@color/Primary" />
@@ -65,8 +65,8 @@
 
             <com.github.ybq.android.spinkit.SpinKitView
                 style="@style/SpinKitView.Large.Circle"
-                android:layout_width="@dimen/spin_kit_medium_size"
-                android:layout_height="@dimen/spin_kit_medium_size"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:background="@color/Transparent"
                 app:SpinKit_Color="@color/Primary" />
 

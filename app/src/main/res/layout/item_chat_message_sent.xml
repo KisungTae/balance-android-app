@@ -16,8 +16,8 @@
         <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/skvChatMessageSentLoading"
             style="@style/SpinKitView.Large.Circle"
-            android:layout_width="@dimen/chat_message_menu_btn_size"
-            android:layout_height="@dimen/chat_message_menu_btn_size"
+            android:layout_width="@dimen/icon_small"
+            android:layout_height="@dimen/icon_small"
             android:layout_gravity="end"
             android:layout_marginEnd="5dp"
             android:background="@color/Transparent"
@@ -31,16 +31,16 @@
 
             <ImageButton
                 android:id="@+id/btnChatMessageSentResend"
-                android:layout_width="@dimen/chat_message_menu_btn_size"
-                android:layout_height="@dimen/chat_message_menu_btn_size"
+                android:layout_width="@dimen/icon_small"
+                android:layout_height="@dimen/icon_small"
                 android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_baseline_refresh"
                 android:contentDescription="@string/chat_message_resend_button_description" />
 
             <ImageButton
                 android:id="@+id/btnChatMessageSentDelete"
-                android:layout_width="@dimen/chat_message_menu_btn_size"
-                android:layout_height="@dimen/chat_message_menu_btn_size"
+                android:layout_width="@dimen/icon_small"
+                android:layout_height="@dimen/icon_small"
                 android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_baseline_close"
                 android:contentDescription="@string/chat_message_delete_button_description" />
@@ -55,7 +55,7 @@
             android:elevation="1dp"
             android:text="2:30 pm"
             android:textColor="@color/TextGrey"
-            android:textSize="@dimen/text_small_size" />
+            android:textSize="@dimen/text_small" />
     </FrameLayout>
 
     <TextView

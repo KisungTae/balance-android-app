@@ -31,6 +31,7 @@ class ClickViewModel(
 
     private var fetchingClicks = false
 
+    @ExperimentalPagingApi
     fun initClickPagingData(): LiveData<PagingData<ClickDomain>> {
         return Pager(
             pagingConfig,
@@ -69,15 +70,14 @@ class ClickViewModel(
 //    }
 
     companion object {
-        private const val CLICK_PAGE_SIZE = 80
+        private const val CLICK_PAGE_SIZE = 20
         private const val CLICK_PAGE_PREFETCH_DISTANCE = CLICK_PAGE_SIZE * 2
         private const val CLICK_MAX_PAGE_SIZE = CLICK_PAGE_PREFETCH_DISTANCE * 2 + CLICK_PAGE_SIZE
         private val pagingConfig = PagingConfig(
             CLICK_PAGE_SIZE,
             CLICK_PAGE_PREFETCH_DISTANCE,
             false,
-            CLICK_PAGE_SIZE,
-            CLICK_MAX_PAGE_SIZE
+            CLICK_PAGE_SIZE
         )
     }
 

@@ -13,8 +13,7 @@
         android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
         android:text="@string/chat_unmatch_btn_title"
-        android:textColor="@color/TextRed"
-        android:textSize="@dimen/text_medium_size" />
+        android:textColor="@color/TextRed"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnChatMoreMenuDialogReport"
@@ -24,8 +23,7 @@
         android:background="@color/BackgroundWhite"
         android:stateListAnimator="@null"
         android:text="@string/chat_report_match_btn_title"
-        android:textColor="@color/TextRed"
-        android:textSize="@dimen/text_medium_size" />
+        android:textColor="@color/TextRed"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnChatMoreMenuDialogClose"
@@ -37,7 +35,6 @@
         android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
         android:text="@string/dialog_close_btn_title"
-        android:textColor="@color/TextGrey"
-        android:textSize="@dimen/text_medium_size" />
+        android:textColor="@color/TextGrey"/>
 
 </LinearLayout>

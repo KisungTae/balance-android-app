@@ -14,8 +14,8 @@
 
         <ImageButton
             android:id="@+id/btnRegisterBack"
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:layout_marginStart="5dp"
             android:background="@color/Transparent"
             android:contentDescription="@string/back_button_description"
@@ -23,8 +23,8 @@
             app:tint="@color/TextBlack" />
 
         <View
-            android:layout_width="@dimen/tool_bar_menu_item_btn_size"
-            android:layout_height="@dimen/tool_bar_menu_item_btn_size" />
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium" />
 
     </LinearLayout>
 
