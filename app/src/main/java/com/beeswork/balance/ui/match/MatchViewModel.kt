@@ -77,25 +77,28 @@ class MatchViewModel(
 
     fun testFunction() {
         viewModelScope.launch {
-            matchRepository.saveMatch(
-                MatchDTO(
-                    PushType.MATCHED,
-                    1,
-                    UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"),
-                    UUID.randomUUID(),
-                    false,
-                    false,
-                    "Michael",
-                    "key",
-                    OffsetDateTime.now()
-                )
-            )
+            matchRepository.testFunction()
+
+
+//            matchRepository.saveMatch(
+//                MatchDTO(
+//                    PushType.MATCHED,
+//                    1,
+//                    UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"),
+//                    UUID.randomUUID(),
+//                    false,
+//                    false,
+//                    "Michael",
+//                    "key",
+//                    OffsetDateTime.now()
+//                )
+//            )
 //            chatRepository.sendChatMessage(1, UUID.randomUUID(), "test")
         }
     }
 
     companion object {
-        private const val MATCH_PAGE_SIZE = 80
+        private const val MATCH_PAGE_SIZE = 30
         private const val MATCH_PAGE_PREFETCH_DISTANCE = MATCH_PAGE_SIZE
         private const val MATCH_MAX_PAGE_SIZE = MATCH_PAGE_PREFETCH_DISTANCE * 3 + MATCH_PAGE_SIZE
         private val pagingConfig = PagingConfig(

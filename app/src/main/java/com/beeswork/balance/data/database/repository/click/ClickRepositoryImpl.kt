@@ -60,6 +60,8 @@ class ClickRepositoryImpl(
     override suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click> {
         return withContext(ioDispatcher) {
             delay(5000)
+//            val clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+
             return@withContext clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
@@ -117,7 +119,7 @@ class ClickRepositoryImpl(
             val clicks = mutableListOf<Click>()
             val accountId = preferenceProvider.getAccountId()
             var now = OffsetDateTime.now()
-            for (i in 0..1000) {
+            for (i in 0..100) {
                 now = now.plusMinutes(1)
                 clicks.add(Click(UUID.randomUUID(), accountId!!, "test-$i", "photo", OffsetDateTime.from(now)))
             }

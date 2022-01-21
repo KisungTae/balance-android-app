@@ -22,6 +22,7 @@ class MatchPagingSource(
         val matches = loadMatches(params.loadSize, (currentPage * params.loadSize))
         val prevPage = if (currentPage >= 1) currentPage - 1 else null
         val nextPage = if (matches.isEmpty()) null else currentPage + 1
+//        println("prevPage: $prevPage | currentPage: $currentPage | nextPage: $nextPage | matches.size(): ${matches.size}")
         return LoadResult.Page(matches, prevPage, nextPage)
     }
 

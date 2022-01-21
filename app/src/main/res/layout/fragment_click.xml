@@ -13,72 +13,109 @@
         android:background="@color/BackgroundWhite"
         app:contentInsetStart="0dp">
 
+        <com.beeswork.balance.ui.common.GradientTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/click_tool_bar_title"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_head"
+            android:textStyle="bold"
+            app:endColor="@color/TextWhite"
+            app:startColor="@color/Primary" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvClick"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="10dp"
+            tools:listitem="@layout/item_click" />
+
+        <FrameLayout
+            android:id="@+id/llClickInitialLoadingPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tvClickHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/click_header_title"
+                android:textAlignment="center"
+                android:textColor="@color/TextGrey" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvClickProgressBar"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
+                android:layout_gravity="center"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Primary" />
+
+        </FrameLayout>
+
         <LinearLayout
+            android:id="@+id/llClickInitialErrorPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="10dp">
 
-            <View
-                android:layout_width="@dimen/icon_medium"
-                android:layout_height="@dimen/icon_medium" />
-
-            <com.beeswork.balance.ui.common.GradientTextView
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvClickErrorMessage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/click_tool_bar_title"
+                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="10dp"
+                android:text="@string/error_generic_try_later"
                 android:textAlignment="center"
-                android:textSize="@dimen/text_head"
-                android:textStyle="bold"
-                app:endColor="@color/TextWhite"
-                app:startColor="@color/Primary" />
+                android:textSize="@dimen/text_large" />
 
-            <FrameLayout
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnClickRetry"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:id="@+id/skvClickLoading"
-                    android:layout_width="@dimen/icon_medium"
-                    android:layout_height="@dimen/icon_medium"
-                    android:gravity="center"
-                    android:visibility="invisible">
-
-                    <com.github.ybq.android.spinkit.SpinKitView
-                        style="@style/SpinKitView.Large.Circle"
-                        android:layout_width="@dimen/icon_small"
-                        android:layout_height="@dimen/icon_small"
-                        android:layout_gravity="center"
-                        app:SpinKit_Color="@color/GreyDark" />
-
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/btnClickRefresh"
-                    android:layout_width="@dimen/icon_medium"
-                    android:layout_height="@dimen/icon_medium"
-                    android:background="@color/white"
-                    android:contentDescription="@string/refresh_button_icon_description"
-                    android:src="@drawable/ic_refresh"
-                    android:visibility="gone" />
-
-            </FrameLayout>
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:backgroundTint="@color/Primary"
+                android:text="@string/retry"
+                android:textColor="@color/white" />
 
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/llClickInitialEmptyPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp">
 
-    </androidx.appcompat.widget.Toolbar>
+            <TextView
+                android:id="@+id/tvClickEmptyPageTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="10dp"
+                android:text="@string/title_click_empty_page"
+                android:textAlignment="center"
+                android:textColor="@color/TextGrey" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvClick"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingStart="0dp"
-        android:paddingEnd="10dp"
-        tools:listitem="@layout/item_click" />
+        </LinearLayout>
+
+    </FrameLayout>
+
 
 </LinearLayout>

@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.click
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.ExperimentalPagingApi
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import kotlinx.coroutines.CoroutineDispatcher

@@ -6,12 +6,13 @@
     android:layout_marginEnd="0dp">
 
     <TextView
-        android:textColor="@color/TextGrey"
+        android:id="@+id/tvClickHeaderTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="40dp"
-        android:id="@+id/tvClickHeaderTitle"
+        android:text="@string/click_header_title"
         android:textAlignment="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:textColor="@color/TextGrey" />
 
 </LinearLayout>

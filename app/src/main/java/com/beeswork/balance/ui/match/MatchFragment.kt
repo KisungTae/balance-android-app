@@ -6,6 +6,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 import com.beeswork.balance.data.network.response.Resource
@@ -59,8 +60,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MatchViewModel::class.java)
         bindUI()
-        viewModel.fetchMatches()
-        viewModel.fetchChatMessages()
+//        viewModel.fetchMatches()
+//        viewModel.fetchChatMessages()
+//        viewModel.testFunction()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -125,6 +127,14 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     private fun setupMatchRecyclerView() {
         matchPagingDataAdapter = MatchPagingDataAdapter(this@MatchFragment)
+
+        matchPagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+//                println("matchPagingDataAdapter onItemRangeInserted ${matchPagingDataAdapter.itemCount}")
+                super.onItemRangeInserted(positionStart, itemCount)
+            }
+        })
+
         binding.rvMatch.adapter = matchPagingDataAdapter
         binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMatch.itemAnimator = null
@@ -156,7 +166,11 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         searchJob = lifecycleScope.launch {
             viewModel.initMatchPagingData(keyword.trim()).observe(viewLifecycleOwner, {
                 matchPagingRefreshAdapter.reset()
-                lifecycleScope.launch { matchPagingDataAdapter.submitData(it) }
+
+                lifecycleScope.launch {
+                    println("matchPagingDataAdapter.submitData(it)")
+                    matchPagingDataAdapter.submitData(it)
+                }
             })
         }
     }

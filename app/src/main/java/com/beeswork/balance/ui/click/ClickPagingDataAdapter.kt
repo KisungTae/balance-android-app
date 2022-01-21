@@ -30,8 +30,7 @@ class ClickPagingDataAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ClickDomain.Type.HEADER.ordinal -> HeaderViewHolder(
-                ItemClickHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                parent.context
+                ItemClickHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
             else -> ItemViewHolder(
                 ItemClickBinding.inflate(LayoutInflater.from(parent.context), parent, false),
@@ -42,13 +41,11 @@ class ClickPagingDataAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+//        println("onBindViewHolder: $position")
         getItem(position)?.let {
             when (holder.itemViewType) {
                 ClickDomain.Type.HEADER.ordinal -> (holder as HeaderViewHolder).bind()
-                else -> {
-
-                    (holder as ItemViewHolder).bind(it)
-                }
+                ClickDomain.Type.ITEM.ordinal -> (holder as ItemViewHolder).bind(it)
             }
         }
     }
@@ -80,12 +77,9 @@ class ClickPagingDataAdapter(
 
     class HeaderViewHolder(
         private val binding: ItemClickHeaderBinding,
-        private val context: Context
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind() {
-            binding.tvClickHeaderTitle.text = context.getString(R.string.click_header_title)
-        }
+        fun bind() {}
     }
 
     class ItemViewHolder(

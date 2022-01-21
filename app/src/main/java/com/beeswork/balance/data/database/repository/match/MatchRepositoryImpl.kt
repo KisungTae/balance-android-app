@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.threeten.bp.OffsetDateTime
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -256,6 +257,16 @@ class MatchRepositoryImpl(
     override fun testFunction() {
 //        _chatMessageReceiptLiveData.postValue(Resource.error(""))
         CoroutineScope(ioDispatcher).launch {
+
+            val matches = mutableListOf<Match>()
+            val accountId = preferenceProvider.getAccountId()
+            var now = OffsetDateTime.now()
+            for (i in 4..1000) {
+                now = now.plusMinutes(1)
+                matches.add(Match(i.toLong(), accountId!!, UUID.randomUUID(), true, false, "test-$i", null, now))
+            }
+            matchDAO.insert(matches)
+
 //            createDummyMatch()
 //            createDummyChatMessages()
 //            matchDAO.insert(Match(Random.nextLong(), UUID.randomUUID(), false, false, "test match", "", OffsetDateTime.now()))

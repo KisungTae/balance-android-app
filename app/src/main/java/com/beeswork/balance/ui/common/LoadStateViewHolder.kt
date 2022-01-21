@@ -17,9 +17,9 @@ class LoadStateViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.layout_load_state, parent, false)
 ) {
     private val binding = LayoutLoadStateBinding.bind(itemView)
-    private val skvProgressBar = binding.skvProgressBar
-    private val tvErrorMessage = binding.tvErrorMessage
-    private val btnRetry: Button = binding.btnRetry.also {
+    private val skvProgressBar = binding.skvLoadStateProgressBar
+    private val tvErrorMessage = binding.tvLoadStateErrorMessage
+    private val btnRetry: Button = binding.btnLoadStateRetry.also {
         it.setOnClickListener { retry() }
     }
 

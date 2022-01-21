@@ -23,12 +23,12 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/click_profile_photo_image_view_description" />
 
-<!--     TODO: remove me   -->
+        <!--     TODO: remove me   -->
         <TextView
             android:id="@+id/clickName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp"/>
+            android:textSize="30sp" />
 
         <View
             android:layout_width="match_parent"

@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.mainviewpager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
+import androidx.paging.ExperimentalPagingApi
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import com.beeswork.balance.ui.account.AccountFragment
@@ -22,12 +23,13 @@ class MainViewPagerAdapter(
         return MainViewPagerTabPosition.values().size
     }
 
+
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            MainViewPagerTabPosition.ACCOUNT.ordinal -> addToFragments(AccountFragment())
-            MainViewPagerTabPosition.SWIPE.ordinal -> addToFragments(SwipeFragment())
-            MainViewPagerTabPosition.CLICK.ordinal -> addToFragments(ClickFragment())
-            MainViewPagerTabPosition.MATCH.ordinal -> addToFragments(MatchFragment())
+            MainViewPagerTabPosition.ACCOUNT.ordinal -> addToFragments(position, AccountFragment())
+            MainViewPagerTabPosition.SWIPE.ordinal -> addToFragments(position, SwipeFragment())
+            MainViewPagerTabPosition.CLICK.ordinal -> addToFragments(position, ClickFragment())
+            MainViewPagerTabPosition.MATCH.ordinal -> addToFragments(position, MatchFragment())
             else -> fragments[1]
         }
     }
@@ -36,8 +38,8 @@ class MainViewPagerAdapter(
         super.onBindViewHolder(holder, position, payloads)
     }
 
-    private fun addToFragments(fragment: Fragment): Fragment {
-        fragments.add(fragment)
+    private fun addToFragments(position: Int, fragment: Fragment): Fragment {
+        fragments.add(position, fragment)
         return fragment
     }
 

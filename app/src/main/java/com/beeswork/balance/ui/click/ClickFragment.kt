@@ -7,46 +7,40 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentClickBinding
 import com.beeswork.balance.databinding.SnackBarNewClickBinding
-import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
-import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
-import com.beeswork.balance.ui.common.BaseFragment
-import com.beeswork.balance.ui.common.PagingRefreshAdapter
-import com.beeswork.balance.ui.common.ViewPagerChildFragment
-import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameDialog
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import java.util.*
 
-
 class ClickFragment : BaseFragment(),
     KodeinAware,
     ClickPagingDataAdapter.OnClickListener,
-    ErrorDialog.OnRetryListener,
     ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ClickViewModelFactory by instance()
     private lateinit var viewModel: ClickViewModel
-    private lateinit var clickPagingRefreshAdapter: PagingRefreshAdapter<ClickDomain, RecyclerView.ViewHolder>
     private lateinit var binding: FragmentClickBinding
+    private lateinit var clickPagingRefreshAdapter: PagingRefreshAdapter<ClickDomain, RecyclerView.ViewHolder>
+    private lateinit var clickPagingDataAdapter: ClickPagingDataAdapter
+    private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
+    private lateinit var clickPagingInitialPageAdapter: PagingInitialPageAdapter<ClickDomain, RecyclerView.ViewHolder>
     private var newClickSnackBar: Snackbar? = null
-    private val clickPagingDataAdapter by lazy { ClickPagingDataAdapter(this) }
 
-    private val footerLoadStateAdapter = BalanceLoadStateAdapter(clickPagingDataAdapter::retry)
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,33 +51,25 @@ class ClickFragment : BaseFragment(),
         return binding.root
     }
 
-    @ExperimentalPagingApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
-//        viewModel.fetchClicks()
-//        viewModel.test()
+        viewModel.test()
 
     }
 
-    @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
         setupClickRecyclerView()
-        setupClickInvalidationObserver()
-        setupFetchClicksObserver()
-        setupNewClickLiveDataObserver()
-        setupClickPagingDataObserver()
-        setupToolbar()
+        setupClickPagingInitialPageAdapter()
+        observeClickInvalidation()
+        observeNewClickLiveData()
+        observeClickPagingData()
     }
 
-    private fun setupToolbar() {
-        binding.btnClickRefresh.setOnClickListener { viewModel.fetchClicks() }
-    }
-
-    private suspend fun setupNewClickLiveDataObserver() {
-        viewModel.newClickLiveData.await().observe(viewLifecycleOwner) {
-            showNewClickSnackBar(it)
+    private suspend fun observeNewClickLiveData() {
+        viewModel.newClickLiveData.await().observe(viewLifecycleOwner) { clickDomain ->
+            showNewClickSnackBar(clickDomain)
         }
     }
 
@@ -113,69 +99,46 @@ class ClickFragment : BaseFragment(),
         snackBar.show()
     }
 
-    private fun setupFetchClicksObserver() {
-        viewModel.fetchClicks.observe(viewLifecycleOwner) { resource ->
-            when {
-                resource.isSuccess() -> {
-                    binding.btnClickRefresh.visibility = View.GONE
-                    binding.skvClickLoading.visibility = View.INVISIBLE
-                }
-                resource.isLoading() -> {
-                    binding.btnClickRefresh.visibility = View.GONE
-                    binding.skvClickLoading.visibility = View.VISIBLE
-                }
-                resource.isError() && validateLogin(resource) -> {
-                    showFetchClickError(resource.error, resource.errorMessage)
-                }
-            }
-        }
-    }
-
-    private fun showFetchClickError(error: String?, errorMessage: String?) {
-        binding.btnClickRefresh.visibility = View.VISIBLE
-        binding.skvClickLoading.visibility = View.GONE
-        val errorTitle = getString(R.string.fetch_clicks_exception_title)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_CLICKS, this, childFragmentManager)
-    }
-
-    @ExperimentalPagingApi
-    private fun setupClickPagingDataObserver() {
-        viewModel.initClickPagingData().observe(viewLifecycleOwner) {
+    private fun observeClickPagingData() {
+        viewModel.initClickPagingData().observe(viewLifecycleOwner, {
+            clickPagingRefreshAdapter.reset()
             lifecycleScope.launch {
+                println("clickPagingDataAdapter.submitData(it)")
                 clickPagingDataAdapter.submitData(it)
             }
-        }
+        })
     }
 
-    private suspend fun setupClickInvalidationObserver() {
+    private suspend fun observeClickInvalidation() {
         viewModel.clickInvalidation.await().observe(viewLifecycleOwner) {
             clickPagingRefreshAdapter.refresh()
         }
     }
 
+
+
     private fun setupClickRecyclerView() {
-
-        clickPagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                println("clickPagingDataAdapter.itemCount ${clickPagingDataAdapter.itemCount}")
-                super.onItemRangeInserted(positionStart, itemCount)
-            }
-        })
-
-
+        clickPagingDataAdapter = ClickPagingDataAdapter(this@ClickFragment)
+        footerLoadStateAdapter = BalanceLoadStateAdapter(clickPagingDataAdapter::retry)
         binding.rvClick.adapter = clickPagingDataAdapter.withLoadStateFooter(
             footer = footerLoadStateAdapter
         )
         val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, CLICK_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                if (position >= clickPagingDataAdapter.itemCount && footerLoadStateAdapter.itemCount > 0) {
+                // NOTE 1.  if you call clickPagingDataAdapter.getItemViewType(position), it will cause an infinite loop of load()
+                //          when it reaches to the max page size. I don't know why but below code only gives the header span count of 2
+                // NOTE 2.  if you put delay(10000) in loadClicks(), then it will make the first card of current pages span of 2, but
+                //          prepend will always have pages to load so it won't call API so no delay when scroll up
+
+                if (position == clickPagingDataAdapter.itemCount && footerLoadStateAdapter.itemCount > 0) {
                     return FOOTER_SPAN_COUNT
                 }
-                return when (clickPagingDataAdapter.getItemViewType(position)) {
-                    ClickDomain.Type.ITEM.ordinal -> ITEM_SPAN_COUNT
-                    ClickDomain.Type.HEADER.ordinal -> HEADER_SPAN_COUNT
-                    else -> HEADER_SPAN_COUNT
+
+                return if (position == 0) {
+                    HEADER_SPAN_COUNT
+                } else {
+                    ITEM_SPAN_COUNT
                 }
             }
         }
@@ -184,8 +147,24 @@ class ClickFragment : BaseFragment(),
         clickPagingRefreshAdapter = PagingRefreshAdapter(binding.rvClick, clickPagingDataAdapter)
     }
 
+    private fun setupClickPagingInitialPageAdapter() {
+        binding.btnClickRetry.setOnClickListener {
+            clickPagingDataAdapter.retry()
+        }
+        clickPagingInitialPageAdapter = PagingInitialPageAdapter(
+            clickPagingDataAdapter,
+            binding.llClickInitialLoadingPage,
+            binding.llClickInitialErrorPage,
+            binding.llClickInitialEmptyPage,
+        )
+        lifecycleScope.launch {
+            clickPagingDataAdapter.loadStateFlow.collect { loadState ->
+                clickPagingInitialPageAdapter.updateUI(loadState)
+            }
+        }
+    }
+
     override fun onFragmentSelected() {
-//        viewModel.fetchClicks()
     }
 
     override fun onSelectClick(position: Int) {
@@ -204,16 +183,10 @@ class ClickFragment : BaseFragment(),
         const val CLICK_PAGE_SPAN_COUNT = 2
     }
 
-    override fun onRetry(requestCode: Int?) {
-        when (requestCode) {
-            RequestCode.FETCH_CLICKS -> viewModel.fetchClicks()
-        }
-    }
-
 
     override fun onResume() {
         super.onResume()
-        clickPagingDataAdapter.refresh()
+//        clickPagingDataAdapter.refresh()
     }
 
 
