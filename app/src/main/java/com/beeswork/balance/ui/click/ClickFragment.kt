@@ -115,8 +115,6 @@ class ClickFragment : BaseFragment(),
         }
     }
 
-
-
     private fun setupClickRecyclerView() {
         clickPagingDataAdapter = ClickPagingDataAdapter(this@ClickFragment)
         footerLoadStateAdapter = BalanceLoadStateAdapter(clickPagingDataAdapter::retry)
@@ -159,6 +157,7 @@ class ClickFragment : BaseFragment(),
         )
         lifecycleScope.launch {
             clickPagingDataAdapter.loadStateFlow.collect { loadState ->
+
                 clickPagingInitialPageAdapter.updateUI(loadState)
             }
         }

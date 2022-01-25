@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -32,8 +33,7 @@ class ProfileRepositoryImpl(
 
     override suspend fun fetchProfile(): Resource<Profile> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             val response = profileRDS.fetchProfile()
             if (response.isSuccess()) response.data?.let { profileDTO ->
@@ -47,8 +47,7 @@ class ProfileRepositoryImpl(
 
     override suspend fun saveAbout(height: Int?, about: String): Resource<Profile> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             profileDAO.updateSynced(accountId, false)
             val response = profileRDS.saveAbout(height, about)

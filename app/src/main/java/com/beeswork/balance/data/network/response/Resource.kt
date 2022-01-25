@@ -1,14 +1,12 @@
 package com.beeswork.balance.data.network.response
 
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.BaseException
 
 class Resource<out T>(
     val status: Status,
     val data: T?,
-    val error: String?,
-    val errorMessage: String?,
-    val fieldErrorMessages: Map<String, String>?
+    val exception: Throwable?
 ) {
     fun isSuccess(): Boolean {
         return this.status == Status.SUCCESS
@@ -22,23 +20,25 @@ class Resource<out T>(
         return this.status == Status.ERROR
     }
 
+    fun isExceptionEqualTo(error: String?): Boolean {
+        return if (exception is BaseException) {
+            exception.code == error
+        } else {
+            false
+        }
+    }
+
     fun <R> map(block: (T?) -> R?): Resource<R> {
         val newData = block.invoke(this.data)
-        return Resource(this.status, newData, this.error, this.errorMessage, this.fieldErrorMessages)
+        return Resource(this.status, newData, this.exception)
     }
 
     fun <P> mapData(data: P?): Resource<P> {
-        return Resource(this.status, data, this.error, this.errorMessage, this.fieldErrorMessages)
+        return Resource(this.status, data, this.exception)
     }
 
     fun toEmptyResponse(): Resource<EmptyResponse> {
-        return Resource(
-            this.status,
-            EmptyResponse(),
-            this.error,
-            this.errorMessage,
-            this.fieldErrorMessages
-        )
+        return Resource(this.status, EmptyResponse(), this.exception)
     }
 
     enum class Status {
@@ -49,35 +49,31 @@ class Resource<out T>(
 
     companion object {
         fun <T> success(data: T?): Resource<T> {
-            return Resource(Status.SUCCESS, data, null, null, null)
+            return Resource(Status.SUCCESS, data, null)
         }
 
-        fun <T> loadingWithData(data: T?): Resource<T> {
-            return Resource(Status.LOADING, data, null, null, null)
+        fun <T> loading(data: T?): Resource<T> {
+            return Resource(Status.LOADING, data, null)
         }
 
-        fun <T> error(
-            error: String?,
-            errorMessage: String?,
-            fieldErrorMessages: Map<String, String>?
-        ): Resource<T> {
-            return Resource(Status.ERROR, null, error, errorMessage, fieldErrorMessages)
-        }
+//        fun <T> error(error: String?, message: String?, fieldErrors: Map<String, String>?): Resource<T> {
+//            return Resource(Status.ERROR, null, ServerException(error, message, fieldErrors))
+//        }
+//
+//        fun <T> error(error: String?, message: String?): Resource<T> {
+//            return Resource(Status.ERROR, null, ServerException(error, message, null))
+//        }
+//
+//        fun <T> error(error: String): Resource<T> {
+//            return Resource(Status.ERROR, null, ServerException(error, null, null))
+//        }
 
-        fun <T> error(error: String?, errorMessage: String?): Resource<T> {
-            return Resource(Status.ERROR, null, error, errorMessage, null)
-        }
-
-        fun <T> error(error: String): Resource<T> {
-            return Resource(Status.ERROR, null, error, null, null)
-        }
-
-        fun <T> errorWithData(data: T?, error: String): Resource<T> {
-            return Resource(Status.ERROR, data, error, null, null)
+        fun <T> error(throwable: Throwable?): Resource<T> {
+            return Resource(Status.ERROR, null, throwable)
         }
 
         fun <T> loading(): Resource<T> {
-            return Resource(Status.LOADING, null, null, null, null)
+            return Resource(Status.LOADING, null, null)
         }
     }
 }

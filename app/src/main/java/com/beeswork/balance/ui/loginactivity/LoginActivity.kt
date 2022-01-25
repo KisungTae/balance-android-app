@@ -12,6 +12,7 @@ import com.beeswork.balance.databinding.ActivityLoginBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.exception.InvalidSocialLoginException
 import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
@@ -42,7 +43,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.socialLogin(account.id, account.idToken, LoginType.GOOGLE)
             } catch (e: ApiException) {
-                showLoginError(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION, null)
+                showLoginError(InvalidSocialLoginException())
             }
         }
     }

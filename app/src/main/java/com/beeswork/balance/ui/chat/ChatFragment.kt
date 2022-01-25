@@ -158,9 +158,10 @@ class ChatFragment : BaseFragment(),
     private fun observeSendChatMessageMediatorLiveData() {
         viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, { resource ->
             if (resource.isError() && validateLogin(resource)) {
-                if (resource.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) setupAsUnmatched()
-                val errorTitle = getString(R.string.error_title_send_chat_message)
-                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
+                if (resource.isExceptionEqualTo(ExceptionCode.MATCH_UNMATCHED_EXCEPTION)) {
+                    setupAsUnmatched()
+                }
+                ErrorDialog.show(getString(R.string.error_title_send_chat_message), resource.exception, childFragmentManager)
             }
         })
     }

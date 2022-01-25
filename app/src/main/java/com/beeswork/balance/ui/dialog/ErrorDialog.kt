@@ -1,12 +1,10 @@
 package com.beeswork.balance.ui.dialog
 
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogErrorBinding
@@ -15,9 +13,8 @@ import com.beeswork.balance.ui.common.BaseDialog
 import java.util.*
 
 class ErrorDialog(
-    private val error: String?,
-    private val errorTitle: String?,
-    private val errorMessage: String?,
+    private val title: String?,
+    private val throwable: Throwable?,
     private val requestCode: Int?,
     private val onRetryListener: OnRetryListener?,
     private val onDismissListener: OnDismissListener?,
@@ -42,7 +39,7 @@ class ErrorDialog(
 
     private fun bindUI() {
         setupRetryListener()
-        binding.tvErrorDialogTitle.text = errorTitle ?: resources.getString(R.string.error_title_generic)
+        binding.tvErrorDialogTitle.text = title ?: resources.getString(R.string.error_title_generic)
         binding.tvErrorDialogMessage.text = getErrorMessage(error, errorMessage)
         binding.btnErrorDialogClose.setOnClickListener { dismiss() }
     }
@@ -75,6 +72,10 @@ class ErrorDialog(
 
     companion object {
         const val TAG = "errorDialog"
+
+        fun show(title: String, throwable: Throwable?, fragmentManager: FragmentManager) {
+            ErrorDialog(title, throwable, null, null, null).show(fragmentManager, TAG)
+        }
 
         fun show(
             error: String?,

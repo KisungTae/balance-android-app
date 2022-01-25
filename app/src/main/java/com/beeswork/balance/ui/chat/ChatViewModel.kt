@@ -11,6 +11,9 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
+import com.beeswork.balance.internal.exception.ChatMessageEmptyException
+import com.beeswork.balance.internal.exception.ChatMessageOverSizedException
+import com.beeswork.balance.internal.exception.MatchUnmatchedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -96,13 +99,13 @@ class ChatViewModel(
             val bodySize = body.toByteArray().size
             when {
                 matchRepository.isUnmatched(chatId) -> _sendChatMessageLiveData.postValue(
-                    Resource.error(ExceptionCode.MATCH_UNMATCHED_EXCEPTION)
+                    Resource.error(MatchUnmatchedException())
                 )
                 bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
-                    Resource.error(ExceptionCode.CHAT_MESSAGE_OVER_SIZED_EXCEPTION)
+                    Resource.error(ChatMessageOverSizedException())
                 )
                 bodySize <= 0 -> _sendChatMessageLiveData.postValue(
-                    Resource.error(ExceptionCode.CHAT_MESSAGE_EMPTY_EXCEPTION)
+                    Resource.error(ChatMessageEmptyException())
                 )
                 else -> _sendChatMessageLiveData.postValue(
                     chatRepository.sendChatMessage(chatId, swipedId, body)
@@ -140,7 +143,7 @@ class ChatViewModel(
     }
 
     fun test2() {
-        _sendChatMessageLiveData.postValue(Resource.error("error"))
+//        _sendChatMessageLiveData.postValue(Resource.error("error"))
     }
 
     companion object {

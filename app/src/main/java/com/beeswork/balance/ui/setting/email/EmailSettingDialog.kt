@@ -92,7 +92,9 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
     private fun observeSaveEmailLiveData() {
         viewModel.saveEmailLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                resource.isSuccess() -> showSaveEmailSuccess()
+                resource.isSuccess() -> {
+                    showSaveEmailSuccess()
+                }
                 resource.isLoading() -> {
                     disableEdit()
                     showLoading()
@@ -116,7 +118,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
         val errorTitle = getString(R.string.error_title_save_email)
         ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
         hideLoadingAndRefreshBtn()
-        email?.let { _email -> binding.etEmailSettingEmail.setText(_email) }
+//        email?.let { _email -> binding.etEmailSettingEmail.setText(_email) }
     }
 
     private fun showLoading() {

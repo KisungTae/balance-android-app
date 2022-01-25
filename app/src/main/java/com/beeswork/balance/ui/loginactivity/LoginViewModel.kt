@@ -10,6 +10,7 @@ import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.exception.InvalidSocialLoginException
 import com.beeswork.balance.internal.mapper.login.LoginMapper
 import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -30,9 +31,11 @@ class LoginViewModel(
     }
 
     fun socialLogin(loginId: String?, accessToken: String?, loginType: LoginType) {
-        safeLet(loginId, accessToken) { _loginId, _accessToken ->
+        if (loginId.isNullOrBlank() || accessToken.isNullOrBlank()) {
+            _loginLiveData.postValue(Resource.error(InvalidSocialLoginException()))
+        } else {
             viewModelScope.launch(coroutineExceptionHandler) {
-                val response = loginRepository.socialLogin(_loginId, _accessToken, loginType)
+                val response = loginRepository.socialLogin(loginId, accessToken, loginType)
                 if (response.isSuccess()) response.data?.let { loginDTO ->
                     settingRepository.prepopulateFetchInfo()
                     if (loginDTO.profileExists && loginDTO.gender != null)
@@ -43,8 +46,6 @@ class LoginViewModel(
                     response.let { it.mapData(it.data?.let { loginDTO -> loginMapper.toLoginDomain(loginDTO) }) }
                 )
             }
-        } ?: kotlin.run {
-            _loginLiveData.postValue(Resource.error(ExceptionCode.INVALID_SOCIAL_LOGIN_EXCEPTION))
         }
     }
 }

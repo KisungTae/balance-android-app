@@ -9,6 +9,7 @@ import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.mapper.setting.PushSettingMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -34,9 +35,7 @@ class SettingRepositoryImpl(
 
     override suspend fun fetchPushSetting(): Resource<PushSetting> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
-
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val response = settingRDS.fetchPushSetting()
 
             if (response.isSuccess()) response.data?.let { pushSettingDTO ->
@@ -55,8 +54,7 @@ class SettingRepositoryImpl(
         emailPush: Boolean
     ): Resource<PushSetting> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             pushSettingDAO.updateSynced(accountId, false)
             val response = settingRDS.savePushSettings(

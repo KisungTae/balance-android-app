@@ -38,7 +38,7 @@ class PushSettingViewModel(
             if (isPushSettingSynced)
                 _fetchPushSettingLiveData.postValue(Resource.success(pushSettingDomain))
             else {
-                _fetchPushSettingLiveData.postValue(Resource.loadingWithData(pushSettingDomain))
+                _fetchPushSettingLiveData.postValue(Resource.loading(pushSettingDomain))
                 val response = settingRepository.fetchPushSetting().map {
                     it?.let { _pushSetting -> pushSettingMapper.toPushSettingDomain(_pushSetting) }
                 }

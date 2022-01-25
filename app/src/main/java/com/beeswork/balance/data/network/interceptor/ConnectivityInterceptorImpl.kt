@@ -19,7 +19,9 @@ class ConnectivityInterceptorImpl(
     private val appContext = context.applicationContext
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        if (!isOnline()) throw NoInternetConnectivityException()
+        if (!isOnline()) {
+            throw NoInternetConnectivityException()
+        }
 
         var request = chain.request()
         val noAuthentication = request.header(HttpHeader.NO_AUTHENTICATION).toBoolean()

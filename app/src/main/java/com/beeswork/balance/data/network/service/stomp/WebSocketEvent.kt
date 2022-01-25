@@ -1,27 +1,26 @@
 package com.beeswork.balance.data.network.service.stomp
 
 class WebSocketEvent(
-    val type: Type,
-    val error: String?,
-    val errorMessage: String?
+    val status: Status,
+    val throwable: Throwable?
 ) {
 
     fun isError(): Boolean {
-        return type == Type.ERROR
+        return status == Status.ERROR
     }
 
     companion object {
-        fun error(error: String?, errorMessage: String?): WebSocketEvent {
-            return WebSocketEvent(Type.ERROR, error, errorMessage)
+        fun error(throwable: Throwable?): WebSocketEvent {
+            return WebSocketEvent(Status.ERROR, throwable)
         }
 
         fun disconnect(): WebSocketEvent {
-            return WebSocketEvent(Type.CLOSED, null, null)
+            return WebSocketEvent(Status.CLOSED, null)
         }
     }
 
 
-    enum class Type {
+    enum class Status {
         OPENED,
         ERROR,
         CLOSED

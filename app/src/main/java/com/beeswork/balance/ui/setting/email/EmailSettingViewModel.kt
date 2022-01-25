@@ -3,8 +3,8 @@ package com.beeswork.balance.ui.setting.email
 import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.exception.InvalidEmailException
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 
@@ -33,8 +33,7 @@ class EmailSettingViewModel(
                 val response = loginRepository.saveEmail(email)
                 _saveEmailLiveData.postValue(response)
             } else {
-                val response = Resource.errorWithData(loginRepository.getEmail(), ExceptionCode.INVALID_EMAIL_EXCEPTION)
-                _saveEmailLiveData.postValue(response)
+                _saveEmailLiveData.postValue(Resource.error(InvalidEmailException()))
             }
         }
     }
@@ -49,7 +48,7 @@ class EmailSettingViewModel(
             if (loginRepository.isEmailSynced())
                 _fetchEmailLiveData.postValue(Resource.success(email))
             else {
-                _fetchEmailLiveData.postValue(Resource.loadingWithData(email))
+                _fetchEmailLiveData.postValue(Resource.loading(email))
                 _fetchEmailLiveData.postValue(loginRepository.fetchEmail())
             }
         }

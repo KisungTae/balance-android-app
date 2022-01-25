@@ -17,6 +17,7 @@ import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PushType
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -72,8 +73,7 @@ class MatchRepositoryImpl(
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             val response = matchRDS.listMatches(fetchInfoDAO.findMatchFetchedAt(accountId))
 
@@ -186,8 +186,7 @@ class MatchRepositoryImpl(
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             val response = matchRDS.click(swipedId, answers)
             response.data?.let { matchDTO ->

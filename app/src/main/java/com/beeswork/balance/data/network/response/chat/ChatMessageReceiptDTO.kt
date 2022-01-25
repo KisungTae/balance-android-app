@@ -5,6 +5,7 @@ import java.util.*
 
 data class ChatMessageReceiptDTO(
     val id: UUID?,
+    val body: String?,
     val chatId: Long?,
     val createdAt: OffsetDateTime?,
     val error: String?

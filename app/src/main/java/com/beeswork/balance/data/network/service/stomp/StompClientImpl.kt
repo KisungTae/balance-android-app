@@ -10,7 +10,10 @@ import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.internal.exception.AccessTokenNotFoundException
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.NoInternetConnectivityException
+import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -77,9 +80,9 @@ class StompClientImpl(
                 } else if (response.isError()) {
                     println("response.isError()")
                     webSocketState.setRefreshAccessToken(true)
-                    if (ExceptionCode.isLoginException(response.error) || response.error == ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION) {
+                    if (ExceptionCode.isLoginException(response.exception) || response.exception is NoInternetConnectivityException) {
                         disconnect(false, null)
-                        sendErrorWebSocketEvent(response.error, response.errorMessage)
+                        sendErrorWebSocketEvent(response.exception)
                     }
                     return
                 }
@@ -103,16 +106,17 @@ class StompClientImpl(
 
     private suspend fun connectToStomp() {
         println("private fun connectToStomp()")
-        preferenceProvider.getAccessToken()?.let { accessToken ->
+        val accessToken = preferenceProvider.getAccessToken()
+        if (accessToken.isNullOrBlank()) {
+            disconnect(false, null)
+            sendErrorWebSocketEvent(AccessTokenNotFoundException())
+        } else {
             val headers = mutableMapOf<String, String>()
             headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
             headers[StompHeader.HEART_BEAT] = DEFAULT_HEART_BEAT
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.ACCESS_TOKEN] = accessToken
             socket?.send(StompFrame(StompFrame.Command.CONNECT, headers, null).compile())
-        } ?: kotlin.run {
-            disconnect(false, null)
-            sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
         }
     }
 
@@ -156,7 +160,7 @@ class StompClientImpl(
             missedChatMessageKeys.clear()
             if (t is NoInternetConnectivityException) {
                 webSocketState.setReconnect(false)
-                sendErrorWebSocketEvent(ExceptionCode.getExceptionCodeFrom(t), null)
+                sendErrorWebSocketEvent(t)
             }
             connectWebSocket(RECONNECT_DELAY)
         }
@@ -211,8 +215,8 @@ class StompClientImpl(
                 webSocketState.setRefreshAccessToken(true)
             }
             ExceptionCode.isLoginException(stompFrame.getError()) -> {
-                webSocketState.update(false, true, null, null)
-                val webSocketEvent = WebSocketEvent.error(stompFrame.getError(), stompFrame.getErrorMessage())
+                webSocketState.update(reconnect = false, refreshAccessToken = true, disconnectedByUser = null, webSocketStatus = null)
+                val webSocketEvent = WebSocketEvent.error(ServerException(stompFrame.getError(), stompFrame.getErrorMessage()))
                 webSocketEventChannel.send(webSocketEvent)
             }
         }
@@ -232,7 +236,12 @@ class StompClientImpl(
         println("private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO)")
 
         if (webSocketState.isStompConnected()) {
-            preferenceProvider.getAccessToken()?.let { accessToken ->
+            val accessToken = preferenceProvider.getAccessToken()
+            if (accessToken.isNullOrBlank()) {
+                disconnect(false, null)
+                chatRepository.clearChatMessage(chatMessageDTO.id)
+                sendErrorWebSocketEvent(AccessTokenNotFoundException())
+            } else {
                 val headers = mutableMapOf<String, String>()
                 headers[StompHeader.DESTINATION] = EndPoint.STOMP_SEND_ENDPOINT
                 headers[StompHeader.RECEIPT] = chatMessageDTO.id.toString()
@@ -240,10 +249,6 @@ class StompClientImpl(
                 headers[HttpHeader.ACCESS_TOKEN] = accessToken
                 val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
                 outgoing.send(stompFrame.compile())
-            } ?: kotlin.run {
-                disconnect(false, null)
-                chatRepository.clearChatMessage(chatMessageDTO.id)
-                sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
             }
         } else {
             if (webSocketState.isDisconnected()) {
@@ -270,13 +275,13 @@ class StompClientImpl(
         println("private fun subscribeToQueue()")
         val accountId = preferenceProvider.getAccountId()
         if (accountId == null) {
-            sendErrorWebSocketEvent(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION, null)
+            sendErrorWebSocketEvent(AccountIdNotFoundException())
             return
         }
 
         val accessToken = preferenceProvider.getAccessToken()
-        if (accessToken == null) {
-            sendErrorWebSocketEvent(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION, null)
+        if (accessToken.isNullOrBlank()) {
+            sendErrorWebSocketEvent(AccessTokenNotFoundException())
             return
         }
 
@@ -289,8 +294,8 @@ class StompClientImpl(
         }
     }
 
-    private fun sendErrorWebSocketEvent(error: String?, errorMessage: String?) {
-        val webSocketEvent = WebSocketEvent.error(error, errorMessage)
+    private fun sendErrorWebSocketEvent(throwable: Throwable?) {
+        val webSocketEvent = WebSocketEvent.error(throwable)
         applicationScope.launch {
             webSocketEventChannel.send(webSocketEvent)
         }

@@ -1,10 +1,7 @@
 package com.beeswork.balance.internal.exception
 
-import java.lang.RuntimeException
-
-class AccessTokenNotFoundException(
-    errorMessage: String?
-): RuntimeException(errorMessage)   {
-
-    constructor() : this(null)
+class AccessTokenNotFoundException : BaseException(CODE, null) {
+    companion object {
+        const val CODE = "access_token_not_found_exception"
+    }
 }

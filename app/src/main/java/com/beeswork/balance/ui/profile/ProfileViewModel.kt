@@ -8,8 +8,10 @@ import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PhotoStatus
+import com.beeswork.balance.internal.exception.PhotoNotExistException
+import com.beeswork.balance.internal.exception.PhotoNotSupportedTypeException
+import com.beeswork.balance.internal.exception.PhotoOverSizeException
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.ui.common.BaseViewModel
@@ -57,7 +59,7 @@ class ProfileViewModel(
             if (isProfileSynced)
                 _fetchProfileLiveData.postValue(Resource.success(profileDomain))
             else {
-                _fetchProfileLiveData.postValue(Resource.loadingWithData(profileDomain))
+                _fetchProfileLiveData.postValue(Resource.loading(profileDomain))
                 val response = profileRepository.fetchProfile().map {
                     it?.let { _profile -> profileMapper.toProfileDomain(_profile) }
                 }
@@ -114,20 +116,20 @@ class ProfileViewModel(
                 val response = photoRepository.uploadPhoto(photoFile, photoUri, extension, photoKey)
                 _uploadPhotoLiveData.postValue(response)
             } else photoKey?.let { key -> photoRepository.updatePhotoStatus(key, PhotoStatus.UPLOAD_ERROR) }
-        } ?: _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION))
+        } ?: _uploadPhotoLiveData.postValue(Resource.error(PhotoNotExistException()))
     }
 
     private fun validatePhoto(photoFile: File, extension: String): Boolean {
         if (!photoFile.exists()) {
-            _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_NOT_EXIST_EXCEPTION))
+            _uploadPhotoLiveData.postValue(Resource.error(PhotoNotExistException()))
             return false
         }
         if (photoFile.length() > MAX_SIZE) {
-            _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_OVER_SIZE_EXCEPTION))
+            _uploadPhotoLiveData.postValue(Resource.error(PhotoOverSizeException()))
             return false
         }
         if (!photoExtensions.contains(extension)) {
-            _uploadPhotoLiveData.postValue(Resource.error(ExceptionCode.PHOTO_NOT_SUPPORTED_TYPE_EXCEPTION))
+            _uploadPhotoLiveData.postValue(Resource.error(PhotoNotSupportedTypeException()))
             return false
         }
         return true

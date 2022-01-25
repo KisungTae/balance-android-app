@@ -14,6 +14,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
@@ -66,8 +67,7 @@ class ChatRepositoryImpl(
 
     override suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
             chatMessageDAO.insert(chatMessage)
             sendChatMessage(chatMessageMapper.toChatMessageDTO(chatMessage, accountId, swipedId))
@@ -88,8 +88,7 @@ class ChatRepositoryImpl(
 
     override suspend fun resendChatMessage(chatMessageId: UUID?): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             chatMessageDAO.findChatMessageToSendTupleById(chatMessageId)?.let { chatMessageToSendTuple ->
                 chatMessageDAO.updateStatusById(chatMessageToSendTuple.id, ChatMessageStatus.SENDING)
                 sendChatMessage(chatMessageMapper.toChatMessageDTO(chatMessageToSendTuple, accountId))
@@ -121,7 +120,7 @@ class ChatRepositoryImpl(
     override suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO) {
         withContext(ioDispatcher) {
             var chatId: Long? = null
-            safeLet(chatMessageReceiptDTO.createdAt, chatMessageDAO.findById(chatMessageReceiptDTO.id) ) { createdAt, chatMessage ->
+            safeLet(chatMessageReceiptDTO.createdAt, chatMessageDAO.findById(chatMessageReceiptDTO.id)) { createdAt, chatMessage ->
                 chatMessage.createdAt = createdAt
                 chatMessage.status = ChatMessageStatus.SENT
                 chatMessageDAO.insert(chatMessage)
@@ -136,7 +135,9 @@ class ChatRepositoryImpl(
                 if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
                     chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
                     matchDAO.updateAsUnmatched(chatId)
-                    chatMessageReceiptFlowListener?.onInvoke(Resource.error(ExceptionCode.MATCH_UNMATCHED_EXCEPTION))
+                    chatMessageReceiptFlowListener?.onInvoke(
+                        Resource.error(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body)
+                    )
                 } else {
                     chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
                 }
@@ -315,8 +316,6 @@ class ChatRepositoryImpl(
 //
 //            chatMessageDAO.insert(chatMessages)
 //        }
-
-
 
 
     }

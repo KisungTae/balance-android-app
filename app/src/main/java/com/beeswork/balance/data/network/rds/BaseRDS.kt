@@ -36,7 +36,7 @@ abstract class BaseRDS(
             } else {
                 println("getResult else")
                 val errorResponse = convertToErrorResponse(response)
-                if (errorResponse.error != ExceptionCode.EXPIRED_JWT_EXCEPTION) {
+                if (errorResponse.isExceptionEqualTo(ExceptionCode.EXPIRED_JWT_EXCEPTION)) {
                     return@sendRequest errorResponse
                 }
                 println("after getResult convertoErrorResponse")
@@ -59,17 +59,22 @@ abstract class BaseRDS(
 
     private fun <T> convertToErrorResponse(response: Response<T>): Resource<T> {
         val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-        return Resource.error(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
+        val serverException = ServerException(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
+        return Resource.error(serverException)
     }
 
 
     protected suspend fun doRefreshAccessToken(): Resource<RefreshAccessTokenDTO> {
         return sendRequest {
             val accessToken = preferenceProvider.getAccessToken()
-            if (accessToken.isNullOrBlank()) return@sendRequest Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
+            if (accessToken.isNullOrBlank()) {
+                return@sendRequest Resource.error(AccessTokenNotFoundException())
+            }
 
             val refreshToken = preferenceProvider.getRefreshToken()
-            if (refreshToken.isNullOrBlank()) return@sendRequest Resource.error(ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION)
+            if (refreshToken.isNullOrBlank()) {
+                return@sendRequest Resource.error(RefreshTokenNotFoundException())
+            }
 
             val refreshAccessTokenBody = RefreshAccessTokenBody(accessToken, refreshToken)
             val response = balanceAPI.refreshAccessToken(refreshAccessTokenBody)
@@ -110,22 +115,22 @@ abstract class BaseRDS(
             }
             eventType = parser.next()
         }
-        return Resource.error(error, message)
+        return Resource.error(ServerException(error, message))
     }
 
     private suspend fun <T> sendRequest(block: suspend () -> Resource<T>): Resource<T> {
         return try {
             block.invoke()
         } catch (e: SocketTimeoutException) {
-            Resource.error(ExceptionCode.SOCKET_TIMEOUT_EXCEPTION)
+            Resource.error(e)
         } catch (e: NoInternetConnectivityException) {
-            Resource.error(ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION)
+            Resource.error(e)
         } catch (e: ConnectException) {
-            Resource.error(ExceptionCode.CONNECT_EXCEPTION)
+            Resource.error(e)
         } catch (e: UnknownHostException) {
-            Resource.error(ExceptionCode.UNKNOWN_HOST_EXCEPTION)
+            Resource.error(e)
         } catch (e: AccessTokenNotFoundException) {
-            Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
+            Resource.error(e)
         }
     }
 

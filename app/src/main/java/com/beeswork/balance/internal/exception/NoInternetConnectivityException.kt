@@ -1,5 +1,7 @@
 package com.beeswork.balance.internal.exception
 
-import java.io.IOException
-
-class NoInternetConnectivityException: IOException()
+class NoInternetConnectivityException : BaseException(CODE, null) {
+    companion object {
+        const val CODE = "no_internet_connectivity_exception"
+    }
+}

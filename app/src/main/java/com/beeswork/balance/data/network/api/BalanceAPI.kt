@@ -56,7 +56,10 @@ interface BalanceAPI {
 
 
     @GET("click/list")
-    suspend fun listClicks(@Query(value = "fetchedAt") fetchedAt: OffsetDateTime): Response<List<ClickDTO>>
+    suspend fun listClicks(
+        @Query(value = "loadSize") loadSize: Int,
+        @Query(value = "startPosition") startPosition: Int
+    ): Response<List<ClickDTO>>
 
 
     @POST("login/social")

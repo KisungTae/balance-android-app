@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.repository.click
 
 import com.beeswork.balance.data.database.BalanceDatabase
+import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.dao.ClickDAO
 import com.beeswork.balance.data.database.dao.FetchInfoDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
@@ -31,6 +32,7 @@ class ClickRepositoryImpl(
 ) : ClickRepository {
 
     private var newClickFlowListener: NewClickFlowListener? = null
+    private val clickPageFetchDateTracker = PageFetchDateTracker()
 
     @ExperimentalCoroutinesApi
     override val newClickFlow: Flow<Click> = callbackFlow {
@@ -59,8 +61,26 @@ class ClickRepositoryImpl(
 
     override suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click> {
         return withContext(ioDispatcher) {
-            delay(5000)
-//            val clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+            val clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+
+            if (clicks.isEmpty()) {
+
+            }
+
+
+
+            if (clicks.isEmpty()) {
+                val response = clickRDS.listClicks(loadSize, startPosition)
+                println(response)
+            }
+
+
+            //            todo: remove me
+            val accountId = preferenceProvider.getAccountId()
+            println(accountId)
+
+            val accessToken = preferenceProvider.getAccessToken()
+            println(accessToken)
 
             return@withContext clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
@@ -68,30 +88,31 @@ class ClickRepositoryImpl(
 
     override suspend fun fetchClicks(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
-
-            val response = clickRDS.listClicks(fetchInfoDAO.findClickFetchedAt(accountId))
-
-            response.data?.let { data ->
-                var clickFetchedAt = OffsetDateTime.MIN
-                balanceDatabase.runInTransaction {
-                    data.forEach { clickDTO ->
-                        if (clickDTO.deleted)
-                            clickDAO.deleteBySwiperId(accountId, clickDTO.swiperId)
-                        else if (!matchDAO.existBySwipedId(accountId, clickDTO.swiperId)) {
-                            val click = clickMapper.toClick(clickDTO)
-                            click.swipedId = accountId
-                            clickDAO.insert(click)
-                        }
-                        if (clickDTO.updatedAt.isAfter(clickFetchedAt))
-                            clickFetchedAt = clickDTO.updatedAt
-                    }
-                }
-                if (clickFetchedAt.isAfter(OffsetDateTime.MIN))
-                    fetchInfoDAO.updateClickFetchedAt(accountId, clickFetchedAt)
-            }
-            return@withContext response.toEmptyResponse()
+//            val accountId = preferenceProvider.getAccountId()
+//                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+//
+//            val response = clickRDS.listClicks(fetchInfoDAO.findClickFetchedAt(accountId),)
+//
+//            response.data?.let { data ->
+//                var clickFetchedAt = OffsetDateTime.MIN
+//                balanceDatabase.runInTransaction {
+//                    data.forEach { clickDTO ->
+//                        if (clickDTO.deleted)
+//                            clickDAO.deleteBySwiperId(accountId, clickDTO.swiperId)
+//                        else if (!matchDAO.existBySwipedId(accountId, clickDTO.swiperId)) {
+//                            val click = clickMapper.toClick(clickDTO)
+//                            click.swipedId = accountId
+//                            clickDAO.insert(click)
+//                        }
+//                        if (clickDTO.updatedAt.isAfter(clickFetchedAt))
+//                            clickFetchedAt = clickDTO.updatedAt
+//                    }
+//                }
+//                if (clickFetchedAt.isAfter(OffsetDateTime.MIN))
+//                    fetchInfoDAO.updateClickFetchedAt(accountId, clickFetchedAt)
+//            }
+//            return@withContext response.toEmptyResponse()
+            return@withContext Resource.success(EmptyResponse())
         }
     }
 

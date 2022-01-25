@@ -47,7 +47,7 @@
 
     <string name="recent_chat_message_new_match">상대방에게 메세지를 보내보세요</string>
     <string name="recent_chat_message_invalid_match">상대방이 채팅방을 나갔습니다</string>
-    <string name="match.unmatched.exception">상대방이 떠난 채팅방입니다.</string>
+
 
     <string name="fetch_clicks_exception_title">클릭정보를 가져오는데 실패했습니다</string>
 
@@ -67,6 +67,7 @@
     <string name="fetch_matches_exception">매치정보를 가져오는데 실패했습니다</string>
     <string name="fetch_chat_messages_exception">채팅 메세지를 가져오는데 실패했습니다</string>
     <string name="account_identity_not_found_exception">로그인 정보가 정확하지않습니다. 다시 로그인 해주세요</string>
+
 
 
 
@@ -204,4 +205,10 @@
     <string name="register_name_hint"></string>
     <string name="title_click_empty_page">아직 내 취향에 클릭한 사람이 없어요.\n스와이프를 통해 상대방에게 관심을 보내세요</string>
     <string name="error_generic_try_later">해당요청을 처리하지 못했습니다. 잠시후에 다시 시도해주세요!</string>
+
+
+
+    <string name="access_token_not_found_exception">access_token_not_found_exception</string>
+    <string name="account_id_not_found_exception">account_id_not_found_exception</string>
+    <string name="match_unmatched_exception">match_unmatched_exception</string>
 </resources>

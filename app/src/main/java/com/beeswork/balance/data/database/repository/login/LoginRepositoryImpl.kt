@@ -9,10 +9,14 @@ import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
+import com.beeswork.balance.internal.exception.AccessTokenNotFoundException
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.internal.exception.RefreshTokenNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import java.lang.NullPointerException
 import java.util.*
 
 class LoginRepositoryImpl(
@@ -30,8 +34,7 @@ class LoginRepositoryImpl(
 
     override suspend fun saveEmail(email: String): Resource<String> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             loginDAO.updateSynced(accountId, false)
             val response = loginRDS.saveEmail(email)
@@ -55,8 +58,7 @@ class LoginRepositoryImpl(
 
     override suspend fun fetchEmail(): Resource<String> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val response = loginRDS.fetchEmail()
             if (response.isSuccess()) loginDAO.updateEmail(accountId, response.data)
             return@withContext response
@@ -75,7 +77,8 @@ class LoginRepositoryImpl(
     }
 
     override suspend fun login(): Resource<EmptyResponse> {
-        return Resource.error("error")
+//      todo: implement it
+        return Resource.error(NullPointerException())
     }
 
     override suspend fun deleteLogin() {
@@ -99,10 +102,14 @@ class LoginRepositoryImpl(
     override suspend fun loginWithRefreshToken(): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
             val accessToken = preferenceProvider.getAccessToken()
-            if (accessToken.isNullOrBlank()) return@withContext Resource.error(ExceptionCode.ACCESS_TOKEN_NOT_FOUND_EXCEPTION)
+            if (accessToken.isNullOrBlank()) {
+                return@withContext Resource.error(AccessTokenNotFoundException())
+            }
 
             val refreshToken = preferenceProvider.getRefreshToken()
-            if (refreshToken.isNullOrBlank()) return@withContext Resource.error(ExceptionCode.REFRESH_TOKEN_NOT_FOUND_EXCEPTION)
+            if (refreshToken.isNullOrBlank()) {
+                return@withContext Resource.error(RefreshTokenNotFoundException())
+            }
 
             val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken)
             if (response.isSuccess()) response.data?.let { loginDTO ->

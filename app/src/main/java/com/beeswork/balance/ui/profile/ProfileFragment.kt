@@ -436,7 +436,7 @@ class ProfileFragment : BaseFragment(),
                 }
                 resource.isSuccess() -> showSaveAboutSuccess()
                 resource.isError() && validateLogin(resource) -> {
-                    showSaveAboutError(resource.data, resource.error, resource.errorMessage, resource.fieldErrorMessages)
+                    showSaveAboutError(resource.data, resource.error, resource.errorMessage, resource.fieldErrors)
                 }
             }
         }
