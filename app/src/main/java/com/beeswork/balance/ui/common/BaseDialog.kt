@@ -7,13 +7,13 @@ import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseDialog : DialogFragment() {
 
-    protected fun validateLogin(resource: Resource<Any>): Boolean {
-        if (ExceptionCode.isLoginException(resource.error)) {
-            if (activity is MainActivity) {
-                (activity as MainActivity).moveToLoginActivity(resource.error, resource.errorMessage)
-            }
-            return false
-        }
-        return true
-    }
+//    protected fun validateLogin(exception: Throwable?): Boolean {
+//        if (ExceptionCode.isLoginException(exception)) {
+//            if (activity is MainActivity) {
+//                (activity as MainActivity).moveToLoginActivity(exception)
+//            }
+//            return false
+//        }
+//        return true
+//    }
 }

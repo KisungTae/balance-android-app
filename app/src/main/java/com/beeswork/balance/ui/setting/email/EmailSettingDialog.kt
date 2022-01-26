@@ -12,6 +12,8 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogEmailSettingBinding
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import kotlinx.coroutines.launch
@@ -19,7 +21,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListener {
+class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.RetryListener {
 
     override val kodein by closestKodein()
 
@@ -63,7 +65,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
     }
 
     private fun observeFetchEmailLiveData() {
-        viewModel.fetchEmailLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.fetchEmailLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isSuccess() -> showFetchEmailSuccess(resource.data)
                 resource.isLoading() -> {
@@ -71,7 +73,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
                     showLoading()
                     binding.etEmailSettingEmail.setText(resource.data)
                 }
-                resource.isError() && validateLogin(resource) -> showFetchEmailError(resource.error, resource.errorMessage)
+                resource.isError() -> showFetchEmailError(resource.exception)
             }
         }
     }
@@ -82,15 +84,16 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
         binding.etEmailSettingEmail.setText(email)
     }
 
-    private fun showFetchEmailError(error: String?, errorMessage: String?) {
+    private fun showFetchEmailError(exception: Throwable?) {
         showRefreshBtn()
         disableEdit()
-        val errorTitle = getString(R.string.error_title_fetch_email)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_EMAIL, this, childFragmentManager)
+        val title = getString(R.string.error_title_fetch_email)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, RequestCode.FETCH_EMAIL, this, childFragmentManager)
     }
 
     private fun observeSaveEmailLiveData() {
-        viewModel.saveEmailLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.saveEmailLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isSuccess() -> {
                     showSaveEmailSuccess()
@@ -99,8 +102,8 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
                     disableEdit()
                     showLoading()
                 }
-                resource.isError() && validateLogin(resource) -> {
-                    showSaveEmailError(resource.data, resource.error, resource.errorMessage)
+                resource.isError() -> {
+                    showSaveEmailError(resource.exception)
                 }
             }
         }
@@ -113,12 +116,12 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnRetryListene
         hideLoadingAndRefreshBtn()
     }
 
-    private fun showSaveEmailError(email: String?, error: String?, errorMessage: String?) {
+    private fun showSaveEmailError(exception: Throwable?) {
         enableEdit()
-        val errorTitle = getString(R.string.error_title_save_email)
-        ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
+        val title = getString(R.string.error_title_save_email)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, childFragmentManager)
         hideLoadingAndRefreshBtn()
-//        email?.let { _email -> binding.etEmailSettingEmail.setText(_email) }
     }
 
     private fun showLoading() {

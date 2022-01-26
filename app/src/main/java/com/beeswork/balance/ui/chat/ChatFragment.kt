@@ -15,8 +15,7 @@ import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidatio
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.internal.util.SnackBarHelper
-import com.beeswork.balance.internal.util.safeLet
+import com.beeswork.balance.internal.util.*
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.dialog.ConfirmDialog
@@ -33,12 +32,12 @@ import java.util.*
 
 class ChatFragment : BaseFragment(),
     KodeinAware,
-    ErrorDialog.OnDismissListener,
+    ErrorDialog.DismissListener,
     ChatMessagePagingAdapter.ChatMessageSentListener,
     ConfirmDialog.ConfirmDialogClickListener,
     ChatMoreMenuDialog.ChatMoreMenuDialogClickListener,
     ReportDialog.ReportDialogClickListener,
-    ErrorDialog.OnRetryListener {
+    ErrorDialog.RetryListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
@@ -79,9 +78,9 @@ class ChatFragment : BaseFragment(),
                 arguments.getBoolean(BundleKey.UNMATCHED)
             )
         } ?: kotlin.run {
-            val errorTitle = getString(R.string.error_title_open_chat)
-            val errorMessage = getString(R.string.error_title_chat_id_not_found)
-            ErrorDialog.show(errorTitle, errorMessage, this, childFragmentManager)
+            val title = getString(R.string.error_title_open_chat)
+            val message = getString(R.string.error_title_chat_id_not_found)
+            ErrorDialog.show(title, message, this, childFragmentManager)
         }
     }
 
@@ -112,19 +111,20 @@ class ChatFragment : BaseFragment(),
 
 
     private fun observeUnmatchLiveData() {
-        viewModel.unmatchLiveData.observe(viewLifecycleOwner, { resource ->
+        viewModel.unmatchLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 resource.isLoading() -> showLoading()
-                resource.isError() && validateLogin(resource) -> showUnmatchError(resource.error, resource.errorMessage)
+                resource.isError() -> showUnmatchErrorDialog(resource.exception)
             }
-        })
+        }
     }
 
-    private fun showUnmatchError(error: String?, errorMessage: String?) {
+    private fun showUnmatchErrorDialog(exception: Throwable?) {
         hideLoading()
-        val errorTitle = getString(R.string.error_title_report)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.REPORT_MATCH, this, childFragmentManager)
+        val title = getString(R.string.error_title_unmatch)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, RequestCode.UNMATCH, this, childFragmentManager)
     }
 
     private fun showLoading() {
@@ -136,34 +136,43 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun observeReportMatchLiveData() {
-        viewModel.reportMatchLiveData.observe(viewLifecycleOwner, { resource ->
+        viewModel.reportMatchLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
                 resource.isLoading() -> getReportDialog()?.showLoading()
-                resource.isError() && validateLogin(resource) -> showReportMatchError(resource.error, resource.errorMessage)
+                resource.isError() -> showReportMatchErrorDialog(resource.exception)
             }
-        })
+        }
     }
 
-    private fun showReportMatchError(error: String?, errorMessage: String?) {
+    private fun showReportMatchErrorDialog(exception: Throwable?) {
         getReportDialog()?.hideLoading()
-        val errorTitle = getString(R.string.error_title_report)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.REPORT_MATCH, this, childFragmentManager)
+        val title = getString(R.string.error_title_report)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, RequestCode.REPORT_MATCH, this, childFragmentManager)
     }
 
     private fun getReportDialog(): ReportDialog? {
-        return childFragmentManager.findFragmentByTag(ReportDialog.TAG)?.let { return@let it as ReportDialog }
+        return childFragmentManager.findFragmentByTag(ReportDialog.TAG)?.let {
+            return@let it as ReportDialog
+        }
     }
 
     private fun observeSendChatMessageMediatorLiveData() {
-        viewModel.sendChatMessageMediatorLiveData.observe(viewLifecycleOwner, { resource ->
-            if (resource.isError() && validateLogin(resource)) {
+        viewModel.sendChatMessageMediatorLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
+            if (resource.isError()) {
                 if (resource.isExceptionEqualTo(ExceptionCode.MATCH_UNMATCHED_EXCEPTION)) {
                     setupAsUnmatched()
                 }
-                ErrorDialog.show(getString(R.string.error_title_send_chat_message), resource.exception, childFragmentManager)
+                showSendChatMessageErrorDialog(resource.exception)
             }
-        })
+        }
+    }
+
+    private fun showSendChatMessageErrorDialog(exception: Throwable?) {
+        val title = getString(R.string.error_title_send_chat_message)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, childFragmentManager)
     }
 
     private suspend fun observeChatMessageInvalidation() {

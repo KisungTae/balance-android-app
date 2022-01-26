@@ -16,6 +16,7 @@ import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.RequestCode
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.chat.ChatFragment
 import com.beeswork.balance.ui.common.BaseFragment
@@ -33,7 +34,7 @@ import org.kodein.di.generic.instance
 import java.util.*
 
 class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchListener,
-    ErrorDialog.OnRetryListener, ViewPagerChildFragment {
+    ErrorDialog.RetryListener, ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MatchViewModelFactory by instance()
@@ -69,9 +70,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         setupMatchRecyclerView()
         setupToolBars()
         observeMatchInvalidation()
-        observeFetchMatchesLiveData()
+//        observeFetchMatchesLiveData()
         observeNewMatchLiveData()
-        observeFetchChatMessagesLiveData()
+//        observeFetchChatMessagesLiveData()
         search("")
     }
 
@@ -200,33 +201,34 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
     }
 
-    private fun observeFetchChatMessagesLiveData() {
-        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) { resource ->
-            fetchChatMessagesStatus = resource.status
-            updateRefreshBtn()
-            if (resource.isError() && validateLogin(resource))
-                showFetchChatMessagesError(resource.error, resource.errorMessage)
-        }
+//    private fun observeFetchChatMessagesLiveData() {
+//        viewModel.fetchChatMessagesLiveData.observe(viewLifecycleOwner) { resource ->
+//            fetchChatMessagesStatus = resource.status
+//            updateRefreshBtn()
+//            if (resource.isError() && validateLogin(resource.exception))
+//                showFetchChatMessagesError(resource.exception)
+//        }
+//    }
+
+    private fun showFetchChatMessagesError(exception: Throwable?) {
+        val title = getString(R.string.error_title_fetch_chat_messages)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, RequestCode.FETCH_CHAT_MESSAGES, this, childFragmentManager)
     }
 
-    private fun showFetchChatMessagesError(error: String?, errorMessage: String?) {
-        val errorTitle = getString(R.string.error_title_fetch_chat_messages)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_CHAT_MESSAGES, this, childFragmentManager)
-    }
+//    private fun observeFetchMatchesLiveData() {
+//        viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, { resource ->
+//            fetchMatchesStatus = resource.status
+//            updateRefreshBtn()
+//            if (resource.isError() && validateLogin(resource.exception))
+//                showFetchMatchesError(resource.error, resource.errorMessage)
+//        })
+//    }
 
-    private fun observeFetchMatchesLiveData() {
-        viewModel.fetchMatchesLiveData.observe(viewLifecycleOwner, { resource ->
-            fetchMatchesStatus = resource.status
-            updateRefreshBtn()
-            if (resource.isError() && validateLogin(resource))
-                showFetchMatchesError(resource.error, resource.errorMessage)
-        })
-    }
-
-    private fun showFetchMatchesError(error: String?, errorMessage: String?) {
-        val errorTitle = getString(R.string.error_title_fetch_matches)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_MATCHES, this, childFragmentManager)
-    }
+//    private fun showFetchMatchesError(error: String?, errorMessage: String?) {
+//        val errorTitle = getString(R.string.error_title_fetch_matches)
+//        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_MATCHES, this, childFragmentManager)
+//    }
 
     override fun onClick(position: Int) {
         val chatFragment = ChatFragment()

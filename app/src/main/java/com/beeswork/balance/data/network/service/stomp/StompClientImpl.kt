@@ -294,8 +294,8 @@ class StompClientImpl(
         }
     }
 
-    private fun sendErrorWebSocketEvent(throwable: Throwable?) {
-        val webSocketEvent = WebSocketEvent.error(throwable)
+    private fun sendErrorWebSocketEvent(exception: Throwable?) {
+        val webSocketEvent = WebSocketEvent.error(exception)
         applicationScope.launch {
             webSocketEventChannel.send(webSocketEvent)
         }

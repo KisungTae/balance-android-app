@@ -2,7 +2,7 @@ package com.beeswork.balance.data.network.service.stomp
 
 class WebSocketEvent(
     val status: Status,
-    val throwable: Throwable?
+    val exception: Throwable?
 ) {
 
     fun isError(): Boolean {
@@ -10,8 +10,8 @@ class WebSocketEvent(
     }
 
     companion object {
-        fun error(throwable: Throwable?): WebSocketEvent {
-            return WebSocketEvent(Status.ERROR, throwable)
+        fun error(exception: Throwable?): WebSocketEvent {
+            return WebSocketEvent(Status.ERROR, exception)
         }
 
         fun disconnect(): WebSocketEvent {

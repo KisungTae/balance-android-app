@@ -60,25 +60,25 @@ abstract class BalanceGame : BaseDialog() {
         setupListeners()
     }
 
-    protected fun showLoading(loadingMessage: String) {
+    protected fun showLoading(message: String) {
         showLayouts(View.GONE, View.VISIBLE, View.GONE)
-        balanceGameLoadingBinding.tvLoadingMessage.text = loadingMessage
+        balanceGameLoadingBinding.tvLoadingMessage.text = message
     }
 
-    protected fun showSaveError(error: String?, errorMessage: String?) {
-        showError(View.GONE, View.VISIBLE, getString(R.string.error_title_click), error, errorMessage)
+    protected fun showSaveError(message: String?) {
+        showError(View.GONE, View.VISIBLE, getString(R.string.error_title_click), message)
     }
 
-    protected fun showFetchQuestionsError(error: String?, errorMessage: String?) {
-        showError(View.VISIBLE, View.GONE, getString(R.string.error_title_fetch_question), error, errorMessage)
+    protected fun showFetchQuestionsError(message: String?) {
+        showError(View.VISIBLE, View.GONE, getString(R.string.error_title_fetch_question), message)
     }
 
-    private fun showError(fetchBtn: Int, saveBtn: Int, errorTitle: String, error: String?, errorMessage: String?) {
+    private fun showError(fetchBtn: Int, saveBtn: Int, title: String, message: String?) {
         showLayouts(View.GONE, View.GONE, View.VISIBLE)
         balanceGameErrorBinding.btnBalanceGameDialogFetch.visibility = fetchBtn
         balanceGameErrorBinding.btnBalanceGameDialogSave.visibility = saveBtn
-        balanceGameErrorBinding.tvBalanceGameDialogErrorTitle.text = errorTitle
-        balanceGameErrorBinding.tvBalanceGameDialogErrorMessage.text = errorMessage
+        balanceGameErrorBinding.tvBalanceGameDialogErrorTitle.text = title
+        balanceGameErrorBinding.tvBalanceGameDialogErrorMessage.text = message
 
 //        TODO: check setupErrorMessage
 //        setupErrorMessage(error, errorMessage, balanceGameErrorBinding.tvBalanceGameDialogErrorMessage)

@@ -26,15 +26,15 @@ class LoginViewModel(
     private val _loginLiveData = MutableLiveData<Resource<LoginDomain>>()
     val loginLiveData: LiveData<Resource<LoginDomain>> get() = _loginLiveData
 
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        _loginLiveData.postValue(Resource.error(null, throwable.message))
-    }
+//    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+//        _loginLiveData.postValue(Resource.error(throwable))
+//    }
 
     fun socialLogin(loginId: String?, accessToken: String?, loginType: LoginType) {
         if (loginId.isNullOrBlank() || accessToken.isNullOrBlank()) {
             _loginLiveData.postValue(Resource.error(InvalidSocialLoginException()))
         } else {
-            viewModelScope.launch(coroutineExceptionHandler) {
+            viewModelScope.launch {
                 val response = loginRepository.socialLogin(loginId, accessToken, loginType)
                 if (response.isSuccess()) response.data?.let { loginDTO ->
                     settingRepository.prepopulateFetchInfo()

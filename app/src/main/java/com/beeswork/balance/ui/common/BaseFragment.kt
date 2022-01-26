@@ -3,23 +3,30 @@ package com.beeswork.balance.ui.common
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.BaseException
 import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
 
-    protected fun validateLogin(resource: Resource<Any>): Boolean {
-        if (ExceptionCode.isLoginException(resource.error)) {
-            moveToLoginActivity(resource.error, resource.errorMessage)
-            return false
-        }
-        return true
-    }
-
-    protected fun moveToLoginActivity(error: String?, errorMessage: String?) {
-        if (activity is MainActivity) (activity as MainActivity).moveToLoginActivity(error, errorMessage)
-    }
+//    protected fun validateLogin(exception: Throwable?): Boolean {
+//        if (ExceptionCode.isLoginException(exception)) {
+//            moveToLoginActivity(exception)
+//            return false
+//        }
+//        return true
+//    }
+//
+//    protected fun moveToLoginActivity(exception: Throwable?) {
+//        if (activity is MainActivity) {
+//            val mainActivity = (activity as MainActivity)
+//            if (exception != null && exception is BaseException) {
+//                mainActivity.moveToLoginActivity(exception)
+//            } else {
+//                mainActivity.moveToLoginActivity(null)
+//            }
+//        }
+//    }
 
     protected fun moveToFragment(toFragment: Fragment, fromFragmentId: Int, fromFragmentTag: String) {
         activity?.supportFragmentManager?.beginTransaction()?.let { transaction ->
@@ -36,7 +43,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     protected fun popBackStack(fragmentTag: String) {
-        requireActivity().supportFragmentManager.popBackStack(
+        activity?.supportFragmentManager?.popBackStack(
             fragmentTag,
             FragmentManager.POP_BACK_STACK_INCLUSIVE
         )

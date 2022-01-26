@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogErrorBinding
@@ -14,12 +15,12 @@ import java.util.*
 
 class ErrorDialog(
     private val title: String?,
-    private val throwable: Throwable?,
+    private val message: String?,
     private val requestCode: Int?,
-    private val onRetryListener: OnRetryListener?,
-    private val onDismissListener: OnDismissListener?,
+    private val retryListener: RetryListener?,
+    private val dismissListener: DismissListener?,
     private val id: UUID? = null
-) : BaseDialog() {
+) : DialogFragment() {
 
     private lateinit var binding: DialogErrorBinding
 
@@ -40,15 +41,15 @@ class ErrorDialog(
     private fun bindUI() {
         setupRetryListener()
         binding.tvErrorDialogTitle.text = title ?: resources.getString(R.string.error_title_generic)
-        binding.tvErrorDialogMessage.text = getErrorMessage(error, errorMessage)
+        binding.tvErrorDialogMessage.text = message ?: ""
         binding.btnErrorDialogClose.setOnClickListener { dismiss() }
     }
 
     private fun setupRetryListener() {
-        onRetryListener?.let {
+        retryListener?.let {
             binding.btnErrorDialogRetry.setOnClickListener {
                 dismiss()
-                onRetryListener.onRetry(requestCode)
+                retryListener.onRetry(requestCode)
             }
         } ?: kotlin.run {
             binding.btnErrorDialogRetry.visibility = View.GONE
@@ -67,51 +68,30 @@ class ErrorDialog(
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismissListener?.onDismissErrorDialog(id)
+        dismissListener?.onDismissErrorDialog(id)
     }
 
     companion object {
         const val TAG = "errorDialog"
 
-        fun show(title: String, throwable: Throwable?, fragmentManager: FragmentManager) {
-            ErrorDialog(title, throwable, null, null, null).show(fragmentManager, TAG)
+        fun show(title: String, message: String?, fragmentManager: FragmentManager) {
+            ErrorDialog(title, message, null, null, null).show(fragmentManager, TAG)
         }
 
-        fun show(
-            error: String?,
-            errorTitle: String,
-            errorMessage: String?,
-            fragmentManager: FragmentManager
-        ) {
-            ErrorDialog(error, errorTitle, errorMessage, null, null, null).show(fragmentManager, TAG)
+        fun show(title: String, message: String?, dismissListener: DismissListener, fragmentManager: FragmentManager) {
+            ErrorDialog(title, message, null, null, dismissListener).show(fragmentManager, TAG)
         }
 
-        fun show(
-            error: String?,
-            errorTitle: String,
-            errorMessage: String?,
-            requestCode: Int,
-            retryListener: OnRetryListener,
-            fragmentManager: FragmentManager
-        ) {
-            ErrorDialog(error, errorTitle, errorMessage, requestCode, retryListener, null).show(fragmentManager, TAG)
-        }
-
-        fun show(
-            errorTitle: String,
-            errorMessage: String?,
-            onDismissListener: OnDismissListener?,
-            fragmentManager: FragmentManager
-        ) {
-            ErrorDialog(null, errorTitle, errorMessage, null, null, null).show(fragmentManager, TAG)
+        fun show(title: String, message: String?, requestCode: Int, retryListener: RetryListener, fragmentManager: FragmentManager) {
+            ErrorDialog(title, message, requestCode, retryListener, null).show(fragmentManager, TAG)
         }
     }
 
-    interface OnRetryListener {
+    interface RetryListener {
         fun onRetry(requestCode: Int?)
     }
 
-    interface OnDismissListener {
+    interface DismissListener {
         fun onDismissErrorDialog(id: UUID?)
     }
 

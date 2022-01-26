@@ -10,6 +10,8 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogSwipeBalanceGameBinding
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BalanceGame
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -64,12 +66,16 @@ class SwipeBalanceGameDialog(
     }
 
     private fun setupSwipeLiveDataObserver() {
-        viewModel.swipeLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.swipeLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
-                resource.isSuccess() -> resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
-                resource.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
-                resource.isError() && validateLogin(resource) -> {
-                    showFetchQuestionsError(resource.error, resource.errorMessage)
+                resource.isSuccess() -> {
+                    resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
+                }
+                resource.isLoading() -> {
+                    showLoading(getString(R.string.balance_game_loading_text))
+                }
+                resource.isError() -> {
+                    showFetchQuestionsError(MessageSource.getMessage(requireContext(), resource.exception))
                 }
             }
         }
@@ -90,7 +96,7 @@ class SwipeBalanceGameDialog(
                     }
                 }
                 resource.isLoading() -> showLoading(getString(R.string.balance_game_checking_text))
-                resource.isError() -> showSaveError(resource.error, resource.errorMessage)
+                resource.isError() -> showSaveError(MessageSource.getMessage(requireContext(), resource.exception))
             }
         }
     }

@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.observeResource
 
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
@@ -57,7 +59,7 @@ class SwipeFragment : BaseFragment(),
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
         setupSwipeCardStackView()
-        setupFetchCardsLiveDataObserver()
+        observeFetchCardsLiveData()
         observeLocationPermissionResultLiveData()
         binding.btnCardStackReload.setOnClickListener { viewModel.fetchCards() }
     }
@@ -66,35 +68,57 @@ class SwipeFragment : BaseFragment(),
         viewModel.locationPermissionResultLiveData.await().observe(viewLifecycleOwner) { granted ->
             granted?.let { _granted ->
                 if (_granted) {
-                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+                    updateSwipeLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
 //                    viewModel.fetchCards()
-                } else showLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE)
+                } else updateSwipeLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE)
             }
         }
     }
 
-    private fun setupFetchCardsLiveDataObserver() {
-        viewModel.fetchCards.observe(viewLifecycleOwner) { resource ->
+    private fun observeFetchCardsLiveData() {
+        viewModel.fetchCards.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isSuccess() -> resource.data?.let { cardDomains ->
-                    if (cardDomains.isEmpty()) showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                    else {
-                        showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                    if (cardDomains.isEmpty()) {
+                        updateSwipeLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                    } else {
+                        updateSwipeLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
                         cardStackAdapter.submitCards(cardDomains)
                         binding.csvSwipe.visibility = View.VISIBLE
                     }
                 }
-                resource.isLoading() -> showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                resource.isError() && validateLogin(resource) -> {
-                    val errorTitle = getString(R.string.fetch_card_exception_title)
-                    ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
-                    showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                resource.isLoading() -> updateSwipeLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                resource.isError() -> {
+                    updateSwipeLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                    val title = getString(R.string.fetch_card_exception_title)
+                    val message = MessageSource.getMessage(requireContext(), resource.exception)
+                    ErrorDialog.show(title, message, childFragmentManager)
                 }
             }
         }
+//        viewModel.fetchCards.observe(viewLifecycleOwner) { resource ->
+//            when {
+//                resource.isSuccess() -> resource.data?.let { cardDomains ->
+//                    if (cardDomains.isEmpty()) {
+//                        updateSwipeLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
+//                    } else {
+//                        updateSwipeLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+//                        cardStackAdapter.submitCards(cardDomains)
+//                        binding.csvSwipe.visibility = View.VISIBLE
+//                    }
+//                }
+//                resource.isLoading() -> updateSwipeLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+//                resource.isError() && validateLogin(resource.exception) -> {
+//                    val title = getString(R.string.fetch_card_exception_title)
+//                    val message = MessageSource.getMessage(requireContext(), resources, resource.exception)
+//                    ErrorDialog.show(title, message, childFragmentManager)
+//                    updateSwipeLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+//                }
+//            }
+//        }
     }
 
-    private fun showLayouts(loading: Int, empty: Int, error: Int, location: Int) {
+    private fun updateSwipeLayouts(loading: Int, empty: Int, error: Int, location: Int) {
         binding.llCardStackLoading.visibility = loading
         binding.llCardStackEmpty.visibility = empty
         binding.llCardStackError.visibility = error
@@ -118,7 +142,6 @@ class SwipeFragment : BaseFragment(),
 
     private fun setupSwipeCardStackView() {
         cardStackAdapter = CardStackAdapter()
-
         cardStackLayoutManager = CardStackLayoutManager(context, this@SwipeFragment)
         cardStackLayoutManager.setCanScrollVertical(false)
         cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)

@@ -26,7 +26,10 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentProfileBinding
 import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
@@ -45,7 +48,7 @@ class ProfileFragment : BaseFragment(),
     KodeinAware,
     HeightOptionDialog.HeightOptionDialogListener,
     PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
-    ErrorDialog.OnRetryListener,
+    ErrorDialog.RetryListener,
     PhotoPickerOptionListener {
 
     override val kodein by closestKodein()
@@ -109,33 +112,38 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun observeFetchPhotosLiveData() {
-        viewModel.fetchPhotosLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.fetchPhotosLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             fetchPhotosStatus = resource.status
             updateRefreshBtn()
-            if (resource.isError() && validateLogin(resource)) showFetchPhotosError(resource.error, resource.errorMessage)
+            if (resource.isError()) {
+                showFetchPhotosError(resource.exception)
+            }
         }
     }
 
-    private fun showFetchPhotosError(error: String?, errorMessage: String?) {
-        val errorTitle = getString(R.string.error_title_fetch_photos)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PHOTOS, this, childFragmentManager)
+    private fun showFetchPhotosError(exception: Throwable?) {
+        val title = getString(R.string.error_title_fetch_photos)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, RequestCode.FETCH_PHOTOS, this, childFragmentManager)
     }
 
 
     private fun observeDeletePhotoLiveData() {
-        viewModel.deletePhotoLiveData.observe(viewLifecycleOwner) { resource ->
-            if (resource.isError() && validateLogin(resource)) {
-                val errorTitle = getString(R.string.error_title_delete_photo)
-                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
+        viewModel.deletePhotoLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
+            if (resource.isError()) {
+                val title = getString(R.string.error_title_delete_photo)
+                val message = MessageSource.getMessage(requireContext(), resource.exception)
+                ErrorDialog.show(title, message, childFragmentManager)
             }
         }
     }
 
     private fun observeOrderPhotosLiveData() {
-        viewModel.orderPhotosLiveData.observe(viewLifecycleOwner) { resource ->
-            if (resource.isError() && validateLogin(resource)) {
-                val errorTitle = getString(R.string.error_title_order_photos)
-                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
+        viewModel.orderPhotosLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
+            if (resource.isError()) {
+                val title = getString(R.string.error_title_order_photos)
+                val message = MessageSource.getMessage(requireContext(), resource.exception)
+                ErrorDialog.show(title, message, childFragmentManager)
             }
         }
     }
@@ -147,12 +155,11 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun observeUploadPhotoLiveData() {
-        viewModel.uploadPhotoLiveData.observe(viewLifecycleOwner) { resource ->
-            if (resource.isError()
-                && resource.error != ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION
-                && validateLogin(resource)) {
-                val errorTitle = getString(R.string.error_title_add_photo)
-                ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
+        viewModel.uploadPhotoLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
+            if (resource.isError() && resource.isExceptionEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)) {
+                val title = getString(R.string.error_title_add_photo)
+                val message = MessageSource.getMessage(requireContext(), resource.exception)
+                ErrorDialog.show(title, message, childFragmentManager)
             }
         }
     }
@@ -200,9 +207,9 @@ class ProfileFragment : BaseFragment(),
             override fun isLongPressDragEnabled(): Boolean {
                 val isSwipeable = photoPickerRecyclerViewAdapter.isSwipeable()
                 if (!isSwipeable) {
-                    val errorTitle = getString(R.string.error_title_order_photos)
-                    val errorMessage = getString(R.string.photo_not_orderable_exception)
-                    ErrorDialog.show(null, errorTitle, errorMessage, childFragmentManager)
+                    val title = getString(R.string.error_title_order_photos)
+                    val message = getString(R.string.photo_not_orderable_exception)
+                    ErrorDialog.show(title, message, childFragmentManager)
                 }
                 return isSwipeable
             }
@@ -305,9 +312,9 @@ class ProfileFragment : BaseFragment(),
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == Activity.RESULT_OK) viewModel.uploadPhoto(result.uri, null)
                 else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    val errorTitle = getString(R.string.error_title_crop_image)
-                    val errorMessage = result.error.localizedMessage ?: ""
-                    ErrorDialog.show(null, errorTitle, errorMessage, childFragmentManager)
+                    val title = getString(R.string.error_title_crop_image)
+                    val message = result.error.localizedMessage ?: ""
+                    ErrorDialog.show(title, message, childFragmentManager)
                 }
                 deleteCapturedPhoto()
             }
@@ -388,7 +395,7 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun observeFetchProfileLiveData() {
-        viewModel.fetchProfileLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.fetchProfileLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             fetchProfileStatus = resource.status
             updateRefreshBtn()
             when {
@@ -397,7 +404,7 @@ class ProfileFragment : BaseFragment(),
                     disableProfileEdit()
                     setupProfile(resource.data)
                 }
-                resource.isError() && validateLogin(resource) -> showFetchProfileError(resource.error, resource.errorMessage)
+                resource.isError() -> showFetchProfileError(resource.exception)
             }
         }
     }
@@ -407,10 +414,11 @@ class ProfileFragment : BaseFragment(),
         setupProfile(profileDomain)
     }
 
-    private fun showFetchProfileError(error: String?, errorMessage: String?) {
+    private fun showFetchProfileError(exception: Throwable?) {
         disableProfileEdit()
-        val errorTitle = getString(R.string.error_title_fetch_profile)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PROFILE, this, childFragmentManager)
+        val title = getString(R.string.error_title_fetch_profile)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, RequestCode.FETCH_PROFILE, this, childFragmentManager)
     }
 
     private fun setupProfile(profileDomain: ProfileDomain?) {
@@ -427,7 +435,7 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun observeSaveAboutLiveData() {
-        viewModel.saveAboutLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.saveAboutLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isLoading() -> {
                     hideFieldErrors()
@@ -435,8 +443,8 @@ class ProfileFragment : BaseFragment(),
                     showLoading()
                 }
                 resource.isSuccess() -> showSaveAboutSuccess()
-                resource.isError() && validateLogin(resource) -> {
-                    showSaveAboutError(resource.data, resource.error, resource.errorMessage, resource.fieldErrors)
+                resource.isError() -> {
+                    showSaveAboutError(resource.data, resource.exception)
                 }
             }
         }
@@ -456,24 +464,23 @@ class ProfileFragment : BaseFragment(),
 
     private fun showSaveAboutError(
         profileDomain: ProfileDomain?,
-        error: String?,
-        errorMessage: String?,
-        fieldErrorMessages: Map<String, String>?
+        exception: Throwable?
     ) {
         enableProfileEdit()
         hideLoadingAndRefreshBtn()
 
-        fieldErrorMessages?.let { _fieldErrorMessages ->
-            for ((key, value) in _fieldErrorMessages) {
-                val errorTextView = getErrorViewByTag(key)
-                errorTextView.text = value
+        if (exception is ServerException && !exception.fieldErrors.isNullOrEmpty()) {
+            exception.fieldErrors.entries.forEach { entry ->
+                val errorTextView = getErrorViewByTag(entry.key)
+                errorTextView.text = entry.value
                 errorTextView.visibility = View.VISIBLE
             }
-        } ?: kotlin.run {
+        } else {
             setupProfile(profileDomain)
             hideFieldErrors()
-            val errorTitle = getString(R.string.error_title_save_about)
-            ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
+            val title = getString(R.string.error_title_save_about)
+            val message = MessageSource.getMessage(requireContext(), exception)
+            ErrorDialog.show(title, message, childFragmentManager)
         }
     }
 

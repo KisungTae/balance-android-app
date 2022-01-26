@@ -13,6 +13,8 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
@@ -124,6 +126,19 @@ fun Activity.hideKeyboard(ev: MotionEvent) {
         if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
             val inputManager = (this.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager)
             inputManager.hideSoftInputFromWindow(this.window.decorView.windowToken, 0)
+        }
+    }
+}
+
+fun <T> LiveData<Resource<T>>.observeResource(lifecycleOwner: LifecycleOwner, activity: Activity?, block: (resource: Resource<T>) -> Unit) {
+    observe(lifecycleOwner) { resource ->
+        println("observeResource inside observe")
+        if (activity != null && resource.isError() && ExceptionCode.isLoginException(resource.exception)) {
+            println("observeResource resource.isError() && ExceptionCode.isLoginException(resource.exception)")
+            val message = MessageSource.getMessage(activity, resource.exception)
+            Navigator.finishToLoginActivity(activity, message)
+        } else {
+            block.invoke(resource)
         }
     }
 }

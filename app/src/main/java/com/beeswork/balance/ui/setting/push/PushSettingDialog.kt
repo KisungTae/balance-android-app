@@ -10,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogPushSettingBinding
 import com.beeswork.balance.internal.constant.RequestCode
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import kotlinx.coroutines.launch
@@ -18,7 +20,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import java.util.*
 
-class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListener, ErrorDialog.OnRetryListener {
+class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener, ErrorDialog.RetryListener {
 
     override val kodein by closestKodein()
 
@@ -52,15 +54,17 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
     }
 
     private fun observeSavePushSettingLiveData() {
-        viewModel.savePushSettingLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.savePushSettingLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
-                resource.isSuccess() -> showSavePushSettingSuccess()
+                resource.isSuccess() -> {
+                    showSavePushSettingSuccess()
+                }
                 resource.isLoading() -> {
                     disableEdit()
                     showLoading()
                 }
-                resource.isError() && validateLogin(resource) -> {
-                    showSavePushSettingError(resource.data, resource.error, resource.errorMessage)
+                resource.isError() -> {
+                    showSavePushSettingError(resource.data, resource.exception)
                 }
             }
         }
@@ -73,24 +77,25 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
         enableEdit()
     }
 
-    private fun showSavePushSettingError(pushSettingDomain: PushSettingDomain?, error: String?, errorMessage: String?) {
+    private fun showSavePushSettingError(pushSettingDomain: PushSettingDomain?, exception: Throwable?) {
         setupPushSetting(pushSettingDomain)
         enableEdit()
         hideLoadingAndRefreshBtn()
-        val errorTitle = getString(R.string.error_title_save_push_setting)
-        ErrorDialog.show(error, errorTitle, errorMessage, childFragmentManager)
+        val title = getString(R.string.error_title_save_push_setting)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, childFragmentManager)
     }
 
     private fun observeFetchPushSettingLiveData() {
-        viewModel.fetchPushSettingLiveData.observe(viewLifecycleOwner) {
+        viewModel.fetchPushSettingLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                it.isSuccess() -> showFetchPushSettingSuccess(it.data)
-                it.isLoading() -> {
+                resource.isSuccess() -> showFetchPushSettingSuccess(resource.data)
+                resource.isLoading() -> {
                     disableEdit()
                     showLoading()
-                    setupPushSetting(it.data)
+                    setupPushSetting(resource.data)
                 }
-                it.isError() -> showFetchPushSettingError(it.error, it.errorMessage)
+                resource.isError() -> showFetchPushSettingError(resource.exception)
             }
         }
     }
@@ -141,11 +146,12 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.OnDismissListen
         }
     }
 
-    private fun showFetchPushSettingError(error: String?, errorMessage: String?) {
+    private fun showFetchPushSettingError(exception: Throwable?) {
         showRefreshBtn()
         disableEdit()
-        val errorTitle = getString(R.string.error_title_fetch_push_setting)
-        ErrorDialog.show(error, errorTitle, errorMessage, RequestCode.FETCH_PUSH_SETTING, this, childFragmentManager)
+        val title = getString(R.string.error_title_fetch_push_setting)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, RequestCode.FETCH_PUSH_SETTING, this, childFragmentManager)
     }
 
 

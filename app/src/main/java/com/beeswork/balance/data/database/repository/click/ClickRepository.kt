@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface ClickRepository {
 
     val newClickFlow: Flow<Click>
+    val clickPageInvalidationFlow: Flow<Any>
 
     suspend fun deleteClicks()
     suspend fun saveClick(clickDTO: ClickDTO)

@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.database.repository.click.ClickRepository
+import java.io.IOException
 import java.lang.NullPointerException
 import kotlin.random.Random
 
@@ -19,11 +20,16 @@ class ClickPagingSource(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Click> {
-        val currentPage = params.key ?: 0
-        val clicks = clickRepository.loadClicks(params.loadSize, (currentPage * params.loadSize))
-        val prevPage = if (currentPage >= 1) currentPage - 1 else null
-        val nextPage = if (clicks.isEmpty()) null else currentPage + 1
-        return LoadResult.Page(clicks, prevPage, nextPage)
+        try {
+            val currentPage = params.key ?: 0
+            val clicks = clickRepository.loadClicks(params.loadSize, (currentPage * params.loadSize))
+            val prevPage = if (currentPage >= 1) currentPage - 1 else null
+            val nextPage = if (clicks.isEmpty()) null else currentPage + 1
+            return LoadResult.Page(clicks, prevPage, nextPage)
+        } catch (e: IOException) {
+            return LoadResult.Error(e)
+        }
+
     }
 
 }

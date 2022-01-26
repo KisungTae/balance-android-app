@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivitySplashBinding
+import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.loginactivity.LoginActivity
 import com.beeswork.balance.ui.mainactivity.MainActivity
@@ -38,14 +39,14 @@ class SplashActivity : BaseActivity(), KodeinAware {
             when {
                 it.isSuccess() -> {
                     // TODO: remove me and comment in
-                    finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                    Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, MainActivity::class.java))
 
 //                    if (it.data?.profileExists == true)
 //                        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
 //                    else
 //                        finishToActivity(Intent(this@SplashActivity, RegisterActivity::class.java))
                 }
-                it.isError() -> finishToActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                it.isError() -> Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, LoginActivity::class.java))
             }
         }
     }

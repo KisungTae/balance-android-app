@@ -6,6 +6,7 @@
 
 
     <string name="error_title_generic">에러</string>
+    <string name="error_title_invalid_login">로그인이 유효하지 않습니다</string>
     <string name="error_title_chat_id_not_found">유효하지 않은 채팅입니다.</string>
     <string name="error_title_fetch_profile">프로필을 가져오지 못했습니다</string>
     <string name="error_title_fetch_matches">매치정보를 가져오는데 실패했습니다</string>
@@ -13,6 +14,7 @@
     <string name="error_title_send_chat_message">채팅 메세지를 전송하지 못했습니다</string>
     <string name="error_title_web_socket_disconnected">서버 연결에러</string>
     <string name="error_title_report">신고요청을 실패했습니다</string>
+    <string name="error_title_unmatch">채팅방을 나가는데 실패했습니다.</string>
     <string name="error_title_fetch_question">밸런스 질문을 가져오지 못했습니다</string>
     <string name="error_title_save_question">밸런스 질문을 저장하지 못했습니다</string>
     <string name="error_title_click">밸런스를 체크하지 못했습니다</string>

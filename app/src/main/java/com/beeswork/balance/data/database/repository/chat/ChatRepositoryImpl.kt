@@ -15,6 +15,7 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
@@ -136,7 +137,7 @@ class ChatRepositoryImpl(
                     chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
                     matchDAO.updateAsUnmatched(chatId)
                     chatMessageReceiptFlowListener?.onInvoke(
-                        Resource.error(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body)
+                        Resource.error(ServerException(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body))
                     )
                 } else {
                     chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)

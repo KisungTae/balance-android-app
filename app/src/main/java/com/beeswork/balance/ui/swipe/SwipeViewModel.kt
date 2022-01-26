@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import com.beeswork.balance.internal.mapper.swipe.CardMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.swipe.card.CardDomain
@@ -34,15 +36,18 @@ class SwipeViewModel(
 
     fun fetchCards() {
         viewModelScope.launch {
-            if (fetchingCards) return@launch
-            settingRepository.syncLocation()
-            fetchingCards = true
-            _fetchCards.postValue(Resource.loading())
-            val response = swipeRepository.fetchCards().let {
-                it.mapData(it.data?.cardDTOs?.map { cardDTO -> cardMapper.toCardDomain(cardDTO) })
-            }
-            fetchingCards = false
-            _fetchCards.postValue(response)
+//            if (fetchingCards) return@launch
+//            settingRepository.syncLocation()
+//            fetchingCards = true
+//            _fetchCards.postValue(Resource.loading())
+//            val response = swipeRepository.fetchCards().let {
+//                it.mapData(it.data?.cardDTOs?.map { cardDTO -> cardMapper.toCardDomain(cardDTO) })
+//            }
+//            fetchingCards = false
+//            _fetchCards.postValue(response)
+
+
+            _fetchCards.postValue(Resource.error(NoInternetConnectivityException()))
         }
 
     }

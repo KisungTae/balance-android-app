@@ -1,26 +1,15 @@
 package com.beeswork.balance.ui.mainactivity
 
 import android.Manifest
-import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.databinding.ActivityMainBinding
 import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.google.android.gms.location.*
@@ -29,15 +18,12 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.beeswork.balance.internal.util.hideKeyboard
-import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
-import com.google.firebase.messaging.FirebaseMessaging
-import java.util.*
+import com.beeswork.balance.internal.exception.NoInternetConnectivityException
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.Navigator
 
 
-class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
+class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.RetryListener {
 
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
@@ -90,20 +76,16 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
 
     private suspend fun setupWebSocketEventObserver() {
         viewModel.webSocketEventLiveData.await().observeForever { webSocketEvent ->
-            if (webSocketEvent.isError()
-                && validateLogin(webSocketEvent)
-                && shouldShowWebSocketErrorMessage(webSocketEvent.error)
-            ) {
-                val errorTitle = getString(R.string.error_title_web_socket_disconnected)
-                ErrorDialog.show(webSocketEvent.error, errorTitle, webSocketEvent.errorMessage, supportFragmentManager)
+            if (webSocketEvent.isError()) {
+                if (ExceptionCode.isLoginException(webSocketEvent.exception)) {
+                    val message = MessageSource.getMessage(this, webSocketEvent.exception)
+                    Navigator.finishToLoginActivity(this, message)
+                } else if (webSocketEvent.exception is NoInternetConnectivityException) {
+                    val title = getString(R.string.error_title_web_socket_disconnected)
+                    val message = MessageSource.getMessage(this, webSocketEvent.exception)
+                    ErrorDialog.show(title, message, supportFragmentManager)
+                }
             }
-        }
-    }
-
-    private fun shouldShowWebSocketErrorMessage(error: String?): Boolean {
-        return when (error) {
-            ExceptionCode.NO_INTERNET_CONNECTIVITY_EXCEPTION -> true
-            else -> false
         }
     }
 
@@ -139,6 +121,10 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.OnRetryListener {
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
 //        this.hideKeyboard(ev)
         return super.dispatchTouchEvent(ev)
+    }
+
+    companion object {
+
     }
 
 

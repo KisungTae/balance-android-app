@@ -46,17 +46,17 @@ class ExceptionCode {
         const val ACCOUNT_IDENTITY_NOT_FOUND_EXCEPTION = "account_identity_not_found_exception"
         const val REFRESH_TOKEN_KEY_NOT_FOUND_EXCEPTION = "refresh.token.key.not.found.exception"
 
-        fun isLoginException(throwable: Throwable?): Boolean {
-            if (throwable == null) {
+        fun isLoginException(exception: Throwable?): Boolean {
+            if (exception == null) {
                 return false
             }
-            if (throwable is AccessTokenNotFoundException
-                || throwable is RefreshTokenNotFoundException
-                || throwable is AccountIdNotFoundException) {
+            if (exception is AccessTokenNotFoundException
+                || exception is RefreshTokenNotFoundException
+                || exception is AccountIdNotFoundException) {
                 return true
             }
-            if (throwable is BaseException) {
-                return isLoginException(throwable.code)
+            if (exception is BaseException) {
+                return isLoginException(exception.error)
             }
             return false
         }

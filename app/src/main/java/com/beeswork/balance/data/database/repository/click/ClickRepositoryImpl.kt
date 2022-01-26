@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.repository.click
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.PageFetchDateTracker
+import com.beeswork.balance.data.database.common.PageInvalidationListener
 import com.beeswork.balance.data.database.dao.ClickDAO
 import com.beeswork.balance.data.database.dao.FetchInfoDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
@@ -32,6 +33,7 @@ class ClickRepositoryImpl(
 ) : ClickRepository {
 
     private var newClickFlowListener: NewClickFlowListener? = null
+    private var clickPageInvalidationListener: PageInvalidationListener? = null
     private val clickPageFetchDateTracker = PageFetchDateTracker()
 
     @ExperimentalCoroutinesApi
@@ -44,8 +46,16 @@ class ClickRepositoryImpl(
         awaitClose { }
     }
 
+
+
+
+
+
+
     override suspend fun deleteClicks() {
-        withContext(ioDispatcher) { clickDAO.deleteAll(preferenceProvider.getAccountId()) }
+        withContext(ioDispatcher) {
+            clickDAO.deleteAll(preferenceProvider.getAccountId())
+        }
     }
 
     override suspend fun saveClick(clickDTO: ClickDTO) {
@@ -64,13 +74,8 @@ class ClickRepositoryImpl(
             val clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
 
             if (clicks.isEmpty()) {
-
-            }
-
-
-
-            if (clicks.isEmpty()) {
                 val response = clickRDS.listClicks(loadSize, startPosition)
+
                 println(response)
             }
 
@@ -83,6 +88,7 @@ class ClickRepositoryImpl(
             println(accessToken)
 
             return@withContext clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+//            return@withContext Resource.success(null)
         }
     }
 

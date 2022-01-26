@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogProfileBalanceGameBinding
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BalanceGame
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -54,21 +56,22 @@ class ProfileBalanceGameDialog : BalanceGame(), KodeinAware {
     }
 
     private fun setupSaveAnswersLiveDataObserver() {
-        viewModel.saveAnswersLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.saveAnswersLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isSuccess() -> dismiss()
                 resource.isLoading() -> showLoading(getString(R.string.balance_game_saving_answers_text))
-                resource.isError() && validateLogin(resource) -> showSaveError(resource.error, resource.errorMessage)
+                resource.isError() -> showSaveError(MessageSource.getMessage(requireContext(), resource.exception))
             }
         }
     }
 
     private fun setupFetchQuestionsLiveDataObserver() {
-        viewModel.fetchQuestionsLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.fetchQuestionsLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isSuccess() -> resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
                 resource.isLoading() -> showLoading(getString(R.string.balance_game_loading_text))
-                resource.isError() && validateLogin(resource) -> showFetchQuestionsError(resource.error, resource.errorMessage)
+                resource.isError() -> showFetchQuestionsError(MessageSource.getMessage(requireContext(), resource.exception))
+
             }
         }
     }

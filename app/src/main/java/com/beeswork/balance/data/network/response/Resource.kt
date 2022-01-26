@@ -22,7 +22,7 @@ class Resource<out T>(
 
     fun isExceptionEqualTo(error: String?): Boolean {
         return if (exception is BaseException) {
-            exception.code == error
+            exception.error == error
         } else {
             false
         }
@@ -68,8 +68,8 @@ class Resource<out T>(
 //            return Resource(Status.ERROR, null, ServerException(error, null, null))
 //        }
 
-        fun <T> error(throwable: Throwable?): Resource<T> {
-            return Resource(Status.ERROR, null, throwable)
+        fun <T> error(exception: Throwable?): Resource<T> {
+            return Resource(Status.ERROR, null, exception)
         }
 
         fun <T> loading(): Resource<T> {

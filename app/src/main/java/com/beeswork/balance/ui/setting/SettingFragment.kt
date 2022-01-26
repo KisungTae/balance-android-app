@@ -10,6 +10,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSettingBinding
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.Navigator
+import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment
@@ -57,14 +60,15 @@ class SettingFragment : BaseFragment(), KodeinAware {
     }
 
     private fun observeDeleteAccountLiveData() {
-        viewModel.deleteAccountLiveData.observe(viewLifecycleOwner) { resource ->
+        viewModel.deleteAccountLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
-                resource.isSuccess() -> moveToLoginActivity(null, null)
+                resource.isSuccess() -> Navigator.finishToLoginActivity(requireActivity(), null)
                 resource.isLoading() -> binding.llSettingLoading.visibility = View.VISIBLE
-                resource.isError() && validateLogin(resource) -> {
+                resource.isError() -> {
                     binding.llSettingLoading.visibility = View.GONE
-                    val errorTitle = getString(R.string.error_title_delete_account)
-                    ErrorDialog.show(resource.error, errorTitle, resource.errorMessage, childFragmentManager)
+                    val title = getString(R.string.error_title_delete_account)
+                    val message = MessageSource.getMessage(requireContext(), resource.exception)
+                    ErrorDialog.show(title, message, childFragmentManager)
                 }
             }
         }

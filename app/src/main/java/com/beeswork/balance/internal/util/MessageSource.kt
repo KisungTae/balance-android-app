@@ -1,7 +1,6 @@
 package com.beeswork.balance.internal.util
 
 import android.content.Context
-import android.content.res.Resources
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.exception.BaseException
 import com.beeswork.balance.internal.exception.ServerException
@@ -12,23 +11,24 @@ import java.net.UnknownHostException
 class MessageSource {
 
     companion object {
-        fun getMessage(context: Context, resources: Resources, throwable: Throwable?): String? {
-            if (throwable == null) {
+        fun getMessage(context: Context, exception: Throwable?): String? {
+            if (exception == null) {
                 return null
             }
 
-            if (throwable is ServerException) {
-                return throwable.message
+            if (exception is ServerException) {
+                return exception.message
             }
 
-            if (throwable is BaseException && throwable.code != null) {
-                val resourceId = resources.getIdentifier(throwable.code, "string", context.packageName)
+            val resources = context.resources
+            if (exception is BaseException && exception.error != null) {
+                val resourceId = resources.getIdentifier(exception.error, "string", context.packageName)
                 if (resourceId > 0) {
                     return resources.getString(resourceId)
                 }
             }
 
-            return when (throwable) {
+            return when (exception) {
                 is SocketTimeoutException -> {
                     resources.getString(R.string.socket_timeout_exception)
                 }

@@ -10,10 +10,10 @@ import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.ActivityLoginBinding
 import com.beeswork.balance.internal.constant.BundleKey
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.exception.InvalidSocialLoginException
-import com.beeswork.balance.internal.util.safeLet
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
@@ -43,7 +43,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 viewModel.socialLogin(account.id, account.idToken, LoginType.GOOGLE)
             } catch (e: ApiException) {
-                showLoginError(InvalidSocialLoginException())
+                showLoginErrorDialog(InvalidSocialLoginException())
             }
         }
     }
@@ -67,18 +67,18 @@ class LoginActivity : BaseActivity(), KodeinAware {
     }
 
     private fun showLoginErrorMessage() {
-        val error = intent.getStringExtra(BundleKey.ERROR)
-        val errorMessage = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
-        safeLet(error, errorMessage) { _error, _errorMessage ->
-            showLoginError(_error, _errorMessage)
+        val message = intent.getStringExtra(BundleKey.ERROR_MESSAGE)
+        if (message != null) {
+            val title = getString(R.string.error_title_invalid_login)
+            ErrorDialog.show(title, message, supportFragmentManager)
         }
     }
 
     private fun observeLoginLiveData() {
-        viewModel.loginLiveData.observe(this) {
-            when (it.status) {
-                Resource.Status.ERROR -> showLoginError(it.error, it.errorMessage)
-                Resource.Status.SUCCESS -> it.data?.let { loginDomain ->
+        viewModel.loginLiveData.observe(this) { resource ->
+            when (resource.status) {
+                Resource.Status.ERROR -> showLoginErrorDialog(resource.exception)
+                Resource.Status.SUCCESS -> resource.data?.let { loginDomain ->
                     //todo: remove me
                     moveToMainActivity()
 
@@ -91,16 +91,19 @@ class LoginActivity : BaseActivity(), KodeinAware {
     }
 
     private fun moveToMainActivity() {
-        finishToActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        Navigator.finishToActivity(this@LoginActivity, intent)
     }
 
     private fun moveToRegisterActivity() {
-        finishToActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+        val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+        Navigator.finishToActivity(this@LoginActivity, intent)
     }
 
-    private fun showLoginError(error: String?, errorMessage: String?) {
-        val errorTitle = getString(R.string.error_title_login)
-        ErrorDialog.show(error, errorTitle, errorMessage, supportFragmentManager)
+    private fun showLoginErrorDialog(exception: Throwable?) {
+        val title = getString(R.string.error_title_login)
+        val message = MessageSource.getMessage(this, exception)
+        ErrorDialog.show(title, message, supportFragmentManager)
     }
 
     private fun setupGoogleSignIn() {
