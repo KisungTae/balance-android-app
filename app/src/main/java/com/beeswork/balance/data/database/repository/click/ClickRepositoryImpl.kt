@@ -9,10 +9,9 @@ import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -32,29 +31,23 @@ class ClickRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : ClickRepository {
 
-    private var newClickFlowListener: NewClickFlowListener? = null
-    private var clickPageInvalidationListener: PageInvalidationListener? = null
+    private var clickPageInvalidationListener: PageInvalidationListener<Click?>? = null
     private val clickPageFetchDateTracker = PageFetchDateTracker()
 
     @ExperimentalCoroutinesApi
-    override val newClickFlow: Flow<Click> = callbackFlow {
-        newClickFlowListener = object : NewClickFlowListener {
-            override fun onReceive(click: Click) {
-                offer(click)
+    override val clickPageInvalidationFlow: Flow<Click?> = callbackFlow {
+        clickPageInvalidationListener = object : PageInvalidationListener<Click?> {
+            override fun onInvalidate(data: Click?) {
+                offer(data)
             }
         }
         awaitClose { }
     }
 
-
-
-
-
-
-
     override suspend fun deleteClicks() {
         withContext(ioDispatcher) {
             clickDAO.deleteAll(preferenceProvider.getAccountId())
+            clickPageInvalidationListener?.onInvalidate(null)
         }
     }
 
@@ -63,37 +56,65 @@ class ClickRepositoryImpl(
             if (!matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
                 val click = clickMapper.toClick(clickDTO)
                 clickDAO.insert(click)
-                if (click.swipedId == preferenceProvider.getAccountId())
-                    newClickFlowListener?.onReceive(click)
+                if (click.swipedId == preferenceProvider.getAccountId()) {
+                    clickPageInvalidationListener?.onInvalidate(click)
+                }
             }
         }
     }
 
-    override suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click> {
+    override suspend fun loadClicks(loadSize: Int, startPosition: Int): Resource<List<Click>> {
         return withContext(ioDispatcher) {
-            val clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
-
+            var clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
             if (clicks.isEmpty()) {
+                val response = fetchClicks(loadSize, startPosition)
+                if (response.isError())
+
+
                 val response = clickRDS.listClicks(loadSize, startPosition)
+                if (response.isError()) {
+                    return@withContext Resource.error(response.exception)
+                }
 
-                println(response)
+                val newClicks = mutableListOf<Click>()
+                val deletedClicks = mutableListOf<Click>()
+                response.data?.forEach { clickDTO ->
+                    newClicks.add(clickMapper.toClick(clickDTO))
+                }
+                clickDAO.insert(newClicks)
+                clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+            } else {
+
             }
-
-
-            //            todo: remove me
-            val accountId = preferenceProvider.getAccountId()
-            println(accountId)
-
-            val accessToken = preferenceProvider.getAccessToken()
-            println(accessToken)
-
-            return@withContext clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
-//            return@withContext Resource.success(null)
+            return@withContext Resource.success(clicks)
         }
     }
 
-    override suspend fun fetchClicks(): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
+    private suspend fun fetchClicks(loadSize: Int, startPosition: Int): Resource<EmptyResponse> {
+        val response = clickRDS.listClicks(loadSize, startPosition)
+        if (response.isError()) {
+            return response.toEmptyResponse()
+        }
+        balanceDatabase.runInTransaction {
+            response.data?.forEach { clickDTO ->
+                if (clickDTO.deleted) {
+                    clickDAO.deleteBySwiperId(clickDTO.swiperId)
+                } else if (matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
+                    clickDAO.deleteBySwiperId(clickDTO.swiperId, clickDTO.swipedId)
+                } else {
+                    val newClick = clickMapper.toClick(clickDTO)
+
+                    if (click != null) {
+                        clickDAO.insert(click)
+                    }
+                }
+            }
+        }
+        return response.toEmptyResponse()
+    }
+
+//    override suspend fun fetchClicks(): Resource<EmptyResponse> {
+//        return withContext(ioDispatcher) {
 //            val accountId = preferenceProvider.getAccountId()
 //                ?: return@withContext Resource.error(ExceptionCode.ACCOUNT_ID_NOT_FOUND_EXCEPTION)
 //
@@ -118,21 +139,18 @@ class ClickRepositoryImpl(
 //                    fetchInfoDAO.updateClickFetchedAt(accountId, clickFetchedAt)
 //            }
 //            return@withContext response.toEmptyResponse()
-            return@withContext Resource.success(EmptyResponse())
-        }
-    }
+//            return@withContext Resource.success(EmptyResponse())
+//        }
+//    }
 
-    override fun getClickInvalidationFlow(): Flow<Boolean> {
-        return clickDAO.invalidation()
-    }
+//    override fun getClickInvalidationFlow(): Flow<Boolean> {
+//        return clickDAO.invalidation()
+//    }
 
     override fun getClickCountFlow(): Flow<Int> {
         return clickDAO.count(preferenceProvider.getAccountId())
     }
 
-    private fun saveDefaultFetchInfo() {
-
-    }
 
     override fun test() {
 

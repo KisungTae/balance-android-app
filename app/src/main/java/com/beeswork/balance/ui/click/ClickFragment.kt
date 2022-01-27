@@ -40,8 +40,6 @@ class ClickFragment : BaseFragment(),
     private lateinit var clickPagingInitialPageAdapter: PagingInitialPageAdapter<ClickDomain, RecyclerView.ViewHolder>
     private var newClickSnackBar: Snackbar? = null
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,21 +53,21 @@ class ClickFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
-        viewModel.test()
-
     }
 
     private fun bindUI() = lifecycleScope.launch {
         setupClickRecyclerView()
         setupClickPagingInitialPageAdapter()
-        observeClickInvalidation()
-        observeNewClickLiveData()
+        observeClickPageInvalidationLiveData()
         observeClickPagingData()
     }
 
-    private suspend fun observeNewClickLiveData() {
-        viewModel.newClickLiveData.await().observe(viewLifecycleOwner) { clickDomain ->
-            showNewClickSnackBar(clickDomain)
+    private suspend fun observeClickPageInvalidationLiveData() {
+        viewModel.clickPageInvalidationLiveData.await().observe(viewLifecycleOwner) { clickDomain ->
+            if (clickDomain != null) {
+                showNewClickSnackBar(clickDomain)
+            }
+            clickPagingRefreshAdapter.refresh()
         }
     }
 
@@ -107,12 +105,6 @@ class ClickFragment : BaseFragment(),
                 clickPagingDataAdapter.submitData(it)
             }
         })
-    }
-
-    private suspend fun observeClickInvalidation() {
-        viewModel.clickInvalidation.await().observe(viewLifecycleOwner) {
-            clickPagingRefreshAdapter.refresh()
-        }
     }
 
     private fun setupClickRecyclerView() {

@@ -18,17 +18,17 @@ interface ClickDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(clicks: List<Click>)
 
-    @Query("delete from click where swipedId = :accountId and swiperId = :swiperId")
-    fun deleteBySwiperId(accountId: UUID?, swiperId: UUID)
+    @Query("delete from click where swiperId = :swiperId and swipedId = :swipedId")
+    fun deleteBySwiperId(swiperId: UUID, swipedId: UUID?)
+
+    @Query("delete from click where swiperId = :swiperId")
+    fun deleteBySwiperId(swiperId: UUID)
 
     @Query("select count(*) from click where swipedId = :accountId")
     fun count(accountId: UUID?): Flow<Int>
 
     @Query("select * from click where swipedId = :accountId order by updatedAt desc limit :loadSize offset :startPosition ")
     fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int): List<Click>
-
-    @Query("select 1 from click")
-    fun invalidation(): Flow<Boolean>
 
     @Query("delete from click where swipedId = :accountId")
     fun deleteAll(accountId: UUID?)

@@ -20,18 +20,19 @@ class ClickViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val clickInvalidation by viewModelLazyDeferred {
-        clickRepository.getClickInvalidationFlow().asLiveData()
+    val clickPageInvalidationLiveData by viewModelLazyDeferred {
+        clickRepository.clickPageInvalidationFlow.map { click ->
+            if (click != null) {
+                clickMapper.toClickDomain(click)
+            } else {
+                null
+            }
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    val newClickLiveData by viewModelLazyDeferred {
-        clickRepository.newClickFlow.map { clickMapper.toClickDomain(it) }.asLiveData()
-    }
-
-    private val _fetchClicks = MutableLiveData<Resource<EmptyResponse>>()
-    val fetchClicks: LiveData<Resource<EmptyResponse>> get() = _fetchClicks
-
-    private var fetchingClicks = false
+//    private val _fetchClicks = MutableLiveData<Resource<EmptyResponse>>()
+//    val fetchClicks: LiveData<Resource<EmptyResponse>> get() = _fetchClicks
+//    private var fetchingClicks = false
 
     fun initClickPagingData(): LiveData<PagingData<ClickDomain>> {
         return Pager(
@@ -49,16 +50,16 @@ class ClickViewModel(
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    fun fetchClicks() {
-        viewModelScope.launch {
-            if (!fetchingClicks) {
-                fetchingClicks = true
-                _fetchClicks.postValue(Resource.loading())
-                _fetchClicks.postValue(clickRepository.fetchClicks())
-                fetchingClicks = false
-            }
-        }
-    }
+//    fun fetchClicks() {
+//        viewModelScope.launch {
+//            if (!fetchingClicks) {
+//                fetchingClicks = true
+//                _fetchClicks.postValue(Resource.loading())
+//                _fetchClicks.postValue(clickRepository.fetchClicks())
+//                fetchingClicks = false
+//            }
+//        }
+//    }
 
     fun test() {
         clickRepository.test()
