@@ -4,7 +4,6 @@ import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.common.PageInvalidationListener
 import com.beeswork.balance.data.database.dao.ClickDAO
-import com.beeswork.balance.data.database.dao.FetchInfoDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.network.rds.click.ClickRDS
@@ -24,7 +23,6 @@ class ClickRepositoryImpl(
     private val clickRDS: ClickRDS,
     private val clickDAO: ClickDAO,
     private val matchDAO: MatchDAO,
-    private val fetchInfoDAO: FetchInfoDAO,
     private val preferenceProvider: PreferenceProvider,
     private val clickMapper: ClickMapper,
     private val balanceDatabase: BalanceDatabase,
@@ -55,38 +53,69 @@ class ClickRepositoryImpl(
         withContext(Dispatchers.IO) {
             if (!matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
                 val click = clickMapper.toClick(clickDTO)
-                clickDAO.insert(click)
-                if (click.swipedId == preferenceProvider.getAccountId()) {
-                    clickPageInvalidationListener?.onInvalidate(click)
+                if (click != null) {
+                    clickDAO.insert(click)
+                    if (click.swipedId == preferenceProvider.getAccountId()) {
+                        clickPageInvalidationListener?.onInvalidate(click)
+                    }
                 }
             }
         }
     }
 
+//    todo: remove me
+    var count = 0
+
     override suspend fun loadClicks(loadSize: Int, startPosition: Int): Resource<List<Click>> {
         return withContext(ioDispatcher) {
             var clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
-            if (clicks.isEmpty()) {
-                val response = fetchClicks(loadSize, startPosition)
-                if (response.isError())
-
-
-                val response = clickRDS.listClicks(loadSize, startPosition)
-                if (response.isError()) {
-                    return@withContext Resource.error(response.exception)
-                }
-
-                val newClicks = mutableListOf<Click>()
-                val deletedClicks = mutableListOf<Click>()
-                response.data?.forEach { clickDTO ->
-                    newClicks.add(clickMapper.toClick(clickDTO))
-                }
-                clickDAO.insert(newClicks)
-                clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
-            } else {
-
-            }
+//            count++
+//            if (count == 10) {
+//                delay(60000)
+//                println("end of delay(60000)")
+//            }
+//            if (clicks.isEmpty()) {
+//                val response = fetchClicks(loadSize, startPosition)
+//                if (response.isError())
+//
+//
+//                val response = clickRDS.listClicks(loadSize, startPosition)
+//                if (response.isError()) {
+//                    return@withContext Resource.error(response.exception)
+//                }
+//
+//                val newClicks = mutableListOf<Click>()
+//                val deletedClicks = mutableListOf<Click>()
+//                response.data?.forEach { clickDTO ->
+//                    newClicks.add(clickMapper.toClick(clickDTO))
+//                }
+//                clickDAO.insert(newClicks)
+//                clicks = clickDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+//            } else {
+//
+//            }
             return@withContext Resource.success(clicks)
+        }
+    }
+
+    override suspend fun fetchClicks(loadSize: Int, lastItemId: UUID): Resource<Int> {
+        return withContext(ioDispatcher) {
+            val response = clickRDS.fetchClicks(loadSize, lastItemId)
+
+            balanceDatabase.runInTransaction {
+                response.data?.forEach { clickDTO ->
+                    if (!matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
+                        val click = clickMapper.toClick(clickDTO)
+                        if (click != null) {
+                            clickDAO.insert(click)
+                        }
+                    }
+                }
+            }
+
+
+
+            return@withContext Resource.error(null)
         }
     }
 
@@ -104,9 +133,9 @@ class ClickRepositoryImpl(
                 } else {
                     val newClick = clickMapper.toClick(clickDTO)
 
-                    if (click != null) {
-                        clickDAO.insert(click)
-                    }
+//                    if (click != null) {
+//                        clickDAO.insert(click)
+//                    }
                 }
             }
         }
@@ -155,22 +184,17 @@ class ClickRepositoryImpl(
     override fun test() {
 
         CoroutineScope(ioDispatcher).launch {
-
-
-//            clickDAO.insert(Click(UUID.fromString("698f2eb6-3fef-4ee3-9c7d-3e527740548e"), "new profile", OffsetDateTime.now()))
-//            clickDAO.insert(Click(UUID.fromString("cd4f05bf-1192-4f16-90c7-f97b46584ba6"), "new profile", OffsetDateTime.now()))
-//            clickDAO.insert(Click(UUID.fromString("82585030-2f0e-4be5-bbf1-bbcce26d0408"), "new profile", OffsetDateTime.now()))
-//            clickDAO.insert(Click(UUID.fromString("44d7c228-f670-4fe7-8302-cdfd7fdaa912"), "new profile", OffsetDateTime.now()))
             val clicks = mutableListOf<Click>()
             val accountId = preferenceProvider.getAccountId()
             var now = OffsetDateTime.now()
-            for (i in 0..100) {
+            for (i in 0..500) {
                 now = now.plusMinutes(1)
                 clicks.add(Click(UUID.randomUUID(), accountId!!, "test-$i", "photo", OffsetDateTime.from(now)))
             }
             clickDAO.insert(clicks)
-
-//            clickDAO.insert(Click(UUID.randomUUID(), "", OffsetDateTime.now()))
+//            println("inserted click")
+//            clickPageInvalidationListener?.onInvalidate(null)
+//            println("called clickPageInvalidationListener?.onInvalidate(null)")
         }
     }
 

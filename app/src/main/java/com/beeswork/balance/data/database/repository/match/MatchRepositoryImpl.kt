@@ -35,7 +35,6 @@ class MatchRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val clickDAO: ClickDAO,
     private val swipeDAO: SwipeDAO,
-    private val fetchInfoDAO: FetchInfoDAO,
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
@@ -73,21 +72,22 @@ class MatchRepositoryImpl(
 
     override suspend fun fetchMatches(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-
-            val response = matchRDS.listMatches(fetchInfoDAO.findMatchFetchedAt(accountId))
-
-            response.data?.let { data ->
-                balanceDatabase.runInTransaction {
-                    data.matchDTOs?.forEach { matchDTO ->
-                        val match = matchMapper.toMatch(matchDTO)
-                        match.swiperId = accountId
-                        saveMatch(match)
-                    }
-                }
-                fetchInfoDAO.updateMatchFetchedAt(accountId, data.fetchedAt)
-            }
-            return@withContext response.toEmptyResponse()
+//            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
+//
+//            val response = matchRDS.listMatches(fetchInfoDAO.findMatchFetchedAt(accountId))
+//
+//            response.data?.let { data ->
+//                balanceDatabase.runInTransaction {
+//                    data.matchDTOs?.forEach { matchDTO ->
+//                        val match = matchMapper.toMatch(matchDTO)
+//                        match.swiperId = accountId
+//                        saveMatch(match)
+//                    }
+//                }
+//                fetchInfoDAO.updateMatchFetchedAt(accountId, data.fetchedAt)
+//            }
+//            return@withContext response.toEmptyResponse()
+            return@withContext Resource.error(null)
         }
     }
 

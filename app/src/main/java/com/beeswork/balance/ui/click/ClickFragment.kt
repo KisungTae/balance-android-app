@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -49,12 +50,21 @@ class ClickFragment : BaseFragment(),
         return binding.root
     }
 
+    @ExperimentalPagingApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
+
+//        todo: remove me
+        binding.btnClickAdd.setOnClickListener {
+            clickPagingDataAdapter.refresh()
+//            viewModel.test()
+        }
+//        viewModel.test()
     }
 
+    @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
         setupClickRecyclerView()
         setupClickPagingInitialPageAdapter()
@@ -68,6 +78,9 @@ class ClickFragment : BaseFragment(),
                 showNewClickSnackBar(clickDomain)
             }
             clickPagingRefreshAdapter.refresh()
+//            println("clickPagingDataAdapter.refresh() will happen")
+//            clickPagingDataAdapter.refresh()
+
         }
     }
 
@@ -97,11 +110,12 @@ class ClickFragment : BaseFragment(),
         snackBar.show()
     }
 
+    @ExperimentalPagingApi
     private fun observeClickPagingData() {
         viewModel.initClickPagingData().observe(viewLifecycleOwner, {
             clickPagingRefreshAdapter.reset()
             lifecycleScope.launch {
-                println("clickPagingDataAdapter.submitData(it)")
+//                println("clickPagingDataAdapter.submitData(it)")
                 clickPagingDataAdapter.submitData(it)
             }
         })
@@ -113,6 +127,16 @@ class ClickFragment : BaseFragment(),
         binding.rvClick.adapter = clickPagingDataAdapter.withLoadStateFooter(
             footer = footerLoadStateAdapter
         )
+
+        clickPagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+//                println("onItemRangeInserted positionStart: $positionStart | itemCount: $itemCount")
+                super.onItemRangeInserted(positionStart, itemCount)
+            }
+        })
+
+
+
         val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, CLICK_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -149,7 +173,7 @@ class ClickFragment : BaseFragment(),
         )
         lifecycleScope.launch {
             clickPagingDataAdapter.loadStateFlow.collect { loadState ->
-
+//                println("prepend: ${loadState.prepend}")
                 clickPagingInitialPageAdapter.updateUI(loadState)
             }
         }

@@ -30,6 +30,5 @@ interface SettingRepository {
     fun getLocationFlow(): Flow<Location?>
 
     suspend fun deleteAccount(): Resource<EmptyResponse>
-    suspend fun prepopulateFetchInfo()
 
 }

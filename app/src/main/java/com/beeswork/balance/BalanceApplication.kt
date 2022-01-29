@@ -145,7 +145,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
         bind() from singleton { instance<BalanceDatabase>().swipeFilterDAO() }
         bind() from singleton { instance<BalanceDatabase>().settingDAO() }
-        bind() from singleton { instance<BalanceDatabase>().fetchInfoDAO() }
         bind() from singleton { instance<BalanceDatabase>().loginDAO() }
 
         // API
@@ -202,13 +201,11 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
                 Dispatchers.IO
             )
         }
         bind<ClickRepository>() with singleton {
             ClickRepositoryImpl(
-                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -233,7 +230,6 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
-                instance(),
                 instance(),
                 instance(),
                 instance(),

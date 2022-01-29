@@ -2,13 +2,11 @@ package com.beeswork.balance.data.database.repository.setting
 
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.entity.FetchInfo
 import com.beeswork.balance.data.database.entity.setting.Location
 import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.mapper.setting.PushSettingMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -22,7 +20,6 @@ class SettingRepositoryImpl(
     private val locationDAO: LocationDAO,
     private val settingRDS: SettingRDS,
     private val pushSettingDAO: PushSettingDAO,
-    private val fetchInfoDAO: FetchInfoDAO,
     private val pushSettingMapper: PushSettingMapper,
     private val ioDispatcher: CoroutineDispatcher
 ) : SettingRepository {
@@ -153,14 +150,6 @@ class SettingRepositoryImpl(
                 //TODO: implement when success
             }
             return@withContext response
-        }
-    }
-
-    override suspend fun prepopulateFetchInfo() {
-        withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-            if (!fetchInfoDAO.existByAccountId(accountId) && accountId != null)
-                fetchInfoDAO.insert(FetchInfo(accountId))
         }
     }
 }

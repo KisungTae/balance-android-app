@@ -169,7 +169,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
                 matchPagingRefreshAdapter.reset()
 
                 lifecycleScope.launch {
-                    println("matchPagingDataAdapter.submitData(it)")
+//                    println("matchPagingDataAdapter.submitData(it)")
                     matchPagingDataAdapter.submitData(it)
                 }
             })

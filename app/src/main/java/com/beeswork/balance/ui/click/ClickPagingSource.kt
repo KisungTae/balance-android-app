@@ -39,6 +39,7 @@ class ClickPagingSource(
             val clicks = response.data ?: listOf()
             val prevPage = if (currentPage >= 1) currentPage - 1 else null
             val nextPage = if (clicks.isEmpty()) null else currentPage + 1
+            println("prevPage: $prevPage | current page: $currentPage | nextPage: $nextPage ")
             LoadResult.Page(clicks, prevPage, nextPage)
         } catch (e: IOException) {
             LoadResult.Error(e)

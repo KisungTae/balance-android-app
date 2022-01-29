@@ -30,17 +30,14 @@ class ClickViewModel(
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-//    private val _fetchClicks = MutableLiveData<Resource<EmptyResponse>>()
-//    val fetchClicks: LiveData<Resource<EmptyResponse>> get() = _fetchClicks
-//    private var fetchingClicks = false
-
+    @ExperimentalPagingApi
     fun initClickPagingData(): LiveData<PagingData<ClickDomain>> {
         return Pager(
-            pagingConfig,
-            null,
-//            ClickRemoteMediator(),
-            { ClickPagingSource(clickRepository) }
-        ).flow.cachedIn(viewModelScope)
+            config = pagingConfig,
+            remoteMediator = ClickRemoteMediator(clickRepository)
+        ) {
+            ClickPagingSource(clickRepository)
+        }.flow.cachedIn(viewModelScope)
             .map { pagingData ->
                 pagingData.map { clickMapper.toClickDomain(it) }
             }
@@ -49,17 +46,6 @@ class ClickViewModel(
             }
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
-
-//    fun fetchClicks() {
-//        viewModelScope.launch {
-//            if (!fetchingClicks) {
-//                fetchingClicks = true
-//                _fetchClicks.postValue(Resource.loading())
-//                _fetchClicks.postValue(clickRepository.fetchClicks())
-//                fetchingClicks = false
-//            }
-//        }
-//    }
 
     fun test() {
         clickRepository.test()

@@ -12,7 +12,6 @@ import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.entity.photo.Photo
 import com.beeswork.balance.data.database.entity.profile.Profile
 import com.beeswork.balance.data.database.entity.setting.FCMToken
-import com.beeswork.balance.data.database.entity.FetchInfo
 import com.beeswork.balance.data.database.entity.setting.Location
 import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.database.entity.swipe.SwipeFilter
@@ -20,7 +19,7 @@ import com.beeswork.balance.data.database.entity.swipe.SwipeFilter
 
 @Database(
     entities = [Match::class, ChatMessage::class, Swipe::class, FCMToken::class,
-        Click::class, Profile::class, Location::class, Photo::class, SwipeFilter::class, PushSetting::class, FetchInfo::class, Login::class],
+        Click::class, Profile::class, Location::class, Photo::class, SwipeFilter::class, PushSetting::class, Login::class],
     version = 1
 )
 @TypeConverters(
@@ -44,7 +43,6 @@ abstract class BalanceDatabase : RoomDatabase() {
     abstract fun photoDAO(): PhotoDAO
     abstract fun swipeFilterDAO(): SwipeFilterDAO
     abstract fun settingDAO(): PushSettingDAO
-    abstract fun fetchInfoDAO(): FetchInfoDAO
     abstract fun loginDAO(): LoginDAO
 
     companion object {

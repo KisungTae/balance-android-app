@@ -99,12 +99,12 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.RetryListener {
         super.onResume()
 //        if (hasLocationPermission()) bindLocationManager()
 //        else viewModel.saveLocationPermissionResult(false)
-        viewModel.connectStomp()
+//        viewModel.connectStomp()
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.disconnectStomp()
+//        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {

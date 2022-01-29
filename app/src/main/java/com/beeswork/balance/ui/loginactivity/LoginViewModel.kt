@@ -37,7 +37,6 @@ class LoginViewModel(
             viewModelScope.launch {
                 val response = loginRepository.socialLogin(loginId, accessToken, loginType)
                 if (response.isSuccess()) response.data?.let { loginDTO ->
-                    settingRepository.prepopulateFetchInfo()
                     if (loginDTO.profileExists && loginDTO.gender != null)
                         swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
                     settingRepository.syncFCMTokenAsync()

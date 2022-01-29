@@ -5,6 +5,7 @@ import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
+import java.util.*
 
 class ClickRDSImpl(
     balanceAPI: BalanceAPI,
@@ -12,5 +13,9 @@ class ClickRDSImpl(
 ) : BaseRDS(balanceAPI, preferenceProvider), ClickRDS {
     override suspend fun listClicks(loadSize: Int, startPosition: Int): Resource<List<ClickDTO>> {
         return getResult { balanceAPI.listClicks(loadSize, startPosition) }
+    }
+
+    override suspend fun fetchClicks(loadSize: Int, lastItemId: UUID): Resource<List<ClickDTO>> {
+        return getResult { balanceAPI.fetchClicks(loadSize, lastItemId) }
     }
 }

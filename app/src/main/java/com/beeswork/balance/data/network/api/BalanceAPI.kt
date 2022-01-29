@@ -38,6 +38,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import java.util.*
 
 interface BalanceAPI {
 
@@ -58,6 +59,12 @@ interface BalanceAPI {
     suspend fun listClicks(
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "startPosition") startPosition: Int
+    ): Response<List<ClickDTO>>
+
+    @GET("click/list")
+    suspend fun fetchClicks(
+        @Query(value = "loadSize") loadSize: Int,
+        @Query(value = "lastItemId") lastItemId: UUID
     ): Response<List<ClickDTO>>
 
 
