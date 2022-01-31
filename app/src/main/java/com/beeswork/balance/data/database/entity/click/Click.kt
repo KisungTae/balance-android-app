@@ -9,10 +9,11 @@ import java.util.*
 data class Click(
 
     @PrimaryKey
-    val swiperId: UUID,
+    val id: Long,
 
+    val swiperId: UUID,
     val swipedId: UUID,
     val name: String,
-    var profilePhotoKey: String,
-    var updatedAt: OffsetDateTime
+    val clicked: Boolean,
+    var profilePhotoKey: String
 )

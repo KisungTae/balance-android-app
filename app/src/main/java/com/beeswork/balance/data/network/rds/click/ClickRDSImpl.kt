@@ -15,7 +15,7 @@ class ClickRDSImpl(
         return getResult { balanceAPI.listClicks(loadSize, startPosition) }
     }
 
-    override suspend fun fetchClicks(loadSize: Int, lastItemId: UUID): Resource<List<ClickDTO>> {
-        return getResult { balanceAPI.fetchClicks(loadSize, lastItemId) }
+    override suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<List<ClickDTO>> {
+        return getResult { balanceAPI.fetchClicks(loadSize, lastSwiperId) }
     }
 }

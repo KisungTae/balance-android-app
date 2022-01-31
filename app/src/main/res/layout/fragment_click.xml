@@ -49,7 +49,7 @@
             android:id="@+id/llClickInitialLoadingPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/BackgroundWhite"
             android:padding="10dp">
 
             <TextView
@@ -76,7 +76,7 @@
             android:id="@+id/llClickInitialErrorPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="10dp">
@@ -104,6 +104,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:background="@color/BackgroundWhite"
             android:id="@+id/llClickInitialEmptyPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

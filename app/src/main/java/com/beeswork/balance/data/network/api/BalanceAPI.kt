@@ -61,10 +61,10 @@ interface BalanceAPI {
         @Query(value = "startPosition") startPosition: Int
     ): Response<List<ClickDTO>>
 
-    @GET("click/list")
+    @GET("click/fetch")
     suspend fun fetchClicks(
         @Query(value = "loadSize") loadSize: Int,
-        @Query(value = "lastItemId") lastItemId: UUID
+        @Query(value = "lastSwiperId") lastSwiperId: UUID?
     ): Response<List<ClickDTO>>
 
 

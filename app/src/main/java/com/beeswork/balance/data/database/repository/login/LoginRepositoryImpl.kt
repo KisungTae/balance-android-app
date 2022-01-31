@@ -113,6 +113,8 @@ class LoginRepositoryImpl(
 
             val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken)
             if (response.isSuccess()) response.data?.let { loginDTO ->
+//              todo: remove me
+                println("access token: ${loginDTO.accessToken}")
                 preferenceProvider.putValidLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
             }
             return@withContext response

@@ -8,7 +8,6 @@ class ExceptionCode {
 
         const val EXPIRED_JWT_EXCEPTION = "expired.jwt.exception"
         const val INVALID_JWT_TOKEN_EXCEPTION = "invalid.jwt.token.exception"
-        const val NO_INTERNET_CONNECTIVITY_EXCEPTION = "no_internet_connectivity_exception"
         const val ACCOUNT_NOT_FOUND_EXCEPTION = "account.not.found.exception"
         const val ACCOUNT_BLOCKED_EXCEPTION = "account.blocked.exception"
         const val ACCOUNT_DELETED_EXCEPTION = "account.deleted.exception"
@@ -16,8 +15,10 @@ class ExceptionCode {
         const val PHOTO_ALREADY_EXIST_EXCEPTION = "photo.already.exists.exception"
         const val MATCH_UNMATCHED_EXCEPTION = "match.unmatched.exception"
         const val INVALID_REFRESH_TOKEN_EXCEPTION = "invalid.refresh.token.exception"
+        const val AUTHENTICATION_EXCEPTION = "authentication.exception"
 
 
+        const val NO_INTERNET_CONNECTIVITY_EXCEPTION = "no_internet_connectivity_exception"
         const val REFRESH_TOKEN_NOT_FOUND_EXCEPTION = "refresh_token_not_found_exception"
         const val ACCESS_TOKEN_NOT_FOUND_EXCEPTION = "access_token_not_found_exception"
         const val ACCOUNT_ID_NOT_FOUND_EXCEPTION = "account.id.not.found.exception"
@@ -69,7 +70,8 @@ class ExceptionCode {
                 ACCOUNT_BLOCKED_EXCEPTION,
                 EXPIRED_JWT_EXCEPTION,
                 INVALID_REFRESH_TOKEN_EXCEPTION,
-                INVALID_JWT_TOKEN_EXCEPTION -> return true
+                INVALID_JWT_TOKEN_EXCEPTION,
+                AUTHENTICATION_EXCEPTION -> return true
             }
             return false
         }

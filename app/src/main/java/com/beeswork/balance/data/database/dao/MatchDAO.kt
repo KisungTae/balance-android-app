@@ -20,8 +20,8 @@ interface MatchDAO {
     @Query("select * from `match` where chatId = :chatId")
     fun findById(chatId: Long?): Match?
 
-    @Query("select count(swipedId) > 0 from `match` where swiperId = :accountId and swipedId = :swipedId")
-    fun existBySwipedId(accountId: UUID?, swipedId: UUID): Boolean
+    @Query("select count(swipedId) > 0 from `match` where swiperId = :swiperId and swipedId = :swipedId")
+    fun existBySwiperIdAndSwipedId(swiperId: UUID?, swipedId: UUID): Boolean
 
     @Query("select * from `match` where swiperId = :accountId and name like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
     fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>

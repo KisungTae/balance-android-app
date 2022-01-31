@@ -20,6 +20,11 @@ class ClickViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
+    val clickPageInvalidation by lazyDeferred {
+        clickRepository.getClickPageInvalidation().asLiveData()
+    }
+
+
     val clickPageInvalidationLiveData by viewModelLazyDeferred {
         clickRepository.clickPageInvalidationFlow.map { click ->
             if (click != null) {

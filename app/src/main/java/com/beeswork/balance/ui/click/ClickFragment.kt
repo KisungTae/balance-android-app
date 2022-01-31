@@ -70,6 +70,13 @@ class ClickFragment : BaseFragment(),
         setupClickPagingInitialPageAdapter()
         observeClickPageInvalidationLiveData()
         observeClickPagingData()
+        observeClickInvalidation()
+    }
+
+    private suspend fun observeClickInvalidation() {
+        viewModel.clickPageInvalidation.await().observe(viewLifecycleOwner) {
+            clickPagingRefreshAdapter.refresh()
+        }
     }
 
     private suspend fun observeClickPageInvalidationLiveData() {
@@ -170,6 +177,8 @@ class ClickFragment : BaseFragment(),
             binding.llClickInitialLoadingPage,
             binding.llClickInitialErrorPage,
             binding.llClickInitialEmptyPage,
+            binding.tvClickErrorMessage,
+            requireContext()
         )
         lifecycleScope.launch {
             clickPagingDataAdapter.loadStateFlow.collect { loadState ->

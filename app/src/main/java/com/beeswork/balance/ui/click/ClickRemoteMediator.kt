@@ -7,9 +7,10 @@ import androidx.paging.RemoteMediator
 import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.network.rds.click.ClickRDS
+import com.beeswork.balance.internal.exception.ServerException
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.NullPointerException
+import java.lang.RuntimeException
 
 
 @ExperimentalPagingApi
@@ -18,24 +19,29 @@ class ClickRemoteMediator(
 ) : RemoteMediator<Int, Click>() {
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Click>): MediatorResult {
         return try {
-            println("clickRemoteMediator load() | loadType: $loadType")
-
-
+            println("click remote mediator load(): $loadType")
             val loadKey = when (loadType) {
-                LoadType.REFRESH -> null
+                LoadType.REFRESH -> {
+                    return MediatorResult.Success(false)
+                }
                 LoadType.PREPEND -> {
-                    return MediatorResult.Success(endOfPaginationReached = true)
+                    return MediatorResult.Success(true)
                 }
                 LoadType.APPEND -> {
-                    val lastItem = state.lastItemOrNull() ?: return MediatorResult.Success(endOfPaginationReached = true)
-                    lastItem.swiperId
+                    state.lastItemOrNull()?.swiperId
                 }
             }
 
+            val pageSize = state.config.pageSize
+            val response = clickRepository.fetchClicks(state.config.pageSize, loadKey)
+            println("fetchClicks response: ${response.status} | fetchedClickSize: ${response.data}")
+            if (response.isError()) {
+                val exception = response.exception ?: RuntimeException()
+                return MediatorResult.Error(exception)
+            }
 
-
-
-            return MediatorResult.Success(true)
+            val fetchedClickSize = response.data ?: 0
+            return MediatorResult.Success(fetchedClickSize < pageSize)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

@@ -27,9 +27,12 @@ interface ClickDAO {
     @Query("select count(*) from click where swipedId = :accountId")
     fun count(accountId: UUID?): Flow<Int>
 
-    @Query("select * from click where swipedId = :accountId order by updatedAt desc limit :loadSize offset :startPosition ")
+    @Query("select * from click where swipedId = :accountId order by id desc limit :loadSize offset :startPosition ")
     fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int): List<Click>
 
     @Query("delete from click where swipedId = :accountId")
     fun deleteAll(accountId: UUID?)
+
+    @Query("select 1 from click")
+    fun findInvalidation(): Flow<Boolean>
 }

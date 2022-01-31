@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.common
 
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -9,25 +10,31 @@ import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.beeswork.balance.internal.util.MessageSource
 import com.github.ybq.android.spinkit.SpinKitView
 
 class PagingInitialPageAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     private val pagingDataAdapter: PagingDataAdapter<T, VH>,
     private val initialLoadingPage: ViewGroup,
     private val initialErrorPage: ViewGroup,
-    private val initialEmptyPage: ViewGroup
+    private val initialEmptyPage: ViewGroup,
+    private val tvErrorMessage: TextView,
+    private val context: Context
 ) {
 
     fun updateUI(loadState: CombinedLoadStates) {
         if (pagingDataAdapter.itemCount <= 1) {
-            if (loadState.refresh is LoadState.Loading) {
+            println("loadState: $loadState")
+            if (loadState.append is LoadState.Loading) {
                 println("show general loading page")
                 updateUI(View.VISIBLE, View.GONE, View.GONE)
-            } else if (loadState.refresh is LoadState.Error) {
+            } else if (loadState.append is LoadState.Error) {
                 println("show general error page")
-                println("(loadState.refresh as LoadState.Error).error ${(loadState.refresh as LoadState.Error).error}")
+                val exception = (loadState.append as LoadState.Error).error
+                val message = MessageSource.getMessage(context, exception)
+                tvErrorMessage.text = message
                 updateUI(View.GONE, View.VISIBLE, View.GONE)
-            } else if (loadState.prepend is LoadState.NotLoading && loadState.prepend.endOfPaginationReached) {
+            } else if (loadState.append is LoadState.NotLoading && loadState.append.endOfPaginationReached) {
                 println("show general empty page")
                 updateUI(View.GONE, View.GONE, View.VISIBLE)
             } else {

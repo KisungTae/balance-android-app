@@ -51,7 +51,7 @@ class ClickRepositoryImpl(
 
     override suspend fun saveClick(clickDTO: ClickDTO) {
         withContext(Dispatchers.IO) {
-            if (!matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
+            if (!matchDAO.existBySwiperIdAndSwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
                 val click = clickMapper.toClick(clickDTO)
                 if (click != null) {
                     clickDAO.insert(click)
@@ -98,25 +98,30 @@ class ClickRepositoryImpl(
         }
     }
 
-    override suspend fun fetchClicks(loadSize: Int, lastItemId: UUID): Resource<Int> {
+    override suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<Int> {
         return withContext(ioDispatcher) {
-            val response = clickRDS.fetchClicks(loadSize, lastItemId)
+//            todo: remove me
+            delay(5000)
+            val response = clickRDS.fetchClicks(loadSize, lastSwiperId)
+            if (response.isError()) {
+                return@withContext Resource.error(response.exception)
+            }
 
             balanceDatabase.runInTransaction {
                 response.data?.forEach { clickDTO ->
-                    if (!matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
-                        val click = clickMapper.toClick(clickDTO)
-                        if (click != null) {
+                    if (!matchDAO.existBySwiperIdAndSwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
+                        clickMapper.toClick(clickDTO)?.let { click ->
                             clickDAO.insert(click)
                         }
                     }
                 }
             }
-
-
-
-            return@withContext Resource.error(null)
+            return@withContext Resource.success(response.data?.size)
         }
+    }
+
+    override fun getClickPageInvalidation(): Flow<Boolean> {
+        return clickDAO.findInvalidation()
     }
 
     private suspend fun fetchClicks(loadSize: Int, startPosition: Int): Resource<EmptyResponse> {
@@ -128,7 +133,7 @@ class ClickRepositoryImpl(
             response.data?.forEach { clickDTO ->
                 if (clickDTO.deleted) {
                     clickDAO.deleteBySwiperId(clickDTO.swiperId)
-                } else if (matchDAO.existBySwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
+                } else if (matchDAO.existBySwiperIdAndSwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
                     clickDAO.deleteBySwiperId(clickDTO.swiperId, clickDTO.swipedId)
                 } else {
                     val newClick = clickMapper.toClick(clickDTO)
@@ -189,7 +194,7 @@ class ClickRepositoryImpl(
             var now = OffsetDateTime.now()
             for (i in 0..500) {
                 now = now.plusMinutes(1)
-                clicks.add(Click(UUID.randomUUID(), accountId!!, "test-$i", "photo", OffsetDateTime.from(now)))
+                clicks.add(Click(0, UUID.randomUUID(), accountId!!, "test-$i", false, "photo"))
             }
             clickDAO.insert(clicks)
 //            println("inserted click")

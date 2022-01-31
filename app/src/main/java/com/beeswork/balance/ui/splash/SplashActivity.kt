@@ -41,6 +41,8 @@ class SplashActivity : BaseActivity(), KodeinAware {
                     // TODO: remove me and comment in
                     Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, MainActivity::class.java))
 
+
+
 //                    if (it.data?.profileExists == true)
 //                        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
 //                    else

@@ -9,12 +9,12 @@ import java.util.*
 class ClickMapperImpl : ClickMapper {
     override fun toClick(clickDTO: ClickDTO): Click? {
         return safeLet(
+            clickDTO.id,
             clickDTO.swipedId,
             clickDTO.name,
-            clickDTO.profilePhotoKey,
-            clickDTO.updatedAt
-        ) { swipedId, name, profilePhotoKey, updatedAt ->
-            return@safeLet Click(clickDTO.swiperId, swipedId, name, profilePhotoKey, updatedAt)
+            clickDTO.profilePhotoKey
+        ) { id, swipedId, name, profilePhotoKey ->
+            return@safeLet Click(id, clickDTO.swiperId, swipedId, name, clickDTO.clicked, profilePhotoKey)
         }
     }
 

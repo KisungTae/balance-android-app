@@ -6,5 +6,5 @@ import java.util.*
 
 interface ClickRDS {
     suspend fun listClicks(loadSize: Int, startPosition: Int): Resource<List<ClickDTO>>
-    suspend fun fetchClicks(loadSize: Int, lastItemId: UUID): Resource<List<ClickDTO>>
+    suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<List<ClickDTO>>
 }
