@@ -24,18 +24,18 @@ class PagingInitialPageAdapter<T : Any, VH : RecyclerView.ViewHolder>(
 
     fun updateUI(loadState: CombinedLoadStates) {
         if (pagingDataAdapter.itemCount <= 1) {
-            println("loadState: $loadState")
+//            println("loadState: $loadState")
             if (loadState.append is LoadState.Loading) {
-                println("show general loading page")
+//                println("show general loading page")
                 updateUI(View.VISIBLE, View.GONE, View.GONE)
             } else if (loadState.append is LoadState.Error) {
-                println("show general error page")
+//                println("show general error page")
                 val exception = (loadState.append as LoadState.Error).error
                 val message = MessageSource.getMessage(context, exception)
                 tvErrorMessage.text = message
                 updateUI(View.GONE, View.VISIBLE, View.GONE)
             } else if (loadState.append is LoadState.NotLoading && loadState.append.endOfPaginationReached) {
-                println("show general empty page")
+//                println("show general empty page")
                 updateUI(View.GONE, View.GONE, View.VISIBLE)
             } else {
                 updateUI(View.GONE, View.GONE, View.GONE)

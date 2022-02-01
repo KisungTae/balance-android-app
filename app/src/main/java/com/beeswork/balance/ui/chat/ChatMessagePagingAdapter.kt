@@ -52,15 +52,15 @@ class ChatMessagePagingAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let { chatMessageDomain ->
             chatMessageDomain.topMargin = calculateTopMargin(chatMessageDomain, position)
-            when (holder.itemViewType) {
-                ChatMessageStatus.SEPARATOR.ordinal -> {
-                    (holder as SeparatorViewHolder).bind(chatMessageDomain)
+            when (holder) {
+                is SeparatorViewHolder -> {
+                    holder.bind(chatMessageDomain)
                 }
-                ChatMessageStatus.RECEIVED.ordinal -> {
-                    (holder as ReceivedViewHolder).bind(chatMessageDomain, profilePhotoEndPoint)
+                is ReceivedViewHolder -> {
+                    holder.bind(chatMessageDomain, profilePhotoEndPoint)
                 }
-                else -> {
-                    (holder as SentViewHolder).bind(chatMessageDomain)
+                is SentViewHolder -> {
+                    holder.bind(chatMessageDomain)
                 }
             }
         }

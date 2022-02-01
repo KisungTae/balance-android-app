@@ -8,14 +8,14 @@ import java.util.*
 
 interface ClickRepository {
 
-    val clickPageInvalidationFlow: Flow<Click?>
+    val newClickInvalidationFlow: Flow<Click?>
 
-    suspend fun deleteClicks()
-    suspend fun saveClick(clickDTO: ClickDTO)
-    suspend fun loadClicks(loadSize: Int, startPosition: Int): Resource<List<Click>>
     suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<Int>
+    suspend fun loadClicks(loadSize: Int, startPosition: Int): List<Click>
+    suspend fun saveClick(clickDTO: ClickDTO)
+    suspend fun deleteClicks()
 
-    fun getClickPageInvalidation(): Flow<Boolean>
+    fun getClickPageInvalidationFlow(): Flow<Boolean>
     fun getClickCountFlow(): Flow<Int>
 
 

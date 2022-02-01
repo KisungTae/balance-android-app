@@ -19,10 +19,10 @@ interface ClickDAO {
     fun insert(clicks: List<Click>)
 
     @Query("delete from click where swiperId = :swiperId and swipedId = :swipedId")
-    fun deleteBySwiperId(swiperId: UUID, swipedId: UUID?)
+    fun deleteBy(swiperId: UUID, swipedId: UUID?)
 
     @Query("delete from click where swiperId = :swiperId")
-    fun deleteBySwiperId(swiperId: UUID)
+    fun deleteBy(swiperId: UUID)
 
     @Query("select count(*) from click where swipedId = :accountId")
     fun count(accountId: UUID?): Flow<Int>
@@ -35,4 +35,9 @@ interface ClickDAO {
 
     @Query("select 1 from click")
     fun findInvalidation(): Flow<Boolean>
+
+    @Query("select * from click where swiperId = :swiperId and swipedId = :swipedId")
+    fun findBy(swiperId: UUID?, swipedId: UUID?): Click?
+
+
 }

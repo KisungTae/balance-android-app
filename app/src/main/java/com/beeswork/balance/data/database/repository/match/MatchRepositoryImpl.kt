@@ -15,7 +15,6 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.internal.constant.ReportReason
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import kotlinx.coroutines.*
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.threeten.bp.OffsetDateTime
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -95,7 +93,7 @@ class MatchRepositoryImpl(
         preferenceProvider.getAccountId()?.let { accountId ->
             updateMatch(match)
             swipeDAO.insert(Swipe(match.swipedId, accountId))
-            clickDAO.deleteBySwiperId(accountId, match.swipedId)
+            clickDAO.deleteBy(accountId, match.swipedId)
             matchDAO.insert(match)
         }
     }

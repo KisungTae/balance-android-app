@@ -17,6 +17,20 @@ class MainViewPagerViewModel(
     private val clickRepository: ClickRepository
 ) : BaseViewModel() {
 
+    //    val newClickLiveData by viewModelLazyDeferred {
+//        clickRepository.newClickInvalidationFlow.map { click -> }
+//    }
+//
+//    val clickPageInvalidationLiveData by viewModelLazyDeferred {
+//        clickRepository.newClickInvalidationFlow.map { click ->
+//            if (click != null) {
+//                clickMapper.toClickDomain(click)
+//            } else {
+//                null
+//            }
+//        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+//    }
+
     val unreadMatchCount by viewModelLazyDeferred {
         matchRepository.getUnreadMatchCountFlow().asLiveData()
     }

@@ -2,16 +2,11 @@ package com.beeswork.balance.ui.click
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.database.repository.click.ClickRepository
-import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.click.ClickMapper
-import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 
 class ClickViewModel(
@@ -20,19 +15,8 @@ class ClickViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val clickPageInvalidation by lazyDeferred {
-        clickRepository.getClickPageInvalidation().asLiveData()
-    }
-
-
     val clickPageInvalidationLiveData by viewModelLazyDeferred {
-        clickRepository.clickPageInvalidationFlow.map { click ->
-            if (click != null) {
-                clickMapper.toClickDomain(click)
-            } else {
-                null
-            }
-        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+        clickRepository.getClickPageInvalidationFlow().asLiveData()
     }
 
     @ExperimentalPagingApi
@@ -55,15 +39,6 @@ class ClickViewModel(
     fun test() {
         clickRepository.test()
     }
-
-
-//    fun fetchClicks() {
-//        balanceRepository.fetchClickedList()
-//    }
-//
-//    fun swipe(swipeId: String) {
-//        balanceRepository.swipe(null, swipeId)
-//    }
 
     companion object {
         private const val CLICK_PAGE_SIZE = 30

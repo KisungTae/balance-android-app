@@ -68,62 +68,24 @@ class ClickFragment : BaseFragment(),
     private fun bindUI() = lifecycleScope.launch {
         setupClickRecyclerView()
         setupClickPagingInitialPageAdapter()
+        observeClickPagingDataLiveData()
         observeClickPageInvalidationLiveData()
-        observeClickPagingData()
-        observeClickInvalidation()
-    }
-
-    private suspend fun observeClickInvalidation() {
-        viewModel.clickPageInvalidation.await().observe(viewLifecycleOwner) {
-            clickPagingRefreshAdapter.refresh()
-        }
     }
 
     private suspend fun observeClickPageInvalidationLiveData() {
-        viewModel.clickPageInvalidationLiveData.await().observe(viewLifecycleOwner) { clickDomain ->
-            if (clickDomain != null) {
-                showNewClickSnackBar(clickDomain)
-            }
+        viewModel.clickPageInvalidationLiveData.await().observe(viewLifecycleOwner) {
             clickPagingRefreshAdapter.refresh()
-//            println("clickPagingDataAdapter.refresh() will happen")
-//            clickPagingDataAdapter.refresh()
-
         }
     }
 
-    private fun showNewClickSnackBar(clickDomain: ClickDomain) {
-        val binding = SnackBarNewClickBinding.inflate(layoutInflater)
-        val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
-        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
-        snackBar.view.setOnClickListener { newClickSnackBar?.dismiss() }
 
-//        val swiperProfilePhoto = EndPoint.ofPhoto(clickDomain.swiperId, clickDomain.profilePhotoKey)
-        val swiperProfilePhoto = R.drawable.person2
-
-        Glide.with(requireContext())
-            .load(swiperProfilePhoto)
-            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-            .into(binding.ivNewClickSnackBarSwiper)
-
-        snackBar.addCallback(object : Snackbar.Callback() {
-            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                super.onDismissed(transientBottomBar, event)
-                if (transientBottomBar === newClickSnackBar) newClickSnackBar = null
-            }
-        })
-
-        newClickSnackBar?.dismiss()
-        newClickSnackBar = snackBar
-        snackBar.show()
-    }
 
     @ExperimentalPagingApi
-    private fun observeClickPagingData() {
-        viewModel.initClickPagingData().observe(viewLifecycleOwner, {
+    private fun observeClickPagingDataLiveData() {
+        viewModel.initClickPagingData().observe(viewLifecycleOwner, { pagingData ->
             clickPagingRefreshAdapter.reset()
             lifecycleScope.launch {
-//                println("clickPagingDataAdapter.submitData(it)")
-                clickPagingDataAdapter.submitData(it)
+                clickPagingDataAdapter.submitData(pagingData)
             }
         })
     }
@@ -137,7 +99,6 @@ class ClickFragment : BaseFragment(),
 
         clickPagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-//                println("onItemRangeInserted positionStart: $positionStart | itemCount: $itemCount")
                 super.onItemRangeInserted(positionStart, itemCount)
             }
         })
@@ -182,7 +143,6 @@ class ClickFragment : BaseFragment(),
         )
         lifecycleScope.launch {
             clickPagingDataAdapter.loadStateFlow.collect { loadState ->
-//                println("prepend: ${loadState.prepend}")
                 clickPagingInitialPageAdapter.updateUI(loadState)
             }
         }

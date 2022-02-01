@@ -25,21 +25,9 @@ class ClickPagingSource(
         return try {
             val currentPage = params.key ?: 0
             val startPosition = currentPage * params.loadSize
-            val response = clickRepository.loadClicks(params.loadSize, startPosition)
-
-
-            if (response.isError()) {
-                if (response.exception == null) {
-                    LoadResult.Error<Int, Click>(RuntimeException())
-                } else {
-                    LoadResult.Error<Int, Click>(response.exception)
-                }
-            }
-
-            val clicks = response.data ?: listOf()
+            val clicks = clickRepository.loadClicks(params.loadSize, startPosition)
             val prevPage = if (currentPage >= 1) currentPage - 1 else null
             val nextPage = if (clicks.isEmpty()) null else currentPage + 1
-            println("prevPage: $prevPage | current page: $currentPage | nextPage: $nextPage ")
             LoadResult.Page(clicks, prevPage, nextPage)
         } catch (e: IOException) {
             LoadResult.Error(e)

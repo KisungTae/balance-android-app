@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.main.MainRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.ui.common.BaseViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -18,6 +19,8 @@ class MainViewModel(
     val webSocketEventLiveData by viewModelLazyDeferred {
         mainRepository.webSocketEventFlow.asLiveData()
     }
+
+
 
     fun connectStomp() {
         viewModelScope.launch { mainRepository.connectStomp() }

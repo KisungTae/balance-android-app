@@ -229,7 +229,7 @@ class ChatRepositoryImpl(
         receivedChatMessageIds: List<UUID>
     ) {
         if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
             chatRDS.syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
         }
     }

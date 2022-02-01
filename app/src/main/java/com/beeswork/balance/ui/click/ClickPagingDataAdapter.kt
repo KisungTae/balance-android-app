@@ -41,20 +41,16 @@ class ClickPagingDataAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-//        println("onBindViewHolder: $position")
         getItem(position)?.let { clickDomain ->
-            println("onBind: $clickDomain")
-            println("holder.itemViewType: ${holder.itemViewType}")
-            when (clickDomain.type) {
-                ClickDomain.Type.HEADER -> (holder as HeaderViewHolder).bind()
-                ClickDomain.Type.ITEM -> (holder as ItemViewHolder).bind(clickDomain)
+            when (holder) {
+                is HeaderViewHolder -> holder.bind()
+                is ItemViewHolder -> holder.bind(clickDomain)
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        println("getClick(position)?.type?.ordinal: ${getClick(position)?.type?.ordinal}")
-        return getClick(position)?.type?.ordinal ?: ClickDomain.Type.HEADER.ordinal
+        return getClick(position)?.type?.ordinal ?: ClickDomain.Type.ITEM.ordinal
     }
 
     fun getClick(position: Int): ClickDomain? {
