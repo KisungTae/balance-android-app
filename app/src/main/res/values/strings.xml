@@ -213,4 +213,6 @@
     <string name="access_token_not_found_exception">access_token_not_found_exception</string>
     <string name="account_id_not_found_exception">account_id_not_found_exception</string>
     <string name="match_unmatched_exception">match_unmatched_exception</string>
+    <string name="click_clicked_icon">click clicked icon</string>
+    <string name="click_not_clicked_icon">click not clicked icon</string>
 </resources>

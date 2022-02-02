@@ -92,25 +92,27 @@ class ClickPagingDataAdapter(
         }
 
         fun bind(click: ClickDomain) {
-            binding.clickName.text = click.name
+            binding.ivClickClickedIcon.isVisible = click.clicked
+            binding.ivClickNotClickedIcon.isVisible = !click.clicked
+
 //            val profilePhoto = EndPoint.ofPhoto(click.swiperId, click.profilePhotoKey)
 
 //            TODO: remove me
-//            val r = Random.nextInt(50)
-//            val re = r % 5
-//            val pic = when (re) {
-//                0 -> R.drawable.person1
-//                1 -> R.drawable.person2
-//                2 -> R.drawable.person3
-//                3 -> R.drawable.person4
-//                4 -> R.drawable.person5
-//                else -> R.drawable.person2
-//            }
-//
-//            Glide.with(context)
-//                .load(pic)
-//                .apply(GlideHelper.profilePhotoGlideOptions())
-//                .into(binding.ivClick)
+            val r = Random.nextInt(50)
+            val re = r % 5
+            val pic = when (re) {
+                0 -> R.drawable.person1
+                1 -> R.drawable.person2
+                2 -> R.drawable.person3
+                3 -> R.drawable.person4
+                4 -> R.drawable.person5
+                else -> R.drawable.person2
+            }
+
+            Glide.with(context)
+                .load(pic)
+                .apply(GlideHelper.profilePhotoGlideOptions())
+                .into(binding.ivClick)
         }
 
         override fun onClick(v: View?) {

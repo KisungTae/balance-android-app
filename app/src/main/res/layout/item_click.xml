@@ -23,19 +23,35 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/click_profile_photo_image_view_description" />
 
-        <!--     TODO: remove me   -->
-        <TextView
-            android:id="@+id/clickName"
+        <FrameLayout
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="right"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30sp" />
+            android:layout_height="wrap_content">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha=".3"
-            android:background="@drawable/sh_round_box"
-            android:backgroundTint="@color/Black" />
+            <ImageView
+                android:id="@+id/ivClickNotClickedIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_thumb_up_off_alt_24"
+                android:contentDescription="@string/click_not_clicked_icon" />
+
+            <ImageView
+                android:id="@+id/ivClickClickedIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_thumb_up_alt_24"
+                android:contentDescription="@string/click_clicked_icon" />
+
+        </FrameLayout>
+
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:alpha=".3"-->
+<!--            android:background="@drawable/sh_round_box"-->
+<!--            android:backgroundTint="@color/Black" />-->
 
         <View
             android:layout_width="70dp"

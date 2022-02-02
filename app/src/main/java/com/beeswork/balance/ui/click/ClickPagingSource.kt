@@ -17,7 +17,6 @@ class ClickPagingSource(
     override fun getRefreshKey(state: PagingState<Int, Click>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
-            println("getRefreshKey ${anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)}")
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }
     }
@@ -29,7 +28,6 @@ class ClickPagingSource(
             val clicks = clickRepository.loadClicks(params.loadSize, startPosition)
             val prevPage = if (currentPage >= 1) currentPage - 1 else null
             val nextPage = if (clicks.isEmpty()) null else currentPage + 1
-            println("prev: $prevPage | current: $currentPage | next: $nextPage")
             LoadResult.Page(clicks, prevPage, nextPage)
         } catch (e: IOException) {
             LoadResult.Error(e)

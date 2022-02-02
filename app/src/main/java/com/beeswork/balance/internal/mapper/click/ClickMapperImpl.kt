@@ -19,6 +19,6 @@ class ClickMapperImpl : ClickMapper {
     }
 
     override fun toClickDomain(click: Click): ClickDomain {
-        return ClickDomain(click.swiperId, click.name, click.profilePhotoKey)
+        return ClickDomain(click.swiperId, click.name, click.clicked, click.profilePhotoKey)
     }
 }

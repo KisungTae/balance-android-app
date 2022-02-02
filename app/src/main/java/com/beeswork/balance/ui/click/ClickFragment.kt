@@ -70,8 +70,6 @@ class ClickFragment : BaseFragment(),
         }
     }
 
-
-
     @ExperimentalPagingApi
     private fun observeClickPagingDataLiveData() {
         viewModel.initClickPagingData().observe(viewLifecycleOwner, { pagingData ->
