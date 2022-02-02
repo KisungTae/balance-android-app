@@ -9,7 +9,6 @@ import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.click.ClickDTO
-import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import kotlinx.coroutines.*
@@ -44,7 +43,6 @@ class ClickRepositoryImpl(
 
     override suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<Int> {
         return withContext(ioDispatcher) {
-            delay(10000)
             val response = clickRDS.fetchClicks(loadSize, lastSwiperId)
             if (response.isError()) {
                 return@withContext Resource.error(response.exception)
@@ -52,11 +50,7 @@ class ClickRepositoryImpl(
 
             balanceDatabase.runInTransaction {
                 response.data?.forEach { clickDTO ->
-                    if (!matchDAO.existBySwiperIdAndSwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
-                        clickMapper.toClick(clickDTO)?.let { click ->
-                            clickDAO.insert(click)
-                        }
-                    }
+                    doSaveClick(clickDTO)
                 }
             }
             return@withContext Resource.success(response.data?.size)
@@ -73,29 +67,19 @@ class ClickRepositoryImpl(
     }
 
     private fun syncClicks(loadSize: Int, startPosition: Int) {
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { a, b -> }) {
             clickPageSyncDateTracker.updateSyncDate(startPosition, OffsetDateTime.now())
             val response = clickRDS.listClicks(loadSize, startPosition)
-
             if (response.isError()) {
                 clickPageSyncDateTracker.updateSyncDate(startPosition, null)
                 return@launch
             }
             balanceDatabase.runInTransaction {
-                println("balanceDatabase.runInTransaction")
                 response.data?.forEach { clickDTO ->
                     if (clickDTO.deleted) {
                         clickDAO.deleteBy(clickDTO.swiperId)
-                    } else if (matchDAO.existBySwiperIdAndSwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
-                        clickDAO.deleteBy(clickDTO.swiperId, clickDTO.swipedId)
                     } else {
-                        val oldClick = clickDAO.findBy(clickDTO.swiperId, clickDTO.swipedId)
-                        if (oldClick?.isEqualTo(clickDTO) == false) {
-                            clickMapper.toClick(clickDTO)?.let { click ->
-                                println("clickDAO.insert(click)")
-                                clickDAO.insert(click)
-                            }
-                        }
+                        doSaveClick(clickDTO)
                     }
                 }
             }
@@ -104,16 +88,27 @@ class ClickRepositoryImpl(
 
     override suspend fun saveClick(clickDTO: ClickDTO) {
         withContext(Dispatchers.IO) {
-            if (!matchDAO.existBySwiperIdAndSwipedId(clickDTO.swipedId, clickDTO.swiperId)) {
-                val click = clickMapper.toClick(clickDTO)
-                if (click != null) {
-                    clickDAO.insert(click)
-                    if (click.swipedId == preferenceProvider.getAccountId()) {
-                        newClickInvalidationListener?.onInvalidate(click)
-                    }
+            doSaveClick(clickDTO)?.let { click ->
+                if (click.swipedId == preferenceProvider.getAccountId()) {
+                    newClickInvalidationListener?.onInvalidate(click)
                 }
             }
         }
+    }
+
+    private fun doSaveClick(clickDTO: ClickDTO): Click? {
+        if (matchDAO.existBy(clickDTO.swipedId, clickDTO.swiperId)) {
+            return null
+        }
+
+        val oldClick = clickDAO.findBy(clickDTO.swiperId, clickDTO.swipedId)
+        if (oldClick == null || !oldClick.isEqualTo(clickDTO)) {
+            clickMapper.toClick(clickDTO)?.let { click ->
+                clickDAO.insert(click)
+                return click
+            }
+        }
+        return null
     }
 
     override suspend fun deleteClicks() {

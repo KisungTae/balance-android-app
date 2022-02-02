@@ -19,7 +19,6 @@ class ClickRemoteMediator(
 ) : RemoteMediator<Int, Click>() {
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Click>): MediatorResult {
         return try {
-//            println("click remote mediator load(): $loadType")
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> {
                     return MediatorResult.Success(false)
@@ -34,12 +33,10 @@ class ClickRemoteMediator(
 
             val pageSize = state.config.pageSize
             val response = clickRepository.fetchClicks(state.config.pageSize, loadKey)
-//            println("fetchClicks response: ${response.status} | fetchedClickSize: ${response.data}")
             if (response.isError()) {
                 val exception = response.exception ?: RuntimeException()
                 return MediatorResult.Error(exception)
             }
-
             val fetchedClickSize = response.data ?: 0
             return MediatorResult.Success(fetchedClickSize < pageSize)
         } catch (e: IOException) {

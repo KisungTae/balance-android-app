@@ -41,7 +41,7 @@ class ClickViewModel(
     }
 
     companion object {
-        private const val CLICK_PAGE_SIZE = 30
+        private const val CLICK_PAGE_SIZE = 100
         private const val CLICK_PAGE_PREFETCH_DISTANCE = CLICK_PAGE_SIZE
         private const val CLICK_MAX_PAGE_SIZE = CLICK_PAGE_PREFETCH_DISTANCE * 3 + CLICK_PAGE_SIZE
         private val pagingConfig = PagingConfig(

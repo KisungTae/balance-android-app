@@ -39,7 +39,6 @@ class ClickFragment : BaseFragment(),
     private lateinit var clickPagingDataAdapter: ClickPagingDataAdapter
     private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
     private lateinit var clickPagingInitialPageAdapter: PagingInitialPageAdapter<ClickDomain, RecyclerView.ViewHolder>
-    private var newClickSnackBar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,13 +54,6 @@ class ClickFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ClickViewModel::class.java)
         bindUI()
-
-//        todo: remove me
-        binding.btnClickAdd.setOnClickListener {
-            clickPagingDataAdapter.refresh()
-//            viewModel.test()
-        }
-//        viewModel.test()
     }
 
     @ExperimentalPagingApi
@@ -96,14 +88,6 @@ class ClickFragment : BaseFragment(),
         binding.rvClick.adapter = clickPagingDataAdapter.withLoadStateFooter(
             footer = footerLoadStateAdapter
         )
-
-        clickPagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-            }
-        })
-
-
 
         val gridLayoutManager = GridLayoutManager(this@ClickFragment.context, CLICK_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
