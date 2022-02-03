@@ -1,7 +1,6 @@
 package com.beeswork.balance.ui.click
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,15 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentClickBinding
-import com.beeswork.balance.databinding.SnackBarNewClickBinding
-import com.beeswork.balance.internal.util.GlideHelper
-import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameDialog
-import com.bumptech.glide.Glide
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -58,14 +51,16 @@ class ClickFragment : BaseFragment(),
 
     @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
+        viewModel.syncClickCount()
         setupClickRecyclerView()
         setupClickPagingInitialPageAdapter()
         observeClickPagingDataLiveData()
-        observeClickPageInvalidationLiveData()
+        observeClickPageInvalidationMediatorLiveData()
     }
 
-    private suspend fun observeClickPageInvalidationLiveData() {
-        viewModel.clickPageInvalidationLiveData.await().observe(viewLifecycleOwner) {
+    private fun observeClickPageInvalidationMediatorLiveData() {
+        viewModel.clickPageInvalidationMediatorLiveData.observe(viewLifecycleOwner) {
+            viewModel.syncClickCount()
             clickPagingRefreshAdapter.refresh()
         }
     }
@@ -131,6 +126,7 @@ class ClickFragment : BaseFragment(),
     }
 
     override fun onFragmentSelected() {
+        viewModel.test()
     }
 
     override fun onSelectClick(position: Int) {
@@ -148,12 +144,4 @@ class ClickFragment : BaseFragment(),
         const val FOOTER_SPAN_COUNT = 2
         const val CLICK_PAGE_SPAN_COUNT = 2
     }
-
-
-    override fun onResume() {
-        super.onResume()
-//        clickPagingDataAdapter.refresh()
-    }
-
-
 }

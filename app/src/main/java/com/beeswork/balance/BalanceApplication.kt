@@ -271,7 +271,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { ClickViewModelFactory(instance(), instance(), Dispatchers.Default) }
+        bind() from provider { ClickViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeBalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider {

@@ -37,8 +37,7 @@ class ClickRemoteMediator(
                 val exception = response.exception ?: RuntimeException()
                 return MediatorResult.Error(exception)
             }
-            val fetchedClickSize = response.data ?: 0
-            return MediatorResult.Success(fetchedClickSize < pageSize)
+            return MediatorResult.Success((response.data?.fetchedClickSize ?: 0) < pageSize)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

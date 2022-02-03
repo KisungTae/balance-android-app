@@ -9,6 +9,7 @@ import com.beeswork.balance.data.database.entity.click.Click
 import com.beeswork.balance.data.network.rds.click.ClickRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.click.FetchClicksDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.click.ClickMapper
 import kotlinx.coroutines.*
@@ -28,20 +29,44 @@ class ClickRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : ClickRepository {
 
-    private var newClickInvalidationListener: InvalidationListener<Click?>? = null
+    private var newClickInvalidationListener: InvalidationListener<Click>? = null
+    private var clickCountInvalidationListener: InvalidationListener<Long?>? = null
+    private var clickPageInvalidationListener: InvalidationListener<Boolean>? = null
     private val clickPageSyncDateTracker = PageSyncDateTracker()
 
     @ExperimentalCoroutinesApi
-    override val newClickInvalidationFlow: Flow<Click?> = callbackFlow {
-        newClickInvalidationListener = object : InvalidationListener<Click?> {
-            override fun onInvalidate(data: Click?) {
+    override val newClickInvalidationFlow: Flow<Click> = callbackFlow {
+        newClickInvalidationListener = object : InvalidationListener<Click> {
+            override fun onInvalidate(data: Click) {
                 offer(data)
             }
         }
         awaitClose { }
     }
 
-    override suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<Int> {
+    @ExperimentalCoroutinesApi
+    override val clickCountInvalidationFlow: Flow<Long?> = callbackFlow {
+        clickCountInvalidationListener = object : InvalidationListener<Long?> {
+            override fun onInvalidate(data: Long?) {
+                offer(data)
+            }
+        }
+        awaitClose { }
+    }
+
+    @ExperimentalCoroutinesApi
+    override val clickPageInvalidationFlow: Flow<Boolean> = callbackFlow {
+        clickPageInvalidationListener = object : InvalidationListener<Boolean> {
+            override fun onInvalidate(data: Boolean) {
+                offer(data)
+            }
+        }
+        awaitClose { }
+    }
+
+
+
+    override suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<FetchClicksDTO> {
         return withContext(ioDispatcher) {
             val response = clickRDS.fetchClicks(loadSize, lastSwiperId)
             if (response.isError()) {
@@ -53,7 +78,8 @@ class ClickRepositoryImpl(
                     doSaveClick(clickDTO)
                 }
             }
-            return@withContext Resource.success(response.data?.size)
+            val fetchedClickSize = response.data?.size ?: 0
+            return@withContext Resource.success(FetchClicksDTO(fetchedClickSize))
         }
     }
 
@@ -111,36 +137,35 @@ class ClickRepositoryImpl(
         return null
     }
 
+    override suspend fun syncClickCount() {
+        withContext(ioDispatcher) {
+            val response = clickRDS.countClicks()
+            clickCountInvalidationListener?.onInvalidate(response.data?.count)
+        }
+    }
+
     override suspend fun deleteClicks() {
         withContext(ioDispatcher) {
             clickDAO.deleteAll(preferenceProvider.getAccountId())
         }
     }
 
-    override fun getClickPageInvalidationFlow(): Flow<Boolean> {
-        return clickDAO.findInvalidation()
-    }
-
-    override fun getClickCountFlow(): Flow<Int> {
-        return clickDAO.count(preferenceProvider.getAccountId())
-    }
-
-
     override fun test() {
-
-        CoroutineScope(ioDispatcher).launch {
-            val clicks = mutableListOf<Click>()
-            val accountId = preferenceProvider.getAccountId()
-            var now = OffsetDateTime.now()
-            for (i in 0..500) {
-                now = now.plusMinutes(1)
-                clicks.add(Click(0, UUID.randomUUID(), accountId!!, "test-$i", false, "photo"))
-            }
-            clickDAO.insert(clicks)
+        println("test()")
+        clickPageInvalidationListener?.onInvalidate(true)
+//        CoroutineScope(ioDispatcher).launch {
+//            val clicks = mutableListOf<Click>()
+//            val accountId = preferenceProvider.getAccountId()
+//            var now = OffsetDateTime.now()
+//            for (i in 0..500) {
+//                now = now.plusMinutes(1)
+//                clicks.add(Click(0, UUID.randomUUID(), accountId!!, "test-$i", false, "photo"))
+//            }
+//            clickDAO.insert(clicks)
 //            println("inserted click")
 //            clickPageInvalidationListener?.onInvalidate(null)
 //            println("called clickPageInvalidationListener?.onInvalidate(null)")
-        }
+//        }
     }
 
 

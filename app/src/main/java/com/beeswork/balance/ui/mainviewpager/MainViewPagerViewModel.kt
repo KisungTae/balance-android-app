@@ -31,11 +31,13 @@ class MainViewPagerViewModel(
 //        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
 //    }
 
+    val clickCountLiveData by viewModelLazyDeferred {
+        clickRepository.clickCountInvalidationFlow.asLiveData()
+    }
+
     val unreadMatchCount by viewModelLazyDeferred {
         matchRepository.getUnreadMatchCountFlow().asLiveData()
     }
 
-    val clickCount by viewModelLazyDeferred {
-        clickRepository.getClickCountFlow().asLiveData()
-    }
+
 }

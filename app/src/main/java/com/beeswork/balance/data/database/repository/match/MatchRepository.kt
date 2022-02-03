@@ -13,6 +13,7 @@ import java.util.*
 interface MatchRepository {
 
     val newMatchFlow: Flow<MatchProfileTuple>
+    val clickPageInvalidationFlow: Flow<Boolean>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>

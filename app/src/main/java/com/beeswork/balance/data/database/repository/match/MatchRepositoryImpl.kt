@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.BalanceDatabase
+import com.beeswork.balance.data.database.common.InvalidationListener
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
@@ -40,12 +41,23 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     private var newMatchFlowListener: NewMatchFlowListener? = null
+    private var clickPageInvalidationListener: InvalidationListener<Boolean>? = null
 
     @ExperimentalCoroutinesApi
     override val newMatchFlow = callbackFlow<MatchProfileTuple> {
         newMatchFlowListener = object : NewMatchFlowListener {
             override fun onReceive(matchProfileTuple: MatchProfileTuple) {
                 offer(matchProfileTuple)
+            }
+        }
+        awaitClose { }
+    }
+
+    @ExperimentalCoroutinesApi
+    override val clickPageInvalidationFlow: Flow<Boolean> = callbackFlow {
+        clickPageInvalidationListener = object : InvalidationListener<Boolean> {
+            override fun onInvalidate(data: Boolean) {
+                offer(data)
             }
         }
         awaitClose { }

@@ -1,7 +1,6 @@
 package com.beeswork.balance.ui.mainviewpager
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
-import com.beeswork.balance.databinding.SnackBarNewClickBinding
-import com.beeswork.balance.internal.util.GlideHelper
-import com.beeswork.balance.internal.util.SnackBarHelper
-import com.beeswork.balance.ui.click.ClickDomain
 import com.beeswork.balance.ui.common.BaseFragment
-import com.bumptech.glide.Glide
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -51,25 +44,31 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     private fun bindUI() = lifecycleScope.launch {
         setupViewPager()
         setupViewPagerTab()
-        setupUnreadMatchCountObserver()
-        setupClickCountObserver()
+        observerUnreadMatchCountLiveData()
+        observeClickCountLiveData()
     }
 
-    private suspend fun setupClickCountObserver() {
-        viewModel.clickCount.await().observe(viewLifecycleOwner) { count ->
+    private suspend fun observeClickCountLiveData() {
+        viewModel.clickCountLiveData.await().observe(viewLifecycleOwner) { count ->
             showBadgeWithCount(MainViewPagerTabPosition.CLICK.ordinal, count)
         }
     }
 
-    private suspend fun setupUnreadMatchCountObserver() {
+    private suspend fun observerUnreadMatchCountLiveData() {
         viewModel.unreadMatchCount.await().observe(viewLifecycleOwner) { count ->
-            showBadgeWithCount(MainViewPagerTabPosition.MATCH.ordinal, count)
+//            showBadgeWithCount(MainViewPagerTabPosition.MATCH.ordinal, count)
         }
     }
 
-    private fun showBadgeWithCount(position: Int, count: Int) {
-        if (count > 0) showTabBadge(position, count)
-        else hideTabBadge(position)
+    private fun showBadgeWithCount(position: Int, count: Long?) {
+        if (count == null) {
+            return
+        }
+        if (count > 0) {
+            showTabBadge(position, count)
+        } else {
+            hideTabBadge(position)
+        }
     }
 
     private fun setupViewPager() {
@@ -105,10 +104,10 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         tabLayoutMediator.attach()
     }
 
-    private fun showTabBadge(position: Int, count: Int?) {
-        binding.tlMain.getTabAt(position)?.let {
-            val badge = it.orCreateBadge
-            count?.let { badge.number = it }
+    private fun showTabBadge(position: Int, count: Long) {
+        binding.tlMain.getTabAt(position)?.let { tab ->
+            val badge = tab.orCreateBadge
+            badge.number = count.toInt()
             badge.maxCharacterCount = BADGE_MAX_CHAR_COUNT
             badge.backgroundColor = ContextCompat.getColor(requireContext(), R.color.WarningRed)
             badge.isVisible = true
@@ -117,7 +116,9 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
 
     private fun hideTabBadge(position: Int) {
         binding.tlMain.getTabAt(position)?.let { tab ->
-            tab.badge?.let { badgeDrawable -> badgeDrawable.isVisible = false }
+            tab.badge?.let { badgeDrawable ->
+                badgeDrawable.isVisible = false
+            }
         }
     }
 

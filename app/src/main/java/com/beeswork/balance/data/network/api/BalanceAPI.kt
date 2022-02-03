@@ -18,6 +18,7 @@ import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.click.CountClicksDTO
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
@@ -66,6 +67,9 @@ interface BalanceAPI {
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "lastSwiperId") lastSwiperId: UUID?
     ): Response<List<ClickDTO>>
+
+    @GET("/click/count")
+    suspend fun countClicks(): Response<CountClicksDTO>
 
 
     @POST("login/social")
@@ -175,6 +179,8 @@ interface BalanceAPI {
 
     @GET("/question/random")
     suspend fun fetchRandomQuestion(@Query(value = "questionIds") questionIds: List<Int>): Response<QuestionDTO>
+
+
 
 
     companion object {
