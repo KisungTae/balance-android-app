@@ -1,39 +1,34 @@
 package com.beeswork.balance.ui.mainviewpager
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.click.ClickRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.database.repository.setting.SettingRepository
-import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
-import com.beeswork.balance.data.network.service.stomp.StompClient
-import com.beeswork.balance.internal.util.lazyDeferred
+import com.beeswork.balance.internal.mapper.click.ClickMapper
 import com.beeswork.balance.ui.common.BaseViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.map
 
 class MainViewPagerViewModel(
     private val matchRepository: MatchRepository,
-    private val clickRepository: ClickRepository
+    private val clickRepository: ClickRepository,
+    private val clickMapper: ClickMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    //    val newClickLiveData by viewModelLazyDeferred {
-//        clickRepository.newClickInvalidationFlow.map { click -> }
-//    }
-//
-//    val clickPageInvalidationLiveData by viewModelLazyDeferred {
-//        clickRepository.newClickInvalidationFlow.map { click ->
-//            if (click != null) {
-//                clickMapper.toClickDomain(click)
-//            } else {
-//                null
-//            }
-//        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
-//    }
-
     val clickCountLiveData by viewModelLazyDeferred {
-        clickRepository.clickCountInvalidationFlow.asLiveData()
+        clickRepository.clickCountFlow.asLiveData()
     }
+
+    val newClickLiveData by viewModelLazyDeferred {
+        clickRepository.newClickFlow.map { click ->
+            clickMapper.toClickDomain(click)
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+    }
+
+
+
+
 
     val unreadMatchCount by viewModelLazyDeferred {
         matchRepository.getUnreadMatchCountFlow().asLiveData()

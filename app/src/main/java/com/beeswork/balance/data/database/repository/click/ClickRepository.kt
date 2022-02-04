@@ -9,8 +9,8 @@ import java.util.*
 
 interface ClickRepository {
 
-    val newClickInvalidationFlow: Flow<Click>
-    val clickCountInvalidationFlow: Flow<Long?>
+    val newClickFlow: Flow<Click>
+    val clickCountFlow: Flow<Long?>
     val clickPageInvalidationFlow: Flow<Boolean>
 
     suspend fun fetchClicks(loadSize: Int, lastSwiperId: UUID?): Resource<FetchClicksDTO>

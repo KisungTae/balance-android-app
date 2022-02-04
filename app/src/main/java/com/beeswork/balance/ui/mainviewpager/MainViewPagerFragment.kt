@@ -1,6 +1,7 @@
 package com.beeswork.balance.ui.mainviewpager
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
+import com.beeswork.balance.databinding.SnackBarNewClickBinding
+import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.SnackBarHelper
+import com.beeswork.balance.ui.click.ClickDomain
 import com.beeswork.balance.ui.common.BaseFragment
+import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -25,6 +33,8 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     private lateinit var binding: FragmentMainViewPagerBinding
     private lateinit var mainViewPagerAdapter: MainViewPagerAdapter
     private lateinit var viewModel: MainViewPagerViewModel
+
+    private var newClickSnackBar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,8 +54,15 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     private fun bindUI() = lifecycleScope.launch {
         setupViewPager()
         setupViewPagerTab()
-        observerUnreadMatchCountLiveData()
+        observeNewClickLiveData()
         observeClickCountLiveData()
+        observerUnreadMatchCountLiveData()
+    }
+
+    private suspend fun observeNewClickLiveData() {
+        viewModel.newClickLiveData.await().observe(viewLifecycleOwner) { clickDomain ->
+            showNewClickSnackBar(clickDomain)
+        }
     }
 
     private suspend fun observeClickCountLiveData() {
@@ -122,31 +139,31 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         }
     }
 
-//    private fun showNewClickSnackBar(clickDomain: ClickDomain) {
-//        val binding = SnackBarNewClickBinding.inflate(layoutInflater)
-//        val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
-//        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
-//        snackBar.view.setOnClickListener { newClickSnackBar?.dismiss() }
-//
+    private fun showNewClickSnackBar(clickDomain: ClickDomain) {
+        val binding = SnackBarNewClickBinding.inflate(layoutInflater)
+        val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
+        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
+        snackBar.view.setOnClickListener { newClickSnackBar?.dismiss() }
+
 //        val swiperProfilePhoto = EndPoint.ofPhoto(clickDomain.swiperId, clickDomain.profilePhotoKey)
-//        val swiperProfilePhoto = R.drawable.person2
-//
-//        Glide.with(requireContext())
-//            .load(swiperProfilePhoto)
-//            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-//            .into(binding.ivNewClickSnackBarSwiper)
-//
-//        snackBar.addCallback(object : Snackbar.Callback() {
-//            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-//                super.onDismissed(transientBottomBar, event)
-//                if (transientBottomBar === newClickSnackBar) newClickSnackBar = null
-//            }
-//        })
-//
-//        newClickSnackBar?.dismiss()
-//        newClickSnackBar = snackBar
-//        snackBar.show()
-//    }
+        val swiperProfilePhoto = R.drawable.person2
+
+        Glide.with(requireContext())
+            .load(swiperProfilePhoto)
+            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+            .into(binding.ivNewClickSnackBarSwiper)
+
+        snackBar.addCallback(object : Snackbar.Callback() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+                if (transientBottomBar === newClickSnackBar) newClickSnackBar = null
+            }
+        })
+
+        newClickSnackBar?.dismiss()
+        newClickSnackBar = snackBar
+        snackBar.show()
+    }
 
     companion object {
         const val TAG = "mainViewPagerFragment"

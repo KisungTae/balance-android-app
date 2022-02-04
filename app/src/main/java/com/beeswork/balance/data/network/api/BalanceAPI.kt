@@ -19,6 +19,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.click.ClickDTO
 import com.beeswork.balance.data.network.response.click.CountClicksDTO
+import com.beeswork.balance.data.network.response.click.ListClicksDTO
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
@@ -60,7 +61,7 @@ interface BalanceAPI {
     suspend fun listClicks(
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "startPosition") startPosition: Int
-    ): Response<List<ClickDTO>>
+    ): Response<ListClicksDTO>
 
     @GET("click/fetch")
     suspend fun fetchClicks(

@@ -22,7 +22,10 @@ interface ClickDAO {
     fun deleteBy(swiperId: UUID, swipedId: UUID?)
 
     @Query("delete from click where swiperId = :swiperId")
-    fun deleteBy(swiperId: UUID)
+    fun deleteBy(swiperId: UUID): Int
+
+    @Query("delete from click where swiperId in (:swiperIds)")
+    fun deleteIn(swiperIds: List<UUID>): Int
 
     @Query("select count(*) from click where swipedId = :swipedId")
     fun countBy(swipedId: UUID?): Long
