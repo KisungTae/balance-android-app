@@ -215,4 +215,12 @@
     <string name="match_unmatched_exception">match_unmatched_exception</string>
     <string name="click_clicked_icon">click clicked icon</string>
     <string name="click_not_clicked_icon">click not clicked icon</string>
+    
+    
+    <string name="message_new_like_title">새로운 관심</string>
+    <string name="message_new_like_message">상대방이 관심을 보내왔어요!</string>
+    <string name="message_new_click_title">새로운 클릭</string>
+    <string name="message_new_click_message">상대방이 내 취향에 클릭했어요!</string>
+    <string name="close">닫기</string>
+
 </resources>

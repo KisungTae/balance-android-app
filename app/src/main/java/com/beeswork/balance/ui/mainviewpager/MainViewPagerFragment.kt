@@ -12,7 +12,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.databinding.SnackBarNewClickBinding
-import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.click.ClickDomain
@@ -112,10 +111,10 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
             false
         ) { tab, position ->
             when (position) {
-                MainViewPagerTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_baseline_account_circle)
                 MainViewPagerTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
                 MainViewPagerTabPosition.CLICK.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
                 MainViewPagerTabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
+                MainViewPagerTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_baseline_account_circle)
             }
         }
         tabLayoutMediator.attach()
@@ -140,23 +139,39 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     }
 
     private fun showNewClickSnackBar(clickDomain: ClickDomain) {
-        val binding = SnackBarNewClickBinding.inflate(layoutInflater)
+        val snackBarNewClickBinding = SnackBarNewClickBinding.inflate(layoutInflater)
         val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
-        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
-        snackBar.view.setOnClickListener { newClickSnackBar?.dismiss() }
+        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, snackBarNewClickBinding.root)
+        snackBar.view.setOnClickListener {
+            binding.tlMain.getTabAt(MainViewPagerTabPosition.CLICK.ordinal)?.select()
+            newClickSnackBar?.dismiss()
+        }
 
 //        val swiperProfilePhoto = EndPoint.ofPhoto(clickDomain.swiperId, clickDomain.profilePhotoKey)
         val swiperProfilePhoto = R.drawable.person2
-
         Glide.with(requireContext())
             .load(swiperProfilePhoto)
             .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-            .into(binding.ivNewClickSnackBarSwiper)
+            .into(snackBarNewClickBinding.ivNewClickSnackBarProfilePicture)
+
+        if (clickDomain.clicked) {
+            snackBarNewClickBinding.tvNewClickSnackBarTitle.text = getString(R.string.message_new_click_title)
+            snackBarNewClickBinding.tvNewClickSnackBarMessage.text = getString(R.string.message_new_click_message)
+        } else {
+            snackBarNewClickBinding.tvNewClickSnackBarTitle.text = getString(R.string.message_new_like_title)
+            snackBarNewClickBinding.tvNewClickSnackBarMessage.text = getString(R.string.message_new_like_message)
+        }
+
+        snackBarNewClickBinding.tvNewClickSnackBarClose.setOnClickListener {
+            newClickSnackBar?.dismiss()
+        }
 
         snackBar.addCallback(object : Snackbar.Callback() {
             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                 super.onDismissed(transientBottomBar, event)
-                if (transientBottomBar === newClickSnackBar) newClickSnackBar = null
+                if (transientBottomBar === newClickSnackBar) {
+                    newClickSnackBar = null
+                }
             }
         })
 

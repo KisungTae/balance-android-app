@@ -169,10 +169,10 @@ class ClickRepositoryImpl(
     }
 
     override fun test() {
-        CoroutineScope(ioDispatcher).launch {
-            val click = Click(1, UUID.randomUUID(), UUID.randomUUID(), "Michael", false, "profiel photo");
-            newClickInvalidationListener?.onInvalidate(click)
-        }
+//        CoroutineScope(ioDispatcher).launch {
+//            val click = Click(1, UUID.randomUUID(), UUID.randomUUID(), true, "profiel photo");
+//            newClickInvalidationListener?.onInvalidate(click)
+//        }
 
 //        CoroutineScope(ioDispatcher).launch {
 //            val ids = mutableListOf<UUID>()

@@ -7,7 +7,6 @@ data class ClickDTO(
     val id: Long,
     val swiperId: UUID,
     var swipedId: UUID?,
-    val name: String?,
     val clicked: Boolean,
     val deleted: Boolean,
     val profilePhotoKey: String?,

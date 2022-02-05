@@ -11,14 +11,13 @@ class ClickMapperImpl : ClickMapper {
         return safeLet(
             clickDTO.id,
             clickDTO.swipedId,
-            clickDTO.name,
             clickDTO.profilePhotoKey
-        ) { id, swipedId, name, profilePhotoKey ->
-            return@safeLet Click(id, clickDTO.swiperId, swipedId, name, clickDTO.clicked, profilePhotoKey)
+        ) { id, swipedId, profilePhotoKey ->
+            return@safeLet Click(id, clickDTO.swiperId, swipedId, clickDTO.clicked, profilePhotoKey)
         }
     }
 
     override fun toClickDomain(click: Click): ClickDomain {
-        return ClickDomain(click.swiperId, click.name, click.clicked, click.profilePhotoKey)
+        return ClickDomain(click.swiperId, click.clicked, click.profilePhotoKey)
     }
 }

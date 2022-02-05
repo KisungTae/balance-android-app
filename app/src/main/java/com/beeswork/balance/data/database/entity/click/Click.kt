@@ -14,7 +14,6 @@ data class Click(
 
     val swiperId: UUID,
     val swipedId: UUID,
-    val name: String,
     val clicked: Boolean,
     var profilePhotoKey: String
 ) {
@@ -22,7 +21,6 @@ data class Click(
         if (this.id != clickDTO.id
             || this.swiperId != clickDTO.swiperId
             || this.swipedId != clickDTO.swipedId
-            || this.name != clickDTO.name
             || this.clicked != clickDTO.clicked
             || this.profilePhotoKey != clickDTO.profilePhotoKey) {
             return false

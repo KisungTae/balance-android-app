@@ -126,15 +126,15 @@ class ClickFragment : BaseFragment(),
     }
 
     override fun onFragmentSelected() {
-        viewModel.test()
+//        viewModel.test()
     }
 
     override fun onSelectClick(position: Int) {
         clickPagingDataAdapter.getClick(position)?.let { click ->
-            SwipeBalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
-                childFragmentManager,
-                SwipeBalanceGameDialog.TAG
-            )
+//            SwipeBalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
+//                childFragmentManager,
+//                SwipeBalanceGameDialog.TAG
+//            )
         }
     }
 
