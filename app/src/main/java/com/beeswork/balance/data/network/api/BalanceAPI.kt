@@ -6,11 +6,11 @@ import com.beeswork.balance.data.network.request.chat.ReceivedChatMessageBody
 import com.beeswork.balance.data.network.request.chat.SyncChatMessagesBody
 import com.beeswork.balance.data.network.request.click.ClickBody
 import com.beeswork.balance.data.network.request.common.ReportBody
+import com.beeswork.balance.data.network.request.login.LoginWithRefreshTokenBody
 import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
 import com.beeswork.balance.data.network.request.login.SocialLoginBody
 import com.beeswork.balance.data.network.request.match.UnmatchBody
 import com.beeswork.balance.data.network.request.profile.*
-import com.beeswork.balance.data.network.request.setting.SaveFCMTokenBody
 import com.beeswork.balance.data.network.request.setting.SaveLocationBody
 import com.beeswork.balance.data.network.request.setting.SavePushSettingsBody
 import com.beeswork.balance.data.network.request.swipe.SwipeBody
@@ -79,7 +79,7 @@ interface BalanceAPI {
 
     @POST("login/refresh-token")
     @Headers("${HttpHeader.NO_AUTHENTICATION}: ${true}")
-    suspend fun loginWithRefreshToken(@Body refreshAccessTokenBody: RefreshAccessTokenBody): Response<LoginDTO>
+    suspend fun loginWithRefreshToken(@Body loginWithRefreshTokenBody: LoginWithRefreshTokenBody): Response<LoginDTO>
 
     @POST("login/access-token/refresh")
     @Headers("${HttpHeader.NO_AUTHENTICATION}: ${true}")
@@ -155,8 +155,6 @@ interface BalanceAPI {
     @POST("setting/push")
     suspend fun savePushSettings(@Body savePushSettingsBody: SavePushSettingsBody): Response<EmptyResponse>
 
-    @POST("push-token/fcm")
-    suspend fun saveFCMToken(@Body saveFcmTokenBody: SaveFCMTokenBody): Response<EmptyResponse>
 
     @POST("profile/location")
     suspend fun saveLocation(@Body saveLocationBody: SaveLocationBody): Response<EmptyResponse>

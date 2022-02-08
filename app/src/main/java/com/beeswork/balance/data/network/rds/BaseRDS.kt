@@ -36,7 +36,7 @@ abstract class BaseRDS(
             } else {
                 println("getResult else")
                 val errorResponse = convertToErrorResponse(response)
-                if (errorResponse.isExceptionEqualTo(ExceptionCode.EXPIRED_JWT_EXCEPTION)) {
+                if (!errorResponse.isExceptionEqualTo(ExceptionCode.EXPIRED_JWT_EXCEPTION)) {
                     return@sendRequest errorResponse
                 }
                 println("after getResult convertoErrorResponse")
@@ -59,6 +59,8 @@ abstract class BaseRDS(
 
     private fun <T> convertToErrorResponse(response: Response<T>): Resource<T> {
         val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
+        println(errorResponse.error)
+        println(errorResponse.message)
         val serverException = ServerException(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
         return Resource.error(serverException)
     }
@@ -82,7 +84,7 @@ abstract class BaseRDS(
             return@sendRequest if (response.isSuccessful) {
                 val resource = Resource.success(response.body())
                 resource.data?.let { refreshAccessTokenDTO ->
-                    preferenceProvider.putValidLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
+                    preferenceProvider.putLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
                 }
                 resource
             } else {

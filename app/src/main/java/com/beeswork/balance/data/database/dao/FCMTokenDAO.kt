@@ -12,9 +12,6 @@ interface FCMTokenDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(FCMToken: FCMToken)
 
-    @Query("update fcmToken set posted = 1 where id = ${FCMToken.ID}")
-    fun sync()
-
     @Query("select token from fcmToken where id = ${FCMToken.ID}")
     fun findById(): String?
 }

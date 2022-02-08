@@ -17,6 +17,5 @@ interface SettingRDS {
         emailPush: Boolean
     ): Resource<EmptyResponse>
 
-    suspend fun saveFCMToken(token: String): Resource<EmptyResponse>
     suspend fun saveLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime): Resource<EmptyResponse>
 }

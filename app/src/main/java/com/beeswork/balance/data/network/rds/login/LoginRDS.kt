@@ -10,7 +10,7 @@ interface LoginRDS {
 
     suspend fun saveEmail(email: String): Resource<EmptyResponse>
     suspend fun fetchEmail(): Resource<String>
-    suspend fun loginWithRefreshToken(accessToken: String, refreshToken: String): Resource<LoginDTO>
-    suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO>
+    suspend fun loginWithRefreshToken(accessToken: String, refreshToken: String, fcmToken: String?): Resource<LoginDTO>
+    suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType, pushToken: String?): Resource<LoginDTO>
     suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO>
 }

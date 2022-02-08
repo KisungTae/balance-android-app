@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.repository.setting
 
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
+import com.beeswork.balance.data.database.entity.setting.FCMToken
 import com.beeswork.balance.data.database.entity.setting.Location
 import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
@@ -84,19 +85,7 @@ class SettingRepositoryImpl(
 
     override suspend fun saveFCMToken(token: String) {
         withContext(Dispatchers.IO) {
-//            fcmTokenDAO.insert(FCMToken(token, posted = false))
-//            preferenceProvider.getAccountId()?.let { accountId ->
-//                val response = settingRDS.saveFCMToken(accountId, token)
-//                if (response.isSuccess()) fcmTokenDAO.sync()
-//            }
-        }
-    }
-
-    override suspend fun syncFCMTokenAsync() {
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-            fcmTokenDAO.findById()?.let { fcmToken ->
-                settingRDS.saveFCMToken(fcmToken)
-            }
+            fcmTokenDAO.insert(FCMToken(token))
         }
     }
 

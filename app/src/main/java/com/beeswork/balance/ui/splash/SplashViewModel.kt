@@ -24,21 +24,17 @@ class SplashViewModel(
     private val _loginWithRefreshToken = MutableLiveData<Resource<LoginDomain>>()
     val loginWithRefreshToken: LiveData<Resource<LoginDomain>> get() = _loginWithRefreshToken
 
-//    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-//        _loginWithRefreshToken.postValue(Resource.error(""))
-//    }
-
     fun loginWithRefreshToken() {
         viewModelScope.launch {
             val response = loginRepository.loginWithRefreshToken()
-            if (response.isSuccess()) response.data?.let { loginDTO ->
-//                settingRepository.prepopulateFetchInfo()
-//                if (loginDTO.profileExists) swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
-//                settingRepository.syncFCMTokenAsync()
+            var loginDomain: LoginDomain? = null
+            response.data?.let { loginDTO ->
+                if (loginDTO.profileExists && loginDTO.gender != null) {
+                    swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
+                }
+                loginDomain = loginMapper.toLoginDomain(loginDTO)
             }
-            _loginWithRefreshToken.postValue(
-                response.let { it.mapData(it.data?.let { loginDTO -> loginMapper.toLoginDomain(loginDTO) }) }
-            )
+            _loginWithRefreshToken.postValue(response.mapData(loginDomain))
         }
     }
 }

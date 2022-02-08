@@ -36,14 +36,14 @@ class LoginViewModel(
         } else {
             viewModelScope.launch {
                 val response = loginRepository.socialLogin(loginId, accessToken, loginType)
-                if (response.isSuccess()) response.data?.let { loginDTO ->
-                    if (loginDTO.profileExists && loginDTO.gender != null)
+                var loginDomain: LoginDomain? = null
+                response.data?.let { loginDTO ->
+                    if (loginDTO.profileExists && loginDTO.gender != null) {
                         swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
-                    settingRepository.syncFCMTokenAsync()
+                    }
+                    loginDomain = loginMapper.toLoginDomain(loginDTO)
                 }
-                _loginLiveData.postValue(
-                    response.let { it.mapData(it.data?.let { loginDTO -> loginMapper.toLoginDomain(loginDTO) }) }
-                )
+                _loginLiveData.postValue(response.mapData(loginDomain))
             }
         }
     }

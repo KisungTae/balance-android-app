@@ -218,7 +218,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
 
-        bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO) }
+        bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
 
         // StompClient
         bind() from singleton { StompClientImpl(applicationScope, instance(), instance(), instance(), instance(), instance(), instance()) }

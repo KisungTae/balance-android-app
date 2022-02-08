@@ -2,7 +2,6 @@ package com.beeswork.balance.data.network.rds.setting
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
-import com.beeswork.balance.data.network.request.setting.SaveFCMTokenBody
 import com.beeswork.balance.data.network.request.setting.SaveLocationBody
 import com.beeswork.balance.data.network.request.setting.SavePushSettingsBody
 import com.beeswork.balance.data.network.response.Resource
@@ -33,10 +32,6 @@ class SettingRDSImpl(
         return getResult {
             balanceAPI.savePushSettings(SavePushSettingsBody(matchPush, clickedPush, chatMessagePush, emailPush))
         }
-    }
-
-    override suspend fun saveFCMToken(token: String): Resource<EmptyResponse> {
-        return getResult { balanceAPI.saveFCMToken(SaveFCMTokenBody(token)) }
     }
 
     override suspend fun saveLocation(

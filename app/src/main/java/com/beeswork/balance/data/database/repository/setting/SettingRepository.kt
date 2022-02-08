@@ -21,7 +21,6 @@ interface SettingRepository {
     suspend fun deleteSettings()
 
     suspend fun saveFCMToken(token: String)
-    suspend fun syncFCMTokenAsync()
 
     suspend fun saveLocation(latitude: Double, longitude: Double)
     suspend fun saveLocationPermissionResult(granted: Boolean)

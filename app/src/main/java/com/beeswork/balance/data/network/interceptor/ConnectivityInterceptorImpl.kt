@@ -23,18 +23,31 @@ class ConnectivityInterceptorImpl(
             throw NoInternetConnectivityException()
         }
 
-        var request = chain.request()
+        val request = chain.request()
         val noAuthentication = request.header(HttpHeader.NO_AUTHENTICATION).toBoolean()
-        if (!noAuthentication) {
-            val accessToken = preferenceProvider.getAccessToken()
-            if (accessToken.isNullOrBlank()) throw AccessTokenNotFoundException()
 
-            request = chain.request()
-                .newBuilder()
-                .addHeader(HttpHeader.ACCESS_TOKEN, accessToken)
-                .build()
+        return if (noAuthentication) {
+            chain.proceed(request)
+        } else {
+            val accessToken = preferenceProvider.getAccessToken()
+            if (accessToken.isNullOrBlank()) {
+                throw AccessTokenNotFoundException()
+            }
+            chain.proceed(request.newBuilder().addHeader(HttpHeader.ACCESS_TOKEN, accessToken).build())
         }
-        return chain.proceed(request)
+
+//        if (!noAuthentication) {
+//            val accessToken = preferenceProvider.getAccessToken()
+//            if (accessToken.isNullOrBlank()) {
+//                throw AccessTokenNotFoundException()
+//            }
+//
+//            request = chain.request()
+//                .newBuilder()
+//                .addHeader(HttpHeader.ACCESS_TOKEN, accessToken)
+//                .build()
+//        }
+//        return chain.proceed(request)
     }
 
     private fun isOnline(): Boolean {

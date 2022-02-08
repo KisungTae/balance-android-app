@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 data class FCMToken(
 
     val token: String,
-    val posted: Boolean,
 
     @PrimaryKey
     val id: Int = ID

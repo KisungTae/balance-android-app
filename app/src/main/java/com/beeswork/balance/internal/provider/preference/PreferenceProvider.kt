@@ -4,7 +4,7 @@ import java.util.*
 
 
 interface PreferenceProvider {
-    fun putValidLoginInfo(accountId: UUID?, accessToken: String?, refreshToken: String?)
+    fun putLoginInfo(accountId: UUID?, accessToken: String?, refreshToken: String?)
 
 
     fun getAccessToken(): String?

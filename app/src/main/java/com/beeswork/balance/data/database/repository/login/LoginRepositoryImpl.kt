@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.database.repository.login
 
+import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.dao.LoginDAO
 import com.beeswork.balance.data.database.entity.login.Login
 import com.beeswork.balance.data.network.rds.login.LoginRDS
@@ -7,7 +8,6 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.exception.AccessTokenNotFoundException
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
@@ -22,6 +22,7 @@ import java.util.*
 class LoginRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
     private val loginDAO: LoginDAO,
+    private val fcmTokenDAO: FCMTokenDAO,
     private val loginRDS: LoginRDS,
     private val ioDispatcher: CoroutineDispatcher
 ) : LoginRepository {
@@ -67,10 +68,10 @@ class LoginRepositoryImpl(
 
     override suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
-            val response = loginRDS.socialLogin(loginId, accessToken, loginType)
-            if (response.isSuccess()) response.data?.let { loginDTO ->
+            val response = loginRDS.socialLogin(loginId, accessToken, loginType, fcmTokenDAO.findById())
+            response.data?.let { loginDTO ->
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
-                preferenceProvider.putValidLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
+                preferenceProvider.putLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
             }
             return@withContext response
         }
@@ -111,11 +112,12 @@ class LoginRepositoryImpl(
                 return@withContext Resource.error(RefreshTokenNotFoundException())
             }
 
-            val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken)
-            if (response.isSuccess()) response.data?.let { loginDTO ->
+
+            val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken, fcmTokenDAO.findById())
+            response.data?.let { loginDTO ->
 //              todo: remove me
                 println("access token: ${loginDTO.accessToken}")
-                preferenceProvider.putValidLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
+                preferenceProvider.putLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
             }
             return@withContext response
         }
