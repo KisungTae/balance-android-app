@@ -18,10 +18,10 @@ class PushSettingViewModel(
     private val _savePushSettingLiveData = MutableLiveData<Resource<PushSettingDomain>>()
     val savePushSettingLiveData: LiveData<Resource<PushSettingDomain>> get() = _savePushSettingLiveData
 
-    fun savePushSetting(matchPush: Boolean, clickedPush: Boolean, chatMessagePush: Boolean, emailPush: Boolean) {
+    fun savePushSetting(matchPush: Boolean, swipePush: Boolean, chatMessagePush: Boolean, emailPush: Boolean) {
         viewModelScope.launch {
             _savePushSettingLiveData.postValue(Resource.loading())
-            val response = settingRepository.savePushSetting(matchPush, clickedPush, chatMessagePush, emailPush).map {
+            val response = settingRepository.savePushSetting(matchPush, swipePush, chatMessagePush, emailPush).map {
                 it?.let { _pushSetting -> pushSettingMapper.toPushSettingDomain(_pushSetting) }
             }
             _savePushSettingLiveData.postValue(response)

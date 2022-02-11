@@ -103,7 +103,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener
     private fun disableEdit() {
         binding.scMatchPush.isEnabled = false
         binding.scChatMessagePush.isEnabled = false
-        binding.scClickedPush.isEnabled = false
+        binding.scSwipePush.isEnabled = false
         binding.scEmailPush.isEnabled = false
         binding.btnPushSettingSave.isEnabled = false
     }
@@ -111,7 +111,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener
     private fun enableEdit() {
         binding.scMatchPush.isEnabled = true
         binding.scChatMessagePush.isEnabled = true
-        binding.scClickedPush.isEnabled = true
+        binding.scSwipePush.isEnabled = true
         binding.scEmailPush.isEnabled = true
         binding.btnPushSettingSave.isEnabled = true
     }
@@ -141,7 +141,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener
         pushSettingDomain?.let { _pushSettingDomain ->
             binding.scMatchPush.isChecked = _pushSettingDomain.matchPush
             binding.scEmailPush.isChecked = _pushSettingDomain.emailPush
-            binding.scClickedPush.isChecked = _pushSettingDomain.clickedPush
+            binding.scSwipePush.isChecked = _pushSettingDomain.swipePush
             binding.scChatMessagePush.isChecked = _pushSettingDomain.chatMessagePush
         }
     }
@@ -160,7 +160,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener
         binding.btnPushSettingSave.setOnClickListener {
             viewModel.savePushSetting(
                 binding.scMatchPush.isChecked,
-                binding.scClickedPush.isChecked,
+                binding.scSwipePush.isChecked,
                 binding.scChatMessagePush.isChecked,
                 binding.scEmailPush.isChecked
             )

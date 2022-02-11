@@ -184,11 +184,11 @@ class StompClientImpl(
                 val chatMessageDTO = GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java)
                 chatRepository.saveChatMessageReceived(chatMessageDTO)
             }
-            PushType.CLICKED -> {
+            PushType.SWIPE -> {
                 val clickDTO = GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java)
                 clickRepository.saveClick(clickDTO)
             }
-            PushType.MATCHED -> {
+            PushType.MATCH -> {
                 val matchDTO = GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java)
                 matchRepository.saveMatch(matchDTO)
             }

@@ -15,8 +15,6 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -45,17 +43,23 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
             PushType.valueOf(it)
         }
         when (pushType) {
-            PushType.CLICKED -> scope.launch {
+            PushType.SWIPE -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
+                val swipe = GsonProvider.gson.fromJson(json, ClickDTO::class.java)
+                println(swipe)
+//                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
             }
-            PushType.MATCHED -> scope.launch {
+            PushType.MATCH -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
+                val match = GsonProvider.gson.fromJson(json, MatchDTO::class.java)
+                println(match)
+//                matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
             }
             PushType.CHAT_MESSAGE -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                chatRepository.saveChatMessageReceived(GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java))
+                val chatMessage = GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java)
+                println(chatMessage)
+//                chatRepository.saveChatMessageReceived(GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java))
             }
             else -> {}
         }

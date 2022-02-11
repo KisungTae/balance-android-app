@@ -11,7 +11,7 @@ class PushSettingMapperImpl : PushSettingMapper {
         return PushSetting(
             accountId,
             pushSettingDTO.matchPush,
-            pushSettingDTO.clickedPush,
+            pushSettingDTO.swipePush,
             pushSettingDTO.chatMessagePush,
             pushSettingDTO.emailPush,
             true
@@ -21,7 +21,7 @@ class PushSettingMapperImpl : PushSettingMapper {
     override fun toPushSettingDomain(pushSetting: PushSetting): PushSettingDomain {
         return PushSettingDomain(
             pushSetting.matchPush,
-            pushSetting.clickedPush,
+            pushSetting.swipePush,
             pushSetting.chatMessagePush,
             pushSetting.emailPush
         )

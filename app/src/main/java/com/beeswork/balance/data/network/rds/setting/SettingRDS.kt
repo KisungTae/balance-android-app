@@ -12,7 +12,7 @@ interface SettingRDS {
 
     suspend fun savePushSettings(
         matchPush: Boolean,
-        clickedPush: Boolean,
+        swipePush: Boolean,
         chatMessagePush: Boolean,
         emailPush: Boolean
     ): Resource<EmptyResponse>

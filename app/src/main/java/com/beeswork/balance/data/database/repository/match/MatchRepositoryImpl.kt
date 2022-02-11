@@ -201,8 +201,8 @@ class MatchRepositoryImpl(
             val response = matchRDS.click(swipedId, answers)
             response.data?.let { matchDTO ->
                 when (matchDTO.pushType) {
-                    PushType.MATCHED -> saveMatch(matchMapper.toMatch(matchDTO))
-                    PushType.CLICKED -> swipeDAO.insert(Swipe(swipedId, accountId))
+                    PushType.MATCH -> saveMatch(matchMapper.toMatch(matchDTO))
+                    PushType.SWIPE -> swipeDAO.insert(Swipe(swipedId, accountId))
                     else -> println()
                 }
                 return@withContext response.mapData(matchDTO.pushType)

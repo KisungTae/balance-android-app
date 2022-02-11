@@ -47,7 +47,7 @@ class SettingRepositoryImpl(
 
     override suspend fun savePushSetting(
         matchPush: Boolean,
-        clickedPush: Boolean,
+        swipePush: Boolean,
         chatMessagePush: Boolean,
         emailPush: Boolean
     ): Resource<PushSetting> {
@@ -57,12 +57,12 @@ class SettingRepositoryImpl(
             pushSettingDAO.updateSynced(accountId, false)
             val response = settingRDS.savePushSettings(
                 matchPush,
-                clickedPush,
+                swipePush,
                 chatMessagePush,
                 emailPush
             )
             if (response.isSuccess()) {
-                pushSettingDAO.updatePushSettings(accountId, matchPush, clickedPush, chatMessagePush, emailPush)
+                pushSettingDAO.updatePushSettings(accountId, matchPush, swipePush, chatMessagePush, emailPush)
                 return@withContext Resource.success(null)
             } else {
                 pushSettingDAO.updateSynced(accountId, true)

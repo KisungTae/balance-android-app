@@ -12,7 +12,7 @@ interface SettingRepository {
     suspend fun fetchPushSetting(): Resource<PushSetting>
     suspend fun savePushSetting(
         matchPush: Boolean,
-        clickedPush: Boolean,
+        swipePush: Boolean,
         chatMessagePush: Boolean,
         emailPush: Boolean
     ): Resource<PushSetting>

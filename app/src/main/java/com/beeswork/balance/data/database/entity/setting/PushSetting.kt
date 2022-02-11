@@ -12,7 +12,7 @@ data class PushSetting(
     val accountId: UUID,
 
     val matchPush: Boolean = true,
-    val clickedPush: Boolean = true,
+    val swipePush: Boolean = true,
     val chatMessagePush: Boolean = true,
     val emailPush: Boolean = true,
     val synced: Boolean = true

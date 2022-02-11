@@ -25,11 +25,11 @@ interface PushSettingDAO {
     @Query("update pushSetting set synced = :synced where accountId = :accountId")
     fun updateSynced(accountId: UUID?, synced: Boolean)
 
-    @Query("update pushSetting set matchPush = :matchPush, clickedPush = :clickedPush, chatMessagePush = :chatMessagePush, emailPush = :emailPush, synced = 1 where accountId = :accountId")
+    @Query("update pushSetting set matchPush = :matchPush, swipePush = :swipePush, chatMessagePush = :chatMessagePush, emailPush = :emailPush, synced = 1 where accountId = :accountId")
     fun updatePushSettings(
         accountId: UUID,
         matchPush: Boolean,
-        clickedPush: Boolean,
+        swipePush: Boolean,
         chatMessagePush: Boolean,
         emailPush: Boolean
     )

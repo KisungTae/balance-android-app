@@ -25,12 +25,12 @@ class SettingRDSImpl(
 
     override suspend fun savePushSettings(
         matchPush: Boolean,
-        clickedPush: Boolean,
+        swipePush: Boolean,
         chatMessagePush: Boolean,
         emailPush: Boolean
     ): Resource<EmptyResponse> {
         return getResult {
-            balanceAPI.savePushSettings(SavePushSettingsBody(matchPush, clickedPush, chatMessagePush, emailPush))
+            balanceAPI.savePushSettings(SavePushSettingsBody(matchPush, swipePush, chatMessagePush, emailPush))
         }
     }
 

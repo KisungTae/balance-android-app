@@ -90,8 +90,8 @@ class SwipeBalanceGameDialog(
                             showLayouts(View.GONE, View.GONE, View.GONE)
                             binding.llBalanceGameDialogMissed.visibility = View.VISIBLE
                         }
-                        PushType.CLICKED -> showClicked()
-                        PushType.MATCHED -> showMatched()
+                        PushType.SWIPE -> showClicked()
+                        PushType.MATCH -> showMatched()
                         else -> println("")
                     }
                 }

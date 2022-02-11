@@ -109,7 +109,7 @@
                 android:text="@string/clicked_notification_label" />
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/scClickedPush"
+                android:id="@+id/scSwipePush"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
                 android:thumb="@drawable/sh_thumb"
