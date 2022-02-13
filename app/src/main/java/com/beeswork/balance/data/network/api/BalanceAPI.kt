@@ -13,13 +13,12 @@ import com.beeswork.balance.data.network.request.match.UnmatchBody
 import com.beeswork.balance.data.network.request.profile.*
 import com.beeswork.balance.data.network.request.setting.SaveLocationBody
 import com.beeswork.balance.data.network.request.setting.SavePushSettingsBody
-import com.beeswork.balance.data.network.request.swipe.SwipeBody
+import com.beeswork.balance.data.network.request.swipe.LikeBody
 import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
-import com.beeswork.balance.data.network.response.click.ClickDTO
-import com.beeswork.balance.data.network.response.click.CountClicksDTO
-import com.beeswork.balance.data.network.response.click.ListClicksDTO
+import com.beeswork.balance.data.network.response.swipe.SwipeDTO
+import com.beeswork.balance.data.network.response.swipe.CountSwipesDTO
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
@@ -28,7 +27,8 @@ import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
-import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
+import com.beeswork.balance.data.network.response.card.FetchCardsDTO
+import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -57,20 +57,20 @@ interface BalanceAPI {
     suspend fun syncChatMessages(@Body syncChatMessagesBody: SyncChatMessagesBody)
 
 
-    @GET("click/list")
-    suspend fun listClicks(
+    @GET("swipe/list")
+    suspend fun listSwipes(
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "startPosition") startPosition: Int
-    ): Response<ListClicksDTO>
+    ): Response<List<SwipeDTO>>
 
-    @GET("click/fetch")
-    suspend fun fetchClicks(
+    @GET("swipe/fetch")
+    suspend fun fetchSwipes(
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "lastSwiperId") lastSwiperId: UUID?
-    ): Response<List<ClickDTO>>
+    ): Response<List<SwipeDTO>>
 
-    @GET("/click/count")
-    suspend fun countClicks(): Response<CountClicksDTO>
+    @GET("swipe/count")
+    suspend fun countSwipes(): Response<CountSwipesDTO>
 
 
     @POST("login/social")
@@ -87,7 +87,7 @@ interface BalanceAPI {
 
 
     @POST("click")
-    suspend fun click(@Body clickBody: ClickBody): Response<MatchDTO>
+    suspend fun click(@Body clickBody: ClickBody): Response<ClickDTO>
 
     @POST("match/unmatch")
     suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<EmptyResponse>
@@ -160,8 +160,8 @@ interface BalanceAPI {
     suspend fun saveLocation(@Body saveLocationBody: SaveLocationBody): Response<EmptyResponse>
 
 
-    @POST("swipe")
-    suspend fun swipe(@Body swipeBody: SwipeBody): Response<List<QuestionDTO>>
+    @POST("like")
+    suspend fun like(@Body likeBody: LikeBody): Response<List<QuestionDTO>>
 
     @GET("profile/recommend")
     suspend fun recommend(

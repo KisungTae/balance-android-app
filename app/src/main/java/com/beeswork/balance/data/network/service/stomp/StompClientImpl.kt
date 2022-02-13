@@ -1,14 +1,14 @@
 package com.beeswork.balance.data.network.service.stomp
 
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
-import com.beeswork.balance.data.database.repository.click.ClickRepository
+import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.api.HttpHeader
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.exception.AccessTokenNotFoundException
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
@@ -32,7 +32,7 @@ class StompClientImpl(
     private val applicationScope: CoroutineScope,
     private val okHttpClient: OkHttpClient,
     private val chatRepository: ChatRepository,
-    private val clickRepository: ClickRepository,
+    private val swipeRepository: SwipeRepository,
     private val matchRepository: MatchRepository,
     private val loginRepository: LoginRepository,
     private val preferenceProvider: PreferenceProvider
@@ -185,8 +185,8 @@ class StompClientImpl(
                 chatRepository.saveChatMessageReceived(chatMessageDTO)
             }
             PushType.SWIPE -> {
-                val clickDTO = GsonProvider.gson.fromJson(stompFrame.payload, ClickDTO::class.java)
-                clickRepository.saveClick(clickDTO)
+                val swipeDTO = GsonProvider.gson.fromJson(stompFrame.payload, SwipeDTO::class.java)
+                swipeRepository.saveSwipe(swipeDTO)
             }
             PushType.MATCH -> {
                 val matchDTO = GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java)

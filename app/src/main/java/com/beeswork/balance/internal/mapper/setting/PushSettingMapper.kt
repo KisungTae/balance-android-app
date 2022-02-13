@@ -2,7 +2,7 @@ package com.beeswork.balance.internal.mapper.setting
 
 import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
-import com.beeswork.balance.ui.setting.push.PushSettingDomain
+import com.beeswork.balance.ui.settingfragment.push.PushSettingDomain
 import java.util.*
 
 interface PushSettingMapper {

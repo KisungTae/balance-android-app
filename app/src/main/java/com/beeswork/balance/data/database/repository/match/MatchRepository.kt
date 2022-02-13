@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.MatchDTO
+import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.ReportReason
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +14,6 @@ import java.util.*
 interface MatchRepository {
 
     val newMatchFlow: Flow<MatchProfileTuple>
-    val clickPageInvalidationFlow: Flow<Boolean>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
@@ -30,7 +30,7 @@ interface MatchRepository {
     suspend fun saveMatch(matchDTO: MatchDTO)
     fun getMatchInvalidationFlow(): Flow<Boolean>
     fun getUnreadMatchCountFlow(): Flow<Int>
-    suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType>
+    suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult>
     suspend fun deleteMatches()
 
     fun testFunction()

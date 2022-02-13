@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.request.click.ClickBody
 import com.beeswork.balance.data.network.request.match.UnmatchBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -18,7 +19,7 @@ class MatchRDSImpl(
     preferenceProvider: PreferenceProvider
 ) : BaseRDS(balanceAPI, preferenceProvider), MatchRDS {
 
-    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<MatchDTO> {
+    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO> {
         return getResult { balanceAPI.click(ClickBody(swipedId, answers)) }
     }
 

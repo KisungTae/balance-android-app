@@ -1,12 +1,12 @@
 package com.beeswork.balance.data.network.service.fcm
 
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
-import com.beeswork.balance.data.database.repository.click.ClickRepository
+import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.data.network.response.click.ClickDTO
+import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.gson.GsonProvider
@@ -27,7 +27,7 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
 
     private val settingRepository: SettingRepository by instance()
     private val matchRepository: MatchRepository by instance()
-    private val clickRepository: ClickRepository by instance()
+    private val swipeRepository: SwipeRepository by instance()
     private val chatRepository: ChatRepository by instance()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -45,7 +45,7 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
         when (pushType) {
             PushType.SWIPE -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                val swipe = GsonProvider.gson.fromJson(json, ClickDTO::class.java)
+                val swipe = GsonProvider.gson.fromJson(json, SwipeDTO::class.java)
                 println(swipe)
 //                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
             }

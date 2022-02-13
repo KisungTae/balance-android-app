@@ -33,10 +33,6 @@ class Resource<out T>(
         return Resource(this.status, newData, this.exception)
     }
 
-    fun <P> mapData(data: P?): Resource<P> {
-        return Resource(this.status, data, this.exception)
-    }
-
     fun toEmptyResponse(): Resource<EmptyResponse> {
         return Resource(this.status, EmptyResponse(), this.exception)
     }
@@ -75,5 +71,7 @@ class Resource<out T>(
         fun <T> loading(): Resource<T> {
             return Resource(Status.LOADING, null, null)
         }
+
+
     }
 }

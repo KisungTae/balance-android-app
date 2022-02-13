@@ -7,6 +7,7 @@ import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
+import com.beeswork.balance.data.database.entity.swipe.Click
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -15,6 +16,7 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
+import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
@@ -32,8 +34,8 @@ class MatchRepositoryImpl(
     private val reportRDS: ReportRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
-    private val clickDAO: ClickDAO,
     private val swipeDAO: SwipeDAO,
+    private val clickDAO: ClickDAO,
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
@@ -41,23 +43,12 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     private var newMatchFlowListener: NewMatchFlowListener? = null
-    private var clickPageInvalidationListener: InvalidationListener<Boolean>? = null
 
     @ExperimentalCoroutinesApi
     override val newMatchFlow = callbackFlow<MatchProfileTuple> {
         newMatchFlowListener = object : NewMatchFlowListener {
             override fun onReceive(matchProfileTuple: MatchProfileTuple) {
                 offer(matchProfileTuple)
-            }
-        }
-        awaitClose { }
-    }
-
-    @ExperimentalCoroutinesApi
-    override val clickPageInvalidationFlow: Flow<Boolean> = callbackFlow {
-        clickPageInvalidationListener = object : InvalidationListener<Boolean> {
-            override fun onInvalidate(data: Boolean) {
-                offer(data)
             }
         }
         awaitClose { }
@@ -104,8 +95,8 @@ class MatchRepositoryImpl(
     private fun saveMatch(match: Match) {
         preferenceProvider.getAccountId()?.let { accountId ->
             updateMatch(match)
-            swipeDAO.insert(Swipe(match.swipedId, accountId))
-            clickDAO.deleteBy(accountId, match.swipedId)
+            clickDAO.insert(Click(match.swipedId, accountId))
+            swipeDAO.deleteBy(accountId, match.swipedId)
             matchDAO.insert(match)
         }
     }
@@ -194,20 +185,29 @@ class MatchRepositoryImpl(
         return matchDAO.countUnread(preferenceProvider.getAccountId())
     }
 
-    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<PushType> {
+    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             val response = matchRDS.click(swipedId, answers)
-            response.data?.let { matchDTO ->
-                when (matchDTO.pushType) {
-                    PushType.MATCH -> saveMatch(matchMapper.toMatch(matchDTO))
-                    PushType.SWIPE -> swipeDAO.insert(Swipe(swipedId, accountId))
-                    else -> println()
+            response.data?.let { clickDTO ->
+                when (clickDTO.clickResult) {
+                    ClickResult.MATCHED -> {
+                        clickDTO.matchDTO?.let { matchDTO ->
+                            saveMatch(matchMapper.toMatch(matchDTO))
+                        }
+                    }
+                    ClickResult.CLICKED -> {
+                        clickDAO.insert(Click(swipedId, accountId))
+                    }
+                    ClickResult.MISSED -> {
+                    }
                 }
-                return@withContext response.mapData(matchDTO.pushType)
             }
-            return@withContext response.mapData(null)
+
+            return@withContext response.map { clickDTO ->
+                clickDTO?.clickResult
+            }
         }
     }
 

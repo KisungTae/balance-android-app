@@ -10,8 +10,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProviderImpl
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.chat.ChatRepositoryImpl
-import com.beeswork.balance.data.database.repository.click.ClickRepository
-import com.beeswork.balance.data.database.repository.click.ClickRepositoryImpl
+import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
+import com.beeswork.balance.data.database.repository.swipe.SwipeRepositoryImpl
 import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.login.LoginRepositoryImpl
 import com.beeswork.balance.data.database.repository.main.MainRepository
@@ -24,12 +24,14 @@ import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepositoryImpl
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepositoryImpl
-import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
-import com.beeswork.balance.data.database.repository.swipe.SwipeRepositoryImpl
+import com.beeswork.balance.data.database.repository.card.CardRepository
+import com.beeswork.balance.data.database.repository.card.CardRepositoryImpl
+import com.beeswork.balance.data.network.rds.card.CardRDS
+import com.beeswork.balance.data.network.rds.card.CardRDSImpl
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.chat.ChatRDSImpl
-import com.beeswork.balance.data.network.rds.click.ClickRDS
-import com.beeswork.balance.data.network.rds.click.ClickRDSImpl
+import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
+import com.beeswork.balance.data.network.rds.swipe.SwipeRDSImpl
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.rds.login.LoginRDSImpl
 import com.beeswork.balance.data.network.rds.match.MatchRDS
@@ -42,17 +44,14 @@ import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.rds.report.ReportRDSImpl
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.rds.setting.SettingRDSImpl
-import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
-import com.beeswork.balance.data.network.rds.swipe.SwipeRDSImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
-import com.beeswork.balance.data.network.service.stomp.WebSocketClient
 import com.beeswork.balance.data.network.service.stomp.WebSocketClientImpl
-import com.beeswork.balance.internal.mapper.click.ClickMapper
-import com.beeswork.balance.internal.mapper.click.ClickMapperImpl
+import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
+import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
 import com.beeswork.balance.internal.mapper.location.LocationMapperImpl
 import com.beeswork.balance.internal.mapper.login.LoginMapper
@@ -65,20 +64,20 @@ import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.internal.mapper.profile.QuestionMapperImpl
 import com.beeswork.balance.internal.mapper.setting.PushSettingMapper
 import com.beeswork.balance.internal.mapper.setting.PushSettingMapperImpl
-import com.beeswork.balance.internal.mapper.swipe.CardMapper
-import com.beeswork.balance.internal.mapper.swipe.CardMapperImpl
-import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapper
-import com.beeswork.balance.internal.mapper.swipe.SwipeFilterMapperImpl
-import com.beeswork.balance.ui.account.AccountViewModelFactory
-import com.beeswork.balance.ui.chat.ChatViewModelFactory
-import com.beeswork.balance.ui.chat.ChatViewModelFactoryParameter
-import com.beeswork.balance.ui.click.ClickViewModelFactory
+import com.beeswork.balance.internal.mapper.card.CardMapper
+import com.beeswork.balance.internal.mapper.card.CardMapperImpl
+import com.beeswork.balance.internal.mapper.card.CardFilterMapper
+import com.beeswork.balance.internal.mapper.card.CardFilterMapperImpl
+import com.beeswork.balance.ui.accountfragment.AccountViewModelFactory
+import com.beeswork.balance.ui.chatfragment.ChatViewModelFactory
+import com.beeswork.balance.ui.chatfragment.ChatViewModelFactoryParameter
+import com.beeswork.balance.ui.swipefragment.SwipeViewModelFactory
 import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
 import com.beeswork.balance.ui.mainactivity.MainViewModelFactory
-import com.beeswork.balance.ui.mainviewpager.MainViewPagerViewModelFactory
-import com.beeswork.balance.ui.match.MatchViewModelFactory
-import com.beeswork.balance.ui.profile.balancegame.ProfileBalanceGameViewModelFactory
-import com.beeswork.balance.ui.profile.ProfileViewModelFactory
+import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerViewModelFactory
+import com.beeswork.balance.ui.matchfragment.MatchViewModelFactory
+import com.beeswork.balance.ui.profilefragment.balancegame.ProfileBalanceGameViewModelFactory
+import com.beeswork.balance.ui.profilefragment.ProfileViewModelFactory
 import com.beeswork.balance.ui.registeractivity.RegisterViewModelFactory
 import com.beeswork.balance.ui.registeractivity.about.AboutViewModelFactory
 import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateViewModelFactory
@@ -87,13 +86,13 @@ import com.beeswork.balance.ui.registeractivity.height.HeightViewModelFactory
 import com.beeswork.balance.ui.registeractivity.name.NameViewModelFactory
 import com.beeswork.balance.ui.registeractivity.photo.PhotoViewModelFactory
 import com.beeswork.balance.ui.registeractivity.registerfinish.RegisterFinishViewModelFactory
-import com.beeswork.balance.ui.setting.SettingViewModelFactory
-import com.beeswork.balance.ui.setting.email.EmailSettingViewModelFactory
-import com.beeswork.balance.ui.setting.push.PushSettingViewModelFactory
-import com.beeswork.balance.ui.splash.SplashViewModelFactory
-import com.beeswork.balance.ui.swipe.balancegame.SwipeBalanceGameViewModelFactory
-import com.beeswork.balance.ui.swipe.filter.SwipeFilterDialogViewModelFactory
-import com.beeswork.balance.ui.swipe.SwipeViewModelFactory
+import com.beeswork.balance.ui.settingfragment.SettingViewModelFactory
+import com.beeswork.balance.ui.settingfragment.email.EmailSettingViewModelFactory
+import com.beeswork.balance.ui.settingfragment.push.PushSettingViewModelFactory
+import com.beeswork.balance.ui.splashfragment.SplashViewModelFactory
+import com.beeswork.balance.ui.cardfragment.balancegame.SwipeBalanceGameViewModelFactory
+import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialogViewModelFactory
+import com.beeswork.balance.ui.cardfragment.CardViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.*
@@ -121,8 +120,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<MatchMapper>() with singleton { MatchMapperImpl() }
         bind<LocationMapper>() with singleton { LocationMapperImpl() }
         bind<ChatMessageMapper>() with singleton { ChatMessageMapperImpl() }
-        bind<ClickMapper>() with singleton { ClickMapperImpl() }
-        bind<SwipeFilterMapper>() with singleton { SwipeFilterMapperImpl() }
+        bind<SwipeMapper>() with singleton { SwipeMapperImpl() }
+        bind<CardFilterMapper>() with singleton { CardFilterMapperImpl() }
         bind<CardMapper>() with singleton { CardMapperImpl() }
         bind<QuestionMapper>() with singleton { QuestionMapperImpl() }
         bind<ProfileMapper>() with singleton { ProfileMapperImpl() }
@@ -137,9 +136,9 @@ class BalanceApplication : Application(), KodeinAware {
         // DAO
         bind() from singleton { instance<BalanceDatabase>().matchDAO() }
         bind() from singleton { instance<BalanceDatabase>().chatMessageDAO() }
-        bind() from singleton { instance<BalanceDatabase>().swipeDAO() }
-        bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
         bind() from singleton { instance<BalanceDatabase>().clickDAO() }
+        bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
+        bind() from singleton { instance<BalanceDatabase>().swipeDAO() }
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
         bind() from singleton { instance<BalanceDatabase>().locationDAO() }
         bind() from singleton { instance<BalanceDatabase>().photoDAO() }
@@ -154,22 +153,22 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ReportRDS>() with singleton { ReportRDSImpl(instance(), instance()) }
         bind<ChatRDS>() with singleton { ChatRDSImpl(instance(), instance()) }
         bind<MatchRDS>() with singleton { MatchRDSImpl(instance(), instance()) }
-        bind<ClickRDS>() with singleton { ClickRDSImpl(instance(), instance()) }
-        bind<SettingRDS>() with singleton { SettingRDSImpl(instance(), instance()) }
         bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance(), instance()) }
+        bind<SettingRDS>() with singleton { SettingRDSImpl(instance(), instance()) }
         bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance(), instance()) }
         bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance(), instance()) }
         bind<LoginRDS>() with singleton { LoginRDSImpl(instance(), instance()) }
+        bind<CardRDS>() with singleton { CardRDSImpl(instance(), instance()) }
 
         // Repository
 
 
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), Dispatchers.IO, applicationScope) }
-        bind<SwipeRepository>() with singleton { SwipeRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
+        bind<CardRepository>() with singleton { CardRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
-        bind<SettingRepository>() with singleton {
-            SettingRepositoryImpl(
+        bind<SwipeRepository>() with singleton {
+            SwipeRepositoryImpl(
                 instance(),
                 instance(),
                 instance(),
@@ -179,8 +178,8 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.IO
             )
         }
-        bind<ClickRepository>() with singleton {
-            ClickRepositoryImpl(
+        bind<SettingRepository>() with singleton {
+            SettingRepositoryImpl(
                 instance(),
                 instance(),
                 instance(),
@@ -232,10 +231,10 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from factory { param: ChatViewModelFactoryParameter ->
             ChatViewModelFactory(param, instance(), instance(), instance(), Dispatchers.Default)
         }
+        bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { ClickViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeBalanceGameViewModelFactory(instance(), instance(), instance()) }
-        bind() from provider { SwipeFilterDialogViewModelFactory(instance(), instance()) }
+        bind() from provider { CardFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }

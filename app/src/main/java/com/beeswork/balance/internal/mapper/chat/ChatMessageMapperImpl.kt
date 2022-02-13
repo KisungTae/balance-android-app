@@ -5,7 +5,7 @@ import com.beeswork.balance.data.database.entity.chat.ChatMessageToSendTuple
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.ui.chat.ChatMessageDomain
+import com.beeswork.balance.ui.chatfragment.ChatMessageDomain
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
 import java.util.*

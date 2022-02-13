@@ -6,7 +6,7 @@
     app:startDestination="@id/mainViewPagerFragment">
     <fragment
         android:id="@+id/mainViewPagerFragment"
-        android:name="com.beeswork.balance.ui.mainviewpager.MainViewPagerFragment"
+        android:name="com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment"
         android:label="fragment_main_view_pager"
         tools:layout="@layout/fragment_main_view_pager" />
 </navigation>

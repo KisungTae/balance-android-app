@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="true"
+    android:clipToPadding="true"
+    android:orientation="vertical"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="20dp">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/sh_top_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:paddingTop="20dp"
+        android:text="@string/card_filter_dialog_title"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_large"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/BackgroundWhite"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/card_filter_gender_title" />
+
+        <RadioGroup
+            android:id="@+id/rgCardFilterGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@color/BackgroundWhite"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingHorizontal="13dp">
+
+            <RadioButton
+                android:id="@+id/rbCardFilterMale"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:background="@drawable/st_radio_button_left"
+                android:button="@color/Transparent"
+                android:gravity="center"
+                android:paddingVertical="8dp"
+                android:text="@string/gender_male_label"
+                android:textColor="@color/radio_button_text" />
+
+            <RadioButton
+                android:id="@+id/rbCardFilterFemale"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:background="@drawable/st_radio_button_right"
+                android:button="@color/Transparent"
+                android:gravity="center"
+                android:paddingVertical="8dp"
+                android:text="@string/gender_female_label"
+                android:textColor="@color/radio_button_text" />
+
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/card_filter_age_slider_title" />
+
+            <TextView
+                android:id="@+id/tvCardFilterMinAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="@string/card_filter_age_slider_between" />
+
+            <TextView
+                android:id="@+id/tvCardFilterMaxAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp" />
+
+        </LinearLayout>
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/rsCardFilterAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/LightGrey"
+            android:stepSize="1"
+            android:valueFrom="20"
+            android:valueTo="80"
+            app:haloColor="@color/Transparent"
+            app:labelBehavior="gone"
+            app:tickVisible="false"
+            app:trackColorInactive="@color/LightGrey"
+            app:trackHeight="3dp"
+            app:values="@array/initial_slider_values" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/card_filter_distance_slider_title" />
+
+            <TextView
+                android:id="@+id/tvCardFilterDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="@string/card_filter_distance_slider_unit" />
+
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderCardFilterDistance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/LightGrey"
+            android:stepSize="1"
+            android:valueFrom="1"
+            android:valueTo="30"
+            app:haloColor="@color/Transparent"
+            app:labelBehavior="gone"
+            app:tickVisible="false"
+            app:trackColorActive="@color/Primary"
+            app:trackColorInactive="@color/LightGrey"
+            app:trackHeight="3dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/sh_bottom_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:orientation="vertical"
+        android:paddingHorizontal="33dp"
+        android:paddingVertical="20dp">
+
+        <Button
+            android:background="@drawable/sh_round_box"
+            android:id="@+id/btnCardFilterApply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stateListAnimator="@null"
+            android:text="@string/apply_button_text" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,15 +1,12 @@
 package com.beeswork.balance.data.network.rds.swipe
 
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.data.network.response.profile.QuestionDTO
-import com.beeswork.balance.data.network.response.swipe.FetchCardsDTO
-import com.beeswork.balance.internal.constant.Gender
+import com.beeswork.balance.data.network.response.swipe.SwipeDTO
+import com.beeswork.balance.data.network.response.swipe.CountSwipesDTO
 import java.util.*
 
 interface SwipeRDS {
-
-    suspend fun fetchCards(minAge: Int, maxAge: Int, gender: Boolean, distance: Int, pageIndex: Int): Resource<FetchCardsDTO>
-
-    suspend fun swipe(swipedId: UUID): Resource<List<QuestionDTO>>
+    suspend fun listSwipes(loadSize: Int, startPosition: Int): Resource<List<SwipeDTO>>
+    suspend fun fetchSwipes(loadSize: Int, lastSwiperId: UUID?): Resource<List<SwipeDTO>>
+    suspend fun countSwipes(): Resource<CountSwipesDTO>
 }

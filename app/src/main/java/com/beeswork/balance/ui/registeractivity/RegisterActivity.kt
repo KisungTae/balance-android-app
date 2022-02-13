@@ -1,24 +1,16 @@
 package com.beeswork.balance.ui.registeractivity
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.databinding.ActivityRegisterBinding
 import com.beeswork.balance.internal.util.hideKeyboard
-import com.beeswork.balance.internal.util.safeLet
 import com.beeswork.balance.ui.common.BaseActivity
-import com.beeswork.balance.ui.loginactivity.LoginViewModel
-import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
-import com.beeswork.balance.ui.mainviewpager.MainViewPagerTabPosition
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware

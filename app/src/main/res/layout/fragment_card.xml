@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundWhite"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tbCard"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/BackgroundWhite"
+        app:contentInsetStart="0dp">
+
+        <Button
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
+            android:visibility="invisible" />
+
+        <com.beeswork.balance.ui.common.GradientTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/card_tool_bar_title"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_head"
+            android:textStyle="bold"
+            app:endColor="@color/TextWhite"
+            app:startColor="@color/Primary" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/llCardStackError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="17dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnCardStackReload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:text="@string/dialog_retry_btn_text" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llCardStackLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="17dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Primary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llCardStackEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="17dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/card_stac_empty_text" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/llCardStackLocationNotPermitted"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location permission should be granted, please Setting > Location and allow "/>
+
+        </LinearLayout>
+
+
+        <com.yuyakaido.android.cardstackview.CardStackView
+            android:id="@+id/csvCard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="10dp"
+            android:visibility="gone" />
+
+
+
+    </FrameLayout>
+
+
+</LinearLayout>

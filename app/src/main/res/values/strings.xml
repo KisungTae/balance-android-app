@@ -51,7 +51,7 @@
     <string name="recent_chat_message_invalid_match">상대방이 채팅방을 나갔습니다</string>
 
 
-    <string name="fetch_clicks_exception_title">클릭정보를 가져오는데 실패했습니다</string>
+    <string name="fetch_swipes_exception_title">클릭정보를 가져오는데 실패했습니다</string>
 
 
     <string name="save_about_success_message">프로필을 저장했습니다</string>
@@ -115,24 +115,24 @@
     <string name="new_match_snack_bar_my_iv_description">my profile photo</string>
     <string name="new_match_snack_bar_title">새로운 매치</string>
 
-    <string name="click_header_title">내 취향에 클릭한 사람들 \n 상대방 취향에 클릭하고 새로운 만남을 만들어보세요</string>
-    <string name="click_tool_bar_title">CLICK</string>
-    <string name="new_click_snack_bar_profile_picture">new click profile picture</string>
-    <string name="new_click_snack_bar_title">새로운 클릭</string>
-    <string name="new_click_snack_bar_body">새로운 만남을 만들어보세요</string>
+    <string name="swipe_header_title">내 취향에 클릭한 사람들 \n 상대방 취향에 클릭하고 새로운 만남을 만들어보세요</string>
     <string name="swipe_tool_bar_title">SWIPE</string>
+    <string name="new_swipe_snack_bar_profile_picture">new swipe profile picture</string>
+    <string name="new_swipe_snack_bar_title">새로운 클릭</string>
+    <string name="new_swipe_snack_bar_body">새로운 만남을 만들어보세요</string>
+    <string name="card_tool_bar_title">CARD</string>
     <string name="fetch_card_exception_title">카드를 가져오는데 실패했습니다</string>
     <string name="gender_male_label">남자</string>
     <string name="gender_female_label">여자</string>
-    <string name="swipe_filter_dialog_title">필터</string>
-    <string name="swipe_filter_age_slider_title">상대방의 나이는</string>
-    <string name="swipe_filter_age_slider_between">에서</string>
-    <string name="swipe_filter_distance_slider_title">상대방과의 거리는 최대</string>
-    <string name="swipe_filter_distance_slider_unit">km</string>
+    <string name="card_filter_dialog_title">필터</string>
+    <string name="card_filter_age_slider_title">상대방의 나이는</string>
+    <string name="card_filter_age_slider_between">에서</string>
+    <string name="card_filter_distance_slider_title">상대방과의 거리는 최대</string>
+    <string name="card_filter_distance_slider_unit">km</string>
     <string name="apply_button_text">적용하기</string>
-    <string name="swipe_filter_gender_title">상대방의 성별은</string>
+    <string name="card_filter_gender_title">상대방의 성별은</string>
     <string name="card_stac_empty_text">현재 주변에 이성이없습니다. 필터를 재조정해보세요</string>
-    <string name="click_profile_photo_image_view_description">click profile photo</string>
+    <string name="swipe_profile_photo_image_view_description">swipe profile photo</string>
     <string name="height_icon_description">height icon</string>
     <string name="location_icon_description">location icon</string>
     <string name="gender_icon_description">gender icon</string>
@@ -145,7 +145,7 @@
     <string name="balance_game_loading_text">밸런스 질문을 가져오고있습니다</string>
     <string name="balance_game_checking_text">상대방 밸런스와 내 취향을 체크하는중이에요..</string>
     <string name="balance_game_saving_answers_text">밸런스 답변을 저장하고있습니다..</string>
-    <string name="swipe_profile_photo_description">swipe profile photo</string>
+    <string name="balance_game_profile_photo_description">balance game swiped profile photo</string>
     <string name="account_tool_bar_title">ACCOUNT</string>
     <string name="account_profile_photo_description">account profile photo</string>
     <string name="profile_edit_icon_description">profile edit icon</string>
@@ -192,7 +192,7 @@
     <string name="save_btn_text">저장하기</string>
     <string name="email_hint">이메일을 입력해주세요</string>
     <string name="match_notification_label">매치 알람</string>
-    <string name="clicked_notification_label">좋아요 알람</string>
+    <string name="swipe_notification_label">좋아요 알람</string>
     <string name="chat_message_notification_label">채팅메세지 알람</string>
     <string name="refresh_button_icon_description">refresh button icon</string>
     <string name="delete_account_button_text">Delete Account</string>
@@ -205,7 +205,7 @@
     <string name="register_name_description">한번 입력한 이름을 바꾸실수 없습니다. 정확히 입력해주세요</string>
     <string name="button_next_label">다음</string>
     <string name="register_name_hint"></string>
-    <string name="title_click_empty_page">아직 내 취향에 클릭한 사람이 없어요.\n스와이프를 통해 상대방에게 관심을 보내세요</string>
+    <string name="title_swipe_empty_page">아직 내 취향에 클릭한 사람이 없어요.\n스와이프를 통해 상대방에게 관심을 보내세요</string>
     <string name="error_generic_try_later">해당요청을 처리하지 못했습니다. 잠시후에 다시 시도해주세요!</string>
 
 
@@ -213,14 +213,14 @@
     <string name="access_token_not_found_exception">access_token_not_found_exception</string>
     <string name="account_id_not_found_exception">account_id_not_found_exception</string>
     <string name="match_unmatched_exception">match_unmatched_exception</string>
-    <string name="click_clicked_icon">click clicked icon</string>
-    <string name="click_not_clicked_icon">click not clicked icon</string>
+    <string name="swipe_clicked_icon">swipe clicked icon</string>
+    <string name="swipe_liked_icon">swipe liked icon</string>
     
     
-    <string name="message_new_like_title">새로운 관심</string>
-    <string name="message_new_like_message">상대방이 관심을 보내왔어요!</string>
-    <string name="message_new_click_title">새로운 클릭</string>
-    <string name="message_new_click_message">상대방이 내 취향에 클릭했어요!</string>
+    <string name="title_new_swipe_liked">새로운 관심</string>
+    <string name="body_new_swipe_liked">상대방이 관심을 보내왔어요!</string>
+    <string name="title_new_swipe_clicked">새로운 클릭</string>
+    <string name="body_new_swipe_clicked">상대방이 내 취향에 클릭했어요!</string>
     <string name="close">닫기</string>
 
 </resources>

@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/swipeFragment"
+        android:id="@+id/cardFragment"
         android:icon="@drawable/ic_baseline_favorite"
         android:title="" />
 
     <item
-        android:id="@+id/clickFragment"
+        android:id="@+id/swipeFragment"
         android:icon="@drawable/ic_baseline_thumb_up"
         android:title="" />
 

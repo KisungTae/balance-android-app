@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/linearLayout"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/BackgroundWhite"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
@@ -13,11 +12,6 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/BackgroundWhite"
         app:contentInsetStart="0dp">
-
-        <Button
-            android:layout_width="@dimen/icon_medium"
-            android:layout_height="@dimen/icon_medium"
-            android:visibility="invisible" />
 
         <com.beeswork.balance.ui.common.GradientTextView
             android:layout_width="match_parent"
@@ -28,92 +22,99 @@
             android:textStyle="bold"
             app:endColor="@color/TextWhite"
             app:startColor="@color/Primary" />
+
     </androidx.appcompat.widget.Toolbar>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <LinearLayout
-            android:id="@+id/llCardStackError"
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSwipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="17dp"
-            android:background="@android:color/white"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="10dp"
+            tools:listitem="@layout/item_swipe" />
 
-            <Button
-                android:id="@+id/btnCardStackReload"
-                android:layout_width="wrap_content"
+        <FrameLayout
+            android:id="@+id/llSwipeInitialLoadingPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/BackgroundWhite"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tvSwipeHeader"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/sh_round_box"
-                android:text="@string/dialog_retry_btn_text" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llCardStackLoading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="17dp"
-            android:background="@android:color/white"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+                android:layout_marginTop="20dp"
+                android:text="@string/swipe_header_title"
+                android:textAlignment="center"
+                android:textColor="@color/TextGrey" />
 
             <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvSwipeProgressBar"
                 style="@style/SpinKitView.Large.Circle"
                 android:layout_width="@dimen/icon_medium"
                 android:layout_height="@dimen/icon_medium"
+                android:layout_gravity="center"
                 android:background="@color/Transparent"
                 app:SpinKit_Color="@color/Primary" />
 
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/llSwipeInitialErrorPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/BackgroundWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tvSwipeErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="10dp"
+                android:text="@string/error_generic_try_later"
+                android:textAlignment="center"
+                android:textSize="@dimen/text_large" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSwipeRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:backgroundTint="@color/Primary"
+                android:text="@string/retry"
+                android:textColor="@color/white" />
+
+
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llCardStackEmpty"
+            android:background="@color/BackgroundWhite"
+            android:id="@+id/llSwipeInitialEmptyPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="17dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:padding="10dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tvSwipeEmptyPageTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/card_stac_empty_text" />
+                android:layout_gravity="center"
+                android:paddingHorizontal="10dp"
+                android:text="@string/title_swipe_empty_page"
+                android:textAlignment="center"
+                android:textColor="@color/TextGrey" />
 
         </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/llCardStackLocationNotPermitted"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Location permission should be granted, please Setting > Location and allow "/>
-
-        </LinearLayout>
-
-
-        <com.yuyakaido.android.cardstackview.CardStackView
-            android:id="@+id/csvSwipe"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingHorizontal="10dp"
-            android:visibility="gone" />
-
-
 
     </FrameLayout>
 

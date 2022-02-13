@@ -6,20 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
-import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
+import com.beeswork.balance.data.database.repository.card.CardRepository
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.exception.InvalidSocialLoginException
 import com.beeswork.balance.internal.mapper.login.LoginMapper
-import com.beeswork.balance.internal.util.safeLet
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val loginRepository: LoginRepository,
     private val settingRepository: SettingRepository,
-    private val swipeRepository: SwipeRepository,
+    private val cardRepository: CardRepository,
     private val loginMapper: LoginMapper
 ) : ViewModel() {
 
@@ -39,11 +36,13 @@ class LoginViewModel(
                 var loginDomain: LoginDomain? = null
                 response.data?.let { loginDTO ->
                     if (loginDTO.profileExists && loginDTO.gender != null) {
-                        swipeRepository.prepopulateSwipeFilter(loginDTO.gender)
+                        cardRepository.prepopulateCardFilter(loginDTO.gender)
                     }
                     loginDomain = loginMapper.toLoginDomain(loginDTO)
                 }
-                _loginLiveData.postValue(response.mapData(loginDomain))
+                _loginLiveData.postValue(
+                    response.map { loginDomain }
+                )
             }
         }
     }
