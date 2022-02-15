@@ -7,14 +7,13 @@ import com.beeswork.balance.data.database.repository.card.CardRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.constant.ClickResult
-import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.ui.common.BaseViewModel
-import com.beeswork.balance.ui.profilefragment.balancegame.QuestionDomain
+import com.beeswork.balance.ui.common.QuestionDomain
 import kotlinx.coroutines.launch
 import java.util.*
 
-class SwipeBalanceGameViewModel(
+class CardBalanceGameViewModel(
     private val cardRepository: CardRepository,
     private val matchRepository: MatchRepository,
     private val questionMapper: QuestionMapper

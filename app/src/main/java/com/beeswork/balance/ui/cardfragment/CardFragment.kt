@@ -14,7 +14,7 @@ import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.cardfragment.balancegame.SwipeBalanceGameDialog
+import com.beeswork.balance.ui.cardfragment.balancegame.CardBalanceGameDialog
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
@@ -138,9 +138,9 @@ class CardFragment : BaseFragment(),
 
         if (direction == Direction.Right) removedCard?.let { _removedCard ->
             val profilePhotoKey = if (_removedCard.photoKeys.isNotEmpty()) _removedCard.photoKeys[0] else null
-            SwipeBalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
+            CardBalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
                 childFragmentManager,
-                SwipeBalanceGameDialog.TAG
+                CardBalanceGameDialog.TAG
             )
         }
     }

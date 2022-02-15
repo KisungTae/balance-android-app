@@ -88,7 +88,7 @@ class SwipeRepositoryImpl(
             }
             balanceDatabase.runInTransaction {
                 response.data?.forEach { swipeDTO ->
-                    if (swipeDTO.deleted) {
+                    if (swipeDTO.swiperDeleted) {
                         swipeDAO.deleteBy(swipeDTO.swiperId)
                     } else {
                         insertSwipe(swipeDTO)
@@ -111,7 +111,7 @@ class SwipeRepositoryImpl(
     }
 
     private fun isSwipeInsertable(swipeDTO: SwipeDTO): Boolean {
-        if (swipeDTO.deleted) {
+        if (swipeDTO.swiperDeleted) {
             return false
         }
         if (matchDAO.existBy(swipeDTO.swipedId, swipeDTO.swiperId)) {

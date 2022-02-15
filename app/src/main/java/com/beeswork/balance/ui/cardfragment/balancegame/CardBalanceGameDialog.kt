@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogSwipeBalanceGameBinding
 import com.beeswork.balance.internal.constant.ClickResult
-import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.observeResource
@@ -21,16 +20,16 @@ import org.kodein.di.generic.instance
 import java.util.*
 
 
-class SwipeBalanceGameDialog(
+class CardBalanceGameDialog(
     private val swipedId: UUID,
     private val swipedName: String,
     private val swipedProfilePhotoKey: String?
 ) : BalanceGame(), KodeinAware {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: SwipeBalanceGameViewModelFactory by instance()
+    private val viewModelFactory: CardBalanceGameViewModelFactory by instance()
     private val preferenceProvider: PreferenceProvider by instance()
-    private lateinit var viewModel: SwipeBalanceGameViewModel
+    private lateinit var viewModel: CardBalanceGameViewModel
     private lateinit var binding: DialogSwipeBalanceGameBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +53,7 @@ class SwipeBalanceGameDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeBalanceGameViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(CardBalanceGameViewModel::class.java)
         bindUI()
         viewModel.like(swipedId)
     }

@@ -6,7 +6,7 @@ import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.database.repository.card.CardRepository
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 
-class SwipeBalanceGameViewModelFactory(
+class CardBalanceGameViewModelFactory(
     private val cardRepository: CardRepository,
     private val matchRepository: MatchRepository,
     private val questionMapper: QuestionMapper
@@ -14,6 +14,6 @@ class SwipeBalanceGameViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return SwipeBalanceGameViewModel(cardRepository, matchRepository, questionMapper) as T
+        return CardBalanceGameViewModel(cardRepository, matchRepository, questionMapper) as T
     }
 }

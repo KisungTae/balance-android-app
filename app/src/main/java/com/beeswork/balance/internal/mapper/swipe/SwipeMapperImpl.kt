@@ -11,13 +11,13 @@ class SwipeMapperImpl : SwipeMapper {
         return safeLet(
             swipeDTO.id,
             swipeDTO.swipedId,
-            swipeDTO.profilePhotoKey
+            swipeDTO.swiperProfilePhotoKey
         ) { id, swipedId, profilePhotoKey ->
             return@safeLet Swipe(id, swipeDTO.swiperId, swipedId, swipeDTO.clicked, profilePhotoKey)
         }
     }
 
     override fun toSwipeDomain(swipe: Swipe): SwipeDomain {
-        return SwipeDomain(swipe.swiperId, swipe.clicked, swipe.profilePhotoKey)
+        return SwipeDomain(swipe.swiperId, swipe.clicked, swipe.swiperProfilePhotoKey)
     }
 }

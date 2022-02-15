@@ -1,7 +1,6 @@
 package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.BalanceDatabase
-import com.beeswork.balance.data.database.common.InvalidationListener
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
@@ -18,7 +17,6 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.ReportReason
-import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -177,8 +175,8 @@ class MatchRepositoryImpl(
         }
     }
 
-    override fun getMatchInvalidationFlow(): Flow<Boolean> {
-        return matchDAO.invalidation()
+    override fun getMatchPageInvalidationFlow(): Flow<Boolean> {
+        return matchDAO.getPageInvalidation()
     }
 
     override fun getUnreadMatchCountFlow(): Flow<Int> {

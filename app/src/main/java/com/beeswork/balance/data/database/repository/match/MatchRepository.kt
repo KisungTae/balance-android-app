@@ -28,7 +28,7 @@ interface MatchRepository {
         description: String
     ): Resource<EmptyResponse>
     suspend fun saveMatch(matchDTO: MatchDTO)
-    fun getMatchInvalidationFlow(): Flow<Boolean>
+    fun getMatchPageInvalidationFlow(): Flow<Boolean>
     fun getUnreadMatchCountFlow(): Flow<Int>
     suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult>
     suspend fun deleteMatches()

@@ -69,7 +69,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private fun bindUI() = lifecycleScope.launch {
         setupMatchRecyclerView()
         setupToolBars()
-        observeMatchInvalidation()
+        observeMatchPageInvalidation()
 //        observeFetchMatchesLiveData()
         observeNewMatchLiveData()
 //        observeFetchChatMessagesLiveData()
@@ -83,8 +83,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
     }
 
-    private suspend fun observeMatchInvalidation() {
-        viewModel.matchInvalidation.await().observe(viewLifecycleOwner) {
+    private suspend fun observeMatchPageInvalidation() {
+        viewModel.matchPageInvalidation.await().observe(viewLifecycleOwner) {
             matchPagingRefreshAdapter.refresh()
         }
     }

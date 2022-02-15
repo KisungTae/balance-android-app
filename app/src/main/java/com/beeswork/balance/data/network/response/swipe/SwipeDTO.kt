@@ -7,6 +7,6 @@ data class SwipeDTO(
     val swiperId: UUID,
     var swipedId: UUID?,
     val clicked: Boolean,
-    val deleted: Boolean,
-    val profilePhotoKey: String?,
+    val swiperDeleted: Boolean,
+    val swiperProfilePhotoKey: String?,
 )

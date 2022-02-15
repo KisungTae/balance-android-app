@@ -18,8 +18,8 @@ class MatchMapperImpl : MatchMapper {
             matchDTO.swipedId,
             matchDTO.active,
             matchDTO.unmatched,
-            matchDTO.name,
-            matchDTO.profilePhotoKey,
+            matchDTO.swipedName,
+            matchDTO.swipedProfilePhotoKey,
             matchDTO.createdAt
         )
     }

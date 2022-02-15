@@ -36,7 +36,7 @@ interface MatchDAO {
     fun delete(chatId: Long)
 
     @Query("select 1 from `match`")
-    fun invalidation(): Flow<Boolean>
+    fun getPageInvalidation(): Flow<Boolean>
 
     @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', profilePhotoKey = null, active = 1 where chatId = :chatId")
     fun updateAsUnmatched(chatId: Long?)

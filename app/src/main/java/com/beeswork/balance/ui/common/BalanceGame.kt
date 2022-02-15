@@ -6,7 +6,6 @@ import com.beeswork.balance.databinding.LayoutBalanceGameBinding
 import com.beeswork.balance.databinding.LayoutBalanceGameErrorBinding
 import com.beeswork.balance.databinding.LayoutBalanceGameLoadingBinding
 import com.beeswork.balance.internal.constant.BalanceGameOption
-import com.beeswork.balance.ui.profilefragment.balancegame.QuestionDomain
 
 abstract class BalanceGame : BaseDialog() {
 

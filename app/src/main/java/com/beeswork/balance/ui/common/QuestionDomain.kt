@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.profilefragment.balancegame
+package com.beeswork.balance.ui.common
 
 data class QuestionDomain(
     val id: Int,
