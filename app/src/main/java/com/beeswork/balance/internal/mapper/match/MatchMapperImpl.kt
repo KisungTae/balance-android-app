@@ -8,7 +8,7 @@ import org.threeten.bp.ZoneId
 
 class MatchMapperImpl : MatchMapper {
     override fun toProfileTuple(match: Match): MatchProfileTuple {
-        return MatchProfileTuple(match.swipedId, match.name, match.profilePhotoKey)
+        return MatchProfileTuple(match.swipedId, match.swipedName, match.swipedProfilePhotoKey)
     }
 
     override fun toMatch(matchDTO: MatchDTO): Match {
@@ -20,7 +20,8 @@ class MatchMapperImpl : MatchMapper {
             matchDTO.unmatched,
             matchDTO.swipedName,
             matchDTO.swipedProfilePhotoKey,
-            matchDTO.createdAt
+            matchDTO.swipedDeleted,
+            null
         )
     }
 
@@ -30,8 +31,8 @@ class MatchMapperImpl : MatchMapper {
             match.swipedId,
             match.active,
             match.unmatched,
-            match.name,
-            match.profilePhotoKey,
+            match.swipedName,
+            match.swipedProfilePhotoKey,
             match.updatedAt?.atZoneSameInstant(ZoneId.systemDefault()),
             match.unread,
             match.recentChatMessage

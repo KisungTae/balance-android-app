@@ -62,12 +62,12 @@ class MatchPagingDataAdapter(
         fun bind(matchDomain: MatchDomain) {
 //            TODO: remove me
 //            binding.tvMatchName.text = "${matchDomain.chatId}"
-            binding.tvMatchName.text = matchDomain.name
+            binding.tvMatchName.text = matchDomain.swipedName
             binding.tvMatchUpdatedAt.text = formatUpdatedAt(matchDomain.updatedAt)
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
-            setupProfilePicture(matchDomain.swipedId, matchDomain.profilePhotoKey)
+            setupProfilePicture(matchDomain.swipedId, matchDomain.swipedProfilePhotoKey)
             setupTextColor(matchDomain)
         }
 

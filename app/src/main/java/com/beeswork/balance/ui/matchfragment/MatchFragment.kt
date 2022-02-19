@@ -239,9 +239,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         matchPagingDataAdapter.getMatch(position)?.let {
             arguments.putLong(BundleKey.CHAT_ID, it.chatId)
             arguments.putString(BundleKey.SWIPED_ID, it.swipedId.toString())
-            arguments.putString(BundleKey.SWIPED_NAME, it.name)
+            arguments.putString(BundleKey.SWIPED_NAME, it.swipedName)
             arguments.putBoolean(BundleKey.UNMATCHED, it.unmatched)
-            arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, it.profilePhotoKey.toString())
+            arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, it.swipedProfilePhotoKey.toString())
             chatFragment.arguments = arguments
         }
         moveToFragment(chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)

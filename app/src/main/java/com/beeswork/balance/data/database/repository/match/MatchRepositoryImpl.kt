@@ -265,14 +265,14 @@ class MatchRepositoryImpl(
 //        _chatMessageReceiptLiveData.postValue(Resource.error(""))
         CoroutineScope(ioDispatcher).launch {
 
-            val matches = mutableListOf<Match>()
-            val accountId = preferenceProvider.getAccountId()
-            var now = OffsetDateTime.now()
-            for (i in 4..1000) {
-                now = now.plusMinutes(1)
-                matches.add(Match(i.toLong(), accountId!!, UUID.randomUUID(), true, false, "test-$i", null, now))
-            }
-            matchDAO.insert(matches)
+//            val matches = mutableListOf<Match>()
+//            val accountId = preferenceProvider.getAccountId()
+//            var now = OffsetDateTime.now()
+//            for (i in 4..1000) {
+//                now = now.plusMinutes(1)
+//                matches.add(Match(i.toLong(), accountId!!, UUID.randomUUID(), true, false, "test-$i", null, now))
+//            }
+//            matchDAO.insert(matches)
 
 //            createDummyMatch()
 //            createDummyChatMessages()

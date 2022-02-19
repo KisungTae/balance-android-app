@@ -8,8 +8,8 @@ data class MatchDomain(
     val swipedId: UUID,
     val active: Boolean,
     val unmatched: Boolean,
-    val name: String,
-    val profilePhotoKey: String?,
+    val swipedName: String,
+    val swipedProfilePhotoKey: String?,
     val updatedAt: ZonedDateTime?,
     val unread: Boolean,
     val recentChatMessage: String

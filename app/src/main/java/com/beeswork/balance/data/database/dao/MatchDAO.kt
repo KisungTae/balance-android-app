@@ -23,7 +23,7 @@ interface MatchDAO {
     @Query("select count(swipedId) > 0 from `match` where swiperId = :swiperId and swipedId = :swipedId")
     fun existBy(swiperId: UUID?, swipedId: UUID): Boolean
 
-    @Query("select * from `match` where swiperId = :accountId and name like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
+    @Query("select * from `match` where swiperId = :accountId and swipedName like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
     fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
 
     @Query("select * from `match` where swiperId = :accountId order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
@@ -38,7 +38,7 @@ interface MatchDAO {
     @Query("select 1 from `match`")
     fun getPageInvalidation(): Flow<Boolean>
 
-    @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', profilePhotoKey = null, active = 1 where chatId = :chatId")
+    @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', swipedProfilePhotoKey = null, active = 1 where chatId = :chatId")
     fun updateAsUnmatched(chatId: Long?)
 
     @Query("select count(unread) from `match` where swiperId = :accountId and unread = 1 or active = 0")
