@@ -135,7 +135,7 @@ class ChatRepositoryImpl(
                 chatId = chatMessageDAO.findChatIdById(chatMessageReceiptDTO.id)
                 if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
                     chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
-                    matchDAO.updateAsUnmatched(chatId)
+                    matchDAO.unmatch(chatId)
                     chatMessageReceiptFlowListener?.onInvoke(
                         Resource.error(ServerException(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body))
                     )
@@ -235,18 +235,18 @@ class ChatRepositoryImpl(
     }
 
     private fun updateMatchOnNewChatMessage(chatId: Long) {
-        matchDAO.findById(chatId)?.let { match ->
-            if (!match.unmatched) chatMessageDAO.findMostRecentAfter(
-                match.chatId,
-                match.lastReadChatMessageKey
-            )?.let { chatMessage ->
-                match.recentChatMessage = chatMessage.body
-                match.updatedAt = chatMessage.createdAt
-                match.active = true
-                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
-            }
-            matchDAO.insert(match)
-        }
+//        matchDAO.findById(chatId)?.let { match ->
+//            if (!match.unmatched) chatMessageDAO.findMostRecentAfter(
+//                match.chatId,
+//                match.lastReadChatMessageKey
+//            )?.let { chatMessage ->
+//                match.recentChatMessage = chatMessage.body
+//                match.updatedAt = chatMessage.createdAt
+//                match.active = true
+//                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
+//            }
+//            matchDAO.insert(match)
+//        }
     }
 
     //  TODO: remove me

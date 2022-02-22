@@ -13,7 +13,7 @@ import java.util.*
 
 interface MatchRepository {
 
-    val newMatchFlow: Flow<MatchProfileTuple>
+    val newMatchFlow: Flow<Match>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match>
     suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
@@ -29,9 +29,10 @@ interface MatchRepository {
     ): Resource<EmptyResponse>
     suspend fun saveMatch(matchDTO: MatchDTO)
     fun getMatchPageInvalidationFlow(): Flow<Boolean>
-    fun getUnreadMatchCountFlow(): Flow<Int>
+    fun getMatchCountFlow(): Flow<Long?>
     suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult>
     suspend fun deleteMatches()
+    suspend fun deleteMatchCount()
 
     fun testFunction()
 }

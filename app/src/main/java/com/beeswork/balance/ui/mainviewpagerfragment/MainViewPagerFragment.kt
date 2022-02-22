@@ -55,8 +55,10 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         setupViewPagerTab()
         observeNewSwipeLiveData()
         observeSwipeCountLiveData()
-        observerUnreadMatchCountLiveData()
+        observeMatchCountLiveData()
+        observeNewMatchLiveData()
     }
+
 
     private suspend fun observeNewSwipeLiveData() {
         viewModel.newSwipeLiveData.await().observe(viewLifecycleOwner) { swipeDomain ->
@@ -70,9 +72,15 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         }
     }
 
-    private suspend fun observerUnreadMatchCountLiveData() {
-        viewModel.unreadMatchCount.await().observe(viewLifecycleOwner) { count ->
-//            showBadgeWithCount(MainViewPagerTabPosition.MATCH.ordinal, count)
+    private suspend fun observeMatchCountLiveData() {
+        viewModel.matchCountLiveData.await().observe(viewLifecycleOwner) { count ->
+            showBadgeWithCount(MainViewPagerTabPosition.MATCH.ordinal, count)
+        }
+    }
+
+    private suspend fun observeNewMatchLiveData() {
+        viewModel.newMatchLiveData.await().observe(viewLifecycleOwner) { matchDomain ->
+            // todo: implement match domain snackbar or popup dialog
         }
     }
 
@@ -179,6 +187,44 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         newSwipeSnackBar = snackBar
         snackBar.show()
     }
+
+
+//    private fun showNewMatchSnackBar(matchProfileTuple: MatchProfileTuple) {
+//        val binding = SnackBarNewMatchBinding.inflate(layoutInflater)
+//        val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
+//        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
+//        snackBar.view.setOnClickListener { newMatchSnackBar?.dismiss() }
+//
+//        val swiperProfilePhoto = EndPoint.ofPhoto(
+//            preferenceProvider.getAccountId(),
+//            preferenceProvider.getProfilePhotoKey()
+//        )
+//        val swipedProfilePhoto = EndPoint.ofPhoto(matchProfileTuple.swipedId, matchProfileTuple.profilePhotoKey)
+//
+//        val swiperProfilePhoto = R.drawable.person2
+//        val swipedProfilePhoto = R.drawable.person1
+//
+//        Glide.with(requireContext())
+//            .load(swiperProfilePhoto)
+//            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+//            .into(binding.ivNewMatchSnackBarSwiper)
+//
+//        Glide.with(requireContext())
+//            .load(swipedProfilePhoto)
+//            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+//            .into(binding.ivNewMatchSnackBarSwiped)
+//
+//        snackBar.addCallback(object : Snackbar.Callback() {
+//            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+//                super.onDismissed(transientBottomBar, event)
+//                if (transientBottomBar === newMatchSnackBar) newMatchSnackBar = null
+//            }
+//        })
+//
+//        newMatchSnackBar?.dismiss()
+//        newMatchSnackBar = snackBar
+//        snackBar.show()
+//    }
 
     companion object {
         const val TAG = "mainViewPagerFragment"

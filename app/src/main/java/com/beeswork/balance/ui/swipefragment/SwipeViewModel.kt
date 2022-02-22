@@ -40,12 +40,6 @@ class SwipeViewModel(
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    fun syncSwipeCount() {
-        viewModelScope.launch {
-            swipeRepository.syncSwipeCount()
-        }
-    }
-
     fun test() {
         swipeRepository.test()
     }

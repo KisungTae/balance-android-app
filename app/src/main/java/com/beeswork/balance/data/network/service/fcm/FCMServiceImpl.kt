@@ -45,9 +45,7 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
         when (pushType) {
             PushType.SWIPE -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                val swipe = GsonProvider.gson.fromJson(json, SwipeDTO::class.java)
-                println(swipe)
-//                clickRepository.saveClick(GsonProvider.gson.fromJson(json, ClickDTO::class.java))
+                swipeRepository.saveSwipe(GsonProvider.gson.fromJson(json, SwipeDTO::class.java))
             }
             PushType.MATCH -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)

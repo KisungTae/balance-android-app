@@ -23,10 +23,6 @@ class MatchViewModel(
         matchRepository.getMatchPageInvalidationFlow().asLiveData()
     }
 
-    val newMatchLiveData by viewModelLazyDeferred {
-        matchRepository.newMatchFlow.asLiveData()
-    }
-
     private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
 

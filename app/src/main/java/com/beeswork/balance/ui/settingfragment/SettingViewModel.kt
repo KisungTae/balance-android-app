@@ -56,8 +56,10 @@ class SettingViewModel(
             if (response.isSuccess()) {
                 chatRepository.deleteChatMessages()
                 swipeRepository.deleteSwipes()
+                swipeRepository.deleteSwipeSwipeCount()
                 settingRepository.deleteSettings()
                 matchRepository.deleteMatches()
+                matchRepository.deleteMatchCount()
                 photoRepository.deletePhotos()
                 cardRepository.deleteCardFilter()
                 profileRepository.deleteProfile()

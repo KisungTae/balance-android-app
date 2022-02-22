@@ -7,21 +7,20 @@ import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 import org.threeten.bp.ZoneId
 
 class MatchMapperImpl : MatchMapper {
-    override fun toProfileTuple(match: Match): MatchProfileTuple {
-        return MatchProfileTuple(match.swipedId, match.swipedName, match.swipedProfilePhotoKey)
-    }
 
     override fun toMatch(matchDTO: MatchDTO): Match {
         return Match(
+            matchDTO.id,
             matchDTO.chatId,
             matchDTO.swiperId,
             matchDTO.swipedId,
-            matchDTO.active,
             matchDTO.unmatched,
+            matchDTO.lastReadChatMessageId,
+            matchDTO.lastChatMessageId,
+            matchDTO.lastChatMessageBody,
             matchDTO.swipedName,
             matchDTO.swipedProfilePhotoKey,
-            matchDTO.swipedDeleted,
-            null
+            matchDTO.swipedDeleted
         )
     }
 
@@ -29,13 +28,12 @@ class MatchMapperImpl : MatchMapper {
         return MatchDomain(
             match.chatId,
             match.swipedId,
-            match.active,
-            match.unmatched,
+            match.lastChatMessageId > 0L,
+            match.lastReadChatMessageId < match.lastChatMessageId,
+            match.unmatched || match.swipedDeleted,
+            match.lastChatMessageBody ?: "",
             match.swipedName,
-            match.swipedProfilePhotoKey,
-            match.updatedAt?.atZoneSameInstant(ZoneId.systemDefault()),
-            match.unread,
-            match.recentChatMessage
+            match.swipedProfilePhotoKey
         )
     }
 }

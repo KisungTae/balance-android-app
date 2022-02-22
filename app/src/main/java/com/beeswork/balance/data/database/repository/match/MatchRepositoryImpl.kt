@@ -1,11 +1,11 @@
 package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.BalanceDatabase
+import com.beeswork.balance.data.database.common.InvalidationListener
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.entity.match.Match
-import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 import com.beeswork.balance.data.database.entity.swipe.Click
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -34,23 +34,26 @@ class MatchRepositoryImpl(
     private val matchDAO: MatchDAO,
     private val swipeDAO: SwipeDAO,
     private val clickDAO: ClickDAO,
+    private val matchCountDAO: MatchCountDAO,
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
 ) : MatchRepository {
 
-    private var newMatchFlowListener: NewMatchFlowListener? = null
+    private var newMatchInvalidationListener: InvalidationListener<Match>? = null
 
     @ExperimentalCoroutinesApi
-    override val newMatchFlow = callbackFlow<MatchProfileTuple> {
-        newMatchFlowListener = object : NewMatchFlowListener {
-            override fun onReceive(matchProfileTuple: MatchProfileTuple) {
-                offer(matchProfileTuple)
+    override val newMatchFlow: Flow<Match> = callbackFlow {
+        newMatchInvalidationListener = object : InvalidationListener<Match> {
+            override fun onInvalidate(data: Match) {
+                offer(data)
             }
         }
-        awaitClose { }
+        awaitClose {  }
     }
+
+
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
         return withContext(ioDispatcher) {
@@ -63,8 +66,7 @@ class MatchRepositoryImpl(
             return@withContext matchDAO.findAllPaged(
                 preferenceProvider.getAccountId(),
                 loadSize,
-                startPosition,
-                "%${searchKeyword}%"
+                startPosition
             )
         }
     }
@@ -100,48 +102,50 @@ class MatchRepositoryImpl(
     }
 
     private fun updateMatch(match: Match) {
-        matchDAO.findById(match.chatId)?.let { existingMatch ->
-            match.lastReadChatMessageKey = existingMatch.lastReadChatMessageKey
-            if (!match.unmatched) {
-                match.updatedAt = existingMatch.updatedAt
-                match.recentChatMessage = existingMatch.recentChatMessage
-                match.active = existingMatch.active
-                chatMessageDAO.findMostRecentAfter(match.chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
-                    match.recentChatMessage = chatMessage.body
-                    match.updatedAt = chatMessage.createdAt
-                    match.active = true
-                }
-                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
-            }
-        }
+//        matchDAO.findById(match.chatId)?.let { existingMatch ->
+//            match.lastReadChatMessageKey = existingMatch.lastReadChatMessageKey
+//            if (!match.unmatched) {
+//                match.updatedAt = existingMatch.updatedAt
+//                match.recentChatMessage = existingMatch.recentChatMessage
+//                match.active = existingMatch.active
+//                chatMessageDAO.findMostRecentAfter(match.chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
+//                    match.recentChatMessage = chatMessage.body
+//                    match.updatedAt = chatMessage.createdAt
+//                    match.active = true
+//                }
+//                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
+//            }
+//        }
 
     }
 
     override suspend fun synchronizeMatch(chatId: Long) {
-        withContext(ioDispatcher) {
-            balanceDatabase.runInTransaction {
-                matchDAO.findById(chatId)?.let { match ->
-                    chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
-                        match.lastReadChatMessageKey = chatMessage.key
-                        match.recentChatMessage = chatMessage.body
-                    }
-                    match.unread = false
-                    matchDAO.insert(match)
-                }
-            }
-        }
+//        withContext(ioDispatcher) {
+//            balanceDatabase.runInTransaction {
+//                matchDAO.findById(chatId)?.let { match ->
+//                    chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
+//                        match.lastReadChatMessageKey = chatMessage.key
+//                        match.recentChatMessage = chatMessage.body
+//                    }
+//                    match.unread = false
+//                    matchDAO.insert(match)
+//                }
+//            }
+//        }
     }
 
     override suspend fun isUnmatched(chatId: Long): Boolean {
         return withContext(ioDispatcher) {
-            return@withContext matchDAO.findUnmatched(chatId)
+            return@withContext matchDAO.isUnmatched(chatId)
         }
     }
 
     override suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val response = matchRDS.unmatch(swipedId)
-            if (response.isSuccess()) unmatch(chatId)
+            if (response.isSuccess()) {
+                unmatch(chatId)
+            }
             return@withContext response
         }
     }
@@ -161,7 +165,9 @@ class MatchRepositoryImpl(
     ): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val response = reportRDS.reportMatch(swipedId, reportReason, description)
-            if (response.isSuccess()) unmatch(chatId)
+            if (response.isSuccess()) {
+                unmatch(chatId)
+            }
             return@withContext response
         }
     }
@@ -170,17 +176,18 @@ class MatchRepositoryImpl(
         withContext(Dispatchers.IO) {
             val match = matchMapper.toMatch(matchDTO)
             saveMatch(match)
-            if (match.swiperId == preferenceProvider.getAccountId())
-                newMatchFlowListener?.onReceive(matchMapper.toProfileTuple(match))
+            if (match.swiperId == preferenceProvider.getAccountId()) {
+                newMatchInvalidationListener?.onInvalidate(match)
+            }
         }
     }
 
     override fun getMatchPageInvalidationFlow(): Flow<Boolean> {
-        return matchDAO.getPageInvalidation()
+        return matchDAO.getPageInvalidationFlow()
     }
 
-    override fun getUnreadMatchCountFlow(): Flow<Int> {
-        return matchDAO.countUnread(preferenceProvider.getAccountId())
+    override fun getMatchCountFlow(): Flow<Long?> {
+        return matchCountDAO.getCountFlow(preferenceProvider.getAccountId())
     }
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult> {
@@ -211,6 +218,12 @@ class MatchRepositoryImpl(
 
     override suspend fun deleteMatches() {
         withContext(ioDispatcher) { matchDAO.deleteAll(preferenceProvider.getAccountId()) }
+    }
+
+    override suspend fun deleteMatchCount() {
+        withContext(ioDispatcher) {
+            matchCountDAO.deleteBy(preferenceProvider.getAccountId())
+        }
     }
 
 

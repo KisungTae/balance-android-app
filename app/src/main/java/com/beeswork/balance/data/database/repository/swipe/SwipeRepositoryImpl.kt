@@ -5,11 +5,13 @@ import com.beeswork.balance.data.database.common.PageSyncDateTracker
 import com.beeswork.balance.data.database.common.InvalidationListener
 import com.beeswork.balance.data.database.dao.SwipeDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
+import com.beeswork.balance.data.database.dao.SwipeCountDAO
 import com.beeswork.balance.data.database.entity.swipe.Swipe
+import com.beeswork.balance.data.database.entity.swipe.SwipeCount
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
-import com.beeswork.balance.data.network.response.swipe.FetchSwipesDTO
+import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import kotlinx.coroutines.*
@@ -23,6 +25,7 @@ class SwipeRepositoryImpl(
     private val swipeRDS: SwipeRDS,
     private val swipeDAO: SwipeDAO,
     private val matchDAO: MatchDAO,
+    private val swipeCountDAO: SwipeCountDAO,
     private val preferenceProvider: PreferenceProvider,
     private val swipeMapper: SwipeMapper,
     private val balanceDatabase: BalanceDatabase,
@@ -30,7 +33,6 @@ class SwipeRepositoryImpl(
 ) : SwipeRepository {
 
     private var newSwipeInvalidationListener: InvalidationListener<Swipe>? = null
-    private var swipeCountInvalidationListener: InvalidationListener<Long?>? = null
     private val swipePageSyncDateTracker = PageSyncDateTracker()
 
     @ExperimentalCoroutinesApi
@@ -43,29 +45,39 @@ class SwipeRepositoryImpl(
         awaitClose { }
     }
 
-    @ExperimentalCoroutinesApi
-    override val swipeCountFlow: Flow<Long?> = callbackFlow {
-        swipeCountInvalidationListener = object : InvalidationListener<Long?> {
-            override fun onInvalidate(data: Long?) {
-                offer(data)
-            }
-        }
-        awaitClose { }
-    }
-
-    override suspend fun fetchSwipes(loadSize: Int, lastSwiperId: UUID?): Resource<FetchSwipesDTO> {
+    override suspend fun fetchSwipes(loadSize: Int, lastSwiperId: UUID?): Resource<ListSwipesDTO> {
         return withContext(ioDispatcher) {
             val response = swipeRDS.fetchSwipes(loadSize, lastSwiperId)
             if (response.isError()) {
                 return@withContext Resource.error(response.exception)
             }
             balanceDatabase.runInTransaction {
-                response.data?.forEach { swipeDTO ->
-                    insertSwipe(swipeDTO)
+                response.data?.let { listSwipesDTO ->
+                    listSwipesDTO.swipeDTOs.forEach { swipeDTO ->
+                        if (isSwipeInsertable(swipeDTO)) {
+                            swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
+                                swipeDAO.insert(swipe)
+                            }
+                        }
+                    }
+                    updateSwipeCount(listSwipesDTO.swipeCount, listSwipesDTO.swipeCountCountedAt)
                 }
             }
-            val fetchedSwipeSize = response.data?.size ?: 0
-            return@withContext Resource.success(FetchSwipesDTO(fetchedSwipeSize))
+            return@withContext response
+        }
+    }
+
+    private fun updateSwipeCount(count: Long, countedAt: OffsetDateTime) {
+        val accountId = preferenceProvider.getAccountId() ?: return
+        val swipeCount = swipeCountDAO.findBy(accountId)
+        if (swipeCount == null) {
+            swipeCountDAO.insert(SwipeCount(accountId, count, countedAt))
+        } else {
+            if (swipeCount.countedAt.isBefore(countedAt)) {
+                swipeCount.count = count
+                swipeCount.countedAt = countedAt
+                swipeCountDAO.insert(swipeCount)
+            }
         }
     }
 
@@ -87,12 +99,19 @@ class SwipeRepositoryImpl(
                 return@launch
             }
             balanceDatabase.runInTransaction {
-                response.data?.forEach { swipeDTO ->
-                    if (swipeDTO.swiperDeleted) {
-                        swipeDAO.deleteBy(swipeDTO.swiperId)
-                    } else {
-                        insertSwipe(swipeDTO)
+                response.data?.let { listSwipesDTO ->
+                    listSwipesDTO.swipeDTOs.forEach { swipeDTO ->
+                        if (swipeDTO.swiperDeleted) {
+                            swipeDAO.deleteBy(swipeDTO.swiperId)
+                        } else {
+                            if (isSwipeInsertable(swipeDTO)) {
+                                swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
+                                    swipeDAO.insert(swipe)
+                                }
+                            }
+                        }
                     }
+                    updateSwipeCount(listSwipesDTO.swipeCount, listSwipesDTO.swipeCountCountedAt)
                 }
             }
         }
@@ -100,10 +119,43 @@ class SwipeRepositoryImpl(
 
     override suspend fun saveSwipe(swipeDTO: SwipeDTO) {
         withContext(Dispatchers.IO) {
+            var isInserted = false
+            var newSwipe: Swipe? = null
             balanceDatabase.runInTransaction {
-                insertSwipe(swipeDTO)?.let { swipe ->
-                    if (swipe.swipedId == preferenceProvider.getAccountId()) {
-                        newSwipeInvalidationListener?.onInvalidate(swipe)
+                if (matchDAO.existBy(swipeDTO.swipedId, swipeDTO.swiperId)) {
+                    return@runInTransaction
+                }
+                val oldSwipe = swipeDAO.findBy(swipeDTO.swiperId, swipeDTO.swipedId)
+                if (oldSwipe == null) {
+                    swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
+                        swipeDAO.insert(swipe)
+                        newSwipe = swipe
+                        isInserted = true
+                    }
+                } else {
+                    if (!oldSwipe.isEqualTo(swipeDTO)) {
+                        swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
+                            swipeDAO.insert(swipe)
+                            newSwipe = swipe
+                        }
+                    }
+                }
+            }
+
+            newSwipe?.let { _newSwipe ->
+                if (_newSwipe.swipedId == preferenceProvider.getAccountId()) {
+                    newSwipeInvalidationListener?.onInvalidate(_newSwipe)
+                }
+            }
+
+            if (isInserted) {
+                val swipeCount = swipeCountDAO.findBy(swipeDTO.swipedId)
+                if (swipeCount == null) {
+                    swipeCountDAO.insert(SwipeCount(swipeDTO.swipedId, 1))
+                } else {
+                    if (swipeDTO.updatedAt?.isAfter(swipeCount.countedAt) == true) {
+                        swipeCount.count = swipeCount.count + 1
+                        swipeCountDAO.insert(swipeCount)
                     }
                 }
             }
@@ -117,25 +169,8 @@ class SwipeRepositoryImpl(
         if (matchDAO.existBy(swipeDTO.swipedId, swipeDTO.swiperId)) {
             return false
         }
-        val oldSwipe = swipeDAO.findBy(swipeDTO.swiperId, swipeDTO.swipedId)
-        return oldSwipe == null || !oldSwipe.isEqualTo(swipeDTO)
-    }
-
-    private fun insertSwipe(swipeDTO: SwipeDTO): Swipe? {
-        if (isSwipeInsertable(swipeDTO)) {
-            swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
-                swipeDAO.insert(swipe)
-                return swipe
-            }
-        }
-        return null
-    }
-
-    override suspend fun syncSwipeCount() {
-        withContext(ioDispatcher) {
-            val response = swipeRDS.countSwipes()
-            swipeCountInvalidationListener?.onInvalidate(response.data?.count)
-        }
+        val swipe = swipeDAO.findBy(swipeDTO.swiperId, swipeDTO.swipedId)
+        return swipe == null || !swipe.isEqualTo(swipeDTO)
     }
 
     override suspend fun deleteSwipes() {
@@ -144,8 +179,18 @@ class SwipeRepositoryImpl(
         }
     }
 
+    override suspend fun deleteSwipeSwipeCount() {
+        withContext(ioDispatcher) {
+            swipeCountDAO.deleteBy(preferenceProvider.getAccountId())
+        }
+    }
+
     override fun getSwipePageInvalidationFlow(): Flow<Boolean> {
-        return swipeDAO.getInvalidationFlow()
+        return swipeDAO.getPageInvalidationFlow()
+    }
+
+    override fun getSwipeCountFlow(): Flow<Long?> {
+        return swipeCountDAO.getCountFlow(preferenceProvider.getAccountId())
     }
 
     override fun test() {

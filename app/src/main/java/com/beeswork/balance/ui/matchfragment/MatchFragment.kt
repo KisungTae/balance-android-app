@@ -71,16 +71,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         setupToolBars()
         observeMatchPageInvalidation()
 //        observeFetchMatchesLiveData()
-        observeNewMatchLiveData()
 //        observeFetchChatMessagesLiveData()
         search("")
-    }
-
-
-    private suspend fun observeNewMatchLiveData() {
-        viewModel.newMatchLiveData.await().observe(viewLifecycleOwner) {
-            showNewMatchSnackBar(it)
-        }
     }
 
     private suspend fun observeMatchPageInvalidation() {
@@ -89,42 +81,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
     }
 
-    private fun showNewMatchSnackBar(matchProfileTuple: MatchProfileTuple) {
-        val binding = SnackBarNewMatchBinding.inflate(layoutInflater)
-        val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
-        val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, binding.root)
-        snackBar.view.setOnClickListener { newMatchSnackBar?.dismiss() }
 
-//        val swiperProfilePhoto = EndPoint.ofPhoto(
-//            preferenceProvider.getAccountId(),
-//            preferenceProvider.getProfilePhotoKey()
-//        )
-//        val swipedProfilePhoto = EndPoint.ofPhoto(matchProfileTuple.swipedId, matchProfileTuple.profilePhotoKey)
-
-        val swiperProfilePhoto = R.drawable.person2
-        val swipedProfilePhoto = R.drawable.person1
-
-        Glide.with(requireContext())
-            .load(swiperProfilePhoto)
-            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-            .into(binding.ivNewMatchSnackBarSwiper)
-
-        Glide.with(requireContext())
-            .load(swipedProfilePhoto)
-            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-            .into(binding.ivNewMatchSnackBarSwiped)
-
-        snackBar.addCallback(object : Snackbar.Callback() {
-            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                super.onDismissed(transientBottomBar, event)
-                if (transientBottomBar === newMatchSnackBar) newMatchSnackBar = null
-            }
-        })
-
-        newMatchSnackBar?.dismiss()
-        newMatchSnackBar = snackBar
-        snackBar.show()
-    }
 
     private fun setupMatchRecyclerView() {
         matchPagingDataAdapter = MatchPagingDataAdapter(this@MatchFragment)
@@ -236,12 +193,12 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         val chatFragment = ChatFragment()
         val arguments = Bundle()
 
-        matchPagingDataAdapter.getMatch(position)?.let {
-            arguments.putLong(BundleKey.CHAT_ID, it.chatId)
-            arguments.putString(BundleKey.SWIPED_ID, it.swipedId.toString())
-            arguments.putString(BundleKey.SWIPED_NAME, it.swipedName)
-            arguments.putBoolean(BundleKey.UNMATCHED, it.unmatched)
-            arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, it.swipedProfilePhotoKey.toString())
+        matchPagingDataAdapter.getMatch(position)?.let { matchDomain ->
+            arguments.putString(BundleKey.CHAT_ID, matchDomain.chatId.toString())
+            arguments.putString(BundleKey.SWIPED_ID, matchDomain.swipedId.toString())
+            arguments.putString(BundleKey.SWIPED_NAME, matchDomain.swipedName)
+            arguments.putBoolean(BundleKey.UNMATCHED, matchDomain.unmatched)
+            arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, matchDomain.swipedProfilePhotoKey)
             chatFragment.arguments = arguments
         }
         moveToFragment(chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)

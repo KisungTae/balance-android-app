@@ -5,7 +5,7 @@ import java.util.*
 data class SwipeDomain(
     val swiperId: UUID,
     val clicked: Boolean,
-    val swiperProfilePhotoKey: String,
+    val swiperProfilePhotoKey: String?,
     val type: Type = Type.ITEM
 ) {
 

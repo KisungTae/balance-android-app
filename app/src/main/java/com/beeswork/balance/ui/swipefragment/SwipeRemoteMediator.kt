@@ -35,7 +35,7 @@ class SwipeRemoteMediator(
                 val exception = response.exception ?: RuntimeException()
                 return MediatorResult.Error(exception)
             }
-            return MediatorResult.Success((response.data?.fetchedSwipeSize ?: 0) < pageSize)
+            return MediatorResult.Success((response.data?.swipeDTOs?.size ?: 0) < pageSize)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

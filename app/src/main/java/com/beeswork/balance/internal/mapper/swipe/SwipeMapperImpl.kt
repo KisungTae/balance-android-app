@@ -10,10 +10,9 @@ class SwipeMapperImpl : SwipeMapper {
     override fun toSwipe(swipeDTO: SwipeDTO): Swipe? {
         return safeLet(
             swipeDTO.id,
-            swipeDTO.swipedId,
-            swipeDTO.swiperProfilePhotoKey
-        ) { id, swipedId, profilePhotoKey ->
-            return@safeLet Swipe(id, swipeDTO.swiperId, swipedId, swipeDTO.clicked, profilePhotoKey)
+            swipeDTO.swipedId
+        ) { id, swipedId ->
+            return@safeLet Swipe(id, swipeDTO.swiperId, swipedId, swipeDTO.clicked, swipeDTO.swiperProfilePhotoKey)
         }
     }
 

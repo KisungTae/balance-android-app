@@ -145,6 +145,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().swipeFilterDAO() }
         bind() from singleton { instance<BalanceDatabase>().settingDAO() }
         bind() from singleton { instance<BalanceDatabase>().loginDAO() }
+        bind() from singleton { instance<BalanceDatabase>().swipeCountDAO() }
+        bind() from singleton { instance<BalanceDatabase>().matchCountDAO() }
 
         // API
         bind() from singleton { BalanceAPI(instance()) }
@@ -169,6 +171,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<SwipeRepository>() with singleton {
             SwipeRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -213,6 +216,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 Dispatchers.IO
             )
         }
@@ -235,7 +239,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { CardBalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance()) }
-        bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }

@@ -17,32 +17,35 @@ interface MatchDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(matches: List<Match>)
 
-    @Query("select * from `match` where chatId = :chatId")
-    fun findById(chatId: Long?): Match?
-
     @Query("select count(swipedId) > 0 from `match` where swiperId = :swiperId and swipedId = :swipedId")
     fun existBy(swiperId: UUID?, swipedId: UUID): Boolean
 
-    @Query("select * from `match` where swiperId = :accountId and swipedName like :searchKeyword order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
-    fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int, searchKeyword: String): List<Match>
+    @Query("select * from `match` where chatId = :chatId")
+    fun findByChatId(chatId: Long?): Match?
 
-    @Query("select * from `match` where swiperId = :accountId order by updatedAt desc, chatId desc limit :loadSize offset :startPosition")
-    fun findAllPaged(accountId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+    @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId is null order by id desc limit :loadSize offset :startPosition")
+    fun findMatchesPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+
+    @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId is not null order by id desc limit :loadSize offset :startPosition")
+    fun findChatsPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+
+    @Query("select * from `match` where swiperId = :swiperId and lastReadChatMessageId < lastChatMessageId order by id desc limit :loadSize offset :startPosition")
+    fun findChatsWithUnreadMessages(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+
+    @Query("select * from `match` where swiperId = :swiperId order by id desc limit :loadSize offset :startPosition")
+    fun findAllPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select unmatched from `match` where chatId = :chatId")
-    fun findUnmatched(chatId: Long): Boolean
+    fun isUnmatched(chatId: Long): Boolean
 
     @Query("delete from `match` where chatId = :chatId")
     fun delete(chatId: Long)
 
     @Query("select 1 from `match`")
-    fun getPageInvalidation(): Flow<Boolean>
+    fun getPageInvalidationFlow(): Flow<Boolean>
 
-    @Query("update `match` set unmatched = 1, updatedAt = null, recentChatMessage = '', swipedProfilePhotoKey = null, active = 1 where chatId = :chatId")
-    fun updateAsUnmatched(chatId: Long?)
-
-    @Query("select count(unread) from `match` where swiperId = :accountId and unread = 1 or active = 0")
-    fun countUnread(accountId: UUID?): Flow<Int>
+    @Query("update `match` set unmatched = 1, lastChatMessageBody = null, lastChatMessageId = 0, swipedProfilePhotoKey = null where chatId = :chatId")
+    fun unmatch(chatId: Long?)
 
     @Query("delete from `match` where swiperId = :accountId")
     fun deleteAll(accountId: UUID?)

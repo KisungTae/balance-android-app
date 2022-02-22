@@ -50,7 +50,6 @@ class SwipeFragment : BaseFragment(),
 
     @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
-        viewModel.syncSwipeCount()
         setupSwipeRecyclerView()
         setupSwipePagingInitialPageAdapter()
         observeSwipePagingDataLiveData()
@@ -59,7 +58,6 @@ class SwipeFragment : BaseFragment(),
 
     private suspend fun observeSwipePageInvalidationLiveData() {
         viewModel.swipePageInvalidationLiveData.await().observe(viewLifecycleOwner) {
-            viewModel.syncSwipeCount()
             swipePagingRefreshAdapter.refresh()
         }
     }

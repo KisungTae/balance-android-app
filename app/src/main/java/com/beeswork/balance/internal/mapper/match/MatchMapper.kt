@@ -6,7 +6,6 @@ import com.beeswork.balance.ui.matchfragment.MatchDomain
 import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
 
 interface MatchMapper {
-    fun toProfileTuple(match: Match): MatchProfileTuple
     fun toMatch(matchDTO: MatchDTO): Match
     fun toMatchDomain(match: Match): MatchDomain
 }

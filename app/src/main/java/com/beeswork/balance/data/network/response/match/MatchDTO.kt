@@ -5,12 +5,15 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 data class MatchDTO(
-    val chatId: Long,
-    val swiperId: UUID?,
+    val id: Long,
+    val chatId: UUID,
+    val swiperId: UUID,
     val swipedId: UUID,
-    val active: Boolean,
     val unmatched: Boolean,
-    val delete: Boolean,
+    val lastReadChatMessageId: Long,
+    val lastChatMessageId: Long,
+    val lastChatMessageBody: String,
+    val createdAt: OffsetDateTime?,
     val swipedName: String,
     val swipedProfilePhotoKey: String?,
     val swipedDeleted: Boolean

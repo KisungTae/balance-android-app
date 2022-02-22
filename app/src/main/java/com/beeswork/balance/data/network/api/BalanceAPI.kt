@@ -29,6 +29,7 @@ import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
 import com.beeswork.balance.data.network.response.match.ClickDTO
+import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -61,13 +62,13 @@ interface BalanceAPI {
     suspend fun listSwipes(
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "startPosition") startPosition: Int
-    ): Response<List<SwipeDTO>>
+    ): Response<ListSwipesDTO>
 
     @GET("swipe/fetch")
     suspend fun fetchSwipes(
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "lastSwiperId") lastSwiperId: UUID?
-    ): Response<List<SwipeDTO>>
+    ): Response<ListSwipesDTO>
 
     @GET("swipe/count")
     suspend fun countSwipes(): Response<CountSwipesDTO>

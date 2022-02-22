@@ -63,9 +63,8 @@ class MatchPagingDataAdapter(
 //            TODO: remove me
 //            binding.tvMatchName.text = "${matchDomain.chatId}"
             binding.tvMatchName.text = matchDomain.swipedName
-            binding.tvMatchUpdatedAt.text = formatUpdatedAt(matchDomain.updatedAt)
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
-            binding.tvMatchRecentChatMessage.text = getRecentChatMessage(matchDomain)
+            binding.tvMatchLastChatMessageBody.text = getLastChatMessageBody(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
             setupProfilePicture(matchDomain.swipedId, matchDomain.swipedProfilePhotoKey)
             setupTextColor(matchDomain)
@@ -102,14 +101,17 @@ class MatchPagingDataAdapter(
             val colorCode = if (matchDomain.unmatched) R.color.TextGrey else R.color.TextBlack
             val textColor = context.getColor(colorCode)
             binding.tvMatchName.setTextColor(textColor)
-            binding.tvMatchRecentChatMessage.setTextColor(textColor)
-            binding.tvMatchUpdatedAt.setTextColor(textColor)
+            binding.tvMatchLastChatMessageBody.setTextColor(textColor)
         }
 
-        private fun getRecentChatMessage(matchDomain: MatchDomain): String {
-            return if (matchDomain.unmatched) context.getString(R.string.recent_chat_message_invalid_match)
-            else if (!matchDomain.active) context.getString(R.string.recent_chat_message_new_match)
-            else matchDomain.recentChatMessage
+        private fun getLastChatMessageBody(matchDomain: MatchDomain): String {
+            return if (matchDomain.unmatched) {
+                context.getString(R.string.recent_chat_message_invalid_match)
+            } else if (!matchDomain.active) {
+                context.getString(R.string.recent_chat_message_new_match)
+            } else {
+                matchDomain.lastChatMessageBody
+            }
         }
 
         override fun onClick(view: View?) {

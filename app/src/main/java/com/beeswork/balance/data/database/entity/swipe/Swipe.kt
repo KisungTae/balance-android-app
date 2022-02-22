@@ -14,7 +14,7 @@ data class Swipe(
     val swiperId: UUID,
     val swipedId: UUID,
     val clicked: Boolean,
-    var swiperProfilePhotoKey: String
+    var swiperProfilePhotoKey: String?
 ) {
     fun isEqualTo(swipeDTO: SwipeDTO): Boolean {
         if (this.id != swipeDTO.id
