@@ -4,10 +4,12 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.repository.match.MatchRepository
+import com.beeswork.balance.internal.constant.MatchPageFilter
+import java.io.IOException
 
 class MatchPagingSource(
     private val matchRepository: MatchRepository,
-    private val searchKeyword: String
+    private val matchPageFilter: MatchPageFilter?
 ) : PagingSource<Int, Match>() {
 
     override fun getRefreshKey(state: PagingState<Int, Match>): Int? {
@@ -18,16 +20,16 @@ class MatchPagingSource(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Match> {
-        val currentPage = params.key ?: 0
-        val matches = loadMatches(params.loadSize, (currentPage * params.loadSize))
-        val prevPage = if (currentPage >= 1) currentPage - 1 else null
-        val nextPage = if (matches.isEmpty()) null else currentPage + 1
-//        println("prevPage: $prevPage | currentPage: $currentPage | nextPage: $nextPage | matches.size(): ${matches.size}")
-        return LoadResult.Page(matches, prevPage, nextPage)
-    }
+        return try {
+            val currentPage = params.key ?: 0
+            val startPosition = currentPage * params.loadSize
+            val matches = matchRepository.loadMatches(params.loadSize, startPosition, matchPageFilter)
+            val prevPage = if (currentPage >= 1) currentPage - 1 else null
+            val nextPage = if (matches.isEmpty()) null else currentPage + 1
+            LoadResult.Page(matches, prevPage, nextPage)
+        } catch (exception: IOException) {
+            LoadResult.Error(exception)
+        }
 
-    private suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
-        return if (searchKeyword.isEmpty()) matchRepository.loadMatches(loadSize, startPosition)
-        else matchRepository.loadMatches(loadSize, startPosition, searchKeyword)
     }
 }

@@ -230,7 +230,6 @@ class ChatFragment : BaseFragment(),
         chatMessagePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                viewModel.synchronizeMatch()
                 binding.rvChat.scrollToPosition(0)
                 chatMessagePagingAdapter.unregisterAdapterDataObserver(this)
             }

@@ -8,9 +8,8 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
-import com.beeswork.balance.data.network.response.match.MatchDTO
+import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
@@ -27,7 +26,11 @@ class MatchRDSImpl(
         return getResult { balanceAPI.unmatch(UnmatchBody(swipedId)) }
     }
 
-    override suspend fun listMatches(fetchedAt: OffsetDateTime): Resource<ListMatchesDTO> {
-        return getResult { balanceAPI.listMatches(fetchedAt) }
+    override suspend fun fetchMatches(loadSize: Int, lastSwipedId: UUID?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO> {
+        return getResult { balanceAPI.fetchMatches(loadSize, lastSwipedId, matchPageFilter) }
+    }
+
+    override suspend fun listMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO> {
+        return getResult { balanceAPI.listMatches(loadSize, startPosition, matchPageFilter) }
     }
 }

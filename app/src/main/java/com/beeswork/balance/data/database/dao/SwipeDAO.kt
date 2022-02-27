@@ -19,7 +19,7 @@ interface SwipeDAO {
     fun insert(swipes: List<Swipe>)
 
     @Query("delete from swipe where swiperId = :swiperId and swipedId = :swipedId")
-    fun deleteBy(swiperId: UUID, swipedId: UUID?)
+    fun deleteBy(swiperId: UUID, swipedId: UUID?): Int
 
     @Query("delete from swipe where swiperId = :swiperId")
     fun deleteBy(swiperId: UUID): Int

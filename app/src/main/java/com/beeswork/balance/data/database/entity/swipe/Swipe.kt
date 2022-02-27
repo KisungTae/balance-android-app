@@ -17,13 +17,13 @@ data class Swipe(
     var swiperProfilePhotoKey: String?
 ) {
     fun isEqualTo(swipeDTO: SwipeDTO): Boolean {
-        if (this.id != swipeDTO.id
-            || this.swiperId != swipeDTO.swiperId
-            || this.swipedId != swipeDTO.swipedId
-            || this.clicked != swipeDTO.clicked
-            || this.swiperProfilePhotoKey != swipeDTO.swiperProfilePhotoKey) {
-            return false
+        if (this.id == swipeDTO.id
+            && this.swiperId == swipeDTO.swiperId
+            && this.swipedId == swipeDTO.swipedId
+            && this.clicked == swipeDTO.clicked
+            && this.swiperProfilePhotoKey == swipeDTO.swiperProfilePhotoKey) {
+            return true
         }
-        return true
+        return false
     }
 }

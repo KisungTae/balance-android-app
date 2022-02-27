@@ -5,15 +5,15 @@ import java.util.concurrent.ConcurrentHashMap
 
 class PageSyncDateTracker {
 
-    private val pageFetchDates = ConcurrentHashMap<Int, OffsetDateTime?>()
+    private val pageFetchDates = ConcurrentHashMap<String, OffsetDateTime?>()
 
-    fun shouldSyncPage(pageIndex: Int): Boolean {
-        val fetchedAt = pageFetchDates[pageIndex]?.plusMinutes(PAGE_FETCH_SYNC_IN_MINUTES) ?: return true
+    fun shouldSyncPage(key: Any): Boolean {
+        val fetchedAt = pageFetchDates[key.toString()]?.plusMinutes(PAGE_FETCH_SYNC_IN_MINUTES) ?: return true
         return fetchedAt.isBefore(OffsetDateTime.now())
     }
 
-    fun updateSyncDate(pageIndex: Int, syncedAt: OffsetDateTime?) {
-        pageFetchDates[pageIndex] = syncedAt
+    fun updateSyncDate(key: Any, syncedAt: OffsetDateTime?) {
+        pageFetchDates[key.toString()] = syncedAt
     }
 
     companion object {

@@ -2,11 +2,15 @@ package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.InvalidationListener
+import com.beeswork.balance.data.database.common.PageSyncDateTracker
+import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.entity.match.Match
+import com.beeswork.balance.data.database.entity.match.MatchCount
 import com.beeswork.balance.data.database.entity.swipe.Click
+import com.beeswork.balance.data.database.entity.swipe.SwipeCount
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -15,7 +19,10 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
+import com.beeswork.balance.data.network.response.match.ClickDTO
+import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.internal.constant.ClickResult
+import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import kotlinx.coroutines.*
@@ -24,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.threeten.bp.OffsetDateTime
 import java.util.*
+import java.util.concurrent.Callable
 import kotlin.random.Random
 
 
@@ -35,6 +43,7 @@ class MatchRepositoryImpl(
     private val swipeDAO: SwipeDAO,
     private val clickDAO: ClickDAO,
     private val matchCountDAO: MatchCountDAO,
+    private val swipeCountDAO: SwipeCountDAO,
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
@@ -42,6 +51,7 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     private var newMatchInvalidationListener: InvalidationListener<Match>? = null
+    private val matchPageSyncDateTracker = PageSyncDateTracker()
 
     @ExperimentalCoroutinesApi
     override val newMatchFlow: Flow<Match> = callbackFlow {
@@ -50,88 +60,179 @@ class MatchRepositoryImpl(
                 offer(data)
             }
         }
-        awaitClose {  }
+        awaitClose { }
     }
 
-
-
-    override suspend fun loadMatches(loadSize: Int, startPosition: Int): List<Match> {
+    override suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match> {
         return withContext(ioDispatcher) {
-            return@withContext matchDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+            val accountId = preferenceProvider.getAccountId()
+            if (matchPageSyncDateTracker.shouldSyncPage(getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter))) {
+                syncMatches(loadSize, startPosition, matchPageFilter)
+            }
+
+            when (matchPageFilter) {
+                null -> {
+                    return@withContext matchDAO.findAllPaged(accountId, loadSize, startPosition)
+                }
+                MatchPageFilter.MATCH -> {
+                    return@withContext matchDAO.findMatchesPaged(accountId, loadSize, startPosition)
+                }
+                MatchPageFilter.CHAT -> {
+                    return@withContext matchDAO.findChatsPaged(accountId, loadSize, startPosition)
+                }
+                MatchPageFilter.CHAT_WITH_MESSAGES -> {
+                    matchDAO.findChatsWithMessagesPaged(accountId, loadSize, startPosition)
+                }
+            }
         }
     }
 
-    override suspend fun loadMatches(loadSize: Int, startPosition: Int, searchKeyword: String): List<Match> {
+    private fun syncMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?) {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+            val matchPageSyncDateTrackerKey = getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter)
+            matchPageSyncDateTracker.updateSyncDate(matchPageSyncDateTrackerKey, OffsetDateTime.now())
+            val response = matchRDS.listMatches(loadSize, startPosition, matchPageFilter)
+            if (response.isError()) {
+                matchPageSyncDateTracker.updateSyncDate(matchPageSyncDateTrackerKey, null)
+                return@launch
+            }
+            balanceDatabase.runInTransaction {
+                response.data?.let { listMatchesDTO ->
+                    saveMatches(listMatchesDTO)
+                }
+            }
+        }
+    }
+
+    override suspend fun fetchMatches(loadSize: Int, lastSwipedId: UUID?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO> {
         return withContext(ioDispatcher) {
-            return@withContext matchDAO.findAllPaged(
-                preferenceProvider.getAccountId(),
-                loadSize,
-                startPosition
-            )
+            val response = matchRDS.fetchMatches(loadSize, lastSwipedId, matchPageFilter)
+            if (response.isError()) {
+                return@withContext response
+            }
+            balanceDatabase.runInTransaction {
+                response.data?.let { listMatchesDTO ->
+                    saveMatches(listMatchesDTO)
+                }
+            }
+            return@withContext response
         }
     }
 
-    override suspend fun fetchMatches(): Resource<EmptyResponse> {
+    private fun saveMatches(listMatchesDTO: ListMatchesDTO) {
+        val swipeCount = swipeCountDAO.findBy(preferenceProvider.getAccountId())
+        listMatchesDTO.matchDTOs.forEach { matchDTO ->
+            val match = insertMatch(matchDTO).data
+            if (match != null && swipeCount != null) {
+                deleteSwipe(match, swipeCount)
+            }
+        }
+        updateMatchCount(listMatchesDTO.matchCount, listMatchesDTO.matchCountCountedAt)
+        if (swipeCount != null) {
+            swipeCountDAO.insert(swipeCount)
+        }
+    }
+
+    private fun insertMatch(matchDTO: MatchDTO): QueryResult<Match> {
+        clickDAO.insert(Click(matchDTO.swiperId, matchDTO.swipedId))
+        val match = matchDAO.findByChatId(matchDTO.chatId)
+        if (match == null || !match.isEqualTo(matchDTO)) {
+            val newMatch = matchMapper.toMatch(matchDTO)
+            matchDAO.insert(newMatch)
+            return if (match == null) {
+                QueryResult.insert(newMatch)
+            } else {
+                QueryResult.update(newMatch)
+            }
+        }
+        return QueryResult.none()
+    }
+
+    private fun deleteSwipe(match: Match) {
+        val swipeCount = swipeCountDAO.findBy(match.swiperId)
+        if (swipeCount != null) {
+            deleteSwipe(match, swipeCount)
+            swipeCountDAO.insert(swipeCount)
+        }
+    }
+
+    private fun deleteSwipe(match: Match, swipeCount: SwipeCount) {
+        val deletedSwipeCount = swipeDAO.deleteBy(match.swipedId, match.swiperId)
+        if (swipeCount.countedAt.isBefore(match.createdAt) && swipeCount.count > 0) {
+            swipeCount.count = swipeCount.count - deletedSwipeCount
+        }
+    }
+
+    private fun updateMatchCount(count: Long, countedAt: OffsetDateTime) {
+        val accountId = preferenceProvider.getAccountId() ?: return
+        val matchCount = matchCountDAO.findBy(accountId)
+        if (matchCount == null) {
+            matchCountDAO.insert(MatchCount(accountId, count, countedAt))
+        } else {
+            if (countedAt.isAfter(matchCount.countedAt)) {
+                matchCount.count = count
+                matchCount.countedAt = countedAt
+                matchCountDAO.insert(matchCount)
+            }
+        }
+    }
+
+    private fun incrementMatchCount(match: Match) {
+        val matchCount = matchCountDAO.findBy(match.swiperId)
+        if (matchCount == null) {
+            matchCountDAO.insert(MatchCount(match.swiperId, 1))
+        } else {
+            if (match.createdAt.isAfter(matchCount.countedAt)) {
+                matchCount.count++
+                matchCountDAO.insert(matchCount)
+            }
+        }
+    }
+
+    private fun doSaveMatch(matchDTO: MatchDTO?): Match? {
+        if (matchDTO == null) {
+            return null
+        }
+        return balanceDatabase.runInTransaction(Callable {
+            val queryResult = insertMatch(matchDTO)
+            if (queryResult.isInsert() && queryResult.data != null) {
+                deleteSwipe(queryResult.data)
+                incrementMatchCount(queryResult.data)
+            }
+            return@Callable queryResult.data
+        })
+    }
+
+    override suspend fun saveMatch(matchDTO: MatchDTO) {
+        withContext(Dispatchers.IO) {
+            val match = doSaveMatch(matchDTO)
+            if (match != null && match.swiperId == preferenceProvider.getAccountId()) {
+                newMatchInvalidationListener?.onInvalidate(match)
+            }
+        }
+    }
+
+    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO> {
         return withContext(ioDispatcher) {
-//            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-//
-//            val response = matchRDS.listMatches(fetchInfoDAO.findMatchFetchedAt(accountId))
-//
-//            response.data?.let { data ->
-//                balanceDatabase.runInTransaction {
-//                    data.matchDTOs?.forEach { matchDTO ->
-//                        val match = matchMapper.toMatch(matchDTO)
-//                        match.swiperId = accountId
-//                        saveMatch(match)
-//                    }
-//                }
-//                fetchInfoDAO.updateMatchFetchedAt(accountId, data.fetchedAt)
-//            }
-//            return@withContext response.toEmptyResponse()
-            return@withContext Resource.error(null)
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
+            val response = matchRDS.click(swipedId, answers)
+            response.data?.let { clickDTO ->
+                when (clickDTO.clickResult) {
+                    ClickResult.MATCHED -> {
+                        doSaveMatch(clickDTO.matchDTO)
+                    }
+                    ClickResult.CLICKED -> {
+                        clickDAO.insert(Click(swipedId, accountId))
+                    }
+                    ClickResult.MISSED -> { }
+                }
+            }
+            return@withContext response
         }
     }
 
-    private fun saveMatch(match: Match) {
-        preferenceProvider.getAccountId()?.let { accountId ->
-            updateMatch(match)
-            clickDAO.insert(Click(match.swipedId, accountId))
-            swipeDAO.deleteBy(accountId, match.swipedId)
-            matchDAO.insert(match)
-        }
-    }
-
-    private fun updateMatch(match: Match) {
-//        matchDAO.findById(match.chatId)?.let { existingMatch ->
-//            match.lastReadChatMessageKey = existingMatch.lastReadChatMessageKey
-//            if (!match.unmatched) {
-//                match.updatedAt = existingMatch.updatedAt
-//                match.recentChatMessage = existingMatch.recentChatMessage
-//                match.active = existingMatch.active
-//                chatMessageDAO.findMostRecentAfter(match.chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
-//                    match.recentChatMessage = chatMessage.body
-//                    match.updatedAt = chatMessage.createdAt
-//                    match.active = true
-//                }
-//                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
-//            }
-//        }
-
-    }
-
-    override suspend fun synchronizeMatch(chatId: Long) {
-//        withContext(ioDispatcher) {
-//            balanceDatabase.runInTransaction {
-//                matchDAO.findById(chatId)?.let { match ->
-//                    chatMessageDAO.findMostRecentAfter(chatId, match.lastReadChatMessageKey)?.let { chatMessage ->
-//                        match.lastReadChatMessageKey = chatMessage.key
-//                        match.recentChatMessage = chatMessage.body
-//                    }
-//                    match.unread = false
-//                    matchDAO.insert(match)
-//                }
-//            }
-//        }
+    private fun getMatchPageSyncDateTrackerKey(startPosition: Int, matchPageFilter: MatchPageFilter?): String {
+        return matchPageFilter?.toString() ?: "" + startPosition
     }
 
     override suspend fun isUnmatched(chatId: Long): Boolean {
@@ -172,48 +273,12 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun saveMatch(matchDTO: MatchDTO) {
-        withContext(Dispatchers.IO) {
-            val match = matchMapper.toMatch(matchDTO)
-            saveMatch(match)
-            if (match.swiperId == preferenceProvider.getAccountId()) {
-                newMatchInvalidationListener?.onInvalidate(match)
-            }
-        }
-    }
-
     override fun getMatchPageInvalidationFlow(): Flow<Boolean> {
         return matchDAO.getPageInvalidationFlow()
     }
 
     override fun getMatchCountFlow(): Flow<Long?> {
         return matchCountDAO.getCountFlow(preferenceProvider.getAccountId())
-    }
-
-    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult> {
-        return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-
-            val response = matchRDS.click(swipedId, answers)
-            response.data?.let { clickDTO ->
-                when (clickDTO.clickResult) {
-                    ClickResult.MATCHED -> {
-                        clickDTO.matchDTO?.let { matchDTO ->
-                            saveMatch(matchMapper.toMatch(matchDTO))
-                        }
-                    }
-                    ClickResult.CLICKED -> {
-                        clickDAO.insert(Click(swipedId, accountId))
-                    }
-                    ClickResult.MISSED -> {
-                    }
-                }
-            }
-
-            return@withContext response.map { clickDTO ->
-                clickDTO?.clickResult
-            }
-        }
     }
 
     override suspend fun deleteMatches() {
@@ -226,84 +291,7 @@ class MatchRepositoryImpl(
         }
     }
 
-
-    //  TODO: remove me
-    private fun createDummyChatMessages() {
-        val messages = mutableListOf<ChatMessage>()
-        var count = 1L
-        var now = OffsetDateTime.now()
-//        val chatId = matchDAO.findAllPaged(100, 0)[0].chatId
-
-        for (i in 1..10) {
-            val status = if (Random.nextBoolean()) ChatMessageStatus.SENDING else ChatMessageStatus.ERROR
-//            messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, null))
-            count++
-        }
-//
-//        for (i in 0..100) {
-//            var createdAt = now.plusMinutes(Random.nextInt(10).toLong())
-//            for (j in 0..Random.nextInt(10)) {
-//                if ((Random.nextInt(3) + 1) % 3 == 0) createdAt = createdAt.plusMinutes(Random.nextInt(10).toLong())
-//                val status = if (Random.nextBoolean()) ChatMessageStatus.SENT else ChatMessageStatus.RECEIVED
-//                messages.add(ChatMessage(chatId, "$count - ${Random.nextLong()}", status, createdAt, count))
-//                count++
-//            }
-//            now = now.plusDays(1)
-//        }
-//        chatMessageDAO.insert(messages)
-    }
-
-
-    //  TODO: remove me
-//    private fun createDummyMatch() {
-//        for ((count, i) in (1..10).withIndex()) {
-//            matchDAO.insert(
-//                Match(
-//                    chatId = count.toLong(),
-//                    matchedId = UUID.randomUUID(),
-//                    active = false,
-//                    unmatched = false,
-//                    name = "user-$count",
-//                    profilePhotoKey = "",
-//                    deleted = false,
-//                    updatedAt = OffsetDateTime.now()
-//                )
-//            )
-//        }
-//    }
-
-
-    //  TODO: remove me
     override fun testFunction() {
-//        _chatMessageReceiptLiveData.postValue(Resource.error(""))
-        CoroutineScope(ioDispatcher).launch {
-
-//            val matches = mutableListOf<Match>()
-//            val accountId = preferenceProvider.getAccountId()
-//            var now = OffsetDateTime.now()
-//            for (i in 4..1000) {
-//                now = now.plusMinutes(1)
-//                matches.add(Match(i.toLong(), accountId!!, UUID.randomUUID(), true, false, "test-$i", null, now))
-//            }
-//            matchDAO.insert(matches)
-
-//            createDummyMatch()
-//            createDummyChatMessages()
-//            matchDAO.insert(Match(Random.nextLong(), UUID.randomUUID(), false, false, "test match", "", OffsetDateTime.now()))
-//            matchDAO.updateAsUnmatched(3)
-//            chatMessageDAO.updateStatusByKey(null, ChatMessageStatus.ERROR)
-//            for (i in 0..10) {
-//                chatMessageDAO.insert(ChatMessage(1, "test", ChatMessageStatus.SENDING, OffsetDateTime.now()))
-//            }
-
-//            val cm = chatMessageDAO.findByKey(3)
-//            val cm2 = chatMessageDAO.findByKey(null)
-//            println("$cm")
-//            println("$cm2")
-
-//            val list = listOf<Long>()
-
-
-        }
+        TODO("Not yet implemented")
     }
 }

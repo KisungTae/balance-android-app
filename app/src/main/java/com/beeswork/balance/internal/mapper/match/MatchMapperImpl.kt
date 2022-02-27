@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.matchfragment.MatchDomain
 import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
+import com.beeswork.balance.internal.util.safeLet
 import org.threeten.bp.ZoneId
 
 class MatchMapperImpl : MatchMapper {
@@ -18,6 +19,7 @@ class MatchMapperImpl : MatchMapper {
             matchDTO.lastReadChatMessageId,
             matchDTO.lastChatMessageId,
             matchDTO.lastChatMessageBody,
+            matchDTO.createdAt,
             matchDTO.swipedName,
             matchDTO.swipedProfilePhotoKey,
             matchDTO.swipedDeleted

@@ -31,6 +31,7 @@ import com.beeswork.balance.data.network.response.card.FetchCardsDTO
 import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
@@ -58,11 +59,6 @@ interface BalanceAPI {
     suspend fun syncChatMessages(@Body syncChatMessagesBody: SyncChatMessagesBody)
 
 
-    @GET("swipe/list")
-    suspend fun listSwipes(
-        @Query(value = "loadSize") loadSize: Int,
-        @Query(value = "startPosition") startPosition: Int
-    ): Response<ListSwipesDTO>
 
     @GET("swipe/fetch")
     suspend fun fetchSwipes(
@@ -70,8 +66,38 @@ interface BalanceAPI {
         @Query(value = "lastSwiperId") lastSwiperId: UUID?
     ): Response<ListSwipesDTO>
 
-    @GET("swipe/count")
-    suspend fun countSwipes(): Response<CountSwipesDTO>
+    @GET("swipe/list")
+    suspend fun listSwipes(
+        @Query(value = "loadSize") loadSize: Int,
+        @Query(value = "startPosition") startPosition: Int
+    ): Response<ListSwipesDTO>
+
+
+
+
+    @GET("match/fetch")
+    suspend fun fetchMatches(
+        @Query(value = "loadSize") loadSize: Int,
+        @Query(value = "lastSwipedId") lastSwipedId: UUID?,
+        @Query(value = "matchPageFilter") matchPageFilter: MatchPageFilter?
+    ): Response<ListMatchesDTO>
+
+    @GET("match/list")
+    suspend fun listMatches(
+        @Query(value = "loadSize") loadSize: Int,
+        @Query(value = "startPosition") startPosition: Int,
+        @Query(value = "matchPageFilter") matchPageFilter: MatchPageFilter?
+    ): Response<ListMatchesDTO>
+
+
+
+    @POST("click")
+    suspend fun click(@Body clickBody: ClickBody): Response<ClickDTO>
+
+    @POST("match/unmatch")
+    suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<EmptyResponse>
+
+
 
 
     @POST("login/social")
@@ -87,14 +113,7 @@ interface BalanceAPI {
     suspend fun refreshAccessToken(@Body refreshAccessTokenBody: RefreshAccessTokenBody): Response<RefreshAccessTokenDTO>
 
 
-    @POST("click")
-    suspend fun click(@Body clickBody: ClickBody): Response<ClickDTO>
 
-    @POST("match/unmatch")
-    suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<EmptyResponse>
-
-    @GET("match/list")
-    suspend fun listMatches(@Query(value = "fetchedAt") fetchedAt: OffsetDateTime): Response<ListMatchesDTO>
 
 
     @GET("photo/list")

@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.*
@@ -19,51 +20,22 @@ class MatchViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val matchPageInvalidation by viewModelLazyDeferred {
+    val matchPageInvalidationLiveData by viewModelLazyDeferred {
         matchRepository.getMatchPageInvalidationFlow().asLiveData()
     }
 
-    private val _fetchMatchesLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val fetchMatchesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchMatchesLiveData
-
-    private val _fetchChatMessagesLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val fetchChatMessagesLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchChatMessagesLiveData
-
-    private var fetchingMatches = false
-    private var fetchingChatMessages = false
-
-    fun initMatchPagingData(searchKeyword: String): LiveData<PagingData<MatchDomain>> {
+    @ExperimentalPagingApi
+    fun initMatchPagingData(matchPageFilter: MatchPageFilter?): LiveData<PagingData<MatchDomain>> {
         return Pager(
-            pagingConfig,
-            null,
-            { MatchPagingSource(matchRepository, searchKeyword) }
-        ).flow.cachedIn(viewModelScope)
-            .map { pagingData -> pagingData.map { matchMapper.toMatchDomain(it) } }
+            config = matchPagingConfig,
+            remoteMediator = MatchRemoteMediator(matchRepository, matchPageFilter)
+        ) {
+            MatchPagingSource(matchRepository, matchPageFilter)
+        }.flow.cachedIn(viewModelScope)
+            .map { pagingData ->
+                pagingData.map { matchMapper.toMatchDomain(it) }
+            }
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
-    }
-
-    fun fetchMatches() {
-        viewModelScope.launch {
-            if (!fetchingMatches) launch {
-                _fetchMatchesLiveData.postValue(Resource.loading())
-                fetchingMatches = true
-                val response = matchRepository.fetchMatches()
-                _fetchMatchesLiveData.postValue(response)
-                fetchingMatches = false
-            }
-        }
-    }
-
-    fun fetchChatMessages() {
-        viewModelScope.launch {
-            if (!fetchingChatMessages) launch {
-                _fetchChatMessagesLiveData.postValue(Resource.loading())
-                fetchingChatMessages = true
-                val response = chatRepository.fetchChatMessages()
-                _fetchChatMessagesLiveData.postValue(response)
-                fetchingChatMessages = false
-            }
-        }
     }
 
     fun testFunction() {
@@ -92,7 +64,7 @@ class MatchViewModel(
         private const val MATCH_PAGE_SIZE = 30
         private const val MATCH_PAGE_PREFETCH_DISTANCE = MATCH_PAGE_SIZE
         private const val MATCH_MAX_PAGE_SIZE = MATCH_PAGE_PREFETCH_DISTANCE * 3 + MATCH_PAGE_SIZE
-        private val pagingConfig = PagingConfig(
+        private val matchPagingConfig = PagingConfig(
             MATCH_PAGE_SIZE,
             MATCH_PAGE_PREFETCH_DISTANCE,
             false,

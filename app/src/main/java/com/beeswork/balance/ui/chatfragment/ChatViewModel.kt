@@ -88,10 +88,6 @@ class ChatViewModel(
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    fun synchronizeMatch() {
-        viewModelScope.launch { matchRepository.synchronizeMatch(chatId) }
-    }
-
     fun sendChatMessage(body: String) {
         viewModelScope.launch {
             val bodySize = body.toByteArray().size

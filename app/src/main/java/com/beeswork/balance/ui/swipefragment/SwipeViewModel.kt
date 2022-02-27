@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 
 class SwipeViewModel(
     private val swipeRepository: SwipeRepository,
-    matchRepository: MatchRepository,
     private val swipeMapper: SwipeMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {

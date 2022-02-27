@@ -222,5 +222,10 @@
     <string name="title_new_swipe_clicked">새로운 클릭</string>
     <string name="body_new_swipe_clicked">상대방이 내 취향에 클릭했어요!</string>
     <string name="close">닫기</string>
+    <string name="title_match_filter_menu_match">match</string>
+    <string name="title_match_filter_menu_chat">chat</string>
+    <string name="title_match_filter_menu_chat_with_messages">chat with messages</string>
+
+    <string name="unknown_user_name">Unknown User</string>
 
 </resources>

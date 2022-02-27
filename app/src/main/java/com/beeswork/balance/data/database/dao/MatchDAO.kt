@@ -21,16 +21,16 @@ interface MatchDAO {
     fun existBy(swiperId: UUID?, swipedId: UUID): Boolean
 
     @Query("select * from `match` where chatId = :chatId")
-    fun findByChatId(chatId: Long?): Match?
+    fun findByChatId(chatId: UUID?): Match?
 
-    @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId is null order by id desc limit :loadSize offset :startPosition")
+    @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId = 0 and unmatched = 0 order by id desc limit :loadSize offset :startPosition")
     fun findMatchesPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
-    @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId is not null order by id desc limit :loadSize offset :startPosition")
+    @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId > 0 and unmatched = 0 order by id desc limit :loadSize offset :startPosition")
     fun findChatsPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
-    @Query("select * from `match` where swiperId = :swiperId and lastReadChatMessageId < lastChatMessageId order by id desc limit :loadSize offset :startPosition")
-    fun findChatsWithUnreadMessages(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+    @Query("select * from `match` where swiperId = :swiperId and lastReadChatMessageId < lastChatMessageId and unmatched = 0 order by id desc limit :loadSize offset :startPosition")
+    fun findChatsWithMessagesPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select * from `match` where swiperId = :swiperId order by id desc limit :loadSize offset :startPosition")
     fun findAllPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>

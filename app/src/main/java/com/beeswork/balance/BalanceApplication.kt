@@ -217,6 +217,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 Dispatchers.IO
             )
         }
@@ -236,7 +237,7 @@ class BalanceApplication : Application(), KodeinAware {
             ChatViewModelFactory(param, instance(), instance(), instance(), Dispatchers.Default)
         }
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { CardBalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }

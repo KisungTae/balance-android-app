@@ -7,43 +7,6 @@
     android:background="@color/BackgroundWhite"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/tbMatchSearch"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/BackgroundWhite"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <EditText
-            android:id="@+id/etMatchSearch"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/sh_round_box_light_grey"
-            android:clickable="true"
-            android:drawableStart="@drawable/ic_baseline_search"
-            android:drawablePadding="10dp"
-            android:focusable="true"
-            android:hint="@string/match_search_hint"
-            android:importantForAutofill="no"
-            android:inputType="text"
-            android:paddingStart="10dp"
-            android:paddingEnd="0dp" />
-
-        <ImageButton
-            android:id="@+id/btnMatchSearchClose"
-            android:layout_width="@dimen/icon_medium"
-            android:layout_height="@dimen/icon_medium"
-            android:background="@color/Transparent"
-            android:contentDescription="@string/search_bar_close_btn_description"
-            android:src="@drawable/ic_baseline_close" />
-    </LinearLayout>
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbMatch"
         android:layout_width="match_parent"
@@ -62,11 +25,6 @@
                 android:layout_height="@dimen/icon_medium"
                 android:visibility="invisible" />
 
-            <Button
-                android:layout_width="@dimen/icon_medium"
-                android:layout_height="@dimen/icon_medium"
-                android:visibility="invisible" />
-
             <com.beeswork.balance.ui.common.GradientTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -78,36 +36,7 @@
                 app:endColor="@color/TextWhite"
                 app:startColor="@color/Primary" />
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
 
-                <LinearLayout
-                    android:id="@+id/skvMatchLoading"
-                    android:layout_width="@dimen/icon_medium"
-                    android:layout_height="@dimen/icon_medium"
-                    android:gravity="center"
-                    android:visibility="invisible">
-
-                    <com.github.ybq.android.spinkit.SpinKitView
-                        style="@style/SpinKitView.Large.Circle"
-                        android:layout_width="@dimen/icon_small"
-                        android:layout_height="@dimen/icon_small"
-                        android:layout_gravity="center"
-                        app:SpinKit_Color="@color/GreyDark" />
-
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/btnMatchRefresh"
-                    android:layout_width="@dimen/icon_medium"
-                    android:layout_height="@dimen/icon_medium"
-                    android:background="@color/white"
-                    android:contentDescription="@string/refresh_button_icon_description"
-                    android:src="@drawable/ic_refresh"
-                    android:visibility="gone" />
-
-            </FrameLayout>
 
         </LinearLayout>
 

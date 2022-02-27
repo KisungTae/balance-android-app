@@ -11,6 +11,6 @@ data class MatchCount(
     @PrimaryKey
     val accountId: UUID,
 
-    val count: Long,
-    val countedAt: OffsetDateTime
+    var count: Long,
+    var countedAt: OffsetDateTime = OffsetDateTime.MIN
 )

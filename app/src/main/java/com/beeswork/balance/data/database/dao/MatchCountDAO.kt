@@ -14,6 +14,9 @@ interface MatchCountDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(matchCount: MatchCount)
 
+    @Query("select * from matchCount where accountId = :accountId")
+    fun findBy(accountId: UUID?): MatchCount?
+
     @Query("select count from matchCount where accountId = :accountId")
     fun getCountFlow(accountId: UUID?): Flow<Long?>
 

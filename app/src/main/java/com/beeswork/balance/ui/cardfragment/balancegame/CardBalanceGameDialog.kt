@@ -84,8 +84,8 @@ class CardBalanceGameDialog(
     private fun setupClickLiveDataObserver() {
         viewModel.clickLiveData.observe(viewLifecycleOwner) { resource ->
             when {
-                resource.isSuccess() -> resource.data?.let { pushType ->
-                    when (pushType) {
+                resource.isSuccess() -> resource.data?.let { clickDTO ->
+                    when (clickDTO.clickResult) {
                         ClickResult.MISSED -> {
                             showMissed()
                         }

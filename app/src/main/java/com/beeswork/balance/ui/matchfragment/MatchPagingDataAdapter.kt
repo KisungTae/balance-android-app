@@ -62,7 +62,7 @@ class MatchPagingDataAdapter(
         fun bind(matchDomain: MatchDomain) {
 //            TODO: remove me
 //            binding.tvMatchName.text = "${matchDomain.chatId}"
-            binding.tvMatchName.text = matchDomain.swipedName
+            binding.tvMatchName.text = matchDomain.swipedName ?: context.getString(R.string.unknown_user_name)
             binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
             binding.tvMatchLastChatMessageBody.text = getLastChatMessageBody(matchDomain)
             setupProfilePictureBorder(matchDomain.active)
@@ -105,9 +105,7 @@ class MatchPagingDataAdapter(
         }
 
         private fun getLastChatMessageBody(matchDomain: MatchDomain): String {
-            return if (matchDomain.unmatched) {
-                context.getString(R.string.recent_chat_message_invalid_match)
-            } else if (!matchDomain.active) {
+            return if (!matchDomain.active) {
                 context.getString(R.string.recent_chat_message_new_match)
             } else {
                 matchDomain.lastChatMessageBody
