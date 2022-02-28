@@ -3,14 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/miMatchFilter"
         android:icon="@drawable/ic_baseline_filter_list_24"
         android:title=""
         app:showAsAction="ifRoom">
 
         <menu>
-            <item android:id="@+id/miMatchFilterByMatch" android:title="@string/title_match_filter_menu_match"/>
-            <item android:id="@+id/miMatchFilterByChat" android:title="@string/title_match_filter_menu_chat"/>
-            <item android:id="@+id/miMatchFilterByChatWithMessages" android:title="@string/title_match_filter_menu_chat_with_messages"/>
+            <item
+                android:id="@+id/miMatchFilterByAll"
+                android:title="@string/title_match_filter_menu_all"/>
+            <item
+                android:id="@+id/miMatchFilterByMatch"
+                android:title="@string/title_match_filter_menu_match" />
+            <item
+                android:id="@+id/miMatchFilterByChat"
+                android:title="@string/title_match_filter_menu_chat" />
+            <item
+                android:id="@+id/miMatchFilterByChatWithMessages"
+                android:title="@string/title_match_filter_menu_chat_with_messages" />
 
         </menu>
 

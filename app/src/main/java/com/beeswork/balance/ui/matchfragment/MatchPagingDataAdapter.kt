@@ -60,56 +60,37 @@ class MatchPagingDataAdapter(
         }
 
         fun bind(matchDomain: MatchDomain) {
-//            TODO: remove me
-//            binding.tvMatchName.text = "${matchDomain.chatId}"
-            binding.tvMatchName.text = matchDomain.swipedName ?: context.getString(R.string.unknown_user_name)
-            binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) View.VISIBLE else View.GONE
-            binding.tvMatchLastChatMessageBody.text = getLastChatMessageBody(matchDomain)
-            setupProfilePictureBorder(matchDomain.active)
-            setupProfilePicture(matchDomain.swipedId, matchDomain.swipedProfilePhotoKey)
-            setupTextColor(matchDomain)
-        }
-
-        private fun formatUpdatedAt(updatedAt: ZonedDateTime?): String {
-            updatedAt?.let {
-                val now = LocalDateTime.now()
-                return if (updatedAt.year != now.year) updatedAt.toLocalDate().toString()
-                else if (updatedAt.month != now.month || updatedAt.dayOfMonth != now.dayOfMonth)
-                    updatedAt.toLocalDate().format(DateTimePattern.ofDateWithShortYear())
-                else updatedAt.format(DateTimePattern.ofTimeWithMeridiem())
-            } ?: return ""
-        }
-
-        private fun setupProfilePictureBorder(matchActive: Boolean) {
-            binding.flMatchProfilePictureWrapper.background = if (matchActive) null else ContextCompat.getDrawable(
-                context,
-                R.drawable.sh_circle_primary_border
-            )
-        }
-
-        private fun setupProfilePicture(swipedId: UUID, profilePhotoKey: String?) {
-//            val photoEndPoint = profilePhotoKey?.let {
+            //            val photoEndPoint = profilePhotoKey?.let {
 //                EndPoint.ofPhotoBucket(matchedId, profilePhotoKey)
 //            } ?: R.drawable.ic_baseline_account_circle
 //            Glide.with(context)
 //                .load(photoEndPoint)
 //                .apply(GlideHelper.profilePhotoGlideOptions())
 //                .into(binding.ivMatchProfilePicture)
-        }
-
-        private fun setupTextColor(matchDomain: MatchDomain) {
-            val colorCode = if (matchDomain.unmatched) R.color.TextGrey else R.color.TextBlack
+            binding.tvMatchName.text = matchDomain.swipedName ?: context.getString(R.string.unknown_user_name)
+            binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            binding.tvMatchLastChatMessageBody.text = if (matchDomain.active) {
+                matchDomain.lastChatMessageBody
+            } else {
+                context.getString(R.string.recent_chat_message_new_match)
+            }
+            binding.flMatchProfilePictureWrapper.background = if (matchDomain.active) {
+                null
+            } else {
+                ContextCompat.getDrawable(context, R.drawable.sh_circle_primary_border)
+            }
+            val colorCode = if (matchDomain.unmatched) {
+                R.color.TextGrey
+            } else {
+                R.color.TextBlack
+            }
             val textColor = context.getColor(colorCode)
             binding.tvMatchName.setTextColor(textColor)
             binding.tvMatchLastChatMessageBody.setTextColor(textColor)
-        }
-
-        private fun getLastChatMessageBody(matchDomain: MatchDomain): String {
-            return if (!matchDomain.active) {
-                context.getString(R.string.recent_chat_message_new_match)
-            } else {
-                matchDomain.lastChatMessageBody
-            }
         }
 
         override fun onClick(view: View?) {

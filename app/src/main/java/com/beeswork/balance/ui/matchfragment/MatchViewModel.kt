@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.*
 
 class MatchViewModel(
     private val matchRepository: MatchRepository,
-    private val chatRepository: ChatRepository,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
@@ -38,25 +37,9 @@ class MatchViewModel(
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    fun testFunction() {
+    fun test() {
         viewModelScope.launch {
             matchRepository.testFunction()
-
-
-//            matchRepository.saveMatch(
-//                MatchDTO(
-//                    PushType.MATCHED,
-//                    1,
-//                    UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"),
-//                    UUID.randomUUID(),
-//                    false,
-//                    false,
-//                    "Michael",
-//                    "key",
-//                    OffsetDateTime.now()
-//                )
-//            )
-//            chatRepository.sendChatMessage(1, UUID.randomUUID(), "test")
         }
     }
 

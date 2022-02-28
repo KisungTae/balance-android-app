@@ -1,7 +1,13 @@
 package com.beeswork.balance.ui.matchfragment
 
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.*
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
+import androidx.core.view.forEach
+import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
@@ -39,7 +45,6 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>
     private lateinit var binding: FragmentMatchBinding
     private var matchPageFilterJob: Job? = null
-    private val preferenceProvider: PreferenceProvider by instance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,18 +75,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
     }
 
-
-
     private fun setupMatchRecyclerView() {
         matchPagingDataAdapter = MatchPagingDataAdapter(this@MatchFragment)
-
-        matchPagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-//                println("matchPagingDataAdapter onItemRangeInserted ${matchPagingDataAdapter.itemCount}")
-                super.onItemRangeInserted(positionStart, itemCount)
-            }
-        })
-
         binding.rvMatch.adapter = matchPagingDataAdapter
         binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMatch.itemAnimator = null
@@ -91,8 +86,16 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     @ExperimentalPagingApi
     private fun setupToolBars() {
         binding.tbMatch.inflateMenu(R.menu.match_tool_bar)
-        binding.tbMatch.setOnMenuItemClickListener {
-            when (it.itemId) {
+        binding.tbMatch.setOnMenuItemClickListener { menuItem ->
+            if (menuItem === binding.tbMatch.menu.findItem(R.id.miMatchFilter)) {
+                return@setOnMenuItemClickListener true
+            }
+            highlightSelectedMenuItem(menuItem)
+            when (menuItem.itemId) {
+                R.id.miMatchFilterByAll -> {
+                    observeMatchPagingDataLiveData(null)
+                    true
+                }
                 R.id.miMatchFilterByMatch -> {
                     observeMatchPagingDataLiveData(MatchPageFilter.MATCH)
                     true
@@ -110,12 +113,25 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         }
     }
 
+    private fun highlightSelectedMenuItem(selectedMenuItem: MenuItem) {
+        binding.tbMatch.menu.getItem(0).subMenu.forEach { menuItem ->
+            val color = if (menuItem === selectedMenuItem) {
+                ContextCompat.getColor(requireContext(), R.color.Primary)
+            } else {
+                ContextCompat.getColor(requireContext(), R.color.TextBlack)
+            }
+            val span = SpannableString(menuItem.title)
+            span.setSpan(ForegroundColorSpan(color), 0, span.length, 0)
+            menuItem.title = span
+        }
+    }
+
     @ExperimentalPagingApi
     private fun observeMatchPagingDataLiveData(matchPageFilter: MatchPageFilter?) {
         matchPageFilterJob?.cancel()
         matchPageFilterJob = lifecycleScope.launch {
             viewModel.initMatchPagingData(matchPageFilter).observe(viewLifecycleOwner) { pagingData ->
-                matchPagingRefreshAdapter.refresh()
+                matchPagingRefreshAdapter.reset()
                 lifecycleScope.launch {
                     matchPagingDataAdapter.submitData(pagingData)
                 }

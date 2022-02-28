@@ -232,7 +232,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
-        bind() from provider { MatchViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from factory { param: ChatViewModelFactoryParameter ->
             ChatViewModelFactory(param, instance(), instance(), instance(), Dispatchers.Default)
         }

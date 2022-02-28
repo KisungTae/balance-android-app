@@ -9,13 +9,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 class MatchViewModelFactory(
     private val matchRepository: MatchRepository,
-    private val chatRepository: ChatRepository,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return MatchViewModel(matchRepository, chatRepository, matchMapper, defaultDispatcher) as T
+        return MatchViewModel(matchRepository, matchMapper, defaultDispatcher) as T
     }
 }

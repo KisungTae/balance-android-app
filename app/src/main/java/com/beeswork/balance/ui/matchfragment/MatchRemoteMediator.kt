@@ -26,7 +26,7 @@ class MatchRemoteMediator(
                     return MediatorResult.Success(true)
                 }
                 LoadType.APPEND -> {
-                    state.lastItemOrNull()?.swiperId
+                    state.lastItemOrNull()?.swipedId
                 }
             }
 
@@ -42,7 +42,5 @@ class MatchRemoteMediator(
         } catch (e: HttpException) {
             MediatorResult.Error(e)
         }
-
-        TODO("Not yet implemented")
     }
 }
