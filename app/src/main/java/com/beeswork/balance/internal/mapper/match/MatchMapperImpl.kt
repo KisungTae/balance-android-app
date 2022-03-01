@@ -3,9 +3,6 @@ package com.beeswork.balance.internal.mapper.match
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.ui.matchfragment.MatchDomain
-import com.beeswork.balance.data.database.entity.match.MatchProfileTuple
-import com.beeswork.balance.internal.util.safeLet
-import org.threeten.bp.ZoneId
 
 class MatchMapperImpl : MatchMapper {
 

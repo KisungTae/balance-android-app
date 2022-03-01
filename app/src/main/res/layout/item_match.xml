@@ -5,7 +5,7 @@
     android:padding="10dp">
 
     <FrameLayout
-        android:id="@+id/flMatchProfilePictureWrapper"
+        android:id="@+id/flMatchProfilePhotoWrapper"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginEnd="10dp">

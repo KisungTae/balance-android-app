@@ -21,9 +21,6 @@ interface SwipeDAO {
     @Query("delete from swipe where swiperId = :swiperId and swipedId = :swipedId")
     fun deleteBy(swiperId: UUID, swipedId: UUID?): Int
 
-    @Query("delete from swipe where swiperId = :swiperId")
-    fun deleteBy(swiperId: UUID): Int
-
     @Query("select * from swipe where swipedId = :swiperId order by id desc limit :loadSize offset :startPosition ")
     fun findAllPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Swipe>
 

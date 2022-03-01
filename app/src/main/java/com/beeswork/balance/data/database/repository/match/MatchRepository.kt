@@ -9,12 +9,13 @@ import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
+import com.beeswork.balance.ui.mainviewpagerfragment.NewMatch
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface MatchRepository {
 
-    val newMatchFlow: Flow<Match>
+    val newMatchFlow: Flow<NewMatch>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match>
     suspend fun fetchMatches(loadSize: Int, lastSwipedId: UUID?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>

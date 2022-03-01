@@ -33,9 +33,7 @@ class MainViewPagerViewModel(
     }
 
     val newMatchLiveData by viewModelLazyDeferred {
-        matchRepository.newMatchFlow.map { match ->
-            matchMapper.toMatchDomain(match)
-        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+        matchRepository.newMatchFlow.asLiveData()
     }
 
 }

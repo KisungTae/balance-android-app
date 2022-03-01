@@ -11,7 +11,7 @@
     android:paddingVertical="10dp">
 
     <ImageView
-        android:id="@+id/ivNewSwipeSnackBarProfilePicture"
+        android:id="@+id/ivNewSwipeSnackBarProfilePhoto"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:contentDescription="@string/new_swipe_snack_bar_profile_picture"

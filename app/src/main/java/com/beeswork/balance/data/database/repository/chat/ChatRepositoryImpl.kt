@@ -135,7 +135,8 @@ class ChatRepositoryImpl(
                 chatId = chatMessageDAO.findChatIdById(chatMessageReceiptDTO.id)
                 if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
                     chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
-                    matchDAO.unmatch(chatId)
+//                    todo: implement udpate match as unmatched
+//                    matchDAO.updateAsUnmatched(chatId)
                     chatMessageReceiptFlowListener?.onInvoke(
                         Resource.error(ServerException(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body))
                     )
@@ -150,6 +151,8 @@ class ChatRepositoryImpl(
             }
         }
     }
+
+
 
     override suspend fun fetchChatMessages(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {

@@ -14,6 +14,7 @@ class ExceptionCode {
 
         const val PHOTO_ALREADY_EXIST_EXCEPTION = "photo.already.exists.exception"
         const val MATCH_UNMATCHED_EXCEPTION = "match.unmatched.exception"
+        const val SWIPED_DELETED_EXCEPTION = "swiped.deleted.exception"
         const val INVALID_REFRESH_TOKEN_EXCEPTION = "invalid.refresh.token.exception"
         const val AUTHENTICATION_EXCEPTION = "authentication.exception"
 

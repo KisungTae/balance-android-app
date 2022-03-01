@@ -73,12 +73,12 @@ class MatchPagingDataAdapter(
             } else {
                 View.GONE
             }
-            binding.tvMatchLastChatMessageBody.text = if (matchDomain.active) {
+            binding.tvMatchLastChatMessageBody.text = if (matchDomain.active || matchDomain.unmatched) {
                 matchDomain.lastChatMessageBody
             } else {
                 context.getString(R.string.recent_chat_message_new_match)
             }
-            binding.flMatchProfilePictureWrapper.background = if (matchDomain.active) {
+            binding.flMatchProfilePhotoWrapper.background = if (matchDomain.active || matchDomain.unmatched) {
                 null
             } else {
                 ContextCompat.getDrawable(context, R.drawable.sh_circle_primary_border)

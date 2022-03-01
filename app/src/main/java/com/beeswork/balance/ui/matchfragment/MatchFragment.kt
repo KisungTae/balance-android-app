@@ -111,10 +111,11 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
                 else -> false
             }
         }
+        highlightSelectedMenuItem(binding.tbMatch.menu.findItem(R.id.miMatchFilter).subMenu.findItem(R.id.miMatchFilterByAll))
     }
 
     private fun highlightSelectedMenuItem(selectedMenuItem: MenuItem) {
-        binding.tbMatch.menu.getItem(0).subMenu.forEach { menuItem ->
+        binding.tbMatch.menu.findItem(R.id.miMatchFilter).subMenu.forEach { menuItem ->
             val color = if (menuItem === selectedMenuItem) {
                 ContextCompat.getColor(requireContext(), R.color.Primary)
             } else {
@@ -134,6 +135,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
                 matchPagingRefreshAdapter.reset()
                 lifecycleScope.launch {
                     matchPagingDataAdapter.submitData(pagingData)
+                    binding.rvMatch.scrollToPosition(0)
                 }
             }
         }
@@ -158,6 +160,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     override fun onFragmentSelected() {
+        viewModel.test()
     }
 }
 

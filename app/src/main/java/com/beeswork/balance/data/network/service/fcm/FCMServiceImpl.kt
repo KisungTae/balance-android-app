@@ -49,9 +49,7 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
             }
             PushType.MATCH -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                val match = GsonProvider.gson.fromJson(json, MatchDTO::class.java)
-                println(match)
-//                matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
+                matchRepository.saveMatch(GsonProvider.gson.fromJson(json, MatchDTO::class.java))
             }
             PushType.CHAT_MESSAGE -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)

@@ -39,15 +39,12 @@ interface MatchDAO {
     fun isUnmatched(chatId: Long): Boolean
 
     @Query("delete from `match` where chatId = :chatId")
-    fun delete(chatId: Long)
+    fun deleteBy(chatId: Long)
 
     @Query("select 1 from `match`")
     fun getPageInvalidationFlow(): Flow<Boolean>
 
-    @Query("update `match` set unmatched = 1, lastChatMessageBody = null, lastChatMessageId = 0, swipedProfilePhotoKey = null where chatId = :chatId")
-    fun unmatch(chatId: Long?)
-
-    @Query("delete from `match` where swiperId = :accountId")
-    fun deleteAll(accountId: UUID?)
+    @Query("delete from `match` where swiperId = :swiperId")
+    fun deleteAll(swiperId: UUID?)
 
 }

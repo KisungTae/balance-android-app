@@ -6,7 +6,6 @@ import com.beeswork.balance.data.database.common.PageSyncDateTracker
 import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
-import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.entity.match.MatchCount
 import com.beeswork.balance.data.database.entity.swipe.Click
@@ -15,7 +14,6 @@ import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
@@ -25,6 +23,7 @@ import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.ui.mainviewpagerfragment.NewMatch
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import java.util.concurrent.Callable
-import kotlin.random.Random
 
 
 class MatchRepositoryImpl(
@@ -44,19 +42,20 @@ class MatchRepositoryImpl(
     private val clickDAO: ClickDAO,
     private val matchCountDAO: MatchCountDAO,
     private val swipeCountDAO: SwipeCountDAO,
+    private val photoDAO: PhotoDAO,
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
     private val preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
 ) : MatchRepository {
 
-    private var newMatchInvalidationListener: InvalidationListener<Match>? = null
+    private var newMatchInvalidationListener: InvalidationListener<NewMatch>? = null
     private val matchPageSyncDateTracker = PageSyncDateTracker()
 
     @ExperimentalCoroutinesApi
-    override val newMatchFlow: Flow<Match> = callbackFlow {
-        newMatchInvalidationListener = object : InvalidationListener<Match> {
-            override fun onInvalidate(data: Match) {
+    override val newMatchFlow: Flow<NewMatch> = callbackFlow {
+        newMatchInvalidationListener = object : InvalidationListener<NewMatch> {
+            override fun onInvalidate(data: NewMatch) {
                 offer(data)
             }
         }
@@ -189,9 +188,9 @@ class MatchRepositoryImpl(
         }
     }
 
-    private fun doSaveMatch(matchDTO: MatchDTO?): Match? {
+    private fun doSaveMatch(matchDTO: MatchDTO?): QueryResult<Match> {
         if (matchDTO == null) {
-            return null
+            return QueryResult.none()
         }
         return balanceDatabase.runInTransaction(Callable {
             val queryResult = insertMatch(matchDTO)
@@ -199,15 +198,18 @@ class MatchRepositoryImpl(
                 deleteSwipe(queryResult.data)
                 incrementMatchCount(queryResult.data)
             }
-            return@Callable queryResult.data
+            return@Callable queryResult
         })
     }
 
     override suspend fun saveMatch(matchDTO: MatchDTO) {
         withContext(Dispatchers.IO) {
-            val match = doSaveMatch(matchDTO)
-            if (match != null && match.swiperId == preferenceProvider.getAccountId()) {
-                newMatchInvalidationListener?.onInvalidate(match)
+            val queryResult = doSaveMatch(matchDTO)
+            val accountId = preferenceProvider.getAccountId()
+            val match = queryResult.data
+            if (queryResult.isInsert() && match != null && match.swiperId == accountId) {
+                val newMatch = NewMatch(accountId, photoDAO.findProfilePhotoBy(accountId), match.swipedId, match.swipedProfilePhotoKey)
+                newMatchInvalidationListener?.onInvalidate(newMatch)
             }
         }
     }
@@ -224,7 +226,8 @@ class MatchRepositoryImpl(
                     ClickResult.CLICKED -> {
                         clickDAO.insert(Click(swipedId, accountId))
                     }
-                    ClickResult.MISSED -> { }
+                    ClickResult.MISSED -> {
+                    }
                 }
             }
             return@withContext response
@@ -253,7 +256,7 @@ class MatchRepositoryImpl(
 
     private fun unmatch(chatId: Long) {
         balanceDatabase.runInTransaction {
-            matchDAO.delete(chatId)
+            matchDAO.deleteBy(chatId)
             chatMessageDAO.deleteByChatId(chatId)
         }
     }
@@ -292,6 +295,7 @@ class MatchRepositoryImpl(
     }
 
     override fun testFunction() {
-        TODO("Not yet implemented")
+        val newMatch = NewMatch(UUID.randomUUID(), "", UUID.randomUUID(), "")
+        newMatchInvalidationListener?.onInvalidate(newMatch)
     }
 }

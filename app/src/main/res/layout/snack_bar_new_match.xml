@@ -15,17 +15,15 @@
 
         <ImageView
             android:id="@+id/ivNewMatchSnackBarSwiper"
-            android:layout_width="43dp"
-            android:layout_height="43dp"
-            android:src="@drawable/person1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/new_match_snack_bar_my_iv_description" />
 
         <ImageView
             android:id="@+id/ivNewMatchSnackBarSwiped"
             android:layout_marginStart="37dp"
-            android:layout_width="43dp"
-            android:layout_height="43dp"
-            android:src="@drawable/person2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/new_match_snack_bar_iv_description" />
 
     </FrameLayout>
@@ -38,7 +36,8 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_marginBottom="3dp"
+            android:layout_marginBottom="2dp"
+            android:textSize="13sp"
             android:textColor="@color/TextGrey"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,11 +45,21 @@
 
 
         <TextView
+            android:textSize="13sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/recent_chat_message_new_match"/>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvNewMatchSnackBarClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/close"
+        android:textColor="@color/Primary"
+        android:padding="10dp"
+        android:textSize="13sp" />
     
 
 </LinearLayout>

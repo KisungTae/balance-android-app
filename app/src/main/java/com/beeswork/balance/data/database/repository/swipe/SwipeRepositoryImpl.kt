@@ -81,7 +81,7 @@ class SwipeRepositoryImpl(
     private fun saveSwipes(listSwipesDTO: ListSwipesDTO) {
         listSwipesDTO.swipeDTOs.forEach { swipeDTO ->
             if (swipeDTO.swiperDeleted) {
-                swipeDAO.deleteBy(swipeDTO.swiperId)
+                swipeDAO.deleteBy(swipeDTO.swiperId, swipeDTO.swipedId)
             } else {
                 insertSwipe(swipeDTO)
             }
