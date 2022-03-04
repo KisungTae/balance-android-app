@@ -8,10 +8,10 @@ import java.util.*
 
 @Entity(
     tableName = "chatMessage",
-    indices = [Index(value = ["status"]), Index(value = ["createdAt", "key"]), Index(value = ["id"], unique = true)]
+//    indices = [Index(value = ["status"]), Index(value = ["createdAt", "key"]), Index(value = ["id"], unique = true)]
 )
 data class ChatMessage(
-    val chatId: Long,
+    val chatId: UUID,
     val body: String,
     var status: ChatMessageStatus,
     var id: UUID,
@@ -20,7 +20,3 @@ data class ChatMessage(
     @PrimaryKey(autoGenerate = true)
     val key: Long = 0
 )
-
-
-// explain query plan select count(cm.id) from chatMessage cm left join `match` m on cm.chatId = m.chatId where cm.chatId = 1 and cm.id > m.lastReadChatMessageId and cm.status = 1
-//1	0	0	0	SEARCH TABLE chatMessage AS cm USING INDEX index_chatMessage_chatId_id (chatId=? AND id>?)

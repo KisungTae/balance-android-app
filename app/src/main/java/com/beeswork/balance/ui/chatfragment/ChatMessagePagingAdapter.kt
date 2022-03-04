@@ -1,6 +1,7 @@
 package com.beeswork.balance.ui.chatfragment
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +26,7 @@ class ChatMessagePagingAdapter(
     private val topMarginMedium: Int = (displayDensity * 15).toInt()
     private val topMarginLong: Int = (displayDensity * 30).toInt()
 
-    private var profilePhotoEndPoint: String? = null
+    private var profilePhoto: Bitmap? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
@@ -55,7 +56,7 @@ class ChatMessagePagingAdapter(
                     holder.bind(chatMessageDomain)
                 }
                 is ReceivedViewHolder -> {
-                    holder.bind(chatMessageDomain, profilePhotoEndPoint)
+                    holder.bind(chatMessageDomain, profilePhoto)
                 }
                 is SentViewHolder -> {
                     holder.bind(chatMessageDomain)
@@ -74,8 +75,8 @@ class ChatMessagePagingAdapter(
         } ?: return ChatMessageStatus.SEPARATOR.ordinal
     }
 
-    fun onProfilePhotoLoaded(profilePhotoEndPoint: String?) {
-        this.profilePhotoEndPoint = profilePhotoEndPoint
+    fun onProfilePhotoDownloaded(profilePhoto: Bitmap) {
+        this.profilePhoto = profilePhoto
         notifyDataSetChanged()
     }
 
@@ -127,18 +128,16 @@ class ChatMessagePagingAdapter(
 
         fun bind(
             chatMessageDomain: ChatMessageDomain,
-            profilePhotoEndPoint: String?,
+            profilePhoto: Bitmap?,
         ) {
             binding.tvChatMessageReceivedBody.text = chatMessageDomain.body
             binding.ivChatMessageReceivedProfilePhoto.visibility = if (chatMessageDomain.showProfilePhoto) View.VISIBLE else View.INVISIBLE
             binding.tvChatMessageReceivedCreatedAt.text = chatMessageDomain.formatTimeCreatedAt()
             setTopMargin(binding.root, chatMessageDomain.topMargin)
-            profilePhotoEndPoint?.let {
-                Glide.with(context)
-                    .load(it)
-                    .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-                    .into(binding.ivChatMessageReceivedProfilePhoto)
-            }
+            Glide.with(context)
+                .load(profilePhoto)
+                .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+                .into(binding.ivChatMessageReceivedProfilePhoto)
         }
     }
 

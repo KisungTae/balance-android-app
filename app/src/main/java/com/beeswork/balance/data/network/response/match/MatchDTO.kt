@@ -5,7 +5,7 @@ import java.util.*
 
 data class MatchDTO(
     val id: Long,
-    val chatId: UUID?,
+    val chatId: UUID,
     val swiperId: UUID,
     val swipedId: UUID,
     val unmatched: Boolean,

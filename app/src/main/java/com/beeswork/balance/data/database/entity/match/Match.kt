@@ -18,7 +18,7 @@ data class Match(
     @PrimaryKey
     val id: Long,
 
-    val chatId: UUID?,
+    val chatId: UUID,
     val swiperId: UUID,
     val swipedId: UUID,
     val unmatched: Boolean,
@@ -32,6 +32,7 @@ data class Match(
 ) {
     fun isEqualTo(matchDTO: MatchDTO): Boolean {
         if (this.id == matchDTO.id
+            && this.chatId == matchDTO.chatId
             && this.swiperId == matchDTO.swiperId
             && this.swipedId == matchDTO.swipedId
             && this.unmatched == matchDTO.unmatched

@@ -5,7 +5,7 @@ import java.util.*
 
 data class ChatMessageDTO(
     val id: UUID?,
-    val chatId: Long?,
+    val chatId: UUID?,
     val body: String?,
     val createdAt: OffsetDateTime?,
     val accountId: UUID?,

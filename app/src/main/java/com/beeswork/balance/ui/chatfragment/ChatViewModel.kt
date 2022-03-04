@@ -13,6 +13,7 @@ import com.beeswork.balance.internal.exception.ChatMessageEmptyException
 import com.beeswork.balance.internal.exception.ChatMessageOverSizedException
 import com.beeswork.balance.internal.exception.MatchUnmatchedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
+import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filter
@@ -22,19 +23,30 @@ import java.util.*
 
 
 class ChatViewModel(
-    private val chatId: Long,
+    private val chatId: UUID,
     private val swipedId: UUID,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
+    private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val chatMessageInvalidationLiveData by viewModelLazyDeferred {
-        chatRepository.chatMessageInvalidationFlow.filter { chatMessageInvalidation ->
-            chatMessageInvalidation.type == ChatMessageInvalidation.Type.FETCHED || chatMessageInvalidation.chatId == chatId
-        }.asLiveData()
+    val matchLiveData by viewModelLazyDeferred {
+        matchRepository.getMatchFlow().map { match ->
+            if (match == null) {
+                null
+            } else {
+                matchMapper.toMatchDomain(match)
+            }
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
+
+//    val chatMessageInvalidationLiveData by viewModelLazyDeferred {
+//        chatRepository.chatMessageInvalidationFlow.filter { chatMessageInvalidation ->
+//            chatMessageInvalidation.type == ChatMessageInvalidation.Type.FETCHED || chatMessageInvalidation.chatId == chatId
+//        }.asLiveData()
+//    }
 
     private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
     private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
@@ -92,24 +104,21 @@ class ChatViewModel(
         viewModelScope.launch {
             val bodySize = body.toByteArray().size
             when {
-                matchRepository.isUnmatched(chatId) -> _sendChatMessageLiveData.postValue(
-                    Resource.error(MatchUnmatchedException())
-                )
                 bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
                     Resource.error(ChatMessageOverSizedException())
                 )
                 bodySize <= 0 -> _sendChatMessageLiveData.postValue(
                     Resource.error(ChatMessageEmptyException())
                 )
-                else -> _sendChatMessageLiveData.postValue(
-                    chatRepository.sendChatMessage(chatId, swipedId, body)
-                )
+//                else -> _sendChatMessageLiveData.postValue(
+//                    chatRepository.sendChatMessage(chatId, swipedId, body)
+//                )
             }
         }
     }
 
     fun deleteChatMessage(key: Long) {
-        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
+//        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
     }
 
     fun resendChatMessage(chatMessageId: UUID?) {
@@ -119,16 +128,16 @@ class ChatViewModel(
     fun unmatch() {
         viewModelScope.launch {
             _unmatchLiveData.postValue(Resource.loading())
-            val response = matchRepository.unmatch(chatId, swipedId)
-            _unmatchLiveData.postValue(response)
+//            val response = matchRepository.unmatch(chatId, swipedId)
+//            _unmatchLiveData.postValue(response)
         }
     }
 
     fun reportMatch(reportReason: ReportReason, description: String) {
         viewModelScope.launch {
             _reportMatchLiveData.postValue(Resource.loading())
-            val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
-            _reportMatchLiveData.postValue(response)
+//            val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
+//            _reportMatchLiveData.postValue(response)
         }
     }
 

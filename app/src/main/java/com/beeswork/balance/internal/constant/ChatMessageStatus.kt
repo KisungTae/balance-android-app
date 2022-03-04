@@ -11,3 +11,5 @@ enum class ChatMessageStatus {
         return (this == RECEIVED || this == SENT)
     }
 }
+
+

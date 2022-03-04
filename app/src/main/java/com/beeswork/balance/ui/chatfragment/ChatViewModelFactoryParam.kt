@@ -2,7 +2,7 @@ package com.beeswork.balance.ui.chatfragment
 
 import java.util.*
 
-data class ChatViewModelFactoryParameter(
-    val chatId: Long,
+data class ChatViewModelFactoryParam(
+    val chatId: UUID,
     val swipedId: UUID
 )

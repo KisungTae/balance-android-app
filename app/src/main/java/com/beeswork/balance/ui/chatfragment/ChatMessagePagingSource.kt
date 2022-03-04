@@ -4,10 +4,11 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import java.util.*
 
 class ChatMessagePagingSource(
     private val chatRepository: ChatRepository,
-    private val chatId: Long
+    private val chatId: UUID
 ): PagingSource<Int, ChatMessage>() {
 
     override fun getRefreshKey(state: PagingState<Int, ChatMessage>): Int? {

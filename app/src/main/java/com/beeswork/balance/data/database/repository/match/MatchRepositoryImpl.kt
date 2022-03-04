@@ -238,13 +238,7 @@ class MatchRepositoryImpl(
         return matchPageFilter?.toString() ?: "" + startPosition
     }
 
-    override suspend fun isUnmatched(chatId: Long): Boolean {
-        return withContext(ioDispatcher) {
-            return@withContext matchDAO.isUnmatched(chatId)
-        }
-    }
-
-    override suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse> {
+    override suspend fun unmatch(chatId: UUID, swipedId: UUID): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val response = matchRDS.unmatch(swipedId)
             if (response.isSuccess()) {
@@ -254,7 +248,7 @@ class MatchRepositoryImpl(
         }
     }
 
-    private fun unmatch(chatId: Long) {
+    private fun unmatch(chatId: UUID) {
         balanceDatabase.runInTransaction {
             matchDAO.deleteBy(chatId)
             chatMessageDAO.deleteByChatId(chatId)
@@ -262,7 +256,7 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun reportMatch(
-        chatId: Long,
+        chatId: UUID,
         swipedId: UUID,
         reportReason: ReportReason,
         description: String
@@ -282,6 +276,10 @@ class MatchRepositoryImpl(
 
     override fun getMatchCountFlow(): Flow<Long?> {
         return matchCountDAO.getCountFlow(preferenceProvider.getAccountId())
+    }
+
+    override fun getMatchFlow(): Flow<Match?> {
+        return matchDAO.getMatchFlowBy(preferenceProvider.getAccountId())
     }
 
     override suspend fun deleteMatches() {

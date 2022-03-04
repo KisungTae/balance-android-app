@@ -146,10 +146,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         val arguments = Bundle()
 
         matchPagingDataAdapter.getMatch(position)?.let { matchDomain ->
-            arguments.putString(BundleKey.CHAT_ID, matchDomain.chatId?.toString())
+            arguments.putString(BundleKey.CHAT_ID, matchDomain.chatId.toString())
             arguments.putString(BundleKey.SWIPED_ID, matchDomain.swipedId.toString())
             arguments.putString(BundleKey.SWIPED_NAME, matchDomain.swipedName)
-            arguments.putBoolean(BundleKey.UNMATCHED, matchDomain.unmatched)
             arguments.putString(BundleKey.SWIPED_PROFILE_PHOTO_KEY, matchDomain.swipedProfilePhotoKey)
             chatFragment.arguments = arguments
         }
@@ -160,7 +159,6 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     override fun onFragmentSelected() {
-        viewModel.test()
     }
 }
 

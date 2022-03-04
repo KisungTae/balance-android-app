@@ -35,16 +35,16 @@ interface MatchDAO {
     @Query("select * from `match` where swiperId = :swiperId order by id desc limit :loadSize offset :startPosition")
     fun findAllPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
-    @Query("select unmatched from `match` where chatId = :chatId")
-    fun isUnmatched(chatId: Long): Boolean
-
     @Query("delete from `match` where chatId = :chatId")
-    fun deleteBy(chatId: Long)
+    fun deleteBy(chatId: UUID)
 
     @Query("select 1 from `match`")
     fun getPageInvalidationFlow(): Flow<Boolean>
 
     @Query("delete from `match` where swiperId = :swiperId")
     fun deleteAll(swiperId: UUID?)
+
+    @Query("select * from `match` where chatId = :chatId")
+    fun getMatchFlowBy(chatId: UUID?): Flow<Match?>
 
 }

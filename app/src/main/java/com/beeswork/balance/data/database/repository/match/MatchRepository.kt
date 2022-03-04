@@ -19,10 +19,9 @@ interface MatchRepository {
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match>
     suspend fun fetchMatches(loadSize: Int, lastSwipedId: UUID?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
-    suspend fun isUnmatched(chatId: Long): Boolean
-    suspend fun unmatch(chatId: Long, swipedId: UUID): Resource<EmptyResponse>
+    suspend fun unmatch(chatId: UUID, swipedId: UUID): Resource<EmptyResponse>
     suspend fun reportMatch(
-        chatId: Long,
+        chatId: UUID,
         swipedId: UUID,
         reportReason: ReportReason,
         description: String
@@ -30,6 +29,7 @@ interface MatchRepository {
     suspend fun saveMatch(matchDTO: MatchDTO)
     fun getMatchPageInvalidationFlow(): Flow<Boolean>
     fun getMatchCountFlow(): Flow<Long?>
+    fun getMatchFlow(): Flow<Match?>
     suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO>
     suspend fun deleteMatches()
     suspend fun deleteMatchCount()

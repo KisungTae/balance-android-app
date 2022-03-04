@@ -69,19 +69,19 @@ class ChatRepositoryImpl(
     override suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-            val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
-            chatMessageDAO.insert(chatMessage)
-            sendChatMessage(chatMessageMapper.toChatMessageDTO(chatMessage, accountId, swipedId))
+//            val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
+//            chatMessageDAO.insert(chatMessage)
+//            sendChatMessage(chatMessageMapper.toChatMessageDTO(chatMessage, accountId, swipedId))
             return@withContext Resource.success(EmptyResponse())
         }
     }
 
     private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO) {
         sendChatMessageChanel.send(chatMessageDTO)
-        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatMessageDTO.chatId))
+//        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatMessageDTO.chatId))
     }
 
-    override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage> {
+    override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage> {
         return withContext(ioDispatcher) {
             return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
         }
@@ -112,8 +112,8 @@ class ChatRepositoryImpl(
                 CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
                     chatRDS.receivedChatMessage(chatMessage.id)
                 }
-                updateMatchOnNewChatMessage(chatMessage.chatId)
-                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceived(chatMessage.chatId, chatMessage.body))
+//                updateMatchOnNewChatMessage(chatMessage.chatId)
+//                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceived(chatMessage.chatId, chatMessage.body))
             }
         }
     }
@@ -125,14 +125,14 @@ class ChatRepositoryImpl(
                 chatMessage.createdAt = createdAt
                 chatMessage.status = ChatMessageStatus.SENT
                 chatMessageDAO.insert(chatMessage)
-                updateMatchOnNewChatMessage(chatMessage.chatId)
-                chatId = chatMessage.chatId
+//                updateMatchOnNewChatMessage(chatMessage.chatId)
+//                chatId = chatMessage.chatId
 
                 CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
                     chatRDS.fetchedChatMessage(chatMessage.id)
                 }
             } ?: kotlin.run {
-                chatId = chatMessageDAO.findChatIdById(chatMessageReceiptDTO.id)
+//                chatId = chatMessageDAO.findChatIdById(chatMessageReceiptDTO.id)
                 if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
                     chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
 //                    todo: implement udpate match as unmatched
@@ -207,7 +207,7 @@ class ChatRepositoryImpl(
             if (!chatMessageDAO.existsById(chatMessageDTO.id)) {
                 chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
                     newChatMessages.add(chatMessage)
-                    chatIds.add(chatMessage.chatId)
+//                    chatIds.add(chatMessage.chatId)
                 }
             }
             chatMessageDTO.id?.let { id -> receivedChatMessageIds.add(id) }
@@ -218,7 +218,7 @@ class ChatRepositoryImpl(
                 chatMessage.createdAt = createdAt
                 chatMessage.status = ChatMessageStatus.SENT
                 newChatMessages.add(chatMessage)
-                chatIds.add(chatMessage.chatId)
+//                chatIds.add(chatMessage.chatId)
             }
             chatMessageDTO.id?.let { id -> sentChatMessageIds.add(id) }
         }
@@ -285,11 +285,14 @@ class ChatRepositoryImpl(
 
     override fun test() {
         CoroutineScope(ioDispatcher).launch {
-            val chatMessages = arrayListOf<ChatMessage>()
-            chatMessages.add(ChatMessage(12, "sent-1", ChatMessageStatus.SENDING, UUID.fromString("938249ad-0ffc-46cf-bd7d-dc4b28f1726b")))
-            chatMessages.add(ChatMessage(12, "sent-2", ChatMessageStatus.SENDING, UUID.fromString("cc00800c-e74f-4dac-bd9b-f0ef487e7d9f")))
-            chatMessages.add(ChatMessage(12, "sent-3", ChatMessageStatus.SENDING, UUID.fromString("05df0340-e581-4f23-a490-bcd8ced00553")))
-            chatMessageDAO.insert(chatMessages)
+//            val chatMessages = arrayListOf<ChatMessage>()
+//            chatMessages.add(ChatMessage(12, "sent-1", ChatMessageStatus.SENDING, UUID.fromString("938249ad-0ffc-46cf-bd7d-dc4b28f1726b")))
+//            chatMessages.add(ChatMessage(12, "sent-2", ChatMessageStatus.SENDING, UUID.fromString("cc00800c-e74f-4dac-bd9b-f0ef487e7d9f")))
+            for (i in 0..10) {
+                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.RECEIVED, UUID.randomUUID(), OffsetDateTime.now()))
+                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.SENT, UUID.randomUUID(), OffsetDateTime.now()))
+            }
+//            chatMessageDAO.insert(chatMessages)
         }
 
 

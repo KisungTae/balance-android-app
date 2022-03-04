@@ -4,7 +4,7 @@ import org.threeten.bp.ZonedDateTime
 import java.util.*
 
 data class MatchDomain(
-    val chatId: UUID?,
+    val chatId: UUID,
     val swipedId: UUID,
     val active: Boolean,
     val unread: Boolean,

@@ -11,7 +11,7 @@ import java.util.*
 interface ChatMessageDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(chatMessage: ChatMessage): Long
+    fun insert(chatMessage: ChatMessage)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(chatMessages: List<ChatMessage>)
@@ -21,7 +21,7 @@ interface ChatMessageDAO {
 
     @Query("select * from chatMessage where chatId = :chatId and `key` > :lastReadChatMessageKey and status in (:statuses) order by `key` desc limit 1")
     fun findMostRecentAfter(
-        chatId: Long,
+        chatId: UUID,
         lastReadChatMessageKey: Long,
         statuses: List<ChatMessageStatus> = listOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED)
     ): ChatMessage?
@@ -34,7 +34,7 @@ interface ChatMessageDAO {
     ): Boolean
 
     @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, `key` desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int, chatId: Long): List<ChatMessage>
+    fun findAllPaged(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
 
     @Query("update chatMessage set status = :status where id = :id")
     fun updateStatusById(id: UUID?, status: ChatMessageStatus)
@@ -49,13 +49,13 @@ interface ChatMessageDAO {
     fun deleteByKey(key: Long)
 
     @Query("delete from chatMessage where chatId = :chatId")
-    fun deleteByChatId(chatId: Long)
+    fun deleteByChatId(chatId: UUID)
 
     @Query("delete from chatMessage")
     fun deleteAll()
 
     @Query("select chatId from chatMessage where id = :id")
-    fun findChatIdById(id: UUID?): Long?
+    fun findChatIdById(id: UUID?): UUID?
 
     @Query("select c.id, m.chatId, c.body, m.swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.id = :id")
     fun findChatMessageToSendTupleById(id: UUID?): ChatMessageToSendTuple?

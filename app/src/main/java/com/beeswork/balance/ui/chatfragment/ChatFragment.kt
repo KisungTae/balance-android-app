@@ -1,5 +1,7 @@
 package com.beeswork.balance.ui.chatfragment
 
+import android.graphics.BitmapFactory
+import android.media.AudioRecord.MetricsConstants.SOURCE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
 import com.beeswork.balance.databinding.FragmentChatBinding
-import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.*
 import com.beeswork.balance.ui.common.BaseFragment
@@ -22,7 +22,8 @@ import com.beeswork.balance.ui.dialog.ConfirmDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.ReportDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
-import com.google.android.material.snackbar.Snackbar
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.coroutines.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -40,12 +41,11 @@ class ChatFragment : BaseFragment(),
     ErrorDialog.RetryListener {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((ChatViewModelFactoryParameter) -> ChatViewModelFactory) by factory()
+    private val viewModelFactory: ((ChatViewModelFactoryParam) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
     private lateinit var chatMessagePagingRefreshAdapter: PagingRefreshAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>
     private lateinit var binding: FragmentChatBinding
-    private var newChatMessageSnackBar: Snackbar? = null
     private var chatMessagePagingObserveJob: Job? = null
 
     override fun onCreateView(
@@ -59,56 +59,83 @@ class ChatFragment : BaseFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupBackPressedDispatcherCallback()
-        safeLet(arguments, arguments?.getString(BundleKey.SWIPED_ID)) { arguments, swipedIdString ->
-            val swipedId = UUID.fromString(swipedIdString)
-            val chatViewModelFactoryParameter = ChatViewModelFactoryParameter(
-                arguments.getLong(BundleKey.CHAT_ID),
-                swipedId
-            )
-            viewModel = ViewModelProvider(
-                this,
-                viewModelFactory(chatViewModelFactoryParameter)
-            ).get(ChatViewModel::class.java)
-
-            bindUI(
-                swipedId,
-                arguments.getString(BundleKey.SWIPED_NAME),
-                arguments.getString(BundleKey.SWIPED_PROFILE_PHOTO_KEY),
-                arguments.getBoolean(BundleKey.UNMATCHED)
-            )
-        } ?: kotlin.run {
+        setupBackBtn()
+        val chatId = Converter.toUUID(arguments?.getString(BundleKey.CHAT_ID))
+        val swipedId = Converter.toUUID(arguments?.getString(BundleKey.SWIPED_ID))
+        if (chatId != null && swipedId != null) {
+            val param = ChatViewModelFactoryParam(chatId, swipedId)
+            viewModel = ViewModelProvider(this, viewModelFactory(param)).get(ChatViewModel::class.java)
+            val swipedName = arguments?.getString(BundleKey.SWIPED_NAME)
+            val swipedProfilePhotoKey = arguments?.getString(BundleKey.SWIPED_PROFILE_PHOTO_KEY)
+            bindUI(swipedId, swipedName, swipedProfilePhotoKey)
+        } else {
             val title = getString(R.string.error_title_open_chat)
             val message = getString(R.string.error_title_chat_id_not_found)
             ErrorDialog.show(title, message, this, childFragmentManager)
         }
     }
 
-    private fun bindUI(
-        swipedId: UUID,
-        swipedName: String?,
-        swipedProfilePhotoKey: String?,
-        unmatched: Boolean
-    ) = lifecycleScope.launch {
+
+    private fun bindUI(swipedId: UUID, swipedName: String?, swipedProfilePhotoKey: String?) = lifecycleScope.launch {
+        observeMatchLiveData()
+        setupToolBar(swipedName)
         setupChatRecyclerView()
         observeChatMessageInvalidation()
-        setupBackPressedDispatcherCallback()
-        setupToolBar(swipedName)
+        observeChatMessagePagingData()
+        setupSwipedProfilePhoto(swipedId, swipedProfilePhotoKey)
+
+
+
         setupSendBtnListener()
         setupEmoticonBtnListener()
         observeSendChatMessageMediatorLiveData()
-        setupProfilePhoto(swipedId, swipedProfilePhotoKey)
-        if (unmatched) {
-            setupAsUnmatched()
-        }
+
+
         observeReportMatchLiveData()
         observeUnmatchLiveData()
-        observeChatMessagePagingData()
 
-//        todo: remove me
-//        viewModel.test()
     }
 
+    private suspend fun observeMatchLiveData() {
+        viewModel.matchLiveData.await().observe(viewLifecycleOwner) { matchDomain ->
+            if (matchDomain == null || matchDomain.unmatched) {
+                setupAsUnmatched()
+            }
+        }
+    }
+
+    private fun setupToolBar(swipedName: String?) {
+        binding.tvChatSwipedName.text = swipedName
+        binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
+        binding.tbChat.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.miChatMore -> showMoreMenu()
+                else -> false
+            }
+        }
+    }
+
+    private fun setupChatRecyclerView() {
+        chatMessagePagingAdapter = ChatMessagePagingAdapter(this, resources.displayMetrics.density)
+        binding.rvChat.adapter = chatMessagePagingAdapter
+        val layoutManager = LinearLayoutManager(this@ChatFragment.context)
+        layoutManager.orientation = LinearLayoutManager.VERTICAL
+        layoutManager.reverseLayout = true
+        binding.rvChat.layoutManager = layoutManager
+        binding.rvChat.itemAnimator = null
+        chatMessagePagingRefreshAdapter = PagingRefreshAdapter(binding.rvChat, chatMessagePagingAdapter)
+    }
+
+    private suspend fun setupSwipedProfilePhoto(swipedId: UUID, photoKey: String?) = withContext(Dispatchers.IO) {
+        runCatching {
+            val profilePhotoEndPoint = EndPoint.ofPhoto(swipedId, photoKey)
+            val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
+            if (file.exists()) withContext(Dispatchers.Main) {
+                val profilePhotoBitmap = BitmapFactory.decodeFile(file.path)
+                chatMessagePagingAdapter.onProfilePhotoDownloaded(profilePhotoBitmap)
+            }
+        }.getOrNull()
+    }
 
     private fun observeUnmatchLiveData() {
         viewModel.unmatchLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
@@ -176,28 +203,28 @@ class ChatFragment : BaseFragment(),
     }
 
     private suspend fun observeChatMessageInvalidation() {
-        viewModel.chatMessageInvalidationLiveData.await().observe(viewLifecycleOwner, { resource ->
-            when (resource.type) {
-                ChatMessageInvalidation.Type.SEND -> {
-                    binding.etChatMessageBody.setText("")
-                    if (binding.rvChat.canScrollVertically(1)) {
-                        chatMessagePagingRefreshAdapter.refresh()
-                    } else {
-                        observeChatMessagePagingData()
-                    }
-                }
-                ChatMessageInvalidation.Type.RECEIVED -> {
-                    if (binding.rvChat.canScrollVertically(1)) {
-                        resource.body?.let { body ->
-                            showNewChatMessageSnackBar(body)
-                        }
-                    } else {
-                        observeChatMessagePagingData()
-                    }
-                }
-                else -> chatMessagePagingRefreshAdapter.refresh()
-            }
-        })
+//        viewModel.chatMessageInvalidationLiveData.await().observe(viewLifecycleOwner, { resource ->
+//            when (resource.type) {
+//                ChatMessageInvalidation.Type.SEND -> {
+//                    binding.etChatMessageBody.setText("")
+//                    if (binding.rvChat.canScrollVertically(1)) {
+//                        chatMessagePagingRefreshAdapter.refresh()
+//                    } else {
+//                        observeChatMessagePagingData()
+//                    }
+//                }
+//                ChatMessageInvalidation.Type.RECEIVED -> {
+//                    if (binding.rvChat.canScrollVertically(1)) {
+//                        resource.body?.let { body ->
+//                            showNewChatMessageSnackBar(body)
+//                        }
+//                    } else {
+//                        observeChatMessagePagingData()
+//                    }
+//                }
+//                else -> chatMessagePagingRefreshAdapter.refresh()
+//            }
+//        })
     }
 
     private fun setupAsUnmatched() {
@@ -236,41 +263,14 @@ class ChatFragment : BaseFragment(),
         })
     }
 
-    private fun setupBackPressedDispatcherCallback() {
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                popBackStack(MainViewPagerFragment.TAG)
-            }
-        })
-    }
 
-    private fun setupToolBar(swipedName: String?) {
-        binding.tvChatSwipedName.text = swipedName ?: ""
-        binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
-        binding.tbChat.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.miChatMore -> showMoreMenu()
-                else -> false
-            }
-        }
-        binding.btnChatBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
-    }
 
     private fun showMoreMenu(): Boolean {
         ChatMoreMenuDialog(this).show(childFragmentManager, ChatMoreMenuDialog.TAG)
         return true
     }
 
-    private fun setupChatRecyclerView() {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter(this, resources.displayMetrics.density)
-        binding.rvChat.adapter = chatMessagePagingAdapter
-        val layoutManager = LinearLayoutManager(this@ChatFragment.context)
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
-        layoutManager.reverseLayout = true
-        binding.rvChat.layoutManager = layoutManager
-        binding.rvChat.itemAnimator = null
-        chatMessagePagingRefreshAdapter = PagingRefreshAdapter(binding.rvChat, chatMessagePagingAdapter)
-    }
+
 
     private fun setupEmoticonBtnListener() {
         binding.btnChatEmoticon.setOnClickListener {
@@ -280,16 +280,7 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private suspend fun setupProfilePhoto(accountId: UUID, photoKey: String?) = withContext(Dispatchers.IO) {
-//        EndPoint.ofPhoto(accountId, photoKey)?.let { profilePhotoEndPoint ->
-//            runCatching {
-//                val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
-//                if (file.exists()) withContext(Dispatchers.Main) {
-//                    chatMessagePagingAdapter.onProfilePhotoLoaded(profilePhotoEndPoint)
-//                }
-//            }.getOrNull()
-//        }
-    }
+
 
     override fun onDismissErrorDialog(id: UUID?) {
         popBackStack(MainViewPagerFragment.TAG)
@@ -315,24 +306,15 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private fun showNewChatMessageSnackBar(body: String) {
-        val snackBarBinding = SnackBarNewChatMessageBinding.inflate(layoutInflater)
-        val snackBar = SnackBarHelper.make(binding.clChatSnackBarPlaceHolder, 0, 0, snackBarBinding.root)
-        snackBarBinding.tvSnackBarNewChatMessage.text = body
-        snackBarBinding.llSnackBarChatMessage.setOnClickListener {
-            observeChatMessagePagingData()
-            newChatMessageSnackBar?.dismiss()
-        }
-        snackBar.addCallback(object : Snackbar.Callback() {
-            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                super.onDismissed(transientBottomBar, event)
-                if (transientBottomBar === newChatMessageSnackBar) newChatMessageSnackBar = null
+    private fun setupBackBtn() {
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                popBackStack(MainViewPagerFragment.TAG)
             }
         })
-        newChatMessageSnackBar?.dismiss()
-        newChatMessageSnackBar = snackBar
-        snackBar.show()
+        binding.btnChatBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
     }
+
 
     override fun onConfirm(requestCode: Int, argument: Bundle?) {
         when (requestCode) {

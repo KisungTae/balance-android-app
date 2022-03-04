@@ -70,7 +70,6 @@ import com.beeswork.balance.internal.mapper.card.CardFilterMapper
 import com.beeswork.balance.internal.mapper.card.CardFilterMapperImpl
 import com.beeswork.balance.ui.accountfragment.AccountViewModelFactory
 import com.beeswork.balance.ui.chatfragment.ChatViewModelFactory
-import com.beeswork.balance.ui.chatfragment.ChatViewModelFactoryParameter
 import com.beeswork.balance.ui.swipefragment.SwipeViewModelFactory
 import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
 import com.beeswork.balance.ui.mainactivity.MainViewModelFactory
@@ -93,6 +92,7 @@ import com.beeswork.balance.ui.splashfragment.SplashViewModelFactory
 import com.beeswork.balance.ui.cardfragment.balancegame.CardBalanceGameViewModelFactory
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialogViewModelFactory
 import com.beeswork.balance.ui.cardfragment.CardViewModelFactory
+import com.beeswork.balance.ui.chatfragment.ChatViewModelFactoryParam
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.*
@@ -101,6 +101,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
 import org.kodein.di.generic.*
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 //TODO: decide timeout duration
@@ -234,8 +235,8 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
-        bind() from factory { param: ChatViewModelFactoryParameter ->
-            ChatViewModelFactory(param, instance(), instance(), instance(), Dispatchers.Default)
+        bind() from factory { param: ChatViewModelFactoryParam ->
+            ChatViewModelFactory(param, instance(), instance(), instance(), instance(), Dispatchers.Default)
         }
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }
