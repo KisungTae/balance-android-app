@@ -285,13 +285,14 @@ class ChatRepositoryImpl(
 
     override fun test() {
         CoroutineScope(ioDispatcher).launch {
+
 //            val chatMessages = arrayListOf<ChatMessage>()
 //            chatMessages.add(ChatMessage(12, "sent-1", ChatMessageStatus.SENDING, UUID.fromString("938249ad-0ffc-46cf-bd7d-dc4b28f1726b")))
 //            chatMessages.add(ChatMessage(12, "sent-2", ChatMessageStatus.SENDING, UUID.fromString("cc00800c-e74f-4dac-bd9b-f0ef487e7d9f")))
-            for (i in 0..10) {
-                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.RECEIVED, UUID.randomUUID(), OffsetDateTime.now()))
-                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.SENT, UUID.randomUUID(), OffsetDateTime.now()))
-            }
+//            for (i in 0..10) {
+//                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.RECEIVED, UUID.randomUUID(), OffsetDateTime.now()))
+//                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.SENT, UUID.randomUUID(), OffsetDateTime.now()))
+//            }
 //            chatMessageDAO.insert(chatMessages)
         }
 

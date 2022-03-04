@@ -278,8 +278,8 @@ class MatchRepositoryImpl(
         return matchCountDAO.getCountFlow(preferenceProvider.getAccountId())
     }
 
-    override fun getMatchFlow(): Flow<Match?> {
-        return matchDAO.getMatchFlowBy(preferenceProvider.getAccountId())
+    override fun getMatchFlow(chatId: UUID): Flow<Match?> {
+        return matchDAO.getMatchFlowBy(chatId)
     }
 
     override suspend fun deleteMatches() {

@@ -6,7 +6,6 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.ui.mainviewpagerfragment.NewMatch
@@ -29,7 +28,7 @@ interface MatchRepository {
     suspend fun saveMatch(matchDTO: MatchDTO)
     fun getMatchPageInvalidationFlow(): Flow<Boolean>
     fun getMatchCountFlow(): Flow<Long?>
-    fun getMatchFlow(): Flow<Match?>
+    fun getMatchFlow(chatId: UUID): Flow<Match?>
     suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO>
     suspend fun deleteMatches()
     suspend fun deleteMatchCount()

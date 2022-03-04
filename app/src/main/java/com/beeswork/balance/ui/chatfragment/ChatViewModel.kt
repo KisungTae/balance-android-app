@@ -4,19 +4,16 @@ import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.database.repository.chat.ChatMessageInvalidation
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.ChatMessageEmptyException
 import com.beeswork.balance.internal.exception.ChatMessageOverSizedException
-import com.beeswork.balance.internal.exception.MatchUnmatchedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.*
@@ -33,7 +30,7 @@ class ChatViewModel(
 ) : BaseViewModel() {
 
     val matchLiveData by viewModelLazyDeferred {
-        matchRepository.getMatchFlow().map { match ->
+        matchRepository.getMatchFlow(chatId).map { match ->
             if (match == null) {
                 null
             } else {

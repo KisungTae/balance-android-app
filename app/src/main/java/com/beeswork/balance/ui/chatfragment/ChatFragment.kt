@@ -83,14 +83,9 @@ class ChatFragment : BaseFragment(),
         observeChatMessageInvalidation()
         observeChatMessagePagingData()
         setupSwipedProfilePhoto(swipedId, swipedProfilePhotoKey)
-
-
-
         setupSendBtnListener()
         setupEmoticonBtnListener()
         observeSendChatMessageMediatorLiveData()
-
-
         observeReportMatchLiveData()
         observeUnmatchLiveData()
 
@@ -105,7 +100,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun setupToolBar(swipedName: String?) {
-        binding.tvChatSwipedName.text = swipedName
+        binding.tvChatSwipedName.text = swipedName ?: getString(R.string.unknown_user_name)
         binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -126,7 +121,7 @@ class ChatFragment : BaseFragment(),
         chatMessagePagingRefreshAdapter = PagingRefreshAdapter(binding.rvChat, chatMessagePagingAdapter)
     }
 
-    private suspend fun setupSwipedProfilePhoto(swipedId: UUID, photoKey: String?) = withContext(Dispatchers.IO) {
+    private suspend fun setupSwipedProfilePhoto(swipedId: UUID?, photoKey: String?) = withContext(Dispatchers.IO) {
         runCatching {
             val profilePhotoEndPoint = EndPoint.ofPhoto(swipedId, photoKey)
             val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
@@ -229,6 +224,13 @@ class ChatFragment : BaseFragment(),
 
     private fun setupAsUnmatched() {
         binding.tvChatSwipedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
+        binding.tvChatSwipedName.text = getString(R.string.unknown_user_name)
+        binding.etChatMessageBody.isFocusableInTouchMode = false
+        binding.etChatMessageBody.isFocusable = false
+        binding.btnChatMessageSend.isEnabled = false
+        lifecycleScope.launch {
+            setupSwipedProfilePhoto(null, null)
+        }
     }
 
     private fun setupSendBtnListener() {
