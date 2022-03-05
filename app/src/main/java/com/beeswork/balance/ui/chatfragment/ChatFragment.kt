@@ -25,10 +25,15 @@ import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
+import java.io.File
+import java.lang.Exception
 import java.util.*
+import java.util.concurrent.ExecutionException
 
 
 class ChatFragment : BaseFragment(),
@@ -65,9 +70,7 @@ class ChatFragment : BaseFragment(),
         if (chatId != null && swipedId != null) {
             val param = ChatViewModelFactoryParam(chatId, swipedId)
             viewModel = ViewModelProvider(this, viewModelFactory(param)).get(ChatViewModel::class.java)
-            val swipedName = arguments?.getString(BundleKey.SWIPED_NAME)
-            val swipedProfilePhotoKey = arguments?.getString(BundleKey.SWIPED_PROFILE_PHOTO_KEY)
-            bindUI(swipedId, swipedName, swipedProfilePhotoKey)
+            bindUI()
         } else {
             val title = getString(R.string.error_title_open_chat)
             val message = getString(R.string.error_title_chat_id_not_found)
@@ -75,32 +78,33 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-
-    private fun bindUI(swipedId: UUID, swipedName: String?, swipedProfilePhotoKey: String?) = lifecycleScope.launch {
-        observeMatchLiveData()
-        setupToolBar(swipedName)
+    private fun bindUI() = lifecycleScope.launch {
         setupChatRecyclerView()
-        observeChatMessageInvalidation()
         observeChatMessagePagingData()
-        setupSwipedProfilePhoto(swipedId, swipedProfilePhotoKey)
+        observeChatMessageInvalidation()
+        observeMatchLiveData()
+        setupToolBar()
         setupSendBtnListener()
         setupEmoticonBtnListener()
         observeSendChatMessageMediatorLiveData()
         observeReportMatchLiveData()
         observeUnmatchLiveData()
-
     }
 
     private suspend fun observeMatchLiveData() {
         viewModel.matchLiveData.await().observe(viewLifecycleOwner) { matchDomain ->
             if (matchDomain == null || matchDomain.unmatched) {
                 setupAsUnmatched()
+            } else {
+                binding.tvChatSwipedName.text = matchDomain.swipedName ?: getString(R.string.unknown_user_name)
+                if (matchDomain.swipedProfilePhotoKey != null) {
+                    setupSwipedProfilePhoto(matchDomain.swipedId, matchDomain.swipedProfilePhotoKey)
+                }
             }
         }
     }
 
-    private fun setupToolBar(swipedName: String?) {
-        binding.tvChatSwipedName.text = swipedName ?: getString(R.string.unknown_user_name)
+    private fun setupToolBar() {
         binding.tbChat.inflateMenu(R.menu.chat_tool_bar)
         binding.tbChat.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -121,15 +125,19 @@ class ChatFragment : BaseFragment(),
         chatMessagePagingRefreshAdapter = PagingRefreshAdapter(binding.rvChat, chatMessagePagingAdapter)
     }
 
-    private suspend fun setupSwipedProfilePhoto(swipedId: UUID?, photoKey: String?) = withContext(Dispatchers.IO) {
-        runCatching {
-            val profilePhotoEndPoint = EndPoint.ofPhoto(swipedId, photoKey)
-            val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
-            if (file.exists()) withContext(Dispatchers.Main) {
-                val profilePhotoBitmap = BitmapFactory.decodeFile(file.path)
-                chatMessagePagingAdapter.onProfilePhotoDownloaded(profilePhotoBitmap)
-            }
-        }.getOrNull()
+    private fun setupSwipedProfilePhoto(swipedId: UUID, photoKey: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val profilePhotoEndPoint = EndPoint.ofPhoto(swipedId, photoKey)
+                val file = Glide.with(requireContext()).downloadOnly().load("https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cmFuZG9tJTIwcGVyc29ufGVufDB8fDB8fA%3D%3D&w=1000&q=80").submit().get()
+                if (file.exists()) {
+                    withContext(Dispatchers.Main) {
+                        val profilePhotoBitmap = BitmapFactory.decodeFile(file.path)
+                        chatMessagePagingAdapter.setProfilePhoto(profilePhotoBitmap)
+                    }
+                }
+            } catch (e: Exception) { }
+        }
     }
 
     private fun observeUnmatchLiveData() {
@@ -198,6 +206,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private suspend fun observeChatMessageInvalidation() {
+
 //        viewModel.chatMessageInvalidationLiveData.await().observe(viewLifecycleOwner, { resource ->
 //            when (resource.type) {
 //                ChatMessageInvalidation.Type.SEND -> {
@@ -228,9 +237,7 @@ class ChatFragment : BaseFragment(),
         binding.etChatMessageBody.isFocusableInTouchMode = false
         binding.etChatMessageBody.isFocusable = false
         binding.btnChatMessageSend.isEnabled = false
-        lifecycleScope.launch {
-            setupSwipedProfilePhoto(null, null)
-        }
+        chatMessagePagingAdapter.setProfilePhoto(null)
     }
 
     private fun setupSendBtnListener() {
@@ -266,12 +273,10 @@ class ChatFragment : BaseFragment(),
     }
 
 
-
     private fun showMoreMenu(): Boolean {
         ChatMoreMenuDialog(this).show(childFragmentManager, ChatMoreMenuDialog.TAG)
         return true
     }
-
 
 
     private fun setupEmoticonBtnListener() {
@@ -281,7 +286,6 @@ class ChatFragment : BaseFragment(),
 //            methodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
     }
-
 
 
     override fun onDismissErrorDialog(id: UUID?) {

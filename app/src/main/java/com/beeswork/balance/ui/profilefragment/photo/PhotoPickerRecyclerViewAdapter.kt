@@ -173,8 +173,20 @@ class PhotoPickerRecyclerViewAdapter(
             showLoading()
             val photoEndPoint = photoUri?.path?.let { path ->
                 val photoFile = File(path)
-                if (photoFile.exists()) path else EndPoint.ofPhoto(accountId, photoKey)
-            } ?: EndPoint.ofPhoto(accountId, photoKey)
+                if (photoFile.exists()) {
+                    path
+                } else if (accountId != null && photoKey != null){
+                    EndPoint.ofPhoto(accountId, photoKey)
+                } else {
+                    null
+                }
+            } ?: kotlin.run {
+                if (accountId != null && photoKey != null) {
+                    EndPoint.ofPhoto(accountId, photoKey)
+                } else {
+                    null
+                }
+            }
 
             println("photo end point: $photoEndPoint")
             Glide.with(context).load(photoEndPoint)

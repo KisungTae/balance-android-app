@@ -17,10 +17,8 @@ class EndPoint {
         const val ACCOUNT_SERVICE_ENDPOINT = "http://10.0.2.2:8080/"
 //        const val ACCOUNT_SERVICE_ENDPOINT = "http://192.168.1.119:8081/"
 
-        fun ofPhoto(accountId: UUID?, photoKey: String?): String? {
-            return safeLet(accountId, photoKey) { id, key ->
-                return@safeLet "$PHOTO_BUCKET/$id/$key"
-            }
+        fun ofPhoto(accountId: UUID, photoKey: String): String {
+            return "$PHOTO_BUCKET/$accountId/$photoKey"
         }
     }
 

@@ -75,9 +75,11 @@ class ChatMessagePagingAdapter(
         } ?: return ChatMessageStatus.SEPARATOR.ordinal
     }
 
-    fun onProfilePhotoDownloaded(profilePhoto: Bitmap) {
-        this.profilePhoto = profilePhoto
-        notifyDataSetChanged()
+    fun setProfilePhoto(newProfilePhoto: Bitmap?) {
+        if ((profilePhoto == null && newProfilePhoto != null) || (profilePhoto != null && newProfilePhoto == null)) {
+            this.profilePhoto = newProfilePhoto
+            notifyDataSetChanged()
+        }
     }
 
     private fun calculateTopMargin(chatMessageDomain: ChatMessageDomain, position: Int): Int {

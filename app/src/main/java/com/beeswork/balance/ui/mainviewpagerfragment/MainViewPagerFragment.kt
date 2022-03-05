@@ -187,10 +187,12 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     }
 
     private fun setupProfilePhoto(accountId: UUID?, profilePhotoKey: String?, imageView: ImageView) {
-        Glide.with(requireContext())
-            .load(EndPoint.ofPhoto(accountId, profilePhotoKey))
-            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-            .into(imageView)
+        if (accountId != null && profilePhotoKey != null) {
+            Glide.with(requireContext())
+                .load(EndPoint.ofPhoto(accountId, profilePhotoKey))
+                .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+                .into(imageView)
+        }
     }
 
     companion object {
