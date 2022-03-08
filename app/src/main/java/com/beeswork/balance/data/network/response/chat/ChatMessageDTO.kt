@@ -5,9 +5,10 @@ import java.util.*
 
 data class ChatMessageDTO(
     val id: UUID?,
-    val chatId: UUID?,
-    val body: String?,
-    val createdAt: OffsetDateTime?,
-    val accountId: UUID?,
-    val recipientId: UUID?
+    val chatId: UUID,
+    val senderId: UUID?,
+    val recipientId: UUID?,
+    val tag: UUID,
+    val body: String,
+    val createdAt: OffsetDateTime?
 )

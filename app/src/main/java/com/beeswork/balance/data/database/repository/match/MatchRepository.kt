@@ -32,6 +32,7 @@ interface MatchRepository {
     suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO>
     suspend fun deleteMatches()
     suspend fun deleteMatchCount()
+    suspend fun isUnmatched(chatId: UUID): Boolean
 
     fun testFunction()
 }

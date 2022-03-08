@@ -9,25 +9,6 @@ import com.beeswork.balance.ui.mainactivity.MainActivity
 
 abstract class BaseFragment : Fragment() {
 
-//    protected fun validateLogin(exception: Throwable?): Boolean {
-//        if (ExceptionCode.isLoginException(exception)) {
-//            moveToLoginActivity(exception)
-//            return false
-//        }
-//        return true
-//    }
-//
-//    protected fun moveToLoginActivity(exception: Throwable?) {
-//        if (activity is MainActivity) {
-//            val mainActivity = (activity as MainActivity)
-//            if (exception != null && exception is BaseException) {
-//                mainActivity.moveToLoginActivity(exception)
-//            } else {
-//                mainActivity.moveToLoginActivity(null)
-//            }
-//        }
-//    }
-
     protected fun moveToFragment(toFragment: Fragment, fromFragmentId: Int, fromFragmentTag: String) {
         activity?.supportFragmentManager?.beginTransaction()?.let { transaction ->
             transaction.setCustomAnimations(

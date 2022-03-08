@@ -147,5 +147,4 @@ dependencies {
 
     implementation 'com.neovisionaries:nv-websocket-client:2.14'
 
-
 }

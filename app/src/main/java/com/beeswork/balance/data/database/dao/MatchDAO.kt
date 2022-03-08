@@ -47,4 +47,7 @@ interface MatchDAO {
     @Query("select * from `match` where chatId = :chatId")
     fun getMatchFlowBy(chatId: UUID?): Flow<Match?>
 
+    @Query("select unmatched from `match` where chatId = :chatId")
+    fun isUnmatched(chatId: UUID): Boolean?
+
 }

@@ -292,6 +292,12 @@ class MatchRepositoryImpl(
         }
     }
 
+    override suspend fun isUnmatched(chatId: UUID): Boolean {
+        return withContext(ioDispatcher) {
+            return@withContext matchDAO.isUnmatched(chatId) ?: true
+        }
+    }
+
     override fun testFunction() {
         val newMatch = NewMatch(UUID.randomUUID(), "", UUID.randomUUID(), "")
         newMatchInvalidationListener?.onInvalidate(newMatch)

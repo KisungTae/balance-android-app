@@ -1,10 +1,10 @@
 package com.beeswork.balance.data.database.repository.chat
 
 import com.beeswork.balance.data.database.BalanceDatabase
+import com.beeswork.balance.data.database.common.InvalidationListener
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
-import com.beeswork.balance.data.database.common.ResourceListener
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -14,7 +14,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.constant.ExceptionCode
-import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.internal.exception.ChatMessageNotFoundException
 import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
@@ -36,50 +36,51 @@ class ChatRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : ChatRepository {
 
-    private var chatMessageInvalidationListener: ChatMessageInvalidationListener? = null
-    private var chatMessageReceiptFlowListener: ResourceListener<EmptyResponse>? = null
-
     private var sendChatMessageChanel = Channel<ChatMessageDTO>(Channel.BUFFERED)
     override val sendChatMessageFlow: Flow<ChatMessageDTO> = sendChatMessageChanel.consumeAsFlow()
 
-    @ExperimentalCoroutinesApi
-    override val chatMessageInvalidationFlow = callbackFlow<ChatMessageInvalidation> {
-        chatMessageInvalidationListener = object : ChatMessageInvalidationListener {
-            override fun onInvalidate(chatMessageInvalidation: ChatMessageInvalidation) {
-                offer(chatMessageInvalidation)
-            }
-        }
-        awaitClose {}
-    }
+    private lateinit var chatPageInvalidationListener: InvalidationListener<ChatMessage?>
 
     @ExperimentalCoroutinesApi
-    override val chatMessageReceiptFlow = callbackFlow<Resource<EmptyResponse>> {
-        chatMessageReceiptFlowListener = object : ResourceListener<EmptyResponse> {
-            override fun onInvoke(element: Resource<EmptyResponse>) {
-                offer(element)
+    override val chatPageInvalidationFlow: Flow<ChatMessage?> = callbackFlow {
+        chatPageInvalidationListener = object : InvalidationListener<ChatMessage?> {
+            override fun onInvalidate(data: ChatMessage?) {
+                offer(data)
             }
         }
-        awaitClose {}
+        awaitClose { }
     }
+
+
+    override suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
+            chatMessageDAO.insert(chatMessage)
+            sendChatMessage(chatMessage)
+            return@withContext Resource.success(EmptyResponse())
+        }
+    }
+
+    override suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val chatMessage = chatMessageDAO.findBy(tag) ?: return@withContext Resource.error(ChatMessageNotFoundException())
+            chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
+            sendChatMessage(chatMessage)
+            return@withContext Resource.success(EmptyResponse())
+        }
+    }
+
+    private suspend fun sendChatMessage(chatMessage: ChatMessage) {
+        val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, null, chatMessage.tag, chatMessage.body, null)
+        sendChatMessageChanel.send(chatMessageDTO)
+        chatPageInvalidationListener.onInvalidate(null)
+    }
+
 
     override suspend fun deleteChatMessages() {
         withContext(ioDispatcher) { chatMessageDAO.deleteAll() }
     }
 
-    override suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-//            val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
-//            chatMessageDAO.insert(chatMessage)
-//            sendChatMessage(chatMessageMapper.toChatMessageDTO(chatMessage, accountId, swipedId))
-            return@withContext Resource.success(EmptyResponse())
-        }
-    }
-
-    private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO) {
-        sendChatMessageChanel.send(chatMessageDTO)
-//        chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofSend(chatMessageDTO.chatId))
-    }
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage> {
         return withContext(ioDispatcher) {
@@ -87,30 +88,20 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun resendChatMessage(chatMessageId: UUID?): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-            chatMessageDAO.findChatMessageToSendTupleById(chatMessageId)?.let { chatMessageToSendTuple ->
-                chatMessageDAO.updateStatusById(chatMessageToSendTuple.id, ChatMessageStatus.SENDING)
-                sendChatMessage(chatMessageMapper.toChatMessageDTO(chatMessageToSendTuple, accountId))
-            }
-            return@withContext Resource.success(EmptyResponse())
-        }
-    }
 
     override suspend fun deleteChatMessage(chatId: Long, key: Long) {
         withContext(ioDispatcher) {
             chatMessageDAO.deleteByKey(key)
-            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofDelete(chatId))
+//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofDelete(chatId))
         }
     }
 
     override suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
                 chatMessageDAO.insert(chatMessage)
                 CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-                    chatRDS.receivedChatMessage(chatMessage.id)
+//                    chatRDS.receivedChatMessage(chatMessage.id)
                 }
 //                updateMatchOnNewChatMessage(chatMessage.chatId)
 //                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceived(chatMessage.chatId, chatMessage.body))
@@ -122,36 +113,35 @@ class ChatRepositoryImpl(
         withContext(ioDispatcher) {
             var chatId: Long? = null
             safeLet(chatMessageReceiptDTO.createdAt, chatMessageDAO.findById(chatMessageReceiptDTO.id)) { createdAt, chatMessage ->
-                chatMessage.createdAt = createdAt
-                chatMessage.status = ChatMessageStatus.SENT
+//                chatMessage.createdAt = createdAt
+//                chatMessage.status = ChatMessageStatus.SENT
                 chatMessageDAO.insert(chatMessage)
 //                updateMatchOnNewChatMessage(chatMessage.chatId)
 //                chatId = chatMessage.chatId
 
                 CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-                    chatRDS.fetchedChatMessage(chatMessage.id)
+//                    chatRDS.fetchedChatMessage(chatMessage.id)
                 }
             } ?: kotlin.run {
 //                chatId = chatMessageDAO.findChatIdById(chatMessageReceiptDTO.id)
                 if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
-                    chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
+//                    chatMessageDAO.updateStatusBy(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
 //                    todo: implement udpate match as unmatched
 //                    matchDAO.updateAsUnmatched(chatId)
-                    chatMessageReceiptFlowListener?.onInvoke(
-                        Resource.error(ServerException(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body))
-                    )
+//                    chatMessageReceiptFlowListener?.onInvoke(
+//                        Resource.error(ServerException(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body))
+//                    )
                 } else {
-                    chatMessageDAO.updateStatusById(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
+//                    chatMessageDAO.updateStatusBy(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
                 }
             }
 
-            chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
-                val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
-                _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
-            }
+//            chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
+//                val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
+//                _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
+//            }
         }
     }
-
 
 
     override suspend fun fetchChatMessages(): Resource<EmptyResponse> {
@@ -167,7 +157,7 @@ class ChatRepositoryImpl(
                     }
                 }
                 chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
-                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+//                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
             }
             return@withContext response.toEmptyResponse()
         }
@@ -176,21 +166,21 @@ class ChatRepositoryImpl(
     override suspend fun clearChatMessages() {
         withContext(ioDispatcher) {
             chatMessageDAO.updateStatus(ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
-            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
         }
     }
 
     override suspend fun clearChatMessages(chatMessageIds: List<UUID>) {
         withContext(ioDispatcher) {
             chatMessageDAO.updateStatusByIds(chatMessageIds, ChatMessageStatus.ERROR)
-            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
         }
     }
 
     override suspend fun clearChatMessage(chatMessageId: UUID?) {
         withContext(ioDispatcher) {
-            chatMessageDAO.updateStatusById(chatMessageId, ChatMessageStatus.ERROR)
-            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
+//            chatMessageDAO.updateStatusBy(chatMessageId, ChatMessageStatus.ERROR)
+//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
         }
     }
 
@@ -215,8 +205,8 @@ class ChatRepositoryImpl(
 
         sentChatMessageDTOs?.forEach { chatMessageDTO ->
             safeLet(chatMessageDTO.createdAt, chatMessageDAO.findById(chatMessageDTO.id)) { createdAt, chatMessage ->
-                chatMessage.createdAt = createdAt
-                chatMessage.status = ChatMessageStatus.SENT
+//                chatMessage.createdAt = createdAt
+//                chatMessage.status = ChatMessageStatus.SENT
                 newChatMessages.add(chatMessage)
 //                chatIds.add(chatMessage.chatId)
             }

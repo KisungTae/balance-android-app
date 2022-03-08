@@ -17,6 +17,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.domain.state.BaseUIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
 
@@ -143,3 +144,16 @@ fun <T> LiveData<Resource<T>>.observeResource(lifecycleOwner: LifecycleOwner, ac
         }
     }
 }
+
+fun <T: BaseUIState> LiveData<T>.observeUIState(lifecycleOwner: LifecycleOwner, activity: Activity?, block: (uiState: T) -> Unit) {
+    observe(lifecycleOwner) { uiState ->
+        if (activity != null && uiState.shouldLogout) {
+            val message = MessageSource.getMessage(activity, uiState.exception)
+            Navigator.finishToLoginActivity(activity, message)
+        } else {
+            block.invoke(uiState)
+        }
+    }
+}
+
+

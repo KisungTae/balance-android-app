@@ -10,6 +10,7 @@ import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.internal.constant.PushType
 import com.beeswork.balance.internal.constant.StompHeader
 import com.beeswork.balance.internal.provider.gson.GsonProvider
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +33,7 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onNewToken(token: String) {
+        FirebaseMessaging.getInstance()
         scope.launch {
             settingRepository.saveFCMToken(token)
         }

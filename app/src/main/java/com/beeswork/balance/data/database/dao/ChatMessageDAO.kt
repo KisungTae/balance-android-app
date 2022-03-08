@@ -16,28 +16,37 @@ interface ChatMessageDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(chatMessages: List<ChatMessage>)
 
+    @Query("select * from chatMessage where tag = :tag")
+    fun findBy(tag: UUID): ChatMessage?
+
+    @Query("update chatMessage set status = :status where tag = :tag")
+    fun updateStatusBy(tag: UUID, status: ChatMessageStatus)
+
+
+
+
+
     @Query("select * from chatMessage where id = :id")
     fun findById(id: UUID?): ChatMessage?
 
-    @Query("select * from chatMessage where chatId = :chatId and `key` > :lastReadChatMessageKey and status in (:statuses) order by `key` desc limit 1")
+    @Query("select * from chatMessage where chatId = :chatId and sequence > :lastReadChatMessageKey and status in (:statuses) order by sequence desc limit 1")
     fun findMostRecentAfter(
         chatId: UUID,
         lastReadChatMessageKey: Long,
         statuses: List<ChatMessageStatus> = listOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED)
     ): ChatMessage?
 
-    @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and `key` > :lastReadChatMessageKey limit 1")
+    @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and `sequence` > :lastReadChatMessageKey limit 1")
     fun existAfter(
         chatId: Long,
         lastReadChatMessageKey: Long,
         status: ChatMessageStatus = ChatMessageStatus.RECEIVED
     ): Boolean
 
-    @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, `key` desc limit :loadSize offset :startPosition")
+    @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, sequence desc limit :loadSize offset :startPosition")
     fun findAllPaged(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
 
-    @Query("update chatMessage set status = :status where id = :id")
-    fun updateStatusById(id: UUID?, status: ChatMessageStatus)
+
 
     @Query("update chatMessage set status = :status where id in (:ids)")
     fun updateStatusByIds(ids: List<UUID>, status: ChatMessageStatus)
@@ -45,8 +54,8 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :toStatus where status = :whereStatus and createdAt < :createdAt")
     fun updateStatusBefore(createdAt: OffsetDateTime, whereStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
-    @Query("delete from chatMessage where `key` = :key")
-    fun deleteByKey(key: Long)
+    @Query("delete from chatMessage where `sequence` = :sequence")
+    fun deleteByKey(sequence: Long)
 
     @Query("delete from chatMessage where chatId = :chatId")
     fun deleteByChatId(chatId: UUID)
@@ -66,9 +75,11 @@ interface ChatMessageDAO {
     @Query("select count(*) > 0 from chatMessage where id = :id")
     fun existsById(id: UUID?): Boolean
 
+
+
 }
 
 
 
-//select * from chatmessage order by case when createdAt is null then 1 else createdAt end, `key` desc
+//select * from chatmessage order by case when createdAt is null then 1 else createdAt end, `sequence` desc
 //insert into chatMessage values (12, 'ddd', 0, null, null, 4)

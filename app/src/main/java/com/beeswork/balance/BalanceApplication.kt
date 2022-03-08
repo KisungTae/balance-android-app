@@ -3,6 +3,8 @@ package com.beeswork.balance
 import android.app.Application
 import android.content.Context
 import com.beeswork.balance.data.database.BalanceDatabase
+import com.beeswork.balance.data.database.lds.chat.ChatLDS
+import com.beeswork.balance.data.database.lds.chat.ChatLDSImpl
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptor
 import com.beeswork.balance.data.network.interceptor.ConnectivityInterceptorImpl
@@ -50,6 +52,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketClientImpl
+import com.beeswork.balance.domain.chat.SendChatMessageUseCase
+import com.beeswork.balance.domain.chat.SendChatMessageUseCaseImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
@@ -152,7 +156,7 @@ class BalanceApplication : Application(), KodeinAware {
         // API
         bind() from singleton { BalanceAPI(instance()) }
 
-        // RDS
+        // Remote Data Source
         bind<ReportRDS>() with singleton { ReportRDSImpl(instance(), instance()) }
         bind<ChatRDS>() with singleton { ChatRDSImpl(instance(), instance()) }
         bind<MatchRDS>() with singleton { MatchRDSImpl(instance(), instance()) }
@@ -163,9 +167,11 @@ class BalanceApplication : Application(), KodeinAware {
         bind<LoginRDS>() with singleton { LoginRDSImpl(instance(), instance()) }
         bind<CardRDS>() with singleton { CardRDSImpl(instance(), instance()) }
 
+
+        // UseCase
+        bind<SendChatMessageUseCase>() with singleton { SendChatMessageUseCaseImpl(instance(), instance(), Dispatchers.Default) }
+
         // Repository
-
-
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), Dispatchers.IO, applicationScope) }
         bind<CardRepository>() with singleton { CardRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
@@ -235,8 +241,8 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
-        bind() from factory { param: ChatViewModelFactoryParam ->
-            ChatViewModelFactory(param, instance(), instance(), instance(), instance(), Dispatchers.Default)
+        bind() from factory { chatId: UUID ->
+            ChatViewModelFactory(chatId, instance(), instance(), instance(), instance(), instance(), Dispatchers.Default)
         }
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }
@@ -265,8 +271,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance()) }
         bind() from provider { RegisterViewModelFactory(instance(), instance()) }
-
-
         bind() from provider { AboutViewModelFactory(instance()) }
         bind() from provider { BirthDateViewModelFactory(instance()) }
         bind() from provider { GenderViewModelFactory(instance()) }
@@ -279,9 +283,7 @@ class BalanceApplication : Application(), KodeinAware {
         // Interceptor
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance(), instance()) }
 
-
-
-
+        //OkHttpClient
         bind<OkHttpClient>() with singleton {
             OkHttpClient.Builder()
                 .addInterceptor(instance())
@@ -291,9 +293,9 @@ class BalanceApplication : Application(), KodeinAware {
                 .build()
         }
 
-
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
+
 
 
     }

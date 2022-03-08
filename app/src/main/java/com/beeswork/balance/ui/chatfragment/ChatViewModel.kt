@@ -6,10 +6,11 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.domain.chat.SendChatMessageUseCase
+import com.beeswork.balance.domain.state.SendChatMessageUIState
 import com.beeswork.balance.internal.constant.DateTimePattern
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
-import com.beeswork.balance.internal.exception.ChatMessageEmptyException
-import com.beeswork.balance.internal.exception.ChatMessageOverSizedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.ui.common.BaseViewModel
@@ -21,7 +22,7 @@ import java.util.*
 
 class ChatViewModel(
     private val chatId: UUID,
-    private val swipedId: UUID,
+    private val sendChatMessageUseCase: SendChatMessageUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -55,13 +56,17 @@ class ChatViewModel(
     private val _unmatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val unmatchLiveData: LiveData<Resource<EmptyResponse>> get() = _unmatchLiveData
 
+    private val _sendChatMessageUIStateLiveData = MutableLiveData<SendChatMessageUIState>()
+    val sendChatMessageUIStateLiveData: LiveData<SendChatMessageUIState> = _sendChatMessageUIStateLiveData
+
     init {
-        sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
-            sendChatMessageMediatorLiveData.postValue(it)
-        }
-        sendChatMessageMediatorLiveData.addSource(chatRepository.chatMessageReceiptFlow.asLiveData()) {
-            sendChatMessageMediatorLiveData.postValue(it)
-        }
+//        sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
+//            sendChatMessageMediatorLiveData.postValue(it)
+//        }
+//        sendChatMessageMediatorLiveData.addSource(chatRepository.chatMessageReceiptFlow.asLiveData()) {
+//            sendChatMessageMediatorLiveData.postValue(it)
+//        }
+
     }
 
     fun initChatMessagePagingData(): LiveData<PagingData<ChatMessageDomain>> {
@@ -99,18 +104,25 @@ class ChatViewModel(
 
     fun sendChatMessage(body: String) {
         viewModelScope.launch {
-            val bodySize = body.toByteArray().size
-            when {
-                bodySize > MAX_CHAT_MESSAGE_BODY_SIZE -> _sendChatMessageLiveData.postValue(
-                    Resource.error(ChatMessageOverSizedException())
+            val response = sendChatMessageUseCase.sendChatMessage(chatId, body)
+            val sendChatMessageUIState = if (response.isSuccess()) {
+                SendChatMessageUIState(
+                    clearChatMessageInput = true,
+                    showLoading = false,
+                    showError = false,
+                    shouldLogout = false,
+                    exception = null
                 )
-                bodySize <= 0 -> _sendChatMessageLiveData.postValue(
-                    Resource.error(ChatMessageEmptyException())
+            } else {
+                SendChatMessageUIState(
+                    clearChatMessageInput = false,
+                    showLoading = response.isLoading(),
+                    showError = response.isError(),
+                    shouldLogout = ExceptionCode.isLoginException(response.exception),
+                    exception = response.exception
                 )
-//                else -> _sendChatMessageLiveData.postValue(
-//                    chatRepository.sendChatMessage(chatId, swipedId, body)
-//                )
             }
+            _sendChatMessageUIStateLiveData.postValue(sendChatMessageUIState)
         }
     }
 
@@ -147,7 +159,6 @@ class ChatViewModel(
     }
 
     companion object {
-        private const val MAX_CHAT_MESSAGE_BODY_SIZE = 500
         private const val CHAT_PAGE_SIZE = 80
         private const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
         private const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 3 + CHAT_PAGE_SIZE

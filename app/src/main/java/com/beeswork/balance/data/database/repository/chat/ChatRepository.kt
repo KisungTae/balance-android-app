@@ -9,14 +9,16 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface ChatRepository {
-    val chatMessageInvalidationFlow: Flow<ChatMessageInvalidation>
-    val chatMessageReceiptFlow: Flow<Resource<EmptyResponse>>
+
+    val chatPageInvalidationFlow: Flow<ChatMessage?>
     val sendChatMessageFlow: Flow<ChatMessageDTO>
 
+    suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse>
+    suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse>
+
+
     suspend fun deleteChatMessages()
-    suspend fun sendChatMessage(chatId: Long, swipedId: UUID, body: String): Resource<EmptyResponse>
     suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
-    suspend fun resendChatMessage(chatMessageId: UUID?): Resource<EmptyResponse>
     suspend fun deleteChatMessage(chatId: Long, key: Long)
     suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO)
     suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO)

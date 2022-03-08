@@ -24,24 +24,25 @@ class ChatMessageMapperImpl : ChatMessageMapper {
     }
 
     override fun toDomain(chatMessage: ChatMessage): ChatMessageDomain {
-        val createdAt = if (chatMessage.status.isProcessed()) {
-            chatMessage.createdAt.atZoneSameInstant(ZoneId.systemDefault())
-        } else {
-            null
-        }
-        return ChatMessageDomain(
-            chatMessage.key,
-            chatMessage.id,
-            chatMessage.body,
-            chatMessage.status,
-            createdAt?.toLocalDate(),
-            createdAt?.toLocalTime()?.truncatedTo(ChronoUnit.MINUTES)
-        )
-
+//        val createdAt = if (chatMessage.status.isProcessed()) {
+//            chatMessage.createdAt.atZoneSameInstant(ZoneId.systemDefault())
+//        } else {
+//            null
+//        }
+//        return ChatMessageDomain(
+//            chatMessage.key,
+//            chatMessage.id,
+//            chatMessage.body,
+//            chatMessage.status,
+//            createdAt?.toLocalDate(),
+//            createdAt?.toLocalTime()?.truncatedTo(ChronoUnit.MINUTES)
+//        )
+        TODO("Not yet implemented")
     }
 
     override fun toChatMessageDTO(chatMessage: ChatMessage, accountId: UUID, recipientId: UUID): ChatMessageDTO {
-        return ChatMessageDTO(chatMessage.id, chatMessage.chatId, chatMessage.body, null, accountId, recipientId)
+//        return ChatMessageDTO(chatMessage.id, chatMessage.chatId, chatMessage.body, null, accountId, recipientId)
+        TODO("Not yet implemented")
     }
 
     override fun toChatMessageDTO(chatMessageToSendTuple: ChatMessageToSendTuple, accountId: UUID): ChatMessageDTO {
