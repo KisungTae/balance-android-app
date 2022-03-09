@@ -1,4 +1,4 @@
-package com.beeswork.balance.domain.chat
+package com.beeswork.balance.domain.usecase.chat
 
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
@@ -19,7 +19,7 @@ class SendChatMessageUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SendChatMessageUseCase {
 
-    override suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse> =
+    override suspend fun invoke(chatId: UUID, body: String): Resource<EmptyResponse> =
         withContext(defaultDispatcher) {
             try {
                 if (matchRepository.isUnmatched(chatId)) {

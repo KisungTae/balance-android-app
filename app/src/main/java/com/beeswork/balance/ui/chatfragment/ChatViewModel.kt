@@ -6,8 +6,10 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.domain.chat.SendChatMessageUseCase
-import com.beeswork.balance.domain.state.SendChatMessageUIState
+import com.beeswork.balance.domain.uistate.chat.ResendChatMessageUIState
+import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCase
+import com.beeswork.balance.domain.uistate.chat.SendChatMessageUIState
+import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
@@ -23,6 +25,7 @@ import java.util.*
 class ChatViewModel(
     private val chatId: UUID,
     private val sendChatMessageUseCase: SendChatMessageUseCase,
+    private val resendChatMessageUseCase: ResendChatMessageUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -56,18 +59,13 @@ class ChatViewModel(
     private val _unmatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val unmatchLiveData: LiveData<Resource<EmptyResponse>> get() = _unmatchLiveData
 
+
+
     private val _sendChatMessageUIStateLiveData = MutableLiveData<SendChatMessageUIState>()
     val sendChatMessageUIStateLiveData: LiveData<SendChatMessageUIState> = _sendChatMessageUIStateLiveData
 
-    init {
-//        sendChatMessageMediatorLiveData.addSource(sendChatMessageLiveData) {
-//            sendChatMessageMediatorLiveData.postValue(it)
-//        }
-//        sendChatMessageMediatorLiveData.addSource(chatRepository.chatMessageReceiptFlow.asLiveData()) {
-//            sendChatMessageMediatorLiveData.postValue(it)
-//        }
-
-    }
+    private val _resendChatMessageUIStateLiveData = MutableLiveData<ResendChatMessageUIState>()
+    val resendChatMessageUIStateLiveData: LiveData<ResendChatMessageUIState> = _resendChatMessageUIStateLiveData
 
     fun initChatMessagePagingData(): LiveData<PagingData<ChatMessageDomain>> {
         return Pager(
@@ -104,20 +102,11 @@ class ChatViewModel(
 
     fun sendChatMessage(body: String) {
         viewModelScope.launch {
-            val response = sendChatMessageUseCase.sendChatMessage(chatId, body)
+            val response = sendChatMessageUseCase.invoke(chatId, body)
             val sendChatMessageUIState = if (response.isSuccess()) {
-                SendChatMessageUIState(
-                    clearChatMessageInput = true,
-                    showLoading = false,
-                    showError = false,
-                    shouldLogout = false,
-                    exception = null
-                )
+                SendChatMessageUIState.ofSuccess()
             } else {
-                SendChatMessageUIState(
-                    clearChatMessageInput = false,
-                    showLoading = response.isLoading(),
-                    showError = response.isError(),
+                SendChatMessageUIState.ofError(
                     shouldLogout = ExceptionCode.isLoginException(response.exception),
                     exception = response.exception
                 )
@@ -126,13 +115,26 @@ class ChatViewModel(
         }
     }
 
+    fun resendChatMessage(tag: UUID) {
+        viewModelScope.launch {
+            val response = resendChatMessageUseCase.invoke(chatId, tag)
+            val resendChatMessageUIState = if (response.isSuccess()) {
+                ResendChatMessageUIState.ofSuccess()
+            } else {
+                ResendChatMessageUIState.ofError(
+                    shouldLogout = ExceptionCode.isLoginException(response.exception),
+                    exception = response.exception
+                )
+            }
+            _resendChatMessageUIStateLiveData.postValue(resendChatMessageUIState)
+        }
+    }
+
     fun deleteChatMessage(key: Long) {
 //        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
     }
 
-    fun resendChatMessage(chatMessageId: UUID?) {
-//        viewModelScope.launch { _sendChatMessageLiveData.postValue(chatRepository.resendChatMessage(chatMessageId)) }
-    }
+
 
     fun unmatch() {
         viewModelScope.launch {

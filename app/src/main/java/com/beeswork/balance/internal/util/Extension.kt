@@ -13,11 +13,10 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.domain.state.BaseUIState
+import com.beeswork.balance.domain.uistate.BaseUIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
 

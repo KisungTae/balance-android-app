@@ -86,8 +86,9 @@ class ChatFragment : BaseFragment(),
         observeChatMessageInvalidation()
         setupSendBtnListener()
         observeSendChatMessageUIStateLiveData()
+        observeResendChatMessageUIStateLiveData()
         setupEmoticonBtnListener()
-        observeSendChatMessageMediatorLiveData()
+
         observeReportMatchLiveData()
         observeUnmatchLiveData()
     }
@@ -201,12 +202,44 @@ class ChatFragment : BaseFragment(),
                 binding.etChatMessageBody.setText("")
             }
             if (uiState.showError) {
-                val title = getString(R.string.error_title_send_chat_message)
-                val message = MessageSource.getMessage(requireContext(), uiState.exception)
-                ErrorDialog.show(title, message, childFragmentManager)
+                showSendChatMessageErrorDialog(uiState.exception)
             }
         }
     }
+
+    private fun observeResendChatMessageUIStateLiveData() {
+        viewModel.resendChatMessageUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
+            if (uiState.showError) {
+                showSendChatMessageErrorDialog(uiState.exception)
+            }
+        }
+    }
+
+    private fun showSendChatMessageErrorDialog(exception: Throwable?) {
+        val title = getString(R.string.error_title_send_chat_message)
+        val message = MessageSource.getMessage(requireContext(), exception)
+        ErrorDialog.show(title, message, childFragmentManager)
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private fun observeUnmatchLiveData() {
         viewModel.unmatchLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
@@ -304,9 +337,9 @@ class ChatFragment : BaseFragment(),
     }
 
     override fun onResendChatMessage(position: Int) {
-        chatMessagePagingAdapter.getChatMessage(position)?.let { chatMessageDomain ->
-            viewModel.resendChatMessage(chatMessageDomain.id)
-        }
+//        chatMessagePagingAdapter.getChatMessage(position)?.let { chatMessageDomain ->
+//            viewModel.resendChatMessage(chatMessageDomain.id)
+//        }
     }
 
     override fun onDeleteChatMessage(position: Int) {

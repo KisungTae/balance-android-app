@@ -1,6 +1,4 @@
-package com.beeswork.balance.domain.state
-
-import com.beeswork.balance.data.network.response.Resource
+package com.beeswork.balance.domain.uistate
 
 abstract class BaseUIState (
     val showLoading: Boolean,

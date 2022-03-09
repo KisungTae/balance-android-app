@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.domain.chat.SendChatMessageUseCase
+import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
+import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCase
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,6 +14,7 @@ import java.util.*
 class ChatViewModelFactory(
     private val chatId: UUID,
     private val sendChatMessageUseCase: SendChatMessageUseCase,
+    private val resendChatMessageUseCase: ResendChatMessageUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -25,6 +27,7 @@ class ChatViewModelFactory(
         return ChatViewModel(
             chatId,
             sendChatMessageUseCase,
+            resendChatMessageUseCase,
             chatRepository,
             matchRepository,
             chatMessageMapper,
