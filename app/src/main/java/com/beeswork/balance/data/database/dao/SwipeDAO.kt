@@ -22,13 +22,13 @@ interface SwipeDAO {
     fun deleteBy(swiperId: UUID, swipedId: UUID?): Int
 
     @Query("select * from swipe where swipedId = :swiperId order by id desc limit :loadSize offset :startPosition ")
-    fun findAllPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Swipe>
+    fun getAllPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Swipe>
 
     @Query("delete from swipe where swipedId = :swiperId")
-    fun deleteAll(swiperId: UUID?)
+    fun deleteAllBy(swiperId: UUID?)
 
     @Query("select * from swipe where swiperId = :swiperId and swipedId = :swipedId")
-    fun findBy(swiperId: UUID?, swipedId: UUID?): Swipe?
+    fun getBy(swiperId: UUID?, swipedId: UUID?): Swipe?
 
     @Query("select 1 from swipe")
     fun getPageInvalidationFlow(): Flow<Boolean>

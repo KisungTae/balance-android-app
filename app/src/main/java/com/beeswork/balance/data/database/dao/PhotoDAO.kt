@@ -19,38 +19,38 @@ interface PhotoDAO {
     fun insert(photos: List<Photo>)
 
     @Query("select * from photo where accountId = :accountId order by sequence limit :maxPhotoCount")
-    fun findAllAsFlow(accountId: UUID?, maxPhotoCount: Int): Flow<List<Photo>>
+    fun getPhotoFlowBy(accountId: UUID?, maxPhotoCount: Int): Flow<List<Photo>>
 
     @Query("select sequence from photo where accountId = :accountId order by sequence desc limit 1")
-    fun findLastSequence(accountId: UUID?): Int?
+    fun getLastSequenceBy(accountId: UUID?): Int?
 
     @Query("select * from photo where accountId = :accountId order by sequence limit :maxPhotoCount")
-    fun findAll(accountId: UUID?, maxPhotoCount: Int): List<Photo>
+    fun getAllBy(accountId: UUID?, maxPhotoCount: Int): List<Photo>
 
     @Query("select * from photo where `key` = :key")
-    fun findByKey(key: String): Photo?
+    fun getBy(key: String): Photo?
 
     @Query("update photo set status = :status where `key` = :key")
-    fun updateStatus(key: String, status: PhotoStatus)
+    fun updateStatusBy(key: String, status: PhotoStatus)
 
     @Query("update photo set uploaded = :uploaded where `key` = :key")
-    fun updateUploaded(key: String, uploaded: Boolean)
+    fun updateUploadedBy(key: String, uploaded: Boolean)
 
     @Query("update photo set status = :status, saved = :saved where `key` = :key")
-    fun updateOnPhotoSaved(key: String, status: PhotoStatus = PhotoStatus.OCCUPIED, saved: Boolean = true)
+    fun updateAsSavedBy(key: String, status: PhotoStatus = PhotoStatus.OCCUPIED, saved: Boolean = true)
 
     @Query("delete from photo where `key` = :photoKey")
-    fun deletePhoto(photoKey: String)
+    fun deleteBy(photoKey: String)
 
     @Query("select count(*) from photo where accountId = :accountId")
-    fun count(accountId: UUID): Int
+    fun getCountBy(accountId: UUID): Int
 
     @Query("update photo set sequence = :sequence where `key` = :photoKey")
-    fun updateSequence(photoKey: String, sequence: Int)
+    fun updateSequenceBy(photoKey: String, sequence: Int)
 
     @Query("select `key` from photo where accountId = :accountId order by sequence limit 1")
-    fun findProfilePhotoKeyAsFlow(accountId: UUID?): Flow<String?>
+    fun getProfilePhotoKeyFlowBy(accountId: UUID?): Flow<String?>
 
     @Query("select `key` from photo where accountId = :accountId order by sequence limit 1")
-    fun findProfilePhotoBy(accountId: UUID?): String?
+    fun getProfilePhotoBy(accountId: UUID?): String?
 }

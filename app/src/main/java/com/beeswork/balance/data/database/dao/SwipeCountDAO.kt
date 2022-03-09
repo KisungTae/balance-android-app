@@ -16,10 +16,10 @@ interface SwipeCountDAO {
     fun insert(swipeCount: SwipeCount)
 
     @Query("select * from swipeCount where accountId = :accountId")
-    fun findBy(accountId: UUID?): SwipeCount?
+    fun getBy(accountId: UUID?): SwipeCount?
 
     @Query("select count from swipeCount where accountId = :accountId")
-    fun getCountFlow(accountId: UUID?): Flow<Long?>
+    fun getCountFlowBy(accountId: UUID?): Flow<Long?>
 
     @Query("select count from swipeCount where accountId = :accountId")
     fun getCountBy(accountId: UUID?): Long?

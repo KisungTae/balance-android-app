@@ -16,29 +16,29 @@ interface LoginDAO {
     fun insert(login: Login)
 
     @Query("select email from login where accountId = :accountId")
-    fun findEmailAsFlow(accountId: UUID?): Flow<String?>
+    fun getEmailFlowBy(accountId: UUID?): Flow<String?>
 
     @Query("select * from login where accountId = :accountId")
-    fun findByAccountId(accountId: UUID): Login?
+    fun getBy(accountId: UUID): Login?
 
     @Query("update login set email = :email, synced = 1 where accountId = :accountId")
-    fun updateEmail(accountId: UUID, email: String?)
+    fun updateEmailBy(accountId: UUID, email: String?)
 
     @Query("update login set synced = :synced where accountId = :accountId")
-    fun updateSynced(accountId: UUID, synced: Boolean)
+    fun updateSyncedBy(accountId: UUID, synced: Boolean)
 
     @Query("delete from login where accountId = :accountId")
-    fun deleteByAccountId(accountId: UUID?)
+    fun deleteBy(accountId: UUID?)
 
     @Query("select synced from login where accountId = :accountId")
-    fun isSynced(accountId: UUID?): Boolean?
+    fun isSyncedBy(accountId: UUID?): Boolean?
 
     @Query("select * from login where accountId = :accountId")
-    fun findAsFlow(accountId: UUID): Flow<Login>
+    fun getLoginFlowBy(accountId: UUID): Flow<Login>
 
     @Query("select email from login where accountId = :accountId")
-    fun findEmail(accountId: UUID?): String?
+    fun getEmailBy(accountId: UUID?): String?
 
     @Query("select type from login where accountId = :accountId")
-    fun findLoginType(accountId: UUID?): LoginType?
+    fun getLoginTypeBy(accountId: UUID?): LoginType?
 }

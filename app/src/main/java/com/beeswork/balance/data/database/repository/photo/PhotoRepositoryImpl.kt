@@ -38,7 +38,7 @@ class PhotoRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
-            if (photoDAO.count(accountId) <= 0) {
+            if (photoDAO.getCountBy(accountId) <= 0) {
                 val response = photoRDS.fetchPhotos()
                 response.data?.let { photoDTOs ->
                     val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(accountId, photoDTO) }
@@ -51,7 +51,7 @@ class PhotoRepositoryImpl(
     }
 
     override fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>> {
-        return photoDAO.findAllAsFlow(preferenceProvider.getAccountId(), maxPhotoCount)
+        return photoDAO.getPhotoFlowBy(preferenceProvider.getAccountId(), maxPhotoCount)
     }
 
     override suspend fun uploadPhoto(
@@ -85,22 +85,22 @@ class PhotoRepositoryImpl(
             if (getPreSignedURLResponse.isError()) {
                 val photoAlreadyExists = getPreSignedURLResponse.isExceptionEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
                 val photoStatus = if (photoAlreadyExists) PhotoStatus.OCCUPIED else PhotoStatus.UPLOAD_ERROR
-                photoDAO.updateStatus(photo.key, photoStatus)
+                photoDAO.updateStatusBy(photo.key, photoStatus)
             }
             return getPreSignedURLResponse.toEmptyResponse()
         }
 
         if (uploadPhotoToS3Response.isError()) {
-            photoDAO.updateStatus(photo.key, PhotoStatus.UPLOAD_ERROR)
+            photoDAO.updateStatusBy(photo.key, PhotoStatus.UPLOAD_ERROR)
         } else if (uploadPhotoToS3Response.isSuccess()) {
-            photoDAO.updateUploaded(photo.key, true)
+            photoDAO.updateUploadedBy(photo.key, true)
         }
         return uploadPhotoToS3Response
     }
 
     private suspend fun savePhoto(photo: Photo): Resource<EmptyResponse> {
         if (photo.saved) {
-            photoDAO.updateStatus(photo.key, PhotoStatus.OCCUPIED)
+            photoDAO.updateStatusBy(photo.key, PhotoStatus.OCCUPIED)
             return Resource.success(EmptyResponse())
         }
         val savePhotoResponse = photoRDS.savePhoto(photo.key, photo.sequence)
@@ -108,11 +108,11 @@ class PhotoRepositoryImpl(
         if (savePhotoResponse.isError()) {
             val photoAlreadyExists = savePhotoResponse.isExceptionEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
             if (photoAlreadyExists) {
-                photoDAO.updateStatus(photo.key, PhotoStatus.OCCUPIED)
+                photoDAO.updateStatusBy(photo.key, PhotoStatus.OCCUPIED)
             } else {
-                photoDAO.updateStatus(photo.key, PhotoStatus.UPLOAD_ERROR)
+                photoDAO.updateStatusBy(photo.key, PhotoStatus.UPLOAD_ERROR)
             }
-        } else if (savePhotoResponse.isSuccess()) photoDAO.updateOnPhotoSaved(photo.key)
+        } else if (savePhotoResponse.isSuccess()) photoDAO.updateAsSavedBy(photo.key)
 
         return savePhotoResponse
     }
@@ -135,11 +135,11 @@ class PhotoRepositoryImpl(
 
     private fun createPhoto(accountId: UUID, photoKey: String?, photoUri: Uri, extension: String): Photo {
         return photoKey?.let { key ->
-            val photo = photoDAO.findByKey(key)
+            val photo = photoDAO.getBy(key)
             photo?.status = PhotoStatus.UPLOADING
             photo
         } ?: kotlin.run {
-            val sequence = (photoDAO.findLastSequence(accountId) ?: 0) + 1
+            val sequence = (photoDAO.getLastSequenceBy(accountId) ?: 0) + 1
             val newPhotoKey = UUID.randomUUID().toString() + "." + extension
             Photo(newPhotoKey, accountId, PhotoStatus.UPLOADING, photoUri, sequence, sequence, false, false)
         }
@@ -147,14 +147,14 @@ class PhotoRepositoryImpl(
 
     override suspend fun listPhotos(maxPhotoCount: Int): List<Photo> {
         return withContext(ioDispatcher) {
-            return@withContext photoDAO.findAll(preferenceProvider.getAccountId(), maxPhotoCount)
+            return@withContext photoDAO.getAllBy(preferenceProvider.getAccountId(), maxPhotoCount)
         }
     }
 
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            photoDAO.findByKey(photoKey)?.let { photo ->
-                photoDAO.updateStatus(photoKey, PhotoStatus.DELETING)
+            photoDAO.getBy(photoKey)?.let { photo ->
+                photoDAO.updateStatusBy(photoKey, PhotoStatus.DELETING)
 
                 val response = if (photo.uploaded || photo.saved) photoRDS.deletePhoto(
                     photo.key
@@ -162,10 +162,10 @@ class PhotoRepositoryImpl(
 
                 if (response.isSuccess()) {
                     deletePhoto(photo.uri)
-                    photoDAO.deletePhoto(photo.key)
+                    photoDAO.deleteBy(photo.key)
                 } else {
                     val photoStatus = if (photo.uploaded && photo.saved) PhotoStatus.DOWNLOADING else PhotoStatus.UPLOAD_ERROR
-                    photoDAO.updateStatus(photoKey, photoStatus)
+                    photoDAO.updateStatusBy(photoKey, photoStatus)
                 }
                 return@withContext response
             } ?: return@withContext Resource.error(PhotoNotExistException())
@@ -187,13 +187,13 @@ class PhotoRepositoryImpl(
 
     override suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus) {
         withContext(ioDispatcher) {
-            photoDAO.updateStatus(photoKey, photoStatus)
+            photoDAO.updateStatusBy(photoKey, photoStatus)
         }
     }
 
     override suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val photos = photoDAO.findAll(
+            val photos = photoDAO.getAllBy(
                 preferenceProvider.getAccountId(),
                 PhotoConstant.MAX_PHOTO_COUNT
             ).toMutableList()
@@ -224,16 +224,16 @@ class PhotoRepositoryImpl(
 
     override suspend fun deletePhotos() {
         withContext(ioDispatcher) {
-            val photos = photoDAO.findAll(preferenceProvider.getAccountId(), Int.MAX_VALUE)
+            val photos = photoDAO.getAllBy(preferenceProvider.getAccountId(), Int.MAX_VALUE)
             photos.forEach { photo ->
-                photoDAO.deletePhoto(photo.key)
+                photoDAO.deleteBy(photo.key)
                 deletePhoto(photo.uri)
             }
         }
     }
 
     override fun getProfilePhotoKeyFlow(): Flow<String?> {
-        return photoDAO.findProfilePhotoKeyAsFlow(preferenceProvider.getAccountId())
+        return photoDAO.getProfilePhotoKeyFlowBy(preferenceProvider.getAccountId())
     }
 
 

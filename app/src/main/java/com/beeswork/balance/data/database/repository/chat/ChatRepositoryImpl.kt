@@ -15,7 +15,6 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.ChatMessageNotFoundException
-import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
@@ -63,7 +62,7 @@ class ChatRepositoryImpl(
 
     override suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val chatMessage = chatMessageDAO.findBy(tag) ?: return@withContext Resource.error(ChatMessageNotFoundException())
+            val chatMessage = chatMessageDAO.getBy(tag) ?: return@withContext Resource.error(ChatMessageNotFoundException())
             chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
             sendChatMessage(chatMessage)
             return@withContext Resource.success(EmptyResponse())
@@ -84,7 +83,7 @@ class ChatRepositoryImpl(
 
     override suspend fun loadChatMessages(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage> {
         return withContext(ioDispatcher) {
-            return@withContext chatMessageDAO.findAllPaged(loadSize, startPosition, chatId)
+            return@withContext chatMessageDAO.getAllPagedBy(loadSize, startPosition, chatId)
         }
     }
 
@@ -112,7 +111,7 @@ class ChatRepositoryImpl(
     override suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO) {
         withContext(ioDispatcher) {
             var chatId: Long? = null
-            safeLet(chatMessageReceiptDTO.createdAt, chatMessageDAO.findById(chatMessageReceiptDTO.id)) { createdAt, chatMessage ->
+            safeLet(chatMessageReceiptDTO.createdAt, chatMessageDAO.getById(chatMessageReceiptDTO.id)) { createdAt, chatMessage ->
 //                chatMessage.createdAt = createdAt
 //                chatMessage.status = ChatMessageStatus.SENT
                 chatMessageDAO.insert(chatMessage)
@@ -204,7 +203,7 @@ class ChatRepositoryImpl(
         }
 
         sentChatMessageDTOs?.forEach { chatMessageDTO ->
-            safeLet(chatMessageDTO.createdAt, chatMessageDAO.findById(chatMessageDTO.id)) { createdAt, chatMessage ->
+            safeLet(chatMessageDTO.createdAt, chatMessageDAO.getById(chatMessageDTO.id)) { createdAt, chatMessage ->
 //                chatMessage.createdAt = createdAt
 //                chatMessage.status = ChatMessageStatus.SENT
                 newChatMessages.add(chatMessage)

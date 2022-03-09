@@ -27,7 +27,7 @@ class SettingRepositoryImpl(
 
     override suspend fun getPushSetting(): PushSetting? {
         return withContext(ioDispatcher) {
-            return@withContext pushSettingDAO.findByAccountId(preferenceProvider.getAccountId())
+            return@withContext pushSettingDAO.getBy(preferenceProvider.getAccountId())
         }
     }
 
@@ -54,7 +54,7 @@ class SettingRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
-            pushSettingDAO.updateSynced(accountId, false)
+            pushSettingDAO.updateSyncedBy(accountId, false)
             val response = settingRDS.savePushSettings(
                 matchPush,
                 swipePush,
@@ -62,11 +62,11 @@ class SettingRepositoryImpl(
                 emailPush
             )
             if (response.isSuccess()) {
-                pushSettingDAO.updatePushSettings(accountId, matchPush, swipePush, chatMessagePush, emailPush)
+                pushSettingDAO.updatePushSettingsBy(accountId, matchPush, swipePush, chatMessagePush, emailPush)
                 return@withContext Resource.success(null)
             } else {
-                pushSettingDAO.updateSynced(accountId, true)
-                return@withContext response.map { pushSettingDAO.findByAccountId(accountId) }
+                pushSettingDAO.updateSyncedBy(accountId, true)
+                return@withContext response.map { pushSettingDAO.getBy(accountId) }
             }
         }
     }
@@ -78,7 +78,7 @@ class SettingRepositoryImpl(
 
     override suspend fun deleteSettings() {
         withContext(ioDispatcher) {
-            pushSettingDAO.delete(preferenceProvider.getAccountId())
+            pushSettingDAO.deleteBy(preferenceProvider.getAccountId())
             preferenceProvider.delete()
         }
     }
@@ -99,7 +99,7 @@ class SettingRepositoryImpl(
 
     override suspend fun syncLocation() {
         withContext(ioDispatcher) {
-            locationDAO.findById()?.let { location ->
+            locationDAO.getById()?.let { location ->
                 if (!location.synced) syncLocation(location.latitude, location.longitude, location.updatedAt)
             }
         }
@@ -118,18 +118,18 @@ class SettingRepositoryImpl(
 
     override suspend fun saveLocationPermissionResult(granted: Boolean) {
         withContext(ioDispatcher) {
-            locationDAO.updateGranted(granted)
+            locationDAO.updateGrantedById(granted)
         }
     }
 
     override suspend fun getLocationPermissionResultFlow(): Flow<Boolean?> {
         return withContext(ioDispatcher) {
-            return@withContext locationDAO.findGrantedAsFlow()
+            return@withContext locationDAO.getGrantedFlowById()
         }
     }
 
     override fun getLocationFlow(): Flow<Location?> {
-        return locationDAO.findLocationFlow()
+        return locationDAO.getLocationFlowById()
     }
 
     override suspend fun deleteAccount(): Resource<EmptyResponse> {

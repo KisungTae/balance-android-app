@@ -131,7 +131,7 @@ class ChatViewModel(
     }
 
     fun resendChatMessage(chatMessageId: UUID?) {
-        viewModelScope.launch { _sendChatMessageLiveData.postValue(chatRepository.resendChatMessage(chatMessageId)) }
+//        viewModelScope.launch { _sendChatMessageLiveData.postValue(chatRepository.resendChatMessage(chatMessageId)) }
     }
 
     fun unmatch() {

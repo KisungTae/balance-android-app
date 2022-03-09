@@ -71,16 +71,16 @@ class MatchRepositoryImpl(
 
             when (matchPageFilter) {
                 null -> {
-                    return@withContext matchDAO.findAllPaged(accountId, loadSize, startPosition)
+                    return@withContext matchDAO.getAllPagedBy(accountId, loadSize, startPosition)
                 }
                 MatchPageFilter.MATCH -> {
-                    return@withContext matchDAO.findMatchesPaged(accountId, loadSize, startPosition)
+                    return@withContext matchDAO.getMatchesPagedBy(accountId, loadSize, startPosition)
                 }
                 MatchPageFilter.CHAT -> {
-                    return@withContext matchDAO.findChatsPaged(accountId, loadSize, startPosition)
+                    return@withContext matchDAO.getChatsPagedBy(accountId, loadSize, startPosition)
                 }
                 MatchPageFilter.CHAT_WITH_MESSAGES -> {
-                    matchDAO.findChatsWithMessagesPaged(accountId, loadSize, startPosition)
+                    matchDAO.getChatsWithMessagesPagedBy(accountId, loadSize, startPosition)
                 }
             }
         }
@@ -119,7 +119,7 @@ class MatchRepositoryImpl(
     }
 
     private fun saveMatches(listMatchesDTO: ListMatchesDTO) {
-        val swipeCount = swipeCountDAO.findBy(preferenceProvider.getAccountId())
+        val swipeCount = swipeCountDAO.getBy(preferenceProvider.getAccountId())
         listMatchesDTO.matchDTOs.forEach { matchDTO ->
             val match = insertMatch(matchDTO).data
             if (match != null && swipeCount != null) {
@@ -134,7 +134,7 @@ class MatchRepositoryImpl(
 
     private fun insertMatch(matchDTO: MatchDTO): QueryResult<Match> {
         clickDAO.insert(Click(matchDTO.swiperId, matchDTO.swipedId))
-        val match = matchDAO.findByChatId(matchDTO.chatId)
+        val match = matchDAO.getBy(matchDTO.chatId)
         if (match == null || !match.isEqualTo(matchDTO)) {
             val newMatch = matchMapper.toMatch(matchDTO)
             matchDAO.insert(newMatch)
@@ -148,7 +148,7 @@ class MatchRepositoryImpl(
     }
 
     private fun deleteSwipe(match: Match) {
-        val swipeCount = swipeCountDAO.findBy(match.swiperId)
+        val swipeCount = swipeCountDAO.getBy(match.swiperId)
         if (swipeCount != null) {
             deleteSwipe(match, swipeCount)
             swipeCountDAO.insert(swipeCount)
@@ -164,7 +164,7 @@ class MatchRepositoryImpl(
 
     private fun updateMatchCount(count: Long, countedAt: OffsetDateTime) {
         val accountId = preferenceProvider.getAccountId() ?: return
-        val matchCount = matchCountDAO.findBy(accountId)
+        val matchCount = matchCountDAO.getBy(accountId)
         if (matchCount == null) {
             matchCountDAO.insert(MatchCount(accountId, count, countedAt))
         } else {
@@ -177,7 +177,7 @@ class MatchRepositoryImpl(
     }
 
     private fun incrementMatchCount(match: Match) {
-        val matchCount = matchCountDAO.findBy(match.swiperId)
+        val matchCount = matchCountDAO.getBy(match.swiperId)
         if (matchCount == null) {
             matchCountDAO.insert(MatchCount(match.swiperId, 1))
         } else {
@@ -208,7 +208,7 @@ class MatchRepositoryImpl(
             val accountId = preferenceProvider.getAccountId()
             val match = queryResult.data
             if (queryResult.isInsert() && match != null && match.swiperId == accountId) {
-                val newMatch = NewMatch(accountId, photoDAO.findProfilePhotoBy(accountId), match.swipedId, match.swipedProfilePhotoKey)
+                val newMatch = NewMatch(accountId, photoDAO.getProfilePhotoBy(accountId), match.swipedId, match.swipedProfilePhotoKey)
                 newMatchInvalidationListener?.onInvalidate(newMatch)
             }
         }
@@ -275,7 +275,7 @@ class MatchRepositoryImpl(
     }
 
     override fun getMatchCountFlow(): Flow<Long?> {
-        return matchCountDAO.getCountFlow(preferenceProvider.getAccountId())
+        return matchCountDAO.getCountFlowBy(preferenceProvider.getAccountId())
     }
 
     override fun getMatchFlow(chatId: UUID): Flow<Match?> {
@@ -283,7 +283,7 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun deleteMatches() {
-        withContext(ioDispatcher) { matchDAO.deleteAll(preferenceProvider.getAccountId()) }
+        withContext(ioDispatcher) { matchDAO.deleteAllBy(preferenceProvider.getAccountId()) }
     }
 
     override suspend fun deleteMatchCount() {
@@ -294,7 +294,7 @@ class MatchRepositoryImpl(
 
     override suspend fun isUnmatched(chatId: UUID): Boolean {
         return withContext(ioDispatcher) {
-            return@withContext matchDAO.isUnmatched(chatId) ?: true
+            return@withContext matchDAO.isUnmatchedBy(chatId) ?: true
         }
     }
 

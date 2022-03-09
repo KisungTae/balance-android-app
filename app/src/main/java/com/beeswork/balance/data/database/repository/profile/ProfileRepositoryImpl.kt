@@ -6,7 +6,6 @@ import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -23,12 +22,12 @@ class ProfileRepositoryImpl(
 
     override suspend fun getProfile(): Profile? {
         return withContext(ioDispatcher) {
-            return@withContext profileDAO.findByAccountId(preferenceProvider.getAccountId())
+            return@withContext profileDAO.getBy(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun deleteProfile() {
-        withContext(ioDispatcher) { profileDAO.deleteById(preferenceProvider.getAccountId()) }
+        withContext(ioDispatcher) { profileDAO.deleteBy(preferenceProvider.getAccountId()) }
     }
 
     override suspend fun fetchProfile(): Resource<Profile> {
@@ -49,15 +48,15 @@ class ProfileRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
-            profileDAO.updateSynced(accountId, false)
+            profileDAO.updateSyncedBy(accountId, false)
             val response = profileRDS.saveAbout(height, about)
 
             if (response.isSuccess()) {
-                profileDAO.updateAbout(accountId, height, about)
+                profileDAO.updateAboutBy(accountId, height, about)
                 return@withContext response.map { null }
             } else {
-                profileDAO.updateSynced(accountId, true)
-                return@withContext response.map { profileDAO.findByAccountId(accountId) }
+                profileDAO.updateSyncedBy(accountId, true)
+                return@withContext response.map { profileDAO.getBy(accountId) }
             }
         }
     }
@@ -75,7 +74,7 @@ class ProfileRepositoryImpl(
     }
 
     override fun getNameFlow(): Flow<String?> {
-        return profileDAO.findNameAsFlow(preferenceProvider.getAccountId())
+        return profileDAO.getNameFlowBy(preferenceProvider.getAccountId())
     }
 
 

@@ -37,22 +37,22 @@ class LoginRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
-            loginDAO.updateSynced(accountId, false)
+            loginDAO.updateSyncedBy(accountId, false)
             val response = loginRDS.saveEmail(email)
 
             if (response.isSuccess()) {
-                loginDAO.updateEmail(accountId, email)
+                loginDAO.updateEmailBy(accountId, email)
                 return@withContext response.map { null }
             } else {
-                loginDAO.updateSynced(accountId, true)
-                return@withContext response.map { loginDAO.findEmail(accountId) }
+                loginDAO.updateSyncedBy(accountId, true)
+                return@withContext response.map { loginDAO.getEmailBy(accountId) }
             }
         }
     }
 
     override suspend fun getEmail(): String? {
         return withContext(ioDispatcher) {
-            return@withContext loginDAO.findEmail(preferenceProvider.getAccountId())
+            return@withContext loginDAO.getEmailBy(preferenceProvider.getAccountId())
         }
     }
 
@@ -61,14 +61,14 @@ class LoginRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val response = loginRDS.fetchEmail()
-            if (response.isSuccess()) loginDAO.updateEmail(accountId, response.data)
+            if (response.isSuccess()) loginDAO.updateEmailBy(accountId, response.data)
             return@withContext response
         }
     }
 
     override suspend fun socialLogin(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> {
         return withContext(ioDispatcher) {
-            val response = loginRDS.socialLogin(loginId, accessToken, loginType, fcmTokenDAO.findById())
+            val response = loginRDS.socialLogin(loginId, accessToken, loginType, fcmTokenDAO.getById())
             response.data?.let { loginDTO ->
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
                 preferenceProvider.putLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
@@ -84,19 +84,19 @@ class LoginRepositoryImpl(
 
     override suspend fun deleteLogin() {
         withContext(ioDispatcher) {
-            loginDAO.deleteByAccountId(preferenceProvider.getAccountId())
+            loginDAO.deleteBy(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun isEmailSynced(): Boolean {
         return withContext(ioDispatcher) {
-            return@withContext loginDAO.isSynced(preferenceProvider.getAccountId()) ?: false
+            return@withContext loginDAO.isSyncedBy(preferenceProvider.getAccountId()) ?: false
         }
     }
 
     override suspend fun getLoginType(): LoginType? {
         return withContext(ioDispatcher) {
-            return@withContext loginDAO.findLoginType(preferenceProvider.getAccountId())
+            return@withContext loginDAO.getLoginTypeBy(preferenceProvider.getAccountId())
         }
     }
 
@@ -113,7 +113,7 @@ class LoginRepositoryImpl(
             }
 
 
-            val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken, fcmTokenDAO.findById())
+            val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken, fcmTokenDAO.getById())
             response.data?.let { loginDTO ->
 //              todo: remove me
                 println("access token: ${loginDTO.accessToken}")
@@ -130,6 +130,6 @@ class LoginRepositoryImpl(
     }
 
     override fun getEmailFlow(): Flow<String?> {
-        return loginDAO.findEmailAsFlow(preferenceProvider.getAccountId())
+        return loginDAO.getEmailFlowBy(preferenceProvider.getAccountId())
     }
 }

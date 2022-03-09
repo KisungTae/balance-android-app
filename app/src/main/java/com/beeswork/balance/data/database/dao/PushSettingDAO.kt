@@ -14,19 +14,19 @@ interface PushSettingDAO {
     fun insert(pushSetting: PushSetting)
 
     @Query("select * from pushSetting where accountId = :accountId")
-    fun findByAccountId(accountId: UUID?): PushSetting?
+    fun getBy(accountId: UUID?): PushSetting?
 
     @Query("select synced from pushSetting where accountId = :accountId")
-    fun isSynced(accountId: UUID): Boolean?
+    fun isSyncedBy(accountId: UUID): Boolean?
 
     @Query("delete from pushSetting where accountId = :accountId")
-    fun delete(accountId: UUID?)
+    fun deleteBy(accountId: UUID?)
 
     @Query("update pushSetting set synced = :synced where accountId = :accountId")
-    fun updateSynced(accountId: UUID?, synced: Boolean)
+    fun updateSyncedBy(accountId: UUID?, synced: Boolean)
 
     @Query("update pushSetting set matchPush = :matchPush, swipePush = :swipePush, chatMessagePush = :chatMessagePush, emailPush = :emailPush, synced = 1 where accountId = :accountId")
-    fun updatePushSettings(
+    fun updatePushSettingsBy(
         accountId: UUID,
         matchPush: Boolean,
         swipePush: Boolean,

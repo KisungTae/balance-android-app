@@ -12,7 +12,7 @@ import org.threeten.bp.OffsetDateTime
 interface LocationDAO {
 
     @Query("select * from location where id = ${Location.ID}")
-    fun findById(): Location?
+    fun getById(): Location?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(location: Location)
@@ -21,14 +21,14 @@ interface LocationDAO {
     fun sync(updatedAt: OffsetDateTime)
 
     @Query("select count() > 0 from location where id = ${Location.ID}")
-    fun exist(): Boolean
+    fun existById(): Boolean
 
     @Query("select * from location where id = ${Location.ID}")
-    fun findLocationFlow(): Flow<Location>
+    fun getLocationFlowById(): Flow<Location>
 
     @Query("select granted from location where id = ${Location.ID}")
-    fun findGrantedAsFlow(): Flow<Boolean?>
+    fun getGrantedFlowById(): Flow<Boolean?>
 
     @Query("update location set granted = :granted where id = ${Location.ID}")
-    fun updateGranted(granted: Boolean)
+    fun updateGrantedById(granted: Boolean)
 }

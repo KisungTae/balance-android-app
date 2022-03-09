@@ -93,7 +93,7 @@ class SwipeRepositoryImpl(
         if (swipeDTO.swiperDeleted || matchDAO.existBy(swipeDTO.swipedId, swipeDTO.swiperId)) {
             return QueryResult.none()
         }
-        val swipe = swipeDAO.findBy(swipeDTO.swiperId, swipeDTO.swipedId)
+        val swipe = swipeDAO.getBy(swipeDTO.swiperId, swipeDTO.swipedId)
         if (swipe == null || !swipe.isEqualTo(swipeDTO)) {
             val newSwipe = swipeMapper.toSwipe(swipeDTO) ?: return QueryResult.none()
             swipeDAO.insert(newSwipe)
@@ -108,7 +108,7 @@ class SwipeRepositoryImpl(
 
     private fun updateSwipeCount(count: Long, countedAt: OffsetDateTime) {
         val accountId = preferenceProvider.getAccountId() ?: return
-        val swipeCount = swipeCountDAO.findBy(accountId)
+        val swipeCount = swipeCountDAO.getBy(accountId)
         if (swipeCount == null) {
             swipeCountDAO.insert(SwipeCount(accountId, count, countedAt))
         } else {
@@ -121,7 +121,7 @@ class SwipeRepositoryImpl(
     }
 
     private fun incrementSwipeCount(swipeDTO: SwipeDTO) {
-        val swipeCount = swipeCountDAO.findBy(swipeDTO.swipedId)
+        val swipeCount = swipeCountDAO.getBy(swipeDTO.swipedId)
         if (swipeCount == null) {
             swipeCountDAO.insert(SwipeCount(swipeDTO.swipedId!!, 1))
         } else {
@@ -137,7 +137,7 @@ class SwipeRepositoryImpl(
             if (swipePageSyncDateTracker.shouldSyncPage(startPosition)) {
                 syncSwipes(loadSize, startPosition)
             }
-            return@withContext swipeDAO.findAllPaged(preferenceProvider.getAccountId(), loadSize, startPosition)
+            return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
 
@@ -158,7 +158,7 @@ class SwipeRepositoryImpl(
 
     override suspend fun deleteSwipes() {
         withContext(ioDispatcher) {
-            swipeDAO.deleteAll(preferenceProvider.getAccountId())
+            swipeDAO.deleteAllBy(preferenceProvider.getAccountId())
         }
     }
 
@@ -173,7 +173,7 @@ class SwipeRepositoryImpl(
     }
 
     override fun getSwipeCountFlow(): Flow<Long?> {
-        return swipeCountDAO.getCountFlow(preferenceProvider.getAccountId())
+        return swipeCountDAO.getCountFlowBy(preferenceProvider.getAccountId())
     }
 
     override fun test() {

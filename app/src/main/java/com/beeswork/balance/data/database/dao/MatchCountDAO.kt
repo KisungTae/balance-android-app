@@ -15,10 +15,10 @@ interface MatchCountDAO {
     fun insert(matchCount: MatchCount)
 
     @Query("select * from matchCount where accountId = :accountId")
-    fun findBy(accountId: UUID?): MatchCount?
+    fun getBy(accountId: UUID?): MatchCount?
 
     @Query("select count from matchCount where accountId = :accountId")
-    fun getCountFlow(accountId: UUID?): Flow<Long?>
+    fun getCountFlowBy(accountId: UUID?): Flow<Long?>
 
     @Query("select count from matchCount where accountId = :accountId")
     fun getCountBy(accountId: UUID?): Long?

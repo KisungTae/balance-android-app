@@ -10,9 +10,9 @@ interface ClickDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(click: Click)
 
-    @Query("select count(*) > 0 from click where swiperId = :accountId and swipedId = :swipedId")
-    fun existBySwipedId(accountId: UUID?, swipedId: UUID): Boolean
+    @Query("select count(*) > 0 from click where swiperId = :swiperId and swipedId = :swipedId")
+    fun existBy(swiperId: UUID?, swipedId: UUID): Boolean
 
     @Query("delete from click where swiperId = :accountId")
-    fun deleteAll(accountId: UUID?)
+    fun deleteAllBy(accountId: UUID?)
 }

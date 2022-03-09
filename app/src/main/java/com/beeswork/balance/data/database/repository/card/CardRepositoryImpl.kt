@@ -28,19 +28,19 @@ class CardRepositoryImpl(
 
     override suspend fun deleteCardFilter() {
         withContext(ioDispatcher) {
-            cardFilterDAO.deleteAll(preferenceProvider.getAccountId())
+            cardFilterDAO.deleteAllBy(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun getCardFilter(): CardFilter {
         return withContext(ioDispatcher) {
-            return@withContext cardFilterDAO.findById(preferenceProvider.getAccountId())
+            return@withContext cardFilterDAO.getBy(preferenceProvider.getAccountId())
         }
     }
 
     override suspend fun saveCardFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int) {
         withContext(ioDispatcher) {
-            cardFilterDAO.update(
+            cardFilterDAO.updateBy(
                 preferenceProvider.getAccountId(),
                 gender,
                 if (minAge < CardFilter.MIN_AGE) CardFilter.MIN_AGE else minAge,
@@ -53,7 +53,7 @@ class CardRepositoryImpl(
     override suspend fun fetchCards(): Resource<FetchCardsDTO> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val swipeFilter = cardFilterDAO.findById(accountId)
+            val swipeFilter = cardFilterDAO.getBy(accountId)
             val response = cardRDS.fetchCards(
                 swipeFilter.minAge,
                 swipeFilter.maxAge,
@@ -65,7 +65,7 @@ class CardRepositoryImpl(
                 savePageIndex(swipeFilter.pageIndex, data.reset)
                 val cardDTOs = data.cardDTOs
                 for (i in cardDTOs.size - 1 downTo 0) {
-                    if (clickDAO.existBySwipedId(accountId, cardDTOs[i].accountId))
+                    if (clickDAO.existBy(accountId, cardDTOs[i].accountId))
                         cardDTOs.removeAt(i)
                 }
                 cardDTOs.shuffle()
@@ -77,7 +77,7 @@ class CardRepositoryImpl(
     override suspend fun prepopulateCardFilter(gender: Boolean) {
         withContext(ioDispatcher) {
             preferenceProvider.getAccountId()?.let { accountId ->
-                if (!cardFilterDAO.existByAccountId(accountId)) {
+                if (!cardFilterDAO.existBy(accountId)) {
                     cardFilterDAO.insert(CardFilter(accountId, Gender.getOppositeGender(gender)))
                 }
             }
@@ -88,7 +88,7 @@ class CardRepositoryImpl(
         withContext(ioDispatcher) {
             var pageIndex = if (reset) 0 else currentPageIndex
             pageIndex++
-            cardFilterDAO.updatePageIndex(preferenceProvider.getAccountId(), pageIndex)
+            cardFilterDAO.updatePageIndexBy(preferenceProvider.getAccountId(), pageIndex)
         }
     }
 }

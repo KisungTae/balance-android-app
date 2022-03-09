@@ -21,19 +21,19 @@ interface MatchDAO {
     fun existBy(swiperId: UUID?, swipedId: UUID): Boolean
 
     @Query("select * from `match` where chatId = :chatId")
-    fun findByChatId(chatId: UUID?): Match?
+    fun getBy(chatId: UUID?): Match?
 
     @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId = 0 and unmatched = 0 and swipedDeleted = 0 order by id desc limit :loadSize offset :startPosition")
-    fun findMatchesPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+    fun getMatchesPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId > 0 and unmatched = 0 and swipedDeleted = 0  order by id desc limit :loadSize offset :startPosition")
-    fun findChatsPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+    fun getChatsPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select * from `match` where swiperId = :swiperId and lastReadChatMessageId < lastChatMessageId and unmatched = 0 and swipedDeleted = 0 order by id desc limit :loadSize offset :startPosition")
-    fun findChatsWithMessagesPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+    fun getChatsWithMessagesPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select * from `match` where swiperId = :swiperId order by id desc limit :loadSize offset :startPosition")
-    fun findAllPaged(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
+    fun getAllPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("delete from `match` where chatId = :chatId")
     fun deleteBy(chatId: UUID)
@@ -42,12 +42,12 @@ interface MatchDAO {
     fun getPageInvalidationFlow(): Flow<Boolean>
 
     @Query("delete from `match` where swiperId = :swiperId")
-    fun deleteAll(swiperId: UUID?)
+    fun deleteAllBy(swiperId: UUID?)
 
     @Query("select * from `match` where chatId = :chatId")
     fun getMatchFlowBy(chatId: UUID?): Flow<Match?>
 
     @Query("select unmatched from `match` where chatId = :chatId")
-    fun isUnmatched(chatId: UUID): Boolean?
+    fun isUnmatchedBy(chatId: UUID): Boolean?
 
 }

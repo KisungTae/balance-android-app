@@ -13,5 +13,5 @@ interface FCMTokenDAO {
     fun insert(FCMToken: FCMToken)
 
     @Query("select token from fcmToken where id = ${FCMToken.ID}")
-    fun findById(): String?
+    fun getById(): String?
 }

@@ -14,17 +14,17 @@ interface CardFilterDAO {
     fun insert(cardFilter: CardFilter)
 
     @Query("select * from cardFilter where accountId = :accountId")
-    fun findById(accountId: UUID?): CardFilter
+    fun getBy(accountId: UUID?): CardFilter
 
     @Query("update cardFilter set pageIndex = :pageIndex where accountId = :accountId")
-    fun updatePageIndex(accountId: UUID?, pageIndex: Int)
+    fun updatePageIndexBy(accountId: UUID?, pageIndex: Int)
 
     @Query("select count() > 0 from cardFilter where accountId = :accountId")
-    fun existByAccountId(accountId: UUID?): Boolean
+    fun existBy(accountId: UUID?): Boolean
 
     @Query("delete from cardFilter where accountId = :accountId")
-    fun deleteAll(accountId: UUID?)
+    fun deleteAllBy(accountId: UUID?)
 
     @Query("update cardFilter set gender = :gender, minAge = :minAge, maxAge = :maxAge, distance = :distance where accountId = :accountId")
-    fun update(accountId: UUID?, gender: Boolean, minAge: Int, maxAge: Int, distance: Int)
+    fun updateBy(accountId: UUID?, gender: Boolean, minAge: Int, maxAge: Int, distance: Int)
 }

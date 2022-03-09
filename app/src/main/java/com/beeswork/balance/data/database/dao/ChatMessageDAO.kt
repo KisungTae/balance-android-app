@@ -2,7 +2,6 @@ package com.beeswork.balance.data.database.dao
 
 import androidx.room.*
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
-import com.beeswork.balance.data.database.entity.chat.ChatMessageToSendTuple
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import org.threeten.bp.OffsetDateTime
 import java.util.*
@@ -17,20 +16,25 @@ interface ChatMessageDAO {
     fun insert(chatMessages: List<ChatMessage>)
 
     @Query("select * from chatMessage where tag = :tag")
-    fun findBy(tag: UUID): ChatMessage?
+    fun getBy(tag: UUID): ChatMessage?
 
     @Query("update chatMessage set status = :status where tag = :tag")
     fun updateStatusBy(tag: UUID, status: ChatMessageStatus)
+
+    @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, sequence desc limit :loadSize offset :startPosition")
+    fun getAllPagedBy(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
+
+
 
 
 
 
 
     @Query("select * from chatMessage where id = :id")
-    fun findById(id: UUID?): ChatMessage?
+    fun getById(id: UUID?): ChatMessage?
 
     @Query("select * from chatMessage where chatId = :chatId and sequence > :lastReadChatMessageKey and status in (:statuses) order by sequence desc limit 1")
-    fun findMostRecentAfter(
+    fun getMostRecentAfter(
         chatId: UUID,
         lastReadChatMessageKey: Long,
         statuses: List<ChatMessageStatus> = listOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED)
@@ -43,8 +47,7 @@ interface ChatMessageDAO {
         status: ChatMessageStatus = ChatMessageStatus.RECEIVED
     ): Boolean
 
-    @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, sequence desc limit :loadSize offset :startPosition")
-    fun findAllPaged(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
+
 
 
 
@@ -64,10 +67,7 @@ interface ChatMessageDAO {
     fun deleteAll()
 
     @Query("select chatId from chatMessage where id = :id")
-    fun findChatIdById(id: UUID?): UUID?
-
-    @Query("select c.id, m.chatId, c.body, m.swipedId from `match` m left join chatMessage c on m.chatId == c.chatId where c.id = :id")
-    fun findChatMessageToSendTupleById(id: UUID?): ChatMessageToSendTuple?
+    fun getChatIdById(id: UUID?): UUID?
 
     @Query("update chatMessage set status = :to where status = :from")
     fun updateStatus(from: ChatMessageStatus, to: ChatMessageStatus)
