@@ -50,10 +50,7 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketClientImpl
-import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
-import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCaseImpl
-import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCase
-import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCaseImpl
+import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
@@ -170,6 +167,7 @@ class BalanceApplication : Application(), KodeinAware {
         // UseCase
         bind<SendChatMessageUseCase>() with singleton { SendChatMessageUseCaseImpl(instance(), instance(), Dispatchers.Default) }
         bind<ResendChatMessageUseCase>() with singleton { ResendChatMessageUseCaseImpl(instance(), instance(), Dispatchers.Default) }
+        bind<GetChatMessagePagingDataUseCase>() with singleton { GetChatMessagePagingDataUseCaseImpl(instance(), instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -242,7 +240,7 @@ class BalanceApplication : Application(), KodeinAware {
         // Factory
         bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from factory { chatId: UUID ->
-            ChatViewModelFactory(chatId, instance(), instance(), instance(), instance(), instance(), instance(), Dispatchers.Default)
+            ChatViewModelFactory(chatId, instance(), instance(), instance(), instance(), instance(), instance(), instance(), Dispatchers.Default)
         }
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }

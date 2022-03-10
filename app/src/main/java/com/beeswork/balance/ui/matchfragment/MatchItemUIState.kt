@@ -3,7 +3,7 @@ package com.beeswork.balance.ui.matchfragment
 import org.threeten.bp.ZonedDateTime
 import java.util.*
 
-data class MatchDomain(
+data class MatchItemUIState(
     val chatId: UUID,
     val swipedId: UUID,
     val active: Boolean,

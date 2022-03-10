@@ -2,10 +2,7 @@ package com.beeswork.balance.ui.matchfragment
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.ui.common.BaseViewModel
@@ -24,7 +21,7 @@ class MatchViewModel(
     }
 
     @ExperimentalPagingApi
-    fun initMatchPagingData(matchPageFilter: MatchPageFilter?): LiveData<PagingData<MatchDomain>> {
+    fun initMatchPagingData(matchPageFilter: MatchPageFilter?): LiveData<PagingData<MatchItemUIState>> {
         return Pager(
             config = matchPagingConfig,
             remoteMediator = MatchRemoteMediator(matchRepository, matchPageFilter)
@@ -32,7 +29,7 @@ class MatchViewModel(
             MatchPagingSource(matchRepository, matchPageFilter)
         }.flow.cachedIn(viewModelScope)
             .map { pagingData ->
-                pagingData.map { matchMapper.toMatchDomain(it) }
+                pagingData.map { matchMapper.toItemUIState(it) }
             }
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }

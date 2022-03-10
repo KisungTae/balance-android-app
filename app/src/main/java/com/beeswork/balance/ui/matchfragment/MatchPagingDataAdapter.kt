@@ -10,14 +10,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemMatchBinding
-import com.beeswork.balance.internal.constant.DateTimePattern
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZonedDateTime
-import java.util.*
 
 class MatchPagingDataAdapter(
     private val matchListener: MatchListener
-) : PagingDataAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MatchItemUIState, MatchPagingDataAdapter.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -31,16 +27,16 @@ class MatchPagingDataAdapter(
         getItem(position)?.let { holder.bind(it) }
     }
 
-    fun getMatch(position: Int): MatchDomain? {
+    fun getMatch(position: Int): MatchItemUIState? {
         return getItem(position)
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<MatchDomain>() {
-            override fun areItemsTheSame(oldItem: MatchDomain, newItem: MatchDomain): Boolean =
+        private val diffCallback = object : DiffUtil.ItemCallback<MatchItemUIState>() {
+            override fun areItemsTheSame(oldItem: MatchItemUIState, newItem: MatchItemUIState): Boolean =
                 oldItem.chatId == newItem.chatId
 
-            override fun areContentsTheSame(oldItem: MatchDomain, newItem: MatchDomain): Boolean =
+            override fun areContentsTheSame(oldItem: MatchItemUIState, newItem: MatchItemUIState): Boolean =
                 oldItem == newItem
         }
     }
@@ -59,7 +55,7 @@ class MatchPagingDataAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(matchDomain: MatchDomain) {
+        fun bind(matchItemUIState: MatchItemUIState) {
             //            val photoEndPoint = profilePhotoKey?.let {
 //                EndPoint.ofPhotoBucket(matchedId, profilePhotoKey)
 //            } ?: R.drawable.ic_baseline_account_circle
@@ -67,23 +63,23 @@ class MatchPagingDataAdapter(
 //                .load(photoEndPoint)
 //                .apply(GlideHelper.profilePhotoGlideOptions())
 //                .into(binding.ivMatchProfilePicture)
-            binding.tvMatchName.text = matchDomain.swipedName ?: context.getString(R.string.unknown_user_name)
-            binding.tvMatchUnreadIndicator.visibility = if (matchDomain.unread) {
+            binding.tvMatchName.text = matchItemUIState.swipedName ?: context.getString(R.string.unknown_user_name)
+            binding.tvMatchUnreadIndicator.visibility = if (matchItemUIState.unread) {
                 View.VISIBLE
             } else {
                 View.GONE
             }
-            binding.tvMatchLastChatMessageBody.text = if (matchDomain.active || matchDomain.unmatched) {
-                matchDomain.lastChatMessageBody
+            binding.tvMatchLastChatMessageBody.text = if (matchItemUIState.active || matchItemUIState.unmatched) {
+                matchItemUIState.lastChatMessageBody
             } else {
                 context.getString(R.string.recent_chat_message_new_match)
             }
-            binding.flMatchProfilePhotoWrapper.background = if (matchDomain.active || matchDomain.unmatched) {
+            binding.flMatchProfilePhotoWrapper.background = if (matchItemUIState.active || matchItemUIState.unmatched) {
                 null
             } else {
                 ContextCompat.getDrawable(context, R.drawable.sh_circle_primary_border)
             }
-            val colorCode = if (matchDomain.unmatched) {
+            val colorCode = if (matchItemUIState.unmatched) {
                 R.color.TextGrey
             } else {
                 R.color.TextBlack

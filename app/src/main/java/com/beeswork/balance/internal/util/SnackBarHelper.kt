@@ -26,9 +26,5 @@ class SnackBarHelper {
             }
             return snackBar
         }
-
-        fun make(parentView: View, topPadding: Int, bottomPadding: Int, customView: View): Snackbar {
-            return make(parentView, Gravity.BOTTOM, topPadding, bottomPadding, customView)
-        }
     }
 }

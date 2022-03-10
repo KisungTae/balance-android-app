@@ -2,7 +2,7 @@ package com.beeswork.balance.internal.mapper.match
 
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
-import com.beeswork.balance.ui.matchfragment.MatchDomain
+import com.beeswork.balance.ui.matchfragment.MatchItemUIState
 
 class MatchMapperImpl : MatchMapper {
 
@@ -23,8 +23,8 @@ class MatchMapperImpl : MatchMapper {
         )
     }
 
-    override fun toMatchDomain(match: Match): MatchDomain {
-        return MatchDomain(
+    override fun toItemUIState(match: Match): MatchItemUIState {
+        return MatchItemUIState(
             match.chatId,
             match.swipedId,
             match.lastChatMessageId > 0L,

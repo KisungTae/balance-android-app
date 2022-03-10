@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.ItemChatMessageReceivedBinding
 import com.beeswork.balance.databinding.ItemChatMessageSentBinding
 import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
+import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
@@ -20,7 +21,7 @@ import com.bumptech.glide.Glide
 class ChatMessagePagingAdapter(
     private val chatMessageSentListener: ChatMessageSentListener,
     displayDensity: Float
-) : PagingDataAdapter<ChatMessageDomain, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<ChatMessageItemUIState, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
 
     private val topMarginShort: Int = (displayDensity * 5).toInt()
     private val topMarginMedium: Int = (displayDensity * 15).toInt()
@@ -82,21 +83,21 @@ class ChatMessagePagingAdapter(
         }
     }
 
-    private fun calculateTopMargin(chatMessageDomain: ChatMessageDomain, position: Int): Int {
+    private fun calculateTopMargin(chatMessageItemUIState: ChatMessageItemUIState, position: Int): Int {
         val nextPosition = position + 1
         if (nextPosition == itemCount) {
             return topMarginLong
         }
         val nextChatMessageDomain = getItem(nextPosition)
         return when {
-            chatMessageDomain.status == ChatMessageStatus.SEPARATOR -> topMarginLong
+            chatMessageItemUIState.status == ChatMessageStatus.SEPARATOR -> topMarginLong
             nextChatMessageDomain?.status == ChatMessageStatus.SEPARATOR -> topMarginLong
-            chatMessageDomain.status == nextChatMessageDomain?.status -> topMarginShort
+            chatMessageItemUIState.status == nextChatMessageDomain?.status -> topMarginShort
             else -> topMarginMedium
         }
     }
 
-    fun getChatMessage(position: Int): ChatMessageDomain? {
+    fun getChatMessage(position: Int): ChatMessageItemUIState? {
         return getItem(position)
     }
 
@@ -106,9 +107,9 @@ class ChatMessagePagingAdapter(
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<ChatMessageDomain>() {
-            override fun areItemsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean = oldItem.id == newItem.id
-            override fun areContentsTheSame(oldItem: ChatMessageDomain, newItem: ChatMessageDomain): Boolean = oldItem == newItem
+        private val diffCallback = object : DiffUtil.ItemCallback<ChatMessageItemUIState>() {
+            override fun areItemsTheSame(oldItem: ChatMessageItemUIState, newItem: ChatMessageItemUIState): Boolean = oldItem.tag == newItem.tag
+            override fun areContentsTheSame(oldItem: ChatMessageItemUIState, newItem: ChatMessageItemUIState): Boolean = oldItem == newItem
         }
     }
 
@@ -129,13 +130,13 @@ class ChatMessagePagingAdapter(
     ) : ViewHolder(binding.root) {
 
         fun bind(
-            chatMessageDomain: ChatMessageDomain,
+            chatMessageItemUIState: ChatMessageItemUIState,
             profilePhoto: Bitmap?,
         ) {
-            binding.tvChatMessageReceivedBody.text = chatMessageDomain.body
-            binding.ivChatMessageReceivedProfilePhoto.visibility = if (chatMessageDomain.showProfilePhoto) View.VISIBLE else View.INVISIBLE
-            binding.tvChatMessageReceivedCreatedAt.text = chatMessageDomain.formatTimeCreatedAt()
-            setTopMargin(binding.root, chatMessageDomain.topMargin)
+            binding.tvChatMessageReceivedBody.text = chatMessageItemUIState.body
+            binding.ivChatMessageReceivedProfilePhoto.visibility = if (chatMessageItemUIState.showProfilePhoto) View.VISIBLE else View.INVISIBLE
+            binding.tvChatMessageReceivedCreatedAt.text = chatMessageItemUIState.formatTimeCreatedAt()
+            setTopMargin(binding.root, chatMessageItemUIState.topMargin)
             Glide.with(context)
                 .load(profilePhoto)
                 .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
@@ -149,21 +150,21 @@ class ChatMessagePagingAdapter(
     ) : ViewHolder(binding.root) {
 
         fun bind(
-            chatMessageDomain: ChatMessageDomain
+            chatMessageItemUIState: ChatMessageItemUIState
         ) {
-            binding.tvChatMessageSentBody.text = chatMessageDomain.body
+            binding.tvChatMessageSentBody.text = chatMessageItemUIState.body
             binding.btnChatMessageSentResend.setOnClickListener {
                 chatMessageSentListener.onResendChatMessage(absoluteAdapterPosition)
             }
             binding.btnChatMessageSentDelete.setOnClickListener {
                 chatMessageSentListener.onDeleteChatMessage(absoluteAdapterPosition)
             }
-            setTopMargin(binding.root, chatMessageDomain.topMargin)
-            when (chatMessageDomain.status) {
+            setTopMargin(binding.root, chatMessageItemUIState.topMargin)
+            when (chatMessageItemUIState.status) {
                 ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
                 ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
                 else -> {
-                    binding.tvChatMessageSentCreatedAt.text = chatMessageDomain.formatTimeCreatedAt()
+                    binding.tvChatMessageSentCreatedAt.text = chatMessageItemUIState.formatTimeCreatedAt()
                     showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
                 }
             }
@@ -184,9 +185,9 @@ class ChatMessagePagingAdapter(
     class SeparatorViewHolder(
         private val binding: ItemChatMessageSeparatorBinding
     ) : ViewHolder(binding.root) {
-        fun bind(chatMessageDomain: ChatMessageDomain) {
-            binding.tvChatSeparatorTitle.text = chatMessageDomain.body
-            setTopMargin(binding.root, chatMessageDomain.topMargin)
+        fun bind(chatMessageItemUIState: ChatMessageItemUIState) {
+            binding.tvChatSeparatorTitle.text = chatMessageItemUIState.body
+            setTopMargin(binding.root, chatMessageItemUIState.topMargin)
         }
     }
 }

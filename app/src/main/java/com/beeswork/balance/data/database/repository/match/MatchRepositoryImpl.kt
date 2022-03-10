@@ -49,7 +49,7 @@ class MatchRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : MatchRepository {
 
-    private var newMatchInvalidationListener: InvalidationListener<NewMatch>? = null
+    private lateinit var newMatchInvalidationListener: InvalidationListener<NewMatch>
     private val matchPageSyncDateTracker = PageSyncDateTracker()
 
     @ExperimentalCoroutinesApi
@@ -209,7 +209,7 @@ class MatchRepositoryImpl(
             val match = queryResult.data
             if (queryResult.isInsert() && match != null && match.swiperId == accountId) {
                 val newMatch = NewMatch(accountId, photoDAO.getProfilePhotoBy(accountId), match.swipedId, match.swipedProfilePhotoKey)
-                newMatchInvalidationListener?.onInvalidate(newMatch)
+                newMatchInvalidationListener.onInvalidate(newMatch)
             }
         }
     }
@@ -300,6 +300,6 @@ class MatchRepositoryImpl(
 
     override fun testFunction() {
         val newMatch = NewMatch(UUID.randomUUID(), "", UUID.randomUUID(), "")
-        newMatchInvalidationListener?.onInvalidate(newMatch)
+        newMatchInvalidationListener.onInvalidate(newMatch)
     }
 }

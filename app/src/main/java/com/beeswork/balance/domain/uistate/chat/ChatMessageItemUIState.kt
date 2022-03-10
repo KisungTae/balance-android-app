@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.chatfragment
+package com.beeswork.balance.domain.uistate.chat
 
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.DateTimePattern
@@ -6,9 +6,8 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import java.util.*
 
-data class ChatMessageDomain(
-    val key: Long,
-    val id: UUID?,
+data class ChatMessageItemUIState(
+    val tag: UUID,
     val body: String,
     var status: ChatMessageStatus,
     var dateCreatedAt: LocalDate?,
@@ -24,12 +23,9 @@ data class ChatMessageDomain(
         return timeCreatedAt?.format(DateTimePattern.ofTimeWithMeridiem()) ?: ""
     }
 
-
     companion object {
-        fun toSeparator(body: String?): ChatMessageDomain? {
-            body?.let {
-                return ChatMessageDomain(0L, null, body, ChatMessageStatus.SEPARATOR, null, null)
-            } ?: return null
+        fun ofSeparator(body: String): ChatMessageItemUIState {
+            return ChatMessageItemUIState(UUID.randomUUID(), body, ChatMessageStatus.SEPARATOR, null, null)
         }
     }
 }

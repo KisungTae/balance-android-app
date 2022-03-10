@@ -50,12 +50,13 @@ class ChatRepositoryImpl(
         awaitClose { }
     }
 
-
     override suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
             chatMessageDAO.insert(chatMessage)
-            sendChatMessage(chatMessage)
+            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, null, chatMessage.tag, chatMessage.body, null)
+//        sendChatMessageChanel.send(chatMessageDTO)
+            chatPageInvalidationListener.onInvalidate(chatMessage)
             return@withContext Resource.success(EmptyResponse())
         }
     }
@@ -64,16 +65,34 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val chatMessage = chatMessageDAO.getBy(tag) ?: return@withContext Resource.error(ChatMessageNotFoundException())
             chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
-            sendChatMessage(chatMessage)
+            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, null, chatMessage.tag, chatMessage.body, null)
+//        sendChatMessageChanel.send(chatMessageDTO)
+            chatPageInvalidationListener.onInvalidate(null)
             return@withContext Resource.success(EmptyResponse())
         }
     }
 
     private suspend fun sendChatMessage(chatMessage: ChatMessage) {
         val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, null, chatMessage.tag, chatMessage.body, null)
-        sendChatMessageChanel.send(chatMessageDTO)
-        chatPageInvalidationListener.onInvalidate(null)
+//        sendChatMessageChanel.send(chatMessageDTO)
+        chatPageInvalidationListener.onInvalidate(chatMessage)
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     override suspend fun deleteChatMessages() {
@@ -273,8 +292,7 @@ class ChatRepositoryImpl(
 //    }
 
     override fun test() {
-        CoroutineScope(ioDispatcher).launch {
-
+//        CoroutineScope(ioDispatcher).launch {
 //            val chatMessages = arrayListOf<ChatMessage>()
 //            chatMessages.add(ChatMessage(12, "sent-1", ChatMessageStatus.SENDING, UUID.fromString("938249ad-0ffc-46cf-bd7d-dc4b28f1726b")))
 //            chatMessages.add(ChatMessage(12, "sent-2", ChatMessageStatus.SENDING, UUID.fromString("cc00800c-e74f-4dac-bd9b-f0ef487e7d9f")))
@@ -283,10 +301,20 @@ class ChatRepositoryImpl(
 //                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.SENT, UUID.randomUUID(), OffsetDateTime.now()))
 //            }
 //            chatMessageDAO.insert(chatMessages)
-        }
+//        }
 
 
-//        CoroutineScope(ioDispatcher).launch {
+        CoroutineScope(ioDispatcher).launch {
+            val today = OffsetDateTime.now()
+            val chatMessage = ChatMessage(
+                UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
+                today.toString(),
+                ChatMessageStatus.RECEIVED,
+                UUID.randomUUID(),
+                today
+            )
+            chatMessageDAO.insert(chatMessage)
+            chatPageInvalidationListener.onInvalidate(chatMessage)
 //            val today = OffsetDateTime.now()
 //            val chatMessages = arrayListOf<ChatMessage>()
 //
@@ -299,22 +327,43 @@ class ChatRepositoryImpl(
 //                    }
 //
 //                    if (Random.nextBoolean()) {
-//                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.SENT, UUID.randomUUID(), date))
+//                        chatMessages.add(
+//                            ChatMessage(
+//                                UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
+//                                date.toString(),
+//                                ChatMessageStatus.SENT,
+//                                UUID.randomUUID(),
+//                                date,
+//                                i.toLong()
+//                            )
+//                        )
 //                    } else {
-//                        chatMessages.add(ChatMessage(12, date.toString(), ChatMessageStatus.RECEIVED, UUID.randomUUID(), date))
+//                        chatMessages.add(
+//                            ChatMessage(
+//                                UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
+//                                date.toString(),
+//                                ChatMessageStatus.RECEIVED,
+//                                UUID.randomUUID(),
+//                                date,
+//                                i.toLong()
+//                            )
+//                        )
 //                    }
 //                }
 //            }
 //
 //            for (i in 0..10) {
-//                chatMessages.add(ChatMessage(12, "sending-$i", ChatMessageStatus.SENDING, UUID.randomUUID()))
+//                chatMessages.add(
+//                    ChatMessage(
+//                        UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
+//                        "sending-$i",
+//                        ChatMessageStatus.SENDING,
+//                        UUID.randomUUID()
+//                    )
+//                )
 //            }
-//
-//
 //            chatMessageDAO.insert(chatMessages)
-//        }
-
-
+        }
     }
 }
 

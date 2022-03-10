@@ -21,7 +21,7 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :status where tag = :tag")
     fun updateStatusBy(tag: UUID, status: ChatMessageStatus)
 
-    @Query("select * from chatMessage where chatId = :chatId order by createdAt desc, sequence desc limit :loadSize offset :startPosition")
+    @Query("select * from chatMessage where chatId = :chatId order by id desc, sequence desc limit :loadSize offset :startPosition")
     fun getAllPagedBy(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
 
 

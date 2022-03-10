@@ -19,7 +19,6 @@ import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.swipefragment.SwipeDomain
 import com.beeswork.balance.ui.common.BaseFragment
-import com.beeswork.balance.ui.matchfragment.MatchDomain
 import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -176,8 +175,8 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, snackBarNewSwipeBinding.root)
         snackBar.view.setOnClickListener {
             binding.tlMain.getTabAt(MainViewPagerTabPosition.MATCH.ordinal)?.select()
+            snackBar.dismiss()
         }
-
         snackBarNewSwipeBinding.tvNewMatchSnackBarClose.setOnClickListener {
             snackBar.dismiss()
         }

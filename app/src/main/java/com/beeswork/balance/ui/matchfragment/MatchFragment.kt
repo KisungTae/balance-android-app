@@ -4,23 +4,16 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.*
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEach
-import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.MatchPageFilter
-import com.beeswork.balance.internal.constant.RequestCode
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.chatfragment.ChatFragment
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
@@ -32,7 +25,6 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchListener,
@@ -42,7 +34,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private val viewModelFactory: MatchViewModelFactory by instance()
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagingDataAdapter: MatchPagingDataAdapter
-    private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchDomain, MatchPagingDataAdapter.ViewHolder>
+    private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchItemUIState, MatchPagingDataAdapter.ViewHolder>
     private lateinit var binding: FragmentMatchBinding
     private var matchPageFilterJob: Job? = null
 
@@ -145,8 +137,8 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
         val chatFragment = ChatFragment()
         val arguments = Bundle()
 
-        matchPagingDataAdapter.getMatch(position)?.let { matchDomain ->
-            arguments.putString(BundleKey.CHAT_ID, matchDomain.chatId.toString())
+        matchPagingDataAdapter.getMatch(position)?.let { matchItemUIState ->
+            arguments.putString(BundleKey.CHAT_ID, matchItemUIState.chatId.toString())
             chatFragment.arguments = arguments
         }
         moveToFragment(chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)
@@ -156,6 +148,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     }
 
     override fun onFragmentSelected() {
+//        viewModel.test()
     }
 }
 

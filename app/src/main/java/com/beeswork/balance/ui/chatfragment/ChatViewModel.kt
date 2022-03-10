@@ -6,17 +6,21 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.domain.uistate.chat.ChatPageInvalidationUIState
+import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.domain.uistate.chat.ResendChatMessageUIState
 import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCase
 import com.beeswork.balance.domain.uistate.chat.SendChatMessageUIState
+import com.beeswork.balance.domain.usecase.chat.GetChatMessagePagingDataUseCase
 import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
-import com.beeswork.balance.internal.constant.DateTimePattern
+import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.*
@@ -26,6 +30,7 @@ class ChatViewModel(
     private val chatId: UUID,
     private val sendChatMessageUseCase: SendChatMessageUseCase,
     private val resendChatMessageUseCase: ResendChatMessageUseCase,
+    private val getChatMessagePagingDataUseCase: GetChatMessagePagingDataUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -38,9 +43,31 @@ class ChatViewModel(
             if (match == null) {
                 null
             } else {
-                matchMapper.toMatchDomain(match)
+                matchMapper.toItemUIState(match)
             }
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+    }
+
+    val chatPageInvalidationLiveData by viewModelLazyDeferred {
+        chatRepository.chatPageInvalidationFlow.filter { chatMessage ->
+            if (chatMessage == null) {
+                true
+            } else {
+                chatMessage.chatId == chatId
+            }
+        }.map { chatMessage ->
+            when (chatMessage?.status) {
+                ChatMessageStatus.RECEIVED -> {
+                    ChatPageInvalidationUIState(false, chatMessage.body)
+                }
+                ChatMessageStatus.SENDING -> {
+                    ChatPageInvalidationUIState(true, null)
+                }
+                else -> {
+                    null
+                }
+            }
+        }.asLiveData(viewModelScope.coroutineContext)
     }
 
 //    val chatMessageInvalidationLiveData by viewModelLazyDeferred {
@@ -60,45 +87,12 @@ class ChatViewModel(
     val unmatchLiveData: LiveData<Resource<EmptyResponse>> get() = _unmatchLiveData
 
 
-
     private val _sendChatMessageUIStateLiveData = MutableLiveData<SendChatMessageUIState>()
     val sendChatMessageUIStateLiveData: LiveData<SendChatMessageUIState> = _sendChatMessageUIStateLiveData
 
     private val _resendChatMessageUIStateLiveData = MutableLiveData<ResendChatMessageUIState>()
     val resendChatMessageUIStateLiveData: LiveData<ResendChatMessageUIState> = _resendChatMessageUIStateLiveData
 
-    fun initChatMessagePagingData(): LiveData<PagingData<ChatMessageDomain>> {
-        return Pager(
-            pagingConfig,
-            null,
-            { ChatMessagePagingSource(chatRepository, chatId) }
-        ).flow.cachedIn(viewModelScope).map { pagingData ->
-            var prevChatMessageDomain: ChatMessageDomain? = null
-            pagingData.map { chatMessage ->
-                val chatMessageDomain = chatMessageMapper.toDomain(chatMessage)
-                if (prevChatMessageDomain != null) {
-                    if (chatMessageDomain.status.isProcessed()
-                        && chatMessageDomain.status == prevChatMessageDomain?.status
-                        && chatMessageDomain.dateCreatedAt == prevChatMessageDomain?.dateCreatedAt
-                        && chatMessageDomain.timeCreatedAt == prevChatMessageDomain?.timeCreatedAt
-                    ) {
-                        prevChatMessageDomain?.showProfilePhoto = false
-                        chatMessageDomain.showTime = false
-                    }
-                }
-                prevChatMessageDomain = chatMessageDomain
-                chatMessageDomain
-            }.insertSeparators { before: ChatMessageDomain?, after: ChatMessageDomain? ->
-                var separator: ChatMessageDomain? = null
-                if (before?.status?.isProcessed() == true && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)) {
-                    separator = ChatMessageDomain.toSeparator(
-                        before.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
-                    )
-                }
-                separator
-            }
-        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
-    }
 
     fun sendChatMessage(body: String) {
         viewModelScope.launch {
@@ -130,10 +124,14 @@ class ChatViewModel(
         }
     }
 
+    fun getChatMessagePagingData(): LiveData<PagingData<ChatMessageItemUIState>> {
+        return getChatMessagePagingDataUseCase.invoke(chatId, viewModelScope)
+    }
+
+
     fun deleteChatMessage(key: Long) {
 //        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
     }
-
 
 
     fun unmatch() {
@@ -154,22 +152,5 @@ class ChatViewModel(
 
     fun test() {
         chatRepository.test()
-    }
-
-    fun test2() {
-//        _sendChatMessageLiveData.postValue(Resource.error("error"))
-    }
-
-    companion object {
-        private const val CHAT_PAGE_SIZE = 80
-        private const val CHAT_PAGE_PREFETCH_DISTANCE = CHAT_PAGE_SIZE
-        private const val CHAT_MAX_PAGE_SIZE = CHAT_PAGE_PREFETCH_DISTANCE * 3 + CHAT_PAGE_SIZE
-        private val pagingConfig = PagingConfig(
-            CHAT_PAGE_SIZE,
-            CHAT_PAGE_PREFETCH_DISTANCE,
-            false,
-            CHAT_PAGE_SIZE,
-            CHAT_MAX_PAGE_SIZE
-        )
     }
 }

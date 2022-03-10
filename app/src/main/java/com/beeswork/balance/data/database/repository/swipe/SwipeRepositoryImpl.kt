@@ -34,7 +34,7 @@ class SwipeRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : SwipeRepository {
 
-    private var newSwipeInvalidationListener: InvalidationListener<Swipe>? = null
+    private lateinit var newSwipeInvalidationListener: InvalidationListener<Swipe>
     private val swipePageSyncDateTracker = PageSyncDateTracker()
 
     @ExperimentalCoroutinesApi
@@ -151,7 +151,7 @@ class SwipeRepositoryImpl(
                 return@Callable queryResult.data
             })
             if (swipe != null && swipe.swipedId == preferenceProvider.getAccountId()) {
-                newSwipeInvalidationListener?.onInvalidate(swipe)
+                newSwipeInvalidationListener.onInvalidate(swipe)
             }
         }
     }
