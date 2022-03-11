@@ -35,19 +35,88 @@
                 android:textStyle="bold"
                 app:endColor="@color/TextWhite"
                 app:startColor="@color/Primary" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvMatch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_match" />
+
+        <LinearLayout
+            android:id="@+id/llMatchInitialLoadingPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/BackgroundWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
+                android:layout_gravity="center"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Primary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llMatchInitialErrorPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/BackgroundWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tvMatchErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="10dp"
+                android:text="@string/error_generic_try_later"
+                android:textAlignment="center" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnMatchRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:backgroundTint="@color/Primary"
+                android:text="@string/retry"
+                android:textColor="@color/white" />
 
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/llMatchInitialEmptyPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/BackgroundWhite"
+            android:padding="10dp">
 
-    </androidx.appcompat.widget.Toolbar>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="10dp"
+                android:text="@string/text_match_empty"
+                android:textAlignment="center"
+                android:textColor="@color/TextGrey" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvMatch"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_match" />
+        </LinearLayout>
+
+    </FrameLayout>
 
 
 </LinearLayout>

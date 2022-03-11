@@ -21,7 +21,7 @@
     <LinearLayout
         android:id="@+id/llLoadStateErrorWrapper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="100dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -29,9 +29,9 @@
             android:id="@+id/tvLoadStateErrorMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/error_generic_try_later"
             android:layout_marginBottom="10dp"
-            android:textAlignment="center"
-            android:textSize="@dimen/text_large" />
+            android:textAlignment="center" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnLoadStateRetry"
@@ -40,6 +40,7 @@
             android:background="@drawable/sh_round_box"
             android:backgroundTint="@color/Primary"
             android:text="@string/retry"
+            android:textSize="13sp"
             android:textColor="@color/white" />
 
 

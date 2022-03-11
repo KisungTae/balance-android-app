@@ -7,6 +7,7 @@ import androidx.paging.RemoteMediator
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.constant.MatchPageFilter
+import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
 import java.lang.RuntimeException
@@ -31,12 +32,15 @@ class MatchRemoteMediator(
             }
 
             val pageSize = state.config.pageSize
-            val response = matchRepository.fetchMatches(pageSize, loadKey, matchPageFilter)
-            if (response.isError()) {
-                val exception = response.exception ?: IOException()
-                return MediatorResult.Error(exception)
-            }
-            return MediatorResult.Success((response.data?.matchDTOs?.size ?: 0) < pageSize)
+            delay(10000)
+            return MediatorResult.Error(IOException())
+//            val response = matchRepository.fetchMatches(pageSize, loadKey, matchPageFilter)
+//
+//            if (response.isError()) {
+//                val exception = response.exception ?: IOException()
+//                return MediatorResult.Error(exception)
+//            }
+//            return MediatorResult.Success((response.data?.matchDTOs?.size ?: 0) < pageSize)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

@@ -25,7 +25,7 @@ class LoadStateViewHolder(
 
     fun bind(loadState: LoadState) {
         if (loadState is LoadState.Error) {
-            tvErrorMessage.text = loadState.error.localizedMessage
+//            tvErrorMessage.text = loadState.error.localizedMessage
         }
         skvProgressBar.isVisible = loadState is LoadState.Loading
         tvErrorMessage.isVisible = loadState is LoadState.Error

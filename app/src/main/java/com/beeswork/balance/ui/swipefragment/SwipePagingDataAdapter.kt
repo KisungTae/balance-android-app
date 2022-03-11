@@ -68,9 +68,8 @@ class SwipePagingDataAdapter(
     }
 
     class HeaderViewHolder(
-        private val binding: ItemSwipeHeaderBinding,
+        binding: ItemSwipeHeaderBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-
         fun bind() {}
     }
 

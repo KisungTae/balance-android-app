@@ -38,7 +38,7 @@ class MessageSource {
                 is UnknownHostException -> {
                     resources.getString(R.string.unknown_host_exception)
                 }
-                else -> null
+                else -> exception.message
             }
 
         }

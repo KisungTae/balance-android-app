@@ -65,9 +65,9 @@ class MatchRepositoryImpl(
     override suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            if (matchPageSyncDateTracker.shouldSyncPage(getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter))) {
-                syncMatches(loadSize, startPosition, matchPageFilter)
-            }
+//            if (matchPageSyncDateTracker.shouldSyncPage(getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter))) {
+//                syncMatches(loadSize, startPosition, matchPageFilter)
+//            }
 
             when (matchPageFilter) {
                 null -> {

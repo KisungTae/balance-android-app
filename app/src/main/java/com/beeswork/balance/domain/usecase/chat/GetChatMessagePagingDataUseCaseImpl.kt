@@ -17,14 +17,16 @@ class GetChatMessagePagingDataUseCaseImpl(
     private val chatRepository: ChatRepository,
     private val chatMessageMapper: ChatMessageMapper,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-): GetChatMessagePagingDataUseCase {
+) : GetChatMessagePagingDataUseCase {
 
+    @ExperimentalPagingApi
     override fun invoke(chatId: UUID, scope: CoroutineScope): LiveData<PagingData<ChatMessageItemUIState>> {
         return Pager(
-            pagingConfig,
-            null,
-            { ChatMessagePagingSource(chatRepository, chatId) }
-        ).flow.cachedIn(scope).map { pagingData ->
+            config = pagingConfig,
+            remoteMediator = ChatMessageRemoteMediator(chatRepository, chatId)
+        ) {
+            ChatMessagePagingSource(chatRepository, chatId)
+        }.flow.cachedIn(scope).map { pagingData ->
             var prevChatMessageItemUIState: ChatMessageItemUIState? = null
             pagingData.map { chatMessage ->
                 val chatMessageItemUIState = chatMessageMapper.toItemUIState(chatMessage)
@@ -51,6 +53,7 @@ class GetChatMessagePagingDataUseCaseImpl(
                 separator
             }
         }.asLiveData(scope.coroutineContext + defaultDispatcher)
+
     }
 
     companion object {

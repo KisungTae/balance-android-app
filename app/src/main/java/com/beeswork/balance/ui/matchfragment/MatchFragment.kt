@@ -10,17 +10,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.ui.chatfragment.ChatFragment
-import com.beeswork.balance.ui.common.BaseFragment
-import com.beeswork.balance.ui.common.PagingRefreshAdapter
-import com.beeswork.balance.ui.common.ViewPagerChildFragment
+import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -35,8 +35,11 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private lateinit var viewModel: MatchViewModel
     private lateinit var matchPagingDataAdapter: MatchPagingDataAdapter
     private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchItemUIState, MatchPagingDataAdapter.ViewHolder>
+    private lateinit var matchPagingInitialPageAdapter: PagingInitialPageAdapter<MatchItemUIState, MatchPagingDataAdapter.ViewHolder>
+    private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
     private lateinit var binding: FragmentMatchBinding
     private var matchPageFilterJob: Job? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,8 +58,9 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
-        setupMatchRecyclerView()
         setupToolBars()
+        setupMatchRecyclerView()
+        setupMatchPagingInitialPageAdapter()
         observeMatchPageInvalidationLiveData()
         observeMatchPagingDataLiveData(null)
     }
@@ -69,7 +73,10 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     private fun setupMatchRecyclerView() {
         matchPagingDataAdapter = MatchPagingDataAdapter(this@MatchFragment)
-        binding.rvMatch.adapter = matchPagingDataAdapter
+        footerLoadStateAdapter = BalanceLoadStateAdapter(matchPagingDataAdapter::retry)
+        binding.rvMatch.adapter = matchPagingDataAdapter.withLoadStateFooter(
+            footer = footerLoadStateAdapter
+        )
         binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMatch.itemAnimator = null
         matchPagingRefreshAdapter = PagingRefreshAdapter(binding.rvMatch, matchPagingDataAdapter)
@@ -142,6 +149,25 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
             chatFragment.arguments = arguments
         }
         moveToFragment(chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)
+    }
+
+    private fun setupMatchPagingInitialPageAdapter() {
+        binding.btnMatchRetry.setOnClickListener {
+            matchPagingDataAdapter.retry()
+        }
+        matchPagingInitialPageAdapter = PagingInitialPageAdapter(
+            matchPagingDataAdapter,
+            binding.llMatchInitialLoadingPage,
+            binding.llMatchInitialErrorPage,
+            binding.llMatchInitialEmptyPage,
+            binding.tvMatchErrorMessage,
+            requireContext()
+        )
+        lifecycleScope.launch {
+            matchPagingDataAdapter.loadStateFlow.collect { loadState ->
+                matchPagingInitialPageAdapter.updateUI(loadState)
+            }
+        }
     }
 
     override fun onRetry(requestCode: Int?) {
