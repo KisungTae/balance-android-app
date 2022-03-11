@@ -239,7 +239,7 @@ class StompClientImpl(
             val accessToken = preferenceProvider.getAccessToken()
             if (accessToken.isNullOrBlank()) {
                 disconnect(false, null)
-                chatRepository.clearChatMessage(chatMessageDTO.id)
+//                chatRepository.clearChatMessage(chatMessageDTO.id)
                 sendErrorWebSocketEvent(AccessTokenNotFoundException())
             } else {
                 val headers = mutableMapOf<String, String>()
@@ -252,9 +252,9 @@ class StompClientImpl(
             }
         } else {
             if (webSocketState.isDisconnected()) {
-                chatRepository.clearChatMessage(chatMessageDTO.id)
+//                chatRepository.clearChatMessage(chatMessageDTO.id)
             } else {
-                missedChatMessageKeys.add(chatMessageDTO.id)
+//                missedChatMessageKeys.add(chatMessageDTO.id)
             }
         }
     }

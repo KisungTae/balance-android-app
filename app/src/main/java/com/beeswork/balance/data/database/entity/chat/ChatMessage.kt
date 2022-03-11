@@ -14,7 +14,7 @@ data class ChatMessage(
     val chatId: UUID,
     val body: String,
     val status: ChatMessageStatus,
-    val tag: UUID,
+    val tag: UUID?,
     val createdAt: OffsetDateTime? = null,
     val id: Long = Long.MAX_VALUE,
 

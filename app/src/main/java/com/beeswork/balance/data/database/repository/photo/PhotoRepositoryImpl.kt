@@ -83,7 +83,7 @@ class PhotoRepositoryImpl(
             uploadPhotoToS3(photoFile, photo.key, mimeType, preSignedURL.url, preSignedURL.fields)
         } ?: kotlin.run {
             if (getPreSignedURLResponse.isError()) {
-                val photoAlreadyExists = getPreSignedURLResponse.isExceptionEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
+                val photoAlreadyExists = getPreSignedURLResponse.isExceptionCodeEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
                 val photoStatus = if (photoAlreadyExists) PhotoStatus.OCCUPIED else PhotoStatus.UPLOAD_ERROR
                 photoDAO.updateStatusBy(photo.key, photoStatus)
             }
@@ -106,7 +106,7 @@ class PhotoRepositoryImpl(
         val savePhotoResponse = photoRDS.savePhoto(photo.key, photo.sequence)
 
         if (savePhotoResponse.isError()) {
-            val photoAlreadyExists = savePhotoResponse.isExceptionEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
+            val photoAlreadyExists = savePhotoResponse.isExceptionCodeEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
             if (photoAlreadyExists) {
                 photoDAO.updateStatusBy(photo.key, PhotoStatus.OCCUPIED)
             } else {

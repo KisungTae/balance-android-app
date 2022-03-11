@@ -15,9 +15,8 @@ import okhttp3.RequestBody
 import java.util.*
 
 class PhotoRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), PhotoRDS {
+    private val balanceAPI: BalanceAPI
+) : BaseRDS(), PhotoRDS {
 
     override suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse> {
         return getResult { balanceAPI.orderPhotos(OrderPhotosBody(photoSequences)) }

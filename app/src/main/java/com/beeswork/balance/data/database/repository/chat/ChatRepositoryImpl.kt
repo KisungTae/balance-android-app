@@ -6,7 +6,9 @@ import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.entity.match.Match
+import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
+import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
@@ -14,7 +16,9 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.constant.ExceptionCode
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.ChatMessageNotFoundException
+import com.beeswork.balance.internal.exception.ChatNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
@@ -26,14 +30,15 @@ import java.util.*
 import kotlin.random.Random
 
 class ChatRepositoryImpl(
+    loginRDS: LoginRDS,
+    preferenceProvider: PreferenceProvider,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val chatRDS: ChatRDS,
     private val chatMessageMapper: ChatMessageMapper,
     private val balanceDatabase: BalanceDatabase,
-    private val preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
-) : ChatRepository {
+) : BaseRepository(loginRDS, preferenceProvider), ChatRepository {
 
     private var sendChatMessageChanel = Channel<ChatMessageDTO>(Channel.BUFFERED)
     override val sendChatMessageFlow: Flow<ChatMessageDTO> = sendChatMessageChanel.consumeAsFlow()
@@ -54,7 +59,7 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
             chatMessageDAO.insert(chatMessage)
-            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, null, chatMessage.tag, chatMessage.body, null)
+            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
 //        sendChatMessageChanel.send(chatMessageDTO)
             chatPageInvalidationListener.onInvalidate(chatMessage)
             return@withContext Resource.success(EmptyResponse())
@@ -65,29 +70,44 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val chatMessage = chatMessageDAO.getBy(tag) ?: return@withContext Resource.error(ChatMessageNotFoundException())
             chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
-            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, null, chatMessage.tag, chatMessage.body, null)
+            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
 //        sendChatMessageChanel.send(chatMessageDTO)
             chatPageInvalidationListener.onInvalidate(null)
             return@withContext Resource.success(EmptyResponse())
         }
     }
 
-    private suspend fun sendChatMessage(chatMessage: ChatMessage) {
-        val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, null, chatMessage.tag, chatMessage.body, null)
-//        sendChatMessageChanel.send(chatMessageDTO)
-        chatPageInvalidationListener.onInvalidate(chatMessage)
+    override suspend fun fetchChatMessages(loadSize: Int, chatId: UUID, lastChatMessageId: Long?): Resource<List<ChatMessageDTO>> {
+        return withContext(ioDispatcher) {
+            val match = matchDAO.getBy(chatId) ?: return@withContext Resource.error(ChatNotFoundException())
+            val response = getResponse { chatRDS.fetchChatMessages(loadSize, chatId, lastChatMessageId) }
+            saveChatMessages(match, response.data)
+            return@withContext response
+        }
     }
 
-
-
-
-
-
-
-
-
-
-
+    private fun saveChatMessages(match: Match, chatMessageDTOs: List<ChatMessageDTO>?) {
+        balanceDatabase.runInTransaction {
+            chatMessageDTOs?.forEach { chatMessageDTO ->
+                if (chatMessageDTO.senderId == null || chatMessageDTO.id == null) {
+                    return@forEach
+                }
+                if (chatMessageDTO.senderId == match.swiperId) {
+                    if (chatMessageDAO.existsBy(chatMessageDTO.tag)) {
+                        chatMessageDAO.updateAsSentBy(chatMessageDTO.tag, chatMessageDTO.id, chatMessageDTO.createdAt)
+                    } else {
+                        chatMessageMapper.toSentChatMessage(chatMessageDTO)?.let { chatMessage ->
+                            chatMessageDAO.insert(chatMessage)
+                        }
+                    }
+                } else if (chatMessageDTO.senderId == match.swipedId) {
+                    chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
+                        chatMessageDAO.insert(chatMessage)
+                    }
+                }
+            }
+        }
+    }
 
 
 
@@ -207,31 +227,31 @@ class ChatRepositoryImpl(
         receivedChatMessageDTOs: List<ChatMessageDTO>?
     ): MutableSet<Long> {
         val chatIds = mutableSetOf<Long>()
-        val sentChatMessageIds = mutableListOf<UUID>()
-        val receivedChatMessageIds = mutableListOf<UUID>()
-        val newChatMessages = mutableListOf<ChatMessage>()
+//        val sentChatMessageIds = mutableListOf<UUID>()
+//        val receivedChatMessageIds = mutableListOf<UUID>()
+//        val newChatMessages = mutableListOf<ChatMessage>()
 
-        receivedChatMessageDTOs?.forEach { chatMessageDTO ->
-            if (!chatMessageDAO.existsById(chatMessageDTO.id)) {
-                chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
-                    newChatMessages.add(chatMessage)
+//        receivedChatMessageDTOs?.forEach { chatMessageDTO ->
+//            if (!chatMessageDAO.existsById(chatMessageDTO.id)) {
+//                chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
+//                    newChatMessages.add(chatMessage)
 //                    chatIds.add(chatMessage.chatId)
-                }
-            }
-            chatMessageDTO.id?.let { id -> receivedChatMessageIds.add(id) }
-        }
+//                }
+//            }
+//            chatMessageDTO.id?.let { id -> receivedChatMessageIds.add(id) }
+//        }
 
-        sentChatMessageDTOs?.forEach { chatMessageDTO ->
-            safeLet(chatMessageDTO.createdAt, chatMessageDAO.getById(chatMessageDTO.id)) { createdAt, chatMessage ->
+//        sentChatMessageDTOs?.forEach { chatMessageDTO ->
+//            safeLet(chatMessageDTO.createdAt, chatMessageDAO.getById(chatMessageDTO.id)) { createdAt, chatMessage ->
 //                chatMessage.createdAt = createdAt
 //                chatMessage.status = ChatMessageStatus.SENT
-                newChatMessages.add(chatMessage)
+//                newChatMessages.add(chatMessage)
 //                chatIds.add(chatMessage.chatId)
-            }
-            chatMessageDTO.id?.let { id -> sentChatMessageIds.add(id) }
-        }
-        syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
-        chatMessageDAO.insert(newChatMessages)
+//            }
+//            chatMessageDTO.id?.let { id -> sentChatMessageIds.add(id) }
+//        }
+//        syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
+//        chatMessageDAO.insert(newChatMessages)
         return chatIds
     }
 

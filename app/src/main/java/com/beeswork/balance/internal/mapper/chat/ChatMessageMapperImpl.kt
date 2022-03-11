@@ -12,14 +12,25 @@ import java.util.*
 class ChatMessageMapperImpl : ChatMessageMapper {
 
     override fun toReceivedChatMessage(chatMessageDTO: ChatMessageDTO): ChatMessage? {
-        return safeLet(
-            chatMessageDTO.id,
+        return toChatMessage(chatMessageDTO, ChatMessageStatus.RECEIVED)
+    }
+
+    override fun toSentChatMessage(chatMessageDTO: ChatMessageDTO): ChatMessage? {
+        return toChatMessage(chatMessageDTO, ChatMessageStatus.SENT)
+    }
+
+    private fun toChatMessage(chatMessageDTO: ChatMessageDTO, status: ChatMessageStatus): ChatMessage? {
+        if (chatMessageDTO.id == null) {
+            return null
+        }
+        return ChatMessage(
             chatMessageDTO.chatId,
             chatMessageDTO.body,
-            chatMessageDTO.createdAt
-        ) { id, chatId, body, createdAt ->
-            return@safeLet ChatMessage(chatId, body, ChatMessageStatus.RECEIVED, id, createdAt)
-        }
+            status,
+            chatMessageDTO.tag,
+            chatMessageDTO.createdAt,
+            chatMessageDTO.id
+        )
     }
 
     override fun toItemUIState(chatMessage: ChatMessage): ChatMessageItemUIState {

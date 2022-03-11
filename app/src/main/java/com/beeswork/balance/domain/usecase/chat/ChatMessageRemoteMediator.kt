@@ -1,22 +1,21 @@
-package com.beeswork.balance.ui.matchfragment
+package com.beeswork.balance.domain.usecase.chat
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.beeswork.balance.data.database.entity.match.Match
-import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.internal.constant.MatchPageFilter
+import com.beeswork.balance.data.database.entity.chat.ChatMessage
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.RuntimeException
+import java.util.*
 
 @ExperimentalPagingApi
-class MatchRemoteMediator(
-    private val matchRepository: MatchRepository,
-    private val matchPageFilter: MatchPageFilter?
-): RemoteMediator<Int, Match>() {
-    override suspend fun load(loadType: LoadType, state: PagingState<Int, Match>): MediatorResult {
+class ChatMessageRemoteMediator(
+    private val chatRepository: ChatRepository,
+    private val chatId: UUID
+): RemoteMediator<Int, ChatMessage>() {
+    override suspend fun load(loadType: LoadType, state: PagingState<Int, ChatMessage>): MediatorResult {
         return try {
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> {
@@ -26,17 +25,16 @@ class MatchRemoteMediator(
                     return MediatorResult.Success(true)
                 }
                 LoadType.APPEND -> {
-                    state.lastItemOrNull()?.swipedId
+                    state.lastItemOrNull()?.id
                 }
             }
-
             val pageSize = state.config.pageSize
-            val response = matchRepository.fetchMatches(pageSize, loadKey, matchPageFilter)
+            val response = chatRepository.fetchChatMessages(pageSize, chatId, loadKey)
             if (response.isError()) {
                 val exception = response.exception ?: IOException()
                 return MediatorResult.Error(exception)
             }
-            return MediatorResult.Success((response.data?.matchDTOs?.size ?: 0) < pageSize)
+            return MediatorResult.Success((response.data?.size ?: 0) < pageSize)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

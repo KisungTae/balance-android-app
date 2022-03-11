@@ -3,6 +3,7 @@ package com.beeswork.balance.data.network.rds.login
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.login.LoginWithRefreshTokenBody
+import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
 import com.beeswork.balance.data.network.request.profile.SaveEmailBody
 import com.beeswork.balance.data.network.request.login.SocialLoginBody
 import com.beeswork.balance.data.network.response.Resource
@@ -13,9 +14,8 @@ import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 
 class LoginRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), LoginRDS {
+    private val balanceAPI: BalanceAPI
+) : BaseRDS(), LoginRDS {
 
     override suspend fun saveEmail(email: String): Resource<EmptyResponse> {
         return getResult { balanceAPI.saveEmail(SaveEmailBody(email)) }
@@ -33,8 +33,8 @@ class LoginRDSImpl(
         return getResult { balanceAPI.socialLogin(SocialLoginBody(loginId, accessToken, loginType, pushToken)) }
     }
 
-    override suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO> {
-        return super.doRefreshAccessToken()
+    override suspend fun refreshAccessToken(accessToken: String, refreshToken: String): Resource<RefreshAccessTokenDTO> {
+        return getResult { balanceAPI.refreshAccessToken(RefreshAccessTokenBody(accessToken, refreshToken)) }
     }
 
 }

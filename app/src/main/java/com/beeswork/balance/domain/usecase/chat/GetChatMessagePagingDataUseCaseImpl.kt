@@ -7,7 +7,6 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
-import com.beeswork.balance.ui.chatfragment.ChatMessagePagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

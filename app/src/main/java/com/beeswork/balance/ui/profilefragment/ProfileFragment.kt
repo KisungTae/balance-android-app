@@ -156,7 +156,7 @@ class ProfileFragment : BaseFragment(),
 
     private fun observeUploadPhotoLiveData() {
         viewModel.uploadPhotoLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
-            if (resource.isError() && resource.isExceptionEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)) {
+            if (resource.isError() && resource.isExceptionCodeEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)) {
                 val title = getString(R.string.error_title_add_photo)
                 val message = MessageSource.getMessage(requireContext(), resource.exception)
                 ErrorDialog.show(title, message, childFragmentManager)

@@ -14,9 +14,8 @@ import java.util.*
 
 
 class MatchRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), MatchRDS {
+    private val balanceAPI: BalanceAPI,
+) : BaseRDS(), MatchRDS {
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO> {
         return getResult { balanceAPI.click(ClickBody(swipedId, answers)) }

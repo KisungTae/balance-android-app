@@ -7,5 +7,6 @@ import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 interface ChatMessageMapper {
 
     fun toReceivedChatMessage(chatMessageDTO: ChatMessageDTO): ChatMessage?
+    fun toSentChatMessage(chatMessageDTO: ChatMessageDTO): ChatMessage?
     fun toItemUIState(chatMessage: ChatMessage): ChatMessageItemUIState
 }

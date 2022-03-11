@@ -28,6 +28,7 @@ import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
+import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.internal.constant.EndPoint
@@ -45,6 +46,13 @@ import retrofit2.http.*
 import java.util.*
 
 interface BalanceAPI {
+
+    @GET("chat/message/fetch")
+    suspend fun fetchChatMessages(
+        @Query(value = "loadSize") loadSize: Int,
+        @Query(value = "chatId") chatId: UUID,
+        @Query(value = "lastChatMessageId") lastChatMessageId: Long?
+    ): Response<List<ChatMessageDTO>>
 
     @POST("chat/message/fetched")
     suspend fun fetchedChatMessage(@Body fetchedChatMessageBody: FetchedChatMessageBody): Response<EmptyResponse>

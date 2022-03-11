@@ -3,6 +3,7 @@ package com.beeswork.balance.data.database.repository.login
 import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.dao.LoginDAO
 import com.beeswork.balance.data.database.entity.login.Login
+import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -20,12 +21,12 @@ import java.lang.NullPointerException
 import java.util.*
 
 class LoginRepositoryImpl(
-    private val preferenceProvider: PreferenceProvider,
     private val loginDAO: LoginDAO,
     private val fcmTokenDAO: FCMTokenDAO,
-    private val loginRDS: LoginRDS,
+    loginRDS: LoginRDS,
+    preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
-) : LoginRepository {
+) : BaseRepository(loginRDS, preferenceProvider), LoginRepository {
     private suspend fun saveEmail(accountId: UUID, email: String?, loginType: LoginType) {
         withContext(ioDispatcher) {
             val login = Login(accountId, loginType, email, true)
@@ -125,7 +126,7 @@ class LoginRepositoryImpl(
 
     override suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO> {
         return withContext(ioDispatcher) {
-            return@withContext loginRDS.refreshAccessToken()
+            return@withContext refreshAccessToken()
         }
     }
 

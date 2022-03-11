@@ -16,13 +16,19 @@ interface ChatMessageDAO {
     fun insert(chatMessages: List<ChatMessage>)
 
     @Query("select * from chatMessage where tag = :tag")
-    fun getBy(tag: UUID): ChatMessage?
+    fun getBy(tag: UUID?): ChatMessage?
 
     @Query("update chatMessage set status = :status where tag = :tag")
-    fun updateStatusBy(tag: UUID, status: ChatMessageStatus)
+    fun updateStatusBy(tag: UUID?, status: ChatMessageStatus)
 
     @Query("select * from chatMessage where chatId = :chatId order by id desc, sequence desc limit :loadSize offset :startPosition")
     fun getAllPagedBy(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
+
+    @Query("select count(*) > 0 from chatMessage where tag = :tag")
+    fun existsBy(tag: UUID?): Boolean
+
+    @Query("update chatMessage set status = :status, createdAt = :createdAt, id = :id where tag = :tag")
+    fun updateAsSentBy(tag: UUID?, id: Long, createdAt: OffsetDateTime?, status: ChatMessageStatus = ChatMessageStatus.SENT)
 
 
 

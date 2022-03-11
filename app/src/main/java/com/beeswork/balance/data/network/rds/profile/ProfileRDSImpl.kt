@@ -12,9 +12,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
 
 class ProfileRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), ProfileRDS {
+    private val balanceAPI: BalanceAPI
+) : BaseRDS(), ProfileRDS {
 
     override suspend fun fetchProfile(): Resource<ProfileDTO> {
         return getResult { balanceAPI.fetchProfile() }

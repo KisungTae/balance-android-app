@@ -10,9 +10,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
 
 class CardRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), CardRDS {
+    private  val balanceAPI: BalanceAPI
+) : BaseRDS(), CardRDS {
 
     override suspend fun fetchCards(
         minAge: Int,

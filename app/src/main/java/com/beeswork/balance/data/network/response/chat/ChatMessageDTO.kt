@@ -4,11 +4,10 @@ import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 data class ChatMessageDTO(
-    val id: UUID?,
+    val id: Long?,
     val chatId: UUID,
     val senderId: UUID?,
-    val recipientId: UUID?,
-    val tag: UUID,
+    val tag: UUID?,
     val body: String,
     val createdAt: OffsetDateTime?
 )

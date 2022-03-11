@@ -11,9 +11,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import org.threeten.bp.OffsetDateTime
 
 class SettingRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), SettingRDS {
+    private val balanceAPI: BalanceAPI
+) : BaseRDS(), SettingRDS {
 
     override suspend fun fetchPushSetting(): Resource<PushSettingDTO> {
         return getResult { balanceAPI.getPushSetting() }

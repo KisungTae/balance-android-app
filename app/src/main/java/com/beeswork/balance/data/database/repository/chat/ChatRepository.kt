@@ -15,6 +15,7 @@ interface ChatRepository {
 
     suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse>
     suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse>
+    suspend fun fetchChatMessages(loadSize: Int, chatId: UUID, lastChatMessageId: Long?): Resource<List<ChatMessageDTO>>
 
 
     suspend fun deleteChatMessages()

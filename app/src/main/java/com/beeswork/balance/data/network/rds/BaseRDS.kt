@@ -19,10 +19,7 @@ import java.net.UnknownHostException
 import java.util.*
 
 
-abstract class BaseRDS(
-    protected val balanceAPI: BalanceAPI,
-    protected val preferenceProvider: PreferenceProvider
-) {
+abstract class BaseRDS {
 
     protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
         return sendRequest {
@@ -34,63 +31,15 @@ abstract class BaseRDS(
                 println("getResult xml")
                 return@sendRequest handleXmlException(response)
             } else {
-                println("getResult else")
-                val errorResponse = convertToErrorResponse(response)
-                if (!errorResponse.isExceptionEqualTo(ExceptionCode.EXPIRED_JWT_EXCEPTION)) {
-                    return@sendRequest errorResponse
-                }
-                println("after getResult convertoErrorResponse")
-                val refreshAccessTokenResponse = doRefreshAccessToken()
-                if (refreshAccessTokenResponse.isSuccess()) {
-                    return@sendRequest getResultWithoutRefreshAccessToken(call)
-                }
-                return@sendRequest refreshAccessTokenResponse.map { null }
+                return@sendRequest convertToErrorResponse(response)
             }
-        }
-    }
-
-    private suspend fun <T> getResultWithoutRefreshAccessToken(call: suspend () -> Response<T>): Resource<T> {
-        return sendRequest {
-            val response = call()
-            if (response.isSuccessful) Resource.success(response.body())
-            else convertToErrorResponse(response)
         }
     }
 
     private fun <T> convertToErrorResponse(response: Response<T>): Resource<T> {
         val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-        println(errorResponse.error)
-        println(errorResponse.message)
         val serverException = ServerException(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
         return Resource.error(serverException)
-    }
-
-
-    protected suspend fun doRefreshAccessToken(): Resource<RefreshAccessTokenDTO> {
-        return sendRequest {
-            val accessToken = preferenceProvider.getAccessToken()
-            if (accessToken.isNullOrBlank()) {
-                return@sendRequest Resource.error(AccessTokenNotFoundException())
-            }
-
-            val refreshToken = preferenceProvider.getRefreshToken()
-            if (refreshToken.isNullOrBlank()) {
-                return@sendRequest Resource.error(RefreshTokenNotFoundException())
-            }
-
-            val refreshAccessTokenBody = RefreshAccessTokenBody(accessToken, refreshToken)
-            val response = balanceAPI.refreshAccessToken(refreshAccessTokenBody)
-
-            return@sendRequest if (response.isSuccessful) {
-                val resource = Resource.success(response.body())
-                resource.data?.let { refreshAccessTokenDTO ->
-                    preferenceProvider.putLoginInfo(null, refreshAccessTokenDTO.accessToken, refreshAccessTokenDTO.refreshToken)
-                }
-                resource
-            } else {
-                convertToErrorResponse(response)
-            }
-        }
     }
 
     private fun <T> handleXmlException(response: Response<T>): Resource<T> {

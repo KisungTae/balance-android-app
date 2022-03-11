@@ -191,8 +191,7 @@ class ChatFragment : BaseFragment(),
 
     private fun setupSendBtnListener() {
         binding.btnChatMessageSend.setOnClickListener {
-//            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
-            viewModel.test()
+            viewModel.sendChatMessage(binding.etChatMessageBody.text.toString())
         }
     }
 
@@ -223,7 +222,9 @@ class ChatFragment : BaseFragment(),
 
     override fun onResendChatMessage(position: Int) {
         chatMessagePagingAdapter.getChatMessage(position)?.let { chatMessageItemUIState ->
-            viewModel.resendChatMessage(chatMessageItemUIState.tag)
+            if (chatMessageItemUIState.tag != null) {
+                viewModel.resendChatMessage(chatMessageItemUIState.tag)
+            }
         }
     }
 
@@ -296,7 +297,7 @@ class ChatFragment : BaseFragment(),
     private fun observeSendChatMessageMediatorLiveData() {
         viewModel.sendChatMessageMediatorLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             if (resource.isError()) {
-                if (resource.isExceptionEqualTo(ExceptionCode.MATCH_UNMATCHED_EXCEPTION)) {
+                if (resource.isExceptionCodeEqualTo(ExceptionCode.MATCH_UNMATCHED_EXCEPTION)) {
                     setupAsUnmatched()
                 }
 //                showSendChatMessageErrorDialog(resource.exception)

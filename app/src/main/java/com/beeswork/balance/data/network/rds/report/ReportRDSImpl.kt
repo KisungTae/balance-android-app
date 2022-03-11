@@ -11,9 +11,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
 
 class ReportRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), ReportRDS {
+    private val balanceAPI: BalanceAPI
+) : BaseRDS(), ReportRDS {
     override suspend fun reportProfile(
         reportedId: UUID,
         reportReason: ReportReason,

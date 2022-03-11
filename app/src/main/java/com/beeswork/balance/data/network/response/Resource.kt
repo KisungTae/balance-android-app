@@ -20,7 +20,7 @@ class Resource<out T>(
         return this.status == Status.ERROR
     }
 
-    fun isExceptionEqualTo(error: String?): Boolean {
+    fun isExceptionCodeEqualTo(error: String?): Boolean {
         return if (exception is BaseException) {
             exception.error == error
         } else {

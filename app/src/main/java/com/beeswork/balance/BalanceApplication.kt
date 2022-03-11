@@ -153,15 +153,15 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { BalanceAPI(instance()) }
 
         // Remote Data Source
-        bind<ReportRDS>() with singleton { ReportRDSImpl(instance(), instance()) }
-        bind<ChatRDS>() with singleton { ChatRDSImpl(instance(), instance()) }
-        bind<MatchRDS>() with singleton { MatchRDSImpl(instance(), instance()) }
-        bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance(), instance()) }
-        bind<SettingRDS>() with singleton { SettingRDSImpl(instance(), instance()) }
-        bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance(), instance()) }
-        bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance(), instance()) }
-        bind<LoginRDS>() with singleton { LoginRDSImpl(instance(), instance()) }
-        bind<CardRDS>() with singleton { CardRDSImpl(instance(), instance()) }
+        bind<ReportRDS>() with singleton { ReportRDSImpl(instance()) }
+        bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
+        bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
+        bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance()) }
+        bind<SettingRDS>() with singleton { SettingRDSImpl(instance()) }
+        bind<ProfileRDS>() with singleton { ProfileRDSImpl(instance()) }
+        bind<PhotoRDS>() with singleton { PhotoRDSImpl(instance()) }
+        bind<LoginRDS>() with singleton { LoginRDSImpl(instance()) }
+        bind<CardRDS>() with singleton { CardRDSImpl(instance()) }
 
 
         // UseCase
@@ -200,6 +200,7 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<ChatRepository>() with singleton {
             ChatRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

@@ -7,7 +7,7 @@ import org.threeten.bp.LocalTime
 import java.util.*
 
 data class ChatMessageItemUIState(
-    val tag: UUID,
+    val tag: UUID?,
     val body: String,
     var status: ChatMessageStatus,
     var dateCreatedAt: LocalDate?,
@@ -25,7 +25,7 @@ data class ChatMessageItemUIState(
 
     companion object {
         fun ofSeparator(body: String): ChatMessageItemUIState {
-            return ChatMessageItemUIState(UUID.randomUUID(), body, ChatMessageStatus.SEPARATOR, null, null)
+            return ChatMessageItemUIState(null, body, ChatMessageStatus.SEPARATOR, null, null)
         }
     }
 }

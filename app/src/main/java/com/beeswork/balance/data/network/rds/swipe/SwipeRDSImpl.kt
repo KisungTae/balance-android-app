@@ -10,9 +10,8 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
 
 class SwipeRDSImpl(
-    balanceAPI: BalanceAPI,
-    preferenceProvider: PreferenceProvider
-) : BaseRDS(balanceAPI, preferenceProvider), SwipeRDS {
+    private val balanceAPI: BalanceAPI
+) : BaseRDS(), SwipeRDS {
 
     override suspend fun listSwipes(loadSize: Int, startPosition: Int): Resource<ListSwipesDTO> {
         return getResult { balanceAPI.listSwipes(loadSize, startPosition) }

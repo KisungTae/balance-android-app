@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.chatfragment
+package com.beeswork.balance.domain.usecase.chat
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
