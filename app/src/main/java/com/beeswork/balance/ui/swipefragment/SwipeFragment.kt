@@ -52,8 +52,8 @@ class SwipeFragment : BaseFragment(),
     private fun bindUI() = lifecycleScope.launch {
         setupSwipeRecyclerView()
         setupSwipePagingInitialPageAdapter()
-//        observeSwipePagingDataLiveData()
-//        observeSwipePageInvalidationLiveData()
+        observeSwipePagingDataLiveData()
+        observeSwipePageInvalidationLiveData()
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {

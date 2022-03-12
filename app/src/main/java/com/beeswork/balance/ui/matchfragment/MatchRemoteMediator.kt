@@ -32,15 +32,13 @@ class MatchRemoteMediator(
             }
 
             val pageSize = state.config.pageSize
-            delay(10000)
-            return MediatorResult.Error(IOException())
-//            val response = matchRepository.fetchMatches(pageSize, loadKey, matchPageFilter)
-//
-//            if (response.isError()) {
-//                val exception = response.exception ?: IOException()
-//                return MediatorResult.Error(exception)
-//            }
-//            return MediatorResult.Success((response.data?.matchDTOs?.size ?: 0) < pageSize)
+            val response = matchRepository.fetchMatches(pageSize, loadKey, matchPageFilter)
+
+            if (response.isError()) {
+                val exception = response.exception ?: IOException()
+                return MediatorResult.Error(exception)
+            }
+            return MediatorResult.Success((response.data?.matchDTOs?.size ?: 0) < pageSize)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

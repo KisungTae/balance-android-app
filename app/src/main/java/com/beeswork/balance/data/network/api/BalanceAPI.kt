@@ -49,9 +49,9 @@ interface BalanceAPI {
 
     @GET("chat/message/fetch")
     suspend fun fetchChatMessages(
-        @Query(value = "loadSize") loadSize: Int,
         @Query(value = "chatId") chatId: UUID,
-        @Query(value = "lastChatMessageId") lastChatMessageId: Long?
+        @Query(value = "lastChatMessageId") lastChatMessageId: Long?,
+        @Query(value = "loadSize") loadSize: Int
     ): Response<List<ChatMessageDTO>>
 
     @POST("chat/message/fetched")

@@ -22,10 +22,10 @@
             app:contentInsetStart="0dp">
 
             <LinearLayout
-                android:gravity="center"
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
 
                 <ImageButton
                     android:id="@+id/btnChatBack"
@@ -37,13 +37,13 @@
 
                 <View
                     android:layout_width="@dimen/icon_medium"
-                    android:layout_height="@dimen/icon_medium"/>
+                    android:layout_height="@dimen/icon_medium" />
 
                 <TextView
                     android:id="@+id/tvChatSwipedName"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:textAlignment="center"
                     android:textSize="@dimen/text_large"
                     android:textStyle="bold" />
@@ -76,14 +76,8 @@
                         android:contentDescription="@string/refresh_button_icon_description"
                         android:src="@drawable/ic_refresh"
                         android:visibility="gone" />
-
                 </FrameLayout>
-
-
             </LinearLayout>
-
-
-
         </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
@@ -104,6 +98,55 @@
                     android:paddingHorizontal="10dp"
                     android:paddingBottom="15dp"
                     tools:listitem="@layout/item_chat_message_sent" />
+
+                <LinearLayout
+                    android:id="@+id/llChatInitialLoadingPage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/BackgroundWhite"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <com.github.ybq.android.spinkit.SpinKitView
+                        style="@style/SpinKitView.Large.Circle"
+                        android:layout_width="@dimen/icon_medium"
+                        android:layout_height="@dimen/icon_medium"
+                        android:layout_gravity="center"
+                        android:background="@color/Transparent"
+                        app:SpinKit_Color="@color/Primary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llChatInitialErrorPage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/BackgroundWhite"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/tvChatErrorMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:paddingHorizontal="10dp"
+                        android:text="@string/error_generic_try_later"
+                        android:textAlignment="center" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnChatRetry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/sh_round_box"
+                        android:backgroundTint="@color/Primary"
+                        android:textSize="13sp"
+                        android:text="@string/retry"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
 
                 <androidx.coordinatorlayout.widget.CoordinatorLayout
                     android:id="@+id/clChatSnackBarPlaceHolder"
@@ -157,8 +200,8 @@
                     android:adjustViewBounds="true"
                     android:background="@drawable/sh_round_box_primary"
                     android:contentDescription="@string/chat_message_send_button_description"
-                    android:padding="8dp"
                     android:focusableInTouchMode="false"
+                    android:padding="8dp"
                     android:src="@drawable/ic_baseline_send_12" />
 
             </LinearLayout>

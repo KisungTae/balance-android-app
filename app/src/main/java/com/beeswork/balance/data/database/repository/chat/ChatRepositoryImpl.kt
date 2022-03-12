@@ -81,7 +81,9 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val match = matchDAO.getBy(chatId) ?: return@withContext Resource.error(ChatNotFoundException())
             val response = getResponse { chatRDS.fetchChatMessages(loadSize, chatId, lastChatMessageId) }
-            saveChatMessages(match, response.data)
+            if (response.data?.size ?: 0 > 0) {
+                saveChatMessages(match, response.data)
+            }
             return@withContext response
         }
     }
@@ -106,6 +108,7 @@ class ChatRepositoryImpl(
                     }
                 }
             }
+            chatPageInvalidationListener.onInvalidate(null)
         }
     }
 

@@ -30,7 +30,6 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSwipe"
             android:layout_width="match_parent"
@@ -90,6 +89,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/sh_round_box"
                 android:backgroundTint="@color/Primary"
+                android:textSize="13sp"
                 android:text="@string/retry"
                 android:textColor="@color/white" />
 
@@ -114,6 +114,9 @@
                 android:textColor="@color/TextGrey" />
 
         </LinearLayout>
+
+
+
 
     </FrameLayout>
 

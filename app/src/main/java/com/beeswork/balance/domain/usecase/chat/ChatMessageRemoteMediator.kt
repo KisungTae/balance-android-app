@@ -6,6 +6,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.*
@@ -14,7 +15,7 @@ import java.util.*
 class ChatMessageRemoteMediator(
     private val chatRepository: ChatRepository,
     private val chatId: UUID
-): RemoteMediator<Int, ChatMessage>() {
+) : RemoteMediator<Int, ChatMessage>() {
     override suspend fun load(loadType: LoadType, state: PagingState<Int, ChatMessage>): MediatorResult {
         return try {
             val loadKey = when (loadType) {

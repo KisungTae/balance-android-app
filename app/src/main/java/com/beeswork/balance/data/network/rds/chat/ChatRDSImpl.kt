@@ -17,7 +17,7 @@ class ChatRDSImpl(
 ) : BaseRDS(), ChatRDS {
 
     override suspend fun fetchChatMessages(loadSize: Int, chatId: UUID, lastChatMessageId: Long?): Resource<List<ChatMessageDTO>> {
-        return getResult { balanceAPI.fetchChatMessages(loadSize, chatId, lastChatMessageId) }
+        return getResult { balanceAPI.fetchChatMessages(chatId, lastChatMessageId, loadSize) }
     }
 
     override suspend fun syncChatMessages(sentChatMessageIds: List<UUID>, receivedChatMessageIds: List<UUID>) {

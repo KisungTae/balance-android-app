@@ -92,6 +92,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/sh_round_box"
                 android:backgroundTint="@color/Primary"
+                android:textSize="13sp"
                 android:text="@string/retry"
                 android:textColor="@color/white" />
 
@@ -115,6 +116,10 @@
                 android:textColor="@color/TextGrey" />
 
         </LinearLayout>
+
+
+
+
 
     </FrameLayout>
 

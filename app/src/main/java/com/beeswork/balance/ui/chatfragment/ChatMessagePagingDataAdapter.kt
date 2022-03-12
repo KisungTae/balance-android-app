@@ -18,10 +18,10 @@ import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 
 
-class ChatMessagePagingAdapter(
+class ChatMessagePagingDataAdapter(
     private val chatMessageSentListener: ChatMessageSentListener,
     displayDensity: Float
-) : PagingDataAdapter<ChatMessageItemUIState, ChatMessagePagingAdapter.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>(diffCallback) {
 
     private val topMarginShort: Int = (displayDensity * 5).toInt()
     private val topMarginMedium: Int = (displayDensity * 15).toInt()

@@ -18,7 +18,9 @@ import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.*
+import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.PagingInitialPageAdapter
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.dialog.ConfirmDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
@@ -26,6 +28,7 @@ import com.beeswork.balance.ui.dialog.ReportDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.factory
@@ -36,7 +39,7 @@ import java.util.*
 class ChatFragment : BaseFragment(),
     KodeinAware,
     ErrorDialog.DismissListener,
-    ChatMessagePagingAdapter.ChatMessageSentListener,
+    ChatMessagePagingDataAdapter.ChatMessageSentListener,
     ConfirmDialog.ConfirmDialogClickListener,
     ChatMoreMenuDialog.ChatMoreMenuDialogClickListener,
     ReportDialog.ReportDialogClickListener,
@@ -45,8 +48,10 @@ class ChatFragment : BaseFragment(),
     override val kodein by closestKodein()
     private val viewModelFactory: ((UUID) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
-    private lateinit var chatMessagePagingAdapter: ChatMessagePagingAdapter
-    private lateinit var chatMessagePagingRefreshAdapter: PagingRefreshAdapter<ChatMessageItemUIState, ChatMessagePagingAdapter.ViewHolder>
+    private lateinit var chatMessagePagingDataAdapter: ChatMessagePagingDataAdapter
+    private lateinit var chatMessagePagingRefreshDataAdapter: PagingRefreshAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>
+    private lateinit var chatPagingInitialPageDataAdapter: PagingInitialPageAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>
+    private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
     private lateinit var binding: FragmentChatBinding
     private var chatMessagePagingObserveJob: Job? = null
 
@@ -76,6 +81,7 @@ class ChatFragment : BaseFragment(),
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
         setupChatRecyclerView()
+        setupChatPagingInitialPageAdapter()
         observeMatchLiveData()
         observeChatMessagePagingData()
         observeChatPageInvalidationLiveData()
@@ -100,14 +106,17 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun setupChatRecyclerView() {
-        chatMessagePagingAdapter = ChatMessagePagingAdapter(this, resources.displayMetrics.density)
-        binding.rvChat.adapter = chatMessagePagingAdapter
+        chatMessagePagingDataAdapter = ChatMessagePagingDataAdapter(this, resources.displayMetrics.density)
+        footerLoadStateAdapter = BalanceLoadStateAdapter(chatMessagePagingDataAdapter::retry)
+        binding.rvChat.adapter = chatMessagePagingDataAdapter.withLoadStateFooter(
+            footer = footerLoadStateAdapter
+        )
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
         binding.rvChat.layoutManager = layoutManager
         binding.rvChat.itemAnimator = null
-        chatMessagePagingRefreshAdapter = PagingRefreshAdapter(binding.rvChat, chatMessagePagingAdapter)
+        chatMessagePagingRefreshDataAdapter = PagingRefreshAdapter(binding.rvChat, chatMessagePagingDataAdapter)
     }
 
     private suspend fun observeMatchLiveData() {
@@ -128,20 +137,20 @@ class ChatFragment : BaseFragment(),
         registerAdapterDataObserver()
         chatMessagePagingObserveJob = lifecycleScope.launch {
             viewModel.getChatMessagePagingData().observe(viewLifecycleOwner) { pagingData ->
-                chatMessagePagingRefreshAdapter.reset()
+                chatMessagePagingRefreshDataAdapter.reset()
                 lifecycleScope.launch {
-                    chatMessagePagingAdapter.submitData(pagingData)
+                    chatMessagePagingDataAdapter.submitData(pagingData)
                 }
             }
         }
     }
 
     private fun registerAdapterDataObserver() {
-        chatMessagePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        chatMessagePagingDataAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 binding.rvChat.scrollToPosition(0)
-                chatMessagePagingAdapter.unregisterAdapterDataObserver(this)
+                chatMessagePagingDataAdapter.unregisterAdapterDataObserver(this)
             }
         })
     }
@@ -155,7 +164,7 @@ class ChatFragment : BaseFragment(),
                     if (chatPageInvalidationUIState?.body != null) {
                         showNewChatMessageSnackBar(chatPageInvalidationUIState.body)
                     }
-                    chatMessagePagingAdapter.refresh()
+                    chatMessagePagingDataAdapter.refresh()
                 }
             } else {
                 observeChatMessagePagingData()
@@ -182,7 +191,7 @@ class ChatFragment : BaseFragment(),
                 if (file.exists()) {
                     withContext(Dispatchers.Main) {
                         val profilePhotoBitmap = BitmapFactory.decodeFile(file.path)
-                        chatMessagePagingAdapter.setProfilePhoto(profilePhotoBitmap)
+                        chatMessagePagingDataAdapter.setProfilePhoto(profilePhotoBitmap)
                     }
                 }
             } catch (e: Exception) { }
@@ -221,13 +230,31 @@ class ChatFragment : BaseFragment(),
     }
 
     override fun onResendChatMessage(position: Int) {
-        chatMessagePagingAdapter.getChatMessage(position)?.let { chatMessageItemUIState ->
+        chatMessagePagingDataAdapter.getChatMessage(position)?.let { chatMessageItemUIState ->
             if (chatMessageItemUIState.tag != null) {
                 viewModel.resendChatMessage(chatMessageItemUIState.tag)
             }
         }
     }
 
+    private fun setupChatPagingInitialPageAdapter() {
+        binding.btnChatRetry.setOnClickListener {
+            chatMessagePagingDataAdapter.retry()
+        }
+        chatPagingInitialPageDataAdapter = PagingInitialPageAdapter(
+            chatMessagePagingDataAdapter,
+            binding.llChatInitialLoadingPage,
+            binding.llChatInitialErrorPage,
+            null,
+            binding.tvChatErrorMessage,
+            requireContext()
+        )
+        lifecycleScope.launch {
+            chatMessagePagingDataAdapter.loadStateFlow.collect { loadState ->
+                chatPagingInitialPageDataAdapter.updateUI(loadState)
+            }
+        }
+    }
 
 
 
@@ -264,11 +291,11 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun showLoading() {
-        binding.llChatLoading.visibility = View.VISIBLE
+//        binding.llChatLoading.visibility = View.VISIBLE
     }
 
     private fun hideLoading() {
-        binding.llChatLoading.visibility = View.GONE
+//        binding.llChatLoading.visibility = View.GONE
     }
 
     private fun observeReportMatchLiveData() {
@@ -314,7 +341,7 @@ class ChatFragment : BaseFragment(),
         binding.etChatMessageBody.isFocusableInTouchMode = false
         binding.etChatMessageBody.isFocusable = false
         binding.btnChatMessageSend.isEnabled = false
-        chatMessagePagingAdapter.setProfilePhoto(null)
+        chatMessagePagingDataAdapter.setProfilePhoto(null)
     }
 
 
@@ -344,7 +371,7 @@ class ChatFragment : BaseFragment(),
 
 
     override fun onDeleteChatMessage(position: Int) {
-        chatMessagePagingAdapter.getChatMessage(position)?.let {
+        chatMessagePagingDataAdapter.getChatMessage(position)?.let {
             val confirmDialog = ConfirmDialog(
                 getString(R.string.confirm_dialog_delete_button_title),
                 RequestCode.DELETE_CHAT_MESSAGE,

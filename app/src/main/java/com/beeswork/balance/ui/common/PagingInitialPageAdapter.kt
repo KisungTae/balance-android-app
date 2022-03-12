@@ -15,9 +15,9 @@ import com.github.ybq.android.spinkit.SpinKitView
 
 class PagingInitialPageAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     private val pagingDataAdapter: PagingDataAdapter<T, VH>,
-    private val initialLoadingPage: ViewGroup,
-    private val initialErrorPage: ViewGroup,
-    private val initialEmptyPage: ViewGroup,
+    private val initialLoadingPage: ViewGroup?,
+    private val initialErrorPage: ViewGroup?,
+    private val initialEmptyPage: ViewGroup?,
     private val tvErrorMessage: TextView,
     private val context: Context
 ) {
@@ -44,9 +44,9 @@ class PagingInitialPageAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     }
 
     private fun updateUI(loadingPageVisibility: Int, errorPageVisibility: Int, emptyPageVisibility: Int) {
-        initialLoadingPage.visibility = loadingPageVisibility
-        initialErrorPage.visibility = errorPageVisibility
-        initialEmptyPage.visibility = emptyPageVisibility
+        initialLoadingPage?.visibility = loadingPageVisibility
+        initialErrorPage?.visibility = errorPageVisibility
+        initialEmptyPage?.visibility = emptyPageVisibility
     }
 
 }
