@@ -18,8 +18,10 @@ interface ChatRepository {
     suspend fun fetchChatMessages(chatId: UUID, lastChatMessageId: Long?, loadSize: Int): Resource<List<ChatMessageDTO>>
     suspend fun loadChatMessages(chatId: UUID, startPosition: Int, loadSize: Int): List<ChatMessage>
 
-    suspend fun deleteChatMessages()
 
+
+
+    suspend fun deleteChatMessages()
     suspend fun deleteChatMessage(chatId: Long, key: Long)
     suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO)
     suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO)

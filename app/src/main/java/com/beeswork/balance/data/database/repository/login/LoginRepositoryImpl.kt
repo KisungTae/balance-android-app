@@ -126,7 +126,7 @@ class LoginRepositoryImpl(
 
     override suspend fun refreshAccessToken(): Resource<RefreshAccessTokenDTO> {
         return withContext(ioDispatcher) {
-            return@withContext refreshAccessToken()
+            return@withContext super.doRefreshAccessToken()
         }
     }
 

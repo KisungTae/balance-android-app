@@ -7,7 +7,6 @@ import com.beeswork.balance.data.network.request.chat.ReceivedChatMessageBody
 import com.beeswork.balance.data.network.request.chat.SyncChatMessagesBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
-import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 
 import java.util.*
@@ -24,8 +23,8 @@ class ChatRDSImpl(
         return getResult { balanceAPI.listChatMessages(chatId, appToken, startPosition, loadSize) }
     }
 
-    override suspend fun syncChatMessages(sentChatMessageIds: List<UUID>, receivedChatMessageIds: List<UUID>) {
-        balanceAPI.syncChatMessages(SyncChatMessagesBody(sentChatMessageIds, receivedChatMessageIds))
+    override suspend fun syncChatMessages(chatId: UUID, appToken: UUID, chatMessageIds: List<Long>) {
+        balanceAPI.syncChatMessages(SyncChatMessagesBody(chatId, appToken, chatMessageIds))
     }
 
 

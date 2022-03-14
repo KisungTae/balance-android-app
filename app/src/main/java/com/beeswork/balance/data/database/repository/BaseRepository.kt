@@ -26,7 +26,7 @@ abstract class BaseRepository(
         return response
     }
 
-    suspend fun doRefreshAccessToken(): Resource<RefreshAccessTokenDTO> {
+    protected suspend fun doRefreshAccessToken(): Resource<RefreshAccessTokenDTO> {
         val accessToken = preferenceProvider.getAccessToken()
         if (accessToken.isNullOrBlank()) {
             return Resource.error(AccessTokenNotFoundException())

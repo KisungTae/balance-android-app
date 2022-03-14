@@ -2,7 +2,7 @@ package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.InvalidationListener
-import com.beeswork.balance.data.database.common.PageSyncDateTracker
+import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
@@ -50,7 +50,7 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     private lateinit var newMatchInvalidationListener: InvalidationListener<NewMatch>
-    private val matchPageSyncDateTracker = PageSyncDateTracker(5L)
+    private val matchPageFetchDateTracker = PageFetchDateTracker(5L)
 
     @ExperimentalCoroutinesApi
     override val newMatchFlow: Flow<NewMatch> = callbackFlow {
@@ -65,7 +65,7 @@ class MatchRepositoryImpl(
     override suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            if (matchPageSyncDateTracker.shouldSyncPage(getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter))) {
+            if (matchPageFetchDateTracker.shouldFetchPage(getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter))) {
                 listMatches(loadSize, startPosition, matchPageFilter)
             }
 
@@ -89,10 +89,10 @@ class MatchRepositoryImpl(
     private fun listMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
             val matchPageSyncDateTrackerKey = getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter)
-            matchPageSyncDateTracker.updateSyncDate(matchPageSyncDateTrackerKey, OffsetDateTime.now())
+            matchPageFetchDateTracker.updateFetchDate(matchPageSyncDateTrackerKey, OffsetDateTime.now())
             val response = matchRDS.listMatches(loadSize, startPosition, matchPageFilter)
             if (response.isError()) {
-                matchPageSyncDateTracker.updateSyncDate(matchPageSyncDateTrackerKey, null)
+                matchPageFetchDateTracker.updateFetchDate(matchPageSyncDateTrackerKey, null)
                 return@launch
             }
             balanceDatabase.runInTransaction {

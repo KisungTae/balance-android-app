@@ -70,8 +70,6 @@ interface BalanceAPI {
     @POST("chat/message/received")
     suspend fun receivedChatMessage(@Body receivedChatMessageBody: ReceivedChatMessageBody): Response<EmptyResponse>
 
-
-
     @POST("chat/message/sync")
     suspend fun syncChatMessages(@Body syncChatMessagesBody: SyncChatMessagesBody)
 

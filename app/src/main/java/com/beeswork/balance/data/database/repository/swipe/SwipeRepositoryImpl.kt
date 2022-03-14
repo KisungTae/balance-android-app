@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.database.repository.swipe
 
 import com.beeswork.balance.data.database.BalanceDatabase
-import com.beeswork.balance.data.database.common.PageSyncDateTracker
+import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.common.InvalidationListener
 import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.SwipeDAO
@@ -35,7 +35,7 @@ class SwipeRepositoryImpl(
 ) : SwipeRepository {
 
     private lateinit var newSwipeInvalidationListener: InvalidationListener<Swipe>
-    private val swipePageSyncDateTracker = PageSyncDateTracker(5L)
+    private val swipePageFetchDateTracker = PageFetchDateTracker(5L)
 
     @ExperimentalCoroutinesApi
     override val newSwipeFlow: Flow<Swipe> = callbackFlow {
@@ -64,10 +64,10 @@ class SwipeRepositoryImpl(
 
     private fun listSwipes(loadSize: Int, startPosition: Int) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-            swipePageSyncDateTracker.updateSyncDate(startPosition, OffsetDateTime.now())
+            swipePageFetchDateTracker.updateFetchDate(startPosition, OffsetDateTime.now())
             val response = swipeRDS.listSwipes(loadSize, startPosition)
             if (response.isError()) {
-                swipePageSyncDateTracker.updateSyncDate(startPosition, null)
+                swipePageFetchDateTracker.updateFetchDate(startPosition, null)
                 return@launch
             }
             balanceDatabase.runInTransaction {
@@ -134,7 +134,7 @@ class SwipeRepositoryImpl(
 
     override suspend fun loadSwipes(loadSize: Int, startPosition: Int): List<Swipe> {
         return withContext(ioDispatcher) {
-            if (swipePageSyncDateTracker.shouldSyncPage(startPosition)) {
+            if (swipePageFetchDateTracker.shouldFetchPage(startPosition)) {
                 listSwipes(loadSize, startPosition)
             }
             return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)

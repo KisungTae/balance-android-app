@@ -2,7 +2,7 @@ package com.beeswork.balance.data.database.repository.chat
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.InvalidationListener
-import com.beeswork.balance.data.database.common.PageSyncDateTracker
+import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
@@ -16,11 +16,9 @@ import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.ChatMessageNotFoundException
 import com.beeswork.balance.internal.exception.ChatNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.internal.util.safeLet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
@@ -44,7 +42,7 @@ class ChatRepositoryImpl(
     override val sendChatMessageFlow: Flow<ChatMessageDTO> = sendChatMessageChanel.consumeAsFlow()
 
     private lateinit var chatPageInvalidationListener: InvalidationListener<ChatMessage?>
-    private val chatPageSyncDateTracker = PageSyncDateTracker(30L)
+    private val chatPageFetchDateTracker = PageFetchDateTracker(30L)
 
     @ExperimentalCoroutinesApi
     override val chatPageInvalidationFlow: Flow<ChatMessage?> = callbackFlow {
@@ -82,25 +80,25 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val match = matchDAO.getBy(chatId) ?: return@withContext Resource.error(ChatNotFoundException())
             val response = getResponse { chatRDS.fetchChatMessages(chatId, lastChatMessageId, loadSize) }
-            if (response.data?.size ?: 0 > 0) {
-                saveChatMessages(match, response.data)
-                if (lastChatMessageId == null) {
-                    updateLastChatMessageOnMatch(match)
+            if (response.data != null && response.data.isNotEmpty()) {
+                val isUpdated = saveChatMessages(match, response.data)
+                if (lastChatMessageId == null && isUpdated) {
+                    updateLastChatMessageOnMatch(chatId)
+                }
+                CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+                    syncChatMessages(chatId, response.data)
                 }
             }
             return@withContext response
         }
     }
 
-    private fun saveChatMessages(match: Match, chatMessageDTOs: List<ChatMessageDTO>?) {
-        val chatMessageIds = arrayListOf<Long>()
+    private fun saveChatMessages(match: Match, chatMessageDTOs: List<ChatMessageDTO>?): Boolean {
         var isUpdated = false
-
         balanceDatabase.runInTransaction {
             chatMessageDTOs?.forEach { chatMessageDTO ->
-                val chatMessage = doSaveChatMessage(match, chatMessageDTO)
+                val chatMessage = insertChatMessage(match, chatMessageDTO)
                 if (chatMessage != null) {
-                    chatMessageIds.add(chatMessage.id)
                     isUpdated = true
                 }
             }
@@ -108,9 +106,10 @@ class ChatRepositoryImpl(
                 chatPageInvalidationListener.onInvalidate(null)
             }
         }
+        return isUpdated
     }
 
-    private fun doSaveChatMessage(match: Match, chatMessageDTO: ChatMessageDTO): ChatMessage? {
+    private fun insertChatMessage(match: Match, chatMessageDTO: ChatMessageDTO): ChatMessage? {
         if (chatMessageDTO.id == null || chatMessageDTO.senderId == null) {
             return null
         }
@@ -136,43 +135,57 @@ class ChatRepositoryImpl(
 
     override suspend fun loadChatMessages(chatId: UUID, startPosition: Int, loadSize: Int): List<ChatMessage> {
         return withContext(ioDispatcher) {
-            syncChatMessages(chatId, startPosition, loadSize)
+            if (chatPageFetchDateTracker.shouldFetchPage(startPosition)) {
+                listChatMessages(chatId, startPosition, loadSize)
+            }
             return@withContext chatMessageDAO.getAllPagedBy(chatId, startPosition, loadSize)
         }
     }
 
-    private fun syncChatMessages(chatId: UUID, startPosition: Int, loadSize: Int) {
+    private fun listChatMessages(chatId: UUID, startPosition: Int, loadSize: Int) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-            chatPageSyncDateTracker.updateSyncDate(startPosition, OffsetDateTime.now())
+            chatPageFetchDateTracker.updateFetchDate(startPosition, OffsetDateTime.now())
             val match = matchDAO.getBy(chatId) ?: return@launch
-            val response = chatRDS.listChatMessages(chatId, preferenceProvider.getAppToken(), startPosition, loadSize)
+            val response = getResponse { chatRDS.listChatMessages(chatId, preferenceProvider.getAppToken(), startPosition, loadSize) }
             if (response.isError()) {
-                chatPageSyncDateTracker.updateSyncDate(startPosition, null)
+                chatPageFetchDateTracker.updateFetchDate(startPosition, null)
             }
-            if (response.data?.size ?: 0 > 0) {
-                saveChatMessages(match, response.data)
-                if (startPosition == 0) {
-                    updateLastChatMessageOnMatch(match)
+            if (response.data != null && response.data.isNotEmpty()) {
+                val isUpdated = saveChatMessages(match, response.data)
+                if (startPosition == 0 && isUpdated) {
+                    updateLastChatMessageOnMatch(chatId)
+                }
+                syncChatMessages(chatId, response.data)
+            }
+        }
+    }
+
+    private suspend fun syncChatMessages(chatId: UUID, chatMessageDTOs: List<ChatMessageDTO>) {
+        val chatMessageIds = arrayListOf<Long>()
+        chatMessageDTOs.forEach { chatMessageDTO ->
+            if (chatMessageDTO.id != null) {
+                chatMessageIds.add(chatMessageDTO.id)
+            }
+        }
+        chatRDS.syncChatMessages(chatId, preferenceProvider.getAppToken(), chatMessageIds)
+    }
+
+    private fun updateLastChatMessageOnMatch(chatId: UUID) {
+        balanceDatabase.runInTransaction {
+            val match = matchDAO.getBy(chatId)
+            if (match != null) {
+                val lastChatMessage = chatMessageDAO.getLastChatMessageBy(match.chatId)
+                if (lastChatMessage != null && lastChatMessage.id > match.lastChatMessageId) {
+                    matchDAO.updateLastChatMessageBy(match.chatId, lastChatMessage.id, lastChatMessage.body)
                 }
             }
         }
     }
 
-    private fun updateLastChatMessageOnMatch(match: Match) {
-        balanceDatabase.runInTransaction {
-            val lastChatMessage = chatMessageDAO.getLastChatMessageBy(match.chatId)
-            if (lastChatMessage != null && lastChatMessage.id > match.lastChatMessageId) {
-                matchDAO.updateLastChatMessageBy(match.chatId, lastChatMessage.id, lastChatMessage.body)
-            }
-        }
-    }
 
-    private fun updateLastChatMessageOnMatch(chatId: UUID) {
-        val match = matchDAO.getBy(chatId)
-        if (match != null) {
-            updateLastChatMessageOnMatch(match)
-        }
-    }
+
+
+
 
 
     override suspend fun deleteChatMessages() {
@@ -289,13 +302,13 @@ class ChatRepositoryImpl(
         return chatIds
     }
 
-    private fun syncChatMessages(
+    private fun listChatMessages(
         sentChatMessageIds: List<UUID>,
         receivedChatMessageIds: List<UUID>
     ) {
         if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-            chatRDS.syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
+//            chatRDS.syncChatMessages(, sentChatMessageIds)
         }
     }
 
