@@ -35,7 +35,7 @@ class SwipeRepositoryImpl(
 ) : SwipeRepository {
 
     private lateinit var newSwipeInvalidationListener: InvalidationListener<Swipe>
-    private val swipePageSyncDateTracker = PageSyncDateTracker()
+    private val swipePageSyncDateTracker = PageSyncDateTracker(5L)
 
     @ExperimentalCoroutinesApi
     override val newSwipeFlow: Flow<Swipe> = callbackFlow {
@@ -62,7 +62,7 @@ class SwipeRepositoryImpl(
         }
     }
 
-    private fun syncSwipes(loadSize: Int, startPosition: Int) {
+    private fun listSwipes(loadSize: Int, startPosition: Int) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
             swipePageSyncDateTracker.updateSyncDate(startPosition, OffsetDateTime.now())
             val response = swipeRDS.listSwipes(loadSize, startPosition)
@@ -135,7 +135,7 @@ class SwipeRepositoryImpl(
     override suspend fun loadSwipes(loadSize: Int, startPosition: Int): List<Swipe> {
         return withContext(ioDispatcher) {
             if (swipePageSyncDateTracker.shouldSyncPage(startPosition)) {
-                syncSwipes(loadSize, startPosition)
+                listSwipes(loadSize, startPosition)
             }
             return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)
         }

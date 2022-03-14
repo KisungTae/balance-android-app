@@ -54,14 +54,23 @@ interface BalanceAPI {
         @Query(value = "loadSize") loadSize: Int
     ): Response<List<ChatMessageDTO>>
 
+    @GET("chat/message/list")
+    suspend fun listChatMessages(
+        @Query(value = "chatId") chatId: UUID,
+        @Query(value = "appToken") appToken: UUID,
+        @Query(value = "startPosition") startPosition: Int,
+        @Query(value = "loadSize") loadSize: Int
+    ): Response<List<ChatMessageDTO>>
+
+
+
     @POST("chat/message/fetched")
     suspend fun fetchedChatMessage(@Body fetchedChatMessageBody: FetchedChatMessageBody): Response<EmptyResponse>
 
     @POST("chat/message/received")
     suspend fun receivedChatMessage(@Body receivedChatMessageBody: ReceivedChatMessageBody): Response<EmptyResponse>
 
-    @GET("chat/message/list")
-    suspend fun listChatMessages(): Response<ListChatMessagesDTO>
+
 
     @POST("chat/message/sync")
     suspend fun syncChatMessages(@Body syncChatMessagesBody: SyncChatMessagesBody)

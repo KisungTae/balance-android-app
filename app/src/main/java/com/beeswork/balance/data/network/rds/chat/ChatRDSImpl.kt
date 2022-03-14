@@ -16,17 +16,19 @@ class ChatRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ChatRDS {
 
-    override suspend fun fetchChatMessages(loadSize: Int, chatId: UUID, lastChatMessageId: Long?): Resource<List<ChatMessageDTO>> {
+    override suspend fun fetchChatMessages(chatId: UUID, lastChatMessageId: Long?, loadSize: Int): Resource<List<ChatMessageDTO>> {
         return getResult { balanceAPI.fetchChatMessages(chatId, lastChatMessageId, loadSize) }
+    }
+
+    override suspend fun listChatMessages(chatId: UUID, appToken: UUID, startPosition: Int, loadSize: Int): Resource<List<ChatMessageDTO>> {
+        return getResult { balanceAPI.listChatMessages(chatId, appToken, startPosition, loadSize) }
     }
 
     override suspend fun syncChatMessages(sentChatMessageIds: List<UUID>, receivedChatMessageIds: List<UUID>) {
         balanceAPI.syncChatMessages(SyncChatMessagesBody(sentChatMessageIds, receivedChatMessageIds))
     }
 
-    override suspend fun listChatMessages(): Resource<ListChatMessagesDTO> {
-        return getResult { balanceAPI.listChatMessages() }
-    }
+
 
     override suspend fun fetchedChatMessage(chatMessageId: UUID): Resource<EmptyResponse> {
         return getResult { balanceAPI.fetchedChatMessage(FetchedChatMessageBody(chatMessageId)) }

@@ -42,6 +42,17 @@ class PreferenceProviderImpl(
         return Converter.toUUID(preferences.getString(ACCOUNT_ID, null))
     }
 
+    override fun getAppToken(): UUID {
+        val appToken = Converter.toUUID(preferences.getString(APP_TOKEN, null))
+        if (appToken == null) {
+            val newAppToken = UUID.randomUUID()
+            editor.putString(APP_TOKEN, newAppToken.toString())
+            editor.apply()
+            return newAppToken
+        }
+        return appToken
+    }
+
     override fun delete() {
         editor.clear().commit()
     }
@@ -50,5 +61,6 @@ class PreferenceProviderImpl(
         const val ACCESS_TOKEN = "accessToken"
         const val REFRESH_TOKEN = "refreshToken"
         const val ACCOUNT_ID = "accountId"
+        const val APP_TOKEN = "appToken"
     }
 }

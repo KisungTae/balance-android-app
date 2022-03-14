@@ -22,29 +22,44 @@ interface ChatMessageDAO {
     fun updateStatusBy(tag: UUID?, status: ChatMessageStatus)
 
     @Query("select * from chatMessage where chatId = :chatId order by id desc, sequence desc limit :loadSize offset :startPosition")
-    fun getAllPagedBy(loadSize: Int, startPosition: Int, chatId: UUID): List<ChatMessage>
+    fun getAllPagedBy(chatId: UUID, startPosition: Int, loadSize: Int): List<ChatMessage>
+
+    @Query("select * from chatMessage where chatId = :chatId and status in (:statuses) order by id desc limit 1")
+    fun getLastChatMessageBy(
+        chatId: UUID,
+        statuses: List<ChatMessageStatus> = listOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED)
+    ): ChatMessage?
+
+    @Query("select * from chatMessage where id = :id and chatId = :chatId")
+    fun getById(id: Long?, chatId: UUID): ChatMessage?
+
+
+
+
+
+
 
     @Query("select count(*) > 0 from chatMessage where tag = :tag")
     fun existsBy(tag: UUID?): Boolean
+
 
     @Query("update chatMessage set status = :status, createdAt = :createdAt, id = :id where tag = :tag")
     fun updateAsSentBy(tag: UUID?, id: Long, createdAt: OffsetDateTime?, status: ChatMessageStatus = ChatMessageStatus.SENT)
 
 
 
+    @Query("select count(*) > 0 from chatMessage where id = :id and chatId = :chatId and status = :status")
+    fun existsBy(id: Long, chatId: UUID, status: ChatMessageStatus = ChatMessageStatus.RECEIVED): Boolean
 
 
 
 
-    @Query("select * from chatMessage where id = :id")
-    fun getById(id: UUID?): ChatMessage?
 
-    @Query("select * from chatMessage where chatId = :chatId and sequence > :lastReadChatMessageKey and status in (:statuses) order by sequence desc limit 1")
-    fun getMostRecentAfter(
-        chatId: UUID,
-        lastReadChatMessageKey: Long,
-        statuses: List<ChatMessageStatus> = listOf(ChatMessageStatus.SENT, ChatMessageStatus.RECEIVED)
-    ): ChatMessage?
+
+
+
+
+
 
     @Query("select count(*) > 0 from chatMessage where chatId = :chatId and status = :status and `sequence` > :lastReadChatMessageKey limit 1")
     fun existAfter(

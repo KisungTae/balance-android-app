@@ -6,7 +6,6 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
-import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.*
@@ -30,7 +29,7 @@ class ChatMessageRemoteMediator(
                 }
             }
             val pageSize = state.config.pageSize
-            val response = chatRepository.fetchChatMessages(pageSize, chatId, loadKey)
+            val response = chatRepository.fetchChatMessages(chatId, loadKey, pageSize)
             if (response.isError()) {
                 val exception = response.exception ?: IOException()
                 return MediatorResult.Error(exception)

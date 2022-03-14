@@ -50,7 +50,7 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     private lateinit var newMatchInvalidationListener: InvalidationListener<NewMatch>
-    private val matchPageSyncDateTracker = PageSyncDateTracker()
+    private val matchPageSyncDateTracker = PageSyncDateTracker(5L)
 
     @ExperimentalCoroutinesApi
     override val newMatchFlow: Flow<NewMatch> = callbackFlow {
@@ -66,7 +66,7 @@ class MatchRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             if (matchPageSyncDateTracker.shouldSyncPage(getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter))) {
-                syncMatches(loadSize, startPosition, matchPageFilter)
+                listMatches(loadSize, startPosition, matchPageFilter)
             }
 
             when (matchPageFilter) {
@@ -86,7 +86,7 @@ class MatchRepositoryImpl(
         }
     }
 
-    private fun syncMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?) {
+    private fun listMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
             val matchPageSyncDateTrackerKey = getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter)
             matchPageSyncDateTracker.updateSyncDate(matchPageSyncDateTrackerKey, OffsetDateTime.now())
