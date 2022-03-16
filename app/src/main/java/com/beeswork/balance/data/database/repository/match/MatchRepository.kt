@@ -17,7 +17,7 @@ interface MatchRepository {
     val newMatchFlow: Flow<NewMatch>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match>
-    suspend fun fetchMatches(loadSize: Int, lastSwipedId: UUID?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
+    suspend fun fetchMatches(loadSize: Int, lastMatchId: Long?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
     suspend fun unmatch(chatId: UUID, swipedId: UUID): Resource<EmptyResponse>
     suspend fun reportMatch(
         chatId: UUID,
@@ -33,6 +33,7 @@ interface MatchRepository {
     suspend fun deleteMatches()
     suspend fun deleteMatchCount()
     suspend fun isUnmatched(chatId: UUID): Boolean
+    fun syncMatch(chatId: UUID)
 
     fun testFunction()
 }

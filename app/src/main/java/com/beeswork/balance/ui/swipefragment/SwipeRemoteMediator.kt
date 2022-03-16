@@ -8,7 +8,6 @@ import com.beeswork.balance.data.database.entity.swipe.Swipe
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.RuntimeException
 
 
 @ExperimentalPagingApi
@@ -25,7 +24,7 @@ class SwipeRemoteMediator(
                     return MediatorResult.Success(true)
                 }
                 LoadType.APPEND -> {
-                    state.lastItemOrNull()?.swiperId
+                    state.lastItemOrNull()?.id
                 }
             }
 

@@ -9,6 +9,7 @@ import com.beeswork.balance.data.network.request.common.ReportBody
 import com.beeswork.balance.data.network.request.login.LoginWithRefreshTokenBody
 import com.beeswork.balance.data.network.request.login.RefreshAccessTokenBody
 import com.beeswork.balance.data.network.request.login.SocialLoginBody
+import com.beeswork.balance.data.network.request.match.SyncMatchBody
 import com.beeswork.balance.data.network.request.match.UnmatchBody
 import com.beeswork.balance.data.network.request.profile.*
 import com.beeswork.balance.data.network.request.setting.SaveLocationBody
@@ -47,6 +48,9 @@ import java.util.*
 
 interface BalanceAPI {
 
+    @POST("match/sync")
+    suspend fun syncMatch(@Body syncMatchBody: SyncMatchBody): Response<EmptyResponse>
+
     @GET("chat/message/fetch")
     suspend fun fetchChatMessages(
         @Query(value = "chatId") chatId: UUID,
@@ -78,7 +82,7 @@ interface BalanceAPI {
     @GET("swipe/fetch")
     suspend fun fetchSwipes(
         @Query(value = "loadSize") loadSize: Int,
-        @Query(value = "lastSwiperId") lastSwiperId: UUID?
+        @Query(value = "lastSwipeId") lastSwiperId: Long?
     ): Response<ListSwipesDTO>
 
     @GET("swipe/list")
@@ -93,7 +97,7 @@ interface BalanceAPI {
     @GET("match/fetch")
     suspend fun fetchMatches(
         @Query(value = "loadSize") loadSize: Int,
-        @Query(value = "lastSwipedId") lastSwipedId: UUID?,
+        @Query(value = "lastMatchId") lastMatchId: Long?,
         @Query(value = "matchPageFilter") matchPageFilter: MatchPageFilter?
     ): Response<ListMatchesDTO>
 

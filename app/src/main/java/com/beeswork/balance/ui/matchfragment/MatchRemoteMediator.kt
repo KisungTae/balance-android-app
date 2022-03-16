@@ -7,10 +7,8 @@ import androidx.paging.RemoteMediator
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.constant.MatchPageFilter
-import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.RuntimeException
 
 @ExperimentalPagingApi
 class MatchRemoteMediator(
@@ -27,7 +25,7 @@ class MatchRemoteMediator(
                     return MediatorResult.Success(true)
                 }
                 LoadType.APPEND -> {
-                    state.lastItemOrNull()?.swipedId
+                    state.lastItemOrNull()?.id
                 }
             }
 

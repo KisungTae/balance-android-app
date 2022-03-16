@@ -19,23 +19,22 @@ class SendChatMessageUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SendChatMessageUseCase {
 
-    override suspend fun invoke(chatId: UUID, body: String): Resource<EmptyResponse> =
-        withContext(defaultDispatcher) {
-            try {
-                if (matchRepository.isUnmatched(chatId)) {
-                    return@withContext Resource.error(MatchUnmatchedException())
-                }
-                val bodySize = body.toByteArray().size
-                if (bodySize > MAX_CHAT_MESSAGE_SIZE) {
-                    return@withContext Resource.error(ChatMessageSizeLimitExceededException())
-                } else if (bodySize <= 0) {
-                    return@withContext Resource.error(ChatMessageEmptyException())
-                }
-                return@withContext chatRepository.sendChatMessage(chatId, body)
-            } catch (e: IOException) {
-                return@withContext Resource.error(e)
+    override suspend fun invoke(chatId: UUID, body: String): Resource<EmptyResponse> = withContext(defaultDispatcher) {
+        try {
+            if (matchRepository.isUnmatched(chatId)) {
+                return@withContext Resource.error(MatchUnmatchedException())
             }
+            val bodySize = body.toByteArray().size
+            if (bodySize > MAX_CHAT_MESSAGE_SIZE) {
+                return@withContext Resource.error(ChatMessageSizeLimitExceededException())
+            } else if (bodySize <= 0) {
+                return@withContext Resource.error(ChatMessageEmptyException())
+            }
+            return@withContext chatRepository.sendChatMessage(chatId, body)
+        } catch (e: IOException) {
+            return@withContext Resource.error(e)
         }
+    }
 
     companion object {
         private const val MAX_CHAT_MESSAGE_SIZE = 500

@@ -13,6 +13,7 @@ import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCase
 import com.beeswork.balance.domain.uistate.chat.SendChatMessageUIState
 import com.beeswork.balance.domain.usecase.chat.GetChatMessagePagingDataUseCase
 import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
+import com.beeswork.balance.domain.usecase.chat.SyncMatchUseCase
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
@@ -31,6 +32,7 @@ class ChatViewModel(
     private val sendChatMessageUseCase: SendChatMessageUseCase,
     private val resendChatMessageUseCase: ResendChatMessageUseCase,
     private val getChatMessagePagingDataUseCase: GetChatMessagePagingDataUseCase,
+    private val syncMatchUseCase: SyncMatchUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -127,6 +129,14 @@ class ChatViewModel(
     fun getChatMessagePagingData(): LiveData<PagingData<ChatMessageItemUIState>> {
         return getChatMessagePagingDataUseCase.invoke(chatId, viewModelScope)
     }
+
+    fun syncMatch() {
+        viewModelScope.launch {
+            syncMatchUseCase.invoke(chatId)
+        }
+    }
+
+
 
 
     fun deleteChatMessage(key: Long) {

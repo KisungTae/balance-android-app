@@ -78,26 +78,23 @@ class ChatRepositoryImpl(
 
     override suspend fun fetchChatMessages(chatId: UUID, lastChatMessageId: Long?, loadSize: Int): Resource<List<ChatMessageDTO>> {
         return withContext(ioDispatcher) {
-            val match = matchDAO.getBy(chatId) ?: return@withContext Resource.error(ChatNotFoundException())
             val response = getResponse { chatRDS.fetchChatMessages(chatId, lastChatMessageId, loadSize) }
             if (response.data != null && response.data.isNotEmpty()) {
-                val isUpdated = saveChatMessages(match, response.data)
+                val isUpdated = saveChatMessages(response.data)
                 if (lastChatMessageId == null && isUpdated) {
                     updateLastChatMessageOnMatch(chatId)
                 }
-                CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-                    syncChatMessages(chatId, response.data)
-                }
+                syncChatMessages(chatId, response.data)
             }
             return@withContext response
         }
     }
 
-    private fun saveChatMessages(match: Match, chatMessageDTOs: List<ChatMessageDTO>?): Boolean {
+    private fun saveChatMessages(chatMessageDTOs: List<ChatMessageDTO>?): Boolean {
         var isUpdated = false
         balanceDatabase.runInTransaction {
             chatMessageDTOs?.forEach { chatMessageDTO ->
-                val chatMessage = insertChatMessage(match, chatMessageDTO)
+                val chatMessage = insertChatMessage(preferenceProvider.getAccountId(), chatMessageDTO)
                 if (chatMessage != null) {
                     isUpdated = true
                 }
@@ -109,19 +106,19 @@ class ChatRepositoryImpl(
         return isUpdated
     }
 
-    private fun insertChatMessage(match: Match, chatMessageDTO: ChatMessageDTO): ChatMessage? {
+    private fun insertChatMessage(senderId: UUID?, chatMessageDTO: ChatMessageDTO): ChatMessage? {
         if (chatMessageDTO.id == null || chatMessageDTO.senderId == null) {
             return null
         }
 
-        val chatMessage = if (chatMessageDTO.senderId == match.swiperId) {
+        val chatMessage = if (chatMessageDTO.senderId == senderId) {
             chatMessageDAO.getBy(chatMessageDTO.tag)
         } else {
             chatMessageDAO.getById(chatMessageDTO.id, chatMessageDTO.chatId)
         }
 
         if (chatMessage == null || !chatMessage.isEqualTo(chatMessageDTO)) {
-            val status = if (chatMessageDTO.senderId == match.swiperId) {
+            val status = if (chatMessageDTO.senderId == senderId) {
                 ChatMessageStatus.SENT
             } else {
                 ChatMessageStatus.RECEIVED
@@ -135,7 +132,7 @@ class ChatRepositoryImpl(
 
     override suspend fun loadChatMessages(chatId: UUID, startPosition: Int, loadSize: Int): List<ChatMessage> {
         return withContext(ioDispatcher) {
-            if (chatPageFetchDateTracker.shouldFetchPage(startPosition)) {
+            if (chatPageFetchDateTracker.shouldFetchPage(getChatPageFetchDateTrackerKey(chatId, startPosition))) {
                 listChatMessages(chatId, startPosition, loadSize)
             }
             return@withContext chatMessageDAO.getAllPagedBy(chatId, startPosition, loadSize)
@@ -144,14 +141,13 @@ class ChatRepositoryImpl(
 
     private fun listChatMessages(chatId: UUID, startPosition: Int, loadSize: Int) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-            chatPageFetchDateTracker.updateFetchDate(startPosition, OffsetDateTime.now())
-            val match = matchDAO.getBy(chatId) ?: return@launch
+            chatPageFetchDateTracker.updateFetchDate(getChatPageFetchDateTrackerKey(chatId, startPosition), OffsetDateTime.now())
             val response = getResponse { chatRDS.listChatMessages(chatId, preferenceProvider.getAppToken(), startPosition, loadSize) }
             if (response.isError()) {
-                chatPageFetchDateTracker.updateFetchDate(startPosition, null)
+                chatPageFetchDateTracker.updateFetchDate(getChatPageFetchDateTrackerKey(chatId, startPosition), null)
             }
             if (response.data != null && response.data.isNotEmpty()) {
-                val isUpdated = saveChatMessages(match, response.data)
+                val isUpdated = saveChatMessages(response.data)
                 if (startPosition == 0 && isUpdated) {
                     updateLastChatMessageOnMatch(chatId)
                 }
@@ -160,14 +156,16 @@ class ChatRepositoryImpl(
         }
     }
 
-    private suspend fun syncChatMessages(chatId: UUID, chatMessageDTOs: List<ChatMessageDTO>) {
-        val chatMessageIds = arrayListOf<Long>()
-        chatMessageDTOs.forEach { chatMessageDTO ->
-            if (chatMessageDTO.id != null) {
-                chatMessageIds.add(chatMessageDTO.id)
+    private fun syncChatMessages(chatId: UUID, chatMessageDTOs: List<ChatMessageDTO>) {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+            val chatMessageIds = arrayListOf<Long>()
+            chatMessageDTOs.forEach { chatMessageDTO ->
+                if (chatMessageDTO.id != null) {
+                    chatMessageIds.add(chatMessageDTO.id)
+                }
             }
+            chatRDS.syncChatMessages(chatId, preferenceProvider.getAppToken(), chatMessageIds)
         }
-        chatRDS.syncChatMessages(chatId, preferenceProvider.getAppToken(), chatMessageIds)
     }
 
     private fun updateLastChatMessageOnMatch(chatId: UUID) {
@@ -181,6 +179,14 @@ class ChatRepositoryImpl(
             }
         }
     }
+
+    private fun getChatPageFetchDateTrackerKey(chatId: UUID, startPosition: Int): String {
+        return "$chatId$startPosition"
+    }
+
+
+
+
 
 
 

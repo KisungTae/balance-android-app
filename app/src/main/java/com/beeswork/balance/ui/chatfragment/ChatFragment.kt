@@ -93,6 +93,7 @@ class ChatFragment : BaseFragment(),
         setupEmoticonBtnListener()
         observeReportMatchLiveData()
         observeUnmatchLiveData()
+        viewModel.syncMatch()
     }
 
     private fun setupToolBar() {
@@ -169,6 +170,7 @@ class ChatFragment : BaseFragment(),
             } else {
                 observeChatMessagePagingData()
             }
+            viewModel.syncMatch()
         }
     }
 
@@ -177,7 +179,7 @@ class ChatFragment : BaseFragment(),
         val snackBar = SnackBarHelper.make(binding.clChatSnackBarPlaceHolder, Gravity.BOTTOM, 0, 0, snackBarBinding.root)
         snackBarBinding.tvSnackBarNewChatMessage.text = body
         snackBarBinding.llSnackBarChatMessage.setOnClickListener {
-            binding.rvChat.scrollToPosition(0)
+            observeChatMessagePagingData()
             snackBar.dismiss()
         }
         snackBar.show()

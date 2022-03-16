@@ -11,6 +11,7 @@ import java.util.*
 interface MatchRDS {
     suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO>
     suspend fun unmatch(swipedId: UUID): Resource<EmptyResponse>
-    suspend fun fetchMatches(loadSize: Int, lastSwipedId: UUID?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
+    suspend fun fetchMatches(loadSize: Int, lastMatchId: Long?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
     suspend fun listMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
+    suspend fun syncMatch(chatId: UUID, lastReadReceivedChatMessageId: Long): Resource<EmptyResponse>
 }

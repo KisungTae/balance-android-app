@@ -167,7 +167,14 @@ class BalanceApplication : Application(), KodeinAware {
         // UseCase
         bind<SendChatMessageUseCase>() with singleton { SendChatMessageUseCaseImpl(instance(), instance(), Dispatchers.Default) }
         bind<ResendChatMessageUseCase>() with singleton { ResendChatMessageUseCaseImpl(instance(), instance(), Dispatchers.Default) }
-        bind<GetChatMessagePagingDataUseCase>() with singleton { GetChatMessagePagingDataUseCaseImpl(instance(), instance(), Dispatchers.Default) }
+        bind<GetChatMessagePagingDataUseCase>() with singleton {
+            GetChatMessagePagingDataUseCaseImpl(
+                instance(),
+                instance(),
+                Dispatchers.Default
+            )
+        }
+        bind<SyncMatchUseCase>() with singleton { SyncMatchUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -225,6 +232,7 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
                 Dispatchers.IO
             )
         }
@@ -241,7 +249,18 @@ class BalanceApplication : Application(), KodeinAware {
         // Factory
         bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from factory { chatId: UUID ->
-            ChatViewModelFactory(chatId, instance(), instance(), instance(), instance(), instance(), instance(), instance(), Dispatchers.Default)
+            ChatViewModelFactory(
+                chatId,
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.Default
+            )
         }
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }
@@ -294,7 +313,6 @@ class BalanceApplication : Application(), KodeinAware {
 
         // FusedLocationProvider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
-
 
 
     }

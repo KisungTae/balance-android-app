@@ -47,9 +47,9 @@ class SwipeRepositoryImpl(
         awaitClose { }
     }
 
-    override suspend fun fetchSwipes(loadSize: Int, lastSwiperId: UUID?): Resource<ListSwipesDTO> {
+    override suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO> {
         return withContext(ioDispatcher) {
-            val response = swipeRDS.fetchSwipes(loadSize, lastSwiperId)
+            val response = swipeRDS.fetchSwipes(loadSize, lastSwipeId)
             if (response.isError()) {
                 return@withContext Resource.error(response.exception)
             }

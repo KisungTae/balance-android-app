@@ -22,7 +22,9 @@ data class Match(
     val swiperId: UUID,
     val swipedId: UUID,
     val unmatched: Boolean,
-    val lastReadChatMessageId: Long,
+    val lastReceivedChatMessageId: Long,
+    val lastReadReceivedChatMessageId: Long,
+    val lastReadByChatMessageId: Long,
     val lastChatMessageId: Long,
     val lastChatMessageBody: String?,
     val createdAt: OffsetDateTime,
@@ -36,7 +38,9 @@ data class Match(
             && this.swiperId == matchDTO.swiperId
             && this.swipedId == matchDTO.swipedId
             && this.unmatched == matchDTO.unmatched
-            && this.lastReadChatMessageId == matchDTO.lastReadChatMessageId
+            && this.lastReceivedChatMessageId == matchDTO.lastReceivedChatMessageId
+            && this.lastReadReceivedChatMessageId == matchDTO.lastReadReceivedChatMessageId
+            && this.lastReadByChatMessageId == matchDTO.lastReadByChatMessageId
             && this.lastChatMessageId == matchDTO.lastChatMessageId
             && this.lastChatMessageBody == matchDTO.lastChatMessageBody
             && this.createdAt == matchDTO.createdAt

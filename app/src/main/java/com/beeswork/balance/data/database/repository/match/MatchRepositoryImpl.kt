@@ -10,6 +10,8 @@ import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.entity.match.MatchCount
 import com.beeswork.balance.data.database.entity.swipe.Click
 import com.beeswork.balance.data.database.entity.swipe.SwipeCount
+import com.beeswork.balance.data.database.repository.BaseRepository
+import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
@@ -36,6 +38,7 @@ import java.util.concurrent.Callable
 class MatchRepositoryImpl(
     private val matchRDS: MatchRDS,
     private val reportRDS: ReportRDS,
+    loginRDS: LoginRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val swipeDAO: SwipeDAO,
@@ -45,9 +48,9 @@ class MatchRepositoryImpl(
     private val photoDAO: PhotoDAO,
     private val matchMapper: MatchMapper,
     private val balanceDatabase: BalanceDatabase,
-    private val preferenceProvider: PreferenceProvider,
+    preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
-) : MatchRepository {
+) : BaseRepository(loginRDS, preferenceProvider), MatchRepository {
 
     private lateinit var newMatchInvalidationListener: InvalidationListener<NewMatch>
     private val matchPageFetchDateTracker = PageFetchDateTracker(5L)
@@ -65,7 +68,7 @@ class MatchRepositoryImpl(
     override suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            if (matchPageFetchDateTracker.shouldFetchPage(getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter))) {
+            if (matchPageFetchDateTracker.shouldFetchPage(getMatchPageFetchDateTrackerKey(startPosition, matchPageFilter))) {
                 listMatches(loadSize, startPosition, matchPageFilter)
             }
 
@@ -88,7 +91,7 @@ class MatchRepositoryImpl(
 
     private fun listMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-            val matchPageSyncDateTrackerKey = getMatchPageSyncDateTrackerKey(startPosition, matchPageFilter)
+            val matchPageSyncDateTrackerKey = getMatchPageFetchDateTrackerKey(startPosition, matchPageFilter)
             matchPageFetchDateTracker.updateFetchDate(matchPageSyncDateTrackerKey, OffsetDateTime.now())
             val response = matchRDS.listMatches(loadSize, startPosition, matchPageFilter)
             if (response.isError()) {
@@ -103,9 +106,9 @@ class MatchRepositoryImpl(
         }
     }
 
-    override suspend fun fetchMatches(loadSize: Int, lastSwipedId: UUID?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO> {
+    override suspend fun fetchMatches(loadSize: Int, lastMatchId: Long?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO> {
         return withContext(ioDispatcher) {
-            val response = matchRDS.fetchMatches(loadSize, lastSwipedId, matchPageFilter)
+            val response = matchRDS.fetchMatches(loadSize, lastMatchId, matchPageFilter)
             if (response.isError()) {
                 return@withContext response
             }
@@ -234,7 +237,7 @@ class MatchRepositoryImpl(
         }
     }
 
-    private fun getMatchPageSyncDateTrackerKey(startPosition: Int, matchPageFilter: MatchPageFilter?): String {
+    private fun getMatchPageFetchDateTrackerKey(startPosition: Int, matchPageFilter: MatchPageFilter?): String {
         return matchPageFilter?.toString() ?: "" + startPosition
     }
 
@@ -295,6 +298,28 @@ class MatchRepositoryImpl(
     override suspend fun isUnmatched(chatId: UUID): Boolean {
         return withContext(ioDispatcher) {
             return@withContext matchDAO.isUnmatchedBy(chatId) ?: true
+        }
+    }
+
+    override fun syncMatch(chatId: UUID) {
+        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+            val lastReceivedChatMessageId = chatMessageDAO.getLastReceivedChatMessageId(chatId) ?: return@launch
+            val lastReadReceivedChatMessageId = matchDAO.getLastReadReceivedChatMessageIdBy(chatId) ?: 0
+
+            if (lastReadReceivedChatMessageId >= lastReceivedChatMessageId) {
+                return@launch
+            }
+            val response = getResponse { matchRDS.syncMatch(chatId, lastReceivedChatMessageId) }
+            if (!response.isSuccess()) {
+                return@launch
+            }
+
+            balanceDatabase.runInTransaction {
+                val currentLastReadReceivedChatMessageId = matchDAO.getLastReadReceivedChatMessageIdBy(chatId) ?: 0
+                if (currentLastReadReceivedChatMessageId < lastReceivedChatMessageId) {
+                    matchDAO.updateLastReadReceivedChatMessageIdBy(chatId, lastReceivedChatMessageId)
+                }
+            }
         }
     }
 

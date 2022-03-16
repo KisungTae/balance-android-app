@@ -33,6 +33,10 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where id = :id and chatId = :chatId")
     fun getById(id: Long?, chatId: UUID): ChatMessage?
 
+    @Query("select id from chatMessage where chatId = :chatId and status = :status order by id desc limit 1")
+    fun getLastReceivedChatMessageId(chatId: UUID, status: ChatMessageStatus = ChatMessageStatus.RECEIVED): Long?
+
+
 
 
 

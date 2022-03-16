@@ -29,7 +29,7 @@ interface MatchDAO {
     @Query("select * from `match` where swiperId = :swiperId and lastChatMessageId > 0 and unmatched = 0 and swipedDeleted = 0  order by id desc limit :loadSize offset :startPosition")
     fun getChatsPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
-    @Query("select * from `match` where swiperId = :swiperId and lastReadChatMessageId < lastChatMessageId and unmatched = 0 and swipedDeleted = 0 order by id desc limit :loadSize offset :startPosition")
+    @Query("select * from `match` where swiperId = :swiperId and lastReadReceivedChatMessageId < lastReceivedChatMessageId and unmatched = 0 and swipedDeleted = 0 order by id desc limit :loadSize offset :startPosition")
     fun getChatsWithMessagesPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Match>
 
     @Query("select * from `match` where swiperId = :swiperId order by id desc limit :loadSize offset :startPosition")
@@ -52,5 +52,11 @@ interface MatchDAO {
 
     @Query("update `match` set lastChatMessageId = :lastChatMessageId, lastChatMessageBody = :lastChatMessageBody where chatId = :chatId")
     fun updateLastChatMessageBy(chatId: UUID, lastChatMessageId: Long, lastChatMessageBody: String)
+
+    @Query("select lastReadReceivedChatMessageId from `match` where chatId = :chatId")
+    fun getLastReadReceivedChatMessageIdBy(chatId: UUID): Long?
+
+    @Query("update `match` set lastReadReceivedChatMessageId = :lastReadReceivedChatMessageId where chatId = :chatId")
+    fun updateLastReadReceivedChatMessageIdBy(chatId: UUID, lastReadReceivedChatMessageId: Long)
 
 }
