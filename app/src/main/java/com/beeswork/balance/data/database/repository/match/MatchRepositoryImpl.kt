@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.BalanceDatabase
-import com.beeswork.balance.data.database.common.InvalidationListener
+import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.*
@@ -52,13 +52,13 @@ class MatchRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : BaseRepository(loginRDS, preferenceProvider), MatchRepository {
 
-    private lateinit var newMatchInvalidationListener: InvalidationListener<NewMatch>
+    private lateinit var newMatchCallBackFlowListener: CallBackFlowListener<NewMatch>
     private val matchPageFetchDateTracker = PageFetchDateTracker(5L)
 
     @ExperimentalCoroutinesApi
     override val newMatchFlow: Flow<NewMatch> = callbackFlow {
-        newMatchInvalidationListener = object : InvalidationListener<NewMatch> {
-            override fun onInvalidate(data: NewMatch) {
+        newMatchCallBackFlowListener = object : CallBackFlowListener<NewMatch> {
+            override fun onInvoke(data: NewMatch) {
                 offer(data)
             }
         }
@@ -212,7 +212,7 @@ class MatchRepositoryImpl(
             val match = queryResult.data
             if (queryResult.isInsert() && match != null && match.swiperId == accountId) {
                 val newMatch = NewMatch(accountId, photoDAO.getProfilePhotoBy(accountId), match.swipedId, match.swipedProfilePhotoKey)
-                newMatchInvalidationListener.onInvalidate(newMatch)
+                newMatchCallBackFlowListener.onInvoke(newMatch)
             }
         }
     }
@@ -325,6 +325,6 @@ class MatchRepositoryImpl(
 
     override fun testFunction() {
         val newMatch = NewMatch(UUID.randomUUID(), "", UUID.randomUUID(), "")
-        newMatchInvalidationListener.onInvalidate(newMatch)
+        newMatchCallBackFlowListener.onInvoke(newMatch)
     }
 }

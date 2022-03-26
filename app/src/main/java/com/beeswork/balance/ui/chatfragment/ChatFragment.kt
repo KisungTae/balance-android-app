@@ -17,6 +17,7 @@ import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.internal.constant.*
+import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.util.*
 import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.common.BaseFragment
@@ -90,6 +91,7 @@ class ChatFragment : BaseFragment(),
         observeResendChatMessageUIStateLiveData()
 
 
+
         setupEmoticonBtnListener()
         observeReportMatchLiveData()
         observeUnmatchLiveData()
@@ -121,13 +123,13 @@ class ChatFragment : BaseFragment(),
     }
 
     private suspend fun observeMatchLiveData() {
-        viewModel.matchLiveData.await().observe(viewLifecycleOwner) { matchItemUIState ->
+        viewModel.matchUIStateLiveData.await().observe(viewLifecycleOwner) { matchItemUIState ->
             if (matchItemUIState == null || matchItemUIState.unmatched) {
                 setupAsUnmatched()
             } else {
                 binding.tvChatSwipedName.text = matchItemUIState.swipedName ?: getString(R.string.unknown_user_name)
                 if (matchItemUIState.swipedProfilePhotoKey != null) {
-                    setupSwipedProfilePhoto(matchItemUIState.swipedId, matchItemUIState.swipedProfilePhotoKey)
+//                    setupSwipedProfilePhoto(matchItemUIState.swipedId, matchItemUIState.swipedProfilePhotoKey)
                 }
             }
         }
@@ -157,7 +159,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private suspend fun observeChatPageInvalidationLiveData() {
-        viewModel.chatPageInvalidationLiveData.await().observe(viewLifecycleOwner) { chatPageInvalidationUIState ->
+        viewModel.chatPageInvalidationUIStateLiveData.await().observe(viewLifecycleOwner) { chatPageInvalidationUIState ->
             if (binding.rvChat.canScrollVertically(1)) {
                 if (chatPageInvalidationUIState?.scrollToBottom == true) {
                     observeChatMessagePagingData()
@@ -196,7 +198,8 @@ class ChatFragment : BaseFragment(),
                         chatMessagePagingDataAdapter.setProfilePhoto(profilePhotoBitmap)
                     }
                 }
-            } catch (e: Exception) { }
+            } catch (e: Exception) {
+            }
         }
     }
 
@@ -207,7 +210,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun observeSendChatMessageUIStateLiveData() {
-        viewModel.sendChatMessageUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
+        viewModel.sendChatMessageUIStateLiveData.observe(viewLifecycleOwner) { uiState ->
             if (uiState.clearChatMessageInput) {
                 binding.etChatMessageBody.setText("")
             }
@@ -218,7 +221,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun observeResendChatMessageUIStateLiveData() {
-        viewModel.resendChatMessageUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
+        viewModel.resendChatMessageUIStateLiveData.observe(viewLifecycleOwner) { uiState ->
             if (uiState.showError) {
                 showSendChatMessageErrorDialog(uiState.exception)
             }
@@ -228,7 +231,12 @@ class ChatFragment : BaseFragment(),
     private fun showSendChatMessageErrorDialog(exception: Throwable?) {
         val title = getString(R.string.error_title_send_chat_message)
         val message = MessageSource.getMessage(requireContext(), exception)
-        ErrorDialog.show(title, message, childFragmentManager)
+        if (exception is WebSocketDisconnectedException) {
+            val retryBtnTitle = resources.getString(R.string.title_connect_to_web_socket)
+            ErrorDialog.show(title, message, retryBtnTitle, RequestCode.CONNECT_TO_STOMP, this, childFragmentManager)
+        } else {
+            ErrorDialog.show(title, message, childFragmentManager)
+        }
     }
 
     override fun onResendChatMessage(position: Int) {
@@ -257,22 +265,6 @@ class ChatFragment : BaseFragment(),
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private fun observeUnmatchLiveData() {
@@ -323,20 +315,6 @@ class ChatFragment : BaseFragment(),
         }
     }
 
-    private fun observeSendChatMessageMediatorLiveData() {
-        viewModel.sendChatMessageMediatorLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
-            if (resource.isError()) {
-                if (resource.isExceptionCodeEqualTo(ExceptionCode.MATCH_UNMATCHED_EXCEPTION)) {
-                    setupAsUnmatched()
-                }
-//                showSendChatMessageErrorDialog(resource.exception)
-            }
-        }
-    }
-
-
-
-
     private fun setupAsUnmatched() {
         binding.tvChatSwipedName.setTextColor(ContextCompat.getColor(requireContext(), R.color.TextGrey))
         binding.tvChatSwipedName.text = getString(R.string.unknown_user_name)
@@ -345,10 +323,6 @@ class ChatFragment : BaseFragment(),
         binding.btnChatMessageSend.isEnabled = false
         chatMessagePagingDataAdapter.setProfilePhoto(null)
     }
-
-
-
-
 
 
     private fun showMoreMenu(): Boolean {
@@ -369,7 +343,6 @@ class ChatFragment : BaseFragment(),
     override fun onDismissErrorDialog(id: UUID?) {
         popBackStack(MainViewPagerFragment.TAG)
     }
-
 
 
     override fun onDeleteChatMessage(position: Int) {
@@ -420,6 +393,7 @@ class ChatFragment : BaseFragment(),
         when (requestCode) {
             RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
             RequestCode.UNMATCH -> onUnmatch()
+            RequestCode.CONNECT_TO_STOMP -> viewModel.connectToStomp()
         }
     }
 }

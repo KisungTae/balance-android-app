@@ -49,7 +49,7 @@ import com.beeswork.balance.internal.mapper.chat.ChatMessageMapperImpl
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
-import com.beeswork.balance.data.network.service.stomp.WebSocketClientImpl
+import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
 import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
@@ -177,7 +177,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SyncMatchUseCase>() with singleton { SyncMatchUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
-        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), Dispatchers.IO, applicationScope) }
+        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
         bind<CardRepository>() with singleton { CardRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
@@ -214,6 +214,8 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
+                applicationScope,
                 Dispatchers.IO
             )
         }
@@ -240,8 +242,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<LoginRepository>() with singleton { LoginRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
 
         // StompClient
-        bind() from singleton { StompClientImpl(applicationScope, instance(), instance(), instance(), instance(), instance(), instance()) }
-        bind() from singleton { WebSocketClientImpl(applicationScope, instance()) }
+        bind() from singleton { WebSocketStateImpl() }
+        bind() from singleton { StompClientImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
 
         // Provider
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
@@ -287,7 +289,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SplashViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { LoginViewModelFactory(instance(), instance(), instance(), instance()) }
-        bind() from provider { MainViewModelFactory(instance(), instance()) }
+        bind() from provider { MainViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { RegisterViewModelFactory(instance(), instance()) }
         bind() from provider { AboutViewModelFactory(instance()) }
         bind() from provider { BirthDateViewModelFactory(instance()) }

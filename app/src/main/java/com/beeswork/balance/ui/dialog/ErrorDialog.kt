@@ -16,6 +16,7 @@ import java.util.*
 class ErrorDialog(
     private val title: String?,
     private val message: String?,
+    private val retryBtnTitle: String?,
     private val requestCode: Int?,
     private val retryListener: RetryListener?,
     private val dismissListener: DismissListener?,
@@ -42,6 +43,9 @@ class ErrorDialog(
         setupRetryListener()
         binding.tvErrorDialogTitle.text = title ?: resources.getString(R.string.error_title_generic)
         binding.tvErrorDialogMessage.text = message ?: ""
+        if (retryBtnTitle != null) {
+            binding.btnErrorDialogRetry.text = retryBtnTitle
+        }
         binding.btnErrorDialogClose.setOnClickListener { dismiss() }
     }
 
@@ -75,15 +79,26 @@ class ErrorDialog(
         const val TAG = "errorDialog"
 
         fun show(title: String, message: String?, fragmentManager: FragmentManager) {
-            ErrorDialog(title, message, null, null, null).show(fragmentManager, TAG)
+            ErrorDialog(title, message, null, null, null, null).show(fragmentManager, TAG)
         }
 
         fun show(title: String, message: String?, dismissListener: DismissListener, fragmentManager: FragmentManager) {
-            ErrorDialog(title, message, null, null, dismissListener).show(fragmentManager, TAG)
+            ErrorDialog(title, message, null, null, null, dismissListener).show(fragmentManager, TAG)
         }
 
         fun show(title: String, message: String?, requestCode: Int, retryListener: RetryListener, fragmentManager: FragmentManager) {
-            ErrorDialog(title, message, requestCode, retryListener, null).show(fragmentManager, TAG)
+            ErrorDialog(title, message, null, requestCode, retryListener, null).show(fragmentManager, TAG)
+        }
+
+        fun show(
+            title: String,
+            message: String?,
+            retryBtnTitle: String,
+            requestCode: Int,
+            retryListener: RetryListener,
+            fragmentManager: FragmentManager
+        ) {
+            ErrorDialog(title, message, retryBtnTitle, requestCode, retryListener, null).show(fragmentManager, TAG)
         }
     }
 

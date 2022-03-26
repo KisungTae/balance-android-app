@@ -7,9 +7,7 @@ import android.view.MotionEvent
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivityMainBinding
-import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.google.android.gms.location.*
@@ -18,7 +16,6 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import com.beeswork.balance.internal.exception.NoInternetConnectivityException
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.Navigator
 
@@ -71,40 +68,34 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.RetryListener {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-        setupWebSocketEventObserver()
+        observeWebSocketEventUIStateLiveData()
     }
 
-    private suspend fun setupWebSocketEventObserver() {
-        viewModel.webSocketEventLiveData.await().observeForever { webSocketEvent ->
-            if (webSocketEvent.isError()) {
-                if (ExceptionCode.isLoginException(webSocketEvent.exception)) {
-                    val message = MessageSource.getMessage(this, webSocketEvent.exception)
-                    Navigator.finishToLoginActivity(this, message)
-                } else if (webSocketEvent.exception is NoInternetConnectivityException) {
-                    val title = getString(R.string.error_title_web_socket_disconnected)
-                    val message = MessageSource.getMessage(this, webSocketEvent.exception)
-                    ErrorDialog.show(title, message, supportFragmentManager)
-                }
+    private suspend fun observeWebSocketEventUIStateLiveData() {
+        viewModel.webSocketEventUIStateLiveData.await().observe(this) { webSocketEventUIState ->
+            if (webSocketEventUIState.shouldLogout) {
+                val message = MessageSource.getMessage(this, webSocketEventUIState.exception)
+                Navigator.finishToLoginActivity(this, message)
             }
         }
     }
 
     override fun onRetry(requestCode: Int?) {
-        when (requestCode) {
-            RequestCode.CONNECT_TO_WEB_SOCKET -> viewModel.connectStomp()
-        }
+//        when (requestCode) {
+//            RequestCode.CONNECT_TO_STOMP -> viewModel.connectStomp(true)
+//        }
     }
 
     override fun onResume() {
         super.onResume()
 //        if (hasLocationPermission()) bindLocationManager()
 //        else viewModel.saveLocationPermissionResult(false)
-//        viewModel.connectStomp()
+        viewModel.connectStomp()
     }
 
     override fun onPause() {
         super.onPause()
-//        viewModel.disconnectStomp()
+        viewModel.disconnectStomp()
     }
 
 //    private fun setupBackStackListener() {

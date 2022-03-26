@@ -4,5 +4,6 @@ enum class WebSocketStatus {
     CONNECTING,
     OPEN,
     CLOSED,
-    STOMP_CONNECTED
+    STOMP_CONNECTED,
+    ERROR
 }

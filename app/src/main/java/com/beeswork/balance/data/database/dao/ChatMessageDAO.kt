@@ -36,6 +36,12 @@ interface ChatMessageDAO {
     @Query("select id from chatMessage where chatId = :chatId and status = :status order by id desc limit 1")
     fun getLastReceivedChatMessageId(chatId: UUID, status: ChatMessageStatus = ChatMessageStatus.RECEIVED): Long?
 
+    @Query("update chatMessage set status = :to where status = :from")
+    fun updateStatus(from: ChatMessageStatus, to: ChatMessageStatus)
+
+    @Query("select * from chatMessage where status = :status")
+    fun getAllBy(status: ChatMessageStatus): List<ChatMessage>
+
 
 
 
@@ -94,8 +100,7 @@ interface ChatMessageDAO {
     @Query("select chatId from chatMessage where id = :id")
     fun getChatIdById(id: UUID?): UUID?
 
-    @Query("update chatMessage set status = :to where status = :from")
-    fun updateStatus(from: ChatMessageStatus, to: ChatMessageStatus)
+
 
     @Query("select count(*) > 0 from chatMessage where id = :id")
     fun existsById(id: UUID?): Boolean

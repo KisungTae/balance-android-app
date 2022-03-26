@@ -3,10 +3,10 @@ package com.beeswork.balance.data.network.response.chat
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
-data class ChatMessageReceiptDTO(
-    val id: UUID?,
-    val body: String?,
-    val chatId: Long?,
+data class StompReceiptDTO(
+    val id: Long?,
+    val tag: UUID?,
     val createdAt: OffsetDateTime?,
-    val error: String?
+    val error: String?,
+    val errorMessage: String?
 )

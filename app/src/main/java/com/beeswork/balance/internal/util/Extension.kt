@@ -19,6 +19,8 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.domain.uistate.BaseUIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
@@ -154,5 +156,6 @@ fun <T: BaseUIState> LiveData<T>.observeUIState(lifecycleOwner: LifecycleOwner, 
         }
     }
 }
+
 
 

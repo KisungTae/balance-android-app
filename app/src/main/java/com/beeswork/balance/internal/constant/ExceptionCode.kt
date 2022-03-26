@@ -17,6 +17,10 @@ class ExceptionCode {
         const val INVALID_REFRESH_TOKEN_EXCEPTION = "invalid.refresh.token.exception"
         const val AUTHENTICATION_EXCEPTION = "authentication.exception"
 
+        fun isExpiredJWTTokenException(exception: Throwable?): Boolean {
+            return exception is BaseException && exception.error == EXPIRED_JWT_EXCEPTION
+        }
+
         fun isLoginException(exception: Throwable?): Boolean {
             if (exception == null) {
                 return false

@@ -39,6 +39,7 @@
     <string name="save_push_setting_success_message">알림설정을 저장했습니다</string>
 
     <string name="unknown_host_exception">인터넷이 연결되어있는지 확인해주세요</string>
+    <string name="web_socket_disconnected_exception">web_socket_disconnected_exception</string>
 
 
     <string name="chat_message_size_limit_exceeded_exception">채팅메세지가 너무 깁니다 줄여주세요</string>
@@ -231,5 +232,7 @@
     <string name="unknown_user_name">Unknown User</string>
     <string name="title_match_filter_menu_all">all</string>
     <string name="text_match_empty">스와이프를 통해 새로운 이성과 매치해보세요!</string>
+
+    <string name="title_connect_to_web_socket">서버 연결하기</string>
 
 </resources>

@@ -1,7 +1,7 @@
 package com.beeswork.balance.data.database.repository.chat
 
 import com.beeswork.balance.data.database.BalanceDatabase
-import com.beeswork.balance.data.database.common.InvalidationListener
+import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
@@ -12,46 +12,58 @@ import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
-import com.beeswork.balance.data.network.response.chat.ChatMessageReceiptDTO
+import com.beeswork.balance.data.network.response.chat.StompReceiptDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.exception.ChatMessageNotFoundException
-import com.beeswork.balance.internal.exception.ChatNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import kotlin.random.Random
 
+
+@ExperimentalCoroutinesApi
 class ChatRepositoryImpl(
     loginRDS: LoginRDS,
     preferenceProvider: PreferenceProvider,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val chatRDS: ChatRDS,
+    private val stompClient: StompClient,
     private val chatMessageMapper: ChatMessageMapper,
     private val balanceDatabase: BalanceDatabase,
+    private val applicationScope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher
 ) : BaseRepository(loginRDS, preferenceProvider), ChatRepository {
 
-    private var sendChatMessageChanel = Channel<ChatMessageDTO>(Channel.BUFFERED)
-    override val sendChatMessageFlow: Flow<ChatMessageDTO> = sendChatMessageChanel.consumeAsFlow()
-
-    private lateinit var chatPageInvalidationListener: InvalidationListener<ChatMessage?>
     private val chatPageFetchDateTracker = PageFetchDateTracker(30L)
 
-    @ExperimentalCoroutinesApi
+    private lateinit var chatPageCallBackFlowListener: CallBackFlowListener<ChatMessage?>
     override val chatPageInvalidationFlow: Flow<ChatMessage?> = callbackFlow {
-        chatPageInvalidationListener = object : InvalidationListener<ChatMessage?> {
-            override fun onInvalidate(data: ChatMessage?) {
+        chatPageCallBackFlowListener = object : CallBackFlowListener<ChatMessage?> {
+            override fun onInvoke(data: ChatMessage?) {
                 offer(data)
             }
         }
         awaitClose { }
+    }
+
+    init {
+        applicationScope.launch {
+            stompClient.webSocketEventChannel.openSubscription().let { receiveChannel ->
+                for (webSocketEvent in receiveChannel) {
+                    when (webSocketEvent.status) {
+                        WebSocketStatus.STOMP_CONNECTED -> sendChatMessages()
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse> {
@@ -59,20 +71,25 @@ class ChatRepositoryImpl(
             val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
             chatMessageDAO.insert(chatMessage)
             val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
-//        sendChatMessageChanel.send(chatMessageDTO)
-            chatPageInvalidationListener.onInvalidate(chatMessage)
-            return@withContext Resource.success(EmptyResponse())
+            val response = stompClient.sendChatMessage(chatMessageDTO)
+            if (response.isError()) {
+                chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.ERROR)
+            }
+            chatPageCallBackFlowListener.onInvoke(chatMessage)
+            return@withContext response
         }
     }
 
     override suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val chatMessage = chatMessageDAO.getBy(tag) ?: return@withContext Resource.error(ChatMessageNotFoundException())
-            chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
             val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
-//        sendChatMessageChanel.send(chatMessageDTO)
-            chatPageInvalidationListener.onInvalidate(null)
-            return@withContext Resource.success(EmptyResponse())
+            val response = stompClient.sendChatMessage(chatMessageDTO)
+            if (response.isSuccess()) {
+                chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
+                chatPageCallBackFlowListener.onInvoke(null)
+            }
+            return@withContext response
         }
     }
 
@@ -100,7 +117,7 @@ class ChatRepositoryImpl(
                 }
             }
             if (isUpdated) {
-                chatPageInvalidationListener.onInvalidate(null)
+                chatPageCallBackFlowListener.onInvoke(null)
             }
         }
         return isUpdated
@@ -140,7 +157,7 @@ class ChatRepositoryImpl(
     }
 
     private fun listChatMessages(chatId: UUID, startPosition: Int, loadSize: Int) {
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+        applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
             chatPageFetchDateTracker.updateFetchDate(getChatPageFetchDateTrackerKey(chatId, startPosition), OffsetDateTime.now())
             val response = getResponse { chatRDS.listChatMessages(chatId, preferenceProvider.getAppToken(), startPosition, loadSize) }
             if (response.isError()) {
@@ -157,7 +174,7 @@ class ChatRepositoryImpl(
     }
 
     private fun syncChatMessages(chatId: UUID, chatMessageDTOs: List<ChatMessageDTO>) {
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+        applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
             val chatMessageIds = arrayListOf<Long>()
             chatMessageDTOs.forEach { chatMessageDTO ->
                 if (chatMessageDTO.id != null) {
@@ -180,9 +197,21 @@ class ChatRepositoryImpl(
         }
     }
 
+    private fun sendChatMessages() {
+        applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
+            val chatMessages = chatMessageDAO.getAllBy(ChatMessageStatus.RECEIVED)
+            for (chatMessage in chatMessages) {
+                val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
+                stompClient.sendChatMessage(chatMessageDTO)
+            }
+        }
+    }
+
     private fun getChatPageFetchDateTrackerKey(chatId: UUID, startPosition: Int): String {
         return "$chatId$startPosition"
     }
+
+
 
 
 
@@ -219,7 +248,7 @@ class ChatRepositoryImpl(
 //        }
     }
 
-    override suspend fun saveChatMessageReceipt(chatMessageReceiptDTO: ChatMessageReceiptDTO) {
+    override suspend fun saveChatMessageReceipt(stompReceiptDTO: StompReceiptDTO) {
 //        withContext(ioDispatcher) {
 //            var chatId: Long? = null
 //            safeLet(chatMessageReceiptDTO.createdAt, chatMessageDAO.getById(chatMessageReceiptDTO.id)) { createdAt, chatMessage ->
@@ -254,26 +283,7 @@ class ChatRepositoryImpl(
     }
 
 
-    override suspend fun clearChatMessages() {
-        withContext(ioDispatcher) {
-            chatMessageDAO.updateStatus(ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
-//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
-        }
-    }
 
-    override suspend fun clearChatMessages(chatMessageIds: List<UUID>) {
-        withContext(ioDispatcher) {
-            chatMessageDAO.updateStatusByIds(chatMessageIds, ChatMessageStatus.ERROR)
-//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
-        }
-    }
-
-    override suspend fun clearChatMessage(chatMessageId: UUID?) {
-        withContext(ioDispatcher) {
-//            chatMessageDAO.updateStatusBy(chatMessageId, ChatMessageStatus.ERROR)
-//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
-        }
-    }
 
     private fun saveChatMessages(
         sentChatMessageDTOs: List<ChatMessageDTO>?,
@@ -387,7 +397,7 @@ class ChatRepositoryImpl(
                 today
             )
             chatMessageDAO.insert(chatMessage)
-            chatPageInvalidationListener.onInvalidate(chatMessage)
+            chatPageCallBackFlowListener.onInvoke(chatMessage)
 //            val today = OffsetDateTime.now()
 //            val chatMessages = arrayListOf<ChatMessage>()
 //

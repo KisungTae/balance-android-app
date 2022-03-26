@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.domain.uistate.chat.ChatPageInvalidationUIState
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.domain.uistate.chat.ResendChatMessageUIState
@@ -17,6 +18,7 @@ import com.beeswork.balance.domain.usecase.chat.SyncMatchUseCase
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
+import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.ui.common.BaseViewModel
@@ -40,7 +42,7 @@ class ChatViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val matchLiveData by viewModelLazyDeferred {
+    val matchUIStateLiveData by viewModelLazyDeferred {
         matchRepository.getMatchFlow(chatId).map { match ->
             if (match == null) {
                 null
@@ -50,7 +52,7 @@ class ChatViewModel(
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    val chatPageInvalidationLiveData by viewModelLazyDeferred {
+    val chatPageInvalidationUIStateLiveData by viewModelLazyDeferred {
         chatRepository.chatPageInvalidationFlow.filter { chatMessage ->
             if (chatMessage == null) {
                 true
@@ -69,18 +71,9 @@ class ChatViewModel(
                     null
                 }
             }
-        }.asLiveData(viewModelScope.coroutineContext)
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-//    val chatMessageInvalidationLiveData by viewModelLazyDeferred {
-//        chatRepository.chatMessageInvalidationFlow.filter { chatMessageInvalidation ->
-//            chatMessageInvalidation.type == ChatMessageInvalidation.Type.FETCHED || chatMessageInvalidation.chatId == chatId
-//        }.asLiveData()
-//    }
-
-    private val _sendChatMessageLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    private val sendChatMessageLiveData: LiveData<Resource<EmptyResponse>> get() = _sendChatMessageLiveData
-    val sendChatMessageMediatorLiveData = MediatorLiveData<Resource<EmptyResponse>>()
 
     private val _reportMatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val reportMatchLiveData: LiveData<Resource<EmptyResponse>> get() = _reportMatchLiveData
@@ -103,7 +96,7 @@ class ChatViewModel(
                 SendChatMessageUIState.ofSuccess()
             } else {
                 SendChatMessageUIState.ofError(
-                    shouldLogout = ExceptionCode.isLoginException(response.exception),
+                    clearChatMessageInput = response.exception is WebSocketDisconnectedException,
                     exception = response.exception
                 )
             }
@@ -117,10 +110,7 @@ class ChatViewModel(
             val resendChatMessageUIState = if (response.isSuccess()) {
                 ResendChatMessageUIState.ofSuccess()
             } else {
-                ResendChatMessageUIState.ofError(
-                    shouldLogout = ExceptionCode.isLoginException(response.exception),
-                    exception = response.exception
-                )
+                ResendChatMessageUIState.ofError(exception = response.exception)
             }
             _resendChatMessageUIStateLiveData.postValue(resendChatMessageUIState)
         }
@@ -134,6 +124,10 @@ class ChatViewModel(
         viewModelScope.launch {
             syncMatchUseCase.invoke(chatId)
         }
+    }
+
+    fun connectToStomp() {
+        println("connectToStomp from chatviewmodel0")
     }
 
 

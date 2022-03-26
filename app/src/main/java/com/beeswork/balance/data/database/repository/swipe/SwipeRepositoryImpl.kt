@@ -2,7 +2,7 @@ package com.beeswork.balance.data.database.repository.swipe
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.PageFetchDateTracker
-import com.beeswork.balance.data.database.common.InvalidationListener
+import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.SwipeDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
@@ -34,13 +34,13 @@ class SwipeRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : SwipeRepository {
 
-    private lateinit var newSwipeInvalidationListener: InvalidationListener<Swipe>
+    private lateinit var newSwipeCallBackFlowListener: CallBackFlowListener<Swipe>
     private val swipePageFetchDateTracker = PageFetchDateTracker(5L)
 
     @ExperimentalCoroutinesApi
     override val newSwipeFlow: Flow<Swipe> = callbackFlow {
-        newSwipeInvalidationListener = object : InvalidationListener<Swipe> {
-            override fun onInvalidate(data: Swipe) {
+        newSwipeCallBackFlowListener = object : CallBackFlowListener<Swipe> {
+            override fun onInvoke(data: Swipe) {
                 offer(data)
             }
         }
@@ -151,7 +151,7 @@ class SwipeRepositoryImpl(
                 return@Callable queryResult.data
             })
             if (swipe != null && swipe.swipedId == preferenceProvider.getAccountId()) {
-                newSwipeInvalidationListener.onInvalidate(swipe)
+                newSwipeCallBackFlowListener.onInvoke(swipe)
             }
         }
     }
