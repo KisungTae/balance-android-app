@@ -20,7 +20,7 @@ class MainRepositoryImpl(
     private val stompClient: StompClient,
     private val ioDispatcher: CoroutineDispatcher,
     private val applicationScope: CoroutineScope
-): BaseRepository(loginRDS, preferenceProvider), MainRepository {
+) : BaseRepository(loginRDS, preferenceProvider), MainRepository {
 
     private lateinit var webSocketEventCallBackFlowListener: CallBackFlowListener<WebSocketEvent>
     override val webSocketEventFlow: Flow<WebSocketEvent> = callbackFlow {
@@ -29,7 +29,7 @@ class MainRepositoryImpl(
                 offer(data)
             }
         }
-        awaitClose {  }
+        awaitClose { }
     }
 
     private var reconnectToStompJob: Job? = null
@@ -40,39 +40,40 @@ class MainRepositoryImpl(
             stompClient.webSocketEventChannel.openSubscription().let { receiveChannel ->
                 for (webSocketEvent in receiveChannel) {
                     when (webSocketEvent.status) {
-                        WebSocketStatus.ERROR -> scheduleConnectToStomp(webSocketEvent)
-                        WebSocketStatus.CLOSED -> scheduleConnectToStomp(webSocketEvent)
+                        WebSocketStatus.ERROR -> reconnectToStomp(webSocketEvent)
+                        WebSocketStatus.CLOSED -> reconnectToStomp(webSocketEvent)
                     }
                 }
             }
         }
     }
 
-    private suspend fun scheduleConnectToStomp(webSocketEvent: WebSocketEvent) {
+    private suspend fun reconnectToStomp(webSocketEvent: WebSocketEvent) {
         if (ExceptionCode.isExpiredJWTTokenException(webSocketEvent.exception)) {
+            reconnectToStompJob?.cancel()
             val response = doRefreshAccessToken()
             if (response.isSuccess()) {
                 reconnectToStompJob?.cancel()
                 stompClient.connect(false)
-                return
+            } else {
+                scheduleReconnectToStomp(WebSocketEvent(webSocketEvent.status, response.exception))
             }
-
-            if (response.isError() && !ExceptionCode.isLoginException(response.exception)) {
-                launchReconnectToStompJob()
-                return
-            }
+        } else {
+            scheduleReconnectToStomp(webSocketEvent)
         }
+    }
 
+    private fun scheduleReconnectToStomp(webSocketEvent: WebSocketEvent) {
+        println("scheduleReconnectToStomp")
         if (ExceptionCode.isLoginException(webSocketEvent.exception) || webSocketEvent.exception is NoInternetConnectivityException) {
+            println("ExceptionCode.isLoginException(webSocketEvent.exception) || webSocketEvent.exception is NoInternetConnectivityException")
             reconnectToStompJob?.cancel()
             webSocketEventCallBackFlowListener.onInvoke(webSocketEvent)
             return
         }
-        launchReconnectToStompJob()
-    }
 
-    private fun launchReconnectToStompJob() {
-        if (reconnectToStompJob?.isActive == false) {
+        if (reconnectToStompJob == null || reconnectToStompJob?.isActive == false) {
+            println("reconnectToStompJob?.isActive == false")
             reconnectToStompJob = applicationScope.launch {
                 delay(RECONNECT_TO_STOMP_DELAY)
                 stompClient.connect(false)

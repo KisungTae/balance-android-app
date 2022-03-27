@@ -8,10 +8,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.internal.constant.*
-import com.beeswork.balance.internal.exception.AccessTokenNotFoundException
-import com.beeswork.balance.internal.exception.AccountIdNotFoundException
-import com.beeswork.balance.internal.exception.ServerException
-import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
+import com.beeswork.balance.internal.exception.*
 import com.beeswork.balance.internal.provider.gson.GsonProvider
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -62,13 +59,8 @@ class StompClientImpl(
 
     @ExperimentalCoroutinesApi
     override fun connect(forceToConnect: Boolean) {
+        println("connect($forceToConnect)")
         applicationScope.launch {
-            if (preferenceProvider.getAccessToken().isNullOrBlank()) {
-                webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
-                socket?.close(1000, null)
-                return@launch
-            }
-
             if (webSocketState.isClosed() && forceToConnect) {
                 webSocketState.reset()
             }
@@ -87,11 +79,12 @@ class StompClientImpl(
     override fun onOpen(webSocket: WebSocket, response: Response) {
         println("override fun onOpen(webSocket: WebSocket, response: Response)")
         applicationScope.launch {
+            delay(3000)
             webSocketState.setSocketStatus(WebSocketStatus.OPEN)
             val accessToken = preferenceProvider.getAccessToken()
             if (accessToken.isNullOrBlank()) {
-                webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
                 socket?.close(1000, null)
+                webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
             } else {
                 val headers = mutableMapOf<String, String>()
                 headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
@@ -123,15 +116,15 @@ class StompClientImpl(
         webSocketState.setSocketStatus(WebSocketStatus.STOMP_CONNECTED)
         val accountId = preferenceProvider.getAccountId()
         if (accountId == null) {
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccountIdNotFoundException()))
             socket?.close(1000, null)
+            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccountIdNotFoundException()))
             return
         }
 
         val accessToken = preferenceProvider.getAccessToken()
         if (accessToken.isNullOrBlank()) {
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
             socket?.close(1000, null)
+            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
             return
         }
 
