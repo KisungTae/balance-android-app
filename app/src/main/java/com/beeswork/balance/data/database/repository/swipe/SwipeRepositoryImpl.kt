@@ -34,9 +34,9 @@ class SwipeRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : SwipeRepository {
 
-    private lateinit var newSwipeCallBackFlowListener: CallBackFlowListener<Swipe>
     private val swipePageFetchDateTracker = PageFetchDateTracker(5L)
 
+    private var newSwipeCallBackFlowListener: CallBackFlowListener<Swipe>? = null
     @ExperimentalCoroutinesApi
     override val newSwipeFlow: Flow<Swipe> = callbackFlow {
         newSwipeCallBackFlowListener = object : CallBackFlowListener<Swipe> {
@@ -151,7 +151,7 @@ class SwipeRepositoryImpl(
                 return@Callable queryResult.data
             })
             if (swipe != null && swipe.swipedId == preferenceProvider.getAccountId()) {
-                newSwipeCallBackFlowListener.onInvoke(swipe)
+                newSwipeCallBackFlowListener?.onInvoke(swipe)
             }
         }
     }

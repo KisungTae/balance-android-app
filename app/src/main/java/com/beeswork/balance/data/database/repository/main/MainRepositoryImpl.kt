@@ -24,7 +24,7 @@ class MainRepositoryImpl(
     private val applicationScope: CoroutineScope
 ) : BaseRepository(loginRDS, preferenceProvider), MainRepository {
 
-    private lateinit var webSocketEventCallBackFlowListener: CallBackFlowListener<WebSocketEvent>
+    private var webSocketEventCallBackFlowListener: CallBackFlowListener<WebSocketEvent>? = null
     override val webSocketEventFlow: Flow<WebSocketEvent> = callbackFlow {
         webSocketEventCallBackFlowListener = object : CallBackFlowListener<WebSocketEvent> {
             override fun onInvoke(data: WebSocketEvent) {
@@ -70,7 +70,7 @@ class MainRepositoryImpl(
         if (ExceptionCode.isLoginException(webSocketEvent.exception) || webSocketEvent.exception is NoInternetConnectivityException) {
             println("ExceptionCode.isLoginException(webSocketEvent.exception) || webSocketEvent.exception is NoInternetConnectivityException")
             reconnectToStompJob?.cancel()
-            webSocketEventCallBackFlowListener.onInvoke(webSocketEvent)
+            webSocketEventCallBackFlowListener?.onInvoke(webSocketEvent)
             return
         }
 

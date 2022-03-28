@@ -52,9 +52,9 @@ class MatchRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : BaseRepository(loginRDS, preferenceProvider), MatchRepository {
 
-    private lateinit var newMatchCallBackFlowListener: CallBackFlowListener<NewMatch>
     private val matchPageFetchDateTracker = PageFetchDateTracker(5L)
 
+    private var newMatchCallBackFlowListener: CallBackFlowListener<NewMatch>? = null
     @ExperimentalCoroutinesApi
     override val newMatchFlow: Flow<NewMatch> = callbackFlow {
         newMatchCallBackFlowListener = object : CallBackFlowListener<NewMatch> {
@@ -212,7 +212,7 @@ class MatchRepositoryImpl(
             val match = queryResult.data
             if (queryResult.isInsert() && match != null && match.swiperId == accountId) {
                 val newMatch = NewMatch(accountId, photoDAO.getProfilePhotoBy(accountId), match.swipedId, match.swipedProfilePhotoKey)
-                newMatchCallBackFlowListener.onInvoke(newMatch)
+                newMatchCallBackFlowListener?.onInvoke(newMatch)
             }
         }
     }
@@ -325,6 +325,6 @@ class MatchRepositoryImpl(
 
     override fun testFunction() {
         val newMatch = NewMatch(UUID.randomUUID(), "", UUID.randomUUID(), "")
-        newMatchCallBackFlowListener.onInvoke(newMatch)
+        newMatchCallBackFlowListener?.onInvoke(newMatch)
     }
 }

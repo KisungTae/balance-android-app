@@ -51,6 +51,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
 import com.beeswork.balance.domain.usecase.chat.*
+import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCase
+import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCaseImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
@@ -176,6 +178,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind<SyncMatchUseCase>() with singleton { SyncMatchUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<ConnectToStompUseCase>() with singleton { ConnectToStompUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -254,6 +257,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from factory { chatId: UUID ->
             ChatViewModelFactory(
                 chatId,
+                instance(),
                 instance(),
                 instance(),
                 instance(),

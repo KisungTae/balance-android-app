@@ -15,6 +15,7 @@ import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.chat.StompReceiptDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
@@ -55,12 +56,26 @@ class ChatRepositoryImpl(
         awaitClose { }
     }
 
+    private var webSocketEventCallBackFlowListener: CallBackFlowListener<WebSocketEvent>? = null
+    override val webSocketEventFlow: Flow<WebSocketEvent> = callbackFlow {
+        webSocketEventCallBackFlowListener = object : CallBackFlowListener<WebSocketEvent> {
+            override fun onInvoke(data: WebSocketEvent) {
+                offer(data)
+            }
+        }
+        awaitClose {  }
+    }
+
+
     init {
         applicationScope.launch {
             stompClient.webSocketEventChannel.openSubscription().let { receiveChannel ->
                 for (webSocketEvent in receiveChannel) {
                     when (webSocketEvent.status) {
-                        WebSocketStatus.STOMP_CONNECTED -> sendChatMessages()
+                        WebSocketStatus.STOMP_CONNECTED -> {
+                            webSocketEventCallBackFlowListener?.onInvoke(webSocketEvent)
+                            sendChatMessages()
+                        }
                     }
                 }
             }

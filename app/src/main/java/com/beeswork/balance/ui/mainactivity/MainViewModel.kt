@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.data.database.repository.main.MainRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
+import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.domain.uistate.main.WebSocketEventUIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.ui.common.BaseViewModel
@@ -20,7 +21,11 @@ class MainViewModel(
 
     val webSocketEventUIStateLiveData by viewModelLazyDeferred {
         mainRepository.webSocketEventFlow.map { webSocketEvent ->
-            WebSocketEventUIState(ExceptionCode.isLoginException(webSocketEvent.exception), webSocketEvent.exception)
+            WebSocketEventUIState(
+                webSocketEvent.status == WebSocketStatus.STOMP_CONNECTED,
+                ExceptionCode.isLoginException(webSocketEvent.exception),
+                webSocketEvent.exception
+            )
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 

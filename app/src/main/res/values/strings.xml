@@ -73,7 +73,7 @@
     <string name="account_identity_not_found_exception">로그인 정보가 정확하지않습니다. 다시 로그인 해주세요</string>
     <string name="chat_message_not_found_exception">메세지를 찾지 못했습니다. 다시 시도해주세요</string>
 
-
+    <string name="message_server_connected">서버에 연결되었습니다</string>
 
 
     <string name="confirm_dialog_delete_chat_message_title">해당 채팅메세지를 삭제하시겠습니다?</string>

@@ -3,18 +3,23 @@ package com.beeswork.balance.ui.chatfragment
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
+import com.beeswork.balance.data.database.repository.main.MainRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.domain.uistate.chat.ChatPageInvalidationUIState
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.domain.uistate.chat.ResendChatMessageUIState
 import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCase
 import com.beeswork.balance.domain.uistate.chat.SendChatMessageUIState
+import com.beeswork.balance.domain.uistate.main.WebSocketEventUIState
 import com.beeswork.balance.domain.usecase.chat.GetChatMessagePagingDataUseCase
 import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
 import com.beeswork.balance.domain.usecase.chat.SyncMatchUseCase
+import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCase
 import com.beeswork.balance.internal.constant.ChatMessageStatus
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -33,6 +38,7 @@ class ChatViewModel(
     private val resendChatMessageUseCase: ResendChatMessageUseCase,
     private val getChatMessagePagingDataUseCase: GetChatMessagePagingDataUseCase,
     private val syncMatchUseCase: SyncMatchUseCase,
+    private val connectToStompUseCase: ConnectToStompUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -69,6 +75,12 @@ class ChatViewModel(
                     null
                 }
             }
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+    }
+
+    val webSocketEventUIStateLiveData by viewModelLazyDeferred {
+        chatRepository.webSocketEventFlow.map { webSocketEvent ->
+            WebSocketEventUIState(webSocketEvent.status == WebSocketStatus.STOMP_CONNECTED, false, webSocketEvent.exception)
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
@@ -125,7 +137,9 @@ class ChatViewModel(
     }
 
     fun connectToStomp() {
-        println("connectToStomp from chatviewmodel0")
+        viewModelScope.launch {
+            connectToStompUseCase.invoke(true)
+        }
     }
 
 

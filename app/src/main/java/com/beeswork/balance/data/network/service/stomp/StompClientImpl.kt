@@ -165,6 +165,10 @@ class StompClientImpl(
     @ExperimentalCoroutinesApi
     private suspend fun onErrorFrameReceived(stompFrame: StompFrame) {
         println("private fun onErrorFrameReceived(stompFrame: StompFrame): ${stompFrame.getError()} - ${stompFrame.getErrorMessage()}")
+        val receiptId = stompFrame.getReceiptId()
+        if (receiptId != null) {
+            stompReceiptChannel.send(StompReceiptDTO(null, receiptId, null, stompFrame.getError(), stompFrame.getErrorMessage()))
+        }
         val serverException = ServerException(stompFrame.getError(), stompFrame.getErrorMessage())
         val webSocketEvent = WebSocketEvent(WebSocketStatus.ERROR, serverException)
         webSocketEventChannel.send(webSocketEvent)

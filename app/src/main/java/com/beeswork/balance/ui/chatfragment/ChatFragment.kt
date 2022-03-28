@@ -28,6 +28,7 @@ import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.dialog.ReportDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import org.kodein.di.KodeinAware
@@ -89,13 +90,21 @@ class ChatFragment : BaseFragment(),
         setupSendBtnListener()
         observeSendChatMessageUIStateLiveData()
         observeResendChatMessageUIStateLiveData()
-
-
+        observeWebSocketEventLiveData()
 
         setupEmoticonBtnListener()
         observeReportMatchLiveData()
         observeUnmatchLiveData()
         viewModel.syncMatch()
+    }
+
+    private suspend fun observeWebSocketEventLiveData() {
+        viewModel.webSocketEventUIStateLiveData.await().observe(viewLifecycleOwner) { webSocketEventUIState ->
+            if (webSocketEventUIState.connected) {
+                Snackbar.make(requireView(), getString(R.string.message_server_connected), Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.close)) {}.show()
+            }
+        }
     }
 
     private fun setupToolBar() {
