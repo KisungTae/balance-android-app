@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.repository.main
 
 import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.repository.BaseRepository
+import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.*
 class MainRepositoryImpl(
     loginRDS: LoginRDS,
     preferenceProvider: PreferenceProvider,
+    private val chatRepository: ChatRepository,
     private val stompClient: StompClient,
     private val ioDispatcher: CoroutineDispatcher,
     private val applicationScope: CoroutineScope

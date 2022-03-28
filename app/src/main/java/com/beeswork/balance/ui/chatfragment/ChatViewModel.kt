@@ -6,7 +6,6 @@ import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import com.beeswork.balance.domain.uistate.chat.ChatPageInvalidationUIState
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.domain.uistate.chat.ResendChatMessageUIState
@@ -16,7 +15,6 @@ import com.beeswork.balance.domain.usecase.chat.GetChatMessagePagingDataUseCase
 import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
 import com.beeswork.balance.domain.usecase.chat.SyncMatchUseCase
 import com.beeswork.balance.internal.constant.ChatMessageStatus
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper

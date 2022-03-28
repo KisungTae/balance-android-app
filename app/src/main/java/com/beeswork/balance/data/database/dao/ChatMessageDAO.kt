@@ -42,7 +42,11 @@ interface ChatMessageDAO {
     @Query("select * from chatMessage where status = :status")
     fun getAllBy(status: ChatMessageStatus): List<ChatMessage>
 
+    @Query("update chatMessage set status = :status, createdAt = :createdAt, id = :id where tag = :tag")
+    fun updateAsSentBy(tag: UUID?, id: Long, createdAt: OffsetDateTime?, status: ChatMessageStatus = ChatMessageStatus.SENT)
 
+    @Query("select chatId from chatMessage where tag = :tag")
+    fun getChatIdBy(tag: UUID?): UUID?
 
 
 
@@ -53,8 +57,7 @@ interface ChatMessageDAO {
     fun existsBy(tag: UUID?): Boolean
 
 
-    @Query("update chatMessage set status = :status, createdAt = :createdAt, id = :id where tag = :tag")
-    fun updateAsSentBy(tag: UUID?, id: Long, createdAt: OffsetDateTime?, status: ChatMessageStatus = ChatMessageStatus.SENT)
+
 
 
 

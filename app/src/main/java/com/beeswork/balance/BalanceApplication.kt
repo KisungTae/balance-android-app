@@ -114,6 +114,7 @@ class BalanceApplication : Application(), KodeinAware {
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 
+    @ExperimentalCoroutinesApi
     override val kodein = Kodein.lazy {
         import(androidXModule(this@BalanceApplication))
 
@@ -177,7 +178,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SyncMatchUseCase>() with singleton { SyncMatchUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
-        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
+        bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
         bind<CardRepository>() with singleton { CardRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }

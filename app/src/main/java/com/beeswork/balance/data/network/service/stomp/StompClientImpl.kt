@@ -16,7 +16,6 @@ import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.sync.Mutex
 import okhttp3.*
 import okio.ByteString
 import java.util.*
@@ -34,16 +33,16 @@ class StompClientImpl(
     private val outgoingChannel = Channel<String>(Channel.BUFFERED)
 
     private val swipeChannel = Channel<SwipeDTO>(Channel.BUFFERED)
-    val swipeFlow = swipeChannel.consumeAsFlow()
+    override val swipeFlow = swipeChannel.consumeAsFlow()
 
     private val matchChannel = Channel<MatchDTO>(Channel.BUFFERED)
-    val matchFlow = matchChannel.consumeAsFlow()
+    override val matchFlow = matchChannel.consumeAsFlow()
 
     private val chatMessageChannel = Channel<ChatMessageDTO>(Channel.BUFFERED)
-    val chatMessageFlow = chatMessageChannel.consumeAsFlow()
+    override val chatMessageFlow = chatMessageChannel.consumeAsFlow()
 
     private val stompReceiptChannel = Channel<StompReceiptDTO>(Channel.BUFFERED)
-    val stompReceiptFlow = stompReceiptChannel.consumeAsFlow()
+    override val stompReceiptFlow = stompReceiptChannel.consumeAsFlow()
 
     @ExperimentalCoroutinesApi
     override val webSocketEventChannel = BroadcastChannel<WebSocketEvent>(4)
@@ -134,6 +133,7 @@ class StompClientImpl(
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.ACCESS_TOKEN] = accessToken
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.STOMP_CONNECTED, null))
         }
     }
 
@@ -219,7 +219,7 @@ class StompClientImpl(
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.ACCESS_TOKEN] = accessToken
             val stompFrame = StompFrame(StompFrame.Command.SEND, headers, GsonProvider.gson.toJson(chatMessageDTO))
-            outgoingChannel.send(stompFrame.compile())
+            socket?.send(stompFrame.compile())
         }
         return Resource.success(EmptyResponse())
     }

@@ -59,4 +59,7 @@ interface MatchDAO {
     @Query("update `match` set lastReadReceivedChatMessageId = :lastReadReceivedChatMessageId where chatId = :chatId")
     fun updateLastReadReceivedChatMessageIdBy(chatId: UUID, lastReadReceivedChatMessageId: Long)
 
+    @Query("update `match` set unmatched = 1, swipedName = null, swipedProfilePhotoKey = null where chatId = :chatId")
+    fun updateAsUnmatched(chatId: UUID?)
+
 }

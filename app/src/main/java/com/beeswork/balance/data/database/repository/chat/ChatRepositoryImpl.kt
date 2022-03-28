@@ -17,6 +17,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.internal.constant.ChatMessageStatus
+import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.exception.ChatMessageNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -44,7 +45,7 @@ class ChatRepositoryImpl(
 
     private val chatPageFetchDateTracker = PageFetchDateTracker(30L)
 
-    private lateinit var chatPageCallBackFlowListener: CallBackFlowListener<ChatMessage?>
+    private var chatPageCallBackFlowListener: CallBackFlowListener<ChatMessage?>? = null
     override val chatPageInvalidationFlow: Flow<ChatMessage?> = callbackFlow {
         chatPageCallBackFlowListener = object : CallBackFlowListener<ChatMessage?> {
             override fun onInvoke(data: ChatMessage?) {
@@ -64,6 +65,9 @@ class ChatRepositoryImpl(
                 }
             }
         }
+        stompClient.stompReceiptFlow.onEach { stompReceiptDTO ->
+            saveChatMessageReceipt(stompReceiptDTO)
+        }.launchIn(applicationScope)
     }
 
     override suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse> {
@@ -75,7 +79,7 @@ class ChatRepositoryImpl(
             if (response.isError()) {
                 chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.ERROR)
             }
-            chatPageCallBackFlowListener.onInvoke(chatMessage)
+            chatPageCallBackFlowListener?.onInvoke(chatMessage)
             return@withContext response
         }
     }
@@ -87,7 +91,7 @@ class ChatRepositoryImpl(
             val response = stompClient.sendChatMessage(chatMessageDTO)
             if (response.isSuccess()) {
                 chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
-                chatPageCallBackFlowListener.onInvoke(null)
+                chatPageCallBackFlowListener?.onInvoke(null)
             }
             return@withContext response
         }
@@ -117,7 +121,7 @@ class ChatRepositoryImpl(
                 }
             }
             if (isUpdated) {
-                chatPageCallBackFlowListener.onInvoke(null)
+                chatPageCallBackFlowListener?.onInvoke(null)
             }
         }
         return isUpdated
@@ -185,7 +189,7 @@ class ChatRepositoryImpl(
         }
     }
 
-    private fun updateLastChatMessageOnMatch(chatId: UUID) {
+    private fun updateLastChatMessageOnMatch(chatId: UUID?) {
         balanceDatabase.runInTransaction {
             val match = matchDAO.getBy(chatId)
             if (match != null) {
@@ -199,10 +203,30 @@ class ChatRepositoryImpl(
 
     private fun sendChatMessages() {
         applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
-            val chatMessages = chatMessageDAO.getAllBy(ChatMessageStatus.RECEIVED)
+            val chatMessages = chatMessageDAO.getAllBy(ChatMessageStatus.SENDING)
+            println("chatMessages.size(): ${chatMessages.size}")
             for (chatMessage in chatMessages) {
                 val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
                 stompClient.sendChatMessage(chatMessageDTO)
+            }
+        }
+    }
+
+    override suspend fun saveChatMessageReceipt(stompReceiptDTO: StompReceiptDTO) {
+        withContext(ioDispatcher) {
+            if (stompReceiptDTO.id != null && stompReceiptDTO.createdAt != null) {
+                chatMessageDAO.updateAsSentBy(stompReceiptDTO.tag, stompReceiptDTO.id, stompReceiptDTO.createdAt)
+                val chatId = chatMessageDAO.getChatIdBy(stompReceiptDTO.tag)
+                updateLastChatMessageOnMatch(chatId)
+            } else if (stompReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
+                chatMessageDAO.updateStatusBy(stompReceiptDTO.tag, ChatMessageStatus.ERROR)
+                val chatId = chatMessageDAO.getChatIdBy(stompReceiptDTO.tag)
+                matchDAO.updateAsUnmatched(chatId)
+            } else if (stompReceiptDTO.error != null) {
+                chatMessageDAO.updateStatusBy(stompReceiptDTO.tag, ChatMessageStatus.ERROR)
+            }
+            if (stompReceiptDTO.tag != null) {
+                chatPageCallBackFlowListener?.onInvoke(null)
             }
         }
     }
@@ -248,39 +272,7 @@ class ChatRepositoryImpl(
 //        }
     }
 
-    override suspend fun saveChatMessageReceipt(stompReceiptDTO: StompReceiptDTO) {
-//        withContext(ioDispatcher) {
-//            var chatId: Long? = null
-//            safeLet(chatMessageReceiptDTO.createdAt, chatMessageDAO.getById(chatMessageReceiptDTO.id)) { createdAt, chatMessage ->
-//                chatMessage.createdAt = createdAt
-//                chatMessage.status = ChatMessageStatus.SENT
-//                chatMessageDAO.insert(chatMessage)
-//                updateMatchOnNewChatMessage(chatMessage.chatId)
-//                chatId = chatMessage.chatId
 
-//                CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-//                    chatRDS.fetchedChatMessage(chatMessage.id)
-//                }
-//            } ?: kotlin.run {
-//                chatId = chatMessageDAO.findChatIdById(chatMessageReceiptDTO.id)
-//                if (chatMessageReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
-//                    chatMessageDAO.updateStatusBy(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
-//                    todo: implement udpate match as unmatched
-//                    matchDAO.updateAsUnmatched(chatId)
-//                    chatMessageReceiptFlowListener?.onInvoke(
-//                        Resource.error(ServerException(chatMessageReceiptDTO.error, chatMessageReceiptDTO.body))
-//                    )
-//                } else {
-//                    chatMessageDAO.updateStatusBy(chatMessageReceiptDTO.id, ChatMessageStatus.ERROR)
-//                }
-//            }
-
-//            chatMessageInvalidationListener?.let { _chatMessageInvalidationListener ->
-//                val chatMessageInvalidation = ChatMessageInvalidation.ofReceipt(chatId)
-//                _chatMessageInvalidationListener.onInvalidate(chatMessageInvalidation)
-//            }
-//        }
-    }
 
 
 
@@ -397,7 +389,7 @@ class ChatRepositoryImpl(
                 today
             )
             chatMessageDAO.insert(chatMessage)
-            chatPageCallBackFlowListener.onInvoke(chatMessage)
+            chatPageCallBackFlowListener?.onInvoke(chatMessage)
 //            val today = OffsetDateTime.now()
 //            val chatMessages = arrayListOf<ChatMessage>()
 //
