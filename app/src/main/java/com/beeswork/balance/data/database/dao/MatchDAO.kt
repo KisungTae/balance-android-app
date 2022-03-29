@@ -50,8 +50,8 @@ interface MatchDAO {
     @Query("select unmatched from `match` where chatId = :chatId")
     fun isUnmatchedBy(chatId: UUID): Boolean?
 
-    @Query("update `match` set lastChatMessageId = :lastChatMessageId, lastChatMessageBody = :lastChatMessageBody where chatId = :chatId")
-    fun updateLastChatMessageBy(chatId: UUID, lastChatMessageId: Long, lastChatMessageBody: String)
+//    @Query("update `match` set lastChatMessageId = :lastChatMessageId, lastChatMessageBody = :lastChatMessageBody where chatId = :chatId")
+//    fun updateLastChatMessageBy(chatId: UUID, lastChatMessageId: Long, lastChatMessageBody: String)
 
     @Query("select lastReadReceivedChatMessageId from `match` where chatId = :chatId")
     fun getLastReadReceivedChatMessageIdBy(chatId: UUID): Long?

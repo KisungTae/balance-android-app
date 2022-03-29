@@ -371,10 +371,14 @@ class ChatFragment : BaseFragment(),
     private fun setupBackBtn() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                requireContext().hideKeyboard(requireView())
                 popBackStack(MainViewPagerFragment.TAG)
             }
         })
-        binding.btnChatBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
+        binding.btnChatBack.setOnClickListener {
+            requireContext().hideKeyboard(requireView())
+            popBackStack(MainViewPagerFragment.TAG)
+        }
     }
 
 

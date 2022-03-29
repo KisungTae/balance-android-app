@@ -310,14 +310,12 @@ class MatchRepositoryImpl(
                 return@launch
             }
             val response = getResponse { matchRDS.syncMatch(chatId, lastReceivedChatMessageId) }
-            if (!response.isSuccess()) {
-                return@launch
-            }
-
-            balanceDatabase.runInTransaction {
-                val currentLastReadReceivedChatMessageId = matchDAO.getLastReadReceivedChatMessageIdBy(chatId) ?: 0
-                if (currentLastReadReceivedChatMessageId < lastReceivedChatMessageId) {
-                    matchDAO.updateLastReadReceivedChatMessageIdBy(chatId, lastReceivedChatMessageId)
+            if (response.isSuccess()) {
+                balanceDatabase.runInTransaction {
+                    val currentLastReadReceivedChatMessageId = matchDAO.getLastReadReceivedChatMessageIdBy(chatId) ?: 0
+                    if (currentLastReadReceivedChatMessageId < lastReceivedChatMessageId) {
+                        matchDAO.updateLastReadReceivedChatMessageIdBy(chatId, lastReceivedChatMessageId)
+                    }
                 }
             }
         }

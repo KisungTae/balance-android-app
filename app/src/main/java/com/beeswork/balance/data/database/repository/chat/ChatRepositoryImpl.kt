@@ -4,8 +4,11 @@ import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
+import com.beeswork.balance.data.database.dao.MatchCountDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
+import com.beeswork.balance.data.database.entity.match.Match
+import com.beeswork.balance.data.database.entity.match.MatchCount
 import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.login.LoginRDS
@@ -34,6 +37,7 @@ class ChatRepositoryImpl(
     preferenceProvider: PreferenceProvider,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
+    private val matchCountDAO: MatchCountDAO,
     private val chatRDS: ChatRDS,
     private val stompClient: StompClient,
     private val chatMessageMapper: ChatMessageMapper,
@@ -210,13 +214,32 @@ class ChatRepositoryImpl(
 
     private fun updateLastChatMessageOnMatch(chatId: UUID?) {
         balanceDatabase.runInTransaction {
-            val match = matchDAO.getBy(chatId)
-            if (match != null) {
-                val lastChatMessage = chatMessageDAO.getLastChatMessageBy(match.chatId)
-                if (lastChatMessage != null && lastChatMessage.id > match.lastChatMessageId) {
-                    matchDAO.updateLastChatMessageBy(match.chatId, lastChatMessage.id, lastChatMessage.body)
-                }
+            val match = matchDAO.getBy(chatId) ?: return@runInTransaction
+            val lastChatMessage = chatMessageDAO.getLastChatMessageBy(match.chatId) ?: return@runInTransaction
+
+            if (lastChatMessage.id > match.lastChatMessageId) {
+                match.lastChatMessageId = lastChatMessage.id
+                match.lastChatMessageBody = lastChatMessage.body
             }
+
+            val lastReceivedChatMessageId = if (lastChatMessage.status == ChatMessageStatus.RECEIVED) {
+                lastChatMessage.id
+            } else {
+                chatMessageDAO.getLastReceivedChatMessageId(match.chatId) ?: 0
+            }
+
+            if (lastReceivedChatMessageId > match.lastReceivedChatMessageId) {
+                match.lastReceivedChatMessageId = lastReceivedChatMessageId
+            }
+            matchDAO.insert(match)
+        }
+    }
+
+    private fun decrementMatchCount(chatMessage: ChatMessage) {
+        val matchCount = matchCountDAO.getBy(preferenceProvider.getAccountId())
+        if (matchCount != null && chatMessage.createdAt?.isAfter(matchCount.countedAt) == true && matchCount.count > 0) {
+            matchCount.count = matchCount.count - 1
+            matchCountDAO.insert(matchCount)
         }
     }
 
