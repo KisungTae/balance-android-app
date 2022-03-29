@@ -9,5 +9,8 @@ data class ChatMessageDTO(
     val senderId: UUID?,
     val tag: UUID?,
     val body: String,
+    val firstMessage: Boolean?,
     val createdAt: OffsetDateTime?
-)
+) {
+    constructor(chatId: UUID, tag: UUID?, body: String) : this(null, chatId, null, tag, body, null, null)
+}

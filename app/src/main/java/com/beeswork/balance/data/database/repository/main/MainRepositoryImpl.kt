@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.*
 class MainRepositoryImpl(
     loginRDS: LoginRDS,
     preferenceProvider: PreferenceProvider,
-    private val chatRepository: ChatRepository,
     private val stompClient: StompClient,
     private val ioDispatcher: CoroutineDispatcher,
     private val applicationScope: CoroutineScope

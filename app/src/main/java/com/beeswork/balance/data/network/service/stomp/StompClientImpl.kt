@@ -97,7 +97,10 @@ class StompClientImpl(
 
     @ExperimentalCoroutinesApi
     override fun onMessage(webSocket: WebSocket, text: String) {
-        applicationScope.launch {
+        applicationScope.launch(CoroutineExceptionHandler { a, t ->
+            println("${t.message}")
+            println("error")
+        }) {
             val stompFrame = StompFrame.from(text)
             println("override fun onMessage(webSocket: WebSocket, text: String): ${stompFrame.command}")
             when (stompFrame.command) {
@@ -167,7 +170,7 @@ class StompClientImpl(
         println("private fun onErrorFrameReceived(stompFrame: StompFrame): ${stompFrame.getError()} - ${stompFrame.getErrorMessage()}")
         val receiptId = stompFrame.getReceiptId()
         if (receiptId != null) {
-            stompReceiptChannel.send(StompReceiptDTO(null, receiptId, null, stompFrame.getError(), stompFrame.getErrorMessage()))
+            stompReceiptChannel.send(StompReceiptDTO(receiptId, stompFrame.getError(), stompFrame.getErrorMessage()))
         }
         val serverException = ServerException(stompFrame.getError(), stompFrame.getErrorMessage())
         val webSocketEvent = WebSocketEvent(WebSocketStatus.ERROR, serverException)

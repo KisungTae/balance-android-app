@@ -70,6 +70,7 @@ class ChatRepositoryImpl(
 
 
     init {
+        println("chatRepository init!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         applicationScope.launch {
             stompClient.webSocketEventChannel.openSubscription().let { receiveChannel ->
                 for (webSocketEvent in receiveChannel) {
@@ -96,7 +97,7 @@ class ChatRepositoryImpl(
         return withContext(ioDispatcher) {
             val chatMessage = ChatMessage(chatId, body, ChatMessageStatus.SENDING, UUID.randomUUID())
             chatMessageDAO.insert(chatMessage)
-            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
+            val chatMessageDTO = ChatMessageDTO(chatMessage.chatId, chatMessage.tag, chatMessage.body)
             val response = stompClient.sendChatMessage(chatMessageDTO)
             if (response.isError()) {
                 chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.ERROR)
@@ -109,7 +110,7 @@ class ChatRepositoryImpl(
     override suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val chatMessage = chatMessageDAO.getBy(tag) ?: return@withContext Resource.error(ChatMessageNotFoundException())
-            val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
+            val chatMessageDTO = ChatMessageDTO(chatMessage.chatId, chatMessage.tag, chatMessage.body)
             val response = stompClient.sendChatMessage(chatMessageDTO)
             if (response.isSuccess()) {
                 chatMessageDAO.updateStatusBy(chatMessage.tag, ChatMessageStatus.SENDING)
@@ -235,11 +236,13 @@ class ChatRepositoryImpl(
         }
     }
 
-    private fun decrementMatchCount(chatMessage: ChatMessage) {
-        val matchCount = matchCountDAO.getBy(preferenceProvider.getAccountId())
-        if (matchCount != null && chatMessage.createdAt?.isAfter(matchCount.countedAt) == true && matchCount.count > 0) {
-            matchCount.count = matchCount.count - 1
-            matchCountDAO.insert(matchCount)
+    private fun decrementMatchCount(updatedAt: OffsetDateTime) {
+        balanceDatabase.runInTransaction {
+            val matchCount = matchCountDAO.getBy(preferenceProvider.getAccountId())
+            if (matchCount != null && updatedAt.isAfter(matchCount.countedAt) && matchCount.count > 0) {
+                matchCount.count = matchCount.count - 1
+                matchCountDAO.insert(matchCount)
+            }
         }
     }
 
@@ -247,7 +250,7 @@ class ChatRepositoryImpl(
         applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
             val chatMessages = chatMessageDAO.getAllBy(ChatMessageStatus.SENDING)
             for (chatMessage in chatMessages) {
-                val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
+                val chatMessageDTO = ChatMessageDTO(chatMessage.chatId, chatMessage.tag, chatMessage.body)
                 stompClient.sendChatMessage(chatMessageDTO)
             }
         }
@@ -259,6 +262,9 @@ class ChatRepositoryImpl(
                 chatMessageDAO.updateAsSentBy(stompReceiptDTO.tag, stompReceiptDTO.id, stompReceiptDTO.createdAt)
                 val chatId = chatMessageDAO.getChatIdBy(stompReceiptDTO.tag)
                 updateLastChatMessageOnMatch(chatId)
+                if (stompReceiptDTO.firstMessage == true) {
+                    decrementMatchCount(stompReceiptDTO.createdAt)
+                }
             } else if (stompReceiptDTO.error == ExceptionCode.MATCH_UNMATCHED_EXCEPTION) {
                 chatMessageDAO.updateStatusBy(stompReceiptDTO.tag, ChatMessageStatus.ERROR)
                 val chatId = chatMessageDAO.getChatIdBy(stompReceiptDTO.tag)
@@ -282,6 +288,9 @@ class ChatRepositoryImpl(
             if (chatMessage != null) {
                 updateLastChatMessageOnMatch(chatMessageDTO.chatId)
                 chatPageCallBackFlowListener?.onInvoke(chatMessage)
+            }
+            if (chatMessageDTO.firstMessage == true && chatMessageDTO.createdAt != null) {
+                decrementMatchCount(chatMessageDTO.createdAt)
             }
         }
     }
