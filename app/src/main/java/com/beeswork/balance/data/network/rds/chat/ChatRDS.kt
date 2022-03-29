@@ -9,8 +9,4 @@ interface ChatRDS {
     suspend fun fetchChatMessages(chatId: UUID, lastChatMessageId: Long?, loadSize: Int): Resource<List<ChatMessageDTO>>
     suspend fun listChatMessages(chatId: UUID, appToken: UUID, startPosition: Int, loadSize: Int): Resource<List<ChatMessageDTO>>
     suspend fun syncChatMessages(chatId: UUID, appToken: UUID, chatMessageIds: List<Long>)
-
-
-    suspend fun fetchedChatMessage(chatMessageId: UUID): Resource<EmptyResponse>
-    suspend fun receivedChatMessage(chatMessageId: UUID): Resource<EmptyResponse>
 }

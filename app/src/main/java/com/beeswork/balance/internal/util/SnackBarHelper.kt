@@ -12,7 +12,7 @@ class SnackBarHelper {
 
     companion object {
         fun make(parentView: View, gravity: Int, topMargin: Int, bottomMargin: Int, customView: View): Snackbar {
-            val snackBar = Snackbar.make(parentView, "", Snackbar.LENGTH_INDEFINITE)
+            val snackBar = Snackbar.make(parentView, "", Snackbar.LENGTH_SHORT)
             snackBar.view.setBackgroundColor(Color.TRANSPARENT)
             val snackBarLayout = snackBar.view as Snackbar.SnackbarLayout
             snackBarLayout.addView(customView, 0)

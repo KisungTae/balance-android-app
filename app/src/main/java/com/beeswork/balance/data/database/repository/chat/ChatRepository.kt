@@ -18,14 +18,14 @@ interface ChatRepository {
     suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse>
     suspend fun fetchChatMessages(chatId: UUID, lastChatMessageId: Long?, loadSize: Int): Resource<List<ChatMessageDTO>>
     suspend fun loadChatMessages(chatId: UUID, startPosition: Int, loadSize: Int): List<ChatMessage>
-
+    suspend fun saveChatMessage(chatMessageDTO: ChatMessageDTO)
 
 
 
     suspend fun deleteChatMessages()
     suspend fun deleteChatMessage(chatId: Long, key: Long)
-    suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO)
-    suspend fun saveChatMessageReceipt(stompReceiptDTO: StompReceiptDTO)
+
+
 
 
 

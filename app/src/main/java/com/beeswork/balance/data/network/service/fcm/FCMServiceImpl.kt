@@ -55,9 +55,7 @@ class FCMServiceImpl : FirebaseMessagingService(), KodeinAware {
             }
             PushType.CHAT_MESSAGE -> scope.launch {
                 val json = GsonProvider.gson.toJsonTree(remoteMessage.data)
-                val chatMessage = GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java)
-                println(chatMessage)
-//                chatRepository.saveChatMessageReceived(GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java))
+                chatRepository.saveChatMessage(GsonProvider.gson.fromJson(json, ChatMessageDTO::class.java))
             }
             else -> {}
         }

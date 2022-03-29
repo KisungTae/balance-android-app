@@ -6,7 +6,6 @@ import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
-import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.login.LoginRDS
@@ -27,7 +26,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.OffsetDateTime
 import java.util.*
-import kotlin.random.Random
 
 
 @ExperimentalCoroutinesApi
@@ -63,7 +61,7 @@ class ChatRepositoryImpl(
                 offer(data)
             }
         }
-        awaitClose {  }
+        awaitClose { }
     }
 
 
@@ -80,8 +78,13 @@ class ChatRepositoryImpl(
                 }
             }
         }
+
         stompClient.stompReceiptFlow.onEach { stompReceiptDTO ->
             saveChatMessageReceipt(stompReceiptDTO)
+        }.launchIn(applicationScope)
+
+        stompClient.chatMessageFlow.onEach { chatMessageDTO ->
+            saveChatMessage(chatMessageDTO)
         }.launchIn(applicationScope)
     }
 
@@ -129,8 +132,9 @@ class ChatRepositoryImpl(
     private fun saveChatMessages(chatMessageDTOs: List<ChatMessageDTO>?): Boolean {
         var isUpdated = false
         balanceDatabase.runInTransaction {
+            val accountId = preferenceProvider.getAccountId()
             chatMessageDTOs?.forEach { chatMessageDTO ->
-                val chatMessage = insertChatMessage(preferenceProvider.getAccountId(), chatMessageDTO)
+                val chatMessage = insertChatMessage(accountId, chatMessageDTO)
                 if (chatMessage != null) {
                     isUpdated = true
                 }
@@ -142,19 +146,19 @@ class ChatRepositoryImpl(
         return isUpdated
     }
 
-    private fun insertChatMessage(senderId: UUID?, chatMessageDTO: ChatMessageDTO): ChatMessage? {
+    private fun insertChatMessage(accountId: UUID?, chatMessageDTO: ChatMessageDTO): ChatMessage? {
         if (chatMessageDTO.id == null || chatMessageDTO.senderId == null) {
             return null
         }
 
-        val chatMessage = if (chatMessageDTO.senderId == senderId) {
+        val chatMessage = if (chatMessageDTO.senderId == accountId) {
             chatMessageDAO.getBy(chatMessageDTO.tag)
         } else {
             chatMessageDAO.getById(chatMessageDTO.id, chatMessageDTO.chatId)
         }
 
         if (chatMessage == null || !chatMessage.isEqualTo(chatMessageDTO)) {
-            val status = if (chatMessageDTO.senderId == senderId) {
+            val status = if (chatMessageDTO.senderId == accountId) {
                 ChatMessageStatus.SENT
             } else {
                 ChatMessageStatus.RECEIVED
@@ -219,7 +223,6 @@ class ChatRepositoryImpl(
     private fun sendChatMessages() {
         applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
             val chatMessages = chatMessageDAO.getAllBy(ChatMessageStatus.SENDING)
-            println("chatMessages.size(): ${chatMessages.size}")
             for (chatMessage in chatMessages) {
                 val chatMessageDTO = ChatMessageDTO(null, chatMessage.chatId, null, chatMessage.tag, chatMessage.body, null)
                 stompClient.sendChatMessage(chatMessageDTO)
@@ -227,7 +230,7 @@ class ChatRepositoryImpl(
         }
     }
 
-    override suspend fun saveChatMessageReceipt(stompReceiptDTO: StompReceiptDTO) {
+    private suspend fun saveChatMessageReceipt(stompReceiptDTO: StompReceiptDTO) {
         withContext(ioDispatcher) {
             if (stompReceiptDTO.id != null && stompReceiptDTO.createdAt != null) {
                 chatMessageDAO.updateAsSentBy(stompReceiptDTO.tag, stompReceiptDTO.id, stompReceiptDTO.createdAt)
@@ -250,15 +253,15 @@ class ChatRepositoryImpl(
         return "$chatId$startPosition"
     }
 
-
-
-
-
-
-
-
-
-
+    override suspend fun saveChatMessage(chatMessageDTO: ChatMessageDTO) {
+        withContext(ioDispatcher) {
+            val chatMessage = insertChatMessage(preferenceProvider.getAccountId(), chatMessageDTO)
+            if (chatMessage != null) {
+                updateLastChatMessageOnMatch(chatMessageDTO.chatId)
+                chatPageCallBackFlowListener?.onInvoke(chatMessage)
+            }
+        }
+    }
 
 
 
@@ -266,194 +269,16 @@ class ChatRepositoryImpl(
         withContext(ioDispatcher) { chatMessageDAO.deleteAll() }
     }
 
-
     override suspend fun deleteChatMessage(chatId: Long, key: Long) {
         withContext(ioDispatcher) {
             chatMessageDAO.deleteByKey(key)
-//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofDelete(chatId))
+            chatPageCallBackFlowListener?.onInvoke(null)
         }
     }
 
-    override suspend fun saveChatMessageReceived(chatMessageDTO: ChatMessageDTO) {
-//        withContext(ioDispatcher) {
-//            chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
-//                chatMessageDAO.insert(chatMessage)
-//                CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-////                    chatRDS.receivedChatMessage(chatMessage.id)
-//                }
-////                updateMatchOnNewChatMessage(chatMessage.chatId)
-////                chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofReceived(chatMessage.chatId, chatMessage.body))
-//            }
-//        }
-    }
-
-
-
-
-
-
-    private fun saveChatMessages(
-        sentChatMessageDTOs: List<ChatMessageDTO>?,
-        receivedChatMessageDTOs: List<ChatMessageDTO>?
-    ): MutableSet<Long> {
-        val chatIds = mutableSetOf<Long>()
-//        val sentChatMessageIds = mutableListOf<UUID>()
-//        val receivedChatMessageIds = mutableListOf<UUID>()
-//        val newChatMessages = mutableListOf<ChatMessage>()
-
-//        receivedChatMessageDTOs?.forEach { chatMessageDTO ->
-//            if (!chatMessageDAO.existsById(chatMessageDTO.id)) {
-//                chatMessageMapper.toReceivedChatMessage(chatMessageDTO)?.let { chatMessage ->
-//                    newChatMessages.add(chatMessage)
-//                    chatIds.add(chatMessage.chatId)
-//                }
-//            }
-//            chatMessageDTO.id?.let { id -> receivedChatMessageIds.add(id) }
-//        }
-
-//        sentChatMessageDTOs?.forEach { chatMessageDTO ->
-//            safeLet(chatMessageDTO.createdAt, chatMessageDAO.getById(chatMessageDTO.id)) { createdAt, chatMessage ->
-//                chatMessage.createdAt = createdAt
-//                chatMessage.status = ChatMessageStatus.SENT
-//                newChatMessages.add(chatMessage)
-//                chatIds.add(chatMessage.chatId)
-//            }
-//            chatMessageDTO.id?.let { id -> sentChatMessageIds.add(id) }
-//        }
-//        syncChatMessages(sentChatMessageIds, receivedChatMessageIds)
-//        chatMessageDAO.insert(newChatMessages)
-        return chatIds
-    }
-
-    private fun listChatMessages(
-        sentChatMessageIds: List<UUID>,
-        receivedChatMessageIds: List<UUID>
-    ) {
-        if (sentChatMessageIds.isEmpty() && receivedChatMessageIds.isEmpty()) return
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-//            chatRDS.syncChatMessages(, sentChatMessageIds)
-        }
-    }
-
-    private fun updateMatchOnNewChatMessage(chatId: Long) {
-//        matchDAO.findById(chatId)?.let { match ->
-//            if (!match.unmatched) chatMessageDAO.findMostRecentAfter(
-//                match.chatId,
-//                match.lastReadChatMessageKey
-//            )?.let { chatMessage ->
-//                match.recentChatMessage = chatMessage.body
-//                match.updatedAt = chatMessage.createdAt
-//                match.active = true
-//                match.unread = chatMessageDAO.existAfter(match.chatId, match.lastReadChatMessageKey)
-//            }
-//            matchDAO.insert(match)
-//        }
-    }
-
-    //  TODO: remove me
-    private fun saveSentChatMessages(sentChatMessages: List<ChatMessage>, matches: List<Match>) {
-        val chatIds = matches.map { it.chatId }
-        for (msg in sentChatMessages) {
-            val randomIndex = Random.nextInt(0, chatIds.size - 1)
-//            chatMessageDAO.insert(
-//                ChatMessage(
-//                    chatIds[randomIndex],
-//                    "message-${Random.nextFloat()}",
-//                    ChatMessageStatus.SENDING,
-//                    OffsetDateTime.now(ZoneOffset.UTC),
-//                    msg.key,
-//                    msg.id,
-//                )
-//            )
-        }
-    }
-
-    //    override suspend fun saveChatMessages(
-//        sentChatMessagesDTOs: List<ChatMessageDTO>?,
-//        receivedChatMessageDTOs: List<ChatMessageDTO>?,
-//        fetchedAt: OffsetDateTime
-//    ) {
-//        withContext(ioDispatcher) {
-//            val chatIds = saveChatMessages(sentChatMessagesDTOs, receivedChatMessageDTOs)
-//            balanceDatabase.runInTransaction { chatIds.forEach { chatId -> updateMatchOnNewChatMessage(chatId) } }
-//            chatMessageDAO.updateStatusBefore(fetchedAt, ChatMessageStatus.SENDING, ChatMessageStatus.ERROR)
-//            chatMessageInvalidationListener?.onInvalidate(ChatMessageInvalidation.ofFetched())
-//        }
-//    }
 
     override fun test() {
-//        CoroutineScope(ioDispatcher).launch {
-//            val chatMessages = arrayListOf<ChatMessage>()
-//            chatMessages.add(ChatMessage(12, "sent-1", ChatMessageStatus.SENDING, UUID.fromString("938249ad-0ffc-46cf-bd7d-dc4b28f1726b")))
-//            chatMessages.add(ChatMessage(12, "sent-2", ChatMessageStatus.SENDING, UUID.fromString("cc00800c-e74f-4dac-bd9b-f0ef487e7d9f")))
-//            for (i in 0..10) {
-//                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.RECEIVED, UUID.randomUUID(), OffsetDateTime.now()))
-//                chatMessageDAO.insert(ChatMessage(UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"), "message-$i", ChatMessageStatus.SENT, UUID.randomUUID(), OffsetDateTime.now()))
-//            }
-//            chatMessageDAO.insert(chatMessages)
-//        }
 
-
-        CoroutineScope(ioDispatcher).launch {
-            val today = OffsetDateTime.now()
-            val chatMessage = ChatMessage(
-                UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
-                today.toString(),
-                ChatMessageStatus.RECEIVED,
-                UUID.randomUUID(),
-                today
-            )
-            chatMessageDAO.insert(chatMessage)
-            chatPageCallBackFlowListener?.onInvoke(chatMessage)
-//            val today = OffsetDateTime.now()
-//            val chatMessages = arrayListOf<ChatMessage>()
-//
-//            for (i in 0..30) {
-//                var date = today.plusDays(i.toLong())
-//
-//                for (j in 0..Random.nextInt(0, 15)) {
-//                    if (Random.nextBoolean()) {
-//                        date = date.plusMinutes(Random.nextLong(0, 3))
-//                    }
-//
-//                    if (Random.nextBoolean()) {
-//                        chatMessages.add(
-//                            ChatMessage(
-//                                UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
-//                                date.toString(),
-//                                ChatMessageStatus.SENT,
-//                                UUID.randomUUID(),
-//                                date,
-//                                i.toLong()
-//                            )
-//                        )
-//                    } else {
-//                        chatMessages.add(
-//                            ChatMessage(
-//                                UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
-//                                date.toString(),
-//                                ChatMessageStatus.RECEIVED,
-//                                UUID.randomUUID(),
-//                                date,
-//                                i.toLong()
-//                            )
-//                        )
-//                    }
-//                }
-//            }
-//
-//            for (i in 0..10) {
-//                chatMessages.add(
-//                    ChatMessage(
-//                        UUID.fromString("233dde32-4bc7-4d05-b695-467fff023976"),
-//                        "sending-$i",
-//                        ChatMessageStatus.SENDING,
-//                        UUID.randomUUID()
-//                    )
-//                )
-//            }
-//            chatMessageDAO.insert(chatMessages)
-        }
     }
 }
 

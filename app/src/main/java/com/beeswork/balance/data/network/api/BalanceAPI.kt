@@ -1,8 +1,6 @@
 package com.beeswork.balance.data.network.api
 
 import com.beeswork.balance.data.network.converter.EnumConverterFactory
-import com.beeswork.balance.data.network.request.chat.FetchedChatMessageBody
-import com.beeswork.balance.data.network.request.chat.ReceivedChatMessageBody
 import com.beeswork.balance.data.network.request.chat.SyncChatMessagesBody
 import com.beeswork.balance.data.network.request.click.ClickBody
 import com.beeswork.balance.data.network.request.common.ReportBody
@@ -15,14 +13,10 @@ import com.beeswork.balance.data.network.request.profile.*
 import com.beeswork.balance.data.network.request.setting.SaveLocationBody
 import com.beeswork.balance.data.network.request.setting.SavePushSettingsBody
 import com.beeswork.balance.data.network.request.swipe.LikeBody
-import com.beeswork.balance.data.network.response.chat.ListChatMessagesDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
-import com.beeswork.balance.data.network.response.swipe.SwipeDTO
-import com.beeswork.balance.data.network.response.swipe.CountSwipesDTO
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
-import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
@@ -39,7 +33,6 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
-import org.threeten.bp.OffsetDateTime
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -65,14 +58,6 @@ interface BalanceAPI {
         @Query(value = "startPosition") startPosition: Int,
         @Query(value = "loadSize") loadSize: Int
     ): Response<List<ChatMessageDTO>>
-
-
-
-    @POST("chat/message/fetched")
-    suspend fun fetchedChatMessage(@Body fetchedChatMessageBody: FetchedChatMessageBody): Response<EmptyResponse>
-
-    @POST("chat/message/received")
-    suspend fun receivedChatMessage(@Body receivedChatMessageBody: ReceivedChatMessageBody): Response<EmptyResponse>
 
     @POST("chat/message/sync")
     suspend fun syncChatMessages(@Body syncChatMessagesBody: SyncChatMessagesBody)
