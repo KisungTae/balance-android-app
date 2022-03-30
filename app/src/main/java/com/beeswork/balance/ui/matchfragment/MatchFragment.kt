@@ -146,6 +146,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
         matchPagingDataAdapter.getMatch(position)?.let { matchItemUIState ->
             arguments.putString(BundleKey.CHAT_ID, matchItemUIState.chatId.toString())
+            arguments.putString(BundleKey.SWIPED_ID, matchItemUIState.swipedId.toString())
             chatFragment.arguments = arguments
         }
         moveToFragment(chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)

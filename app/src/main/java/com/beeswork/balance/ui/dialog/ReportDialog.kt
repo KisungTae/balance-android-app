@@ -61,6 +61,12 @@ class ReportDialog(
                 reportDialogClickListener.submitReport(it, binding.etReportDialogDetail.text.toString())
             } ?: showReportOption()
         }
+        binding.btnReportDialogErrorBack.setOnClickListener {
+            backToReportOption()
+        }
+        binding.btnReportDialogRetry.setOnClickListener {
+            clickSubmitButton()
+        }
     }
 
     private fun showReportDetail(reportReason: ReportReason, head: String) {
@@ -80,8 +86,19 @@ class ReportDialog(
         binding.llReportDialogLoading.visibility = View.VISIBLE
     }
 
-    fun hideLoading() {
+    fun showError(title: String, message: String?) {
+        requireContext().hideKeyboard(requireView())
         binding.llReportDialogLoading.visibility = View.GONE
+        binding.tvReportDialogErrorTitle.text = title
+        binding.tvReportDialogErrorMessage.text = message
+        binding.llReportDialogDetailWrapper.slideOutToLeft()
+        binding.llReportDialogErrorWrapper.slideInFromLeft()
+    }
+
+    private fun backToReportOption() {
+        binding.llReportDialogLoading.visibility = View.GONE
+        binding.llReportDialogErrorWrapper.slideOutToRight()
+        binding.llReportDialogDetailWrapper.slideInFromLeft()
     }
 
     fun clickSubmitButton() {

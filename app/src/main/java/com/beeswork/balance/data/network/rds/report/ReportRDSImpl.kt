@@ -5,8 +5,8 @@ import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.common.ReportBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.match.UnmatchDTO
 import com.beeswork.balance.internal.constant.ReportReason
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 
 import java.util.*
 
@@ -25,7 +25,7 @@ class ReportRDSImpl(
         reportedId: UUID,
         reportReason: ReportReason,
         description: String
-    ): Resource<EmptyResponse> {
+    ): Resource<UnmatchDTO> {
         return getResult { balanceAPI.reportMatch(ReportBody(reportedId, reportReason, description)) }
     }
 }

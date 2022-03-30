@@ -3,23 +3,15 @@ package com.beeswork.balance.ui.chatfragment
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
-import com.beeswork.balance.data.database.repository.main.MainRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
-import com.beeswork.balance.domain.uistate.chat.ChatPageInvalidationUIState
-import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
-import com.beeswork.balance.domain.uistate.chat.ResendChatMessageUIState
-import com.beeswork.balance.domain.usecase.chat.SendChatMessageUseCase
-import com.beeswork.balance.domain.uistate.chat.SendChatMessageUIState
+import com.beeswork.balance.domain.uistate.chat.*
 import com.beeswork.balance.domain.uistate.main.WebSocketEventUIState
-import com.beeswork.balance.domain.usecase.chat.GetChatMessagePagingDataUseCase
-import com.beeswork.balance.domain.usecase.chat.ResendChatMessageUseCase
-import com.beeswork.balance.domain.usecase.chat.SyncMatchUseCase
+import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCase
 import com.beeswork.balance.internal.constant.ChatMessageStatus
-import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -34,11 +26,15 @@ import java.util.*
 
 class ChatViewModel(
     private val chatId: UUID,
+    private val swipedId: UUID,
     private val sendChatMessageUseCase: SendChatMessageUseCase,
     private val resendChatMessageUseCase: ResendChatMessageUseCase,
     private val getChatMessagePagingDataUseCase: GetChatMessagePagingDataUseCase,
     private val syncMatchUseCase: SyncMatchUseCase,
     private val connectToStompUseCase: ConnectToStompUseCase,
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val unmatchUseCase: UnmatchUseCase,
+    private val reportMatchUseCase: ReportMatchUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val chatMessageMapper: ChatMessageMapper,
@@ -84,20 +80,17 @@ class ChatViewModel(
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-
-    private val _reportMatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val reportMatchLiveData: LiveData<Resource<EmptyResponse>> get() = _reportMatchLiveData
-
-    private val _unmatchLiveData = MutableLiveData<Resource<EmptyResponse>>()
-    val unmatchLiveData: LiveData<Resource<EmptyResponse>> get() = _unmatchLiveData
-
-
     private val _sendChatMessageUIStateLiveData = MutableLiveData<SendChatMessageUIState>()
     val sendChatMessageUIStateLiveData: LiveData<SendChatMessageUIState> = _sendChatMessageUIStateLiveData
 
     private val _resendChatMessageUIStateLiveData = MutableLiveData<ResendChatMessageUIState>()
     val resendChatMessageUIStateLiveData: LiveData<ResendChatMessageUIState> = _resendChatMessageUIStateLiveData
 
+    private val _reportMatchLiveData = MutableLiveData<UnmatchUIState>()
+    val reportMatchLiveData: LiveData<UnmatchUIState> get() = _reportMatchLiveData
+
+    private val _unmatchLiveData = MutableLiveData<UnmatchUIState>()
+    val unmatchLiveData: LiveData<UnmatchUIState> get() = _unmatchLiveData
 
     fun sendChatMessage(body: String) {
         viewModelScope.launch {
@@ -142,27 +135,36 @@ class ChatViewModel(
         }
     }
 
-
-
-
-    fun deleteChatMessage(key: Long) {
-//        viewModelScope.launch { chatRepository.deleteChatMessage(chatId, key) }
+    fun deleteChatMessage(tag: UUID) {
+        viewModelScope.launch {
+            deleteChatMessageUseCase.invoke(chatId, tag)
+        }
     }
 
 
     fun unmatch() {
         viewModelScope.launch {
-            _unmatchLiveData.postValue(Resource.loading())
-//            val response = matchRepository.unmatch(chatId, swipedId)
-//            _unmatchLiveData.postValue(response)
+            _unmatchLiveData.postValue(UnmatchUIState.ofLoading())
+            val response = unmatchUseCase.onInvoke(chatId, swipedId)
+            val unmatchUIState = if (response.isSuccess()) {
+                UnmatchUIState.ofSuccess()
+            } else {
+                UnmatchUIState.ofError(response.exception)
+            }
+            _unmatchLiveData.postValue(unmatchUIState)
         }
     }
 
     fun reportMatch(reportReason: ReportReason, description: String) {
         viewModelScope.launch {
-            _reportMatchLiveData.postValue(Resource.loading())
-//            val response = matchRepository.reportMatch(chatId, swipedId, reportReason, description)
-//            _reportMatchLiveData.postValue(response)
+            _reportMatchLiveData.postValue(UnmatchUIState.ofLoading())
+            val response = reportMatchUseCase.invoke(chatId, swipedId, reportReason, description)
+            val unmatchUIState = if (response.isSuccess()) {
+                UnmatchUIState.ofSuccess()
+            } else {
+                UnmatchUIState.ofError(response.exception)
+            }
+            _reportMatchLiveData.postValue(unmatchUIState)
         }
     }
 

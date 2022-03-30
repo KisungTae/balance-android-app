@@ -105,7 +105,28 @@ class StompClientImpl(
             println("override fun onMessage(webSocket: WebSocket, text: String): ${stompFrame.command}")
             when (stompFrame.command) {
                 StompFrame.Command.CONNECTED -> onConnectedFrameReceived()
-                StompFrame.Command.MESSAGE -> onMessageFrameReceived(stompFrame)
+                StompFrame.Command.MESSAGE -> {
+                    println("onMessageFrameReceived pushType: ${stompFrame.getPushType()}")
+                    when (stompFrame.getPushType()) {
+                        PushType.SWIPE -> {
+                            println("PushType.SWIPE ->")
+                            val swipeDTO = GsonProvider.gson.fromJson(stompFrame.payload, SwipeDTO::class.java)
+                            swipeChannel.send(swipeDTO)
+                        }
+                        PushType.MATCH -> {
+                            println("PushType.MATCH ->")
+                            val matchDTO = GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java)
+                            matchChannel.send(matchDTO)
+                        }
+                        PushType.CHAT_MESSAGE -> {
+                            println(":PushType.CHAT_MESSAGE ->")
+                            val chatMessageDTO = GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java)
+                            chatMessageChannel.send(chatMessageDTO)
+                        }
+                    }
+                    println("exit out of when statement")
+//                    onMessageFrameReceived(stompFrame)
+                }
                 StompFrame.Command.RECEIPT -> onReceiptFrameReceived(stompFrame)
                 StompFrame.Command.ERROR -> onErrorFrameReceived(stompFrame)
             }
@@ -141,21 +162,21 @@ class StompClientImpl(
     }
 
     private suspend fun onMessageFrameReceived(stompFrame: StompFrame) {
-        println("onMessageFrameReceived")
-        when (stompFrame.getPushType()) {
-            PushType.SWIPE -> {
-                val swipeDTO = GsonProvider.gson.fromJson(stompFrame.payload, SwipeDTO::class.java)
-                swipeChannel.send(swipeDTO)
-            }
-            PushType.MATCH -> {
-                val matchDTO = GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java)
-                matchChannel.send(matchDTO)
-            }
-            PushType.CHAT_MESSAGE -> {
-                val chatMessageDTO = GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java)
-                chatMessageChannel.send(chatMessageDTO)
-            }
-        }
+//        println("onMessageFrameReceived")
+//        when (stompFrame.getPushType()) {
+//            PushType.SWIPE -> {
+//                val swipeDTO = GsonProvider.gson.fromJson(stompFrame.payload, SwipeDTO::class.java)
+//                swipeChannel.send(swipeDTO)
+//            }
+//            PushType.MATCH -> {
+//                val matchDTO = GsonProvider.gson.fromJson(stompFrame.payload, MatchDTO::class.java)
+//                matchChannel.send(matchDTO)
+//            }
+//            PushType.CHAT_MESSAGE -> {
+//                val chatMessageDTO = GsonProvider.gson.fromJson(stompFrame.payload, ChatMessageDTO::class.java)
+//                chatMessageChannel.send(chatMessageDTO)
+//            }
+//        }
     }
 
     private suspend fun onReceiptFrameReceived(stompFrame: StompFrame) {

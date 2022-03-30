@@ -25,6 +25,7 @@ import com.beeswork.balance.data.network.response.setting.PushSettingDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.ClickDTO
+import com.beeswork.balance.data.network.response.match.UnmatchDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.MatchPageFilter
@@ -99,7 +100,7 @@ interface BalanceAPI {
     suspend fun click(@Body clickBody: ClickBody): Response<ClickDTO>
 
     @POST("match/unmatch")
-    suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<EmptyResponse>
+    suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<UnmatchDTO>
 
 
 
@@ -166,8 +167,8 @@ interface BalanceAPI {
     @POST("report/profile")
     suspend fun reportProfile(@Body reportBody: ReportBody): Response<EmptyResponse>
 
-    @POST("report/match")
-    suspend fun reportMatch(@Body reportBody: ReportBody): Response<EmptyResponse>
+    @POST("match/report")
+    suspend fun reportMatch(@Body reportBody: ReportBody): Response<UnmatchDTO>
 
 
     @GET("setting/push")

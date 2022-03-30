@@ -48,6 +48,10 @@ interface ChatMessageDAO {
     @Query("select chatId from chatMessage where tag = :tag")
     fun getChatIdBy(tag: UUID?): UUID?
 
+    @Query("delete from chatMessage where chatId = :chatId and tag = :tag")
+    fun deleteBy(chatId: UUID, tag: UUID)
+
+
 
 
 
@@ -91,8 +95,7 @@ interface ChatMessageDAO {
     @Query("update chatMessage set status = :toStatus where status = :whereStatus and createdAt < :createdAt")
     fun updateStatusBefore(createdAt: OffsetDateTime, whereStatus: ChatMessageStatus, toStatus: ChatMessageStatus)
 
-    @Query("delete from chatMessage where `sequence` = :sequence")
-    fun deleteByKey(sequence: Long)
+
 
     @Query("delete from chatMessage where chatId = :chatId")
     fun deleteByChatId(chatId: UUID)

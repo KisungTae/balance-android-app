@@ -11,6 +11,71 @@
     android:paddingBottom="20dp">
 
     <LinearLayout
+        android:id="@+id/llReportDialogErrorWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sh_top_round_box"
+            android:backgroundTint="@color/BackgroundWhite"
+            android:orientation="horizontal"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
+
+            <ImageButton
+                android:id="@+id/btnReportDialogErrorBack"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
+                android:layout_marginStart="10dp"
+                android:background="@color/Transparent"
+                android:contentDescription="@string/back_button_description"
+                android:src="@drawable/ic_baseline_arrow_back_ios" />
+
+            <TextView
+                android:id="@+id/tvReportDialogErrorTitle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="@dimen/text_large"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
+                android:layout_marginEnd="10dp"
+                android:background="@color/Transparent" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvReportDialogErrorMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/BackgroundWhite"
+            android:padding="20dp"
+            android:text="해당 매치를 신고하는데 실해하였습니다. 다시 시도해주세요"
+            android:textAlignment="center" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnReportDialogRetry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sh_bottom_round_box"
+            android:backgroundTint="@color/BackgroundWhite"
+            android:paddingBottom="10dp"
+            android:stateListAnimator="@null"
+            android:text="@string/retry"
+            android:textColor="@color/Primary" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/llReportDialogDetailWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,7 +151,7 @@
             android:paddingBottom="10dp"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_submit_button_title"
-            android:textColor="@color/Primary"/>
+            android:textColor="@color/Primary" />
 
     </LinearLayout>
 
@@ -134,7 +199,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_photo_button_title"
-            android:textColor="@color/TextRed"/>
+            android:textColor="@color/TextRed" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogSpam"
@@ -143,7 +208,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_spam_button_title"
-            android:textColor="@color/TextRed"/>
+            android:textColor="@color/TextRed" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogBehaviour"
@@ -152,7 +217,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_behaviour_button_title"
-            android:textColor="@color/TextRed"/>
+            android:textColor="@color/TextRed" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogOther"
@@ -161,7 +226,7 @@
             android:background="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/report_dialog_other_button_title"
-            android:textColor="@color/TextRed"/>
+            android:textColor="@color/TextRed" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnReportDialogClose"
@@ -172,7 +237,7 @@
             android:paddingBottom="10dp"
             android:stateListAnimator="@null"
             android:text="@string/dialog_close_btn_title"
-            android:textColor="@color/TextGrey"/>
+            android:textColor="@color/TextGrey" />
     </LinearLayout>
 
     <LinearLayout
@@ -180,10 +245,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha=".8"
+        android:background="@drawable/sh_report_dialog_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:background="@color/BackgroundWhite">
+        android:visibility="gone">
 
         <com.github.ybq.android.spinkit.SpinKitView
             style="@style/SpinKitView.Large.Circle"
@@ -193,9 +259,6 @@
             app:SpinKit_Color="@color/Primary" />
 
     </LinearLayout>
-
-
-
 
 
 </FrameLayout>

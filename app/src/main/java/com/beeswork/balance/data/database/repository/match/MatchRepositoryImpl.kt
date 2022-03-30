@@ -14,13 +14,10 @@ import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
-import com.beeswork.balance.data.network.response.match.ClickDTO
-import com.beeswork.balance.data.network.response.match.ListMatchesDTO
+import com.beeswork.balance.data.network.response.match.*
 import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
@@ -241,38 +238,6 @@ class MatchRepositoryImpl(
         return matchPageFilter?.toString() ?: "" + startPosition
     }
 
-    override suspend fun unmatch(chatId: UUID, swipedId: UUID): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
-            val response = matchRDS.unmatch(swipedId)
-            if (response.isSuccess()) {
-                unmatch(chatId)
-            }
-            return@withContext response
-        }
-    }
-
-    private fun unmatch(chatId: UUID) {
-        balanceDatabase.runInTransaction {
-            matchDAO.deleteBy(chatId)
-            chatMessageDAO.deleteByChatId(chatId)
-        }
-    }
-
-    override suspend fun reportMatch(
-        chatId: UUID,
-        swipedId: UUID,
-        reportReason: ReportReason,
-        description: String
-    ): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
-            val response = reportRDS.reportMatch(swipedId, reportReason, description)
-            if (response.isSuccess()) {
-                unmatch(chatId)
-            }
-            return@withContext response
-        }
-    }
-
     override fun getMatchPageInvalidationFlow(): Flow<Boolean> {
         return matchDAO.getPageInvalidationFlow()
     }
@@ -318,6 +283,45 @@ class MatchRepositoryImpl(
                     }
                 }
             }
+        }
+    }
+
+    override suspend fun unmatch(chatId: UUID, swipedId: UUID): Resource<UnmatchDTO> {
+        return withContext(ioDispatcher) {
+            val response = matchRDS.unmatch(swipedId)
+            if (response.isSuccess()) {
+                unmatch(chatId)
+            }
+            if (response.data != null) {
+                updateMatchCount(response.data.matchCount, response.data.matchCountCountedAt)
+            }
+            return@withContext response
+        }
+    }
+
+    override suspend fun reportMatch(
+        chatId: UUID,
+        swipedId: UUID,
+        reportReason: ReportReason,
+        description: String
+    ): Resource<UnmatchDTO> {
+        return withContext(ioDispatcher) {
+            delay(10000)
+            val response = reportRDS.reportMatch(swipedId, reportReason, description)
+            if (response.isSuccess()) {
+                unmatch(chatId)
+            }
+            if (response.data != null) {
+                updateMatchCount(response.data.matchCount, response.data.matchCountCountedAt)
+            }
+            return@withContext response
+        }
+    }
+
+    private fun unmatch(chatId: UUID) {
+        balanceDatabase.runInTransaction {
+            matchDAO.deleteBy(chatId)
+            chatMessageDAO.deleteByChatId(chatId)
         }
     }
 

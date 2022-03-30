@@ -9,6 +9,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
+import com.beeswork.balance.data.network.response.match.UnmatchDTO
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import java.util.*
 
@@ -21,7 +22,7 @@ class MatchRDSImpl(
         return getResult { balanceAPI.click(ClickBody(swipedId, answers)) }
     }
 
-    override suspend fun unmatch(swipedId: UUID): Resource<EmptyResponse> {
+    override suspend fun unmatch(swipedId: UUID): Resource<UnmatchDTO> {
         return getResult { balanceAPI.unmatch(UnmatchBody(swipedId)) }
     }
 

@@ -48,7 +48,7 @@ class ChatFragment : BaseFragment(),
     ErrorDialog.RetryListener {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: ((UUID) -> ChatViewModelFactory) by factory()
+    private val viewModelFactory: ((ChatViewModelParameter) -> ChatViewModelFactory) by factory()
     private lateinit var viewModel: ChatViewModel
     private lateinit var chatMessagePagingDataAdapter: ChatMessagePagingDataAdapter
     private lateinit var chatMessagePagingRefreshDataAdapter: PagingRefreshAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>
@@ -70,8 +70,10 @@ class ChatFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         setupBackBtn()
         val chatId = Converter.toUUID(arguments?.getString(BundleKey.CHAT_ID))
-        if (chatId != null) {
-            viewModel = ViewModelProvider(this, viewModelFactory(chatId)).get(ChatViewModel::class.java)
+        val swipedId = Converter.toUUID(arguments?.getString(BundleKey.SWIPED_ID))
+        if (chatId != null && swipedId != null) {
+            val chatViewModelParameter = ChatViewModelParameter(chatId, swipedId)
+            viewModel = ViewModelProvider(this, viewModelFactory(chatViewModelParameter)).get(ChatViewModel::class.java)
             bindUI()
         } else {
             val title = getString(R.string.error_title_open_chat)
@@ -277,45 +279,41 @@ class ChatFragment : BaseFragment(),
 
 
     private fun observeUnmatchLiveData() {
-        viewModel.unmatchLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
+        viewModel.unmatchLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
             when {
-                resource.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
-                resource.isLoading() -> showLoading()
-                resource.isError() -> showUnmatchErrorDialog(resource.exception)
+                uiState.unmatched -> popBackStack(MainViewPagerFragment.TAG)
+                uiState.showLoading -> {
+                    binding.llChatLoading.visibility = View.VISIBLE
+                }
+                uiState.showError -> {
+                    binding.llChatLoading.visibility = View.GONE
+                    showUnmatchErrorDialog(uiState.exception)
+                }
             }
         }
     }
 
     private fun showUnmatchErrorDialog(exception: Throwable?) {
-        hideLoading()
         val title = getString(R.string.error_title_unmatch)
         val message = MessageSource.getMessage(requireContext(), exception)
         ErrorDialog.show(title, message, RequestCode.UNMATCH, this, childFragmentManager)
     }
 
-    private fun showLoading() {
-//        binding.llChatLoading.visibility = View.VISIBLE
-    }
-
-    private fun hideLoading() {
-//        binding.llChatLoading.visibility = View.GONE
-    }
-
     private fun observeReportMatchLiveData() {
-        viewModel.reportMatchLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
+        viewModel.reportMatchLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
             when {
-                resource.isSuccess() -> popBackStack(MainViewPagerFragment.TAG)
-                resource.isLoading() -> getReportDialog()?.showLoading()
-                resource.isError() -> showReportMatchErrorDialog(resource.exception)
+                uiState.unmatched -> popBackStack(MainViewPagerFragment.TAG)
+                uiState.showLoading -> getReportDialog()?.showLoading()
+                uiState.showError -> {
+                    val reportDialog = getReportDialog()
+                    if (reportDialog != null) {
+                        val title = getString(R.string.error_title_report)
+                        val message = MessageSource.getMessage(requireContext(), uiState.exception)
+                        getReportDialog()?.showError(title, message)
+                    }
+                }
             }
         }
-    }
-
-    private fun showReportMatchErrorDialog(exception: Throwable?) {
-        getReportDialog()?.hideLoading()
-        val title = getString(R.string.error_title_report)
-        val message = MessageSource.getMessage(requireContext(), exception)
-        ErrorDialog.show(title, message, RequestCode.REPORT_MATCH, this, childFragmentManager)
     }
 
     private fun getReportDialog(): ReportDialog? {
@@ -355,14 +353,14 @@ class ChatFragment : BaseFragment(),
 
 
     override fun onDeleteChatMessage(position: Int) {
-        chatMessagePagingDataAdapter.getChatMessage(position)?.let {
+        chatMessagePagingDataAdapter.getChatMessage(position)?.let { chatMessageItemUIState ->
             val confirmDialog = ConfirmDialog(
                 getString(R.string.confirm_dialog_delete_button_title),
                 RequestCode.DELETE_CHAT_MESSAGE,
                 this
             )
             val arguments = Bundle()
-//            arguments.putLong(BundleKey.CHAT_MESSAGE_KEY, it.key)
+            arguments.putString(BundleKey.CHAT_MESSAGE_TAG, chatMessageItemUIState.tag.toString())
             confirmDialog.arguments = arguments
             confirmDialog.show(childFragmentManager, ConfirmDialog.TAG)
         }
@@ -385,7 +383,10 @@ class ChatFragment : BaseFragment(),
     override fun onConfirm(requestCode: Int, argument: Bundle?) {
         when (requestCode) {
             RequestCode.DELETE_CHAT_MESSAGE -> {
-                argument?.let { viewModel.deleteChatMessage(it.getLong(BundleKey.CHAT_MESSAGE_KEY)) }
+                val chatMessageTag = Converter.toUUID(argument?.getString(BundleKey.CHAT_MESSAGE_TAG))
+                if (chatMessageTag != null) {
+                    viewModel.deleteChatMessage(chatMessageTag)
+                }
             }
         }
     }

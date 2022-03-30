@@ -7,8 +7,6 @@ import com.beeswork.balance.data.database.dao.ChatMessageDAO
 import com.beeswork.balance.data.database.dao.MatchCountDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
-import com.beeswork.balance.data.database.entity.match.Match
-import com.beeswork.balance.data.database.entity.match.MatchCount
 import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
 import com.beeswork.balance.data.network.rds.login.LoginRDS
@@ -295,18 +293,18 @@ class ChatRepositoryImpl(
         }
     }
 
-
+    override suspend fun deleteChatMessage(chatId: UUID, tag: UUID) {
+        withContext(ioDispatcher) {
+            chatMessageDAO.deleteBy(chatId, tag)
+            chatPageCallBackFlowListener?.onInvoke(null)
+        }
+    }
 
     override suspend fun deleteChatMessages() {
         withContext(ioDispatcher) { chatMessageDAO.deleteAll() }
     }
 
-    override suspend fun deleteChatMessage(chatId: Long, key: Long) {
-        withContext(ioDispatcher) {
-            chatMessageDAO.deleteByKey(key)
-            chatPageCallBackFlowListener?.onInvoke(null)
-        }
-    }
+
 
 
     override fun test() {

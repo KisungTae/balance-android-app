@@ -95,6 +95,7 @@ import com.beeswork.balance.ui.splashfragment.SplashViewModelFactory
 import com.beeswork.balance.ui.cardfragment.balancegame.CardBalanceGameViewModelFactory
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialogViewModelFactory
 import com.beeswork.balance.ui.cardfragment.CardViewModelFactory
+import com.beeswork.balance.ui.chatfragment.ChatViewModelParameter
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.*
@@ -179,6 +180,10 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind<SyncMatchUseCase>() with singleton { SyncMatchUseCaseImpl(instance(), Dispatchers.Default) }
         bind<ConnectToStompUseCase>() with singleton { ConnectToStompUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<DeleteChatMessageUseCase>() with singleton { DeleteChatMessageUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<UnmatchUseCase>() with singleton { UnmatchUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<ReportMatchUseCase>() with singleton { ReportMatchUseCaseImpl(instance(), Dispatchers.Default) }
+
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -255,9 +260,12 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Factory
         bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
-        bind() from factory { chatId: UUID ->
+        bind() from factory { chatViewModelParameter: ChatViewModelParameter ->
             ChatViewModelFactory(
-                chatId,
+                chatViewModelParameter,
+                instance(),
+                instance(),
+                instance(),
                 instance(),
                 instance(),
                 instance(),
