@@ -18,6 +18,7 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.response.match.*
+import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.constant.ClickResult
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
@@ -27,6 +28,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import java.util.concurrent.Callable
@@ -44,6 +47,8 @@ class MatchRepositoryImpl(
     private val swipeCountDAO: SwipeCountDAO,
     private val photoDAO: PhotoDAO,
     private val matchMapper: MatchMapper,
+    private val stompClient: StompClient,
+    private val applicationScope: CoroutineScope,
     private val balanceDatabase: BalanceDatabase,
     preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
@@ -60,6 +65,12 @@ class MatchRepositoryImpl(
             }
         }
         awaitClose { }
+    }
+
+    init {
+        stompClient.matchFlow.onEach { matchDTO ->
+            saveMatch(matchDTO)
+        }.launchIn(applicationScope)
     }
 
     override suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match> {

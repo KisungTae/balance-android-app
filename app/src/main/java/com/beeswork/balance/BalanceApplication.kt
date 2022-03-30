@@ -199,6 +199,8 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                applicationScope,
+                instance(),
                 Dispatchers.IO
             )
         }
@@ -243,6 +245,8 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
+                applicationScope,
                 instance(),
                 instance(),
                 Dispatchers.IO

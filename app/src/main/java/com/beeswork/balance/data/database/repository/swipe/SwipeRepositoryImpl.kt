@@ -13,12 +13,15 @@ import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
+import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import java.util.concurrent.Callable
@@ -30,6 +33,8 @@ class SwipeRepositoryImpl(
     private val swipeCountDAO: SwipeCountDAO,
     private val preferenceProvider: PreferenceProvider,
     private val swipeMapper: SwipeMapper,
+    private val stompClient: StompClient,
+    private val applicationScope: CoroutineScope,
     private val balanceDatabase: BalanceDatabase,
     private val ioDispatcher: CoroutineDispatcher
 ) : SwipeRepository {
@@ -45,6 +50,12 @@ class SwipeRepositoryImpl(
             }
         }
         awaitClose { }
+    }
+
+    init {
+        stompClient.swipeFlow.onEach { swipeDTO ->
+            saveSwipe(swipeDTO)
+        }.launchIn(applicationScope)
     }
 
     override suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO> {
