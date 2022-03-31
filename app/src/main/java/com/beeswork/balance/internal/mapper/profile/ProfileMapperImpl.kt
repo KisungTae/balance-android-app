@@ -19,7 +19,7 @@ class ProfileMapperImpl : ProfileMapper {
     }
 
     override fun toProfileDomain(profile: Profile): ProfileDomain {
-        return ProfileDomain(profile.name, profile.birth, profile.gender, profile.height, profile.about)
+        return ProfileDomain(profile.name, profile.birthDate, profile.gender, profile.height, profile.about)
     }
 
 }

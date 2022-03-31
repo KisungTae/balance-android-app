@@ -24,8 +24,8 @@ class RegisterViewPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             RegisterViewPagerTabPosition.NAME.ordinal -> NameFragment()
-            RegisterViewPagerTabPosition.BIRTH_DATE.ordinal -> BirthDateFragment()
             RegisterViewPagerTabPosition.GENDER.ordinal -> GenderFragment()
+            RegisterViewPagerTabPosition.BIRTH_DATE.ordinal -> BirthDateFragment()
             RegisterViewPagerTabPosition.HEIGHT.ordinal -> HeightFragment()
             RegisterViewPagerTabPosition.ABOUT.ordinal -> AboutFragment()
             RegisterViewPagerTabPosition.PHOTO.ordinal -> PhotoFragment()
@@ -33,4 +33,5 @@ class RegisterViewPagerAdapter(
             else -> NameFragment()
         }
     }
+
 }

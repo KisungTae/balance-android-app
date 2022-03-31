@@ -51,8 +51,13 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
 import com.beeswork.balance.domain.usecase.chat.*
+import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCase
+import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImpl
+import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
+import com.beeswork.balance.domain.usecase.login.SocialLoginUseCaseImpl
 import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCase
 import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCaseImpl
+import com.beeswork.balance.domain.usecase.register.*
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
@@ -185,11 +190,33 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ReportMatchUseCase>() with singleton { ReportMatchUseCaseImpl(instance(), Dispatchers.Default) }
 
 
+        bind<LoginWithRefreshTokenUseCase>() with singleton {
+            LoginWithRefreshTokenUseCaseImpl(
+                instance(),
+                Dispatchers.Default
+            )
+        }
+        bind<SocialLoginUseCase>() with singleton { SocialLoginUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetNameUseCase>() with singleton { GetNameUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveNameUseCase>() with singleton { SaveNameUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetGenderUseCase>() with singleton { GetGenderUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveGenderUseCase>() with singleton { SaveGenderUseCaseImpl(instance(), Dispatchers.Default) }
+
+
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
         bind<CardRepository>() with singleton { CardRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
-        bind<ProfileRepository>() with singleton { ProfileRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
+        bind<ProfileRepository>() with singleton {
+            ProfileRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.IO
+            )
+        }
         bind<SwipeRepository>() with singleton {
             SwipeRepositoryImpl(
                 instance(),
@@ -305,15 +332,15 @@ class BalanceApplication : Application(), KodeinAware {
                 instance()
             )
         }
-        bind() from provider { SplashViewModelFactory(instance(), instance(), instance(), instance()) }
-        bind() from provider { LoginViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind() from provider { SplashViewModelFactory(instance()) }
+        bind() from provider { LoginViewModelFactory(instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { RegisterViewModelFactory(instance(), instance()) }
         bind() from provider { AboutViewModelFactory(instance()) }
         bind() from provider { BirthDateViewModelFactory(instance()) }
-        bind() from provider { GenderViewModelFactory(instance()) }
+        bind() from provider { GenderViewModelFactory(instance(), instance()) }
         bind() from provider { HeightViewModelFactory(instance()) }
-        bind() from provider { NameViewModelFactory(instance()) }
+        bind() from provider { NameViewModelFactory(instance(), instance()) }
         bind() from provider { PhotoViewModelFactory(instance()) }
         bind() from provider { RegisterFinishViewModelFactory(instance()) }
 

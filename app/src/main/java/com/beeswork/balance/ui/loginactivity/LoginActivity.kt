@@ -75,29 +75,15 @@ class LoginActivity : BaseActivity(), KodeinAware {
     }
 
     private fun observeLoginLiveData() {
-        viewModel.loginLiveData.observe(this) { resource ->
-            when (resource.status) {
-                Resource.Status.ERROR -> showLoginErrorDialog(resource.exception)
-                Resource.Status.SUCCESS -> resource.data?.let { loginDomain ->
-                    //todo: remove me
-                    moveToMainActivity()
-
-//                    if (loginDomain.profileExists) moveToMainActivity()
-//                    else moveToRegisterActivity()
-                }
-                else -> println()
+        viewModel.loginLiveData.observe(this) { uiState ->
+            if (uiState.shouldLogin) {
+                showLoginErrorDialog(uiState.exception)
+            } else if (!uiState.profileExists) {
+                Navigator.finishToActivity(this@LoginActivity, Intent(this@LoginActivity, RegisterActivity::class.java))
+            } else {
+                Navigator.finishToActivity(this@LoginActivity, Intent(this@LoginActivity, MainActivity::class.java))
             }
         }
-    }
-
-    private fun moveToMainActivity() {
-        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-        Navigator.finishToActivity(this@LoginActivity, intent)
-    }
-
-    private fun moveToRegisterActivity() {
-        val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-        Navigator.finishToActivity(this@LoginActivity, intent)
     }
 
     private fun showLoginErrorDialog(exception: Throwable?) {

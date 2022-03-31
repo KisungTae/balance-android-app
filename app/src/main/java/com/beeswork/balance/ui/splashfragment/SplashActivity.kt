@@ -11,6 +11,7 @@ import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseActivity
 import com.beeswork.balance.ui.loginactivity.LoginActivity
 import com.beeswork.balance.ui.mainactivity.MainActivity
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -34,20 +35,13 @@ class SplashActivity : BaseActivity(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-        viewModel.loginWithRefreshToken.observe(this@SplashActivity) {
-            when {
-                it.isSuccess() -> {
-                    // TODO: remove me and comment in
-                    Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, MainActivity::class.java))
-
-
-
-//                    if (it.data?.profileExists == true)
-//                        finishToActivity(Intent(this@SplashActivity, MainActivity::class.java))
-//                    else
-//                        finishToActivity(Intent(this@SplashActivity, RegisterActivity::class.java))
-                }
-                it.isError() -> Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, LoginActivity::class.java))
+        viewModel.loginWithRefreshTokenLiveData.observe(this@SplashActivity) { uiState ->
+            if (uiState.shouldLogin) {
+                Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, LoginActivity::class.java))
+            } else if (!uiState.profileExists) {
+                Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, RegisterActivity::class.java))
+            } else {
+                Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, MainActivity::class.java))
             }
         }
     }

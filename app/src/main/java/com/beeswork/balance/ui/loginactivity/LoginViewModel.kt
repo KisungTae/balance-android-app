@@ -8,41 +8,32 @@ import com.beeswork.balance.data.database.repository.login.LoginRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.card.CardRepository
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.domain.uistate.login.LoginUIState
+import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.exception.InvalidSocialLoginException
 import com.beeswork.balance.internal.mapper.login.LoginMapper
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val loginRepository: LoginRepository,
-    private val settingRepository: SettingRepository,
-    private val cardRepository: CardRepository,
-    private val loginMapper: LoginMapper
+    private val socialLoginUseCase: SocialLoginUseCase
 ) : ViewModel() {
 
-    private val _loginLiveData = MutableLiveData<Resource<LoginDomain>>()
-    val loginLiveData: LiveData<Resource<LoginDomain>> get() = _loginLiveData
-
-//    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-//        _loginLiveData.postValue(Resource.error(throwable))
-//    }
+    private val _loginLiveData = MutableLiveData<LoginUIState>()
+    val loginLiveData: LiveData<LoginUIState> get() = _loginLiveData
 
     fun socialLogin(loginId: String?, accessToken: String?, loginType: LoginType) {
         if (loginId.isNullOrBlank() || accessToken.isNullOrBlank()) {
-            _loginLiveData.postValue(Resource.error(InvalidSocialLoginException()))
+            _loginLiveData.postValue(LoginUIState.ofError(InvalidSocialLoginException()))
         } else {
             viewModelScope.launch {
-                val response = loginRepository.socialLogin(loginId, accessToken, loginType)
-                var loginDomain: LoginDomain? = null
-                response.data?.let { loginDTO ->
-                    if (loginDTO.profileExists && loginDTO.gender != null) {
-                        cardRepository.prepopulateCardFilter(loginDTO.gender)
-                    }
-                    loginDomain = loginMapper.toLoginDomain(loginDTO)
+                val response = socialLoginUseCase.invoke(loginId, accessToken, loginType)
+                val loginUIState = if (response.isSuccess() && response.data != null) {
+                    LoginUIState.ofSuccess(response.data.profileExists)
+                } else {
+                    LoginUIState.ofError(response.exception)
                 }
-                _loginLiveData.postValue(
-                    response.map { loginDomain }
-                )
+                _loginLiveData.postValue(loginUIState)
             }
         }
     }

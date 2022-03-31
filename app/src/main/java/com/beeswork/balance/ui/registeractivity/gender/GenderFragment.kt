@@ -7,8 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentBirthdateBinding
 import com.beeswork.balance.databinding.FragmentGenderBinding
+import com.beeswork.balance.internal.constant.Gender
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.beeswork.balance.ui.registeractivity.about.AboutViewModel
 import com.beeswork.balance.ui.registeractivity.about.AboutViewModelFactory
 import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateViewModel
@@ -35,7 +40,45 @@ class GenderFragment: Fragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        observeGenderLiveData()
+        observeSaveGenderLiveData()
+        setupNextBtnListener()
+    }
 
+    private fun observeGenderLiveData() {
+        viewModel.genderLiveData.observe(viewLifecycleOwner) { gender ->
+            if (gender != null) {
+                binding.rbRegisterFemale.isChecked = gender == Gender.FEMALE
+                binding.rbRegisterMale.isChecked = gender == Gender.MALE
+            }
+        }
+        viewModel.getGender()
+    }
+
+    private fun observeSaveGenderLiveData() {
+        viewModel.saveGenderUIStateLiveData.observe(viewLifecycleOwner) { saveGenderUIState ->
+            if (saveGenderUIState.saved) {
+                activity?.let { _activity ->
+                    (_activity as RegisterActivity).moveToNextTab()
+                }
+            } else if (saveGenderUIState.showError) {
+                val title = getString(R.string.error_title_save_gender)
+                val message = MessageSource.getMessage(requireContext(), saveGenderUIState.exception)
+                ErrorDialog.show(title, message, childFragmentManager)
+            }
+        }
+    }
+
+    private fun setupNextBtnListener() {
+        binding.btnRegisterGenderNext.setOnClickListener {
+            val selectedGenderButtonId =binding.rgRegisterGender.checkedRadioButtonId
+            val gender = if (selectedGenderButtonId == R.id.rbRegisterFemale) {
+                Gender.FEMALE
+            } else {
+                Gender.MALE
+            }
+            viewModel.saveGender(gender)
+        }
     }
 
 }

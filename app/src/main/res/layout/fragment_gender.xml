@@ -1,11 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/Primary"
+    android:orientation="vertical">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="gender fragment"/>
+        android:text="@string/register_gender_label"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/register_gender_description" />
+
+
+    <RadioGroup
+        android:id="@+id/rgRegisterGender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbRegisterMale"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:background="@drawable/st_radio_button_left"
+            android:button="@color/Transparent"
+            android:gravity="center"
+            android:paddingVertical="8dp"
+            android:text="@string/gender_male_label"
+            android:textColor="@color/radio_button_text" />
+
+        <RadioButton
+            android:id="@+id/rbRegisterFemale"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:background="@drawable/st_radio_button_right"
+            android:button="@color/Transparent"
+            android:gravity="center"
+            android:paddingVertical="8dp"
+            android:text="@string/gender_female_label"
+            android:textColor="@color/radio_button_text" />
+
+    </RadioGroup>
+
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnRegisterGenderNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/sh_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
+        android:text="@string/button_next_label" />
 
 </LinearLayout>

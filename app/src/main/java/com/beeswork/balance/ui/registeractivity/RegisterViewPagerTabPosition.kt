@@ -2,8 +2,8 @@ package com.beeswork.balance.ui.registeractivity
 
 enum class RegisterViewPagerTabPosition {
     NAME,
-    BIRTH_DATE,
     GENDER,
+    BIRTH_DATE,
     HEIGHT,
     ABOUT,
     PHOTO,

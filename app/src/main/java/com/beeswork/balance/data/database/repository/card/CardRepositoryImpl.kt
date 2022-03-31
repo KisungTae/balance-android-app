@@ -76,10 +76,9 @@ class CardRepositoryImpl(
 
     override suspend fun prepopulateCardFilter(gender: Boolean) {
         withContext(ioDispatcher) {
-            preferenceProvider.getAccountId()?.let { accountId ->
-                if (!cardFilterDAO.existBy(accountId)) {
-                    cardFilterDAO.insert(CardFilter(accountId, Gender.getOppositeGender(gender)))
-                }
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext
+            if (!cardFilterDAO.existBy(accountId)) {
+                cardFilterDAO.insert(CardFilter(accountId, Gender.getOppositeGender(gender)))
             }
         }
     }

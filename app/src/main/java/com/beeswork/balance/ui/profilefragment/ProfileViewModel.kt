@@ -32,8 +32,8 @@ class ProfileViewModel(
     private val _fetchProfileLiveData = MutableLiveData<Resource<ProfileDomain>>()
     val fetchProfileLiveData: LiveData<Resource<ProfileDomain>> get() = _fetchProfileLiveData
 
-    private val _saveAboutLiveData = MutableLiveData<Resource<ProfileDomain>>()
-    val saveAboutLiveData: LiveData<Resource<ProfileDomain>> get() = _saveAboutLiveData
+    private val _saveBioLiveData = MutableLiveData<Resource<ProfileDomain>>()
+    val saveBioLiveData: LiveData<Resource<ProfileDomain>> get() = _saveBioLiveData
 
     private val _fetchPhotosLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchPhotosLiveData
@@ -68,13 +68,13 @@ class ProfileViewModel(
         }
     }
 
-    fun saveAbout(height: Int?, about: String) {
+    fun saveBio(height: Int?, about: String) {
         viewModelScope.launch {
-            _saveAboutLiveData.postValue(Resource.loading())
-            val response = profileRepository.saveAbout(height, about).map {
+            _saveBioLiveData.postValue(Resource.loading())
+            val response = profileRepository.saveBio(height, about).map {
                 it?.let { profile -> profileMapper.toProfileDomain(profile) }
             }
-            _saveAboutLiveData.postValue(response)
+            _saveBioLiveData.postValue(response)
         }
     }
 

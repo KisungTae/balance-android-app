@@ -196,7 +196,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
 
     companion object {
         const val TAG = "mainViewPagerFragment"
-        const val BADGE_MAX_CHAR_COUNT = 4
+        const val BADGE_MAX_CHAR_COUNT = 3
     }
 
 

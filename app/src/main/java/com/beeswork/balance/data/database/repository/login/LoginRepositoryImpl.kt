@@ -27,6 +27,7 @@ class LoginRepositoryImpl(
     preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
 ) : BaseRepository(loginRDS, preferenceProvider), LoginRepository {
+
     private suspend fun saveEmail(accountId: UUID, email: String?, loginType: LoginType) {
         withContext(ioDispatcher) {
             val login = Login(accountId, loginType, email, true)
@@ -113,11 +114,8 @@ class LoginRepositoryImpl(
                 return@withContext Resource.error(RefreshTokenNotFoundException())
             }
 
-
             val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken, fcmTokenDAO.getById())
             response.data?.let { loginDTO ->
-//              todo: remove me
-                println("access token: ${loginDTO.accessToken}")
                 preferenceProvider.putLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
             }
             return@withContext response

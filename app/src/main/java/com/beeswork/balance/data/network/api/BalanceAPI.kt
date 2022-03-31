@@ -160,8 +160,8 @@ interface BalanceAPI {
     @GET("account/question/list")
     suspend fun listQuestions(): Response<List<QuestionDTO>>
 
-    @POST("profile/about")
-    suspend fun postAbout(@Body saveAboutBody: SaveAboutBody): Response<EmptyResponse>
+    @POST("profile/bio")
+    suspend fun saveBio(@Body saveBioBody: SaveBioBody): Response<EmptyResponse>
 
 
     @POST("report/profile")

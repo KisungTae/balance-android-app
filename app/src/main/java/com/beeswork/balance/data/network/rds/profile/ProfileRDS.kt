@@ -9,5 +9,5 @@ interface ProfileRDS {
     suspend fun fetchProfile(): Resource<ProfileDTO>
     suspend fun saveQuestions(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     suspend fun listQuestions(): Resource<List<QuestionDTO>>
-    suspend fun saveAbout(height: Int?, about: String): Resource<EmptyResponse>
+    suspend fun saveBio(height: Int?, about: String): Resource<EmptyResponse>
 }

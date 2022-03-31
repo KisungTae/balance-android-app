@@ -12,10 +12,10 @@ data class Profile(
     @PrimaryKey
     val accountId: UUID,
 
-    val name: String,
-    val birth: OffsetDateTime,
-    val gender: Boolean,
+    val name: String?,
+    val birthDate: OffsetDateTime?,
+    val gender: Boolean?,
     val height: Int?,
-    val about: String,
+    val about: String?,
     var synced: Boolean
 )

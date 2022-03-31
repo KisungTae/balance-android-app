@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentNameBinding
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -23,7 +23,7 @@ class NameFragment : Fragment(), KodeinAware {
     private lateinit var viewModel: NameViewModel
     private val viewModelFactory: NameViewModelFactory by instance()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentNameBinding.inflate(inflater)
         return binding.root
     }
@@ -35,8 +35,37 @@ class NameFragment : Fragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        observeNameLiveData()
+        observeSaveNameLiveData()
+        setupNextBtnListener()
+    }
+
+    private fun observeNameLiveData() {
+        viewModel.nameLiveData.observe(viewLifecycleOwner) { name ->
+            if (name != null && name.isNotBlank()) {
+                binding.etRegisterName.setText(name)
+            }
+        }
+        viewModel.getName()
+    }
+
+    private fun observeSaveNameLiveData() {
+        viewModel.saveNameUIStateLiveData.observe(viewLifecycleOwner) { saveNameUIState ->
+            if (saveNameUIState.saved) {
+                activity?.let { _activity ->
+                    (_activity as RegisterActivity).moveToNextTab()
+                }
+            } else if (saveNameUIState.showError) {
+                val title = getString(R.string.error_title_save_name)
+                val message = MessageSource.getMessage(requireContext(), saveNameUIState.exception)
+                ErrorDialog.show(title, message, childFragmentManager)
+            }
+        }
+    }
+
+    private fun setupNextBtnListener() {
         binding.btnRegisterNameNext.setOnClickListener {
-            activity?.let { _activity -> (_activity as RegisterActivity).moveToNextTab() }
+            viewModel.saveName(binding.etRegisterName.text.toString())
         }
     }
 

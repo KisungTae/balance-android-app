@@ -98,7 +98,7 @@ class ProfileFragment : BaseFragment(),
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
         observeFetchProfileLiveData()
-        observeSaveAboutLiveData()
+        observeSaveBioLiveData()
         setupListeners()
         observeFetchPhotosLiveData()
         setupPhotoPickerRecyclerView()
@@ -238,7 +238,7 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun setupToolBar() {
-        binding.btnProfileSave.setOnClickListener { saveAbout() }
+        binding.btnProfileSave.setOnClickListener { saveBio() }
         binding.btnProfileBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
     }
 
@@ -424,7 +424,7 @@ class ProfileFragment : BaseFragment(),
     private fun setupProfile(profileDomain: ProfileDomain?) {
         profileDomain?.let { _profileDomain ->
             binding.tvProfileName.text = _profileDomain.name
-            binding.tvProfileDateOfBirth.text = _profileDomain.birth.format(DateTimePattern.ofDate())
+            binding.tvProfileDateOfBirth.text = _profileDomain.birth?.format(DateTimePattern.ofDate())
             binding.tvProfileHeight.text = _profileDomain.height?.toString() ?: ""
             binding.etProfileAbout.setText(_profileDomain.about)
             when (_profileDomain.gender) {
@@ -434,17 +434,17 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    private fun observeSaveAboutLiveData() {
-        viewModel.saveAboutLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
+    private fun observeSaveBioLiveData() {
+        viewModel.saveBioLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
             when {
                 resource.isLoading() -> {
                     hideFieldErrors()
                     disableProfileEdit()
                     showLoading()
                 }
-                resource.isSuccess() -> showSaveAboutSuccess()
+                resource.isSuccess() -> showSaveBioSuccess()
                 resource.isError() -> {
-                    showSaveAboutError(resource.data, resource.exception)
+                    showSaveBioError(resource.data, resource.exception)
                 }
             }
         }
@@ -455,14 +455,14 @@ class ProfileFragment : BaseFragment(),
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.Primary))
     }
 
-    private fun showSaveAboutSuccess() {
+    private fun showSaveBioSuccess() {
         hideLoadingAndRefreshBtn()
         hideFieldErrors()
         enableProfileEdit()
         Toast.makeText(requireContext(), getString(R.string.save_about_success_message), Toast.LENGTH_SHORT).show()
     }
 
-    private fun showSaveAboutError(
+    private fun showSaveBioError(
         profileDomain: ProfileDomain?,
         exception: Throwable?
     ) {
@@ -492,10 +492,10 @@ class ProfileFragment : BaseFragment(),
         return binding.root.findViewWithTag("${tag}Error")
     }
 
-    private fun saveAbout(): Boolean {
+    private fun saveBio(): Boolean {
         val height = binding.tvProfileHeight.text.toString().toIntOrNull()
         val about = binding.etProfileAbout.text.toString()
-        viewModel.saveAbout(height, about)
+        viewModel.saveBio(height, about)
         return true
     }
 
