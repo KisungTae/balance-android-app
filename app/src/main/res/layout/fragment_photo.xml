@@ -8,4 +8,14 @@
         android:layout_height="wrap_content"
         android:text="photo fragment"/>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnRegisterPhotoNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/sh_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
+        android:text="@string/button_next_label" />
+
 </LinearLayout>

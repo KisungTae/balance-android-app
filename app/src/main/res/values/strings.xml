@@ -239,11 +239,21 @@
     <string name="text_match_empty">스와이프를 통해 새로운 이성과 매치해보세요!</string>
 
     <string name="title_connect_to_web_socket">서버 연결하기</string>
+    <string name="about_max_size_exceed_exception">about_max_size_exceed_exception</string>
 
     <string name="name_empty_exception">name_empty_exception</string>
     <string name="name_max_size_exceed_exception">name_max_size_exceed_exception</string>
     <string name="register_gender_label">성별을 선택해주세요</string>
     <string name="register_gender_description">한번 선택한 성별은 다시 바꿀수 없습니다. 정확하게 선택해주세요</string>
     <string name="error_title_save_gender">성별저장 실패</string>
+    <string name="register_birth_date_label">생년월일을 입력해주세요</string>
+    <string name="register_birth_date_description">입력된 생년월일은 계정생성후에 변경이 불가능 합니다. 정확하게 입력해주세</string>
+    <string name="error_title_save_birthDate">생년월일 저장실패</string>
+    <string name="error_title_save_height">키 저장실패</string>
+    <string name="register_height_label">키를 입력해주세요</string>
+    <string name="register_height_description">키는 계정생성후에도 변경하실 수 있습니다.</string>
+    <string name="register_about_description">자기소개는 계정생성이후에도 변경이 가능합니다. 상대방에게 어필할 수 있는 자기소개를 만들어보세요</string>
+    <string name="register_about_label">자기소개를 입력해주세요</string>
+    <string name="register_about_hint">자기소개를 입력해주세요</string>
 
 </resources>

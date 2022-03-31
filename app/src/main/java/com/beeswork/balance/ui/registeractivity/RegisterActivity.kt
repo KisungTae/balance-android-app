@@ -39,25 +39,30 @@ class RegisterActivity : BaseActivity(), KodeinAware {
         setupListeners()
     }
 
-    private fun setupListeners() {
-        binding.btnRegisterBack.setOnClickListener { moveToPreviousTab() }
+    private fun setupRegisterTabLayout() {
+        for (i in 1..RegisterViewPagerTabPosition.values().size) {
+            binding.tlRegister.addTab(binding.tlRegister.newTab())
+        }
     }
 
-    private fun setupRegisterTabLayout() {
-        TabLayoutMediator(binding.tlRegister, binding.vpRegister, false, false) { _, _ -> }.attach()
+    private fun setupListeners() {
+        binding.btnRegisterBack.setOnClickListener { moveToPreviousTab() }
     }
 
     private fun setupRegisterViewPager() {
         registerViewPagerAdapter = RegisterViewPagerAdapter(supportFragmentManager, lifecycle)
         binding.vpRegister.adapter = registerViewPagerAdapter
         binding.vpRegister.offscreenPageLimit = RegisterViewPagerTabPosition.values().size
-        binding.vpRegister.setCurrentItem(RegisterViewPagerTabPosition.NAME.ordinal, false)
         binding.vpRegister.isUserInputEnabled = false
         binding.vpRegister.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                if (position == RegisterViewPagerTabPosition.NAME.ordinal) hideBackBtn()
-                else showBackBtn()
+                if (position == RegisterViewPagerTabPosition.NAME.ordinal) {
+                    hideBackBtn()
+                } else {
+                    showBackBtn()
+                }
+                binding.tlRegister.selectTab(binding.tlRegister.getTabAt(position))
             }
         })
     }

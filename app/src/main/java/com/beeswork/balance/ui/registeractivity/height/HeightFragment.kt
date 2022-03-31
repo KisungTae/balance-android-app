@@ -7,8 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentHeightBinding
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.beeswork.balance.ui.registeractivity.gender.GenderViewModel
 import com.beeswork.balance.ui.registeractivity.gender.GenderViewModelFactory
 import kotlinx.coroutines.launch
@@ -34,7 +38,52 @@ class HeightFragment: Fragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        observeHeightLiveData()
+        observeSaveHeightLiveData()
+        setupNextBtnListener()
+        setupHeightNumberPicker()
+    }
 
+    private fun setupHeightNumberPicker() {
+        binding.npRegisterHeight.maxValue = MAX_HEIGHT
+        binding.npRegisterHeight.minValue = MIN_HEIGHT
+    }
+
+    private fun observeHeightLiveData() {
+        viewModel.heightLiveData.observe(viewLifecycleOwner) { height ->
+            if (height == null) {
+                binding.npRegisterHeight.value = DEFAULT_HEIGHT
+            } else {
+                binding.npRegisterHeight.value = height
+            }
+        }
+        viewModel.getHeight()
+    }
+
+    private fun observeSaveHeightLiveData() {
+        viewModel.saveHeightUIStateLiveData.observe(viewLifecycleOwner) { saveHeightUIState ->
+            if (saveHeightUIState.saved) {
+                activity?.let { _activity ->
+                    (_activity as RegisterActivity).moveToNextTab()
+                }
+            } else if (saveHeightUIState.showError) {
+                val title = getString(R.string.error_title_save_height)
+                val message = MessageSource.getMessage(requireContext(), saveHeightUIState.exception)
+                ErrorDialog.show(title, message, childFragmentManager)
+            }
+        }
+    }
+
+    private fun setupNextBtnListener() {
+        binding.btnRegisterHeightNext.setOnClickListener {
+            viewModel.saveHeight(binding.npRegisterHeight.value)
+        }
+    }
+
+    companion object {
+        const val MAX_HEIGHT = 300
+        const val MIN_HEIGHT = 100
+        const val DEFAULT_HEIGHT = 150
     }
 
 }

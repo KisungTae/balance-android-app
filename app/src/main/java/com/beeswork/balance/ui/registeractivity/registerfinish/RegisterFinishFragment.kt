@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentRegisterFinishBinding
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.beeswork.balance.ui.registeractivity.RegisterViewPagerAdapter
 import com.beeswork.balance.ui.registeractivity.photo.PhotoViewModel
 import com.beeswork.balance.ui.registeractivity.photo.PhotoViewModelFactory
@@ -35,7 +36,11 @@ class RegisterFinishFragment : Fragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-
+        binding.btnRegisterFinishNext.setOnClickListener {
+            activity?.let { _activity ->
+                (_activity as RegisterActivity).moveToNextTab()
+            }
+        }
     }
 
 

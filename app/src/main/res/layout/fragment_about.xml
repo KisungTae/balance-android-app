@@ -5,16 +5,45 @@
     android:background="@color/Primary"
     android:orientation="vertical">
 
-
-
-
-
-    <EditText
-        android:layout_marginTop="50dp"
-        android:padding="20dp"
-        android:layout_marginHorizontal="30dp"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/sh_round_box_thin_border" />
+        android:text="@string/register_about_label"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/register_about_description" />
+
+    <EditText
+        android:id="@+id/etRegisterAbout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/sh_round_box_thin_border"
+        android:gravity="top|start"
+        android:lines="8"
+        android:padding="15dp"
+        android:hint="@string/register_about_hint"
+        android:autofillHints="@string/register_about_hint"
+        android:inputType="textMultiLine" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnRegisterAboutNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/sh_round_box"
+        android:backgroundTint="@color/BackgroundWhite"
+        android:stateListAnimator="@null"
+        android:text="@string/button_next_label" />
 
 </LinearLayout>

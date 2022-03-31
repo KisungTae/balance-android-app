@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAboutBinding
-import com.beeswork.balance.ui.registeractivity.name.NameViewModel
-import com.beeswork.balance.ui.registeractivity.name.NameViewModelFactory
+import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -34,6 +36,37 @@ class AboutFragment: Fragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        observeAboutLiveData()
+        observeSaveAboutLiveData()
+        setupNextBtnListener()
+    }
 
+    private fun observeAboutLiveData() {
+        viewModel.aboutLiveData.observe(viewLifecycleOwner) { about ->
+            if (about != null && about.isNotBlank()) {
+                binding.etRegisterAbout.setText(about)
+            }
+        }
+        viewModel.getAbout()
+    }
+
+    private fun observeSaveAboutLiveData() {
+        viewModel.saveAboutUIStateLiveData.observe(viewLifecycleOwner) { saveAboutUIState ->
+            if (saveAboutUIState.saved) {
+                activity?.let { _activity ->
+                    (_activity as RegisterActivity).moveToNextTab()
+                }
+            } else if (saveAboutUIState.showError) {
+                val title = getString(R.string.error_title_save_about)
+                val message = MessageSource.getMessage(requireContext(), saveAboutUIState.exception)
+                ErrorDialog.show(title, message, childFragmentManager)
+            }
+        }
+    }
+
+    private fun setupNextBtnListener() {
+        binding.btnRegisterAboutNext.setOnClickListener {
+            viewModel.saveAbout(binding.etRegisterAbout.text.toString())
+        }
     }
 }

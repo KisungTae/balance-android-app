@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentPhotoBinding
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.beeswork.balance.ui.registeractivity.height.HeightViewModel
 import com.beeswork.balance.ui.registeractivity.height.HeightViewModelFactory
 import kotlinx.coroutines.launch
@@ -34,7 +35,11 @@ class PhotoFragment : Fragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-
+        binding.btnRegisterPhotoNext.setOnClickListener {
+            activity?.let { _activity ->
+                (_activity as RegisterActivity).moveToNextTab()
+            }
+        }
     }
 
 }

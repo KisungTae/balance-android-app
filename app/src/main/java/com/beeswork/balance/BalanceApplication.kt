@@ -201,7 +201,12 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SaveNameUseCase>() with singleton { SaveNameUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetGenderUseCase>() with singleton { GetGenderUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveGenderUseCase>() with singleton { SaveGenderUseCaseImpl(instance(), Dispatchers.Default) }
-
+        bind<GetBirthDateUseCase>() with singleton { GetBirthDateUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveBirthDateUseCase>() with singleton { SaveBirthDateUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetHeightUseCase>() with singleton { GetHeightUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveHeightUseCase>() with singleton { SaveHeightUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetAboutUseCase>() with singleton { GetAboutUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveAboutUseCase>() with singleton { SaveAboutUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -336,10 +341,10 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { LoginViewModelFactory(instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { RegisterViewModelFactory(instance(), instance()) }
-        bind() from provider { AboutViewModelFactory(instance()) }
-        bind() from provider { BirthDateViewModelFactory(instance()) }
+        bind() from provider { AboutViewModelFactory(instance(), instance()) }
+        bind() from provider { BirthDateViewModelFactory(instance(), instance()) }
         bind() from provider { GenderViewModelFactory(instance(), instance()) }
-        bind() from provider { HeightViewModelFactory(instance()) }
+        bind() from provider { HeightViewModelFactory(instance(), instance()) }
         bind() from provider { NameViewModelFactory(instance(), instance()) }
         bind() from provider { PhotoViewModelFactory(instance()) }
         bind() from provider { RegisterFinishViewModelFactory(instance()) }
