@@ -19,8 +19,8 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
+                android:layout_width="@dimen/icon_large"
+                android:layout_height="@dimen/icon_large"
                 android:layout_marginBottom="20dp"
                 android:contentDescription="@string/dialog_error_icon_description"
                 android:src="@drawable/ic_baseline_error_outline"
@@ -34,7 +34,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:textAlignment="center"
-                android:textColor="@android:color/black" />
+                android:textColor="@color/TextBlack" />
 
             <TextView
                 android:id="@+id/tvRegisterFinishErrorMessage"
@@ -44,7 +44,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:textAlignment="center"
-                android:textColor="@color/TextGrey" />
+                android:textColor="@color/TextBlack" />
 
 
         </LinearLayout>

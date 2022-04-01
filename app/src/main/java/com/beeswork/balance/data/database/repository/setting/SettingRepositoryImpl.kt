@@ -92,7 +92,7 @@ class SettingRepositoryImpl(
     override suspend fun saveLocation(latitude: Double, longitude: Double) {
         withContext(ioDispatcher) {
             val updatedAt = OffsetDateTime.now()
-            locationDAO.insert(Location(latitude, longitude, false, updatedAt, true))
+            locationDAO.insert(Location(latitude, longitude, false, updatedAt))
             syncLocation(latitude, longitude, updatedAt)
         }
     }
@@ -113,18 +113,6 @@ class SettingRepositoryImpl(
                 updatedAt
             )
             if (response.isSuccess()) locationDAO.sync(updatedAt)
-        }
-    }
-
-    override suspend fun saveLocationPermissionResult(granted: Boolean) {
-        withContext(ioDispatcher) {
-            locationDAO.updateGrantedById(granted)
-        }
-    }
-
-    override suspend fun getLocationPermissionResultFlow(): Flow<Boolean?> {
-        return withContext(ioDispatcher) {
-            return@withContext locationDAO.getGrantedFlowById()
         }
     }
 

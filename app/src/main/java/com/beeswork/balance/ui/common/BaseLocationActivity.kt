@@ -8,10 +8,14 @@ import com.beeswork.balance.ui.mainactivity.LocationLifecycleObserver
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 
-abstract class BaseLocationActivity: BaseActivity() {
+abstract class BaseLocationActivity: BaseActivity(), KodeinAware {
 
-    protected var fusedLocationProviderClient: FusedLocationProviderClient? = null
+    override val kodein by closestKodein()
+    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
     protected var locationViewModel: BaseLocationViewModel? = null
     protected val locationPermissionListeners = mutableListOf<LocationPermissionListener>()
 
@@ -31,7 +35,6 @@ abstract class BaseLocationActivity: BaseActivity() {
     protected fun setupLocationManager() {
         if (hasLocationPermission()) {
             bindLocationManager()
-            onLocationPermissionChanged(true)
         } else {
             requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
@@ -48,8 +51,13 @@ abstract class BaseLocationActivity: BaseActivity() {
     }
 
     private fun bindLocationManager() {
-        fusedLocationProviderClient?.let { _fusedLocationProviderClient ->
-            LocationLifecycleObserver(this, _fusedLocationProviderClient, locationCallback, this)
+        onLocationPermissionChanged(true)
+        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
+    }
+
+    protected fun doCheckLocationPermission() {
+        if (hasLocationPermission()) {
+            bindLocationManager()
         }
     }
 }

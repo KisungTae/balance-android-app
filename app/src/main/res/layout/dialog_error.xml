@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/ivErrorDialogIcon"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="@dimen/icon_large"
+        android:layout_height="@dimen/icon_large"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"

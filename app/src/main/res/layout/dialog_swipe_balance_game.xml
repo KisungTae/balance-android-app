@@ -42,8 +42,8 @@
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
+                android:layout_width="@dimen/icon_large"
+                android:layout_height="@dimen/icon_large"
                 android:layout_marginBottom="10dp"
                 android:contentDescription="@string/balance_game_retry_icon_description"
                 android:src="@drawable/ic_refresh"

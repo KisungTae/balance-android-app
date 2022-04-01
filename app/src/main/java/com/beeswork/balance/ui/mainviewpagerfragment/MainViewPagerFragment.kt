@@ -17,6 +17,7 @@ import com.beeswork.balance.databinding.SnackBarNewSwipeBinding
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
+import com.beeswork.balance.ui.cardfragment.CardFragment
 import com.beeswork.balance.ui.swipefragment.SwipeDomain
 import com.beeswork.balance.ui.common.BaseFragment
 import com.bumptech.glide.Glide
@@ -193,6 +194,15 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
                 .into(imageView)
         }
     }
+
+    fun onLocationPermissionChanged(grated: Boolean) {
+        val fragment = mainViewPagerAdapter.getFragmentAt(MainViewPagerTabPosition.CARD.ordinal)
+        if (fragment is CardFragment) {
+            fragment.onLocationPermissionChanged(grated)
+        }
+    }
+
+
 
     companion object {
         const val TAG = "mainViewPagerFragment"

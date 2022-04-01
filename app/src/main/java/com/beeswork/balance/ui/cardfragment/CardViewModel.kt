@@ -17,10 +17,6 @@ class CardViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val locationPermissionResultLiveData by viewModelLazyDeferred {
-        settingRepository.getLocationPermissionResultFlow().asLiveData()
-    }
-
     private val _fetchCards = MutableLiveData<Resource<List<CardDomain>>>()
     val fetchCards: LiveData<Resource<List<CardDomain>>> get() = _fetchCards
 

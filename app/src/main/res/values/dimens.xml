@@ -7,6 +7,7 @@
 
     <dimen name="icon_medium">48dp</dimen>
     <dimen name="icon_small">24dp</dimen>
+    <dimen name="icon_large">72dp</dimen>
 
     <dimen name="snack_bar_top_padding">10dp</dimen>
     <dimen name="snack_bar_new_chat_message_bottom_padding">10dp</dimen>

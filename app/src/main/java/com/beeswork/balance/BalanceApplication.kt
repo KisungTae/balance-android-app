@@ -208,7 +208,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SaveAboutUseCase>() with singleton { SaveAboutUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveProfileUseCase>() with singleton { SaveProfileUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveLocationUseCase>() with singleton { SaveLocationUseCaseImpl(instance(), Dispatchers.Default) }
-        bind<SaveLocationPermissionUseCase>() with singleton { SaveLocationPermissionUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -341,8 +340,8 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { SplashViewModelFactory(instance()) }
         bind() from provider { LoginViewModelFactory(instance()) }
-        bind() from provider { MainViewModelFactory(instance(), instance(), Dispatchers.Default) }
-        bind() from provider { RegisterViewModelFactory(instance(), instance()) }
+        bind() from provider { MainViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { RegisterViewModelFactory(instance()) }
         bind() from provider { AboutViewModelFactory(instance(), instance()) }
         bind() from provider { BirthDateViewModelFactory(instance(), instance()) }
         bind() from provider { GenderViewModelFactory(instance(), instance()) }

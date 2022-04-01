@@ -8,8 +8,8 @@
     android:visibility="gone">
 
     <ImageView
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="@dimen/icon_large"
+        android:layout_height="@dimen/icon_large"
         android:layout_marginBottom="20dp"
         android:contentDescription="@string/dialog_error_icon_description"
         android:src="@drawable/ic_baseline_error_outline" />

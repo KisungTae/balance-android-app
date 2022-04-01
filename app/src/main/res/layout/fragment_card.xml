@@ -97,10 +97,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <ImageView
+                android:layout_width="@dimen/icon_large"
+                android:layout_height="@dimen/icon_large"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="@string/dialog_error_icon_description"
+                android:src="@drawable/ic_baseline_error_outline"
+                app:tint="@color/Primary" />
+
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location permission should be granted, please Setting > Location and allow "/>
+                android:layout_marginBottom="20dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="@string/location_permission_required_message"
+                android:textAlignment="center"
+                android:textColor="@android:color/black" />
 
         </LinearLayout>
 
@@ -112,8 +125,6 @@
             android:clipToPadding="false"
             android:paddingHorizontal="10dp"
             android:visibility="gone" />
-
-
 
     </FrameLayout>
 

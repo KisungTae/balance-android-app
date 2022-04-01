@@ -17,6 +17,7 @@ import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.cardfragment.balancegame.CardBalanceGameDialog
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
+import com.beeswork.balance.ui.mainactivity.MainActivity
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -53,6 +54,7 @@ class CardFragment : BaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(CardViewModel::class.java)
         bindUI()
+        requestLocationPermission()
     }
 
 
@@ -60,19 +62,7 @@ class CardFragment : BaseFragment(),
         setupToolBar()
         setupCardStackView()
         observeFetchCardsLiveData()
-        observeLocationPermissionResultLiveData()
         binding.btnCardStackReload.setOnClickListener { viewModel.fetchCards() }
-    }
-
-    private suspend fun observeLocationPermissionResultLiveData() {
-        viewModel.locationPermissionResultLiveData.await().observe(viewLifecycleOwner) { granted ->
-            granted?.let { _granted ->
-                if (_granted) {
-                    updateCardLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
-//                    viewModel.fetchCards()
-                } else updateCardLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE)
-            }
-        }
     }
 
     private fun observeFetchCardsLiveData() {
@@ -98,12 +88,6 @@ class CardFragment : BaseFragment(),
         }
     }
 
-    private fun updateCardLayouts(loading: Int, empty: Int, error: Int, location: Int) {
-        binding.llCardStackLoading.visibility = loading
-        binding.llCardStackEmpty.visibility = empty
-        binding.llCardStackError.visibility = error
-        binding.llCardStackLocationNotPermitted.visibility = location
-    }
 
     private fun setupToolBar() {
         binding.tbCard.inflateMenu(R.menu.card_tool_bar)
@@ -145,17 +129,40 @@ class CardFragment : BaseFragment(),
         }
     }
 
+    fun onLocationPermissionChanged(granted: Boolean) {
+        if (granted) {
+            updateCardLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+            viewModel.fetchCards()
+        } else {
+            updateCardLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE)
+        }
+    }
+
+    private fun updateCardLayouts(loading: Int, empty: Int, error: Int, location: Int) {
+        binding.llCardStackLoading.visibility = loading
+        binding.llCardStackEmpty.visibility = empty
+        binding.llCardStackError.visibility = error
+        binding.llCardStackLocationNotPermitted.visibility = location
+    }
+
+
+    private fun requestLocationPermission() {
+        getMainActivity()?.requestLocationPermission()
+    }
+
+    private fun getMainActivity(): MainActivity? {
+        activity?.let { _activity ->
+            return if (_activity is MainActivity) {
+                _activity
+            } else {
+                null
+            }
+        } ?: return null
+    }
+
     override fun onResume() {
         super.onResume()
-    }
-
-
-    private fun showLocationNotPermitScreen() {
-
-    }
-
-    private fun hideLocationNotPermittedScreen() {
-
+        getMainActivity()?.checkLocationPermission()
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {
@@ -182,12 +189,12 @@ class CardFragment : BaseFragment(),
         println("swipe fragment: onFragmentSelected")
     }
 
-    companion object {
-        const val MIN_CARD_STACK_SIZE = 15
-    }
-
     override fun onApplyCardFilter() {
         println("onApplySwipeFilter")
+    }
+
+    companion object {
+        const val MIN_CARD_STACK_SIZE = 15
     }
 
 }

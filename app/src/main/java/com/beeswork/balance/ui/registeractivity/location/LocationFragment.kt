@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentLocationBinding
 import com.beeswork.balance.ui.common.LocationPermissionListener
+import com.beeswork.balance.ui.mainactivity.MainActivity
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -19,37 +20,33 @@ class LocationFragment : Fragment(), LocationPermissionListener {
 
     private lateinit var binding: FragmentLocationBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentLocationBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindUI()
         requestLocationPermission()
     }
 
-    private fun bindUI() = lifecycleScope.launch {
-        setupRegisterLocationRetryBtnListener()
-    }
-
-    private fun setupRegisterLocationRetryBtnListener() {
-        binding.btnRegisterLocationRetry.setOnClickListener {
-            binding.llRegisterLocationErrorWrapper.visibility = View.GONE
-            binding.llRegisterLocationLoadingWrapper.visibility = View.VISIBLE
-            binding.btnRegisterLocationRetry.visibility = View.INVISIBLE
-            binding.btnRegisterLocationRetry.isEnabled = false
-            requestLocationPermission()
-        }
-    }
-
     private fun requestLocationPermission() {
+        getRegisterActivity()?.requestLocationPermission()
+    }
+
+    private fun getRegisterActivity(): RegisterActivity? {
         activity?.let { _activity ->
-            if (_activity is RegisterActivity) {
-                _activity.requestLocationPermission()
+            return if (_activity is RegisterActivity) {
+                _activity
+            } else {
+                null
             }
-        }
+        } ?: return null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getRegisterActivity()?.checkLocationPermission()
     }
 
     override fun onLocationPermissionChanged(granted: Boolean) {
@@ -62,8 +59,6 @@ class LocationFragment : Fragment(), LocationPermissionListener {
         } else {
             binding.llRegisterLocationLoadingWrapper.visibility = View.GONE
             binding.llRegisterLocationErrorWrapper.visibility = View.VISIBLE
-            binding.btnRegisterLocationRetry.visibility = View.VISIBLE
-            binding.btnRegisterLocationRetry.isEnabled = true
         }
     }
 }

@@ -25,10 +25,4 @@ interface LocationDAO {
 
     @Query("select * from location where id = ${Location.ID}")
     fun getLocationFlowById(): Flow<Location>
-
-    @Query("select granted from location where id = ${Location.ID}")
-    fun getGrantedFlowById(): Flow<Boolean?>
-
-    @Query("update location set granted = :granted where id = ${Location.ID}")
-    fun updateGrantedById(granted: Boolean)
 }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.ui.common.*
+import com.beeswork.balance.ui.mainactivity.MainActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -124,6 +125,11 @@ class SwipeFragment : BaseFragment(),
 
     override fun onFragmentSelected() {
 //        viewModel.test()
+        activity?.let { _activity ->
+            if (_activity is MainActivity) {
+                _activity.requestLocationPermission()
+            }
+        }
     }
 
     override fun onSelectSwipe(position: Int) {

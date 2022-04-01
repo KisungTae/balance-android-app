@@ -23,8 +23,6 @@ interface SettingRepository {
     suspend fun saveFCMToken(token: String)
 
     suspend fun saveLocation(latitude: Double, longitude: Double)
-    suspend fun saveLocationPermissionResult(granted: Boolean)
-    suspend fun getLocationPermissionResultFlow(): Flow<Boolean?>
     suspend fun syncLocation()
     fun getLocationFlow(): Flow<Location?>
 

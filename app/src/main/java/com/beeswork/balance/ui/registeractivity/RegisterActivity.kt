@@ -21,9 +21,8 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
-class RegisterActivity : BaseLocationActivity(), LocationPermissionListener, KodeinAware {
+class RegisterActivity : BaseLocationActivity(), LocationPermissionListener {
 
-    override val kodein by closestKodein()
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var viewModel: RegisterViewModel
     private val viewModelFactory: RegisterViewModelFactory by instance()
@@ -36,7 +35,6 @@ class RegisterActivity : BaseLocationActivity(), LocationPermissionListener, Kod
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         super.locationViewModel = viewModel
-        super.fusedLocationProviderClient = fusedLocationProviderClient
         super.locationPermissionListeners.add(this)
         bindUI()
     }
@@ -101,6 +99,10 @@ class RegisterActivity : BaseLocationActivity(), LocationPermissionListener, Kod
 
     fun requestLocationPermission() {
         setupLocationManager()
+    }
+
+    fun checkLocationPermission() {
+        doCheckLocationPermission()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
