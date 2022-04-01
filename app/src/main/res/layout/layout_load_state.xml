@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/sh_round_box"
             android:backgroundTint="@color/Primary"
-            android:text="@string/retry"
+            android:text="@string/retry_btn"
             android:textSize="13sp"
             android:textColor="@color/white" />
 

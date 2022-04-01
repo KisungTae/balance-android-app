@@ -78,7 +78,6 @@ class StompClientImpl(
     override fun onOpen(webSocket: WebSocket, response: Response) {
         println("override fun onOpen(webSocket: WebSocket, response: Response)")
         applicationScope.launch {
-            delay(3000)
             webSocketState.setSocketStatus(WebSocketStatus.OPEN)
             val accessToken = preferenceProvider.getAccessToken()
             if (accessToken.isNullOrBlank()) {

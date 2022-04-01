@@ -55,8 +55,7 @@ import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCase
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImpl
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCaseImpl
-import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCase
-import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCaseImpl
+import com.beeswork.balance.domain.usecase.main.*
 import com.beeswork.balance.domain.usecase.register.*
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
@@ -207,6 +206,9 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SaveHeightUseCase>() with singleton { SaveHeightUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetAboutUseCase>() with singleton { GetAboutUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveAboutUseCase>() with singleton { SaveAboutUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveProfileUseCase>() with singleton { SaveProfileUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveLocationUseCase>() with singleton { SaveLocationUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveLocationPermissionUseCase>() with singleton { SaveLocationPermissionUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }

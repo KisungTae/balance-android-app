@@ -10,7 +10,7 @@ class ProfileMapperImpl : ProfileMapper {
         return Profile(
             accountId,
             profileDTO.name,
-            profileDTO.birth,
+            profileDTO.birthDate,
             profileDTO.gender,
             profileDTO.height,
             profileDTO.about,
@@ -20,6 +20,13 @@ class ProfileMapperImpl : ProfileMapper {
 
     override fun toProfileDomain(profile: Profile): ProfileDomain {
         return ProfileDomain(profile.name, profile.birthDate, profile.gender, profile.height, profile.about)
+    }
+
+    override fun toProfileDTO(profile: Profile): ProfileDTO? {
+        if (profile.name != null && profile.birthDate != null && profile.gender != null) {
+            return ProfileDTO(profile.name, profile.birthDate, profile.gender, profile.height, profile.about)
+        }
+        return null
     }
 
 }

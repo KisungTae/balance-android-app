@@ -317,7 +317,6 @@ class MatchRepositoryImpl(
         description: String
     ): Resource<UnmatchDTO> {
         return withContext(ioDispatcher) {
-            delay(10000)
             val response = reportRDS.reportMatch(swipedId, reportReason, description)
             if (response.isSuccess()) {
                 unmatch(chatId)

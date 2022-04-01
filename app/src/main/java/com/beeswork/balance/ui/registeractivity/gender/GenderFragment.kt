@@ -59,7 +59,9 @@ class GenderFragment: Fragment(), KodeinAware {
         viewModel.saveGenderUIStateLiveData.observe(viewLifecycleOwner) { saveGenderUIState ->
             if (saveGenderUIState.saved) {
                 activity?.let { _activity ->
-                    (_activity as RegisterActivity).moveToNextTab()
+                    if (_activity is RegisterActivity) {
+                        _activity.moveToNextTab()
+                    }
                 }
             } else if (saveGenderUIState.showError) {
                 val title = getString(R.string.error_title_save_gender)
@@ -71,11 +73,16 @@ class GenderFragment: Fragment(), KodeinAware {
 
     private fun setupNextBtnListener() {
         binding.btnRegisterGenderNext.setOnClickListener {
-            val selectedGenderButtonId =binding.rgRegisterGender.checkedRadioButtonId
-            val gender = if (selectedGenderButtonId == R.id.rbRegisterFemale) {
-                Gender.FEMALE
-            } else {
-                Gender.MALE
+            val gender = when (binding.rgRegisterGender.checkedRadioButtonId) {
+                R.id.rbRegisterFemale -> {
+                    Gender.FEMALE
+                }
+                R.id.rbRegisterMale -> {
+                    Gender.MALE
+                }
+                else -> {
+                    null
+                }
             }
             viewModel.saveGender(gender)
         }

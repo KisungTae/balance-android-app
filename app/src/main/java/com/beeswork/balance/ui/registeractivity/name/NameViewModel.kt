@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.beeswork.balance.domain.uistate.register.SaveProfileUIState
+import com.beeswork.balance.domain.uistate.register.RegisterStepUIState
 import com.beeswork.balance.domain.usecase.register.GetNameUseCase
 import com.beeswork.balance.domain.usecase.register.SaveNameUseCase
 import kotlinx.coroutines.launch
@@ -17,8 +17,8 @@ class NameViewModel(
     private val _nameLiveData = MutableLiveData<String?>()
     val nameLiveData: LiveData<String?> get() = _nameLiveData
 
-    private val _saveNameUIStateLiveData = MutableLiveData<SaveProfileUIState>()
-    val saveNameUIStateLiveData: LiveData<SaveProfileUIState> get() = _saveNameUIStateLiveData
+    private val _saveNameUIStateLiveData = MutableLiveData<RegisterStepUIState>()
+    val saveNameUIStateLiveData: LiveData<RegisterStepUIState> get() = _saveNameUIStateLiveData
 
     fun getName() {
         viewModelScope.launch {
@@ -30,9 +30,9 @@ class NameViewModel(
         viewModelScope.launch {
             val response = saveNameUseCase.invoke(name)
             val saveNameUIState = if (response.isSuccess()) {
-                SaveProfileUIState.ofSuccess()
+                RegisterStepUIState.ofSuccess()
             } else {
-                SaveProfileUIState.ofError(response.exception)
+                RegisterStepUIState.ofError(response.exception)
             }
             _saveNameUIStateLiveData.postValue(saveNameUIState)
         }

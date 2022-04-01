@@ -95,6 +95,7 @@
     <string name="search_bar_close_btn_description">서치 닫기</string>
     <string name="back_button_description">back button</string>
     <string name="dialog_error_icon_description">errorIcon</string>
+    <string name="retry_btn">다시 시도하기</string>
 
     <string name="dialog_retry_btn_text">다시 시도하기</string>
     <string name="dialog_close_btn_title">닫기</string>
@@ -240,6 +241,10 @@
 
     <string name="title_connect_to_web_socket">서버 연결하기</string>
     <string name="about_max_size_exceed_exception">about_max_size_exceed_exception</string>
+    <string name="profile_not_found_exception">profile_not_found_exception</string>
+    <string name="profile_not_completed_exception">profile_not_completed_exception</string>
+    <string name="gender_not_selected_exception">gender_not_selected_exception</string>
+    <string name="error_title_save_profile">프로필 저장실패</string>
 
     <string name="name_empty_exception">name_empty_exception</string>
     <string name="name_max_size_exceed_exception">name_max_size_exceed_exception</string>
@@ -255,5 +260,6 @@
     <string name="register_about_description">자기소개는 계정생성이후에도 변경이 가능합니다. 상대방에게 어필할 수 있는 자기소개를 만들어보세요</string>
     <string name="register_about_label">자기소개를 입력해주세요</string>
     <string name="register_about_hint">자기소개를 입력해주세요</string>
+    <string name="save_profile_loading_text">saving profile......</string>
 
 </resources>

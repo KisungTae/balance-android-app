@@ -29,33 +29,11 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.RetryListener {
     private val viewModelFactory: MainViewModelFactory by instance()
 
     private val requestLocationPermission = registerForActivityResult(RequestPermission()) { granted ->
-        if (granted) bindLocationManager()
-        else viewModel.saveLocationPermissionResult(false)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-//        setupLocationManager()
-        bindUI()
-    }
-
-    private fun setupLocationManager() {
-        if (hasLocationPermission()) bindLocationManager()
-        else requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
-
-    private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun bindLocationManager() {
-        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
+        if (granted) {
+            bindLocationManager()
+        } else {
+            viewModel.saveLocationPermissionResult(false)
+        }
     }
 
     private val locationCallback = object : LocationCallback() {
@@ -66,6 +44,34 @@ class MainActivity : BaseActivity(), KodeinAware, ErrorDialog.RetryListener {
             }
         }
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setupLocationManager()
+        bindUI()
+    }
+
+    private fun setupLocationManager() {
+        if (hasLocationPermission()) {
+            println("has location permission")
+            bindLocationManager()
+        } else {
+            requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun bindLocationManager() {
+        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
+    }
+
+
 
     private fun bindUI() = lifecycleScope.launch {
         observeWebSocketEventUIStateLiveData()

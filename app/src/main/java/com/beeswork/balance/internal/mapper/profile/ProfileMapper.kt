@@ -8,4 +8,5 @@ import java.util.*
 interface ProfileMapper {
     fun toProfile(accountId:UUID, profileDTO: ProfileDTO): Profile
     fun toProfileDomain(profile: Profile): ProfileDomain
+    fun toProfileDTO(profile: Profile): ProfileDTO?
 }

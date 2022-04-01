@@ -90,7 +90,7 @@
                 android:background="@drawable/sh_round_box"
                 android:backgroundTint="@color/Primary"
                 android:textSize="13sp"
-                android:text="@string/retry"
+                android:text="@string/retry_btn"
                 android:textColor="@color/white" />
 
 

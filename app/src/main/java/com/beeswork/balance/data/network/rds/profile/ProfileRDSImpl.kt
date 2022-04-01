@@ -17,6 +17,10 @@ class ProfileRDSImpl(
         return getResult { balanceAPI.fetchProfile() }
     }
 
+    override suspend fun saveProfile(profileDTO: ProfileDTO): Resource<EmptyResponse> {
+        return getResult { balanceAPI.saveProfile(profileDTO) }
+    }
+
     override suspend fun saveQuestions(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return getResult { balanceAPI.saveAnswers(SaveAnswersBody(answers)) }
     }

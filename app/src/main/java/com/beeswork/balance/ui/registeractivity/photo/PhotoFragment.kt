@@ -37,7 +37,9 @@ class PhotoFragment : Fragment(), KodeinAware {
     private fun bindUI() = lifecycleScope.launch {
         binding.btnRegisterPhotoNext.setOnClickListener {
             activity?.let { _activity ->
-                (_activity as RegisterActivity).moveToNextTab()
+                if (_activity is RegisterActivity) {
+                    _activity.moveToNextTab()
+                }
             }
         }
     }

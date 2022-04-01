@@ -53,7 +53,9 @@ class NameFragment : Fragment(), KodeinAware {
         viewModel.saveNameUIStateLiveData.observe(viewLifecycleOwner) { saveNameUIState ->
             if (saveNameUIState.saved) {
                 activity?.let { _activity ->
-                    (_activity as RegisterActivity).moveToNextTab()
+                    if (_activity is RegisterActivity) {
+                        _activity.moveToNextTab()
+                    }
                 }
             } else if (saveNameUIState.showError) {
                 val title = getString(R.string.error_title_save_name)

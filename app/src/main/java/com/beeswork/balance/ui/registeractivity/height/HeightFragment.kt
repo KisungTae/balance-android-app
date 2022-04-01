@@ -64,7 +64,9 @@ class HeightFragment: Fragment(), KodeinAware {
         viewModel.saveHeightUIStateLiveData.observe(viewLifecycleOwner) { saveHeightUIState ->
             if (saveHeightUIState.saved) {
                 activity?.let { _activity ->
-                    (_activity as RegisterActivity).moveToNextTab()
+                    if (_activity is RegisterActivity) {
+                        _activity.moveToNextTab()
+                    }
                 }
             } else if (saveHeightUIState.showError) {
                 val title = getString(R.string.error_title_save_height)

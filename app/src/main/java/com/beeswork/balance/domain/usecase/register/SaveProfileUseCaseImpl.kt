@@ -3,26 +3,22 @@ package com.beeswork.balance.domain.usecase.register
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.exception.GenderNotSelectedException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class SaveGenderUseCaseImpl(
+class SaveProfileUseCaseImpl(
     private val profileRepository: ProfileRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-) : SaveGenderUseCase {
+) : SaveProfileUseCase {
 
-    override suspend fun invoke(gender: Boolean?): Resource<EmptyResponse> = withContext(defaultDispatcher) {
+    override suspend fun invoke(): Resource<EmptyResponse> = withContext(defaultDispatcher) {
         try {
-            if (gender == null) {
-                return@withContext Resource.error(GenderNotSelectedException())
-            }
-            profileRepository.saveGender(gender)
-            return@withContext Resource.success(EmptyResponse())
+            return@withContext profileRepository.saveProfile()
         } catch (e: IOException) {
             return@withContext Resource.error(e)
         }
     }
+
 }

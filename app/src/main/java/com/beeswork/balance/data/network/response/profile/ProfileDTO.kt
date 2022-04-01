@@ -5,8 +5,8 @@ import java.util.*
 
 data class ProfileDTO(
     val name: String,
-    val birth: OffsetDateTime,
+    val birthDate: OffsetDateTime,
     val gender: Boolean,
     val height: Int?,
-    val about: String
+    val about: String?
 )

@@ -19,7 +19,7 @@ import com.bumptech.glide.Glide
 
 
 class ChatMessagePagingDataAdapter(
-    private val chatMessageSentListener: ChatMessageSentListener,
+    private val chatMessageListener: ChatMessageListener,
     displayDensity: Float
 ) : PagingDataAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>(diffCallback) {
 
@@ -43,7 +43,7 @@ class ChatMessagePagingDataAdapter(
             else -> {
                 SentViewHolder(
                     ItemChatMessageSentBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                    chatMessageSentListener
+                    chatMessageListener
                 )
             }
         }
@@ -101,7 +101,7 @@ class ChatMessagePagingDataAdapter(
         return getItem(position)
     }
 
-    interface ChatMessageSentListener {
+    interface ChatMessageListener {
         fun onResendChatMessage(position: Int)
         fun onDeleteChatMessage(position: Int)
     }
@@ -146,7 +146,7 @@ class ChatMessagePagingDataAdapter(
 
     class SentViewHolder(
         private val binding: ItemChatMessageSentBinding,
-        private val chatMessageSentListener: ChatMessageSentListener
+        private val chatMessageListener: ChatMessageListener
     ) : ViewHolder(binding.root) {
 
         fun bind(
@@ -154,10 +154,10 @@ class ChatMessagePagingDataAdapter(
         ) {
             binding.tvChatMessageSentBody.text = chatMessageItemUIState.body
             binding.btnChatMessageSentResend.setOnClickListener {
-                chatMessageSentListener.onResendChatMessage(absoluteAdapterPosition)
+                chatMessageListener.onResendChatMessage(absoluteAdapterPosition)
             }
             binding.btnChatMessageSentDelete.setOnClickListener {
-                chatMessageSentListener.onDeleteChatMessage(absoluteAdapterPosition)
+                chatMessageListener.onDeleteChatMessage(absoluteAdapterPosition)
             }
             setTopMargin(binding.root, chatMessageItemUIState.topMargin)
             when (chatMessageItemUIState.status) {

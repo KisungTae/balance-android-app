@@ -8,6 +8,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
+import com.beeswork.balance.internal.exception.ProfileNotFoundException
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -46,11 +47,76 @@ class ProfileRepositoryImpl(
         }
     }
 
+    override suspend fun getGender(): Boolean? {
+        return withContext(ioDispatcher) {
+            profileDAO.getGender(preferenceProvider.getAccountId())
+        }
+    }
+
+    override suspend fun saveGender(gender: Boolean) {
+        withContext(ioDispatcher) {
+            profileDAO.saveGenderBy(preferenceProvider.getAccountId(), gender)
+        }
+    }
+
+    override suspend fun getBirthDate(): OffsetDateTime? {
+        return withContext(ioDispatcher) {
+            profileDAO.getBirthDate(preferenceProvider.getAccountId())
+        }
+    }
+
+    override suspend fun saveBirthDate(birthDate: OffsetDateTime) {
+        withContext(ioDispatcher) {
+            profileDAO.saveBirthDateBy(preferenceProvider.getAccountId(), birthDate)
+        }
+    }
+
+    override suspend fun getHeight(): Int? {
+        return withContext(ioDispatcher) {
+            profileDAO.getHeight(preferenceProvider.getAccountId())
+        }
+    }
+
+    override suspend fun saveHeight(height: Int) {
+        withContext(ioDispatcher) {
+            profileDAO.saveHeightBy(preferenceProvider.getAccountId(), height)
+        }
+    }
+
+    override suspend fun getAbout(): String? {
+        return withContext(ioDispatcher) {
+            profileDAO.getAbout(preferenceProvider.getAccountId())
+        }
+    }
+
+    override suspend fun saveAbout(about: String) {
+        withContext(ioDispatcher) {
+            profileDAO.saveAboutBy(preferenceProvider.getAccountId(), about)
+        }
+    }
+
     override suspend fun getProfile(): Profile? {
         return withContext(ioDispatcher) {
             return@withContext profileDAO.getBy(preferenceProvider.getAccountId())
         }
     }
+
+    override suspend fun saveProfile(): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val profile = profileDAO.getBy(preferenceProvider.getAccountId())
+                ?: return@withContext Resource.error(ProfileNotFoundException())
+
+            val profileDTO = profileMapper.toProfileDTO(profile)
+                ?: return@withContext Resource.error(ProfileNotFoundException())
+
+            val response = profileRDS.saveProfile(profileDTO)
+            if (response.isSuccess()) {
+                profileDAO.updateSyncedBy(preferenceProvider.getAccountId(), true)
+            }
+            return@withContext response
+        }
+    }
+
 
     override suspend fun deleteProfile() {
         withContext(ioDispatcher) { profileDAO.deleteBy(preferenceProvider.getAccountId()) }
@@ -70,17 +136,6 @@ class ProfileRepositoryImpl(
         }
     }
 
-    override suspend fun getAbout(): String? {
-        return withContext(ioDispatcher) {
-            profileDAO.getAbout(preferenceProvider.getAccountId())
-        }
-    }
-
-    override suspend fun saveAbout(about: String) {
-        withContext(ioDispatcher) {
-            profileDAO.saveAboutBy(preferenceProvider.getAccountId(), about)
-        }
-    }
 
     override suspend fun saveBio(height: Int?, about: String): Resource<Profile> {
         return withContext(ioDispatcher) {
@@ -99,41 +154,6 @@ class ProfileRepositoryImpl(
         }
     }
 
-    override suspend fun getHeight(): Int? {
-        return withContext(ioDispatcher) {
-            profileDAO.getHeight(preferenceProvider.getAccountId())
-        }
-    }
-
-    override suspend fun saveHeight(height: Int) {
-        withContext(ioDispatcher) {
-            profileDAO.saveHeightBy(preferenceProvider.getAccountId(), height)
-        }
-    }
-
-    override suspend fun getBirthDate(): OffsetDateTime? {
-        return withContext(ioDispatcher) {
-            profileDAO.getBirthDate(preferenceProvider.getAccountId())
-        }
-    }
-
-    override suspend fun saveBirthDate(birthDate: OffsetDateTime) {
-        withContext(ioDispatcher) {
-            profileDAO.saveBirthDateBy(preferenceProvider.getAccountId(), birthDate)
-        }
-    }
-
-    override suspend fun getGender(): Boolean? {
-        return withContext(ioDispatcher) {
-            profileDAO.getGender(preferenceProvider.getAccountId())
-        }
-    }
-
-    override suspend fun saveGender(gender: Boolean) {
-        withContext(ioDispatcher) {
-            profileDAO.saveGenderBy(preferenceProvider.getAccountId(), gender)
-        }
-    }
 
     override suspend fun fetchQuestions(): Resource<List<QuestionDTO>> {
         return withContext(ioDispatcher) {

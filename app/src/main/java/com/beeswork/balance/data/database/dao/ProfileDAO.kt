@@ -28,7 +28,7 @@ interface ProfileDAO {
     fun getNameFlowBy(accountId: UUID?): Flow<String?>
 
     @Query("update profile set synced = :synced where accountId = :accountId")
-    fun updateSyncedBy(accountId: UUID, synced: Boolean)
+    fun updateSyncedBy(accountId: UUID?, synced: Boolean)
 
     @Query("update profile set name = :name where accountId = :accountId")
     fun saveNameBy(accountId: UUID?, name: String)

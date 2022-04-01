@@ -41,7 +41,7 @@ import java.util.*
 class ChatFragment : BaseFragment(),
     KodeinAware,
     ErrorDialog.DismissListener,
-    ChatMessagePagingDataAdapter.ChatMessageSentListener,
+    ChatMessagePagingDataAdapter.ChatMessageListener,
     ConfirmDialog.ConfirmDialogClickListener,
     ChatMoreMenuDialog.ChatMoreMenuDialogClickListener,
     ReportDialog.ReportDialogClickListener,

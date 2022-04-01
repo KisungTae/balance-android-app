@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.registeractivity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -9,15 +10,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivityRegisterBinding
+import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.internal.util.hideKeyboard
-import com.beeswork.balance.ui.common.BaseActivity
-import com.google.android.material.tabs.TabLayoutMediator
+import com.beeswork.balance.ui.common.BaseLocationActivity
+import com.beeswork.balance.ui.common.LocationPermissionListener
+import com.beeswork.balance.ui.mainactivity.MainActivity
+import com.beeswork.balance.ui.registeractivity.location.LocationFragment
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
-class RegisterActivity : BaseActivity(), KodeinAware {
+class RegisterActivity : BaseLocationActivity(), LocationPermissionListener, KodeinAware {
+
     override val kodein by closestKodein()
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var viewModel: RegisterViewModel
@@ -30,6 +35,9 @@ class RegisterActivity : BaseActivity(), KodeinAware {
         window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        super.locationViewModel = viewModel
+        super.fusedLocationProviderClient = fusedLocationProviderClient
+        super.locationPermissionListeners.add(this)
         bindUI()
     }
 
@@ -87,8 +95,23 @@ class RegisterActivity : BaseActivity(), KodeinAware {
         binding.vpRegister.currentItem = previousIndex
     }
 
+    fun moveToMainActivity() {
+        Navigator.finishToActivity(this@RegisterActivity, Intent(this@RegisterActivity, MainActivity::class.java))
+    }
+
+    fun requestLocationPermission() {
+        setupLocationManager()
+    }
+
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         this.hideKeyboard(ev)
         return super.dispatchTouchEvent(ev)
+    }
+
+    override fun onLocationPermissionChanged(granted: Boolean) {
+        val locationFragment = supportFragmentManager.findFragmentByTag("f${RegisterViewPagerTabPosition.LOCATION.ordinal}")
+        if (locationFragment is LocationFragment) {
+            locationFragment.onLocationPermissionChanged(granted)
+        }
     }
 }

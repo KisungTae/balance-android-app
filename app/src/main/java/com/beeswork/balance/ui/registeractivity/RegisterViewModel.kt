@@ -1,12 +1,13 @@
 package com.beeswork.balance.ui.registeractivity
 
-import androidx.lifecycle.ViewModel
-import com.beeswork.balance.data.database.repository.photo.PhotoRepository
-import com.beeswork.balance.data.database.repository.profile.ProfileRepository
+import com.beeswork.balance.domain.usecase.main.SaveLocationPermissionUseCase
+import com.beeswork.balance.domain.usecase.main.SaveLocationUseCase
+import com.beeswork.balance.ui.common.BaseLocationViewModel
 
 class RegisterViewModel(
-    private val profileRepository: ProfileRepository,
-    private val photoRepository: PhotoRepository
-): ViewModel() {
+    saveLocationUseCase: SaveLocationUseCase,
+    saveLocationPermissionUseCase: SaveLocationPermissionUseCase
+): BaseLocationViewModel(saveLocationUseCase, saveLocationPermissionUseCase) {
+
 
 }

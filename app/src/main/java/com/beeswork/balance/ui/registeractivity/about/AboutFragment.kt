@@ -54,7 +54,9 @@ class AboutFragment: Fragment(), KodeinAware {
         viewModel.saveAboutUIStateLiveData.observe(viewLifecycleOwner) { saveAboutUIState ->
             if (saveAboutUIState.saved) {
                 activity?.let { _activity ->
-                    (_activity as RegisterActivity).moveToNextTab()
+                    if (_activity is RegisterActivity) {
+                        _activity.moveToNextTab()
+                    }
                 }
             } else if (saveAboutUIState.showError) {
                 val title = getString(R.string.error_title_save_about)

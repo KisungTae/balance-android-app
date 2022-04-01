@@ -1,18 +1,35 @@
 package com.beeswork.balance.domain.uistate.register
 
-data class SaveProfileUIState(
+import com.beeswork.balance.domain.uistate.BaseUIState
+import com.beeswork.balance.internal.constant.ExceptionCode
+
+class SaveProfileUIState(
     val saved: Boolean,
-    val showError: Boolean,
-    val exception: Throwable?
-) {
+    showLoading: Boolean,
+    showError: Boolean,
+    shouldLogout: Boolean,
+    exception: Throwable?
+) : BaseUIState(showLoading, showError, shouldLogout, exception) {
+
 
     companion object {
+
         fun ofSuccess(): SaveProfileUIState {
-            return SaveProfileUIState(saved = true, showError = false, exception = null)
+            return SaveProfileUIState(saved = true, showLoading = false, showError = false, shouldLogout = false, exception = null)
+        }
+
+        fun ofLoading(): SaveProfileUIState {
+            return SaveProfileUIState(saved = false, showLoading = true, showError = false, shouldLogout = false, exception = null)
         }
 
         fun ofError(exception: Throwable?): SaveProfileUIState {
-            return SaveProfileUIState(saved = false, showError = true, exception = exception)
+            return SaveProfileUIState(
+                saved = false,
+                showLoading = false,
+                showError = true,
+                shouldLogout = ExceptionCode.isLoginException(exception),
+                exception = exception
+            )
         }
     }
 }
