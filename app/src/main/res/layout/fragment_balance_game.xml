@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/register_about_label"
+        android:text="밸런스 게임을 진행해주세요"
         android:textSize="25sp"
         android:textStyle="bold" />
 
@@ -16,34 +16,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="@string/register_about_description" />
+        android:text="밸런스 게임을 통해서 본인의 취향을 표현해주세요. 각각 질문들은 리프레쉬 버튼으로 새로운 질문으로 바꾸실 수 있습니다. 아래 질문보기 버튼을 눌러 진행해주세" />
 
-    <EditText
-        android:id="@+id/etRegisterAbout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/sh_round_box_thin_border"
-        android:gravity="top|start"
-        android:lines="8"
-        android:padding="15dp"
-        android:hint="@string/register_about_hint"
-        android:autofillHints="@string/register_about_hint"
-        android:inputType="textMultiLine" />
-
-<Space
+    <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />`
+        android:layout_weight="1" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnRegisterAboutNext"
+        android:id="@+id/btnRegisterBalanceGameLaunch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
         android:background="@drawable/sh_round_box"
         android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
-        android:text="@string/button_next_label" />
+        android:text="밸런스 게임 질문보기" />
 
 </LinearLayout>

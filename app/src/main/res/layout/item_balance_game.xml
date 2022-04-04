@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llBalanceGameWrapper"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/sh_round_box_medium"
+    android:backgroundTint="@color/white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginVertical="20dp"
+        android:background="@drawable/sh_circle_border"
+        android:backgroundTint="@color/Primary"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/ivBalanceGameProfilePhoto"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:contentDescription="@string/match_rep_photo_iv_description"
+            android:src="@drawable/ic_baseline_account_circle" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/balance_game_capital"
+                android:textColor="@color/TextGrey"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="4dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameCurrentCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/TextGrey"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="3dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/of"
+                android:textColor="@color/TextGrey"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="3dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameTotalCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/TextGrey"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="19dp"
+                android:layout_height="19dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:contentDescription="@string/letter_q_icon_description"
+                android:src="@drawable/ic_letter_q" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnBalanceGameTopOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/Grey"
+            android:drawableEnd="@drawable/ic_baseline_radio_button_unchecked_24"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/GreyDark"
+            android:padding="20dp"
+            android:stateListAnimator="@null"
+            android:textAlignment="textStart"
+            android:textColor="@color/Black"
+            android:textSize="16sp" />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnBalanceGameBottomOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/Grey"
+            android:drawableEnd="@drawable/ic_baseline_radio_button_unchecked_24"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/GreyDark"
+            android:padding="20dp"
+            android:stateListAnimator="@null"
+            android:textAlignment="textStart"
+            android:textColor="@color/TextBlack"
+            android:textSize="16sp" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.beeswork.balance.ui.registeractivity.about.AboutFragment
+import com.beeswork.balance.ui.registeractivity.balancegame.BalanceGameFragment
 import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateFragment
 import com.beeswork.balance.ui.registeractivity.gender.GenderFragment
 import com.beeswork.balance.ui.registeractivity.height.HeightFragment
@@ -31,6 +32,7 @@ class RegisterViewPagerAdapter(
             RegisterViewPagerTabPosition.HEIGHT.ordinal -> HeightFragment()
             RegisterViewPagerTabPosition.ABOUT.ordinal -> AboutFragment()
             RegisterViewPagerTabPosition.PHOTO.ordinal -> PhotoFragment()
+            RegisterViewPagerTabPosition.BALANCE_GAME.ordinal -> BalanceGameFragment()
             RegisterViewPagerTabPosition.FINISH.ordinal -> RegisterFinishFragment()
             else -> NameFragment()
         }

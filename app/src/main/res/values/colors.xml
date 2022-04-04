@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="Primary">#FF7F8E</color>
+    <color name="PrimaryLight">#FAB0B9</color>
+    <color name="PrimaryLighter">#fed7dc</color>
     <color name="PrimaryDark">#3700B3</color>
-    <color name="Accent">#03DAC5</color>
+    <color name="Accent">#ffa67f</color>
     <color name="Transparent">@android:color/transparent</color>
     <color name="TextBlack">#282828</color>
     <color name="TextWhite">#FFFFFF</color>
     <color name="TextGrey">#9E9E9E</color>
     <color name="TextRed">#ff4d4d</color>
     <color name="WarningRed">#ff4d4d</color>
+
 
 
 

@@ -173,9 +173,5 @@ class ProfileRepositoryImpl(
 
 
     override fun test() {
-
-//        CoroutineScope(ioDispatcher).launch {
-//            profileDAO.insert(Profile("Michael", OffsetDateTime.now(), true, 177, "I am Michael this is about", false))
-//        }
     }
 }

@@ -58,6 +58,8 @@ abstract class BaseLocationActivity: BaseActivity(), KodeinAware {
     protected fun doCheckLocationPermission() {
         if (hasLocationPermission()) {
             bindLocationManager()
+        } else {
+            onLocationPermissionChanged(false)
         }
     }
 }

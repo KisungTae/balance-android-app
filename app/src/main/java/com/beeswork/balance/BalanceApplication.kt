@@ -82,7 +82,7 @@ import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
 import com.beeswork.balance.ui.mainactivity.MainViewModelFactory
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.matchfragment.MatchViewModelFactory
-import com.beeswork.balance.ui.profilefragment.balancegame.ProfileBalanceGameViewModelFactory
+import com.beeswork.balance.ui.profilebalancegamedialog.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profilefragment.ProfileViewModelFactory
 import com.beeswork.balance.ui.registeractivity.RegisterViewModelFactory
 import com.beeswork.balance.ui.registeractivity.about.AboutViewModelFactory

@@ -264,5 +264,12 @@
     <string name="location_permission_required_message">위치정보는 어플리케이션을 이용하데 필수 정보입니다. 위클릭이 위치 정보에 접근할 수 있게 허락해주세요. \n세팅 > Security &amp; Location > App-Level permission  </string>
     <string name="retrieving_location_info">retrieving location info.....</string>
     <string name="request_location_permission_btn">위치정보 요청하기</string>
+    <string name="retrieving_questions">retrieving questions....</string>
+    <string name="balance_game_capital">BALANCE GAME</string>
+    <string name="number_of_attempts_icon_description">number of attempts icon</string>
+    <string name="point_icon_description">point icon</string>
+    <string name="balance_game_capital_space">BALANCE GAME </string>
+    <string name="letter_q_icon_description">letter q</string>
+    <string name="of"> OF </string>
 
 </resources>

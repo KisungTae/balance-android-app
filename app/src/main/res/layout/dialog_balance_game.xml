@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Primary"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnBalanceGameBack"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
+            android:background="@color/Transparent"
+            android:contentDescription="@string/back_button_description"
+            android:src="@drawable/ic_baseline_arrow_back_ios"
+            app:tint="@color/white" />
+
+        <com.beeswork.balance.ui.common.GradientTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/balance_game_capital"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_head"
+            android:textStyle="bold"
+            app:endColor="@color/TextWhite"
+            app:startColor="@color/Primary" />
+
+        <ImageButton
+            android:id="@+id/btnBalanceGameRefresh"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
+            android:background="@color/Transparent"
+            android:contentDescription="@string/refresh_button_icon_description"
+            android:src="@drawable/ic_refresh"
+            app:tint="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:baselineAligned="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box_small"
+                android:backgroundTint="@color/PrimaryLight"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="9dp">
+
+                <ImageView
+                    android:contentDescription="@string/number_of_attempts_icon_description"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_refresh"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:id="@+id/tvBalanceGameAttemptCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="1"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tlBalanceGame"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_weight="1"
+            android:background="#FFA8B3"
+            app:tabBackground="@drawable/sl_tab_indicator_primary"
+            app:tabIndicator="@color/Transparent"
+            app:tabMode="fixed" />
+
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box_small"
+                android:backgroundTint="@color/Accent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="9dp">
+
+                <ImageView
+                    android:contentDescription="@string/point_icon_description"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_baseline_attach_money_24"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:id="@+id/tvBalanceGamePoint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="200"
+                    android:textColor="@color/TextWhite"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vpBalanceGame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="48dp"
+            android:padding="10dp" />
+
+        <LinearLayout
+            android:id="@+id/llBalanceGameLoadingWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
+                android:layout_gravity="center"
+                android:background="@color/Transparent"
+                app:SpinKit_Color="@color/Primary" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameLoadingMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llBalanceGameErrorWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="@dimen/icon_large"
+                android:layout_height="@dimen/icon_large"
+                android:layout_marginBottom="20dp"
+                android:contentDescription="@string/dialog_error_icon_description"
+                android:src="@drawable/ic_baseline_error_outline"
+                app:tint="@color/Primary" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameErrorTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/TextBlack" />
+
+            <TextView
+                android:id="@+id/tvBalanceGameErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/TextBlack" />
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -8,5 +8,6 @@ enum class RegisterViewPagerTabPosition {
     HEIGHT,
     ABOUT,
     PHOTO,
+    BALANCE_GAME,
     FINISH
 }

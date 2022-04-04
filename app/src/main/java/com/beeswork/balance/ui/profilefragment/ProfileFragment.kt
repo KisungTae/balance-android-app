@@ -33,7 +33,7 @@ import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
-import com.beeswork.balance.ui.profilefragment.balancegame.ProfileBalanceGameDialog
+import com.beeswork.balance.ui.profilebalancegamedialog.ProfileBalanceGameDialog
 import com.beeswork.balance.ui.profilefragment.photo.*
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView

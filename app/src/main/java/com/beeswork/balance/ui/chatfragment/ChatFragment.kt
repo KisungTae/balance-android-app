@@ -93,7 +93,6 @@ class ChatFragment : BaseFragment(),
         observeSendChatMessageUIStateLiveData()
         observeResendChatMessageUIStateLiveData()
         observeWebSocketEventLiveData()
-
         setupEmoticonBtnListener()
         observeReportMatchLiveData()
         observeUnmatchLiveData()

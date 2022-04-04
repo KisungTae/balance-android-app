@@ -71,6 +71,9 @@ class RegisterActivity : BaseLocationActivity(), LocationPermissionListener {
                 binding.tlRegister.selectTab(binding.tlRegister.getTabAt(position))
             }
         })
+
+        //todo: remove me
+        binding.vpRegister.currentItem = RegisterViewPagerTabPosition.BALANCE_GAME.ordinal
     }
 
     private fun showBackBtn() {
