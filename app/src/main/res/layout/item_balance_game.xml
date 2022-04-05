@@ -15,7 +15,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginVertical="20dp"
         android:background="@drawable/sh_circle_border"
-        android:backgroundTint="@color/Primary"
+        android:backgroundTint="@color/PrimaryLighter"
         android:gravity="center">
 
         <ImageView
@@ -52,7 +52,7 @@
                 android:layout_height="match_parent" />
 
             <TextView
-                android:id="@+id/tvBalanceGameCurrentCount"
+                android:id="@+id/tvBalanceGameCurrentPosition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/TextGrey"
@@ -66,7 +66,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/of"
+                android:text="OF"
                 android:textColor="@color/TextGrey"
                 android:textSize="15sp"
                 android:textStyle="bold" />

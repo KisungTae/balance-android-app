@@ -2,16 +2,16 @@ package com.beeswork.balance.ui.profilebalancegamedialog
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.beeswork.balance.data.database.repository.profile.ProfileRepository
-import com.beeswork.balance.internal.mapper.profile.QuestionMapper
+import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionsUseCase
+import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
 
 class ProfileBalanceGameViewModelFactory(
-    private val profileRepository: ProfileRepository,
-    private val questionMapper: QuestionMapper
+    private val fetchRandomQuestionsUseCase: FetchRandomQuestionsUseCase,
+    private val saveAnswersUseCase: SaveAnswersUseCase
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ProfileBalanceGameViewModel(profileRepository, questionMapper) as T
+        return ProfileBalanceGameViewModel(fetchRandomQuestionsUseCase, saveAnswersUseCase) as T
     }
 }

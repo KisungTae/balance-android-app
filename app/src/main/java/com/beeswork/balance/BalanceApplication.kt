@@ -50,6 +50,10 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
+import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionsUseCase
+import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionsUseCaseImpl
+import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
+import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCaseImpl
 import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCase
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImpl
@@ -208,6 +212,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SaveAboutUseCase>() with singleton { SaveAboutUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveProfileUseCase>() with singleton { SaveProfileUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveLocationUseCase>() with singleton { SaveLocationUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<FetchRandomQuestionsUseCase>() with singleton { FetchRandomQuestionsUseCaseImpl(instance(), instance(), Dispatchers.Default) }
+        bind<SaveAnswersUseCase>() with singleton { SaveAnswersUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }

@@ -3,65 +3,107 @@ package com.beeswork.balance.ui.balancegameviewpageradapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemBalanceGameBinding
-import com.beeswork.balance.domain.uistate.balancegame.BalanceGameQuestionItemUIState
+import com.beeswork.balance.domain.uistate.balancegame.QuestionItemUIState
 import com.beeswork.balance.internal.constant.BalanceGameOption
 import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 
 class BalanceGameViewPagerAdapter(
-    private val balanceGameQuestionItemUIStates: MutableList<BalanceGameQuestionItemUIState>,
     private val balanceGameListener: BalanceGameListener
-): RecyclerView.Adapter<BalanceGameViewPagerAdapter.ViewHolder>(), BalanceGameItemListener {
+) : RecyclerView.Adapter<BalanceGameViewPagerAdapter.ViewHolder>(), BalanceGameQuestionListener {
+
+    private val questionItemUIStates = mutableListOf<QuestionItemUIState>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(ItemBalanceGameBinding.inflate(LayoutInflater.from(parent.context), parent, false), this, parent.context)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(balanceGameQuestionItemUIStates[position])
+        holder.bind(questionItemUIStates[position], position + 1, itemCount)
     }
 
     override fun getItemCount(): Int {
-        return balanceGameQuestionItemUIStates.size
+        return questionItemUIStates.size
+    }
+
+    fun submit(newQuestionItemUIStates: List<QuestionItemUIState>) {
+        questionItemUIStates.clear()
+        questionItemUIStates.addAll(newQuestionItemUIStates)
+        notifyDataSetChanged()
+    }
+
+    fun getAnswers(): Map<Int, Boolean> {
+        val answers = mutableMapOf<Int, Boolean>()
+        questionItemUIStates.forEach { questionItemUIState ->
+            questionItemUIState.answer?.let { _answer ->
+                answers[questionItemUIState.id] = _answer
+            }
+        }
+        return answers
     }
 
 
     override fun onOptionSelected(position: Int, answer: Boolean) {
-        balanceGameQuestionItemUIStates[position].answer = answer
+        questionItemUIStates[position].answer = answer
+        balanceGameListener.onOptionSelected()
         notifyItemChanged(position)
+    }
+
+    interface BalanceGameListener {
+        fun onOptionSelected()
     }
 
 
     class ViewHolder(
         private val binding: ItemBalanceGameBinding,
-        private val balanceGameItemListener: BalanceGameItemListener,
+        private val balanceGameQuestionListener: BalanceGameQuestionListener,
         private val context: Context
-    ): RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(balanceGameQuestionItemUIState: BalanceGameQuestionItemUIState) {
-//            binding.btnBalanceGameTopOption.text = balanceGameQuestionItemUIState.topOption
-//            binding.btnBalanceGameBottomOption.text = balanceGameQuestionItemUIState.bottomOption
+        fun bind(questionItemUIState: QuestionItemUIState, position: Int, totalCount: Int) {
+
+            binding.tvBalanceGameDescription.text = questionItemUIState.description
+            binding.btnBalanceGameTopOption.text = questionItemUIState.topOption
+            binding.btnBalanceGameBottomOption.text = questionItemUIState.bottomOption
+            binding.tvBalanceGameCurrentPosition.text = position.toString()
+            binding.tvBalanceGameTotalCount.text = totalCount.toString()
+
+            setOptionButton(binding.btnBalanceGameTopOption, questionItemUIState.answer == BalanceGameOption.TOP)
+            setOptionButton(binding.btnBalanceGameBottomOption, questionItemUIState.answer == BalanceGameOption.BOTTOM)
+
+            binding.btnBalanceGameTopOption.setOnClickListener {
+                balanceGameQuestionListener.onOptionSelected(absoluteAdapterPosition, BalanceGameOption.TOP)
+            }
+            binding.btnBalanceGameBottomOption.setOnClickListener {
+                balanceGameQuestionListener.onOptionSelected(absoluteAdapterPosition, BalanceGameOption.BOTTOM)
+            }
 
             Glide.with(context)
                 .load(R.drawable.person1)
                 .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
                 .into(binding.ivBalanceGameProfilePhoto)
+        }
 
-
-            if (balanceGameQuestionItemUIState.answer != null) {
-
+        private fun setOptionButton(button: Button, selected: Boolean) {
+            if (selected) {
+                val drawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_baseline_check_circle_outline_24, null)
+                button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+                button.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.PrimaryLighter)
+                button.compoundDrawableTintList = AppCompatResources.getColorStateList(context, R.color.Primary)
+            } else {
+                val drawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_baseline_radio_button_unchecked_24, null)
+                button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+                button.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.Grey)
+                button.compoundDrawableTintList = AppCompatResources.getColorStateList(context, R.color.GreyDark)
             }
-
-//            binding.btnBalanceGameTopOption.setOnClickListener {
-//                balanceGameItemListener.onOptionSelected(absoluteAdapterPosition, BalanceGameOption.TOP)
-//            }
-//
-//            binding.btnBalanceGameBottomOption.setOnClickListener {
-//                balanceGameItemListener.onOptionSelected(absoluteAdapterPosition, BalanceGameOption.BOTTOM)
-//            }
         }
     }
 

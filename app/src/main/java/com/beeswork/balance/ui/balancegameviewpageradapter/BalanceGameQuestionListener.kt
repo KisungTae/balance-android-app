@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.balancegameviewpageradapter
 
-interface BalanceGameItemListener {
-
+interface BalanceGameQuestionListener {
     fun onOptionSelected(position: Int, answer: Boolean)
 }

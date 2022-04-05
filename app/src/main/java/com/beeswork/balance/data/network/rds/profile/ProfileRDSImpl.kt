@@ -13,6 +13,10 @@ class ProfileRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ProfileRDS {
 
+    override suspend fun fetchRandomQuestions(): Resource<List<QuestionDTO>> {
+        return getResult { balanceAPI.fetchRandomQuestions() }
+    }
+
     override suspend fun fetchProfile(): Resource<ProfileDTO> {
         return getResult { balanceAPI.fetchProfile() }
     }
@@ -21,7 +25,7 @@ class ProfileRDSImpl(
         return getResult { balanceAPI.saveProfile(profileDTO) }
     }
 
-    override suspend fun saveQuestions(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
+    override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return getResult { balanceAPI.saveAnswers(SaveAnswersBody(answers)) }
     }
 
@@ -32,6 +36,4 @@ class ProfileRDSImpl(
     override suspend fun saveBio(height: Int?, about: String): Resource<EmptyResponse> {
         return getResult { balanceAPI.saveBio(SaveBioBody(height, about)) }
     }
-
-
 }

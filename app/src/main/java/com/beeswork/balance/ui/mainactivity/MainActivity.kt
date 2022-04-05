@@ -53,12 +53,12 @@ class MainActivity : BaseLocationActivity(), LocationPermissionListener {
 
     override fun onResume() {
         super.onResume()
-        viewModel.connectStomp()
+//        viewModel.connectStomp()
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.disconnectStomp()
+//        viewModel.disconnectStomp()
     }
 
     override fun onLocationPermissionChanged(granted: Boolean) {

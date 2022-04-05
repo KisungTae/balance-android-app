@@ -9,6 +9,8 @@ import org.threeten.bp.OffsetDateTime
 
 interface ProfileRepository {
 
+    suspend fun fetchRandomQuestions(): Resource<List<QuestionDTO>>
+
     suspend fun getName(): String?
     suspend fun saveName(name: String): Resource<EmptyResponse>
     suspend fun getGender(): Boolean?

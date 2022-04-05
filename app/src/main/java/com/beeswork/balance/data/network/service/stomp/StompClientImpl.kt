@@ -60,17 +60,17 @@ class StompClientImpl(
     override fun connect(forceToConnect: Boolean) {
         println("connect($forceToConnect)")
         applicationScope.launch {
-            if (webSocketState.isClosed() && forceToConnect) {
-                webSocketState.reset()
-            }
-
-            if (webSocketState.isConnectableAndSetToConnecting()) {
-                val webSocketRequest = Request.Builder()
-                    .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
-                    .url(EndPoint.WEB_SOCKET_ENDPOINT)
-                    .build()
-                socket = okHttpClient.newWebSocket(webSocketRequest, this@StompClientImpl)
-            }
+//            if (webSocketState.isClosed() && forceToConnect) {
+//                webSocketState.reset()
+//            }
+//
+//            if (webSocketState.isConnectableAndSetToConnecting()) {
+//                val webSocketRequest = Request.Builder()
+//                    .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
+//                    .url(EndPoint.WEB_SOCKET_ENDPOINT)
+//                    .build()
+//                socket = okHttpClient.newWebSocket(webSocketRequest, this@StompClientImpl)
+//            }
         }
     }
 

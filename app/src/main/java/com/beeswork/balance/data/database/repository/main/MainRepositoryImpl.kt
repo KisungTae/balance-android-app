@@ -83,11 +83,11 @@ class MainRepositoryImpl(
     }
 
     override fun connectStomp(forceToConnect: Boolean) {
-        stompClient.connect(forceToConnect)
+//        stompClient.connect(forceToConnect)
     }
 
     override fun disconnectStomp() {
-        stompClient.disconnect()
+//        stompClient.disconnect()
     }
 
     companion object {

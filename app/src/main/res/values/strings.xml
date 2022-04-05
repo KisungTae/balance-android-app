@@ -270,6 +270,6 @@
     <string name="point_icon_description">point icon</string>
     <string name="balance_game_capital_space">BALANCE GAME </string>
     <string name="letter_q_icon_description">letter q</string>
-    <string name="of"> OF </string>
+    <string name="error_title_fetch_random_questions">질문가져오기 실패!</string>
 
 </resources>

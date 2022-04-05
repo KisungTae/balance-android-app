@@ -44,9 +44,9 @@
     </LinearLayout>
 
     <LinearLayout
-        android:baselineAligned="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="10dp">
@@ -67,9 +67,10 @@
                 android:paddingVertical="9dp">
 
                 <ImageView
-                    android:contentDescription="@string/number_of_attempts_icon_description"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:contentDescription="@string/number_of_attempts_icon_description"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_refresh"
                     app:tint="@color/white" />
 
@@ -93,7 +94,7 @@
             android:layout_height="4dp"
             android:layout_marginHorizontal="20dp"
             android:layout_weight="1"
-            android:background="#FFA8B3"
+            android:background="@color/PrimaryLight"
             app:tabBackground="@drawable/sl_tab_indicator_primary"
             app:tabIndicator="@color/Transparent"
             app:tabMode="fixed" />
@@ -115,9 +116,10 @@
                 android:paddingVertical="9dp">
 
                 <ImageView
-                    android:contentDescription="@string/point_icon_description"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:contentDescription="@string/point_icon_description"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_baseline_attach_money_24"
                     app:tint="@color/white" />
 
@@ -142,19 +144,21 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_marginBottom="48dp"
+        android:layout_weight="1"
+        android:padding="10dp">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/vpBalanceGame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="48dp"
-            android:padding="10dp" />
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:id="@+id/llBalanceGameLoadingWrapper"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
@@ -164,6 +168,7 @@
                 android:layout_width="@dimen/icon_medium"
                 android:layout_height="@dimen/icon_medium"
                 android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
                 android:background="@color/Transparent"
                 app:SpinKit_Color="@color/Primary" />
 
@@ -171,7 +176,6 @@
                 android:id="@+id/tvBalanceGameLoadingMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:textAlignment="center" />
 
         </LinearLayout>
@@ -180,17 +184,19 @@
             android:id="@+id/llBalanceGameErrorWrapper"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
+            android:padding="30dp"
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="@dimen/icon_large"
-                android:layout_height="@dimen/icon_large"
-                android:layout_marginBottom="20dp"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:layout_marginBottom="10dp"
                 android:contentDescription="@string/dialog_error_icon_description"
-                android:src="@drawable/ic_baseline_error_outline"
-                app:tint="@color/Primary" />
+                android:src="@drawable/ic_thankful" />
 
             <TextView
                 android:id="@+id/tvBalanceGameErrorTitle"
@@ -200,16 +206,57 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:textAlignment="center"
-                android:textColor="@color/TextBlack" />
+                android:textColor="@color/TextBlack"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvBalanceGameErrorMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:textAlignment="center"
                 android:textColor="@color/TextBlack" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameResave"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="다시 시도하기"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameRefetch"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="@string/retry_btn"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameClose"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_round_box"
+                android:backgroundTint="@color/BackgroundWhite"
+                android:stateListAnimator="@null"
+                android:text="@string/close"
+                android:textColor="@color/Primary"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 

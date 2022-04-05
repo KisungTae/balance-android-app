@@ -24,6 +24,12 @@ class ProfileRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : ProfileRepository {
 
+    override suspend fun fetchRandomQuestions(): Resource<List<QuestionDTO>> {
+        return withContext(ioDispatcher) {
+            return@withContext profileRDS.fetchRandomQuestions()
+        }
+    }
+
     override suspend fun getName(): String? {
         return withContext(ioDispatcher) {
             return@withContext profileDAO.getName(preferenceProvider.getAccountId())
@@ -163,7 +169,7 @@ class ProfileRepositoryImpl(
 
     override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            return@withContext profileRDS.saveQuestions(answers)
+            return@withContext profileRDS.saveAnswers(answers)
         }
     }
 
