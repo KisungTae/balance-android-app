@@ -10,9 +10,9 @@ class RegisterBalanceGameDialog(
     private val balanceGameResultListener: BalanceGameResultListener
 ): BaseBalanceGameDialog() {
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        observeFetchQuestionsUIStateLiveData(true)
         bindUI()
         viewModel.fetchRandomQuestions()
     }
@@ -21,6 +21,9 @@ class RegisterBalanceGameDialog(
         observeSaveAnswersUIStateLiveData()
         binding.btnBalanceGameRefetch.setOnClickListener {
             viewModel.fetchRandomQuestions()
+        }
+        binding.btnBalanceGameResave.setOnClickListener {
+            viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
         }
     }
 

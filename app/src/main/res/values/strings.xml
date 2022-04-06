@@ -14,7 +14,7 @@
     <string name="error_title_report">신고요청을 실패</string>
     <string name="error_title_unmatch">채팅방을 나가는데 실패했습니다.</string>
     <string name="error_title_fetch_question">밸런스 질문을 가져오지 못했습니다</string>
-    <string name="error_title_save_answers">밸런스 질문을 저장하지 못했습니다</string>
+    <string name="error_title_save_answers">밸런스 질문답변 저장실패</string>
     <string name="error_title_click">밸런스를 체크하지 못했습니다</string>
     <string name="error_title_save_about">프로필을 저장하지 못했습니다</string>
     <string name="error_title_fetch_photos">사진을 가져오지 못했습니다</string>

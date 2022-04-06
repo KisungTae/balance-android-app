@@ -157,10 +157,10 @@ interface BalanceAPI {
     @GET("profile")
     suspend fun fetchProfile(): Response<ProfileDTO>
 
-    @POST("/account/answers")
+    @POST("/question/answers")
     suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
 
-    @GET("account/question/list")
+    @GET("/question/list")
     suspend fun listQuestions(): Response<List<QuestionDTO>>
 
     @POST("profile/bio")

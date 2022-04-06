@@ -80,7 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
-                    android:text="1"
+                    android:text="0"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
 
@@ -129,7 +129,6 @@
                     android:id="@+id/tvBalanceGamePoint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="200"
                     android:textColor="@color/TextWhite"
                     android:textStyle="bold" />
 

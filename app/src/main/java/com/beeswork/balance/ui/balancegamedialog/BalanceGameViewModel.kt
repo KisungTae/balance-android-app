@@ -26,7 +26,7 @@ class BalanceGameViewModel(
             _fetchRandomQuestionsUIStateLiveData.postValue(FetchQuestionsUIState.ofLoading())
             val response = fetchRandomQuestionsUseCase.invoke()
             val fetchRandomQuestionsUIState = if (response.isSuccess() && response.data != null) {
-                FetchQuestionsUIState.ofSuccess(response.data)
+                FetchQuestionsUIState.ofSuccess(response.data, 0)
             } else {
                 FetchQuestionsUIState.ofError(response.exception)
             }
