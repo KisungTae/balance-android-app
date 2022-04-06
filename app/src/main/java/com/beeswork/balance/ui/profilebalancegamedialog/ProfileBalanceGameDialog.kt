@@ -9,11 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogBalanceGameBinding
-import com.beeswork.balance.domain.uistate.balancegame.QuestionItemUIState
 import com.beeswork.balance.internal.util.MessageSource
-import com.beeswork.balance.ui.balancegameviewpageradapter.BalanceGameViewPagerAdapter
+import com.beeswork.balance.ui.balancegamedialog.BalanceGameViewPagerAdapter
 import com.beeswork.balance.ui.common.BaseDialog
-import com.beeswork.balance.ui.registeractivity.RegisterViewPagerTabPosition
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -90,7 +88,7 @@ class ProfileBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameViewPager
     }
 
     private fun observeFetchRandomQuestionsUIStateLiveData() {
-        viewModel.fetchRandomQuestionsUIStateLiveData.observe(viewLifecycleOwner) { fetchRandomQuestionsUIState ->
+        viewModel.fetchQuestionsUIStateLiveData.observe(viewLifecycleOwner) { fetchRandomQuestionsUIState ->
             when {
                 fetchRandomQuestionsUIState.questionItemUIStates != null -> {
                     binding.llBalanceGameErrorWrapper.visibility = View.GONE
@@ -114,7 +112,7 @@ class ProfileBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameViewPager
                     binding.llBalanceGameLoadingWrapper.visibility = View.GONE
                     binding.btnBalanceGameResave.visibility = View.GONE
                     binding.btnBalanceGameRefetch.visibility = View.VISIBLE
-                    binding.tvBalanceGameErrorTitle.text = getString(R.string.error_title_fetch_random_questions)
+//                    binding.tvBalanceGameErrorTitle.text = getString(R.string.error_title_fetch_random_questions)
                     binding.tvBalanceGameErrorMessage.text = MessageSource.getMessage(
                         requireContext(),
                         fetchRandomQuestionsUIState.exception

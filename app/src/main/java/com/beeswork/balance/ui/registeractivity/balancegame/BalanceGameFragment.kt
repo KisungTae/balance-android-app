@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentBalanceGameBinding
+import com.beeswork.balance.ui.balancegamedialog.BalanceGameResultListener
+import com.beeswork.balance.ui.balancegamedialog.RegisterBalanceGameDialog
 import com.beeswork.balance.ui.profilebalancegamedialog.ProfileBalanceGameDialog
+import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import kotlinx.coroutines.launch
 
-class BalanceGameFragment: Fragment() {
+class BalanceGameFragment: BaseRegisterStepFragment(), BalanceGameResultListener {
 
     private lateinit var binding: FragmentBalanceGameBinding
 
@@ -30,7 +33,11 @@ class BalanceGameFragment: Fragment() {
 
     private fun setupLaunchBalanceGameBtnListener() {
         binding.btnRegisterBalanceGameLaunch.setOnClickListener {
-            ProfileBalanceGameDialog().show(childFragmentManager, ProfileBalanceGameDialog.TAG)
+            RegisterBalanceGameDialog(this).show(childFragmentManager, RegisterBalanceGameDialog.TAG)
         }
+    }
+
+    override fun onBalanceGameAnswersSaved() {
+        moveToNextTab()
     }
 }

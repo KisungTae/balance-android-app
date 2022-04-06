@@ -5,6 +5,7 @@
       <w>insertable</w>
       <w>meridiem</w>
       <w>orderable</w>
+      <w>reclick</w>
       <w>redownload</w>
       <w>refetch</w>
       <w>resave</w>

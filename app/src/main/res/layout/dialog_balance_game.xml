@@ -62,6 +62,7 @@
                 android:background="@drawable/sh_round_box_small"
                 android:backgroundTint="@color/PrimaryLight"
                 android:gravity="center"
+                android:minWidth="60dp"
                 android:orientation="horizontal"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="9dp">
@@ -111,6 +112,7 @@
                 android:background="@drawable/sh_round_box_small"
                 android:backgroundTint="@color/Accent"
                 android:gravity="center"
+                android:minWidth="70dp"
                 android:orientation="horizontal"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="9dp">
@@ -221,6 +223,19 @@
                 android:textColor="@color/TextBlack" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameReclick"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="@string/retry_btn"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnBalanceGameResave"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
@@ -228,7 +243,7 @@
                 android:background="@drawable/sh_round_box_medium"
                 android:backgroundTint="@color/Primary"
                 android:stateListAnimator="@null"
-                android:text="다시 시도하기"
+                android:text="@string/retry_btn"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:visibility="gone" />
@@ -256,6 +271,26 @@
                 android:text="@string/close"
                 android:textColor="@color/Primary"
                 android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llBalanceGameClickedWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/BackgroundWhite"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llBalanceGameMatchedWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/BackgroundWhite"
+            android:orientation="vertical">
 
 
         </LinearLayout>

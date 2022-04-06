@@ -12,6 +12,7 @@ import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentHeightBinding
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.beeswork.balance.ui.registeractivity.gender.GenderViewModel
 import com.beeswork.balance.ui.registeractivity.gender.GenderViewModelFactory
@@ -20,7 +21,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class HeightFragment: Fragment(), KodeinAware {
+class HeightFragment: BaseRegisterStepFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentHeightBinding
     private lateinit var viewModel: HeightViewModel
@@ -63,11 +64,7 @@ class HeightFragment: Fragment(), KodeinAware {
     private fun observeSaveHeightLiveData() {
         viewModel.saveHeightUIStateLiveData.observe(viewLifecycleOwner) { saveHeightUIState ->
             if (saveHeightUIState.saved) {
-                activity?.let { _activity ->
-                    if (_activity is RegisterActivity) {
-                        _activity.moveToNextTab()
-                    }
-                }
+                moveToNextTab()
             } else if (saveHeightUIState.showError) {
                 val title = getString(R.string.error_title_save_height)
                 val message = MessageSource.getMessage(requireContext(), saveHeightUIState.exception)

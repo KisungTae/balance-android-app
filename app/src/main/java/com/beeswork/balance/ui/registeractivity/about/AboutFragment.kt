@@ -11,13 +11,14 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAboutBinding
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class AboutFragment: Fragment(), KodeinAware {
+class AboutFragment: BaseRegisterStepFragment(), KodeinAware {
 
     override val kodein by closestKodein()
     private lateinit var binding: FragmentAboutBinding
@@ -53,11 +54,7 @@ class AboutFragment: Fragment(), KodeinAware {
     private fun observeSaveAboutLiveData() {
         viewModel.saveAboutUIStateLiveData.observe(viewLifecycleOwner) { saveAboutUIState ->
             if (saveAboutUIState.saved) {
-                activity?.let { _activity ->
-                    if (_activity is RegisterActivity) {
-                        _activity.moveToNextTab()
-                    }
-                }
+                moveToNextTab()
             } else if (saveAboutUIState.showError) {
                 val title = getString(R.string.error_title_save_about)
                 val message = MessageSource.getMessage(requireContext(), saveAboutUIState.exception)

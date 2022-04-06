@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.profilebalancegamedialog
+package com.beeswork.balance.ui.balancegamedialog
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,27 +10,27 @@ import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 
-class ProfileBalanceGameViewModel(
+class BalanceGameViewModel(
     private val fetchRandomQuestionsUseCase: FetchRandomQuestionsUseCase,
     private val saveAnswersUseCase: SaveAnswersUseCase
 ) : BaseViewModel() {
 
-    private val _fetchQuestionsUIStateLiveData = MutableLiveData<FetchQuestionsUIState>()
-    val fetchQuestionsUIStateLiveData: LiveData<FetchQuestionsUIState> get() = _fetchQuestionsUIStateLiveData
+    private val _fetchRandomQuestionsUIStateLiveData = MutableLiveData<FetchQuestionsUIState>()
+    val fetchQuestionsUIStateLiveData: LiveData<FetchQuestionsUIState> get() = _fetchRandomQuestionsUIStateLiveData
 
     private val _saveAnswersUIStateLiveData = MutableLiveData<SaveAnswersUIState>()
     val saveAnswersUIStateLiveData: LiveData<SaveAnswersUIState> get() = _saveAnswersUIStateLiveData
 
     fun fetchRandomQuestions() {
         viewModelScope.launch {
-            _fetchQuestionsUIStateLiveData.postValue(FetchQuestionsUIState.ofLoading())
+            _fetchRandomQuestionsUIStateLiveData.postValue(FetchQuestionsUIState.ofLoading())
             val response = fetchRandomQuestionsUseCase.invoke()
             val fetchRandomQuestionsUIState = if (response.isSuccess() && response.data != null) {
                 FetchQuestionsUIState.ofSuccess(response.data)
             } else {
                 FetchQuestionsUIState.ofError(response.exception)
             }
-            _fetchQuestionsUIStateLiveData.postValue(fetchRandomQuestionsUIState)
+            _fetchRandomQuestionsUIStateLiveData.postValue(fetchRandomQuestionsUIState)
         }
     }
 

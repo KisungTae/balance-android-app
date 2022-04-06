@@ -10,13 +10,14 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentLocationBinding
 import com.beeswork.balance.ui.common.LocationPermissionListener
 import com.beeswork.balance.ui.mainactivity.MainActivity
+import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class LocationFragment : Fragment(), LocationPermissionListener {
+class LocationFragment : BaseRegisterStepFragment(), LocationPermissionListener {
 
     private lateinit var binding: FragmentLocationBinding
 
@@ -51,11 +52,7 @@ class LocationFragment : Fragment(), LocationPermissionListener {
 
     override fun onLocationPermissionChanged(granted: Boolean) {
         if (granted) {
-            activity?.let { _activity ->
-                if (_activity is RegisterActivity) {
-                    _activity.moveToNextTab()
-                }
-            }
+            moveToNextTab()
         } else {
             binding.llRegisterLocationLoadingWrapper.visibility = View.GONE
             binding.llRegisterLocationErrorWrapper.visibility = View.VISIBLE

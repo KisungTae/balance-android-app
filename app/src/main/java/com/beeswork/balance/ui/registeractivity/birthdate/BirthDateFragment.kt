@@ -11,13 +11,14 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentBirthdateBinding
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.dialog.ErrorDialog
+import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class BirthDateFragment : Fragment(), KodeinAware {
+class BirthDateFragment : BaseRegisterStepFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentBirthdateBinding
     private lateinit var viewModel: BirthDateViewModel
@@ -52,11 +53,7 @@ class BirthDateFragment : Fragment(), KodeinAware {
     private fun observeSaveBirthDateLiveData() {
         viewModel.saveBirthDateUIStateLiveData.observe(viewLifecycleOwner) { saveBirthDateUIState ->
             if (saveBirthDateUIState.saved) {
-                activity?.let { _activity ->
-                    if (_activity is RegisterActivity) {
-                        _activity.moveToNextTab()
-                    }
-                }
+                moveToNextTab()
             } else if (saveBirthDateUIState.showError) {
                 val title = getString(R.string.error_title_save_birthDate)
                 val message = MessageSource.getMessage(requireContext(), saveBirthDateUIState.exception)

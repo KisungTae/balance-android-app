@@ -80,6 +80,7 @@ import com.beeswork.balance.internal.mapper.card.CardMapperImpl
 import com.beeswork.balance.internal.mapper.card.CardFilterMapper
 import com.beeswork.balance.internal.mapper.card.CardFilterMapperImpl
 import com.beeswork.balance.ui.accountfragment.AccountViewModelFactory
+import com.beeswork.balance.ui.balancegamedialog.BalanceGameViewModelFactory
 import com.beeswork.balance.ui.chatfragment.ChatViewModelFactory
 import com.beeswork.balance.ui.swipefragment.SwipeViewModelFactory
 import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
@@ -329,6 +330,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
+        bind() from provider { BalanceGameViewModelFactory(instance(), instance()) }
         bind() from provider { EmailSettingViewModelFactory(instance()) }
         bind() from provider { PushSettingViewModelFactory(instance(), instance()) }
         bind() from provider {
@@ -355,6 +357,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { NameViewModelFactory(instance(), instance()) }
         bind() from provider { PhotoViewModelFactory(instance()) }
         bind() from provider { RegisterFinishViewModelFactory(instance()) }
+
+
 
 
         // Interceptor

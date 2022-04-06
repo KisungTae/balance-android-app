@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.balancegameviewpageradapter
+package com.beeswork.balance.ui.balancegamedialog
 
 interface BalanceGameQuestionListener {
     fun onOptionSelected(position: Int, answer: Boolean)
