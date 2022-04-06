@@ -13,6 +13,7 @@ class RegisterBalanceGameDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeFetchQuestionsUIStateLiveData(true)
+        observeFetchRandomQuestionUIStateLiveData()
         bindUI()
         viewModel.fetchQuestions()
     }

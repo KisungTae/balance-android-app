@@ -162,6 +162,12 @@ class ProfileRepositoryImpl(
         }
     }
 
+    override suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionDTO> {
+        return withContext(ioDispatcher) {
+            return@withContext profileRDS.fetchRandomQuestion(questionIds)
+        }
+    }
+
     override suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             return@withContext profileRDS.saveAnswers(answers)

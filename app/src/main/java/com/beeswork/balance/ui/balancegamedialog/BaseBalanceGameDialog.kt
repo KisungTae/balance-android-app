@@ -11,12 +11,13 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogBalanceGameBinding
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.common.BaseDialog
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-abstract class BaseBalanceGameDialog: BaseDialog(), KodeinAware, BalanceGameViewPagerAdapter.BalanceGameListener {
+abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameViewPagerAdapter.BalanceGameListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: BalanceGameViewModelFactory by instance()
@@ -82,13 +83,40 @@ abstract class BaseBalanceGameDialog: BaseDialog(), KodeinAware, BalanceGameView
                     binding.tvBalanceGamePoint.text = fetchQuestionUIState.point.toString()
                 }
                 fetchQuestionUIState.showLoading -> {
-                    showLoading(getString(R.string.balance_game_loading_text))
+                    showLoading(getString(R.string.fetch_question_message))
                 }
                 fetchQuestionUIState.showError -> {
-                    val title = getString(R.string.error_title_fetch_questions)
+                    val title = getString(R.string.error_title_fetch_question)
                     val message = MessageSource.getMessage(requireContext(), fetchQuestionUIState.exception)
                     showError(title, message)
                     showErrorBtn(View.GONE, View.VISIBLE, View.GONE)
+                }
+            }
+        }
+    }
+
+    protected fun observeFetchRandomQuestionUIStateLiveData() {
+        viewModel.fetchRandomQuestionUIStateLiveData.observe(viewLifecycleOwner) { fetchRandomQuestionUIState ->
+            when {
+                fetchRandomQuestionUIState.questionItemUIState != null -> {
+                    balanceGameViewPagerAdapter.replaceQuestion(
+                        binding.vpBalanceGame.currentItem,
+                        fetchRandomQuestionUIState.questionItemUIState
+                    )
+                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+                    showRefreshBtn()
+                    showBackBtn()
+                }
+                fetchRandomQuestionUIState.showLoading -> {
+                    showLoading(getString(R.string.fetch_question_message))
+                }
+                fetchRandomQuestionUIState.showError -> {
+                    showRefreshBtn()
+                    showBackBtn()
+                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+                    val title = getString(R.string.error_title_fetch_question)
+                    val message = MessageSource.getMessage(requireContext(), fetchRandomQuestionUIState.exception)
+                    ErrorDialog.show(title, message, childFragmentManager)
                 }
             }
         }
@@ -132,11 +160,16 @@ abstract class BaseBalanceGameDialog: BaseDialog(), KodeinAware, BalanceGameView
                 binding.vpBalanceGame.currentItem = currentPosition - 1
             }
         }
+        binding.btnBalanceGameRefresh.setOnClickListener {
+            viewModel.fetchRandomQuestion(balanceGameViewPagerAdapter.getQuestionIds())
+        }
     }
 
     private fun showBackBtn() {
-        binding.btnBalanceGameBack.visibility = View.VISIBLE
-        binding.btnBalanceGameBack.isEnabled = true
+        if (binding.vpBalanceGame.currentItem > 0) {
+            binding.btnBalanceGameBack.visibility = View.VISIBLE
+            binding.btnBalanceGameBack.isEnabled = true
+        }
     }
 
     private fun hideBackBtn() {

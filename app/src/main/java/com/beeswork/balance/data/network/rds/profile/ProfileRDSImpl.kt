@@ -30,7 +30,13 @@ class ProfileRDSImpl(
         return getResult { balanceAPI.fetchQuestions() }
     }
 
+    override suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionDTO> {
+        return getResult { balanceAPI.fetchRandomQuestion(questionIds) }
+    }
+
     override suspend fun saveBio(height: Int?, about: String): Resource<EmptyResponse> {
         return getResult { balanceAPI.saveBio(SaveBioBody(height, about)) }
     }
+
+
 }

@@ -7,7 +7,6 @@ class FetchQuestionsUIState(
     val showError: Boolean,
     val exception: Throwable?
 ) {
-
     companion object {
 
         fun ofSuccess(questionItemUIStates: List<QuestionItemUIState>, point: Int): FetchQuestionsUIState {
@@ -22,6 +21,4 @@ class FetchQuestionsUIState(
             return FetchQuestionsUIState(null, null, showLoading = false, showError = true, exception = exception)
         }
     }
-
-
 }

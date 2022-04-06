@@ -39,6 +39,10 @@ class ErrorDialog(
         bindUI()
     }
 
+    override fun getTheme(): Int {
+        return R.style.RoundedCornersDialog
+    }
+
     private fun bindUI() {
         setupRetryListener()
         binding.tvErrorDialogTitle.text = title ?: resources.getString(R.string.error_title_generic)

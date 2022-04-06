@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.domain.uistate.balancegame.FetchQuestionsUIState
+import com.beeswork.balance.domain.uistate.balancegame.FetchRandomQuestionUIState
 import com.beeswork.balance.domain.uistate.balancegame.SaveAnswersUIState
 import com.beeswork.balance.domain.usecase.balancegame.FetchQuestionsUseCase
+import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionUseCase
 import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.ui.common.BaseViewModel
@@ -14,6 +16,7 @@ import kotlinx.coroutines.launch
 class BalanceGameViewModel(
     private val fetchQuestionsUseCase: FetchQuestionsUseCase,
     private val saveAnswersUseCase: SaveAnswersUseCase,
+    private val fetchRandomQuestionUseCase: FetchRandomQuestionUseCase,
     private val questionMapper: QuestionMapper
 ) : BaseViewModel() {
 
@@ -22,6 +25,23 @@ class BalanceGameViewModel(
 
     private val _saveAnswersUIStateLiveData = MutableLiveData<SaveAnswersUIState>()
     val saveAnswersUIStateLiveData: LiveData<SaveAnswersUIState> get() = _saveAnswersUIStateLiveData
+
+    private val _fetchRandomQuestionUIStateLiveData = MutableLiveData<FetchRandomQuestionUIState>()
+    val fetchRandomQuestionUIStateLiveData: LiveData<FetchRandomQuestionUIState> get() = _fetchRandomQuestionUIStateLiveData
+
+    fun fetchRandomQuestion(questionIds: List<Int>) {
+        viewModelScope.launch {
+            _fetchRandomQuestionUIStateLiveData.postValue(FetchRandomQuestionUIState.ofLoading())
+            val response = fetchRandomQuestionUseCase.invoke(questionIds)
+            val fetchRandomQuestionUIState = if (response.isSuccess() && response.data != null) {
+                FetchRandomQuestionUIState.ofSuccess(questionMapper.toQuestionItemUIState(response.data))
+            } else {
+                FetchRandomQuestionUIState.ofError(response.exception)
+            }
+            _fetchRandomQuestionUIStateLiveData.postValue(fetchRandomQuestionUIState)
+        }
+    }
+
 
     fun fetchQuestions() {
         viewModelScope.launch {

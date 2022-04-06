@@ -73,7 +73,7 @@ class RegisterActivity : BaseLocationActivity(), LocationPermissionListener {
         })
 
         //todo: remove me
-        binding.vpRegister.currentItem = RegisterViewPagerTabPosition.BALANCE_GAME.ordinal
+//        binding.vpRegister.currentItem = RegisterViewPagerTabPosition.BALANCE_GAME.ordinal
     }
 
     private fun showBackBtn() {

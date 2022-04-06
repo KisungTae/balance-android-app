@@ -26,7 +26,9 @@ interface ProfileRepository {
     suspend fun fetchProfile(): Resource<Profile>
     suspend fun saveBio(height: Int?, about: String): Resource<Profile>
     suspend fun fetchQuestions(): Resource<FetchQuestionsDTO>
+    suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionDTO>
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     fun getNameFlow(): Flow<String?>
     fun test()
+
 }

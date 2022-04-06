@@ -201,8 +201,6 @@ interface BalanceAPI {
         @Query(value = "pageIndex") pageIndex: Int
     ): Response<FetchCardsDTO>
 
-
-
     @GET("/question/random")
     suspend fun fetchRandomQuestion(@Query(value = "questionIds") questionIds: List<Int>): Response<QuestionDTO>
 

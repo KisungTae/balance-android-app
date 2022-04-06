@@ -38,6 +38,15 @@ class BalanceGameViewPagerAdapter(
         notifyDataSetChanged()
     }
 
+    fun getQuestionIds(): List<Int> {
+        return questionItemUIStates.map { questionItemUIState -> questionItemUIState.id }
+    }
+
+    fun replaceQuestion(position: Int, questionItemUIState: QuestionItemUIState) {
+        questionItemUIStates[position] = questionItemUIState
+        notifyItemChanged(position)
+    }
+
     fun getAnswers(): Map<Int, Boolean> {
         val answers = mutableMapOf<Int, Boolean>()
         questionItemUIStates.forEach { questionItemUIState ->

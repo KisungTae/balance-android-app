@@ -72,7 +72,7 @@ class CardBalanceGameDialog(
                     resource.data?.let { newQuestions -> setupBalanceGame(newQuestions) }
                 }
                 resource.isLoading() -> {
-                    showLoading(getString(R.string.balance_game_loading_text))
+                    showLoading(getString(R.string.fetch_question_message))
                 }
                 resource.isError() -> {
                     showFetchQuestionsError(MessageSource.getMessage(requireContext(), resource.exception))

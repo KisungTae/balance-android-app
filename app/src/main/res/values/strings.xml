@@ -13,7 +13,7 @@
     <string name="error_title_web_socket_disconnected">서버 연결에러</string>
     <string name="error_title_report">신고요청을 실패</string>
     <string name="error_title_unmatch">채팅방을 나가는데 실패했습니다.</string>
-    <string name="error_title_fetch_question">밸런스 질문을 가져오지 못했습니다</string>
+    <string name="error_title_fetch_question">밸런스 질문가져오기 실패</string>
     <string name="error_title_save_answers">밸런스 질문답변 저장실패</string>
     <string name="error_title_click">밸런스를 체크하지 못했습니다</string>
     <string name="error_title_save_about">프로필을 저장하지 못했습니다</string>
@@ -29,8 +29,6 @@
     <string name="error_title_open_chat">채팅을 열지 못했습니다</string>
     <string name="error_title_fetch_push_setting">알람세팅정보를 가져오지 못했습니다</string>
     <string name="error_title_save_name">이름 저장실패</string>
-
-
 
 
 
@@ -151,7 +149,7 @@
     <string name="balance_game_retry_icon_description">balance game retry icon</string>
     <string name="balance_game_missed_text">우린 서로 다른 취향을 가지고 있나봐요!</string>
     <string name="balance_game_keep_swiping_btn_text">스와이프 하기</string>
-    <string name="balance_game_loading_text">밸런스 질문을 가져오고있습니다</string>
+    <string name="fetch_question_message">밸런스 질문을 가져오고있습니다</string>
     <string name="balance_game_checking_text">상대방 밸런스와 내 취향을 체크하는중이에요..</string>
     <string name="balance_game_saving_answers_text">밸런스 답변을 저장하고있습니다..</string>
     <string name="balance_game_profile_photo_description">balance game swiped profile photo</string>
@@ -270,6 +268,5 @@
     <string name="point_icon_description">point icon</string>
     <string name="balance_game_capital_space">BALANCE GAME </string>
     <string name="letter_q_icon_description">letter q</string>
-    <string name="error_title_fetch_questions">질문가져오기 실패!</string>
 
 </resources>
