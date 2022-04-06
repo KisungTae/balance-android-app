@@ -3,13 +3,12 @@ package com.beeswork.balance.data.database.repository.profile
 import com.beeswork.balance.data.database.entity.profile.Profile
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 
 interface ProfileRepository {
-
-    suspend fun fetchRandomQuestions(): Resource<List<QuestionDTO>>
 
     suspend fun getName(): String?
     suspend fun saveName(name: String): Resource<EmptyResponse>
@@ -26,7 +25,7 @@ interface ProfileRepository {
     suspend fun deleteProfile()
     suspend fun fetchProfile(): Resource<Profile>
     suspend fun saveBio(height: Int?, about: String): Resource<Profile>
-    suspend fun fetchQuestions(): Resource<List<QuestionDTO>>
+    suspend fun fetchQuestions(): Resource<FetchQuestionsDTO>
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     fun getNameFlow(): Flow<String?>
     fun test()

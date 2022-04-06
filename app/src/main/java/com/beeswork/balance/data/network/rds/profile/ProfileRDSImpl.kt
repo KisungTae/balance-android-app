@@ -6,16 +6,13 @@ import com.beeswork.balance.data.network.request.profile.SaveAnswersBody
 import com.beeswork.balance.data.network.request.profile.SaveBioBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 
 class ProfileRDSImpl(
     private val balanceAPI: BalanceAPI
 ) : BaseRDS(), ProfileRDS {
-
-    override suspend fun fetchRandomQuestions(): Resource<List<QuestionDTO>> {
-        return getResult { balanceAPI.fetchRandomQuestions() }
-    }
 
     override suspend fun fetchProfile(): Resource<ProfileDTO> {
         return getResult { balanceAPI.fetchProfile() }
@@ -29,8 +26,8 @@ class ProfileRDSImpl(
         return getResult { balanceAPI.saveAnswers(SaveAnswersBody(answers)) }
     }
 
-    override suspend fun listQuestions(): Resource<List<QuestionDTO>> {
-        return getResult { balanceAPI.listQuestions() }
+    override suspend fun fetchQuestions(): Resource<FetchQuestionsDTO> {
+        return getResult { balanceAPI.fetchQuestions() }
     }
 
     override suspend fun saveBio(height: Int?, about: String): Resource<EmptyResponse> {

@@ -2,7 +2,7 @@ package com.beeswork.balance.domain.uistate.balancegame
 
 class FetchQuestionsUIState(
     val questionItemUIStates: List<QuestionItemUIState>?,
-    val point: Int,
+    val point: Int?,
     val showLoading: Boolean,
     val showError: Boolean,
     val exception: Throwable?
@@ -15,11 +15,11 @@ class FetchQuestionsUIState(
         }
 
         fun ofLoading(): FetchQuestionsUIState {
-            return FetchQuestionsUIState(null, 0, showLoading = true, showError = false, exception = null)
+            return FetchQuestionsUIState(null, null, showLoading = true, showError = false, exception = null)
         }
 
         fun ofError(exception: Throwable?): FetchQuestionsUIState {
-            return FetchQuestionsUIState(null, 0, showLoading = false, showError = true, exception = exception)
+            return FetchQuestionsUIState(null, null, showLoading = false, showError = true, exception = exception)
         }
     }
 

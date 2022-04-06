@@ -33,7 +33,6 @@ import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
-import com.beeswork.balance.ui.profilebalancegamedialog.ProfileBalanceGameDialog
 import com.beeswork.balance.ui.profilefragment.photo.*
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
@@ -176,9 +175,9 @@ class ProfileFragment : BaseFragment(),
             val height = binding.tvProfileHeight.text.toString().toIntOrNull()
             HeightOptionDialog(this, height).show(childFragmentManager, HeightOptionDialog.TAG)
         }
-        binding.btnProfileEditBalanceGame.setOnClickListener {
-            ProfileBalanceGameDialog().show(childFragmentManager, ProfileBalanceGameDialog.TAG)
-        }
+//        binding.btnProfileEditBalanceGame.setOnClickListener {
+//            ProfileBalanceGameDialog().show(childFragmentManager, ProfileBalanceGameDialog.TAG)
+//        }
         binding.btnProfileRefresh.setOnClickListener {
             if (fetchProfileStatus == Resource.Status.ERROR) viewModel.fetchProfile()
             if (fetchPhotosStatus == Resource.Status.ERROR) viewModel.fetchPhotos()

@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.entity.profile.Profile
 import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.ProfileNotFoundException
@@ -23,12 +24,6 @@ class ProfileRepositoryImpl(
     private val profileMapper: ProfileMapper,
     private val ioDispatcher: CoroutineDispatcher
 ) : ProfileRepository {
-
-    override suspend fun fetchRandomQuestions(): Resource<List<QuestionDTO>> {
-        return withContext(ioDispatcher) {
-            return@withContext profileRDS.fetchRandomQuestions()
-        }
-    }
 
     override suspend fun getName(): String? {
         return withContext(ioDispatcher) {
@@ -161,9 +156,9 @@ class ProfileRepositoryImpl(
     }
 
 
-    override suspend fun fetchQuestions(): Resource<List<QuestionDTO>> {
+    override suspend fun fetchQuestions(): Resource<FetchQuestionsDTO> {
         return withContext(ioDispatcher) {
-            return@withContext profileRDS.listQuestions()
+            return@withContext profileRDS.fetchQuestions()
         }
     }
 

@@ -26,6 +26,7 @@ import com.beeswork.balance.data.network.response.card.FetchCardsDTO
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.ClickDTO
 import com.beeswork.balance.data.network.response.match.UnmatchDTO
+import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.MatchPageFilter
@@ -160,8 +161,8 @@ interface BalanceAPI {
     @POST("/question/answers")
     suspend fun saveAnswers(@Body saveAnswersBody: SaveAnswersBody): Response<EmptyResponse>
 
-    @GET("/question/list")
-    suspend fun listQuestions(): Response<List<QuestionDTO>>
+    @GET("question/list")
+    suspend fun fetchQuestions(): Response<FetchQuestionsDTO>
 
     @POST("profile/bio")
     suspend fun saveBio(@Body saveBioBody: SaveBioBody): Response<EmptyResponse>
@@ -201,8 +202,6 @@ interface BalanceAPI {
     ): Response<FetchCardsDTO>
 
 
-    @GET("/question/random/list")
-    suspend fun fetchRandomQuestions(): Response<List<QuestionDTO>>
 
     @GET("/question/random")
     suspend fun fetchRandomQuestion(@Query(value = "questionIds") questionIds: List<Int>): Response<QuestionDTO>

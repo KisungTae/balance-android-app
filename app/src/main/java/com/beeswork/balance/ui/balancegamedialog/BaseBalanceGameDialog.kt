@@ -11,7 +11,6 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogBalanceGameBinding
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.common.BaseDialog
-import com.beeswork.balance.ui.profilebalancegamedialog.ProfileBalanceGameViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -21,7 +20,7 @@ abstract class BaseBalanceGameDialog: BaseDialog(), KodeinAware, BalanceGameView
 
     override val kodein by closestKodein()
     private val viewModelFactory: BalanceGameViewModelFactory by instance()
-    protected lateinit var viewModel: ProfileBalanceGameViewModel
+    protected lateinit var viewModel: BalanceGameViewModel
     protected lateinit var binding: DialogBalanceGameBinding
     protected lateinit var balanceGameViewPagerAdapter: BalanceGameViewPagerAdapter
 
@@ -42,7 +41,7 @@ abstract class BaseBalanceGameDialog: BaseDialog(), KodeinAware, BalanceGameView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileBalanceGameViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(BalanceGameViewModel::class.java)
         bindUI()
     }
 
@@ -71,7 +70,7 @@ abstract class BaseBalanceGameDialog: BaseDialog(), KodeinAware, BalanceGameView
     protected fun observeFetchQuestionsUIStateLiveData(showRefreshBtn: Boolean) {
         viewModel.fetchQuestionsUIStateLiveData.observe(viewLifecycleOwner) { fetchQuestionUIState ->
             when {
-                fetchQuestionUIState.questionItemUIStates != null -> {
+                fetchQuestionUIState.questionItemUIStates != null && fetchQuestionUIState.point != null -> {
                     if (showRefreshBtn) {
                         showRefreshBtn()
                     } else {

@@ -14,13 +14,13 @@ class RegisterBalanceGameDialog(
         super.onViewCreated(view, savedInstanceState)
         observeFetchQuestionsUIStateLiveData(true)
         bindUI()
-        viewModel.fetchRandomQuestions()
+        viewModel.fetchQuestions()
     }
 
     private fun bindUI() = lifecycleScope.launch {
         observeSaveAnswersUIStateLiveData()
         binding.btnBalanceGameRefetch.setOnClickListener {
-            viewModel.fetchRandomQuestions()
+            viewModel.fetchQuestions()
         }
         binding.btnBalanceGameResave.setOnClickListener {
             viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())

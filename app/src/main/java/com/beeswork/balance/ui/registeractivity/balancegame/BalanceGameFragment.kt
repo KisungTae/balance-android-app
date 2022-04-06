@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentBalanceGameBinding
 import com.beeswork.balance.ui.balancegamedialog.BalanceGameResultListener
 import com.beeswork.balance.ui.balancegamedialog.RegisterBalanceGameDialog
-import com.beeswork.balance.ui.profilebalancegamedialog.ProfileBalanceGameDialog
 import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import kotlinx.coroutines.launch
 

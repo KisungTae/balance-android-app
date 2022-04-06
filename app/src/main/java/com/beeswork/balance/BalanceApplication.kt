@@ -50,8 +50,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
-import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionsUseCase
-import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionsUseCaseImpl
+import com.beeswork.balance.domain.usecase.balancegame.FetchQuestionsUseCase
+import com.beeswork.balance.domain.usecase.balancegame.FetchQuestionsUseCaseImpl
 import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
 import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCaseImpl
 import com.beeswork.balance.domain.usecase.chat.*
@@ -87,7 +87,6 @@ import com.beeswork.balance.ui.loginactivity.LoginViewModelFactory
 import com.beeswork.balance.ui.mainactivity.MainViewModelFactory
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.matchfragment.MatchViewModelFactory
-import com.beeswork.balance.ui.profilebalancegamedialog.ProfileBalanceGameViewModelFactory
 import com.beeswork.balance.ui.profilefragment.ProfileViewModelFactory
 import com.beeswork.balance.ui.registeractivity.RegisterViewModelFactory
 import com.beeswork.balance.ui.registeractivity.about.AboutViewModelFactory
@@ -213,7 +212,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SaveAboutUseCase>() with singleton { SaveAboutUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveProfileUseCase>() with singleton { SaveProfileUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveLocationUseCase>() with singleton { SaveLocationUseCaseImpl(instance(), Dispatchers.Default) }
-        bind<FetchRandomQuestionsUseCase>() with singleton { FetchRandomQuestionsUseCaseImpl(instance(), instance(), Dispatchers.Default) }
+        bind<FetchQuestionsUseCase>() with singleton { FetchQuestionsUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveAnswersUseCase>() with singleton { SaveAnswersUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
@@ -329,8 +328,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { ProfileBalanceGameViewModelFactory(instance(), instance()) }
-        bind() from provider { BalanceGameViewModelFactory(instance(), instance()) }
+        bind() from provider { BalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { EmailSettingViewModelFactory(instance()) }
         bind() from provider { PushSettingViewModelFactory(instance(), instance()) }
         bind() from provider {

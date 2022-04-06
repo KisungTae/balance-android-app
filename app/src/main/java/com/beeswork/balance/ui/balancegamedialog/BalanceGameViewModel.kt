@@ -5,32 +5,37 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.domain.uistate.balancegame.FetchQuestionsUIState
 import com.beeswork.balance.domain.uistate.balancegame.SaveAnswersUIState
-import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionsUseCase
+import com.beeswork.balance.domain.usecase.balancegame.FetchQuestionsUseCase
 import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
+import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 
 class BalanceGameViewModel(
-    private val fetchRandomQuestionsUseCase: FetchRandomQuestionsUseCase,
-    private val saveAnswersUseCase: SaveAnswersUseCase
+    private val fetchQuestionsUseCase: FetchQuestionsUseCase,
+    private val saveAnswersUseCase: SaveAnswersUseCase,
+    private val questionMapper: QuestionMapper
 ) : BaseViewModel() {
 
-    private val _fetchRandomQuestionsUIStateLiveData = MutableLiveData<FetchQuestionsUIState>()
-    val fetchQuestionsUIStateLiveData: LiveData<FetchQuestionsUIState> get() = _fetchRandomQuestionsUIStateLiveData
+    private val _fetchQuestionsUIStateLiveData = MutableLiveData<FetchQuestionsUIState>()
+    val fetchQuestionsUIStateLiveData: LiveData<FetchQuestionsUIState> get() = _fetchQuestionsUIStateLiveData
 
     private val _saveAnswersUIStateLiveData = MutableLiveData<SaveAnswersUIState>()
     val saveAnswersUIStateLiveData: LiveData<SaveAnswersUIState> get() = _saveAnswersUIStateLiveData
 
-    fun fetchRandomQuestions() {
+    fun fetchQuestions() {
         viewModelScope.launch {
-            _fetchRandomQuestionsUIStateLiveData.postValue(FetchQuestionsUIState.ofLoading())
-            val response = fetchRandomQuestionsUseCase.invoke()
-            val fetchRandomQuestionsUIState = if (response.isSuccess() && response.data != null) {
-                FetchQuestionsUIState.ofSuccess(response.data, 0)
+            _fetchQuestionsUIStateLiveData.postValue(FetchQuestionsUIState.ofLoading())
+            val response = fetchQuestionsUseCase.invoke()
+            val fetchQuestionsUIState = if (response.isSuccess() && response.data != null) {
+                val questionItemUIStates = response.data.questionDTOs.map { questionDTO ->
+                    questionMapper.toQuestionItemUIState(questionDTO)
+                }
+                FetchQuestionsUIState.ofSuccess(questionItemUIStates, response.data.point)
             } else {
                 FetchQuestionsUIState.ofError(response.exception)
             }
-            _fetchRandomQuestionsUIStateLiveData.postValue(fetchRandomQuestionsUIState)
+            _fetchQuestionsUIStateLiveData.postValue(fetchQuestionsUIState)
         }
     }
 
