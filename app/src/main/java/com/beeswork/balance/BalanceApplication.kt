@@ -103,7 +103,6 @@ import com.beeswork.balance.ui.settingfragment.SettingViewModelFactory
 import com.beeswork.balance.ui.settingfragment.email.EmailSettingViewModelFactory
 import com.beeswork.balance.ui.settingfragment.push.PushSettingViewModelFactory
 import com.beeswork.balance.ui.splashfragment.SplashViewModelFactory
-import com.beeswork.balance.ui.cardfragment.balancegame.CardBalanceGameViewModelFactory
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialogViewModelFactory
 import com.beeswork.balance.ui.cardfragment.CardViewModelFactory
 import com.beeswork.balance.ui.chatfragment.ChatViewModelParameter
@@ -330,7 +329,6 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }
-        bind() from provider { CardBalanceGameViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance()) }
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }

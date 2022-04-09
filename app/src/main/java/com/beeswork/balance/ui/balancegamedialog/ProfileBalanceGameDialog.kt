@@ -39,11 +39,11 @@ class ProfileBalanceGameDialog: BaseBalanceGameDialog() {
         }
     }
 
-    override fun onOptionSelected() {
-        if (isBalanceGameFinished()) {
+    override fun onBalanceGameOptionSelected(position: Int) {
+        if (isBalanceGameFinished(position)) {
             viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
         } else {
-            moveToNextTab()
+            moveToNextTab(position)
         }
     }
 

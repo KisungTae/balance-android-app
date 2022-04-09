@@ -479,8 +479,7 @@
             android:backgroundTint="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="30dp"
-            android:visibility="gone">
+            android:padding="30dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"

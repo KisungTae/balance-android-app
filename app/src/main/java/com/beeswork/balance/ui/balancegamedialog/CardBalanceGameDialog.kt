@@ -13,7 +13,8 @@ import java.util.*
 class CardBalanceGameDialog(
     private val swipedId: UUID,
     private val swipedName: String?,
-    private val swipedProfilePhotoUrl: String?
+    private val swipedProfilePhotoUrl: String?,
+    private val cardBalanceGameListener: CardBalanceGameListener
 ): BaseBalanceGameDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,11 +42,11 @@ class CardBalanceGameDialog(
             viewModel.like(swipedId)
         }
         binding.btnBalanceGameClickedGoToSwipe.setOnClickListener {
-            // implement listener to go to swipe
+            cardBalanceGameListener.onGoToSwipeSelected()
             dismiss()
         }
         binding.btnBalanceGameMatchedGoToMatch.setOnClickListener {
-            // implement listener to go to match
+            cardBalanceGameListener.onGoToMatchSelected()
             dismiss()
         }
         binding.btnBalanceGameClickedClose.setOnClickListener {
@@ -117,11 +118,11 @@ class CardBalanceGameDialog(
     }
 
 
-    override fun onOptionSelected() {
-        if (isBalanceGameFinished()) {
+    override fun onBalanceGameOptionSelected(position: Int) {
+        if (isBalanceGameFinished(position)) {
             viewModel.click(swipedId, balanceGameViewPagerAdapter.getAnswers())
         } else {
-            moveToNextTab()
+            moveToNextTab(position)
         }
     }
 

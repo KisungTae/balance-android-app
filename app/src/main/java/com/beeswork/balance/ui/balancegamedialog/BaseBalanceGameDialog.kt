@@ -204,12 +204,12 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
         binding.llBalanceGameMissedWrapper.visibility = missed
     }
 
-    protected fun isBalanceGameFinished(): Boolean {
-        return binding.vpBalanceGame.currentItem >= (balanceGameViewPagerAdapter.itemCount - 1)
+    protected fun isBalanceGameFinished(position: Int): Boolean {
+        return position >= (balanceGameViewPagerAdapter.itemCount - 1)
     }
 
-    protected fun moveToNextTab() {
-        if (!isBalanceGameFinished()) {
+    protected fun moveToNextTab(position: Int) {
+        if (!isBalanceGameFinished(position)) {
             binding.vpBalanceGame.currentItem = binding.vpBalanceGame.currentItem + 1
         }
     }

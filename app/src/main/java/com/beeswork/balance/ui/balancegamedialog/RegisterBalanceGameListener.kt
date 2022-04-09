@@ -1,7 +1,6 @@
 package com.beeswork.balance.ui.balancegamedialog
 
-interface BalanceGameResultListener {
-
+interface RegisterBalanceGameListener {
 
     fun onBalanceGameAnswersSaved()
 }

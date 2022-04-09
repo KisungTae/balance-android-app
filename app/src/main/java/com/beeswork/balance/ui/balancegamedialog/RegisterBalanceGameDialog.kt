@@ -7,7 +7,7 @@ import com.beeswork.balance.R
 import kotlinx.coroutines.launch
 
 class RegisterBalanceGameDialog(
-    private val balanceGameResultListener: BalanceGameResultListener
+    private val registerBalanceGameListener: RegisterBalanceGameListener
 ): BaseBalanceGameDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,7 +40,7 @@ class RegisterBalanceGameDialog(
         viewModel.saveAnswersUIStateLiveData.observe(viewLifecycleOwner) { saveAnswersUIState ->
             when {
                 saveAnswersUIState.saved -> {
-                    balanceGameResultListener.onBalanceGameAnswersSaved()
+                    registerBalanceGameListener.onBalanceGameAnswersSaved()
                     dismiss()
                 }
                 saveAnswersUIState.showLoading -> {
@@ -53,11 +53,11 @@ class RegisterBalanceGameDialog(
         }
     }
 
-    override fun onOptionSelected() {
-        if (isBalanceGameFinished()) {
+    override fun onBalanceGameOptionSelected(position: Int) {
+        if (isBalanceGameFinished(position)) {
             viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
         } else {
-            moveToNextTab()
+            moveToNextTab(position)
         }
     }
 

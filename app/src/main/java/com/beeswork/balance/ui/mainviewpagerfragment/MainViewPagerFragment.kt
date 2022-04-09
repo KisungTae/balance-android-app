@@ -18,6 +18,7 @@ import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
 import com.beeswork.balance.domain.usecase.swipe.SwipeNotificationUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
+import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.cardfragment.CardFragment
 import com.beeswork.balance.ui.swipefragment.SwipeDomain
 import com.beeswork.balance.ui.common.BaseFragment
@@ -29,7 +30,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 
-class MainViewPagerFragment : BaseFragment(), KodeinAware {
+class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: MainViewPagerViewModelFactory by instance()
@@ -98,7 +99,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     }
 
     private fun setupViewPager() {
-        mainViewPagerAdapter = MainViewPagerAdapter(childFragmentManager, lifecycle)
+        mainViewPagerAdapter = MainViewPagerAdapter(childFragmentManager, lifecycle, this@MainViewPagerFragment)
         binding.vpMain.adapter = mainViewPagerAdapter
         binding.vpMain.offscreenPageLimit = MainViewPagerTabPosition.values().size
         binding.vpMain.setPageTransformer(null)
@@ -200,12 +201,19 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         }
     }
 
+    override fun onGoToSwipeSelected() {
+        binding.tlMain.getTabAt(MainViewPagerTabPosition.SWIPE.ordinal)?.select()
+    }
 
+    override fun onGoToMatchSelected() {
+        binding.tlMain.getTabAt(MainViewPagerTabPosition.MATCH.ordinal)?.select()
+    }
 
     companion object {
         const val TAG = "mainViewPagerFragment"
         const val BADGE_MAX_CHAR_COUNT = 3
     }
+
 
 
 }

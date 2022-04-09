@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemBalanceGameBinding
@@ -66,8 +67,8 @@ class BalanceGameViewPagerAdapter(
 
     override fun onOptionSelected(position: Int, answer: Boolean) {
         questionItemUIStates[position].answer = answer
-        balanceGameListener.onOptionSelected()
         notifyItemChanged(position)
+        balanceGameListener.onBalanceGameOptionSelected(position)
     }
 
     fun setupProfilePhotoULR(url: String?) {
@@ -75,7 +76,7 @@ class BalanceGameViewPagerAdapter(
     }
 
     interface BalanceGameListener {
-        fun onOptionSelected()
+        fun onBalanceGameOptionSelected(position: Int)
     }
 
 
@@ -115,12 +116,12 @@ class BalanceGameViewPagerAdapter(
                 val drawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_baseline_check_circle_outline_24, null)
                 button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
                 button.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.PrimaryLighter)
-                button.compoundDrawableTintList = AppCompatResources.getColorStateList(context, R.color.Primary)
+                TextViewCompat.setCompoundDrawableTintList(button, AppCompatResources.getColorStateList(context, R.color.Primary))
             } else {
                 val drawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_baseline_radio_button_unchecked_24, null)
                 button.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
                 button.backgroundTintList = AppCompatResources.getColorStateList(context, R.color.Grey)
-                button.compoundDrawableTintList = AppCompatResources.getColorStateList(context, R.color.GreyDark)
+                TextViewCompat.setCompoundDrawableTintList(button, AppCompatResources.getColorStateList(context, R.color.GreyDark))
             }
         }
     }

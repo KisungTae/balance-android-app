@@ -10,11 +10,12 @@ import com.beeswork.balance.databinding.FragmentCardBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.observeResource
+import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameDialog
+import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.cardfragment.balancegame.CardBalanceGameDialog
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
 import com.beeswork.balance.ui.mainactivity.MainActivity
@@ -28,7 +29,9 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import java.util.*
 
-class CardFragment : BaseFragment(),
+class CardFragment(
+    private val cardBalanceGameListener: CardBalanceGameListener
+) : BaseFragment(),
     KodeinAware,
     CardStackListener,
     ViewPagerChildFragment,
@@ -122,10 +125,10 @@ class CardFragment : BaseFragment(),
 
         if (direction == Direction.Right) removedCard?.let { _removedCard ->
             val profilePhotoKey = if (_removedCard.photoKeys.isNotEmpty()) _removedCard.photoKeys[0] else null
-            CardBalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
-                childFragmentManager,
-                CardBalanceGameDialog.TAG
-            )
+//            CardBalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
+//                childFragmentManager,
+//                CardBalanceGameDialog.TAG
+//            )
         }
     }
 
@@ -186,7 +189,10 @@ class CardFragment : BaseFragment(),
     }
 
     override fun onFragmentSelected() {
-        println("swipe fragment: onFragmentSelected")
+        CardBalanceGameDialog(UUID.fromString("a514e4ab-a5b0-4efb-a2ac-b96edfb0e77d"), "Kisung Tae", "", cardBalanceGameListener).show(
+            childFragmentManager,
+            CardBalanceGameDialog.TAG
+        )
     }
 
     override fun onApplyCardFilter() {
