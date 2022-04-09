@@ -22,9 +22,9 @@ class MainViewPagerViewModel(
         swipeRepository.getSwipeCountFlow().asLiveData()
     }
 
-    val newSwipeLiveData by viewModelLazyDeferred {
+    val swipeNotificationUIStateLiveData by viewModelLazyDeferred {
         swipeRepository.newSwipeFlow.map { swipe ->
-            swipeMapper.toSwipeDomain(swipe)
+            swipeMapper.toSwipeNotificationUIState(swipe)
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
@@ -32,8 +32,10 @@ class MainViewPagerViewModel(
         matchRepository.getMatchCountFlow().asLiveData()
     }
 
-    val newMatchLiveData by viewModelLazyDeferred {
-        matchRepository.newMatchFlow.asLiveData()
+    val matchNotificationUIStateLiveData by viewModelLazyDeferred {
+        matchRepository.newMatchFlow.map { match ->
+            matchMapper.toMatchNotificationUIState(match)
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
 }

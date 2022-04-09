@@ -18,10 +18,17 @@ class BalanceGameViewPagerAdapter(
     private val balanceGameListener: BalanceGameListener
 ) : RecyclerView.Adapter<BalanceGameViewPagerAdapter.ViewHolder>(), BalanceGameQuestionListener {
 
+    private var profilePhotoURL: String? = null
+
     private val questionItemUIStates = mutableListOf<QuestionItemUIState>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(ItemBalanceGameBinding.inflate(LayoutInflater.from(parent.context), parent, false), this, parent.context)
+        return ViewHolder(
+            ItemBalanceGameBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            profilePhotoURL,
+            this,
+            parent.context
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -57,11 +64,14 @@ class BalanceGameViewPagerAdapter(
         return answers
     }
 
-
     override fun onOptionSelected(position: Int, answer: Boolean) {
         questionItemUIStates[position].answer = answer
         balanceGameListener.onOptionSelected()
         notifyItemChanged(position)
+    }
+
+    fun setupProfilePhotoULR(url: String?) {
+        profilePhotoURL = url
     }
 
     interface BalanceGameListener {
@@ -71,6 +81,7 @@ class BalanceGameViewPagerAdapter(
 
     class ViewHolder(
         private val binding: ItemBalanceGameBinding,
+        private val profilePhotoUrl: String?,
         private val balanceGameQuestionListener: BalanceGameQuestionListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -94,7 +105,7 @@ class BalanceGameViewPagerAdapter(
             }
 
             Glide.with(context)
-                .load(R.drawable.person1)
+                .load(profilePhotoUrl)
                 .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
                 .into(binding.ivBalanceGameProfilePhoto)
         }

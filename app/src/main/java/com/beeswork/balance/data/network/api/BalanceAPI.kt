@@ -24,7 +24,7 @@ import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
-import com.beeswork.balance.data.network.response.match.ClickDTO
+import com.beeswork.balance.data.network.response.match.ClickResponse
 import com.beeswork.balance.data.network.response.match.UnmatchDTO
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
@@ -101,7 +101,7 @@ interface BalanceAPI {
 
 
     @POST("click")
-    suspend fun click(@Body clickBody: ClickBody): Response<ClickDTO>
+    suspend fun click(@Body clickBody: ClickBody): Response<ClickResponse>
 
     @POST("match/unmatch")
     suspend fun unmatch(@Body unmatchBody: UnmatchBody): Response<UnmatchDTO>
@@ -190,7 +190,7 @@ interface BalanceAPI {
 
 
     @POST("like")
-    suspend fun like(@Body likeBody: LikeBody): Response<List<QuestionDTO>>
+    suspend fun like(@Body likeBody: LikeBody): Response<FetchQuestionsDTO>
 
     @GET("profile/recommend")
     suspend fun recommend(

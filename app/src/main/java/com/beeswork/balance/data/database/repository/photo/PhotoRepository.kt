@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface PhotoRepository {
+    suspend fun getProfilePhoto(): Photo?
     suspend fun fetchPhotos(): Resource<EmptyResponse>
     fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>>
     suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String, photoKey: String?): Resource<EmptyResponse>

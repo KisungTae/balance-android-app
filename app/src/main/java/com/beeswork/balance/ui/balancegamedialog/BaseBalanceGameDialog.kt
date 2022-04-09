@@ -77,7 +77,7 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                     } else {
                         hideRefreshBtn()
                     }
-                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
                     addTabs(fetchQuestionUIState.questionItemUIStates.size)
                     balanceGameViewPagerAdapter.submit(fetchQuestionUIState.questionItemUIStates)
                     binding.tvBalanceGamePoint.text = fetchQuestionUIState.point.toString()
@@ -103,7 +103,7 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                         binding.vpBalanceGame.currentItem,
                         fetchRandomQuestionUIState.questionItemUIState
                     )
-                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
                     showRefreshBtn()
                     showBackBtn()
                 }
@@ -113,7 +113,7 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                 fetchRandomQuestionUIState.showError -> {
                     showRefreshBtn()
                     showBackBtn()
-                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
                     val title = getString(R.string.error_title_fetch_question)
                     val message = MessageSource.getMessage(requireContext(), fetchRandomQuestionUIState.exception)
                     ErrorDialog.show(title, message, childFragmentManager)
@@ -132,14 +132,14 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
     protected fun showLoading(message: String) {
         hideBackBtn()
         hideRefreshBtn()
-        showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+        showLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE, View.GONE)
         binding.tvBalanceGameLoadingMessage.text = message
     }
 
     protected fun showError(title: String, message: String?) {
         hideBackBtn()
         hideRefreshBtn()
-        showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
+        showLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE)
         binding.tvBalanceGameErrorTitle.text = title
         binding.tvBalanceGameErrorMessage.text = message
     }
@@ -162,6 +162,9 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
         }
         binding.btnBalanceGameRefresh.setOnClickListener {
             viewModel.fetchRandomQuestion(balanceGameViewPagerAdapter.getQuestionIds())
+        }
+        binding.btnBalanceGameResave.setOnClickListener {
+            viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
         }
     }
 
@@ -193,11 +196,12 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
         binding.btnBalanceGameReclick.visibility = reclick
     }
 
-    private fun showLayouts(loading: Int, error: Int, clicked: Int, matched: Int) {
+    protected fun showLayouts(loading: Int, error: Int, clicked: Int, matched: Int, missed: Int) {
         binding.llBalanceGameLoadingWrapper.visibility = loading
         binding.llBalanceGameErrorWrapper.visibility = error
         binding.llBalanceGameClickedWrapper.visibility = clicked
         binding.llBalanceGameMatchedWrapper.visibility = matched
+        binding.llBalanceGameMissedWrapper.visibility = missed
     }
 
     protected fun isBalanceGameFinished(): Boolean {

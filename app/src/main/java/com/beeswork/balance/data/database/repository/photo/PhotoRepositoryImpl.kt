@@ -33,6 +33,12 @@ class PhotoRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : PhotoRepository {
 
+    override suspend fun getProfilePhoto(): Photo? {
+        return withContext(ioDispatcher) {
+            return@withContext photoDAO.getProfilePhotoBy(preferenceProvider.getAccountId())
+        }
+    }
+
     //  NOTE 1. because it only fetches when no photo is in database, it's okay to insert them all without checking duplicates
     override suspend fun fetchPhotos(): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {

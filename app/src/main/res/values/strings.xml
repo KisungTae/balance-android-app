@@ -150,7 +150,7 @@
     <string name="balance_game_missed_text">우린 서로 다른 취향을 가지고 있나봐요!</string>
     <string name="balance_game_keep_swiping_btn_text">스와이프 하기</string>
     <string name="fetch_question_message">밸런스 질문을 가져오고있습니다</string>
-    <string name="balance_game_checking_text">상대방 밸런스와 내 취향을 체크하는중이에요..</string>
+    <string name="msg_check_answers">상대방 밸런스와 내 취향을 체크하는중이에요..</string>
     <string name="balance_game_saving_answers_text">밸런스 답변을 저장하고있습니다..</string>
     <string name="balance_game_profile_photo_description">balance game swiped profile photo</string>
     <string name="account_tool_bar_title">ACCOUNT</string>
@@ -268,5 +268,17 @@
     <string name="point_icon_description">point icon</string>
     <string name="balance_game_capital_space">BALANCE GAME </string>
     <string name="letter_q_icon_description">letter q</string>
+    <string name="error_title_check_answers">밸런스게임 체크실패</string>
+    <string name="broken_heart_icon_description">broken heart icon</string>
+    <string name="balance_game_missed_title">님과 나는 서로다른취향...</string>
+    <string name="balance_game_missed_message">밸런스게임에 클릭하지 못했습니다. 걱정마세요 다시도전해보세요!</string>
+    <string name="balance_game_retry_btn_title">다시 도전하기</string>
+    <string name="favorite_icon_description">favorite icon</string>
+    <string name="balance_game_clicked_title">님 밸런스게임에 클릭!</string>
+    <string name="balance_game_clicked_message">상대방 밸런스게임 답변과 일치해요! 상대방동 내 밸런스게임에 일치할때까지 스와이프를 즐겨보세요!</string>
+    <string name="swipe_btn_title">스와이프 하기</string>
+    <string name="balance_game_matched_title">님과 새로운 매치!</string>
+    <string name="balance_game_matched_message">새루은 매치가 성사되었습니다! 상대방에게 메세지를 보내 관심을 표해보세요!</string>
+    <string name="go_to_match_btn_title">매치 확인하기</string>
 
 </resources>

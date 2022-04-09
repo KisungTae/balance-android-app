@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.request.swipe.LikeBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
+import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import java.util.*
 
@@ -23,7 +24,7 @@ class CardRDSImpl(
         return getResult { balanceAPI.recommend(minAge, maxAge, gender, distance, pageIndex) }
     }
 
-    override suspend fun like(swipedId: UUID): Resource<List<QuestionDTO>> {
+    override suspend fun like(swipedId: UUID): Resource<FetchQuestionsDTO> {
         return getResult { balanceAPI.like(LikeBody(swipedId)) }
     }
 }

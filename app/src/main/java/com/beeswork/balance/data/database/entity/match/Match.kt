@@ -32,6 +32,10 @@ data class Match(
     val swipedProfilePhotoKey: String?,
     val swipedDeleted: Boolean
 ) {
+
+    @Ignore
+    var swiperProfilePhotoKey: String? = null
+
     fun isEqualTo(matchDTO: MatchDTO): Boolean {
         if (this.id == matchDTO.id
             && this.chatId == matchDTO.chatId

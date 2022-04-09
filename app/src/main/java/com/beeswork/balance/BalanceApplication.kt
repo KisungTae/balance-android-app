@@ -51,12 +51,18 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
 import com.beeswork.balance.domain.usecase.balancegame.*
+import com.beeswork.balance.domain.usecase.card.ClickUseCase
+import com.beeswork.balance.domain.usecase.card.ClickUseCaseImpl
+import com.beeswork.balance.domain.usecase.card.LikeUseCase
+import com.beeswork.balance.domain.usecase.card.LikeUseCaseImpl
 import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCase
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImpl
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCaseImpl
 import com.beeswork.balance.domain.usecase.main.*
+import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCase
+import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCaseImpl
 import com.beeswork.balance.domain.usecase.register.*
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
@@ -212,6 +218,9 @@ class BalanceApplication : Application(), KodeinAware {
         bind<FetchQuestionsUseCase>() with singleton { FetchQuestionsUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveAnswersUseCase>() with singleton { SaveAnswersUseCaseImpl(instance(), Dispatchers.Default) }
         bind<FetchRandomQuestionUseCase>() with singleton { FetchRandomQuestionUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<LikeUseCase>() with singleton { LikeUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<ClickUseCase>() with singleton { ClickUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetProfilePhotoUrlUseCase>() with singleton { GetProfilePhotoUrlUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -326,7 +335,18 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { BalanceGameViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind() from provider {
+            BalanceGameViewModelFactory(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
         bind() from provider { EmailSettingViewModelFactory(instance()) }
         bind() from provider { PushSettingViewModelFactory(instance(), instance()) }
         bind() from provider {
@@ -353,8 +373,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { NameViewModelFactory(instance(), instance()) }
         bind() from provider { PhotoViewModelFactory(instance()) }
         bind() from provider { RegisterFinishViewModelFactory(instance()) }
-
-
 
 
         // Interceptor

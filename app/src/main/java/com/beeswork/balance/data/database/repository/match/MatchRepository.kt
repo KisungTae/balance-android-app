@@ -1,8 +1,10 @@
 package com.beeswork.balance.data.database.repository.match
 
 import com.beeswork.balance.data.database.entity.match.Match
+import com.beeswork.balance.data.database.result.ClickResult
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.match.*
+import com.beeswork.balance.internal.constant.ClickOutcome
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.ui.mainviewpagerfragment.NewMatch
@@ -11,7 +13,7 @@ import java.util.*
 
 interface MatchRepository {
 
-    val newMatchFlow: Flow<NewMatch>
+    val newMatchFlow: Flow<Match>
 
     suspend fun loadMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): List<Match>
     suspend fun fetchMatches(loadSize: Int, lastMatchId: Long?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
@@ -21,7 +23,7 @@ interface MatchRepository {
     fun getMatchPageInvalidationFlow(): Flow<Boolean>
     fun getMatchCountFlow(): Flow<Long?>
     fun getMatchFlow(chatId: UUID): Flow<Match?>
-    suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO>
+    suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult>
     suspend fun deleteMatches()
     suspend fun deleteMatchCount()
     suspend fun isUnmatched(chatId: UUID): Boolean

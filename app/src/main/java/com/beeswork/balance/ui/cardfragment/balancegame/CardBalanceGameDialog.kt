@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogSwipeBalanceGameBinding
-import com.beeswork.balance.internal.constant.ClickResult
+import com.beeswork.balance.internal.constant.ClickOutcome
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.observeResource
@@ -85,20 +85,20 @@ class CardBalanceGameDialog(
         viewModel.clickLiveData.observe(viewLifecycleOwner) { resource ->
             when {
                 resource.isSuccess() -> resource.data?.let { clickDTO ->
-                    when (clickDTO.clickResult) {
-                        ClickResult.MISSED -> {
+                    when (clickDTO.clickOutcome) {
+                        ClickOutcome.MISSED -> {
                             showMissed()
                         }
-                        ClickResult.CLICKED -> {
+                        ClickOutcome.CLICKED -> {
                             showClicked()
                         }
-                        ClickResult.MATCHED -> {
+                        ClickOutcome.MATCHED -> {
                             showMatched()
                         }
                     }
                 }
                 resource.isLoading() -> {
-                    showLoading(getString(R.string.balance_game_checking_text))
+                    showLoading(getString(R.string.msg_check_answers))
                 }
                 resource.isError() -> {
                     showSaveError(MessageSource.getMessage(requireContext(), resource.exception))

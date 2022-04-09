@@ -126,10 +126,10 @@
                     app:tint="@color/white" />
 
                 <TextView
-                    android:text="0"
                     android:id="@+id/tvBalanceGamePoint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="0"
                     android:textColor="@color/TextWhite"
                     android:textStyle="bold" />
 
@@ -194,8 +194,8 @@
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="128dp"
-                android:layout_height="128dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginBottom="10dp"
                 android:contentDescription="@string/dialog_error_icon_description"
                 android:src="@drawable/ic_thankful" />
@@ -275,12 +275,199 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llBalanceGameMissedWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/BackgroundWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="30dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="20dp"
+                android:contentDescription="@string/broken_heart_icon_description"
+                android:src="@drawable/ic_broken_heart" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvBalanceGameMissedSwipedName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="슈기"
+                    android:textColor="@color/Primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/balance_game_missed_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:text="@string/balance_game_missed_message"
+                android:textAlignment="center" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameMissedRetry"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="@string/balance_game_retry_btn_title"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameMissedClose"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/sh_round_box"
+                android:backgroundTint="@color/BackgroundWhite"
+                android:stateListAnimator="@null"
+                android:text="@string/close"
+                android:textColor="@color/Primary"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/llBalanceGameClickedWrapper"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/sh_round_box_medium"
             android:backgroundTint="@color/BackgroundWhite"
-            android:orientation="vertical">
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="30dp"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center|bottom">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center|top"
+                    android:layout_marginStart="-50dp"
+                    android:layout_marginTop="40dp"
+                    android:contentDescription="@string/favorite_icon_description"
+                    android:rotation="-25"
+                    android:src="@drawable/ic_baseline_favorite"
+                    app:tint="@color/Primary" />
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center|top"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="-25dp"
+                    android:contentDescription="@string/favorite_icon_description"
+                    android:rotation="25"
+                    android:src="@drawable/ic_baseline_favorite"
+                    app:tint="@color/Primary" />
+
+                <LinearLayout
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center|bottom"
+                    android:background="@drawable/sh_circle_border"
+                    android:backgroundTint="@color/white"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/ivBalanceGameClickedSwipedProfilePhoto"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:contentDescription="@string/balance_game_profile_photo_description"
+                        android:src="@drawable/person1" />
+
+                </LinearLayout>
+
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvBalanceGameClickedSwipedName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="슈기"
+                    android:textColor="@color/Primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/balance_game_clicked_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:text="@string/balance_game_clicked_message"
+                android:textAlignment="center" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameClickedGoToSwipe"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="@string/swipe_btn_title"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameClickedClose"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/sh_round_box"
+                android:backgroundTint="@color/BackgroundWhite"
+                android:stateListAnimator="@null"
+                android:text="@string/close"
+                android:textColor="@color/Primary"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 
@@ -290,7 +477,139 @@
             android:layout_height="match_parent"
             android:background="@drawable/sh_round_box_medium"
             android:backgroundTint="@color/BackgroundWhite"
-            android:orientation="vertical">
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="30dp"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center|bottom">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="-18dp"
+                    android:layout_marginTop="10dp"
+                    android:contentDescription="@string/favorite_icon_description"
+                    android:rotation="-25"
+                    android:src="@drawable/ic_baseline_favorite"
+                    app:tint="@color/Primary" />
+
+                <ImageView
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_marginStart="155dp"
+                    android:layout_marginTop="-18dp"
+                    android:contentDescription="@string/favorite_icon_description"
+                    android:rotation="25"
+                    android:src="@drawable/ic_baseline_favorite"
+                    app:tint="@color/Primary" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
+                        android:layout_marginEnd="-8dp"
+                        android:background="@drawable/sh_circle_border"
+                        android:backgroundTint="@color/white"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/ivBalanceGameMatchedSwiperProfilePhoto"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:contentDescription="@string/balance_game_profile_photo_description"
+                            android:src="@drawable/person3" />
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
+                        android:layout_marginStart="-8dp"
+                        android:background="@drawable/sh_circle_border"
+                        android:backgroundTint="@color/white"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/ivBalanceGameMatchedSwipedProfilePhoto"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:contentDescription="@string/balance_game_profile_photo_description"
+                            android:src="@drawable/person1" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvBalanceGameMatchedSwipedName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="슈기"
+                    android:textColor="@color/Primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/balance_game_matched_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:text="@string/balance_game_matched_message"
+                android:textAlignment="center" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameMatchedGoToMatch"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="@string/go_to_match_btn_title"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBalanceGameMatchedClose"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/sh_round_box"
+                android:backgroundTint="@color/BackgroundWhite"
+                android:stateListAnimator="@null"
+                android:text="@string/close"
+                android:textColor="@color/Primary"
+                android:textStyle="bold" />
 
 
         </LinearLayout>

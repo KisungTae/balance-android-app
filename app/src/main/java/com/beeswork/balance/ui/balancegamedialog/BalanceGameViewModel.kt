@@ -3,20 +3,32 @@ package com.beeswork.balance.ui.balancegamedialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
+import com.beeswork.balance.domain.uistate.balancegame.ClickUIState
 import com.beeswork.balance.domain.uistate.balancegame.FetchQuestionsUIState
 import com.beeswork.balance.domain.uistate.balancegame.FetchRandomQuestionUIState
 import com.beeswork.balance.domain.uistate.balancegame.SaveAnswersUIState
 import com.beeswork.balance.domain.usecase.balancegame.FetchQuestionsUseCase
 import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionUseCase
 import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
+import com.beeswork.balance.domain.usecase.card.ClickUseCase
+import com.beeswork.balance.domain.usecase.card.LikeUseCase
+import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCase
+import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
+import java.util.*
 
 class BalanceGameViewModel(
     private val fetchQuestionsUseCase: FetchQuestionsUseCase,
     private val saveAnswersUseCase: SaveAnswersUseCase,
     private val fetchRandomQuestionUseCase: FetchRandomQuestionUseCase,
+    private val getProfilePhotoUrlUseCase: GetProfilePhotoUrlUseCase,
+    private val likeUseCase: LikeUseCase,
+    private val clickUseCase: ClickUseCase,
+    private val matchMapper: MatchMapper,
     private val questionMapper: QuestionMapper
 ) : BaseViewModel() {
 
@@ -28,6 +40,41 @@ class BalanceGameViewModel(
 
     private val _fetchRandomQuestionUIStateLiveData = MutableLiveData<FetchRandomQuestionUIState>()
     val fetchRandomQuestionUIStateLiveData: LiveData<FetchRandomQuestionUIState> get() = _fetchRandomQuestionUIStateLiveData
+
+    private val _clickUIStateLiveData = MutableLiveData<ClickUIState>()
+    val clickUIStateLiveData: LiveData<ClickUIState> get() = _clickUIStateLiveData
+
+    private val _profilePhotoUrlLiveData = MutableLiveData<String?>()
+    val profilePhotoUrlLiveData: LiveData<String?> get() = _profilePhotoUrlLiveData
+
+
+    fun fetchProfilePhotoUrl() {
+        viewModelScope.launch {
+            _profilePhotoUrlLiveData.postValue(getProfilePhotoUrlUseCase.invoke())
+        }
+    }
+
+    fun like(swipedId: UUID) {
+        viewModelScope.launch {
+            _fetchQuestionsUIStateLiveData.postValue(FetchQuestionsUIState.ofLoading())
+            val response = likeUseCase.invoke(swipedId)
+            handleFetchQuestionsResponse(response)
+        }
+    }
+
+    fun click(swipedId: UUID, answers: Map<Int, Boolean>) {
+        viewModelScope.launch {
+            _clickUIStateLiveData.postValue(ClickUIState.ofLoading())
+            val response = clickUseCase.invoke(swipedId, answers)
+            val clickUIState = if (response.isSuccess() && response.data != null && response.data.match != null) {
+                val matchNotificationUIState = matchMapper.toMatchNotificationUIState(response.data.match)
+                ClickUIState.ofSuccess(response.data.clickOutcome, matchNotificationUIState)
+            } else {
+                ClickUIState.ofError(response.exception)
+            }
+            _clickUIStateLiveData.postValue(clickUIState)
+        }
+    }
 
     fun fetchRandomQuestion(questionIds: List<Int>) {
         viewModelScope.launch {
@@ -42,22 +89,26 @@ class BalanceGameViewModel(
         }
     }
 
-
     fun fetchQuestions() {
         viewModelScope.launch {
             _fetchQuestionsUIStateLiveData.postValue(FetchQuestionsUIState.ofLoading())
             val response = fetchQuestionsUseCase.invoke()
-            val fetchQuestionsUIState = if (response.isSuccess() && response.data != null) {
-                val questionItemUIStates = response.data.questionDTOs.map { questionDTO ->
-                    questionMapper.toQuestionItemUIState(questionDTO)
-                }
-                FetchQuestionsUIState.ofSuccess(questionItemUIStates, response.data.point)
-            } else {
-                FetchQuestionsUIState.ofError(response.exception)
-            }
-            _fetchQuestionsUIStateLiveData.postValue(fetchQuestionsUIState)
+            handleFetchQuestionsResponse(response)
         }
     }
+
+    private fun handleFetchQuestionsResponse(response: Resource<FetchQuestionsDTO>) {
+        val fetchQuestionsUIState = if (response.isSuccess() && response.data != null) {
+            val questionItemUIStates = response.data.questionDTOs.map { questionDTO ->
+                questionMapper.toQuestionItemUIState(questionDTO)
+            }
+            FetchQuestionsUIState.ofSuccess(questionItemUIStates, response.data.point)
+        } else {
+            FetchQuestionsUIState.ofError(response.exception)
+        }
+        _fetchQuestionsUIStateLiveData.postValue(fetchQuestionsUIState)
+    }
+
 
     fun saveAnswers(answers: Map<Int, Boolean>) {
         viewModelScope.launch {

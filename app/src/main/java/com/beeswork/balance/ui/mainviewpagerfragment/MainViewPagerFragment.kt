@@ -14,7 +14,8 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewSwipeBinding
-import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
+import com.beeswork.balance.domain.usecase.swipe.SwipeNotificationUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.cardfragment.CardFragment
@@ -26,7 +27,6 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-import java.util.*
 
 
 class MainViewPagerFragment : BaseFragment(), KodeinAware {
@@ -55,16 +55,16 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
     private fun bindUI() = lifecycleScope.launch {
         setupViewPager()
         setupViewPagerTab()
-        observeNewSwipeLiveData()
+        observeSwipeNotificationUIStateLiveData()
         observeSwipeCountLiveData()
         observeMatchCountLiveData()
-        observeNewMatchLiveData()
+        observeMatchNotificationUIStateLiveData()
     }
 
 
-    private suspend fun observeNewSwipeLiveData() {
-        viewModel.newSwipeLiveData.await().observe(viewLifecycleOwner) { swipeDomain ->
-            showNewSwipeSnackBar(swipeDomain)
+    private suspend fun observeSwipeNotificationUIStateLiveData() {
+        viewModel.swipeNotificationUIStateLiveData.await().observe(viewLifecycleOwner) { swipeNotificationUIState ->
+            showNewSwipeSnackBar(swipeNotificationUIState)
         }
     }
 
@@ -80,9 +80,9 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         }
     }
 
-    private suspend fun observeNewMatchLiveData() {
-        viewModel.newMatchLiveData.await().observe(viewLifecycleOwner) { newMatch ->
-            showNewMatchSnackBar(newMatch)
+    private suspend fun observeMatchNotificationUIStateLiveData() {
+        viewModel.matchNotificationUIStateLiveData.await().observe(viewLifecycleOwner) { matchNotificationUIState ->
+            showNewMatchSnackBar(matchNotificationUIState)
         }
     }
 
@@ -148,16 +148,16 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         }
     }
 
-    private fun showNewSwipeSnackBar(swipeDomain: SwipeDomain) {
+    private fun showNewSwipeSnackBar(swipeNotificationUIState: SwipeNotificationUIState) {
         val snackBarNewSwipeBinding = SnackBarNewSwipeBinding.inflate(layoutInflater)
         val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
         val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, snackBarNewSwipeBinding.root)
         snackBar.view.setOnClickListener {
             binding.tlMain.getTabAt(MainViewPagerTabPosition.SWIPE.ordinal)?.select()
         }
-        setupProfilePhoto(swipeDomain.swiperId, swipeDomain.swiperProfilePhotoKey, snackBarNewSwipeBinding.ivNewSwipeSnackBarProfilePhoto)
+        setupProfilePhoto(swipeNotificationUIState.swiperProfilePhotoUrl, snackBarNewSwipeBinding.ivNewSwipeSnackBarProfilePhoto)
 
-        if (swipeDomain.clicked) {
+        if (swipeNotificationUIState.clicked) {
             snackBarNewSwipeBinding.tvNewSwipeSnackBarTitle.text = getString(R.string.title_new_swipe_clicked)
             snackBarNewSwipeBinding.tvNewSwipeSnackBarMessage.text = getString(R.string.body_new_swipe_clicked)
         } else {
@@ -170,7 +170,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         snackBar.show()
     }
 
-    private fun showNewMatchSnackBar(newMatch: NewMatch) {
+    private fun showNewMatchSnackBar(matchNotificationUIState: MatchNotificationUIState) {
         val snackBarNewSwipeBinding = SnackBarNewMatchBinding.inflate(layoutInflater)
         val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
         val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, snackBarNewSwipeBinding.root)
@@ -181,18 +181,16 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware {
         snackBarNewSwipeBinding.tvNewMatchSnackBarClose.setOnClickListener {
             snackBar.dismiss()
         }
-        setupProfilePhoto(newMatch.swiperId, newMatch.swiperProfilePhoto, snackBarNewSwipeBinding.ivNewMatchSnackBarSwiper)
-        setupProfilePhoto(newMatch.swipedId, newMatch.swipedProfilePhoto, snackBarNewSwipeBinding.ivNewMatchSnackBarSwiped)
+        setupProfilePhoto(matchNotificationUIState.swiperProfilePhotoUrl, snackBarNewSwipeBinding.ivNewMatchSnackBarSwiper)
+        setupProfilePhoto(matchNotificationUIState.swipedProfilePhotoUrl, snackBarNewSwipeBinding.ivNewMatchSnackBarSwiped)
         snackBar.show()
     }
 
-    private fun setupProfilePhoto(accountId: UUID?, profilePhotoKey: String?, imageView: ImageView) {
-        if (accountId != null && profilePhotoKey != null) {
-            Glide.with(requireContext())
-                .load(EndPoint.ofPhoto(accountId, profilePhotoKey))
-                .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-                .into(imageView)
-        }
+    private fun setupProfilePhoto(photoUrl: String?, imageView: ImageView) {
+        Glide.with(requireContext())
+            .load(photoUrl)
+            .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+            .into(imageView)
     }
 
     fun onLocationPermissionChanged(grated: Boolean) {

@@ -11,6 +11,7 @@ import com.beeswork.balance.data.database.entity.match.MatchCount
 import com.beeswork.balance.data.database.entity.swipe.Click
 import com.beeswork.balance.data.database.entity.swipe.SwipeCount
 import com.beeswork.balance.data.database.repository.BaseRepository
+import com.beeswork.balance.data.database.result.ClickResult
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -19,7 +20,7 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.response.match.*
 import com.beeswork.balance.data.network.service.stomp.StompClient
-import com.beeswork.balance.internal.constant.ClickResult
+import com.beeswork.balance.internal.constant.ClickOutcome
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
@@ -56,11 +57,11 @@ class MatchRepositoryImpl(
 
     private val matchPageFetchDateTracker = PageFetchDateTracker(5L)
 
-    private var newMatchCallBackFlowListener: CallBackFlowListener<NewMatch>? = null
+    private var newMatchCallBackFlowListener: CallBackFlowListener<Match>? = null
     @ExperimentalCoroutinesApi
-    override val newMatchFlow: Flow<NewMatch> = callbackFlow {
-        newMatchCallBackFlowListener = object : CallBackFlowListener<NewMatch> {
-            override fun onInvoke(data: NewMatch) {
+    override val newMatchFlow: Flow<Match> = callbackFlow {
+        newMatchCallBackFlowListener = object : CallBackFlowListener<Match> {
+            override fun onInvoke(data: Match) {
                 offer(data)
             }
         }
@@ -219,29 +220,38 @@ class MatchRepositoryImpl(
             val accountId = preferenceProvider.getAccountId()
             val match = queryResult.data
             if (queryResult.isInsert() && match != null && match.swiperId == accountId) {
-                val newMatch = NewMatch(accountId, photoDAO.getProfilePhotoBy(accountId), match.swipedId, match.swipedProfilePhotoKey)
-                newMatchCallBackFlowListener?.onInvoke(newMatch)
+                match.swiperProfilePhotoKey = photoDAO.getProfilePhotoKeyBy(match.swiperId)
+                newMatchCallBackFlowListener?.onInvoke(match)
             }
         }
     }
 
-    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickDTO> {
+    override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val response = matchRDS.click(swipedId, answers)
-            response.data?.let { clickDTO ->
-                when (clickDTO.clickResult) {
-                    ClickResult.MATCHED -> {
-                        doSaveMatch(clickDTO.matchDTO)
+
+            return@withContext response.map { clickResponse ->
+                if (clickResponse == null) {
+                    return@map null
+                }
+
+                when (clickResponse.clickOutcome) {
+                    ClickOutcome.MATCHED -> {
+                        val saveMatchResult = doSaveMatch(clickResponse.matchDTO)
+                        val match = saveMatchResult.data
+                        match?.swiperProfilePhotoKey = photoDAO.getProfilePhotoKeyBy(match?.swiperId)
+                        return@map ClickResult(clickResponse.clickOutcome, match)
                     }
-                    ClickResult.CLICKED -> {
+                    ClickOutcome.CLICKED -> {
                         clickDAO.insert(Click(swipedId, accountId))
+                        return@map ClickResult(clickResponse.clickOutcome, null)
                     }
-                    ClickResult.MISSED -> {
+                    ClickOutcome.MISSED -> {
+                        return@map ClickResult(clickResponse.clickOutcome, null)
                     }
                 }
             }
-            return@withContext response
         }
     }
 
@@ -336,7 +346,7 @@ class MatchRepositoryImpl(
     }
 
     override fun testFunction() {
-        val newMatch = NewMatch(UUID.randomUUID(), "", UUID.randomUUID(), "")
-        newMatchCallBackFlowListener?.onInvoke(newMatch)
+//        val newMatch = NewMatch(UUID.randomUUID(), "", UUID.randomUUID(), "")
+//        newMatchCallBackFlowListener?.onInvoke(newMatch)
     }
 }

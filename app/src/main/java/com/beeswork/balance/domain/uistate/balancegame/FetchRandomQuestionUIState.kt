@@ -10,7 +10,7 @@ class FetchRandomQuestionUIState(
 
         fun ofSuccess(questionItemUIState: QuestionItemUIState): FetchRandomQuestionUIState {
             return FetchRandomQuestionUIState(
-                questionItemUIState = questionItemUIState,
+                questionItemUIState,
                 showLoading = false,
                 showError = false,
                 exception = null

@@ -1,6 +1,6 @@
 package com.beeswork.balance.internal.constant
 
-enum class ClickResult {
+enum class ClickOutcome {
     MISSED,
     CLICKED,
     MATCHED

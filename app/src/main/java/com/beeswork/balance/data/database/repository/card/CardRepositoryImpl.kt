@@ -7,6 +7,7 @@ import com.beeswork.balance.data.network.rds.card.CardRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
+import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
@@ -20,7 +21,7 @@ class CardRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : CardRepository {
 
-    override suspend fun like(swipedId: UUID): Resource<List<QuestionDTO>> {
+    override suspend fun like(swipedId: UUID): Resource<FetchQuestionsDTO> {
         return withContext(ioDispatcher) {
             return@withContext cardRDS.like(swipedId)
         }

@@ -51,6 +51,10 @@ interface PhotoDAO {
     @Query("select `key` from photo where accountId = :accountId order by sequence limit 1")
     fun getProfilePhotoKeyFlowBy(accountId: UUID?): Flow<String?>
 
+    @Query("select * from photo where accountId = :accountId order by sequence limit 1")
+    fun getProfilePhotoBy(accountId: UUID?): Photo?
+
     @Query("select `key` from photo where accountId = :accountId order by sequence limit 1")
-    fun getProfilePhotoBy(accountId: UUID?): String?
+    fun getProfilePhotoKeyBy(accountId: UUID?): String?
+
 }
