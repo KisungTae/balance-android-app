@@ -12,7 +12,7 @@ import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import kotlinx.coroutines.launch
 import java.util.*
 
-class BalanceGameFragment: BaseRegisterStepFragment(), RegisterBalanceGameListener {
+class BalanceGameFragment : BaseRegisterStepFragment(), RegisterBalanceGameListener {
 
     private lateinit var binding: FragmentBalanceGameBinding
 
@@ -33,8 +33,6 @@ class BalanceGameFragment: BaseRegisterStepFragment(), RegisterBalanceGameListen
     private fun setupLaunchBalanceGameBtnListener() {
         binding.btnRegisterBalanceGameLaunch.setOnClickListener {
             RegisterBalanceGameDialog(this).show(childFragmentManager, RegisterBalanceGameDialog.TAG)
-//            ProfileBalanceGameDialog().show(childFragmentManager, RegisterBalanceGameDialog.TAG)
-//            CardBalanceGameDialog(UUID.fromString("a514e4ab-a5b0-4efb-a2ac-b96edfb0e77d"), "").show(childFragmentManager, CardBalanceGameDialog.TAG)
         }
     }
 

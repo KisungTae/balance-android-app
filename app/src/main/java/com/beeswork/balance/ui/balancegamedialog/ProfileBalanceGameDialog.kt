@@ -10,17 +10,15 @@ class ProfileBalanceGameDialog: BaseBalanceGameDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeFetchQuestionsUIStateLiveData(true)
-        observeFetchRandomQuestionUIStateLiveData()
         bindUI()
-        viewModel.fetchQuestions()
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        setupBtnListenersForProfileBalanceGame()
+        observeFetchQuestionsUIStateLiveData(true)
+        observeFetchRandomQuestionUIStateLiveData()
         observeSaveAnswersUIStateLiveData()
-        binding.btnBalanceGameRefetch.setOnClickListener {
-            viewModel.fetchQuestions()
-        }
+        viewModel.fetchQuestions()
     }
 
     private fun observeSaveAnswersUIStateLiveData() {

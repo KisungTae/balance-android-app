@@ -17,21 +17,18 @@ class CardBalanceGameDialog(
     private val cardBalanceGameListener: CardBalanceGameListener
 ): BaseBalanceGameDialog() {
 
+    private var balanceGameAttemptCount: Int = 0
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindUI()
-//        viewModel.like(swipedId)
+        viewModel.like(swipedId)
     }
 
     private fun bindUI() {
         setupBtnListeners()
         observeFetchQuestionsUIStateLiveData(false)
         observeClickUIStateLiveData()
-
-
-
-
-
     }
 
     private fun setupBtnListeners() {
@@ -39,6 +36,11 @@ class CardBalanceGameDialog(
             viewModel.click(swipedId, balanceGameViewPagerAdapter.getAnswers())
         }
         binding.btnBalanceGameMissedRetry.setOnClickListener {
+            balanceGameAttemptCount++
+            binding.tvBalanceGameAttemptCount.text = balanceGameAttemptCount.toString()
+            viewModel.like(swipedId)
+        }
+        binding.btnBalanceGameRefetch.setOnClickListener {
             viewModel.like(swipedId)
         }
         binding.btnBalanceGameClickedGoToSwipe.setOnClickListener {
@@ -58,7 +60,6 @@ class CardBalanceGameDialog(
         binding.btnBalanceGameMissedClose.setOnClickListener {
             dismiss()
         }
-
     }
 
     private fun observeClickUIStateLiveData() {
@@ -93,7 +94,6 @@ class CardBalanceGameDialog(
 
     private fun showMatched(matchNotificationUIState: MatchNotificationUIState?) {
         showLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.GONE)
-
         Glide.with(requireContext())
             .load(swipedProfilePhotoUrl)
             .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
@@ -116,7 +116,6 @@ class CardBalanceGameDialog(
     private fun showMissed() {
         showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.VISIBLE)
     }
-
 
     override fun onBalanceGameOptionSelected(position: Int) {
         if (isBalanceGameFinished(position)) {

@@ -33,7 +33,7 @@
             app:startColor="@color/Primary" />
 
         <ImageButton
-            android:id="@+id/btnBalanceGameRefresh"
+            android:id="@+id/btnBalanceGameFetchRandomQuestion"
             android:layout_width="@dimen/icon_medium"
             android:layout_height="@dimen/icon_medium"
             android:background="@color/Transparent"
@@ -479,7 +479,8 @@
             android:backgroundTint="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="30dp">
+            android:padding="30dp"
+            android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"

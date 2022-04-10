@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.size
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -68,6 +69,18 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
         })
     }
 
+    private fun setupBtnListeners() {
+        binding.btnBalanceGameClose.setOnClickListener {
+            dismiss()
+        }
+        binding.btnBalanceGameBack.setOnClickListener {
+            val currentPosition = binding.vpBalanceGame.currentItem
+            if (currentPosition > 0) {
+                binding.vpBalanceGame.currentItem = currentPosition - 1
+            }
+        }
+    }
+
     protected fun observeFetchQuestionsUIStateLiveData(showRefreshBtn: Boolean) {
         viewModel.fetchQuestionsUIStateLiveData.observe(viewLifecycleOwner) { fetchQuestionUIState ->
             when {
@@ -78,7 +91,7 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                         hideRefreshBtn()
                     }
                     showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
-                    addTabs(fetchQuestionUIState.questionItemUIStates.size)
+                    addBalanceGameTabs(fetchQuestionUIState.questionItemUIStates.size)
                     balanceGameViewPagerAdapter.submit(fetchQuestionUIState.questionItemUIStates)
                     binding.tvBalanceGamePoint.text = fetchQuestionUIState.point.toString()
                 }
@@ -91,6 +104,15 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                     showError(title, message)
                     showErrorBtn(View.GONE, View.VISIBLE, View.GONE)
                 }
+            }
+        }
+    }
+
+    private fun addBalanceGameTabs(size: Int) {
+        val diff = size - binding.tlBalanceGame.tabCount
+        if (diff > 0) {
+            for (i in 1..diff) {
+                binding.tlBalanceGame.addTab(binding.tlBalanceGame.newTab())
             }
         }
     }
@@ -111,9 +133,9 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                     showLoading(getString(R.string.fetch_question_message))
                 }
                 fetchRandomQuestionUIState.showError -> {
+                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
                     showRefreshBtn()
                     showBackBtn()
-                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
                     val title = getString(R.string.error_title_fetch_question)
                     val message = MessageSource.getMessage(requireContext(), fetchRandomQuestionUIState.exception)
                     ErrorDialog.show(title, message, childFragmentManager)
@@ -144,24 +166,15 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
         binding.tvBalanceGameErrorMessage.text = message
     }
 
-    private fun addTabs(size: Int) {
-        for (i in 1..size) {
-            binding.tlBalanceGame.addTab(binding.tlBalanceGame.newTab())
-        }
-    }
-
-    private fun setupBtnListeners() {
-        binding.btnBalanceGameClose.setOnClickListener {
-            dismiss()
-        }
-        binding.btnBalanceGameBack.setOnClickListener {
-            val currentPosition = binding.vpBalanceGame.currentItem
-            if (currentPosition > 0) {
-                binding.vpBalanceGame.currentItem = currentPosition - 1
-            }
-        }
-        binding.btnBalanceGameRefresh.setOnClickListener {
+    protected fun setupBtnListenersForProfileBalanceGame() {
+        binding.btnBalanceGameFetchRandomQuestion.setOnClickListener {
             viewModel.fetchRandomQuestion(balanceGameViewPagerAdapter.getQuestionIds())
+        }
+        binding.btnBalanceGameResave.setOnClickListener {
+            viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
+        }
+        binding.btnBalanceGameRefetch.setOnClickListener {
+            viewModel.fetchQuestions()
         }
         binding.btnBalanceGameResave.setOnClickListener {
             viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
@@ -181,13 +194,13 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
     }
 
     private fun showRefreshBtn() {
-        binding.btnBalanceGameRefresh.visibility = View.VISIBLE
-        binding.btnBalanceGameRefresh.isEnabled = true
+        binding.btnBalanceGameFetchRandomQuestion.visibility = View.VISIBLE
+        binding.btnBalanceGameFetchRandomQuestion.isEnabled = true
     }
 
     private fun hideRefreshBtn() {
-        binding.btnBalanceGameRefresh.visibility = View.INVISIBLE
-        binding.btnBalanceGameRefresh.isEnabled = false
+        binding.btnBalanceGameFetchRandomQuestion.visibility = View.INVISIBLE
+        binding.btnBalanceGameFetchRandomQuestion.isEnabled = false
     }
 
     protected fun showErrorBtn(resave: Int, refetch: Int, reclick: Int) {

@@ -13,26 +13,21 @@ class RegisterBalanceGameDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindUI()
+    }
+
+    private fun bindUI() = lifecycleScope.launch {
+        observeProfilePhotoUrlLiveData()
+        viewModel.fetchProfilePhotoUrl()
+        setupBtnListenersForProfileBalanceGame()
+        observeFetchQuestionsUIStateLiveData(true)
+        observeFetchRandomQuestionUIStateLiveData()
+        observeSaveAnswersUIStateLiveData()
         viewModel.fetchQuestions()
     }
 
     private fun observeProfilePhotoUrlLiveData() {
         viewModel.profilePhotoUrlLiveData.observe(viewLifecycleOwner) { profilePhotoUrl ->
             balanceGameViewPagerAdapter.setupProfilePhotoULR(profilePhotoUrl)
-        }
-    }
-
-    private fun bindUI() = lifecycleScope.launch {
-        observeProfilePhotoUrlLiveData()
-        viewModel.fetchProfilePhotoUrl()
-        observeSaveAnswersUIStateLiveData()
-        observeFetchQuestionsUIStateLiveData(true)
-        observeFetchRandomQuestionUIStateLiveData()
-        binding.btnBalanceGameRefetch.setOnClickListener {
-            viewModel.fetchQuestions()
-        }
-        binding.btnBalanceGameResave.setOnClickListener {
-            viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
         }
     }
 
