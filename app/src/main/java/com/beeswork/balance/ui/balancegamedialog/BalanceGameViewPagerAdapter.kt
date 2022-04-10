@@ -17,7 +17,7 @@ import com.bumptech.glide.Glide
 
 class BalanceGameViewPagerAdapter(
     private val balanceGameListener: BalanceGameListener
-) : RecyclerView.Adapter<BalanceGameViewPagerAdapter.ViewHolder>(), BalanceGameQuestionListener {
+) : RecyclerView.Adapter<BalanceGameViewPagerAdapter.ViewHolder>() {
 
     private var profilePhotoURL: String? = null
 
@@ -27,7 +27,7 @@ class BalanceGameViewPagerAdapter(
         return ViewHolder(
             ItemBalanceGameBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             profilePhotoURL,
-            this,
+            balanceGameListener,
             parent.context
         )
     }
@@ -65,10 +65,9 @@ class BalanceGameViewPagerAdapter(
         return answers
     }
 
-    override fun onOptionSelected(position: Int, answer: Boolean) {
+    fun updateAnswer(position: Int, answer: Boolean) {
         questionItemUIStates[position].answer = answer
         notifyItemChanged(position)
-        balanceGameListener.onBalanceGameOptionSelected(position)
     }
 
     fun setupProfilePhotoULR(url: String?) {
@@ -76,14 +75,14 @@ class BalanceGameViewPagerAdapter(
     }
 
     interface BalanceGameListener {
-        fun onBalanceGameOptionSelected(position: Int)
+        fun onBalanceGameOptionSelected(position: Int, answer: Boolean)
     }
 
 
     class ViewHolder(
         private val binding: ItemBalanceGameBinding,
         private val profilePhotoUrl: String?,
-        private val balanceGameQuestionListener: BalanceGameQuestionListener,
+        private val balanceGameListener: BalanceGameListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -99,10 +98,10 @@ class BalanceGameViewPagerAdapter(
             setOptionButton(binding.btnBalanceGameBottomOption, questionItemUIState.answer == BalanceGameOption.BOTTOM)
 
             binding.btnBalanceGameTopOption.setOnClickListener {
-                balanceGameQuestionListener.onOptionSelected(absoluteAdapterPosition, BalanceGameOption.TOP)
+                balanceGameListener.onBalanceGameOptionSelected(absoluteAdapterPosition, BalanceGameOption.TOP)
             }
             binding.btnBalanceGameBottomOption.setOnClickListener {
-                balanceGameQuestionListener.onOptionSelected(absoluteAdapterPosition, BalanceGameOption.BOTTOM)
+                balanceGameListener.onBalanceGameOptionSelected(absoluteAdapterPosition, BalanceGameOption.BOTTOM)
             }
 
             Glide.with(context)

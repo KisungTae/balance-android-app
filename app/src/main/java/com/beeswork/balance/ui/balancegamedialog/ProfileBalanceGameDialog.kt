@@ -100,7 +100,8 @@ class ProfileBalanceGameDialog(
         }
     }
 
-    override fun onBalanceGameOptionSelected(position: Int) {
+    override fun onBalanceGameOptionSelected(position: Int, answer: Boolean) {
+        balanceGameViewPagerAdapter.updateAnswer(position, answer)
         if (isBalanceGameFinished(position)) {
             viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
         } else {
