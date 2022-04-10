@@ -117,40 +117,6 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
         }
     }
 
-    protected fun observeFetchRandomQuestionUIStateLiveData() {
-        viewModel.fetchRandomQuestionUIStateLiveData.observe(viewLifecycleOwner) { fetchRandomQuestionUIState ->
-            when {
-                fetchRandomQuestionUIState.questionItemUIState != null -> {
-                    balanceGameViewPagerAdapter.replaceQuestion(
-                        binding.vpBalanceGame.currentItem,
-                        fetchRandomQuestionUIState.questionItemUIState
-                    )
-                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
-                    showRefreshBtn()
-                    showBackBtn()
-                }
-                fetchRandomQuestionUIState.showLoading -> {
-                    showLoading(getString(R.string.fetch_question_message))
-                }
-                fetchRandomQuestionUIState.showError -> {
-                    showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
-                    showRefreshBtn()
-                    showBackBtn()
-                    val title = getString(R.string.error_title_fetch_question)
-                    val message = MessageSource.getMessage(requireContext(), fetchRandomQuestionUIState.exception)
-                    ErrorDialog.show(title, message, childFragmentManager)
-                }
-            }
-        }
-    }
-
-    protected fun showSaveQuestionsError(exception: Throwable?) {
-        val title = getString(R.string.error_title_save_answers)
-        val message = MessageSource.getMessage(requireContext(), exception)
-        showError(title, message)
-        showErrorBtn(View.VISIBLE, View.GONE, View.GONE)
-    }
-
     protected fun showLoading(message: String) {
         hideBackBtn()
         hideRefreshBtn()
@@ -166,34 +132,20 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
         binding.tvBalanceGameErrorMessage.text = message
     }
 
-    protected fun setupBtnListenersForProfileBalanceGame() {
-        binding.btnBalanceGameFetchRandomQuestion.setOnClickListener {
-            viewModel.fetchRandomQuestion(balanceGameViewPagerAdapter.getQuestionIds())
-        }
-        binding.btnBalanceGameResave.setOnClickListener {
-            viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
-        }
-        binding.btnBalanceGameRefetch.setOnClickListener {
-            viewModel.fetchQuestions()
-        }
-        binding.btnBalanceGameResave.setOnClickListener {
-            viewModel.saveAnswers(balanceGameViewPagerAdapter.getAnswers())
-        }
-    }
 
-    private fun showBackBtn() {
+    protected fun showBackBtn() {
         if (binding.vpBalanceGame.currentItem > 0) {
             binding.btnBalanceGameBack.visibility = View.VISIBLE
             binding.btnBalanceGameBack.isEnabled = true
         }
     }
 
-    private fun hideBackBtn() {
+    protected fun hideBackBtn() {
         binding.btnBalanceGameBack.visibility = View.INVISIBLE
         binding.btnBalanceGameBack.isEnabled = false
     }
 
-    private fun showRefreshBtn() {
+    protected fun showRefreshBtn() {
         binding.btnBalanceGameFetchRandomQuestion.visibility = View.VISIBLE
         binding.btnBalanceGameFetchRandomQuestion.isEnabled = true
     }

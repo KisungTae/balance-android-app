@@ -32,7 +32,7 @@ class BalanceGameFragment : BaseRegisterStepFragment(), RegisterBalanceGameListe
 
     private fun setupLaunchBalanceGameBtnListener() {
         binding.btnRegisterBalanceGameLaunch.setOnClickListener {
-            RegisterBalanceGameDialog(this).show(childFragmentManager, RegisterBalanceGameDialog.TAG)
+            ProfileBalanceGameDialog(null, this).show(childFragmentManager, ProfileBalanceGameDialog.TAG)
         }
     }
 
