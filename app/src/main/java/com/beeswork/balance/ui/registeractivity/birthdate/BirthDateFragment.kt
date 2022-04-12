@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.FragmentBirthdateBinding
+import com.beeswork.balance.databinding.FragmentBirthDateBinding
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
@@ -20,12 +20,12 @@ import org.kodein.di.generic.instance
 
 class BirthDateFragment : BaseRegisterStepFragment(), KodeinAware {
     override val kodein by closestKodein()
-    private lateinit var binding: FragmentBirthdateBinding
+    private lateinit var binding: FragmentBirthDateBinding
     private lateinit var viewModel: BirthDateViewModel
     private val viewModelFactory: BirthDateViewModelFactory by instance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentBirthdateBinding.inflate(inflater)
+        binding = FragmentBirthDateBinding.inflate(inflater)
         return binding.root
     }
 

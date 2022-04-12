@@ -280,5 +280,10 @@
     <string name="balance_game_matched_title">님과 새로운 매치!</string>
     <string name="balance_game_matched_message">새루은 매치가 성사되었습니다! 상대방에게 메세지를 보내 관심을 표해보세요!</string>
     <string name="go_to_match_btn_title">매치 확인하기</string>
+    <string name="register_photo_description">자신을 어필할 수 있는 사진을 선택해주세요. 최대 6장 까지 가능하고 드래그 앤 드랍으로 위치를 바꿔보세요.</string>
+    <string name="register_photo_title">사진을 선택해주세요</string>
+    <string name="register_balance_game_title">밸런스 게임을 진행해주세요</string>
+    <string name="register_balance_game_description">밸런스 게임을 통해서 본인의 취향을 표현해주세요. 각각 질문들은 리프레쉬 버튼으로 새로운 질문으로 바꾸실 수 있습니다. 아래 질문보기 버튼을 눌러 진행해주세</string>
+    <string name="start_balance_game_btn">밸런스 게임 질문보기</string>
 
 </resources>

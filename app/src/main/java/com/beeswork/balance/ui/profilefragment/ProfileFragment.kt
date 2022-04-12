@@ -99,8 +99,10 @@ class ProfileFragment : BaseFragment(),
         observeFetchProfileLiveData()
         observeSaveBioLiveData()
         setupListeners()
-        observeFetchPhotosLiveData()
+
+
         setupPhotoPickerRecyclerView()
+        observeFetchPhotosLiveData()
         observeSyncPhotosLiveData()
         observeUploadPhotoLiveData()
         observeOrderPhotosLiveData()
@@ -186,11 +188,7 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun setupPhotoPickerRecyclerView() {
-        photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(
-            requireContext(),
-            this,
-            preferenceProvider.getAccountId()
-        )
+        photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(this)
         binding.rvPhotoPicker.adapter = photoPickerRecyclerViewAdapter
         binding.rvPhotoPicker.layoutManager = object : GridLayoutManager(
             requireContext(),
@@ -253,7 +251,7 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    override fun onClickPhotoPicker(position: Int) {
+    override fun onClickPhoto(position: Int) {
         if (fetchPhotosStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.ERROR) {
             val message = getString(R.string.fetching_photos_message)
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
@@ -349,16 +347,23 @@ class ProfileFragment : BaseFragment(),
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (hasExternalStoragePermission()) selectPhotoFromGallery()
             else requestGalleryPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else selectPhotoFromGallery()
+        } else {
+            selectPhotoFromGallery()
+        }
     }
 
     override fun uploadPhotoFromCapture() {
         val cameraIsAvailable = activity?.packageManager?.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) ?: false
         if (cameraIsAvailable) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (hasCameraPermission()) selectPhotoFromCapture()
-                else requestCameraPermission.launch(Manifest.permission.CAMERA)
-            } else selectPhotoFromCapture()
+                if (hasCameraPermission()) {
+                    selectPhotoFromCapture()
+                } else {
+                    requestCameraPermission.launch(Manifest.permission.CAMERA)
+                }
+            } else {
+                selectPhotoFromCapture()
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package com.beeswork.balance.internal.mapper.photo
 
 import com.beeswork.balance.data.database.entity.photo.Photo
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.ui.profilefragment.photo.PhotoPicker
 import java.util.*
@@ -22,7 +23,7 @@ class PhotoMapperImpl : PhotoMapper {
     }
 
     override fun toPhotoPicker(photo: Photo): PhotoPicker {
-        return PhotoPicker(photo.key, photo.status, photo.uri, photo.sequence)
+        return PhotoPicker(photo.key, photo.status, photo.uri, photo.sequence, EndPoint.ofPhoto(photo.accountId, photo.key))
     }
 
 }

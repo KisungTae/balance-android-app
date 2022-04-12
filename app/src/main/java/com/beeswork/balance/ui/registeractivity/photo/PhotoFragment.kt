@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentPhotoBinding
+import com.beeswork.balance.ui.common.BasePhotoFragment
 import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.beeswork.balance.ui.registeractivity.height.HeightViewModel
@@ -18,7 +19,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class PhotoFragment : BaseRegisterStepFragment(), KodeinAware {
+class PhotoFragment : BasePhotoFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentPhotoBinding
     private lateinit var viewModel: PhotoViewModel
@@ -32,12 +33,18 @@ class PhotoFragment : BaseRegisterStepFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(PhotoViewModel::class.java)
+
+        super.onViewCreated(viewModel, binding.layoutPhotoPicker)
         bindUI()
     }
 
     private fun bindUI() = lifecycleScope.launch {
         binding.btnRegisterPhotoNext.setOnClickListener {
-            moveToNextTab()
+            activity?.let { _activity ->
+                if (_activity is RegisterActivity) {
+                    _activity.moveToNextTab()
+                }
+            }
         }
     }
 

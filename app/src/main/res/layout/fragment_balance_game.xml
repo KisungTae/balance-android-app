@@ -8,15 +8,15 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="밸런스 게임을 진행해주세요"
+        android:text="@string/register_balance_game_title"
         android:textSize="25sp"
+        android:layout_marginBottom="10dp"
         android:textStyle="bold" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="밸런스 게임을 통해서 본인의 취향을 표현해주세요. 각각 질문들은 리프레쉬 버튼으로 새로운 질문으로 바꾸실 수 있습니다. 아래 질문보기 버튼을 눌러 진행해주세" />
+        android:text="@string/register_balance_game_description" />
 
     <Space
         android:layout_width="match_parent"
@@ -30,6 +30,6 @@
         android:background="@drawable/sh_round_box"
         android:backgroundTint="@color/BackgroundWhite"
         android:stateListAnimator="@null"
-        android:text="밸런스 게임 질문보기" />
+        android:text="@string/start_balance_game_btn" />
 
 </LinearLayout>

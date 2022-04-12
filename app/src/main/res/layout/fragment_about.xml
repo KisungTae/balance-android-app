@@ -10,19 +10,19 @@
         android:layout_height="wrap_content"
         android:text="@string/register_about_label"
         android:textSize="25sp"
+        android:layout_marginBottom="10dp"
         android:textStyle="bold" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
         android:text="@string/register_about_description" />
 
     <EditText
         android:id="@+id/etRegisterAbout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:background="@drawable/sh_round_box_thin_border"
         android:gravity="top|start"
         android:lines="8"

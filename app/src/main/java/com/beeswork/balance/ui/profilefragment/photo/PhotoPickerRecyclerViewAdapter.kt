@@ -26,16 +26,14 @@ import java.io.File
 import java.util.*
 
 class PhotoPickerRecyclerViewAdapter(
-    private val context: Context,
-    private val photoPickerListener: PhotoPickerListener,
-    private val accountId: UUID?
+    private val photoPickerListener: PhotoPickerListener
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
 
     private var photoPickers = mutableListOf<PhotoPicker>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPhotoPickerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding, accountId, photoPickerListener, context)
+        return ViewHolder(binding, photoPickerListener, parent.context)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
@@ -129,14 +127,13 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     interface PhotoPickerListener {
-        fun onClickPhotoPicker(position: Int)
+        fun onClickPhoto(position: Int)
         fun onDownloadPhotoError(photoKey: String?)
         fun onDownloadPhotoSuccess(photoKey: String?)
     }
 
     class ViewHolder(
         binding: ItemPhotoPickerBinding,
-        private val accountId: UUID?,
         private val photoPickerListener: PhotoPickerListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
@@ -149,7 +146,7 @@ class PhotoPickerRecyclerViewAdapter(
             when (photoPicker.status) {
                 PhotoStatus.EMPTY -> showEmpty()
                 PhotoStatus.LOADING -> showLoading()
-                PhotoStatus.DOWNLOADING -> loadPhoto(photoPicker.uri, photoPicker.key)
+                PhotoStatus.DOWNLOADING -> loadPhoto(photoPicker)
                 PhotoStatus.DOWNLOAD_ERROR -> showDownloadError()
                 PhotoStatus.UPLOADING -> loadPhoto(photoPicker.uri)
                 PhotoStatus.UPLOAD_ERROR -> showUploadError(photoPicker.uri)
@@ -169,26 +166,21 @@ class PhotoPickerRecyclerViewAdapter(
 
         }
 
-        private fun loadPhoto(photoUri: Uri?, photoKey: String?) {
+        private fun loadPhoto(photoPicker: PhotoPicker) {
             showLoading()
-            val photoEndPoint = photoUri?.path?.let { path ->
-                val photoFile = File(path)
-                if (photoFile.exists()) {
-                    path
-                } else if (accountId != null && photoKey != null){
-                    EndPoint.ofPhoto(accountId, photoKey)
-                } else {
-                    null
+            val uriPath = photoPicker.uri?.path
+            val photoEndPoint = when {
+                uriPath != null && File(uriPath).exists() -> {
+                    uriPath
                 }
-            } ?: kotlin.run {
-                if (accountId != null && photoKey != null) {
-                    EndPoint.ofPhoto(accountId, photoKey)
-                } else {
+                photoPicker.url != null -> {
+                    photoPicker.url
+                }
+                else -> {
                     null
                 }
             }
 
-            println("photo end point: $photoEndPoint")
             Glide.with(context).load(photoEndPoint)
                 .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toPx()))
                 .apply(GlideHelper.photoPickerGlideOptions())
@@ -199,7 +191,7 @@ class PhotoPickerRecyclerViewAdapter(
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPickerListener.onDownloadPhotoError(photoKey)
+                        photoPickerListener.onDownloadPhotoError(photoPicker.key)
                         return false
                     }
 
@@ -210,7 +202,7 @@ class PhotoPickerRecyclerViewAdapter(
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPickerListener.onDownloadPhotoSuccess(photoKey)
+                        photoPickerListener.onDownloadPhotoSuccess(photoPicker.key)
                         return false
                     }
                 }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
@@ -258,7 +250,7 @@ class PhotoPickerRecyclerViewAdapter(
         }
 
         override fun onClick(view: View?) {
-            photoPickerListener.onClickPhotoPicker(absoluteAdapterPosition)
+            photoPickerListener.onClickPhoto(absoluteAdapterPosition)
         }
 
         companion object {

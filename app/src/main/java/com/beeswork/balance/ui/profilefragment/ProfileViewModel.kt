@@ -173,7 +173,9 @@ class ProfileViewModel(
                     else -> println("")
                 }
             }
-            if (photoSequences.isNotEmpty()) launch { orderPhotos(photoSequences) }
+            if (photoSequences.isNotEmpty()) {
+                launch { orderPhotos(photoSequences) }
+            }
             _syncPhotosLiveData.postValue(true)
         }
     }
