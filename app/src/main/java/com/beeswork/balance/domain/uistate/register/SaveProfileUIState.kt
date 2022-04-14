@@ -1,6 +1,6 @@
 package com.beeswork.balance.domain.uistate.register
 
-import com.beeswork.balance.domain.uistate.BaseUIState
+import com.beeswork.balance.domain.uistate.UIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 
 class SaveProfileUIState(
@@ -9,7 +9,7 @@ class SaveProfileUIState(
     showError: Boolean,
     shouldLogout: Boolean,
     exception: Throwable?
-) : BaseUIState(showLoading, showError, shouldLogout, exception) {
+) : UIState(showLoading, showError, shouldLogout, exception) {
 
 
     companion object {

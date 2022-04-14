@@ -3,7 +3,7 @@ package com.beeswork.balance.ui.profilefragment.photo
 import android.net.Uri
 import com.beeswork.balance.internal.constant.PhotoStatus
 
-data class PhotoPicker(
+data class PhotoItemUIState(
     var key: String?,
     var status: PhotoStatus,
     var uri: Uri?,
@@ -15,8 +15,12 @@ data class PhotoPicker(
         const val MAX_PHOTO_WIDTH = 1200
         const val MAX_PHOTO_HEIGHT = 1560
 
-        fun asEmpty(): PhotoPicker {
-            return PhotoPicker(null, PhotoStatus.EMPTY, null, Int.MAX_VALUE, null)
+        fun asEmpty(): PhotoItemUIState {
+            return PhotoItemUIState(null, PhotoStatus.EMPTY, null, Int.MAX_VALUE, null)
+        }
+
+        fun asLoading(): PhotoItemUIState {
+            return PhotoItemUIState(null, PhotoStatus.LOADING, null, Int.MAX_VALUE, null)
         }
     }
 }

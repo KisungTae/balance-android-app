@@ -285,5 +285,6 @@
     <string name="register_balance_game_title">밸런스 게임을 진행해주세요</string>
     <string name="register_balance_game_description">밸런스 게임을 통해서 본인의 취향을 표현해주세요. 각각 질문들은 리프레쉬 버튼으로 새로운 질문으로 바꾸실 수 있습니다. 아래 질문보기 버튼을 눌러 진행해주세</string>
     <string name="start_balance_game_btn">밸런스 게임 질문보기</string>
+    <string name="err_msg_fetch_photos">사진갤러리를 세팅하지 못했습니다. 다시 시도해주세요.</string>
 
 </resources>

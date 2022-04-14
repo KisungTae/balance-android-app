@@ -9,11 +9,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.ItemPhotoPickerBinding
-import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.PhotoConstant
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.util.GlideHelper
-import com.beeswork.balance.internal.util.toPx
+import com.beeswork.balance.internal.util.toDP
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -23,13 +22,18 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.github.ybq.android.spinkit.SpinKitView
 import java.io.File
-import java.util.*
 
 class PhotoPickerRecyclerViewAdapter(
     private val photoPickerListener: PhotoPickerListener
 ) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
 
-    private var photoPickers = mutableListOf<PhotoPicker>()
+    private var photoItemUIStates = mutableListOf<PhotoItemUIState>()
+
+    init {
+        for (i in 1..PhotoConstant.MAX_PHOTO_COUNT) {
+            photoItemUIStates.add(PhotoItemUIState.asLoading())
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPhotoPickerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -37,28 +41,28 @@ class PhotoPickerRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        holder.bind(photoPickers[position])
+        holder.bind(photoItemUIStates[position])
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(photoPickers[position])
+        holder.bind(photoItemUIStates[position])
     }
 
-    override fun getItemCount(): Int = photoPickers.size
+    override fun getItemCount(): Int = photoItemUIStates.size
 
-    fun submit(newPhotoPickers: MutableMap<String, PhotoPicker>) {
+    fun submit(newPhotoPickers: MutableMap<String, PhotoItemUIState>) {
 
-        if (photoPickers.isEmpty()) {
-            newPhotoPickers.map { photoPickers.add(it.value) }
+        if (photoItemUIStates.isEmpty()) {
+            newPhotoPickers.map { photoItemUIStates.add(it.value) }
             repeat((PhotoConstant.MAX_PHOTO_COUNT - newPhotoPickers.size)) {
-                photoPickers.add(PhotoPicker.asEmpty())
+                photoItemUIStates.add(PhotoItemUIState.asEmpty())
             }
             notifyDataSetChanged()
             return
         }
 
-        for (i in photoPickers.size - 1 downTo 0) {
-            val photoPicker = photoPickers[i]
+        for (i in photoItemUIStates.size - 1 downTo 0) {
+            val photoPicker = photoItemUIStates[i]
             photoPicker.key?.let { key ->
                 newPhotoPickers[key]?.let { newPhotoPicker ->
                     if (photoPicker.status != newPhotoPicker.status) {
@@ -66,17 +70,17 @@ class PhotoPickerRecyclerViewAdapter(
                         notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
                     }
                 } ?: kotlin.run {
-                    photoPickers.removeAt(i)
+                    photoItemUIStates.removeAt(i)
                     notifyItemRemoved(i)
-                    photoPickers.add(PhotoPicker.asEmpty())
-                    notifyItemInserted(photoPickers.size - 1)
+                    photoItemUIStates.add(PhotoItemUIState.asEmpty())
+                    notifyItemInserted(photoItemUIStates.size - 1)
                 }
             }
         }
 
         var index = 0
-        while (index < photoPickers.size) {
-            val photoPicker = photoPickers[index]
+        while (index < photoItemUIStates.size) {
+            val photoPicker = photoItemUIStates[index]
             newPhotoPickers[photoPicker.key]?.let { newPhotoPicker ->
                 if (index != newPhotoPicker.sequence) {
                     swapPhotos(index, newPhotoPicker.sequence)
@@ -88,35 +92,35 @@ class PhotoPickerRecyclerViewAdapter(
 
         newPhotoPickers.forEach {
             val newPhotoPicker = it.value
-            photoPickers.removeAt(newPhotoPicker.sequence)
+            photoItemUIStates.removeAt(newPhotoPicker.sequence)
             notifyItemRemoved(newPhotoPicker.sequence)
-            photoPickers.add(newPhotoPicker.sequence, newPhotoPicker)
+            photoItemUIStates.add(newPhotoPicker.sequence, newPhotoPicker)
             notifyItemInserted(newPhotoPicker.sequence)
         }
     }
 
-    fun getPhotoPicker(position: Int): PhotoPicker {
-        return photoPickers[position]
+    fun getPhotoPicker(position: Int): PhotoItemUIState {
+        return photoItemUIStates[position]
     }
 
     fun swapPhotos(from: Int, to: Int) {
-        if (photoPickers[to].status == PhotoStatus.OCCUPIED && from != to) {
-            val photoPicker = photoPickers.removeAt(from)
-            photoPickers.add(to, photoPicker)
+        if (photoItemUIStates[to].status == PhotoStatus.OCCUPIED && from != to) {
+            val photoPicker = photoItemUIStates.removeAt(from)
+            photoItemUIStates.add(to, photoPicker)
             notifyItemMoved(from, to)
         }
     }
 
     fun getPhotoPickerSequences(): Map<String, Int> {
         val photoPickerSequences = mutableMapOf<String, Int>()
-        photoPickers.forEachIndexed { index, photoPicker ->
+        photoItemUIStates.forEachIndexed { index, photoPicker ->
             photoPicker.key?.let { key -> photoPickerSequences[key] = index }
         }
         return photoPickerSequences
     }
 
     fun isSwipeable(): Boolean {
-        photoPickers.forEach { photoPicker ->
+        photoItemUIStates.forEach { photoPicker ->
             if (photoPicker.status != PhotoStatus.OCCUPIED) return false
         }
         return true
@@ -124,6 +128,7 @@ class PhotoPickerRecyclerViewAdapter(
 
     companion object {
         private const val PHOTO_PICKER_PAYLOAD = "photoPickerPayload"
+        const val NUM_OF_COLUMNS = 3
     }
 
     interface PhotoPickerListener {
@@ -142,14 +147,16 @@ class PhotoPickerRecyclerViewAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(photoPicker: PhotoPicker) {
-            when (photoPicker.status) {
+        fun bind(photoItemUIState: PhotoItemUIState) {
+
+
+            when (photoItemUIState.status) {
                 PhotoStatus.EMPTY -> showEmpty()
                 PhotoStatus.LOADING -> showLoading()
-                PhotoStatus.DOWNLOADING -> loadPhoto(photoPicker)
+                PhotoStatus.DOWNLOADING -> loadPhoto(photoItemUIState)
                 PhotoStatus.DOWNLOAD_ERROR -> showDownloadError()
-                PhotoStatus.UPLOADING -> loadPhoto(photoPicker.uri)
-                PhotoStatus.UPLOAD_ERROR -> showUploadError(photoPicker.uri)
+                PhotoStatus.UPLOADING -> loadPhoto(photoItemUIState.uri)
+                PhotoStatus.UPLOAD_ERROR -> showUploadError(photoItemUIState.uri)
                 PhotoStatus.ORDERING -> showLoading()
                 PhotoStatus.OCCUPIED -> showOccupied()
                 PhotoStatus.DELETING -> showLoading()
@@ -160,21 +167,21 @@ class PhotoPickerRecyclerViewAdapter(
             showLoading()
             Glide.with(context)
                 .load(photoUri)
-                .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toPx()))
+                .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toDP()))
                 .apply(GlideHelper.photoPickerGlideOptions())
                 .into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
 
         }
 
-        private fun loadPhoto(photoPicker: PhotoPicker) {
+        private fun loadPhoto(photoItemUIState: PhotoItemUIState) {
             showLoading()
-            val uriPath = photoPicker.uri?.path
+            val uriPath = photoItemUIState.uri?.path
             val photoEndPoint = when {
                 uriPath != null && File(uriPath).exists() -> {
                     uriPath
                 }
-                photoPicker.url != null -> {
-                    photoPicker.url
+                photoItemUIState.url != null -> {
+                    photoItemUIState.url
                 }
                 else -> {
                     null
@@ -182,7 +189,7 @@ class PhotoPickerRecyclerViewAdapter(
             }
 
             Glide.with(context).load(photoEndPoint)
-                .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toPx()))
+                .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toDP()))
                 .apply(GlideHelper.photoPickerGlideOptions())
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
@@ -191,7 +198,7 @@ class PhotoPickerRecyclerViewAdapter(
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPickerListener.onDownloadPhotoError(photoPicker.key)
+                        photoPickerListener.onDownloadPhotoError(photoItemUIState.key)
                         return false
                     }
 
@@ -202,7 +209,7 @@ class PhotoPickerRecyclerViewAdapter(
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        photoPickerListener.onDownloadPhotoSuccess(photoPicker.key)
+                        photoPickerListener.onDownloadPhotoSuccess(photoItemUIState.key)
                         return false
                     }
                 }).into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.LayoutPhotoPickerBinding
+import com.beeswork.balance.internal.util.observeUIState
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.profilefragment.photo.PhotoPickerOptionListener
 import com.beeswork.balance.ui.profilefragment.photo.PhotoPickerRecyclerViewAdapter
@@ -25,7 +26,25 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
         this.photoViewModel = viewModel
         this.binding = layoutPhotoPickerBinding
         setupPhotoPickerRecyclerView(binding.rvPhotoPicker)
+        setupBtnListeners()
+        observeFetchPhotosUIStateLiveData()
+//        viewModel.fetchPhotos()
+    }
 
+    private fun setupBtnListeners() {
+        binding.btnPhotoPickerRefetch.setOnClickListener {
+            photoViewModel.fetchPhotos()
+        }
+    }
+
+    private fun observeFetchPhotosUIStateLiveData() {
+        photoViewModel.fetchPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, requireActivity()) { fetchPhotosUIState ->
+            if (fetchPhotosUIState.showLoading) {
+                binding.llPhotoPickerErrorWrapper.visibility = View.GONE
+            } else if (fetchPhotosUIState.showError) {
+                binding.llPhotoPickerErrorWrapper.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setupPhotoPickerRecyclerView(photoPickerRecyclerView: RecyclerView) {
@@ -33,7 +52,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
         photoPickerRecyclerView.adapter = photoPickerRecyclerViewAdapter
         photoPickerRecyclerView.layoutManager = object : GridLayoutManager(
             requireContext(),
-            PHOTO_PICKER_NUM_OF_COLUMNS
+            PhotoPickerRecyclerViewAdapter.NUM_OF_COLUMNS
         ) {
             override fun canScrollVertically(): Boolean = false
             override fun canScrollHorizontally(): Boolean = false
@@ -68,7 +87,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
-                photoViewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
+//                photoViewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
             }
 
         })
@@ -111,7 +130,6 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
     companion object {
         private const val CAPTURED_PHOTO_NAME = "capturedPhoto.jpg"
         private const val FILE_PROVIDER_SUFFIX = ".fileProvider"
-        private const val PHOTO_PICKER_NUM_OF_COLUMNS = 3
     }
 
 }

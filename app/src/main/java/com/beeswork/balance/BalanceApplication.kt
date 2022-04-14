@@ -61,6 +61,8 @@ import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImp
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCaseImpl
 import com.beeswork.balance.domain.usecase.main.*
+import com.beeswork.balance.domain.usecase.photo.FetchPhotosUseCase
+import com.beeswork.balance.domain.usecase.photo.FetchPhotosUseCaseImpl
 import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCase
 import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCaseImpl
 import com.beeswork.balance.domain.usecase.register.*
@@ -220,6 +222,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<LikeUseCase>() with singleton { LikeUseCaseImpl(instance(), Dispatchers.Default) }
         bind<ClickUseCase>() with singleton { ClickUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetProfilePhotoUrlUseCase>() with singleton { GetProfilePhotoUrlUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<FetchPhotosUseCase>() with singleton { FetchPhotosUseCaseImpl(instance(), Dispatchers.Default) }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }

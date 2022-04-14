@@ -47,7 +47,9 @@ class PhotoRepositoryImpl(
             if (photoDAO.getCountBy(accountId) <= 0) {
                 val response = photoRDS.fetchPhotos()
                 response.data?.let { photoDTOs ->
-                    val photos = photoDTOs.map { photoDTO -> photoMapper.toPhoto(accountId, photoDTO) }
+                    val photos = photoDTOs.map { photoDTO ->
+                        photoMapper.toPhoto(photoDTO)
+                    }
                     photoDAO.insert(photos)
                 }
                 return@withContext response.toEmptyResponse()

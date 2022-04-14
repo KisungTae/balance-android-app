@@ -1,7 +1,5 @@
 package com.beeswork.balance.domain.uistate.chat
 
-import com.beeswork.balance.domain.uistate.BaseUIState
-
 class ResendChatMessageUIState(
     val showError: Boolean,
     val exception: Throwable?

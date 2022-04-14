@@ -15,7 +15,7 @@ import com.beeswork.balance.internal.exception.PhotoOverSizeException
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.ui.common.BaseViewModel
-import com.beeswork.balance.ui.profilefragment.photo.PhotoPicker
+import com.beeswork.balance.ui.profilefragment.photo.PhotoItemUIState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -92,9 +92,9 @@ class ProfileViewModel(
         }
     }
 
-    fun getPhotosLiveData(): LiveData<MutableMap<String, PhotoPicker>> {
+    fun getPhotosLiveData(): LiveData<MutableMap<String, PhotoItemUIState>> {
         return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
-            val photoPickers = mutableMapOf<String, PhotoPicker>()
+            val photoPickers = mutableMapOf<String, PhotoItemUIState>()
             photos.mapIndexed { index, photo ->
                 val photoPicker = photoMapper.toPhotoPicker(photo)
                 photoPicker.sequence = index

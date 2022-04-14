@@ -321,11 +321,11 @@ class ProfileFragment : BaseFragment(),
     private fun launchCropImage(uri: Uri) {
         CropImage.activity(uri)
             .setGuidelines(CropImageView.Guidelines.ON)
-            .setAspectRatio(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
+            .setAspectRatio(PhotoItemUIState.MAX_PHOTO_WIDTH, PhotoItemUIState.MAX_PHOTO_HEIGHT)
             .setAutoZoomEnabled(false)
             .setFixAspectRatio(true)
-            .setMaxCropResultSize(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
-            .setMinCropResultSize(PhotoPicker.MAX_PHOTO_WIDTH, PhotoPicker.MAX_PHOTO_HEIGHT)
+            .setMaxCropResultSize(PhotoItemUIState.MAX_PHOTO_WIDTH, PhotoItemUIState.MAX_PHOTO_HEIGHT)
+            .setMinCropResultSize(PhotoItemUIState.MAX_PHOTO_WIDTH, PhotoItemUIState.MAX_PHOTO_HEIGHT)
             .setCropShape(CropImageView.CropShape.RECTANGLE)
             .start(requireContext(), this)
     }

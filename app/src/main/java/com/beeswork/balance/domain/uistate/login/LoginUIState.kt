@@ -1,8 +1,5 @@
 package com.beeswork.balance.domain.uistate.login
 
-import com.beeswork.balance.domain.uistate.BaseUIState
-import com.beeswork.balance.internal.constant.ExceptionCode
-
 class LoginUIState(
     val profileExists: Boolean,
     val shouldLogin: Boolean,

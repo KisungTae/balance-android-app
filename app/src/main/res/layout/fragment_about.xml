@@ -3,14 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/Primary"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:text="@string/register_about_label"
         android:textSize="25sp"
-        android:layout_marginBottom="10dp"
         android:textStyle="bold" />
 
     <TextView
@@ -23,15 +24,15 @@
         android:id="@+id/etRegisterAbout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autofillHints="@string/register_about_hint"
         android:background="@drawable/sh_round_box_thin_border"
         android:gravity="top|start"
-        android:lines="8"
-        android:padding="15dp"
         android:hint="@string/register_about_hint"
-        android:autofillHints="@string/register_about_hint"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:lines="8"
+        android:padding="15dp" />
 
-<Space
+    <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />`

@@ -16,11 +16,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.domain.uistate.BaseUIState
+import com.beeswork.balance.domain.uistate.UIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
@@ -114,7 +112,7 @@ fun <T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>> {
 }
 
 
-fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+fun Int.toDP(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 
 fun Activity.hideKeyboard(ev: MotionEvent) {
     val v: View? = currentFocus
@@ -146,7 +144,7 @@ fun <T> LiveData<Resource<T>>.observeResource(lifecycleOwner: LifecycleOwner, ac
     }
 }
 
-fun <T: BaseUIState> LiveData<T>.observeUIState(lifecycleOwner: LifecycleOwner, activity: Activity?, block: (uiState: T) -> Unit) {
+fun <T: UIState> LiveData<T>.observeUIState(lifecycleOwner: LifecycleOwner, activity: Activity?, block: (uiState: T) -> Unit) {
     observe(lifecycleOwner) { uiState ->
         if (activity != null && uiState.shouldLogout) {
             val message = MessageSource.getMessage(activity, uiState.exception)

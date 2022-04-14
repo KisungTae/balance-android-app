@@ -14,6 +14,7 @@ import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import com.beeswork.balance.ui.registeractivity.height.HeightViewModel
 import com.beeswork.balance.ui.registeractivity.height.HeightViewModelFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -33,18 +34,18 @@ class PhotoFragment : BasePhotoFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(PhotoViewModel::class.java)
-
         super.onViewCreated(viewModel, binding.layoutPhotoPicker)
         bindUI()
     }
 
     private fun bindUI() = lifecycleScope.launch {
+
         binding.btnRegisterPhotoNext.setOnClickListener {
-            activity?.let { _activity ->
-                if (_activity is RegisterActivity) {
-                    _activity.moveToNextTab()
-                }
-            }
+//            activity?.let { _activity ->
+//                if (_activity is RegisterActivity) {
+//                    _activity.moveToNextTab()
+//                }
+//            }
         }
     }
 
