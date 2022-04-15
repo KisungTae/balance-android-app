@@ -1,28 +1,45 @@
 package com.beeswork.balance.ui.registeractivity.photo
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.beeswork.balance.domain.uistate.UIState
+import androidx.lifecycle.*
+import com.beeswork.balance.data.database.repository.photo.PhotoRepository
+import com.beeswork.balance.domain.uistate.photo.FetchPhotosUIState
 import com.beeswork.balance.domain.usecase.photo.FetchPhotosUseCase
+import com.beeswork.balance.internal.constant.PhotoConstant
+import com.beeswork.balance.ui.common.BaseViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 open class PhotoViewModel (
-    private val fetchPhotosUseCase: FetchPhotosUseCase
-): ViewModel() {
+    private val fetchPhotosUseCase: FetchPhotosUseCase,
 
-    private val _fetchPhotosUIStateLiveData = MutableLiveData<UIState>()
-    val fetchPhotosUIStateLiveData: LiveData<UIState> get() = _fetchPhotosUIStateLiveData
+    private val photoRepository: PhotoRepository,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
+): BaseViewModel() {
+
+    val photoItemUIStateLiveData by viewModelLazyDeferred {
+        photoRepository.getPhotosFlow(PhotoConstant.MAX_NUM_OF_PHOTOS).map { photos ->
+
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+    }
+
+    private val _fetchPhotosUIStateLiveData = MutableLiveData<FetchPhotosUIState>()
+    val fetchPhotosUIStateLiveData: LiveData<FetchPhotosUIState> get() = _fetchPhotosUIStateLiveData
 
 
     fun fetchPhotos() {
         viewModelScope.launch {
-            _fetchPhotosUIStateLiveData.postValue(UIState.ofLoading())
+            _fetchPhotosUIStateLiveData.postValue(FetchPhotosUIState.ofLoading())
             val response = fetchPhotosUseCase.invoke()
-            if (response.isError()) {
-                _fetchPhotosUIStateLiveData.postValue(UIState.ofError(response.exception))
+            val fetchPhotosUIState = if (response.isSuccess()) {
+                FetchPhotosUIState.ofSuccess()
+            } else {
+                FetchPhotosUIState.ofError(response.exception)
             }
+            _fetchPhotosUIStateLiveData.postValue(fetchPhotosUIState)
         }
     }
+
+
 }

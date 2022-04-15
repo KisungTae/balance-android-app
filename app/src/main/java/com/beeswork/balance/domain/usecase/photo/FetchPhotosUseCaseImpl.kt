@@ -16,9 +16,7 @@ class FetchPhotosUseCaseImpl(
 
     override suspend fun invoke(): Resource<EmptyResponse> = withContext(defaultDispatcher) {
         try {
-            delay(3000)
-//            return@withContext photoRepository.fetchPhotos()
-            return@withContext Resource.error(IOException())
+            return@withContext photoRepository.fetchPhotos()
         } catch (e: IOException) {
             return@withContext Resource.error(e)
         }

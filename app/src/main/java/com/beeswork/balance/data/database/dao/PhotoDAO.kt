@@ -28,7 +28,7 @@ interface PhotoDAO {
     fun getAllBy(accountId: UUID?, maxPhotoCount: Int): List<Photo>
 
     @Query("select * from photo where `key` = :key")
-    fun getBy(key: String): Photo?
+    fun getBy(key: String?): Photo?
 
     @Query("update photo set status = :status where `key` = :key")
     fun updateStatusBy(key: String, status: PhotoStatus)

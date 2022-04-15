@@ -28,7 +28,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
         setupPhotoPickerRecyclerView(binding.rvPhotoPicker)
         setupBtnListeners()
         observeFetchPhotosUIStateLiveData()
-//        viewModel.fetchPhotos()
+
     }
 
     private fun setupBtnListeners() {
@@ -39,12 +39,23 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
 
     private fun observeFetchPhotosUIStateLiveData() {
         photoViewModel.fetchPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, requireActivity()) { fetchPhotosUIState ->
-            if (fetchPhotosUIState.showLoading) {
-                binding.llPhotoPickerErrorWrapper.visibility = View.GONE
-            } else if (fetchPhotosUIState.showError) {
-                binding.llPhotoPickerErrorWrapper.visibility = View.VISIBLE
+            when {
+                fetchPhotosUIState.fetched -> {
+                    observePhotoItemUIStatesLiveData()
+                }
+                fetchPhotosUIState.showLoading -> {
+                    binding.llPhotoPickerErrorWrapper.visibility = View.GONE
+                }
+                fetchPhotosUIState.showError -> {
+                    binding.llPhotoPickerErrorWrapper.visibility = View.VISIBLE
+                }
             }
         }
+        photoViewModel.fetchPhotos()
+    }
+
+    private fun observePhotoItemUIStatesLiveData() {
+
     }
 
     private fun setupPhotoPickerRecyclerView(photoPickerRecyclerView: RecyclerView) {

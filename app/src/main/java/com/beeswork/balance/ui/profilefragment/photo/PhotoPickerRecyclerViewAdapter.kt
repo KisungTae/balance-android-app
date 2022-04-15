@@ -30,7 +30,7 @@ class PhotoPickerRecyclerViewAdapter(
     private var photoItemUIStates = mutableListOf<PhotoItemUIState>()
 
     init {
-        for (i in 1..PhotoConstant.MAX_PHOTO_COUNT) {
+        for (i in 1..PhotoConstant.MAX_NUM_OF_PHOTOS) {
             photoItemUIStates.add(PhotoItemUIState.asLoading())
         }
     }
@@ -54,7 +54,7 @@ class PhotoPickerRecyclerViewAdapter(
 
         if (photoItemUIStates.isEmpty()) {
             newPhotoPickers.map { photoItemUIStates.add(it.value) }
-            repeat((PhotoConstant.MAX_PHOTO_COUNT - newPhotoPickers.size)) {
+            repeat((PhotoConstant.MAX_NUM_OF_PHOTOS - newPhotoPickers.size)) {
                 photoItemUIStates.add(PhotoItemUIState.asEmpty())
             }
             notifyDataSetChanged()
@@ -148,8 +148,6 @@ class PhotoPickerRecyclerViewAdapter(
         }
 
         fun bind(photoItemUIState: PhotoItemUIState) {
-
-
             when (photoItemUIState.status) {
                 PhotoStatus.EMPTY -> showEmpty()
                 PhotoStatus.LOADING -> showLoading()
@@ -170,7 +168,6 @@ class PhotoPickerRecyclerViewAdapter(
                 .transform(CenterCrop(), RoundedCorners(PHOTO_ROUND_CORNER_DP.toDP()))
                 .apply(GlideHelper.photoPickerGlideOptions())
                 .into(itemView.findViewWithTag(IV_PHOTO_PICKER_PHOTO))
-
         }
 
         private fun loadPhoto(photoItemUIState: PhotoItemUIState) {
@@ -268,7 +265,7 @@ class PhotoPickerRecyclerViewAdapter(
             private const val IV_PHOTO_PICKER_DOWNLOAD_ERROR = "photoPickerDownloadError"
             private const val VIEW_PHOTO_PICKER_MASK = "photoPickerMask"
             private const val IV_PHOTO_PICKER_DELETE_ICON = "photoPickerDeleteIcon"
-            private const val PHOTO_ROUND_CORNER_DP = 5
+            private const val PHOTO_ROUND_CORNER_DP = 15
         }
     }
 }

@@ -21,10 +21,16 @@ class Resource<out T>(
     }
 
     fun isExceptionCodeEqualTo(error: String?): Boolean {
-        return if (exception is BaseException) {
-            exception.error == error
-        } else {
-            false
+        return when (exception) {
+            null -> {
+                false
+            }
+            is BaseException -> {
+                exception.error == error
+            }
+            else -> {
+                false
+            }
         }
     }
 

@@ -17,6 +17,7 @@ interface PhotoRepository {
     suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse>
     suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus)
     suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse>
+    suspend fun reorderPhotos(photos: List<Photo>): Resource<EmptyResponse>
     suspend fun deletePhotos()
     fun getProfilePhotoKeyFlow(): Flow<String?>
     suspend fun test()
