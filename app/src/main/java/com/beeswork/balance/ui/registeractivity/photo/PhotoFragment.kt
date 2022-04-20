@@ -4,17 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentPhotoBinding
 import com.beeswork.balance.ui.common.BasePhotoFragment
-import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
-import com.beeswork.balance.ui.registeractivity.RegisterActivity
-import com.beeswork.balance.ui.registeractivity.height.HeightViewModel
-import com.beeswork.balance.ui.registeractivity.height.HeightViewModelFactory
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -41,6 +34,7 @@ class PhotoFragment : BasePhotoFragment(), KodeinAware {
     private fun bindUI() = lifecycleScope.launch {
 
         binding.btnRegisterPhotoNext.setOnClickListener {
+            viewModel.syncPhotos()
 //            activity?.let { _activity ->
 //                if (_activity is RegisterActivity) {
 //                    _activity.moveToNextTab()

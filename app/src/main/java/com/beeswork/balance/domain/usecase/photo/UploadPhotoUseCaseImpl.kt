@@ -21,22 +21,24 @@ class UploadPhotoUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : UploadPhotoUseCase {
 
-    override suspend fun invoke(photoUri: Uri?, photoKey: String?): Resource<EmptyResponse> = withContext(defaultDispatcher) {
-        try {
-            val photoUriPath = photoUri?.path ?: return@withContext getErrorResource(PhotoNotExistException(), photoKey)
-            val photoFile = File(photoUriPath)
-            if (!photoFile.exists()) {
-                return@withContext getErrorResource(PhotoNotExistException(), photoKey)
-            } else if (photoFile.length() > PhotoConstant.MAX_NUM_OF_PHOTOS) {
-                return@withContext getErrorResource(PhotoOverSizeException(), photoKey)
+    override suspend fun invoke(photoUri: Uri?, photoKey: String?): Resource<EmptyResponse> {
+        return try {
+            withContext(defaultDispatcher) {
+                val photoUriPath = photoUri?.path ?: return@withContext getErrorResource(PhotoNotExistException(), photoKey)
+                val photoFile = File(photoUriPath)
+                if (!photoFile.exists()) {
+                    return@withContext getErrorResource(PhotoNotExistException(), photoKey)
+                } else if (photoFile.length() > PhotoConstant.MAX_NUM_OF_PHOTOS) {
+                    return@withContext getErrorResource(PhotoOverSizeException(), photoKey)
+                }
+                val extension = MimeTypeMap.getFileExtensionFromUrl(photoUriPath)
+                if (!PhotoConstant.PHOTO_EXTENSIONS.contains(extension)) {
+                    return@withContext getErrorResource(PhotoNotSupportedTypeException(), photoKey)
+                }
+                return@withContext photoRepository.uploadPhoto(photoFile, photoUri, extension, photoKey)
             }
-            val extension = MimeTypeMap.getFileExtensionFromUrl(photoUriPath)
-            if (!PhotoConstant.PHOTO_EXTENSIONS.contains(extension)) {
-                return@withContext getErrorResource(PhotoNotSupportedTypeException(), photoKey)
-            }
-            return@withContext photoRepository.uploadPhoto(photoFile, photoUri, extension, photoKey)
         } catch (e: IOException) {
-            return@withContext getErrorResource(e, photoKey)
+            return getErrorResource(e, photoKey)
         }
     }
 

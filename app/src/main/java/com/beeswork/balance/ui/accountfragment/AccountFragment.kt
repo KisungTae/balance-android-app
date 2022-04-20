@@ -51,14 +51,14 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private suspend fun observeProfilePhotoLiveData() {
-        viewModel.profilePhotoKeyLiveData.await().observe(viewLifecycleOwner) {
+//        viewModel.profilePhotoKeyLiveData.await().observe(viewLifecycleOwner) {
 //            val profilePhotoKey = EndPoint.ofPhoto(preferenceProvider.getAccountId(), it)
-            Glide.with(requireContext())
-                .load(R.drawable.person4)
-                .apply(GlideHelper.profilePhotoGlideOptions())
-                .circleCrop()
-                .into(binding.ivAccountProfile)
-        }
+//            Glide.with(requireContext())
+//                .load(R.drawable.person4)
+//                .apply(GlideHelper.profilePhotoGlideOptions())
+//                .circleCrop()
+//                .into(binding.ivAccountProfile)
+//        }
     }
 
     private suspend fun observeNameLiveData() {

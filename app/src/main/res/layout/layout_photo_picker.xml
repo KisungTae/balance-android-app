@@ -20,7 +20,8 @@
         android:background="@drawable/sh_round_box_medium"
         android:backgroundTint="@color/white"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/ivErrorDialogIcon"
@@ -31,10 +32,10 @@
             android:src="@drawable/ic_thankful" />
 
         <TextView
-            android:paddingHorizontal="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
+            android:paddingHorizontal="20dp"
             android:text="@string/err_msg_fetch_photos"
             android:textAlignment="center" />
 

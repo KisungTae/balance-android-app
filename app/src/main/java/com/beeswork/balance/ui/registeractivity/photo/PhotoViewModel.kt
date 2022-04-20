@@ -2,8 +2,8 @@ package com.beeswork.balance.ui.registeractivity.photo
 
 import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
-import com.beeswork.balance.domain.uistate.photo.FetchPhotosUIState
-import com.beeswork.balance.domain.usecase.photo.FetchPhotosUseCase
+import com.beeswork.balance.domain.uistate.photo.SyncPhotosUIState
+import com.beeswork.balance.domain.usecase.photo.*
 import com.beeswork.balance.internal.constant.PhotoConstant
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 open class PhotoViewModel (
-    private val fetchPhotosUseCase: FetchPhotosUseCase,
-
+    private val uploadPhotoUseCase: UploadPhotoUseCase,
+    private val deletePhotoUseCase: DeletePhotoUseCase,
+    private val orderPhotosUseCase: OrderPhotosUseCase,
+    private val syncPhotosUseCase: SyncPhotosUseCase,
     private val photoRepository: PhotoRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ): BaseViewModel() {
@@ -24,20 +26,20 @@ open class PhotoViewModel (
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
-    private val _fetchPhotosUIStateLiveData = MutableLiveData<FetchPhotosUIState>()
-    val fetchPhotosUIStateLiveData: LiveData<FetchPhotosUIState> get() = _fetchPhotosUIStateLiveData
+    private val _syncPhotosUIStateLiveData = MutableLiveData<SyncPhotosUIState>()
+    val syncPhotosUIStateLiveData: LiveData<SyncPhotosUIState> get() = _syncPhotosUIStateLiveData
 
 
-    fun fetchPhotos() {
+    fun syncPhotos() {
         viewModelScope.launch {
-            _fetchPhotosUIStateLiveData.postValue(FetchPhotosUIState.ofLoading())
-            val response = fetchPhotosUseCase.invoke()
-            val fetchPhotosUIState = if (response.isSuccess()) {
-                FetchPhotosUIState.ofSuccess()
+            _syncPhotosUIStateLiveData.postValue(SyncPhotosUIState.ofLoading())
+            val response = syncPhotosUseCase.invoke()
+            val syncPhotosUIState = if (response.isSuccess()) {
+                SyncPhotosUIState.ofSuccess()
             } else {
-                FetchPhotosUIState.ofError(response.exception)
+                SyncPhotosUIState.ofError(response.exception)
             }
-            _fetchPhotosUIStateLiveData.postValue(fetchPhotosUIState)
+            _syncPhotosUIStateLiveData.postValue(syncPhotosUIState)
         }
     }
 

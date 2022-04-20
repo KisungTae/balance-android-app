@@ -7,6 +7,7 @@ import com.beeswork.balance.data.database.entity.photo.Photo
 import com.beeswork.balance.data.network.rds.photo.PhotoRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.Delimiter
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.constant.PhotoConstant
 import com.beeswork.balance.internal.constant.PhotoStatus
@@ -39,27 +40,29 @@ class PhotoRepositoryImpl(
         }
     }
 
-    //  NOTE 1. because it only fetches when no photo is in database, it's okay to insert them all without checking duplicates
-    override suspend fun fetchPhotos(): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-
-            if (photoDAO.getCountBy(accountId) <= 0) {
-                val response = photoRDS.fetchPhotos()
-                response.data?.let { photoDTOs ->
-                    val photos = photoDTOs.map { photoDTO ->
-                        photoMapper.toPhoto(photoDTO)
-                    }
-                    photoDAO.insert(photos)
-                }
-                return@withContext response.toEmptyResponse()
-            }
-            return@withContext Resource.success(EmptyResponse())
-        }
-    }
-
     override fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>> {
         return photoDAO.getPhotoFlowBy(preferenceProvider.getAccountId(), maxPhotoCount)
+    }
+
+    override suspend fun fetchPhotos(maxNumOfPhotos: Int): Resource<List<Photo>> {
+        return withContext(ioDispatcher) {
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
+            val photos = photoDAO.getAllBy(accountId, maxNumOfPhotos)
+            if (photos.isNotEmpty()) {
+                return@withContext Resource.success(photos)
+            }
+
+            val response = photoRDS.fetchPhotos().map { photoDTOs ->
+                photoDTOs?.map { photoDTO ->
+                    photoMapper.toPhoto(photoDTO)
+                }
+            }
+
+            if (response.data != null && response.data.isNotEmpty()) {
+                photoDAO.insert(response.data)
+            }
+            return@withContext response
+        }
     }
 
     override suspend fun uploadPhoto(
@@ -69,14 +72,6 @@ class PhotoRepositoryImpl(
         photoKey: String?
     ): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-//            val mediaType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-//            if (mediaType == null) {
-//                if (photoKey != null) {
-//                    photoDAO.updateStatusBy(photoKey, PhotoStatus.UPLOAD_ERROR)
-//                }
-//                return@withContext Resource.error(PhotoNotSupportedTypeException())
-//            }
-
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val photo = createPhoto(accountId, photoKey, photoUri, extension)
 
@@ -102,20 +97,20 @@ class PhotoRepositoryImpl(
                 photoDAO.updateStatusBy(photo.key, PhotoStatus.UPLOAD_ERROR)
             }
             return@withContext savePhotoResponse
-
-
-//            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)?.let { mimeType ->
-//                val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-//                val photo = createPhoto(accountId, photoKey, photoUri, extension)
-//
-//                val uploadPhotoToS3Response = uploadPhotoToS3(photoFile, photo, mimeType)
-//                if (uploadPhotoToS3Response.isError()) {
-//                    return@withContext uploadPhotoToS3Response
-//                }
-//
-//                return@withContext savePhoto(photo)
-//            } ?: return@withContext Resource.error(PhotoNotSupportedTypeException())
         }
+    }
+
+    private suspend fun createPhoto(accountId: UUID, photoKey: String?, photoUri: Uri, extension: String): Photo {
+        val photo = photoDAO.getBy(photoKey)?.let { photo ->
+            photo.status = PhotoStatus.UPLOADING
+            photo
+        } ?: kotlin.run {
+            val sequence = (photoDAO.getLastSequenceBy(accountId) ?: 0) + 1
+            val newPhotoKey = UUID.randomUUID().toString() + Delimiter.FULL_STOP + extension
+            Photo(newPhotoKey, accountId, PhotoStatus.UPLOADING, false, photoUri, sequence, sequence, false, false)
+        }
+        photoDAO.insert(photo)
+        return photo
     }
 
 
@@ -140,122 +135,35 @@ class PhotoRepositoryImpl(
             return photoRDS.uploadPhotoToS3(preSignedURLDTO.url, formData, multiPartBody)
         }
         return getPreSignedURLResponse.toEmptyResponse()
-
-
-//        val uploadPhotoToS3Response = getPreSignedURLResponse.data?.let { preSignedURL ->
-//            uploadPhotoToS3(photoFile, photo.key, mimeType, preSignedURL.url, preSignedURL.fields)
-//        } ?: kotlin.run {
-//            if (getPreSignedURLResponse.isError()) {
-//                val photoAlreadyExists = getPreSignedURLResponse.isExceptionCodeEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
-//                val photoStatus = if (photoAlreadyExists) {
-//                    PhotoStatus.OCCUPIED
-//                } else {
-//                    PhotoStatus.UPLOAD_ERROR
-//                }
-//                photoDAO.updateStatusBy(photo.key, photoStatus)
-//            }
-//            return getPreSignedURLResponse.toEmptyResponse()
-//        }
-//
-//        if (uploadPhotoToS3Response.isError()) {
-//            photoDAO.updateStatusBy(photo.key, PhotoStatus.UPLOAD_ERROR)
-//        } else if (uploadPhotoToS3Response.isSuccess()) {
-//            photoDAO.updateUploadedBy(photo.key, true)
-//        }
-//        return uploadPhotoToS3Response
-    }
-
-    private suspend fun savePhoto(photo: Photo): Resource<EmptyResponse> {
-        if (photo.saved) {
-            photoDAO.updateStatusBy(photo.key, PhotoStatus.OCCUPIED)
-            return Resource.success(EmptyResponse())
-        }
-        val savePhotoResponse = photoRDS.savePhoto(photo.key, photo.sequence)
-
-        if (savePhotoResponse.isError()) {
-            val photoAlreadyExists = savePhotoResponse.isExceptionCodeEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)
-            if (photoAlreadyExists) {
-                photoDAO.updateStatusBy(photo.key, PhotoStatus.OCCUPIED)
-            } else {
-                photoDAO.updateStatusBy(photo.key, PhotoStatus.UPLOAD_ERROR)
-            }
-        } else if (savePhotoResponse.isSuccess()) photoDAO.updateAsSavedBy(photo.key)
-
-        return savePhotoResponse
-    }
-
-    private suspend fun uploadPhotoToS3(
-        photoFile: File,
-        photoKey: String,
-        mimeType: String,
-        url: String,
-        fields: Map<String, String>
-    ): Resource<EmptyResponse> {
-        val formData = mutableMapOf<String, RequestBody>()
-        for ((key, value) in fields) {
-            formData[key] = RequestBody.create(MultipartBody.FORM, value)
-        }
-        val requestBody = RequestBody.create(MediaType.parse(mimeType), photoFile)
-        val multiPartBody = MultipartBody.Part.createFormData(FILE, photoKey, requestBody)
-        return photoRDS.uploadPhotoToS3(url, formData, multiPartBody)
-    }
-
-    private suspend fun createPhoto(accountId: UUID, photoKey: String?, photoUri: Uri, extension: String): Photo {
-        val photo = photoDAO.getBy(photoKey)?.let { photo ->
-            photo.status = PhotoStatus.UPLOADING
-            photo
-        } ?: kotlin.run {
-            val sequence = (photoDAO.getLastSequenceBy(accountId) ?: 0) + 1
-            val newPhotoKey = UUID.randomUUID().toString() + "." + extension
-            Photo(newPhotoKey, accountId, PhotoStatus.UPLOADING, photoUri, sequence, sequence, false, false)
-        }
-        photoDAO.insert(photo)
-        return photo
-
-//        return photoKey?.let { key ->
-//            val photo = photoDAO.getBy(key)
-//            photo?.status = PhotoStatus.UPLOADING
-//            photo
-//        } ?: kotlin.run {
-//            val sequence = (photoDAO.getLastSequenceBy(accountId) ?: 0) + 1
-//            val newPhotoKey = UUID.randomUUID().toString() + "." + extension
-//            Photo(newPhotoKey, accountId, PhotoStatus.UPLOADING, photoUri, sequence, sequence, false, false)
-//        }
-    }
-
-    override suspend fun listPhotos(maxPhotoCount: Int): List<Photo> {
-        return withContext(ioDispatcher) {
-            return@withContext photoDAO.getAllBy(preferenceProvider.getAccountId(), maxPhotoCount)
-        }
     }
 
     override suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val photo = photoDAO.getBy(photoKey) ?: return@withContext Resource.error(PhotoNotExistException())
-            val response = if (photo.uploaded || photo.saved) {
-                photoRDS.deletePhoto(photoKey)
-            } else {
-                Resource.success(EmptyResponse())
-            }
+            photoDAO.updateDeletingBy(photoKey, true)
+            val response = photoRDS.deletePhoto(photoKey)
+
             if (response.isSuccess()) {
-                deletePhoto(photo.uri)
+                deletePhotoFile(photo.uri)
                 photoDAO.deleteBy(photo.key)
             } else {
-                if (photo.uploaded && photo.saved) {
-                    photoDAO.updateStatusBy(photoKey, PhotoStatus.DOWNLOADING)
-                } else {
-                    photoDAO.updateStatusBy(photoKey, PhotoStatus.UPLOAD_ERROR)
-                }
+                cancelDeletePhoto(photoKey)
             }
             return@withContext response
         }
     }
 
-    private fun deletePhoto(photoUri: Uri?) {
+    override suspend fun cancelDeletePhoto(photoKey: String) {
+        photoDAO.updateDeletingBy(photoKey, false)
+    }
+
+    private fun deletePhotoFile(photoUri: Uri?) {
         photoUri?.path?.let { path ->
-            val file = File(path)
-            if (file.exists()) {
-                file.delete()
+            val photoFile = File(path)
+            if (photoFile.exists()) {
+                if (!photoFile.delete()) {
+                    throw IOException()
+                }
             }
         }
     }
@@ -266,66 +174,61 @@ class PhotoRepositoryImpl(
         }
     }
 
+    override suspend fun updatePhotoStatuses(photoKeys: List<String>, photoStatus: PhotoStatus) {
+        withContext(ioDispatcher) {
+            photoDAO.updateStatusBy(photoKeys, photoStatus)
+        }
+    }
+
     override suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val photos = photoDAO.getAllBy(preferenceProvider.getAccountId(), PhotoConstant.MAX_NUM_OF_PHOTOS).toMutableList()
-
-            for (i in photos.size - 1 downTo 0) {
-                val photo = photos[i]
+            val photos = photoDAO.getAllBy(photoSequences.keys.toList())
+            if (photos.isEmpty()) {
+                return@withContext Resource.success(EmptyResponse())
+            }
+            photos.forEach { photo ->
                 val sequence = photoSequences[photo.key]
                 if (sequence != null && photo.sequence != sequence) {
                     photo.status = PhotoStatus.ORDERING
                     photo.oldSequence = photo.sequence
                     photo.sequence = sequence
-                } else {
-                    photos.removeAt(i)
                 }
             }
-            if (photos.isEmpty()) {
-                return@withContext Resource.success(EmptyResponse())
+            photoDAO.insert(photos)
+            val response = photoRDS.orderPhotos(photoSequences)
+            photos.forEach { photo ->
+                photo.status = PhotoStatus.OCCUPIED
+                if (response.isError()) {
+                    photo.sequence = photo.oldSequence
+                }
             }
             photoDAO.insert(photos)
-            return@withContext doOrderPhotos(photos, photoSequences)
+            response
         }
     }
 
-    override suspend fun reorderPhotos(photos: List<Photo>): Resource<EmptyResponse> {
-        return withContext(ioDispatcher) {
-            if (photos.isEmpty()) {
-                return@withContext Resource.success(EmptyResponse())
-            }
-            val photoSequences = photos.map { photo ->
-                photo.key to photo.sequence
-            }.toMap()
-            return@withContext doOrderPhotos(photos, photoSequences)
+    override suspend fun cancelOrderPhotos(photoKeys: List<String>) {
+        val photos = photoDAO.getAllBy(photoKeys)
+        if (photos.isEmpty()) {
+            return
         }
-    }
-
-    private suspend fun doOrderPhotos(photos: List<Photo>, photoSequences: Map<String, Int>): Resource<EmptyResponse> {
-        val response = photoRDS.orderPhotos(photoSequences)
         photos.forEach { photo ->
             photo.status = PhotoStatus.OCCUPIED
-            if (response.isError()) {
-                photo.sequence = photo.oldSequence
-            }
+            photo.sequence = photo.oldSequence
         }
         photoDAO.insert(photos)
-        return response
     }
 
     override suspend fun deletePhotos() {
         withContext(ioDispatcher) {
             val photos = photoDAO.getAllBy(preferenceProvider.getAccountId(), Int.MAX_VALUE)
             photos.forEach { photo ->
+                deletePhotoFile(photo.uri)
                 photoDAO.deleteBy(photo.key)
-                deletePhoto(photo.uri)
             }
         }
     }
 
-    override fun getProfilePhotoKeyFlow(): Flow<String?> {
-        return photoDAO.getProfilePhotoKeyFlowBy(preferenceProvider.getAccountId())
-    }
 
 
     override suspend fun test() {

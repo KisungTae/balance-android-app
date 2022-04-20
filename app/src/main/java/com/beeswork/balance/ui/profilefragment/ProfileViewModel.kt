@@ -88,7 +88,7 @@ class ProfileViewModel(
     fun fetchPhotos() {
         viewModelScope.launch {
             _fetchPhotosLiveData.postValue(Resource.loading())
-            _fetchPhotosLiveData.postValue(photoRepository.fetchPhotos())
+//            _fetchPhotosLiveData.postValue(photoRepository.fetchPhotos())
         }
     }
 
@@ -156,23 +156,23 @@ class ProfileViewModel(
 
     fun syncPhotos() {
         viewModelScope.launch(defaultDispatcher) {
-            val photos = photoRepository.listPhotos(MAX_PHOTO_COUNT)
+//            val photos = photoRepository.listPhotos(MAX_PHOTO_COUNT)
             val photoSequences = mutableMapOf<String, Int>()
-            photos.forEach { photo ->
-                when (photo.status) {
-                    PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> launch {
-                        photoRepository.updatePhotoStatus(photo.key, PhotoStatus.DOWNLOADING)
-                    }
-                    PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> launch {
-                        doUploadPhoto(photo.uri, photo.key)
-                    }
-                    PhotoStatus.DELETING -> launch {
-                        _deletePhotoLiveData.postValue(photoRepository.deletePhoto(photo.key))
-                    }
-                    PhotoStatus.ORDERING -> photoSequences[photo.key] = photo.sequence
-                    else -> println("")
-                }
-            }
+//            photos.forEach { photo ->
+//                when (photo.status) {
+//                    PhotoStatus.OCCUPIED, PhotoStatus.DOWNLOAD_ERROR -> launch {
+//                        photoRepository.updatePhotoStatus(photo.key, PhotoStatus.DOWNLOADING)
+//                    }
+//                    PhotoStatus.UPLOAD_ERROR, PhotoStatus.UPLOADING -> launch {
+//                        doUploadPhoto(photo.uri, photo.key)
+//                    }
+//                    PhotoStatus.DELETING -> launch {
+//                        _deletePhotoLiveData.postValue(photoRepository.deletePhoto(photo.key))
+//                    }
+//                    PhotoStatus.ORDERING -> photoSequences[photo.key] = photo.sequence
+//                    else -> println("")
+//                }
+//            }
             if (photoSequences.isNotEmpty()) {
                 launch { orderPhotos(photoSequences) }
             }

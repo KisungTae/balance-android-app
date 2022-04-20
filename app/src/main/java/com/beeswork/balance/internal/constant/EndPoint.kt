@@ -20,7 +20,7 @@ class EndPoint {
             if (accountId ==  null || photoKey.isNullOrBlank()) {
                 return null
             }
-            return "$PHOTO_BUCKET/$accountId/$photoKey"
+            return "$PHOTO_BUCKET${Delimiter.FORWARD_SLASH}$accountId${Delimiter.FORWARD_SLASH}$photoKey"
         }
     }
 

@@ -6,6 +6,7 @@ import com.beeswork.balance.internal.constant.PhotoStatus
 data class PhotoItemUIState(
     var key: String?,
     var status: PhotoStatus,
+    val deleting: Boolean,
     var uri: Uri?,
     var sequence: Int,
     val url: String?
@@ -16,11 +17,11 @@ data class PhotoItemUIState(
         const val MAX_PHOTO_HEIGHT = 1560
 
         fun asEmpty(): PhotoItemUIState {
-            return PhotoItemUIState(null, PhotoStatus.EMPTY, null, Int.MAX_VALUE, null)
+            return PhotoItemUIState(null, PhotoStatus.EMPTY, false, null, Int.MAX_VALUE, null)
         }
 
         fun asLoading(): PhotoItemUIState {
-            return PhotoItemUIState(null, PhotoStatus.LOADING, null, Int.MAX_VALUE, null)
+            return PhotoItemUIState(null, PhotoStatus.LOADING, false, null, Int.MAX_VALUE, null)
         }
     }
 }

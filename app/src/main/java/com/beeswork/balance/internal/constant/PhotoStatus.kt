@@ -8,6 +8,5 @@ enum class PhotoStatus {
     UPLOADING,
     UPLOAD_ERROR,
     ORDERING,
-    DELETING,
     OCCUPIED
 }

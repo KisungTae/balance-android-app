@@ -10,15 +10,17 @@ import java.io.File
 
 interface PhotoRepository {
     suspend fun getProfilePhoto(): Photo?
-    suspend fun fetchPhotos(): Resource<EmptyResponse>
     fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>>
+    suspend fun fetchPhotos(maxNumOfPhotos: Int): Resource<List<Photo>>
     suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String, photoKey: String?): Resource<EmptyResponse>
-    suspend fun listPhotos(maxPhotoCount: Int): List<Photo>
+
     suspend fun deletePhoto(photoKey: String): Resource<EmptyResponse>
+    suspend fun cancelDeletePhoto(photoKey: String)
     suspend fun updatePhotoStatus(photoKey: String, photoStatus: PhotoStatus)
+    suspend fun updatePhotoStatuses(photoKeys: List<String>, photoStatus: PhotoStatus)
     suspend fun orderPhotos(photoSequences: Map<String, Int>): Resource<EmptyResponse>
-    suspend fun reorderPhotos(photos: List<Photo>): Resource<EmptyResponse>
+    suspend fun cancelOrderPhotos(photoKeys: List<String>)
     suspend fun deletePhotos()
-    fun getProfilePhotoKeyFlow(): Flow<String?>
+
     suspend fun test()
 }

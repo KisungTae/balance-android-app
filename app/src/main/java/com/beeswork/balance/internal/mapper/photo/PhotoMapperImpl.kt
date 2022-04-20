@@ -13,6 +13,7 @@ class PhotoMapperImpl : PhotoMapper {
             photoDTO.key,
             photoDTO.accountId,
             PhotoStatus.DOWNLOADING,
+            false,
             null,
             photoDTO.sequence,
             photoDTO.sequence,
@@ -22,7 +23,14 @@ class PhotoMapperImpl : PhotoMapper {
     }
 
     override fun toPhotoPicker(photo: Photo): PhotoItemUIState {
-        return PhotoItemUIState(photo.key, photo.status, photo.uri, photo.sequence, EndPoint.ofPhoto(photo.accountId, photo.key))
+        return PhotoItemUIState(
+            photo.key,
+            photo.status,
+            photo.deleting,
+            photo.uri,
+            photo.sequence,
+            EndPoint.ofPhoto(photo.accountId, photo.key)
+        )
     }
 
 }

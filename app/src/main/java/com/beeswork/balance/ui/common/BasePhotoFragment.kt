@@ -1,8 +1,6 @@
 package com.beeswork.balance.ui.common
 
 import android.net.Uri
-import android.os.Bundle
-import android.text.Layout
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -33,14 +31,14 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
 
     private fun setupBtnListeners() {
         binding.btnPhotoPickerRefetch.setOnClickListener {
-            photoViewModel.fetchPhotos()
+            photoViewModel.syncPhotos()
         }
     }
 
     private fun observeFetchPhotosUIStateLiveData() {
-        photoViewModel.fetchPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, requireActivity()) { fetchPhotosUIState ->
+        photoViewModel.syncPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, requireActivity()) { fetchPhotosUIState ->
             when {
-                fetchPhotosUIState.fetched -> {
+                fetchPhotosUIState.synced -> {
                     observePhotoItemUIStatesLiveData()
                 }
                 fetchPhotosUIState.showLoading -> {
@@ -51,7 +49,6 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
                 }
             }
         }
-        photoViewModel.fetchPhotos()
     }
 
     private fun observePhotoItemUIStatesLiveData() {

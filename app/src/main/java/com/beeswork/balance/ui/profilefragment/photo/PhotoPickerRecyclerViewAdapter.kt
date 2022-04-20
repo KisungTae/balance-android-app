@@ -148,6 +148,10 @@ class PhotoPickerRecyclerViewAdapter(
         }
 
         fun bind(photoItemUIState: PhotoItemUIState) {
+            if (photoItemUIState.deleting) {
+                showLoading()
+                return
+            }
             when (photoItemUIState.status) {
                 PhotoStatus.EMPTY -> showEmpty()
                 PhotoStatus.LOADING -> showLoading()
@@ -157,7 +161,6 @@ class PhotoPickerRecyclerViewAdapter(
                 PhotoStatus.UPLOAD_ERROR -> showUploadError(photoItemUIState.uri)
                 PhotoStatus.ORDERING -> showLoading()
                 PhotoStatus.OCCUPIED -> showOccupied()
-                PhotoStatus.DELETING -> showLoading()
             }
         }
 

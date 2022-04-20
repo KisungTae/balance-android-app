@@ -18,7 +18,7 @@ class AccountViewModel(
 
 
     val profilePhotoKeyLiveData by lazyDeferred {
-        photoRepository.getProfilePhotoKeyFlow().asLiveData()
+//        photoRepository.getProfilePhotoKeyFlow().asLiveData()
     }
 
     val nameLiveData by lazyDeferred {
@@ -30,6 +30,6 @@ class AccountViewModel(
     }
 
     fun fetchPhotos() {
-        viewModelScope.launch { photoRepository.fetchPhotos() }
+//        viewModelScope.launch { photoRepository.fetchPhotos() }
     }
 }

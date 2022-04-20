@@ -15,6 +15,7 @@ data class Photo(
 
     val accountId: UUID,
     var status: PhotoStatus,
+    var deleting: Boolean,
     var uri: Uri?,
     var sequence: Int,
     var oldSequence: Int,

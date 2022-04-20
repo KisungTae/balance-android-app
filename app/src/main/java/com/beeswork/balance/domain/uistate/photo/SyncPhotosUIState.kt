@@ -3,8 +3,8 @@ package com.beeswork.balance.domain.uistate.photo
 import com.beeswork.balance.domain.uistate.UIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 
-class FetchPhotosUIState(
-    val fetched: Boolean,
+class SyncPhotosUIState(
+    val synced: Boolean,
     showLoading: Boolean,
     showError: Boolean,
     shouldLogout: Boolean,
@@ -13,17 +13,17 @@ class FetchPhotosUIState(
 
     companion object {
 
-        fun ofSuccess(): FetchPhotosUIState {
-            return FetchPhotosUIState(fetched = true, showLoading = false, showError = false, shouldLogout = false, exception = null)
+        fun ofSuccess(): SyncPhotosUIState {
+            return SyncPhotosUIState(synced = true, showLoading = false, showError = false, shouldLogout = false, exception = null)
         }
 
-        fun ofLoading(): FetchPhotosUIState {
-            return FetchPhotosUIState(fetched = false, showLoading = true, showError = false, shouldLogout = false, exception = null)
+        fun ofLoading(): SyncPhotosUIState {
+            return SyncPhotosUIState(synced = false, showLoading = true, showError = false, shouldLogout = false, exception = null)
         }
 
-        fun ofError(exception: Throwable?): FetchPhotosUIState {
-            return FetchPhotosUIState(
-                fetched = false,
+        fun ofError(exception: Throwable?): SyncPhotosUIState {
+            return SyncPhotosUIState(
+                synced = false,
                 showLoading = false,
                 showError = true,
                 shouldLogout = ExceptionCode.isLoginException(exception),

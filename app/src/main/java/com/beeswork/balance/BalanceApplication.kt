@@ -61,10 +61,7 @@ import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImp
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCaseImpl
 import com.beeswork.balance.domain.usecase.main.*
-import com.beeswork.balance.domain.usecase.photo.FetchPhotosUseCase
-import com.beeswork.balance.domain.usecase.photo.FetchPhotosUseCaseImpl
-import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCase
-import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCaseImpl
+import com.beeswork.balance.domain.usecase.photo.*
 import com.beeswork.balance.domain.usecase.register.*
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
@@ -222,7 +219,18 @@ class BalanceApplication : Application(), KodeinAware {
         bind<LikeUseCase>() with singleton { LikeUseCaseImpl(instance(), Dispatchers.Default) }
         bind<ClickUseCase>() with singleton { ClickUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetProfilePhotoUrlUseCase>() with singleton { GetProfilePhotoUrlUseCaseImpl(instance(), Dispatchers.Default) }
-        bind<FetchPhotosUseCase>() with singleton { FetchPhotosUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<UploadPhotoUseCase>() with singleton { UploadPhotoUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<DeletePhotoUseCase>() with singleton { DeletePhotoUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<OrderPhotosUseCase>() with singleton { OrderPhotosUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SyncPhotosUseCase>() with singleton {
+            SyncPhotosUseCaseImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.Default
+            )
+        }
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -372,7 +380,16 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { GenderViewModelFactory(instance(), instance()) }
         bind() from provider { HeightViewModelFactory(instance(), instance()) }
         bind() from provider { NameViewModelFactory(instance(), instance()) }
-        bind() from provider { PhotoViewModelFactory(instance()) }
+        bind() from provider {
+            PhotoViewModelFactory(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.Default
+            )
+        }
         bind() from provider { RegisterFinishViewModelFactory(instance()) }
 
 
