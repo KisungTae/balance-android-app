@@ -46,7 +46,7 @@ import java.io.File
 class ProfileFragment : BaseFragment(),
     KodeinAware,
     HeightOptionDialog.HeightOptionDialogListener,
-    PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
+    PhotoItemUIStateRecyclerViewAdapter.PhotoPickerListener,
     ErrorDialog.RetryListener,
     PhotoPickerOptionListener {
 
@@ -56,7 +56,7 @@ class ProfileFragment : BaseFragment(),
 
     private lateinit var viewModel: ProfileViewModel
     private lateinit var binding: FragmentProfileBinding
-    private lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
+    private lateinit var photoItemUIStateRecyclerViewAdapter: PhotoItemUIStateRecyclerViewAdapter
 
     private var fetchPhotosStatus = Resource.Status.SUCCESS
     private var fetchProfileStatus = Resource.Status.SUCCESS
@@ -167,7 +167,7 @@ class ProfileFragment : BaseFragment(),
 
     private fun observePhotosLiveData() {
         viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
-            photoPickerRecyclerViewAdapter.submit(it)
+            photoItemUIStateRecyclerViewAdapter.submit(it)
         }
     }
 
@@ -188,8 +188,8 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun setupPhotoPickerRecyclerView() {
-        photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(this)
-        binding.rvPhotoPicker.adapter = photoPickerRecyclerViewAdapter
+        photoItemUIStateRecyclerViewAdapter = PhotoItemUIStateRecyclerViewAdapter(this)
+        binding.rvPhotoPicker.adapter = photoItemUIStateRecyclerViewAdapter
         binding.rvPhotoPicker.layoutManager = object : GridLayoutManager(
             requireContext(),
             PHOTO_PICKER_NUM_OF_COLUMNS
@@ -202,7 +202,7 @@ class ProfileFragment : BaseFragment(),
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0
         ) {
             override fun isLongPressDragEnabled(): Boolean {
-                val isSwipeable = photoPickerRecyclerViewAdapter.isSwipeable()
+                val isSwipeable = photoItemUIStateRecyclerViewAdapter.isSwipeable()
                 if (!isSwipeable) {
                     val title = getString(R.string.error_title_order_photos)
                     val message = getString(R.string.photo_not_orderable_exception)
@@ -216,7 +216,7 @@ class ProfileFragment : BaseFragment(),
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                photoPickerRecyclerViewAdapter.swapPhotos(
+                photoItemUIStateRecyclerViewAdapter.swapPhotos(
                     viewHolder.absoluteAdapterPosition,
                     target.absoluteAdapterPosition
                 )
@@ -227,7 +227,7 @@ class ProfileFragment : BaseFragment(),
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
-                viewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
+                viewModel.orderPhotos(photoItemUIStateRecyclerViewAdapter.getPhotoPickerSequences())
             }
 
         })
@@ -259,7 +259,7 @@ class ProfileFragment : BaseFragment(),
             return
         }
 
-        val photoPicker = photoPickerRecyclerViewAdapter.getPhotoPicker(position)
+        val photoPicker = photoItemUIStateRecyclerViewAdapter.getPhotoPicker(position)
         when (photoPicker.status) {
             PhotoStatus.EMPTY -> UploadPhotoOptionDialog(this).show(childFragmentManager, UploadPhotoOptionDialog.TAG)
             PhotoStatus.OCCUPIED -> DeletePhotoOptionDialog(photoPicker.key, this).show(

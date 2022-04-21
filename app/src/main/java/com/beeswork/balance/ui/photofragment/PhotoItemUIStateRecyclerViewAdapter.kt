@@ -24,9 +24,9 @@ import com.bumptech.glide.request.target.Target
 import com.github.ybq.android.spinkit.SpinKitView
 import java.io.File
 
-class PhotoPickerRecyclerViewAdapter(
+class PhotoItemUIStateRecyclerViewAdapter(
     private val photoPickerListener: PhotoPickerListener
-) : RecyclerView.Adapter<PhotoPickerRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<PhotoItemUIStateRecyclerViewAdapter.ViewHolder>() {
 
     private var photoItemUIStates = mutableListOf<PhotoItemUIState>()
 
