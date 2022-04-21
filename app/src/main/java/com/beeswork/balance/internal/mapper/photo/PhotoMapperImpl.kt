@@ -4,7 +4,7 @@ import com.beeswork.balance.data.database.entity.photo.Photo
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.PhotoStatus
-import com.beeswork.balance.ui.profilefragment.photo.PhotoItemUIState
+import com.beeswork.balance.ui.photofragment.PhotoItemUIState
 
 class PhotoMapperImpl : PhotoMapper {
 
@@ -22,13 +22,12 @@ class PhotoMapperImpl : PhotoMapper {
         )
     }
 
-    override fun toPhotoPicker(photo: Photo): PhotoItemUIState {
+    override fun toPhotoItemUIState(photo: Photo): PhotoItemUIState {
         return PhotoItemUIState(
             photo.key,
             photo.status,
             photo.deleting,
             photo.uri,
-            photo.sequence,
             EndPoint.ofPhoto(photo.accountId, photo.key)
         )
     }

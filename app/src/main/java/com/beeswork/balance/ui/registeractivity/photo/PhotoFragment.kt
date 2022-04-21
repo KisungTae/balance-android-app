@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentPhotoBinding
-import com.beeswork.balance.ui.common.BasePhotoFragment
+import com.beeswork.balance.ui.photofragment.BasePhotoFragment
+import com.beeswork.balance.ui.photofragment.PhotoViewModel
+import com.beeswork.balance.ui.photofragment.PhotoViewModelFactory
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein

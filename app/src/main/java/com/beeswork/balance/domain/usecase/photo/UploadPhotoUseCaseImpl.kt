@@ -28,7 +28,7 @@ class UploadPhotoUseCaseImpl(
                 val photoFile = File(photoUriPath)
                 if (!photoFile.exists()) {
                     return@withContext getErrorResource(PhotoNotExistException(), photoKey)
-                } else if (photoFile.length() > PhotoConstant.MAX_NUM_OF_PHOTOS) {
+                } else if (photoFile.length() > PhotoConstant.MAX_PHOTO_SIZE) {
                     return@withContext getErrorResource(PhotoOverSizeException(), photoKey)
                 }
                 val extension = MimeTypeMap.getFileExtensionFromUrl(photoUriPath)

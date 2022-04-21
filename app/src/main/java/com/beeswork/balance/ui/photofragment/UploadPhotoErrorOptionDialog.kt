@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.profilefragment.photo
+package com.beeswork.balance.ui.photofragment
 
 import android.net.Uri
 import android.os.Bundle

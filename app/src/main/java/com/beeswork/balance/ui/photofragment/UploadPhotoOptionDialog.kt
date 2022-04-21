@@ -1,19 +1,18 @@
-package com.beeswork.balance.ui.profilefragment.photo
+package com.beeswork.balance.ui.photofragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.DialogDownloadPhotoErrorOptionBinding
+import com.beeswork.balance.databinding.DialogUploadPhotoOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class DownloadPhotoErrorOptionDialog(
-    private val photoKey: String?,
+class UploadPhotoOptionDialog(
     private val photoPickerOptionListener: PhotoPickerOptionListener
 ) : BottomSheetDialogFragment() {
 
-    private lateinit var binding: DialogDownloadPhotoErrorOptionBinding
+    private lateinit var binding: DialogUploadPhotoOptionBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,24 +20,24 @@ class DownloadPhotoErrorOptionDialog(
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DialogDownloadPhotoErrorOptionBinding.inflate(inflater)
+        binding = DialogUploadPhotoOptionBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.btnDownloadPhotoErrorClose.setOnClickListener { dismiss() }
-        binding.btnDownloadPhotoErrorDelete.setOnClickListener {
+        binding.btnPhotoAddOptionClose.setOnClickListener { dismiss() }
+        binding.btnUploadPhotoFromCapture.setOnClickListener {
             dismiss()
-            photoPickerOptionListener.deletePhoto(photoKey)
+            photoPickerOptionListener.uploadPhotoFromCapture()
         }
-        binding.btnDownloadPhotoErrorRedownload.setOnClickListener {
+        binding.btnUploadPhotoFromGallery.setOnClickListener {
             dismiss()
-            photoPickerOptionListener.redownloadPhoto(photoKey)
+            photoPickerOptionListener.uploadPhotoFromGallery()
         }
     }
 
     companion object {
-        const val TAG = "downloadPhotoErrorOptionDialog"
+        const val TAG = "photoAddOptionDialog"
     }
 }

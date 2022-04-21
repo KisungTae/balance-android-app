@@ -96,7 +96,7 @@ import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateViewModelFact
 import com.beeswork.balance.ui.registeractivity.gender.GenderViewModelFactory
 import com.beeswork.balance.ui.registeractivity.height.HeightViewModelFactory
 import com.beeswork.balance.ui.registeractivity.name.NameViewModelFactory
-import com.beeswork.balance.ui.registeractivity.photo.PhotoViewModelFactory
+import com.beeswork.balance.ui.photofragment.PhotoViewModelFactory
 import com.beeswork.balance.ui.registeractivity.registerfinish.RegisterFinishViewModelFactory
 import com.beeswork.balance.ui.settingfragment.SettingViewModelFactory
 import com.beeswork.balance.ui.settingfragment.email.EmailSettingViewModelFactory
@@ -231,6 +231,8 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.Default
             )
         }
+        bind<UpdatePhotoStatusUseCase>() with singleton { UpdatePhotoStatusUseCaseImpl(instance(), Dispatchers.Default) }
+
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
@@ -382,6 +384,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { NameViewModelFactory(instance(), instance()) }
         bind() from provider {
             PhotoViewModelFactory(
+                instance(),
+                instance(),
                 instance(),
                 instance(),
                 instance(),

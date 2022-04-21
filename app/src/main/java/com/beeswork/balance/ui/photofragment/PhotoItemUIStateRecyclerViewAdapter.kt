@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.profilefragment.photo
+package com.beeswork.balance.ui.photofragment
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.databinding.ItemPhotoPickerBinding
 import com.beeswork.balance.internal.constant.PhotoConstant
@@ -50,53 +51,64 @@ class PhotoPickerRecyclerViewAdapter(
 
     override fun getItemCount(): Int = photoItemUIStates.size
 
+    fun submit(photoItemUIStates: List<PhotoItemUIState>) {
+        val photoItemUIStateDiffCallBack = PhotoItemUIStateDiffCallBack(this.photoItemUIStates, photoItemUIStates)
+        val diffResult = DiffUtil.calculateDiff(photoItemUIStateDiffCallBack)
+
+        this.photoItemUIStates.clear()
+        this.photoItemUIStates.addAll(photoItemUIStates)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
     fun submit(newPhotoPickers: MutableMap<String, PhotoItemUIState>) {
 
-        if (photoItemUIStates.isEmpty()) {
-            newPhotoPickers.map { photoItemUIStates.add(it.value) }
-            repeat((PhotoConstant.MAX_NUM_OF_PHOTOS - newPhotoPickers.size)) {
-                photoItemUIStates.add(PhotoItemUIState.asEmpty())
-            }
-            notifyDataSetChanged()
-            return
-        }
-
-        for (i in photoItemUIStates.size - 1 downTo 0) {
-            val photoPicker = photoItemUIStates[i]
-            photoPicker.key?.let { key ->
-                newPhotoPickers[key]?.let { newPhotoPicker ->
-                    if (photoPicker.status != newPhotoPicker.status) {
-                        photoPicker.status = newPhotoPicker.status
-                        notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
-                    }
-                } ?: kotlin.run {
-                    photoItemUIStates.removeAt(i)
-                    notifyItemRemoved(i)
-                    photoItemUIStates.add(PhotoItemUIState.asEmpty())
-                    notifyItemInserted(photoItemUIStates.size - 1)
-                }
-            }
-        }
-
-        var index = 0
-        while (index < photoItemUIStates.size) {
-            val photoPicker = photoItemUIStates[index]
-            newPhotoPickers[photoPicker.key]?.let { newPhotoPicker ->
-                if (index != newPhotoPicker.sequence) {
-                    swapPhotos(index, newPhotoPicker.sequence)
-                    photoPicker.sequence = newPhotoPicker.sequence
-                } else index++
-                newPhotoPickers.remove(photoPicker.key)
-            } ?: kotlin.run { index++ }
-        }
-
-        newPhotoPickers.forEach {
-            val newPhotoPicker = it.value
-            photoItemUIStates.removeAt(newPhotoPicker.sequence)
-            notifyItemRemoved(newPhotoPicker.sequence)
-            photoItemUIStates.add(newPhotoPicker.sequence, newPhotoPicker)
-            notifyItemInserted(newPhotoPicker.sequence)
-        }
+//        if (photoItemUIStates.isEmpty()) {
+//            newPhotoPickers.map {
+//                photoItemUIStates.add(it.value)
+//            }
+//            repeat((PhotoConstant.MAX_NUM_OF_PHOTOS - newPhotoPickers.size)) {
+//                photoItemUIStates.add(PhotoItemUIState.asEmpty())
+//            }
+//            notifyDataSetChanged()
+//            return
+//        }
+//
+//        for (i in photoItemUIStates.size - 1 downTo 0) {
+//            val photoPicker = photoItemUIStates[i]
+//            photoPicker.key?.let { key ->
+//                newPhotoPickers[key]?.let { newPhotoPicker ->
+//                    if (photoPicker.status != newPhotoPicker.status) {
+//                        photoPicker.status = newPhotoPicker.status
+//                        notifyItemChanged(i, PHOTO_PICKER_PAYLOAD)
+//                    }
+//                } ?: kotlin.run {
+//                    photoItemUIStates.removeAt(i)
+//                    notifyItemRemoved(i)
+//                    photoItemUIStates.add(PhotoItemUIState.asEmpty())
+//                    notifyItemInserted(photoItemUIStates.size - 1)
+//                }
+//            }
+//        }
+//
+//        var index = 0
+//        while (index < photoItemUIStates.size) {
+//            val photoPicker = photoItemUIStates[index]
+//            newPhotoPickers[photoPicker.key]?.let { newPhotoPicker ->
+//                if (index != newPhotoPicker.sequence) {
+//                    swapPhotos(index, newPhotoPicker.sequence)
+//                    photoPicker.sequence = newPhotoPicker.sequence
+//                } else index++
+//                newPhotoPickers.remove(photoPicker.key)
+//            } ?: kotlin.run { index++ }
+//        }
+//
+//        newPhotoPickers.forEach {
+//            val newPhotoPicker = it.value
+//            photoItemUIStates.removeAt(newPhotoPicker.sequence)
+//            notifyItemRemoved(newPhotoPicker.sequence)
+//            photoItemUIStates.add(newPhotoPicker.sequence, newPhotoPicker)
+//            notifyItemInserted(newPhotoPicker.sequence)
+//        }
     }
 
     fun getPhotoPicker(position: Int): PhotoItemUIState {

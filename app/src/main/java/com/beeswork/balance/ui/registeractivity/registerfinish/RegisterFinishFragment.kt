@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.registeractivity.registerfinish
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,15 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentRegisterFinishBinding
 import com.beeswork.balance.internal.util.MessageSource
-import com.beeswork.balance.internal.util.Navigator
-import com.beeswork.balance.ui.mainactivity.MainActivity
 import com.beeswork.balance.ui.registeractivity.RegisterActivity
-import com.beeswork.balance.ui.registeractivity.RegisterViewPagerAdapter
-import com.beeswork.balance.ui.registeractivity.photo.PhotoViewModel
-import com.beeswork.balance.ui.registeractivity.photo.PhotoViewModelFactory
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein

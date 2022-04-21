@@ -33,7 +33,7 @@ import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
-import com.beeswork.balance.ui.profilefragment.photo.*
+import com.beeswork.balance.ui.photofragment.*
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
@@ -394,7 +394,9 @@ class ProfileFragment : BaseFragment(),
 
     private fun deleteCapturedPhoto() {
         val file = getCapturedPhotoFile()
-        if (file.exists()) file.delete()
+        if (file.exists()) {
+            file.delete()
+        }
     }
 
 
