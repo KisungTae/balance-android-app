@@ -5,7 +5,7 @@ import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.domain.usecase.swipe.SwipeNotificationUIState
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.ui.swipefragment.SwipeItemUIState
+import com.beeswork.balance.domain.usecase.swipe.SwipeItemUIState
 import java.util.*
 
 class SwipeMapperImpl : SwipeMapper {

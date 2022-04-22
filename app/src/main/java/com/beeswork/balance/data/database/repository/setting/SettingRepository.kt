@@ -22,7 +22,7 @@ interface SettingRepository {
 
     suspend fun saveFCMToken(token: String)
 
-    suspend fun saveLocation(latitude: Double, longitude: Double)
+    suspend fun saveLocation(latitude: Double, longitude: Double, syncLocation: Boolean)
     suspend fun syncLocation()
     fun getLocationFlow(): Flow<Location?>
 

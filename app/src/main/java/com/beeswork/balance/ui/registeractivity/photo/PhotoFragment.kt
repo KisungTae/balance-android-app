@@ -11,6 +11,7 @@ import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.ui.photofragment.BasePhotoFragment
 import com.beeswork.balance.ui.photofragment.PhotoViewModel
 import com.beeswork.balance.ui.photofragment.PhotoViewModelFactory
+import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -36,12 +37,11 @@ class PhotoFragment : BasePhotoFragment(), KodeinAware {
 
     private fun bindUI() = lifecycleScope.launch {
         binding.btnRegisterPhotoNext.setOnClickListener {
-            viewModel.syncPhotos()
-//            activity?.let { _activity ->
-//                if (_activity is RegisterActivity) {
-//                    _activity.moveToNextTab()
-//                }
-//            }
+            activity?.let { _activity ->
+                if (_activity is RegisterActivity) {
+                    _activity.moveToNextTab()
+                }
+            }
         }
     }
 

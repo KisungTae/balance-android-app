@@ -1,4 +1,4 @@
-package com.beeswork.balance.ui.swipefragment
+package com.beeswork.balance.domain.usecase.swipe
 
 import java.util.*
 
@@ -16,7 +16,7 @@ data class SwipeItemUIState(
 
     companion object {
         fun asHeader(): SwipeItemUIState {
-            return SwipeItemUIState(UUID.randomUUID(), false, "", Type.HEADER)
+            return SwipeItemUIState(UUID.randomUUID(), false, null, Type.HEADER)
         }
     }
 }

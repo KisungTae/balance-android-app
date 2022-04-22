@@ -12,7 +12,9 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
-abstract class BaseLocationActivity: BaseActivity(), KodeinAware {
+abstract class BaseLocationActivity(
+    private val syncLocation: Boolean
+) : BaseActivity(), KodeinAware {
 
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
@@ -27,7 +29,7 @@ abstract class BaseLocationActivity: BaseActivity(), KodeinAware {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult?.let { _locationResult ->
                 val location = _locationResult.lastLocation
-                locationViewModel?.saveLocation(location.latitude, location.longitude)
+                locationViewModel?.saveLocation(location.latitude, location.longitude, syncLocation)
             }
         }
     }

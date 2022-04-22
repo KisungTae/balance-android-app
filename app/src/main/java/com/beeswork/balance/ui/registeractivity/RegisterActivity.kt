@@ -21,7 +21,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
-class RegisterActivity : BaseLocationActivity(), LocationPermissionListener {
+class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener {
 
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var viewModel: RegisterViewModel

@@ -3,7 +3,9 @@ package com.beeswork.balance.ui.swipefragment
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
+import com.beeswork.balance.domain.usecase.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.map
 class SwipeViewModel(
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper,
+    private val preferenceProvider: PreferenceProvider,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
@@ -29,7 +32,9 @@ class SwipeViewModel(
             SwipePagingSource(swipeRepository)
         }.flow.cachedIn(viewModelScope)
             .map { pagingData ->
-                pagingData.map { swipeMapper.toSwipeItemUIState(it,) }
+                pagingData.map { swipe ->
+                    swipeMapper.toSwipeItemUIState(swipe, preferenceProvider.getPhotoBucketUrl())
+                }
             }
             .map { pagingData ->
                 pagingData.insertHeaderItem(TerminalSeparatorType.FULLY_COMPLETE, SwipeItemUIState.asHeader())

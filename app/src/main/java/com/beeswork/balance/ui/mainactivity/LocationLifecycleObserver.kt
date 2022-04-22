@@ -36,8 +36,9 @@ class LocationLifecycleObserver(
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun startLocationUpdates() {
         val locationPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-        if (locationPermission == PackageManager.PERMISSION_GRANTED)
+        if (locationPermission == PackageManager.PERMISSION_GRANTED) {
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

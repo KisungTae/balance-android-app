@@ -14,7 +14,7 @@ import com.beeswork.balance.ui.common.LocationPermissionListener
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 
 
-class MainActivity : BaseLocationActivity(), LocationPermissionListener {
+class MainActivity : BaseLocationActivity(true), LocationPermissionListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel

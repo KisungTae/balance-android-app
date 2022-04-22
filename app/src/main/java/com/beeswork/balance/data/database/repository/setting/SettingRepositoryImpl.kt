@@ -89,18 +89,22 @@ class SettingRepositoryImpl(
         }
     }
 
-    override suspend fun saveLocation(latitude: Double, longitude: Double) {
+    override suspend fun saveLocation(latitude: Double, longitude: Double, syncLocation: Boolean) {
         withContext(ioDispatcher) {
             val updatedAt = OffsetDateTime.now()
             locationDAO.insert(Location(latitude, longitude, false, updatedAt))
-            syncLocation(latitude, longitude, updatedAt)
+            if (syncLocation) {
+                syncLocation(latitude, longitude, updatedAt)
+            }
         }
     }
 
     override suspend fun syncLocation() {
         withContext(ioDispatcher) {
             locationDAO.getById()?.let { location ->
-                if (!location.synced) syncLocation(location.latitude, location.longitude, location.updatedAt)
+                if (!location.synced) {
+                    syncLocation(location.latitude, location.longitude, location.updatedAt)
+                }
             }
         }
     }
