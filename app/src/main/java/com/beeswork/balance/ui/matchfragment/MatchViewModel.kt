@@ -5,6 +5,7 @@ import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.mapper.match.MatchMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.*
 
 class MatchViewModel(
     private val matchRepository: MatchRepository,
+    private val preferenceProvider: PreferenceProvider,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
@@ -29,7 +31,9 @@ class MatchViewModel(
             MatchPagingSource(matchRepository, matchPageFilter)
         }.flow.cachedIn(viewModelScope)
             .map { pagingData ->
-                pagingData.map { matchMapper.toItemUIState(it) }
+                pagingData.map { match ->
+                    matchMapper.toItemUIState(match, preferenceProvider.getBalancePhotoBucketURL())
+                }
             }
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }

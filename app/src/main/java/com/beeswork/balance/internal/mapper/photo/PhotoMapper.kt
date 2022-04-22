@@ -7,5 +7,5 @@ import com.beeswork.balance.ui.photofragment.PhotoItemUIState
 interface PhotoMapper {
 
     fun toPhoto(photoDTO: PhotoDTO): Photo
-    fun toPhotoItemUIState(photo: Photo): PhotoItemUIState
+    fun toPhotoItemUIState(photo: Photo, balancePhotoBucketUrl: String?): PhotoItemUIState
 }

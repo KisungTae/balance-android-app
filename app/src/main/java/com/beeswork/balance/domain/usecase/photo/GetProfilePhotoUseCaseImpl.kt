@@ -1,5 +1,6 @@
 package com.beeswork.balance.domain.usecase.photo
 
+import com.beeswork.balance.data.database.entity.photo.Photo
 import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.internal.constant.EndPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -7,15 +8,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class GetProfilePhotoUrlUseCaseImpl(
+class GetProfilePhotoUseCaseImpl(
     private val photoRepository: PhotoRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-): GetProfilePhotoUrlUseCase {
+) : GetProfilePhotoUseCase {
 
-    override suspend fun invoke(): String? = withContext(defaultDispatcher){
+    override suspend fun invoke(): Photo? = withContext(defaultDispatcher) {
         try {
-            val profilePhoto = photoRepository.getProfilePhoto() ?: return@withContext null
-            return@withContext EndPoint.ofPhoto(profilePhoto.accountId, profilePhoto.key)
+            return@withContext photoRepository.getProfilePhoto()
         } catch (e: IOException) {
             return@withContext null
         }

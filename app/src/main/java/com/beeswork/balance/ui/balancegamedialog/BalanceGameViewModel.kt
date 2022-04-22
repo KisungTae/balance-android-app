@@ -14,9 +14,11 @@ import com.beeswork.balance.domain.usecase.balancegame.FetchRandomQuestionUseCas
 import com.beeswork.balance.domain.usecase.balancegame.SaveAnswersUseCase
 import com.beeswork.balance.domain.usecase.card.ClickUseCase
 import com.beeswork.balance.domain.usecase.card.LikeUseCase
-import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUrlUseCase
+import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUseCase
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -25,9 +27,10 @@ class BalanceGameViewModel(
     private val fetchQuestionsUseCase: FetchQuestionsUseCase,
     private val saveAnswersUseCase: SaveAnswersUseCase,
     private val fetchRandomQuestionUseCase: FetchRandomQuestionUseCase,
-    private val getProfilePhotoUrlUseCase: GetProfilePhotoUrlUseCase,
+    private val getProfilePhotoUseCase: GetProfilePhotoUseCase,
     private val likeUseCase: LikeUseCase,
     private val clickUseCase: ClickUseCase,
+    private val preferenceProvider: PreferenceProvider,
     private val matchMapper: MatchMapper,
     private val questionMapper: QuestionMapper
 ) : BaseViewModel() {
@@ -50,7 +53,13 @@ class BalanceGameViewModel(
 
     fun fetchProfilePhotoUrl() {
         viewModelScope.launch {
-            _profilePhotoUrlLiveData.postValue(getProfilePhotoUrlUseCase.invoke())
+            val profilePhoto = getProfilePhotoUseCase.invoke()
+            val profilePhotoUrl = EndPoint.ofPhoto(
+                preferenceProvider.getBalancePhotoBucketURL(),
+                profilePhoto?.accountId,
+                profilePhoto?.key
+            )
+            _profilePhotoUrlLiveData.postValue(profilePhotoUrl)
         }
     }
 
@@ -67,7 +76,10 @@ class BalanceGameViewModel(
             _clickUIStateLiveData.postValue(ClickUIState.ofLoading())
             val response = clickUseCase.invoke(swipedId, answers)
             val clickUIState = if (response.isSuccess() && response.data != null && response.data.match != null) {
-                val matchNotificationUIState = matchMapper.toMatchNotificationUIState(response.data.match)
+                val matchNotificationUIState = matchMapper.toMatchNotificationUIState(
+                    response.data.match,
+                    preferenceProvider.getBalancePhotoBucketURL()
+                )
                 ClickUIState.ofSuccess(response.data.clickOutcome, matchNotificationUIState)
             } else {
                 ClickUIState.ofError(response.exception)

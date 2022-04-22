@@ -213,7 +213,7 @@ interface BalanceAPI {
         ): BalanceAPI {
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl(EndPoint.ACCOUNT_SERVICE_ENDPOINT)
+                .baseUrl(EndPoint.WEB_SERVICE_ENDPOINT)
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create(GsonProvider.gson))
                 .addConverterFactory(EnumConverterFactory())

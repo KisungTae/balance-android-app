@@ -33,7 +33,7 @@ class CardPhotoViewPagerAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(EndPoint.ofPhoto(accountId, photoKeys[position]))
+//        holder.bind(EndPoint.ofPhoto(accountId, photoKeys[position]))
 //        holder.itemView.imageView.setImageResource(images[position])
     }
 

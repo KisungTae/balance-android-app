@@ -1,26 +1,19 @@
 package com.beeswork.balance.internal.constant
 
-import com.beeswork.balance.internal.util.safeLet
 import java.util.*
 
 class EndPoint {
 
     companion object {
-//        const val PHOTO_BUCKET = "https://balance-photo-bucket.s3.ap-northeast-2.amazonaws.com"
-        private const val PHOTO_BUCKET = "https://test-balance-photo-bucket.s3-ap-southeast-2.amazonaws.com"
-//        private const val PHOTO_BUCKET = "https://test-balance-photo-bucket.s3-ap-southeast-2.amazonaw.com"
 
-        const val WEB_SOCKET_ENDPOINT = "ws://192.168.1.119:8081/web-socket"
+//        private const val BALANCE_WEB_URL = "192.168.1.119:8081"
+        private const val WEB_SERVICE_URL = "10.0.2.2:8080"
+        const val WEB_SERVICE_ENDPOINT = "http://$WEB_SERVICE_URL/"
+        const val WEB_SOCKET_ENDPOINT = "ws://$WEB_SERVICE_URL/web-socket"
         const val STOMP_SEND_ENDPOINT = "/app/chat/send"
 
-        const val ACCOUNT_SERVICE_ENDPOINT = "http://10.0.2.2:8080/"
-//        const val ACCOUNT_SERVICE_ENDPOINT = "http://192.168.1.119:8081/"
-
-        fun ofPhoto(accountId: UUID?, photoKey: String?): String? {
-            if (accountId ==  null || photoKey.isNullOrBlank()) {
-                return null
-            }
-            return "$PHOTO_BUCKET${Delimiter.FORWARD_SLASH}$accountId${Delimiter.FORWARD_SLASH}$photoKey"
+        fun ofPhoto(balancePhotoBucketURL: String?, accountId: UUID?, photoKey: String?): String {
+            return "$balancePhotoBucketURL${Delimiter.FORWARD_SLASH}$accountId${Delimiter.FORWARD_SLASH}$photoKey"
         }
     }
 

@@ -4,8 +4,6 @@ import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.domain.uistate.chat.*
 import com.beeswork.balance.domain.uistate.main.WebSocketEventUIState
@@ -16,6 +14,7 @@ import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filter
@@ -37,6 +36,7 @@ class ChatViewModel(
     private val reportMatchUseCase: ReportMatchUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
+    private val preferenceProvider: PreferenceProvider,
     private val chatMessageMapper: ChatMessageMapper,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
@@ -47,7 +47,7 @@ class ChatViewModel(
             if (match == null) {
                 null
             } else {
-                matchMapper.toItemUIState(match)
+                matchMapper.toItemUIState(match, preferenceProvider.getBalancePhotoBucketURL())
             }
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }

@@ -138,8 +138,8 @@ class ChatFragment : BaseFragment(),
                 setupAsUnmatched()
             } else {
                 binding.tvChatSwipedName.text = matchItemUIState.swipedName ?: getString(R.string.unknown_user_name)
-                if (matchItemUIState.swipedProfilePhotoKey != null) {
-//                    setupSwipedProfilePhoto(matchItemUIState.swipedId, matchItemUIState.swipedProfilePhotoKey)
+                if (matchItemUIState.swipedProfilePhotoUrl != null) {
+                    setupSwipedProfilePhoto(matchItemUIState.swipedProfilePhotoUrl)
                 }
             }
         }
@@ -197,11 +197,10 @@ class ChatFragment : BaseFragment(),
         snackBar.show()
     }
 
-    private fun setupSwipedProfilePhoto(swipedId: UUID, photoKey: String) {
+    private fun setupSwipedProfilePhoto(swipedProfilePhotoUrl: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val profilePhotoEndPoint = EndPoint.ofPhoto(swipedId, photoKey)
-                val file = Glide.with(requireContext()).downloadOnly().load(profilePhotoEndPoint).submit().get()
+                val file = Glide.with(requireContext()).downloadOnly().load(swipedProfilePhotoUrl).submit().get()
                 if (file.exists()) {
                     withContext(Dispatchers.Main) {
                         val profilePhotoBitmap = BitmapFactory.decodeFile(file.path)

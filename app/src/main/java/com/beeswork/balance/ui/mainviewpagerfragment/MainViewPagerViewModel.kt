@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
@@ -15,6 +16,7 @@ class MainViewPagerViewModel(
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper,
     private val matchMapper: MatchMapper,
+    private val preferenceProvider: PreferenceProvider,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
@@ -24,7 +26,7 @@ class MainViewPagerViewModel(
 
     val swipeNotificationUIStateLiveData by viewModelLazyDeferred {
         swipeRepository.newSwipeFlow.map { swipe ->
-            swipeMapper.toSwipeNotificationUIState(swipe)
+            swipeMapper.toSwipeNotificationUIState(swipe, preferenceProvider.getBalancePhotoBucketURL())
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
@@ -34,7 +36,7 @@ class MainViewPagerViewModel(
 
     val matchNotificationUIStateLiveData by viewModelLazyDeferred {
         matchRepository.newMatchFlow.map { match ->
-            matchMapper.toMatchNotificationUIState(match)
+            matchMapper.toMatchNotificationUIState(match, preferenceProvider.getBalancePhotoBucketURL())
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 

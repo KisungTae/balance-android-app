@@ -23,9 +23,9 @@ class SwipeMapperImpl : SwipeMapper {
         return SwipeDomain(swipe.swiperId, swipe.clicked, swipe.swiperProfilePhotoKey)
     }
 
-    override fun toSwipeNotificationUIState(swipe: Swipe): SwipeNotificationUIState {
+    override fun toSwipeNotificationUIState(swipe: Swipe, balancePhotoBucketUrl: String?): SwipeNotificationUIState {
         return SwipeNotificationUIState(
-            EndPoint.ofPhoto(swipe.swiperId, swipe.swiperProfilePhotoKey),
+            EndPoint.ofPhoto(balancePhotoBucketUrl, swipe.swiperId, swipe.swiperProfilePhotoKey),
             swipe.clicked
         )
     }

@@ -218,7 +218,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<FetchRandomQuestionUseCase>() with singleton { FetchRandomQuestionUseCaseImpl(instance(), Dispatchers.Default) }
         bind<LikeUseCase>() with singleton { LikeUseCaseImpl(instance(), Dispatchers.Default) }
         bind<ClickUseCase>() with singleton { ClickUseCaseImpl(instance(), Dispatchers.Default) }
-        bind<GetProfilePhotoUrlUseCase>() with singleton { GetProfilePhotoUrlUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetProfilePhotoUseCase>() with singleton { GetProfilePhotoUseCaseImpl(instance(), Dispatchers.Default) }
         bind<UploadPhotoUseCase>() with singleton { UploadPhotoUseCaseImpl(instance(), Dispatchers.Default) }
         bind<DeletePhotoUseCase>() with singleton { DeletePhotoUseCaseImpl(instance(), Dispatchers.Default) }
         bind<OrderPhotosUseCase>() with singleton { OrderPhotosUseCaseImpl(instance(), Dispatchers.Default) }
@@ -321,10 +321,11 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
-        bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
+        bind() from provider { MatchViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from factory { chatViewModelParameter: ChatViewModelParameter ->
             ChatViewModelFactory(
                 chatViewModelParameter,
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -343,11 +344,21 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance()) }
-        bind() from provider { MainViewPagerViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider {
+            MainViewPagerViewModelFactory(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.Default
+            )
+        }
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider {
             BalanceGameViewModelFactory(
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -384,6 +395,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { NameViewModelFactory(instance(), instance()) }
         bind() from provider {
             PhotoViewModelFactory(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

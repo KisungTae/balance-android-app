@@ -6,6 +6,7 @@ import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
 
 class MainViewPagerViewModelFactory(
@@ -13,6 +14,7 @@ class MainViewPagerViewModelFactory(
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper,
     private val matchMapper: MatchMapper,
+    private val preferenceProvider: PreferenceProvider,
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -23,6 +25,7 @@ class MainViewPagerViewModelFactory(
             swipeRepository,
             swipeMapper,
             matchMapper,
+            preferenceProvider,
             defaultDispatcher
         ) as T
     }

@@ -13,12 +13,22 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-    override fun putLoginInfo(accountId: UUID, accessToken: String, refreshToken: String?) {
+    override fun putLoginInfo(accountId: UUID, accessToken: String, refreshToken: String?, balancePhotoBucketURL: String) {
         editor.putString(ACCOUNT_ID, accountId.toString())
         editor.putString(ACCESS_TOKEN, accessToken)
         if (refreshToken != null) {
             editor.putString(REFRESH_TOKEN, refreshToken)
         }
+        editor.putString(BALANCE_PHOTO_BUCKET_URL, balancePhotoBucketURL)
+        editor.apply()
+    }
+
+    override fun putAccessInfo(accessToken: String, refreshToken: String?, balancePhotoBucketURL: String) {
+        editor.putString(ACCESS_TOKEN, accessToken)
+        if (refreshToken != null) {
+            editor.putString(REFRESH_TOKEN, refreshToken)
+        }
+        editor.putString(BALANCE_PHOTO_BUCKET_URL, balancePhotoBucketURL)
         editor.apply()
     }
 
@@ -53,6 +63,10 @@ class PreferenceProviderImpl(
         return appToken
     }
 
+    override fun getBalancePhotoBucketURL(): String? {
+        return preferences.getString(BALANCE_PHOTO_BUCKET_URL, null)
+    }
+
     override fun delete() {
         editor.clear().commit()
     }
@@ -62,5 +76,6 @@ class PreferenceProviderImpl(
         const val REFRESH_TOKEN = "refreshToken"
         const val ACCOUNT_ID = "accountId"
         const val APP_TOKEN = "appToken"
+        const val BALANCE_PHOTO_BUCKET_URL = "balancePhotoBucketURL"
     }
 }

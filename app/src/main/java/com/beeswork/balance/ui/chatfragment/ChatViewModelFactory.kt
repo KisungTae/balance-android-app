@@ -9,6 +9,7 @@ import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCase
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import java.util.*
 
@@ -24,6 +25,7 @@ class ChatViewModelFactory(
     private val reportMatchUseCase: ReportMatchUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
+    private val preferenceProvider: PreferenceProvider,
     private val chatMessageMapper: ChatMessageMapper,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
@@ -44,6 +46,7 @@ class ChatViewModelFactory(
             reportMatchUseCase,
             chatRepository,
             matchRepository,
+            preferenceProvider,
             chatMessageMapper,
             matchMapper,
             defaultDispatcher

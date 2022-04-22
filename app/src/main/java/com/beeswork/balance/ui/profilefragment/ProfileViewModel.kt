@@ -95,11 +95,11 @@ class ProfileViewModel(
     fun getPhotosLiveData(): LiveData<MutableMap<String, PhotoItemUIState>> {
         return photoRepository.getPhotosFlow(MAX_PHOTO_COUNT).map { photos ->
             val photoPickers = mutableMapOf<String, PhotoItemUIState>()
-            photos.mapIndexed { index, photo ->
-                val photoPicker = photoMapper.toPhotoItemUIState(photo)
+//            photos.mapIndexed { index, photo ->
+//                val photoPicker = photoMapper.toPhotoItemUIState(photo)
 //                photoPicker.sequence = index
-                photoPickers[photo.key] = photoPicker
-            }
+//                photoPickers[photo.key] = photoPicker
+//            }
             photoPickers
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }

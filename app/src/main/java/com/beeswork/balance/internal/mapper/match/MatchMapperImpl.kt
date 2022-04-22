@@ -27,7 +27,7 @@ class MatchMapperImpl : MatchMapper {
         )
     }
 
-    override fun toItemUIState(match: Match): MatchItemUIState {
+    override fun toItemUIState(match: Match, balancePhotoBucketUrl: String?): MatchItemUIState {
         return MatchItemUIState(
             match.chatId,
             match.swipedId,
@@ -36,14 +36,14 @@ class MatchMapperImpl : MatchMapper {
             match.unmatched || match.swipedDeleted,
             match.lastChatMessageBody ?: "",
             match.swipedName,
-            match.swipedProfilePhotoKey
+            EndPoint.ofPhoto(balancePhotoBucketUrl, match.swipedId, match.swipedProfilePhotoKey)
         )
     }
 
-    override fun toMatchNotificationUIState(match: Match): MatchNotificationUIState {
+    override fun toMatchNotificationUIState(match: Match, balancePhotoBucketUrl: String?): MatchNotificationUIState {
         return MatchNotificationUIState(
-            EndPoint.ofPhoto(match.swiperId, match.swiperProfilePhotoKey),
-            EndPoint.ofPhoto(match.swipedId, match.swipedProfilePhotoKey),
+            EndPoint.ofPhoto(balancePhotoBucketUrl, match.swiperId, match.swiperProfilePhotoKey),
+            EndPoint.ofPhoto(balancePhotoBucketUrl, match.swipedId, match.swipedProfilePhotoKey),
             match.swipedName
         )
     }

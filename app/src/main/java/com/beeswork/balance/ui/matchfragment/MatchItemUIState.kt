@@ -11,5 +11,5 @@ data class MatchItemUIState(
     val unmatched: Boolean,
     val lastChatMessageBody: String,
     val swipedName: String?,
-    val swipedProfilePhotoKey: String?,
+    val swipedProfilePhotoUrl: String?,
 )

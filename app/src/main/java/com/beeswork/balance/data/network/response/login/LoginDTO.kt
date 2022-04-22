@@ -7,5 +7,6 @@ data class LoginDTO(
     val profileExists: Boolean,
     val accessToken: String,
     val refreshToken: String?,
-    val email: String?
+    val email: String?,
+    val balancePhotoBucketURL: String
 )

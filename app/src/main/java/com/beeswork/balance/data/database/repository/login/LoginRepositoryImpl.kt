@@ -73,7 +73,12 @@ class LoginRepositoryImpl(
             val response = loginRDS.socialLogin(loginId, accessToken, loginType, fcmTokenDAO.getById())
             response.data?.let { loginDTO ->
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
-                preferenceProvider.putLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
+                preferenceProvider.putLoginInfo(
+                    loginDTO.accountId,
+                    loginDTO.accessToken,
+                    loginDTO.refreshToken,
+                    loginDTO.balancePhotoBucketURL
+                )
             }
             return@withContext response
         }
@@ -116,7 +121,12 @@ class LoginRepositoryImpl(
 
             val response = loginRDS.loginWithRefreshToken(accessToken, refreshToken, fcmTokenDAO.getById())
             response.data?.let { loginDTO ->
-                preferenceProvider.putLoginInfo(loginDTO.accountId, loginDTO.accessToken, loginDTO.refreshToken)
+                preferenceProvider.putLoginInfo(
+                    loginDTO.accountId,
+                    loginDTO.accessToken,
+                    loginDTO.refreshToken,
+                    loginDTO.balancePhotoBucketURL
+                )
             }
             return@withContext response
         }
