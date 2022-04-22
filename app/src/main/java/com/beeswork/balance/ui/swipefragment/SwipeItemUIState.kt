@@ -1,11 +1,11 @@
-package com.beeswork.balance.domain.usecase.swipe
+package com.beeswork.balance.ui.swipefragment
 
 import java.util.*
 
 data class SwipeItemUIState(
     val swiperId: UUID,
-    val swiperProfilePhotoUrl: String?,
     val clicked: Boolean,
+    val swiperProfilePhotoUrl: String?,
     val type: Type = Type.ITEM
 ) {
 
@@ -15,8 +15,8 @@ data class SwipeItemUIState(
     }
 
     companion object {
-        fun ofHeader(): SwipeItemUIState {
-            return SwipeItemUIState(UUID.randomUUID(), null, false, Type.HEADER)
+        fun asHeader(): SwipeItemUIState {
+            return SwipeItemUIState(UUID.randomUUID(), false, "", Type.HEADER)
         }
     }
 }

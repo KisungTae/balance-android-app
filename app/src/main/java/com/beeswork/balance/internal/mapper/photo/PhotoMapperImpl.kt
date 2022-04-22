@@ -22,13 +22,13 @@ class PhotoMapperImpl : PhotoMapper {
         )
     }
 
-    override fun toPhotoItemUIState(photo: Photo, balancePhotoBucketUrl: String?): PhotoItemUIState {
+    override fun toPhotoItemUIState(photo: Photo, photoBucketUrl: String?): PhotoItemUIState {
         return PhotoItemUIState(
             photo.key,
             photo.status,
             photo.deleting,
             photo.uri,
-            EndPoint.ofPhoto(balancePhotoBucketUrl, photo.accountId, photo.key)
+            EndPoint.ofPhoto(photoBucketUrl, photo.accountId, photo.key)
         )
     }
 

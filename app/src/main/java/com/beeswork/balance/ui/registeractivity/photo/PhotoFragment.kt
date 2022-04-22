@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentPhotoBinding
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.ui.photofragment.BasePhotoFragment
 import com.beeswork.balance.ui.photofragment.PhotoViewModel
 import com.beeswork.balance.ui.photofragment.PhotoViewModelFactory
@@ -34,7 +35,6 @@ class PhotoFragment : BasePhotoFragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-
         binding.btnRegisterPhotoNext.setOnClickListener {
             viewModel.syncPhotos()
 //            activity?.let { _activity ->

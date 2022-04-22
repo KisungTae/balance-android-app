@@ -26,7 +26,7 @@ class MainViewPagerViewModel(
 
     val swipeNotificationUIStateLiveData by viewModelLazyDeferred {
         swipeRepository.newSwipeFlow.map { swipe ->
-            swipeMapper.toSwipeNotificationUIState(swipe, preferenceProvider.getBalancePhotoBucketURL())
+            swipeMapper.toSwipeNotificationUIState(swipe, preferenceProvider.getPhotoBucketUrl())
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
@@ -36,7 +36,7 @@ class MainViewPagerViewModel(
 
     val matchNotificationUIStateLiveData by viewModelLazyDeferred {
         matchRepository.newMatchFlow.map { match ->
-            matchMapper.toMatchNotificationUIState(match, preferenceProvider.getBalancePhotoBucketURL())
+            matchMapper.toMatchNotificationUIState(match, preferenceProvider.getPhotoBucketUrl())
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 

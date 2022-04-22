@@ -56,11 +56,8 @@ class MatchPagingDataAdapter(
         }
 
         fun bind(matchItemUIState: MatchItemUIState) {
-            //            val photoEndPoint = profilePhotoKey?.let {
-//                EndPoint.ofPhotoBucket(matchedId, profilePhotoKey)
-//            } ?: R.drawable.ic_baseline_account_circle
 //            Glide.with(context)
-//                .load(photoEndPoint)
+//                .load(matchItemUIState.swipedProfilePhotoUrl)
 //                .apply(GlideHelper.profilePhotoGlideOptions())
 //                .into(binding.ivMatchProfilePicture)
             binding.tvMatchName.text = matchItemUIState.swipedName ?: context.getString(R.string.unknown_user_name)

@@ -5,7 +5,7 @@ import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.domain.usecase.swipe.SwipeNotificationUIState
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.ui.swipefragment.SwipeDomain
+import com.beeswork.balance.ui.swipefragment.SwipeItemUIState
 import java.util.*
 
 class SwipeMapperImpl : SwipeMapper {
@@ -19,13 +19,17 @@ class SwipeMapperImpl : SwipeMapper {
         }
     }
 
-    override fun toSwipeDomain(swipe: Swipe): SwipeDomain {
-        return SwipeDomain(swipe.swiperId, swipe.clicked, swipe.swiperProfilePhotoKey)
+    override fun toSwipeItemUIState(swipe: Swipe, photoBucketUrl: String?): SwipeItemUIState {
+        return SwipeItemUIState(
+            swipe.swiperId,
+            swipe.clicked,
+            EndPoint.ofPhoto(photoBucketUrl, swipe.swiperId, swipe.swiperProfilePhotoKey)
+        )
     }
 
-    override fun toSwipeNotificationUIState(swipe: Swipe, balancePhotoBucketUrl: String?): SwipeNotificationUIState {
+    override fun toSwipeNotificationUIState(swipe: Swipe, photoBucketUrl: String?): SwipeNotificationUIState {
         return SwipeNotificationUIState(
-            EndPoint.ofPhoto(balancePhotoBucketUrl, swipe.swiperId, swipe.swiperProfilePhotoKey),
+            EndPoint.ofPhoto(photoBucketUrl, swipe.swiperId, swipe.swiperProfilePhotoKey),
             swipe.clicked
         )
     }

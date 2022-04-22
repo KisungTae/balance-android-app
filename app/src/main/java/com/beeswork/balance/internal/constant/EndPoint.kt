@@ -12,8 +12,8 @@ class EndPoint {
         const val WEB_SOCKET_ENDPOINT = "ws://$WEB_SERVICE_URL/web-socket"
         const val STOMP_SEND_ENDPOINT = "/app/chat/send"
 
-        fun ofPhoto(balancePhotoBucketURL: String?, accountId: UUID?, photoKey: String?): String {
-            return "$balancePhotoBucketURL${Delimiter.FORWARD_SLASH}$accountId${Delimiter.FORWARD_SLASH}$photoKey"
+        fun ofPhoto(photoBucketURL: String?, accountId: UUID?, photoKey: String?): String {
+            return "$photoBucketURL${Delimiter.FORWARD_SLASH}$accountId${Delimiter.FORWARD_SLASH}$photoKey"
         }
     }
 

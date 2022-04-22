@@ -3,13 +3,11 @@ package com.beeswork.balance.ui.swipefragment
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
-import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 
 class SwipeViewModel(
@@ -23,7 +21,7 @@ class SwipeViewModel(
     }
 
     @ExperimentalPagingApi
-    fun initSwipePagingData(): LiveData<PagingData<SwipeDomain>> {
+    fun initSwipePagingData(): LiveData<PagingData<SwipeItemUIState>> {
         return Pager(
             config = swipePagingConfig,
             remoteMediator = SwipeRemoteMediator(swipeRepository)
@@ -31,10 +29,10 @@ class SwipeViewModel(
             SwipePagingSource(swipeRepository)
         }.flow.cachedIn(viewModelScope)
             .map { pagingData ->
-                pagingData.map { swipeMapper.toSwipeDomain(it) }
+                pagingData.map { swipeMapper.toSwipeItemUIState(it,) }
             }
             .map { pagingData ->
-                pagingData.insertHeaderItem(TerminalSeparatorType.FULLY_COMPLETE, SwipeDomain.header())
+                pagingData.insertHeaderItem(TerminalSeparatorType.FULLY_COMPLETE, SwipeItemUIState.asHeader())
             }
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }

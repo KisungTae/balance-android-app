@@ -20,7 +20,6 @@ import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.cardfragment.CardFragment
-import com.beeswork.balance.ui.swipefragment.SwipeDomain
 import com.beeswork.balance.ui.common.BaseFragment
 import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayoutMediator

@@ -18,11 +18,11 @@ import kotlin.random.Random
 
 class SwipePagingDataAdapter(
     private val onSwipeListener: OnSwipeListener
-) : PagingDataAdapter<SwipeDomain, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            SwipeDomain.Type.HEADER.ordinal -> HeaderViewHolder(
+            SwipeItemUIState.Type.HEADER.ordinal -> HeaderViewHolder(
                 ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
             else -> ItemViewHolder(
@@ -43,10 +43,10 @@ class SwipePagingDataAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getSwipeDomain(position)?.type?.ordinal ?: SwipeDomain.Type.ITEM.ordinal
+        return getSwipeDomain(position)?.type?.ordinal ?: SwipeItemUIState.Type.ITEM.ordinal
     }
 
-    fun getSwipeDomain(position: Int): SwipeDomain? {
+    fun getSwipeDomain(position: Int): SwipeItemUIState? {
         if (position >= itemCount) {
             return null
         }
@@ -54,11 +54,11 @@ class SwipePagingDataAdapter(
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<SwipeDomain>() {
-            override fun areItemsTheSame(oldItem: SwipeDomain, newItem: SwipeDomain): Boolean =
+        private val diffCallback = object : DiffUtil.ItemCallback<SwipeItemUIState>() {
+            override fun areItemsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
                 oldItem.swiperId == newItem.swiperId
 
-            override fun areContentsTheSame(oldItem: SwipeDomain, newItem: SwipeDomain): Boolean =
+            override fun areContentsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
                 oldItem == newItem
         }
     }
@@ -83,11 +83,11 @@ class SwipePagingDataAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(swipe: SwipeDomain) {
-            binding.ivSwipeClickedIcon.isVisible = swipe.clicked
-            binding.ivSwipeLikedIcon.isVisible = !swipe.clicked
+        fun bind(swipeItemUIState: SwipeItemUIState) {
+            binding.ivSwipeClickedIcon.isVisible = swipeItemUIState.clicked
+            binding.ivSwipeLikedIcon.isVisible = !swipeItemUIState.clicked
 
-//            val profilePhoto = EndPoint.ofPhoto(click.swiperId, click.profilePhotoKey)
+//            swipeItemUIState.swiperProfilePhotoUrl
 
 //            TODO: remove me
             val r = Random.nextInt(50)

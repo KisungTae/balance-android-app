@@ -31,10 +31,10 @@ class SwipeFragment(
     private val viewModelFactory: SwipeViewModelFactory by instance()
     private lateinit var viewModel: SwipeViewModel
     private lateinit var binding: FragmentSwipeBinding
-    private lateinit var swipePagingRefreshAdapter: PagingRefreshAdapter<SwipeDomain, RecyclerView.ViewHolder>
+    private lateinit var swipePagingRefreshAdapter: PagingRefreshAdapter<SwipeItemUIState, RecyclerView.ViewHolder>
     private lateinit var swipePagingDataAdapter: SwipePagingDataAdapter
     private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
-    private lateinit var swipePagingInitialPageAdapter: PagingInitialPageAdapter<SwipeDomain, RecyclerView.ViewHolder>
+    private lateinit var swipePagingInitialPageAdapter: PagingInitialPageAdapter<SwipeItemUIState, RecyclerView.ViewHolder>
 
     override fun onCreateView(
         inflater: LayoutInflater,
