@@ -10,6 +10,6 @@ class SaveLocationUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SaveLocationUseCase {
     override suspend fun invoke(latitude: Double, longitude: Double, syncLocation: Boolean) = withContext(defaultDispatcher) {
-        settingRepository.saveLocation(latitude, longitude,)
+        settingRepository.saveLocation(latitude, longitude, syncLocation)
     }
 }

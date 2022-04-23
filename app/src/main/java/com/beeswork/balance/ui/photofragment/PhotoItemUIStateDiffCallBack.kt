@@ -7,8 +7,6 @@ class PhotoItemUIStateDiffCallBack(
     private val newPhotoItemUIStates: List<PhotoItemUIState>
 ): DiffUtil.Callback() {
 
-
-
     override fun getOldListSize(): Int {
         return oldPhotoItemUIStates.size
     }
@@ -23,5 +21,9 @@ class PhotoItemUIStateDiffCallBack(
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return oldPhotoItemUIStates[oldItemPosition] == newPhotoItemUIStates[newItemPosition]
+    }
+
+    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
+        return oldPhotoItemUIStates[oldItemPosition].status == newPhotoItemUIStates[newItemPosition].status
     }
 }

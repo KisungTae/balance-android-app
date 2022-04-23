@@ -75,7 +75,11 @@ class PhotoRepositoryImpl(
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val photo = createPhoto(accountId, photoKey, photoUri, extension)
 
-            val uploadPhotoToS3Response = uploadPhotoToS3(photoFile, photo, extension)
+            val uploadPhotoToS3Response = if (photo.uploaded) {
+                Resource.success(EmptyResponse())
+            } else {
+                uploadPhotoToS3(photoFile, photo, extension)
+            }
             when {
                 uploadPhotoToS3Response.isExceptionCodeEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION) -> {
                     photoDAO.updateStatusBy(photo.key, PhotoStatus.OCCUPIED)
@@ -115,10 +119,6 @@ class PhotoRepositoryImpl(
 
 
     private suspend fun uploadPhotoToS3(photoFile: File, photo: Photo, extension: String): Resource<EmptyResponse> {
-        if (photo.uploaded) {
-            return Resource.success(EmptyResponse())
-        }
-
         val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: return Resource.error(
             PhotoNotSupportedTypeException()
         )

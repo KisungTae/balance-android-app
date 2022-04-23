@@ -28,9 +28,9 @@ import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
 import java.io.File
 
-open class BasePhotoFragment : BaseFragment(), PhotoItemUIStateRecyclerViewAdapter.PhotoPickerListener, PhotoPickerOptionListener {
+open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.PhotoPickerListener, PhotoPickerOptionListener {
 
-    private lateinit var photoItemUIStateRecyclerViewAdapter: PhotoItemUIStateRecyclerViewAdapter
+    private lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
     private lateinit var photoViewModel: PhotoViewModel
     private lateinit var binding: LayoutPhotoPickerBinding
 
@@ -126,16 +126,16 @@ open class BasePhotoFragment : BaseFragment(), PhotoItemUIStateRecyclerViewAdapt
 
     private suspend fun observePhotoItemUIStatesLiveData() {
         photoViewModel.photoItemUIStatesLiveData.await().observe(viewLifecycleOwner) { photoItemUIStates ->
-            photoItemUIStateRecyclerViewAdapter.submit(photoItemUIStates)
+            photoPickerRecyclerViewAdapter.submit(photoItemUIStates)
         }
     }
 
     private fun setupPhotoPickerRecyclerView(photoPickerRecyclerView: RecyclerView) {
-        photoItemUIStateRecyclerViewAdapter = PhotoItemUIStateRecyclerViewAdapter(this)
-        photoPickerRecyclerView.adapter = photoItemUIStateRecyclerViewAdapter
+        photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(this)
+        photoPickerRecyclerView.adapter = photoPickerRecyclerViewAdapter
         photoPickerRecyclerView.layoutManager = object : GridLayoutManager(
             requireContext(),
-            PhotoItemUIStateRecyclerViewAdapter.NUM_OF_COLUMNS
+            PhotoPickerRecyclerViewAdapter.NUM_OF_COLUMNS
         ) {
             override fun canScrollVertically(): Boolean = false
             override fun canScrollHorizontally(): Boolean = false
@@ -145,7 +145,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoItemUIStateRecyclerViewAdapt
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0
         ) {
             override fun isLongPressDragEnabled(): Boolean {
-                val isSwipeable = photoItemUIStateRecyclerViewAdapter.isSwipeable()
+                val isSwipeable = photoPickerRecyclerViewAdapter.isSwipeable()
                 if (!isSwipeable) {
                     val title = getString(R.string.error_title_order_photos)
                     val message = getString(R.string.photo_not_orderable_exception)
@@ -159,7 +159,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoItemUIStateRecyclerViewAdapt
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                photoItemUIStateRecyclerViewAdapter.swapPhotos(
+                photoPickerRecyclerViewAdapter.swapPhotos(
                     viewHolder.absoluteAdapterPosition,
                     target.absoluteAdapterPosition
                 )
@@ -170,7 +170,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoItemUIStateRecyclerViewAdapt
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
-                photoViewModel.orderPhotos(photoItemUIStateRecyclerViewAdapter.getPhotoPickerSequences())
+                photoViewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
             }
 
         })
@@ -179,7 +179,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoItemUIStateRecyclerViewAdapt
 
 
     override fun onClickPhoto(position: Int) {
-        val photoPicker = photoItemUIStateRecyclerViewAdapter.getPhotoPicker(position)
+        val photoPicker = photoPickerRecyclerViewAdapter.getPhotoPicker(position)
         when (photoPicker.status) {
             PhotoStatus.EMPTY -> {
                 UploadPhotoOptionDialog(this).show(childFragmentManager, UploadPhotoOptionDialog.TAG)
@@ -207,7 +207,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoItemUIStateRecyclerViewAdapt
     }
 
     override fun onDownloadPhotoSuccess(photoKey: String?) {
-        photoViewModel.updatePhotoStatus(photoKey, PhotoStatus.DOWNLOAD_ERROR)
+        photoViewModel.updatePhotoStatus(photoKey, PhotoStatus.OCCUPIED)
     }
 
     override fun reuploadPhoto(photoUri: Uri?, photoKey: String?) {

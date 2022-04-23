@@ -16,43 +16,52 @@
 
 
         <ImageView
+            android:id="@+id/ivPhotoPickerPhoto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="@string/photo_picker_photo_iv_description"
-            android:tag="photoPickerPhoto" />
+            android:contentDescription="@string/photo_picker_photo_iv_description" />
 
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+        <LinearLayout
+            android:id="@+id/llPhotoPickerDeleteIconWrapper"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_gravity="top|end"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
-            android:contentDescription="@string/delete_photo_icon_description"
-            android:src="@drawable/ic_baseline_close"
-            android:tag="photoPickerDeleteIcon"
-            app:tint="@color/lighterGrey" />
+            android:background="@drawable/sh_circle_box"
+            android:backgroundTint="@color/TransparentBlack"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/delete_photo_icon_description"
+                android:src="@drawable/ic_baseline_close"
+                app:tint="@color/lighterGrey" />
+
+        </LinearLayout>
+
 
         <View
+            android:id="@+id/vPhotoPickerMask"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha=".2"
             android:background="@drawable/sh_round_box_medium"
             android:backgroundTint="@color/Black"
-            android:tag="photoPickerMask"
             android:visibility="gone" />
 
         <ImageView
+            android:id="@+id/ivPhotoPickerAdd"
             android:layout_width="@dimen/icon_medium"
             android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:contentDescription="@string/add_icon_description"
             android:src="@drawable/ic_baseline_add"
-            android:tag="photoPickerAdd"
             app:tint="@color/BackgroundWhite" />
 
         <com.github.ybq.android.spinkit.SpinKitView
-            android:id="@+id/spin_kit"
+            android:id="@+id/skvPhotoPickerLoading"
             style="@style/SpinKitView.Large.Circle"
             android:layout_width="@dimen/icon_medium"
             android:layout_height="@dimen/icon_medium"
@@ -60,28 +69,27 @@
             android:background="@color/Transparent"
             android:clickable="true"
             android:focusable="true"
-            android:tag="photoPickerLoading"
             app:SpinKit_Color="@color/BackgroundWhite" />
 
         <ImageView
+            android:id="@+id/ivDownloadError"
             android:layout_width="@dimen/icon_medium"
             android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:clickable="false"
             android:contentDescription="@string/download_icon_description"
             android:src="@drawable/ic_baseline_download_24"
-            android:tag="photoPickerDownloadError"
             android:visibility="gone"
             app:tint="@color/white" />
 
         <ImageView
+            android:id="@+id/ivUploadError"
             android:layout_width="@dimen/icon_medium"
             android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:clickable="false"
             android:contentDescription="@string/upload_icon_description"
             android:src="@drawable/ic_baseline_upload_24"
-            android:tag="photoPickerUploadError"
             android:visibility="gone"
             app:tint="@color/white" />
 
