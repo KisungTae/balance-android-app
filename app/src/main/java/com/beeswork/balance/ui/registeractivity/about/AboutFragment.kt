@@ -4,21 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAboutBinding
 import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.RegisterStepListener
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
-import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class AboutFragment: BaseRegisterStepFragment(), KodeinAware {
+class AboutFragment(
+    private val registerStepListener: RegisterStepListener
+): BaseFragment(), KodeinAware {
 
     override val kodein by closestKodein()
     private lateinit var binding: FragmentAboutBinding
@@ -54,7 +55,7 @@ class AboutFragment: BaseRegisterStepFragment(), KodeinAware {
     private fun observeSaveAboutLiveData() {
         viewModel.saveAboutUIStateLiveData.observe(viewLifecycleOwner) { saveAboutUIState ->
             if (saveAboutUIState.saved) {
-                moveToNextTab()
+                registerStepListener.onMoveToNextStep()
             } else if (saveAboutUIState.showError) {
                 val title = getString(R.string.error_title_save_about)
                 val message = MessageSource.getMessage(requireContext(), saveAboutUIState.exception)

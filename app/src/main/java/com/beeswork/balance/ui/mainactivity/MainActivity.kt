@@ -11,10 +11,11 @@ import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseLocationActivity
 import com.beeswork.balance.ui.common.LocationPermissionListener
+import com.beeswork.balance.ui.common.LocationRequestListener
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 
 
-class MainActivity : BaseLocationActivity(true), LocationPermissionListener {
+class MainActivity : BaseLocationActivity(true), LocationPermissionListener, LocationRequestListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
@@ -25,8 +26,7 @@ class MainActivity : BaseLocationActivity(true), LocationPermissionListener {
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        super.locationViewModel = viewModel
-        super.locationPermissionListeners.add(this)
+        super.onCreate(viewModel, this@MainActivity)
         bindUI()
     }
 
@@ -43,11 +43,20 @@ class MainActivity : BaseLocationActivity(true), LocationPermissionListener {
         }
     }
 
-    fun requestLocationPermission() {
+    override fun onLocationPermissionChanged(granted: Boolean) {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcvMain)
+        navHostFragment?.childFragmentManager?.fragments?.forEach { fragment ->
+            if (fragment is MainViewPagerFragment) {
+                fragment.onLocationPermissionChanged(granted)
+            }
+        }
+    }
+
+    override fun onRequestLocationPermission() {
         setupLocationManager()
     }
 
-    fun checkLocationPermission() {
+    override fun onCheckLocationPermission() {
         doCheckLocationPermission()
     }
 
@@ -60,16 +69,6 @@ class MainActivity : BaseLocationActivity(true), LocationPermissionListener {
         super.onPause()
 //        viewModel.disconnectStomp()
     }
-
-    override fun onLocationPermissionChanged(granted: Boolean) {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcvMain)
-        navHostFragment?.childFragmentManager?.fragments?.forEach { fragment ->
-            if (fragment is MainViewPagerFragment) {
-                fragment.onLocationPermissionChanged(granted)
-            }
-        }
-    }
-
 
 }
 

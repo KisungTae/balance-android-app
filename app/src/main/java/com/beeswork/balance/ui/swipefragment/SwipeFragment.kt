@@ -129,11 +129,11 @@ class SwipeFragment(
 
     override fun onFragmentSelected() {
 //        viewModel.test()
-        activity?.let { _activity ->
-            if (_activity is MainActivity) {
-                _activity.requestLocationPermission()
-            }
-        }
+//        activity?.let { _activity ->
+//            if (_activity is MainActivity) {
+//                _activity.requestLocationPermission()
+//            }
+//        }
     }
 
     override fun onSelectSwipe(position: Int) {

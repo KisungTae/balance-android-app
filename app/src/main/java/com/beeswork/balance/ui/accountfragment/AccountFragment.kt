@@ -10,6 +10,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAccountBinding
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
@@ -69,12 +70,12 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     private fun setupListeners() {
         binding.llAccountEditProfile.setOnClickListener {
-            moveToFragment(ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+            Navigator.moveToFragment(activity, ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
         binding.llAccountChargePoint.setOnClickListener {
         }
         binding.llAccountSetting.setOnClickListener {
-            moveToFragment(SettingFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+            Navigator.moveToFragment(activity, SettingFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
     }
 

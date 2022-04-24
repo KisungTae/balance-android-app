@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.cardfragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +19,7 @@ import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
+import com.beeswork.balance.ui.common.LocationRequestListener
 import com.beeswork.balance.ui.mainactivity.MainActivity
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import java.lang.ClassCastException
 import java.util.*
 
 class CardFragment(
@@ -44,6 +47,7 @@ class CardFragment(
     private lateinit var cardStackAdapter: CardStackAdapter
     private lateinit var cardStackLayoutManager: CardStackLayoutManager
     private lateinit var binding: FragmentCardBinding
+    private var locationRequestListener: LocationRequestListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +61,7 @@ class CardFragment(
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(CardViewModel::class.java)
         bindUI()
-        requestLocationPermission()
+        locationRequestListener?.onRequestLocationPermission()
     }
 
 
@@ -148,24 +152,9 @@ class CardFragment(
         binding.llCardStackLocationNotPermitted.visibility = location
     }
 
-
-    private fun requestLocationPermission() {
-        getMainActivity()?.requestLocationPermission()
-    }
-
-    private fun getMainActivity(): MainActivity? {
-        activity?.let { _activity ->
-            return if (_activity is MainActivity) {
-                _activity
-            } else {
-                null
-            }
-        } ?: return null
-    }
-
     override fun onResume() {
         super.onResume()
-        getMainActivity()?.checkLocationPermission()
+        locationRequestListener?.onCheckLocationPermission()
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {
@@ -197,6 +186,11 @@ class CardFragment(
 
     override fun onApplyCardFilter() {
         println("onApplySwipeFilter")
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        locationRequestListener = context as LocationRequestListener
     }
 
     companion object {

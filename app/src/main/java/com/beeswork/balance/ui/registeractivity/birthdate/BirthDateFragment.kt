@@ -4,21 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentBirthDateBinding
 import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.RegisterStepListener
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
-import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class BirthDateFragment : BaseRegisterStepFragment(), KodeinAware {
+class BirthDateFragment(
+    private val registerStepListener: RegisterStepListener
+) : BaseFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentBirthDateBinding
     private lateinit var viewModel: BirthDateViewModel
@@ -53,7 +54,7 @@ class BirthDateFragment : BaseRegisterStepFragment(), KodeinAware {
     private fun observeSaveBirthDateLiveData() {
         viewModel.saveBirthDateUIStateLiveData.observe(viewLifecycleOwner) { saveBirthDateUIState ->
             if (saveBirthDateUIState.saved) {
-                moveToNextTab()
+                registerStepListener.onMoveToNextStep()
             } else if (saveBirthDateUIState.showError) {
                 val title = getString(R.string.error_title_save_birthDate)
                 val message = MessageSource.getMessage(requireContext(), saveBirthDateUIState.exception)

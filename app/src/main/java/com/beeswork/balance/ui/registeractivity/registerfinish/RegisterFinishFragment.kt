@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentRegisterFinishBinding
 import com.beeswork.balance.internal.util.MessageSource
-import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -55,11 +54,11 @@ class RegisterFinishFragment : Fragment(), KodeinAware {
                     binding.btnRegisterFinishRetry.isEnabled = false
                 }
                 saveProfileUIState.saved -> {
-                    activity?.let { _activity ->
-                        if (_activity is RegisterActivity) {
-                            _activity.moveToNextTab()
-                        }
-                    }
+//                    activity?.let { _activity ->
+//                        if (_activity is RegisterActivity) {
+//                            _activity.moveToNextTab()
+//                        }
+//                    }
                 }
                 else -> {
                     binding.llRegisterFinishLoadingWrapper.visibility = View.GONE

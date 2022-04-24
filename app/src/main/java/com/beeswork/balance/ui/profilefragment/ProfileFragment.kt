@@ -29,6 +29,7 @@ import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.dialog.ErrorDialog
@@ -236,7 +237,7 @@ class ProfileFragment : BaseFragment(),
 
     private fun setupToolBar() {
         binding.btnProfileSave.setOnClickListener { saveBio() }
-        binding.btnProfileBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
+        binding.btnProfileBack.setOnClickListener { Navigator.popBackStack(activity, MainViewPagerFragment.TAG) }
     }
 
     override fun onHeightChanged(height: Int) {

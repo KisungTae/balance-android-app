@@ -88,6 +88,15 @@ class PhotoPickerRecyclerViewAdapter(
         return true
     }
 
+    fun hasOccupiedPhoto(): Boolean {
+        photoItemUIStates.forEach { photoItemUIState ->
+            if (photoItemUIState.status == PhotoStatus.OCCUPIED) {
+                return true
+            }
+        }
+        return false
+    }
+
     companion object {
         const val NUM_OF_COLUMNS = 3
     }

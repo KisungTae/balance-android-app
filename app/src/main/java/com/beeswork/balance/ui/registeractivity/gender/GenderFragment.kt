@@ -10,14 +10,17 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.RegisterStepListener
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class GenderFragment: BaseRegisterStepFragment(), KodeinAware {
+class GenderFragment(
+    private val registerStepListener: RegisterStepListener
+): BaseFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentGenderBinding
     private lateinit var viewModel: GenderViewModel
@@ -53,7 +56,7 @@ class GenderFragment: BaseRegisterStepFragment(), KodeinAware {
     private fun observeSaveGenderLiveData() {
         viewModel.saveGenderUIStateLiveData.observe(viewLifecycleOwner) { saveGenderUIState ->
             if (saveGenderUIState.saved) {
-                moveToNextTab()
+                registerStepListener.onMoveToNextStep()
             } else if (saveGenderUIState.showError) {
                 val title = getString(R.string.error_title_save_gender)
                 val message = MessageSource.getMessage(requireContext(), saveGenderUIState.exception)

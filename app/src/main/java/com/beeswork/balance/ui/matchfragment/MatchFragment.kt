@@ -15,6 +15,7 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
 import com.beeswork.balance.internal.constant.MatchPageFilter
+import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.chatfragment.ChatFragment
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.dialog.ErrorDialog
@@ -149,7 +150,7 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
             arguments.putString(BundleKey.SWIPED_ID, matchItemUIState.swipedId.toString())
             chatFragment.arguments = arguments
         }
-        moveToFragment(chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)
+        Navigator.moveToFragment(activity, chatFragment, R.id.fcvMain, MainViewPagerFragment.TAG)
     }
 
     private fun setupMatchPagingInitialPageAdapter() {

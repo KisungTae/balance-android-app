@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.registeractivity
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -10,18 +9,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivityRegisterBinding
-import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.internal.util.hideKeyboard
 import com.beeswork.balance.ui.common.BaseLocationActivity
 import com.beeswork.balance.ui.common.LocationPermissionListener
-import com.beeswork.balance.ui.mainactivity.MainActivity
+import com.beeswork.balance.ui.common.RegisterStepListener
+import com.beeswork.balance.ui.common.LocationRequestListener
 import com.beeswork.balance.ui.registeractivity.location.LocationFragment
 import kotlinx.coroutines.launch
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
-class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener {
+class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener, RegisterStepListener, LocationRequestListener {
 
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var viewModel: RegisterViewModel
@@ -34,8 +31,7 @@ class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener
         window?.statusBarColor = ContextCompat.getColor(this, R.color.Primary)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        super.locationViewModel = viewModel
-        super.locationPermissionListeners.add(this)
+        super.onCreate(viewModel, this@RegisterActivity)
         bindUI()
     }
 
@@ -56,7 +52,7 @@ class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener
     }
 
     private fun setupRegisterViewPager() {
-        registerViewPagerAdapter = RegisterViewPagerAdapter(supportFragmentManager, lifecycle)
+        registerViewPagerAdapter = RegisterViewPagerAdapter(supportFragmentManager, lifecycle, this@RegisterActivity, this@RegisterActivity)
         binding.vpRegister.adapter = registerViewPagerAdapter
         binding.vpRegister.offscreenPageLimit = RegisterViewPagerTabPosition.values().size
         binding.vpRegister.isUserInputEnabled = false
@@ -86,7 +82,7 @@ class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener
         binding.btnRegisterBack.isEnabled = false
     }
 
-    fun moveToNextTab() {
+    private fun moveToNextTab() {
         val nextIndex = binding.vpRegister.currentItem + 1
         binding.vpRegister.currentItem = nextIndex
     }
@@ -96,18 +92,6 @@ class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener
         binding.vpRegister.currentItem = previousIndex
     }
 
-    fun moveToMainActivity() {
-        Navigator.finishToActivity(this@RegisterActivity, Intent(this@RegisterActivity, MainActivity::class.java))
-    }
-
-    fun requestLocationPermission() {
-        setupLocationManager()
-    }
-
-    fun checkLocationPermission() {
-        doCheckLocationPermission()
-    }
-
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         this.hideKeyboard(ev)
         return super.dispatchTouchEvent(ev)
@@ -115,8 +99,20 @@ class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener
 
     override fun onLocationPermissionChanged(granted: Boolean) {
         val locationFragment = supportFragmentManager.findFragmentByTag("f${RegisterViewPagerTabPosition.LOCATION.ordinal}")
-        if (locationFragment is LocationFragment) {
+        if (locationFragment != null && locationFragment is LocationFragment) {
             locationFragment.onLocationPermissionChanged(granted)
         }
+    }
+
+    override fun onMoveToNextStep() {
+        moveToNextTab()
+    }
+
+    override fun onRequestLocationPermission() {
+        setupLocationManager()
+    }
+
+    override fun onCheckLocationPermission() {
+        doCheckLocationPermission()
     }
 }

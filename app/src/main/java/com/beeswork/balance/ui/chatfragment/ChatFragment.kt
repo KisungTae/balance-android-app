@@ -279,7 +279,7 @@ class ChatFragment : BaseFragment(),
     private fun observeUnmatchLiveData() {
         viewModel.unmatchLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
             when {
-                uiState.unmatched -> popBackStack(MainViewPagerFragment.TAG)
+                uiState.unmatched -> Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
                 uiState.showLoading -> {
                     binding.llChatLoading.visibility = View.VISIBLE
                 }
@@ -300,7 +300,7 @@ class ChatFragment : BaseFragment(),
     private fun observeReportMatchLiveData() {
         viewModel.reportMatchLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
             when {
-                uiState.unmatched -> popBackStack(MainViewPagerFragment.TAG)
+                uiState.unmatched -> Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
                 uiState.showLoading -> getReportDialog()?.showLoading()
                 uiState.showError -> {
                     val reportDialog = getReportDialog()
@@ -346,7 +346,7 @@ class ChatFragment : BaseFragment(),
 
 
     override fun onDismissErrorDialog(id: UUID?) {
-        popBackStack(MainViewPagerFragment.TAG)
+        Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
     }
 
 
@@ -368,12 +368,12 @@ class ChatFragment : BaseFragment(),
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 requireContext().hideKeyboard(requireView())
-                popBackStack(MainViewPagerFragment.TAG)
+                Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
             }
         })
         binding.btnChatBack.setOnClickListener {
             requireContext().hideKeyboard(requireView())
-            popBackStack(MainViewPagerFragment.TAG)
+            Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
         }
     }
 

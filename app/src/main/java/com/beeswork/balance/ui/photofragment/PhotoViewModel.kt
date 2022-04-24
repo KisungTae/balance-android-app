@@ -68,10 +68,11 @@ open class PhotoViewModel (
     }
 
     fun updatePhotoStatus(photoKey: String?, photoStatus: PhotoStatus) {
-        if (photoKey != null) {
-            viewModelScope.launch {
-                updatePhotoStatusUseCase.invoke(photoKey, photoStatus)
-            }
+        if (photoKey == null) {
+            return
+        }
+        viewModelScope.launch {
+            updatePhotoStatusUseCase.invoke(photoKey, photoStatus)
         }
     }
 

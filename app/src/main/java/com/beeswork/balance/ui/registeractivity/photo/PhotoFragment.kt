@@ -6,18 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentPhotoBinding
-import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.ui.common.RegisterStepListener
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.photofragment.BasePhotoFragment
 import com.beeswork.balance.ui.photofragment.PhotoViewModel
 import com.beeswork.balance.ui.photofragment.PhotoViewModelFactory
-import com.beeswork.balance.ui.registeractivity.RegisterActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class PhotoFragment : BasePhotoFragment(), KodeinAware {
+class PhotoFragment(
+    private val registerStepListener: RegisterStepListener
+) : BasePhotoFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentPhotoBinding
     private lateinit var viewModel: PhotoViewModel
@@ -36,13 +39,18 @@ class PhotoFragment : BasePhotoFragment(), KodeinAware {
     }
 
     private fun bindUI() = lifecycleScope.launch {
+        setupNextBtnListener()
+    }
+
+    private fun setupNextBtnListener() {
         binding.btnRegisterPhotoNext.setOnClickListener {
-            activity?.let { _activity ->
-                if (_activity is RegisterActivity) {
-                    _activity.moveToNextTab()
-                }
+            if (photoPickerRecyclerViewAdapter.hasOccupiedPhoto()) {
+                registerStepListener.onMoveToNextStep()
+            } else {
+                val title = getString(R.string.error_title_fail_to_next_register_step)
+                val message = getString(R.string.error_message_upload_photo)
+                ErrorDialog.show(title, message, childFragmentManager)
             }
         }
     }
-
 }

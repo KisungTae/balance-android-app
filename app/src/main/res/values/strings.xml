@@ -29,6 +29,8 @@
     <string name="error_title_open_chat">채팅을 열지 못했습니다</string>
     <string name="error_title_fetch_push_setting">알람세팅정보를 가져오지 못했습니다</string>
     <string name="error_title_save_name">이름 저장실패</string>
+    <string name="error_title_fail_to_next_register_step">다음스텝으로 못가요!</string>
+    <string name="error_message_upload_photo">사진을 올려주세요</string>
 
 
 

@@ -85,7 +85,9 @@ class SettingFragment : BaseFragment(), KodeinAware {
     }
 
     private fun setupListeners() {
-        binding.btnSettingBack.setOnClickListener { popBackStack(MainViewPagerFragment.TAG) }
+        binding.btnSettingBack.setOnClickListener {
+            Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
+        }
         binding.btnSettingEmail.setOnClickListener {
             EmailSettingDialog().show(childFragmentManager, EmailSettingDialog.TAG)
         }

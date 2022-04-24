@@ -4,15 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentBalanceGameBinding
 import com.beeswork.balance.ui.balancegamedialog.*
-import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
+import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.RegisterStepListener
 import kotlinx.coroutines.launch
 import java.util.*
 
-class BalanceGameFragment : BaseRegisterStepFragment(), RegisterBalanceGameListener {
+class BalanceGameFragment(
+    private val registerStepListener: RegisterStepListener
+) : BaseFragment(), RegisterBalanceGameListener {
 
     private lateinit var binding: FragmentBalanceGameBinding
 
@@ -37,6 +39,6 @@ class BalanceGameFragment : BaseRegisterStepFragment(), RegisterBalanceGameListe
     }
 
     override fun onBalanceGameAnswersSaved() {
-        moveToNextTab()
+        registerStepListener.onMoveToNextStep()
     }
 }

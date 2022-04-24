@@ -18,8 +18,14 @@ abstract class BaseLocationActivity(
 
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-    protected var locationViewModel: BaseLocationViewModel? = null
-    protected val locationPermissionListeners = mutableListOf<LocationPermissionListener>()
+    private lateinit var viewModel: BaseLocationViewModel
+    private val locationPermissionListeners = mutableListOf<LocationPermissionListener>()
+
+
+    fun onCreate(viewModel: BaseLocationViewModel, locationPermissionListener: LocationPermissionListener) {
+        this.viewModel = viewModel
+        locationPermissionListeners.add(locationPermissionListener)
+    }
 
     private val requestLocationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         onLocationPermissionChanged(granted)
@@ -29,7 +35,7 @@ abstract class BaseLocationActivity(
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult?.let { _locationResult ->
                 val location = _locationResult.lastLocation
-                locationViewModel?.saveLocation(location.latitude, location.longitude, syncLocation)
+                viewModel.saveLocation(location.latitude, location.longitude, syncLocation)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.mainviewpagerfragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -206,6 +207,10 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
 
     override fun onGoToMatchSelected() {
         binding.tlMain.getTabAt(MainViewPagerTabPosition.MATCH.ordinal)?.select()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
     }
 
     companion object {

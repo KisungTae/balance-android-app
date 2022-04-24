@@ -4,24 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.FragmentGenderBinding
 import com.beeswork.balance.databinding.FragmentHeightBinding
 import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.ui.common.BaseFragment
+import com.beeswork.balance.ui.common.RegisterStepListener
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.registeractivity.BaseRegisterStepFragment
-import com.beeswork.balance.ui.registeractivity.RegisterActivity
-import com.beeswork.balance.ui.registeractivity.gender.GenderViewModel
-import com.beeswork.balance.ui.registeractivity.gender.GenderViewModelFactory
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class HeightFragment: BaseRegisterStepFragment(), KodeinAware {
+class HeightFragment(
+    private val registerStepListener: RegisterStepListener
+): BaseFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentHeightBinding
     private lateinit var viewModel: HeightViewModel
@@ -64,7 +62,7 @@ class HeightFragment: BaseRegisterStepFragment(), KodeinAware {
     private fun observeSaveHeightLiveData() {
         viewModel.saveHeightUIStateLiveData.observe(viewLifecycleOwner) { saveHeightUIState ->
             if (saveHeightUIState.saved) {
-                moveToNextTab()
+                registerStepListener.onMoveToNextStep()
             } else if (saveHeightUIState.showError) {
                 val title = getString(R.string.error_title_save_height)
                 val message = MessageSource.getMessage(requireContext(), saveHeightUIState.exception)

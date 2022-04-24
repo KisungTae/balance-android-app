@@ -30,8 +30,8 @@ import java.io.File
 
 open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.PhotoPickerListener, PhotoPickerOptionListener {
 
-    private lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
-    private lateinit var photoViewModel: PhotoViewModel
+    protected lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
+    private lateinit var viewModel: PhotoViewModel
     private lateinit var binding: LayoutPhotoPickerBinding
 
     private val requestGalleryPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -61,7 +61,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
     }
 
     protected fun onViewCreated(viewModel: PhotoViewModel, layoutPhotoPickerBinding: LayoutPhotoPickerBinding) {
-        this.photoViewModel = viewModel
+        this.viewModel = viewModel
         this.binding = layoutPhotoPickerBinding
         setupPhotoPickerRecyclerView(binding.rvPhotoPicker)
         setupBtnListeners()
@@ -69,11 +69,11 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
         observeUploadPhotoUIStateLiveData()
         observeDeletePhotoUIStateLiveData()
         observeOrderPhotosUIStateLiveData()
-        photoViewModel.syncPhotos()
+        this.viewModel.syncPhotos()
     }
 
     private fun observeOrderPhotosUIStateLiveData() {
-        photoViewModel.orderPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { orderPhotosUIState ->
+        viewModel.orderPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { orderPhotosUIState ->
             if (orderPhotosUIState.showError) {
                 val title = getString(R.string.error_title_order_photos)
                 val message = MessageSource.getMessage(requireContext(), orderPhotosUIState.exception)
@@ -83,7 +83,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
     }
 
     private fun observeDeletePhotoUIStateLiveData() {
-        photoViewModel.deletePhotoUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { deletePhotoUIState ->
+        viewModel.deletePhotoUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { deletePhotoUIState ->
             if (deletePhotoUIState.showError) {
                 val title = getString(R.string.error_title_delete_photo)
                 val message = MessageSource.getMessage(requireContext(), deletePhotoUIState.exception)
@@ -93,7 +93,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
     }
 
     private fun observeUploadPhotoUIStateLiveData() {
-        photoViewModel.uploadPhotoUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { uploadPhotoUIState ->
+        viewModel.uploadPhotoUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { uploadPhotoUIState ->
             if (uploadPhotoUIState.showError) {
                 val title = getString(R.string.error_title_add_photo)
                 val message = MessageSource.getMessage(requireContext(), uploadPhotoUIState.exception)
@@ -104,12 +104,12 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
 
     private fun setupBtnListeners() {
         binding.btnPhotoPickerRefetch.setOnClickListener {
-            photoViewModel.syncPhotos()
+            viewModel.syncPhotos()
         }
     }
 
     private fun observeSyncPhotosUIStateLiveData() {
-        photoViewModel.syncPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, requireActivity()) { fetchPhotosUIState ->
+        viewModel.syncPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, requireActivity()) { fetchPhotosUIState ->
             when {
                 fetchPhotosUIState.synced -> lifecycleScope.launch {
                     observePhotoItemUIStatesLiveData()
@@ -125,7 +125,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
     }
 
     private suspend fun observePhotoItemUIStatesLiveData() {
-        photoViewModel.photoItemUIStatesLiveData.await().observe(viewLifecycleOwner) { photoItemUIStates ->
+        viewModel.photoItemUIStatesLiveData.await().observe(viewLifecycleOwner) { photoItemUIStates ->
             photoPickerRecyclerViewAdapter.submit(photoItemUIStates)
         }
     }
@@ -170,7 +170,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
-                photoViewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
+                viewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
             }
 
         })
@@ -203,23 +203,23 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
     }
 
     override fun onDownloadPhotoError(photoKey: String?) {
-        photoViewModel.updatePhotoStatus(photoKey, PhotoStatus.DOWNLOAD_ERROR)
+        viewModel.updatePhotoStatus(photoKey, PhotoStatus.DOWNLOAD_ERROR)
     }
 
     override fun onDownloadPhotoSuccess(photoKey: String?) {
-        photoViewModel.updatePhotoStatus(photoKey, PhotoStatus.OCCUPIED)
+        viewModel.updatePhotoStatus(photoKey, PhotoStatus.OCCUPIED)
     }
 
     override fun reuploadPhoto(photoUri: Uri?, photoKey: String?) {
-        photoViewModel.uploadPhoto(photoUri, photoKey)
+        viewModel.uploadPhoto(photoUri, photoKey)
     }
 
     override fun redownloadPhoto(photoKey: String?) {
-        photoViewModel.updatePhotoStatus(photoKey, PhotoStatus.DOWNLOADING)
+        viewModel.updatePhotoStatus(photoKey, PhotoStatus.DOWNLOADING)
     }
 
     override fun deletePhoto(photoKey: String?) {
-        photoViewModel.deletePhoto(photoKey)
+        viewModel.deletePhoto(photoKey)
     }
 
     override fun uploadPhotoFromGallery() {
@@ -268,7 +268,7 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == Activity.RESULT_OK) {
-                    photoViewModel.uploadPhoto(result.uri, null)
+                    viewModel.uploadPhoto(result.uri, null)
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                     val title = getString(R.string.error_title_crop_image)
                     val message = result.error.localizedMessage ?: ""
