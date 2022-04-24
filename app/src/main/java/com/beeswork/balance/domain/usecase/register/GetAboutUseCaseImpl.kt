@@ -11,11 +11,13 @@ class GetAboutUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : GetAboutUseCase {
 
-    override suspend fun invoke(): String? = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.getAbout()
+    override suspend fun invoke(): String? {
+        return try {
+            withContext(defaultDispatcher) {
+                return@withContext profileRepository.getAbout()
+            }
         } catch (e: IOException) {
-            return@withContext null
+            return null
         }
     }
 }

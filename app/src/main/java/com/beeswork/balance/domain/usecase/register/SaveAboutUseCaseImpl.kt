@@ -14,18 +14,20 @@ class SaveAboutUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SaveAboutUseCase {
 
-    override suspend fun invoke(about: String): Resource<EmptyResponse> = withContext(defaultDispatcher) {
-        try {
-            if (about.toByteArray().size > MAX_ABOUT_SIZE) {
-                return@withContext Resource.error(AboutMaxSizeExceedException())
-            }
-            if (about.isBlank()) {
+    override suspend fun invoke(about: String): Resource<EmptyResponse> {
+        return try {
+            withContext(defaultDispatcher) {
+                if (about.toByteArray().size > MAX_ABOUT_SIZE) {
+                    return@withContext Resource.error(AboutMaxSizeExceedException())
+                }
+                if (about.isBlank()) {
+                    return@withContext Resource.success(EmptyResponse())
+                }
+                profileRepository.saveAbout(about)
                 return@withContext Resource.success(EmptyResponse())
             }
-            profileRepository.saveAbout(about)
-            return@withContext Resource.success(EmptyResponse())
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 

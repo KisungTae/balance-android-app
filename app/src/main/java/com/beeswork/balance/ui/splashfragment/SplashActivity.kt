@@ -39,8 +39,7 @@ class SplashActivity : BaseActivity(), KodeinAware {
             if (uiState.shouldLogin) {
                 Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, LoginActivity::class.java))
             } else if (!uiState.profileExists) {
-                Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, MainActivity::class.java))
-//                Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, RegisterActivity::class.java))
+                Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, RegisterActivity::class.java))
             } else {
                 Navigator.finishToActivity(this@SplashActivity, Intent(this@SplashActivity, MainActivity::class.java))
             }

@@ -11,11 +11,13 @@ class GetNameUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : GetNameUseCase {
 
-    override suspend fun invoke(): String? = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.getName()
+    override suspend fun invoke(): String? {
+        return try {
+            withContext(defaultDispatcher) {
+                return@withContext profileRepository.getName()
+            }
         } catch (e: IOException) {
-            return@withContext null
+            null
         }
     }
 }

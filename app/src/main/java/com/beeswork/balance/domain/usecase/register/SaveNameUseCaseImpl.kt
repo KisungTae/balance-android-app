@@ -15,17 +15,19 @@ class SaveNameUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SaveNameUseCase {
 
-    override suspend fun invoke(name: String): Resource<EmptyResponse> = withContext(defaultDispatcher) {
-        try {
-            when {
-                name.isBlank() -> {
-                    return@withContext Resource.error<EmptyResponse>(NameEmptyException())
-                }
-                name.toByteArray().size > MAX_NAME_SIZE -> {
-                    return@withContext Resource.error<EmptyResponse>(NameMaxSizeExceedException())
-                }
-                else -> {
-                    return@withContext profileRepository.saveName(name)
+    override suspend fun invoke(name: String): Resource<EmptyResponse> {
+        return try {
+            withContext(defaultDispatcher) {
+                when {
+                    name.isBlank() -> {
+                        return@withContext Resource.error<EmptyResponse>(NameEmptyException())
+                    }
+                    name.toByteArray().size > MAX_NAME_SIZE -> {
+                        return@withContext Resource.error<EmptyResponse>(NameMaxSizeExceedException())
+                    }
+                    else -> {
+                        return@withContext profileRepository.saveName(name)
+                    }
                 }
             }
         } catch (e: IOException) {

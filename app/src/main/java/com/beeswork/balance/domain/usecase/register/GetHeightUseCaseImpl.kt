@@ -11,11 +11,13 @@ class GetHeightUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : GetHeightUseCase {
 
-    override suspend fun invoke(): Int? = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.getHeight()
+    override suspend fun invoke(): Int? {
+        return try {
+            withContext(defaultDispatcher) {
+                return@withContext profileRepository.getHeight()
+            }
         } catch (e: IOException) {
-            return@withContext null
+            null
         }
     }
 }

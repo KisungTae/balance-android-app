@@ -14,7 +14,6 @@ class RegisterFinishViewModel (
     private val saveProfileUseCase: SaveProfileUseCase
 ): ViewModel() {
 
-
     private val _saveProfileUIStateLiveData = MutableLiveData<SaveProfileUIState>()
     val saveProfileUIStateLiveData: LiveData<SaveProfileUIState> get() = _saveProfileUIStateLiveData
 

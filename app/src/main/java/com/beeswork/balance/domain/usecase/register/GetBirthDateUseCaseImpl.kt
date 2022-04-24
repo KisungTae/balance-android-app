@@ -12,11 +12,13 @@ class GetBirthDateUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : GetBirthDateUseCase {
 
-    override suspend fun invoke(): OffsetDateTime? = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.getBirthDate()
+    override suspend fun invoke(): OffsetDateTime? {
+        return try {
+            withContext(defaultDispatcher) {
+                return@withContext profileRepository.getBirthDate()
+            }
         } catch (e: IOException) {
-            return@withContext null
+            null
         }
     }
 }

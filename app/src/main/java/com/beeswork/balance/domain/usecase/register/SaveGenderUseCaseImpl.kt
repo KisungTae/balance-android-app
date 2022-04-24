@@ -7,6 +7,8 @@ import com.beeswork.balance.internal.exception.GenderNotSelectedException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 import java.io.IOException
 
 class SaveGenderUseCaseImpl(
@@ -14,15 +16,17 @@ class SaveGenderUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SaveGenderUseCase {
 
-    override suspend fun invoke(gender: Boolean?): Resource<EmptyResponse> = withContext(defaultDispatcher) {
-        try {
-            if (gender == null) {
-                return@withContext Resource.error(GenderNotSelectedException())
+    override suspend fun invoke(gender: Boolean?): Resource<EmptyResponse> {
+        return try {
+            withContext(defaultDispatcher) {
+                if (gender == null) {
+                    return@withContext Resource.error(GenderNotSelectedException())
+                }
+                profileRepository.saveGender(gender)
+                return@withContext Resource.success(EmptyResponse())
             }
-            profileRepository.saveGender(gender)
-            return@withContext Resource.success(EmptyResponse())
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 }

@@ -11,12 +11,13 @@ class GetGenderUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : GetGenderUseCase {
 
-    override suspend fun invoke(): Boolean? = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.getGender()
+    override suspend fun invoke(): Boolean? {
+        return try {
+            withContext(defaultDispatcher) {
+                return@withContext profileRepository.getGender()
+            }
         } catch (e: IOException) {
-            return@withContext null
+            null
         }
-
     }
 }
