@@ -63,7 +63,7 @@ abstract class BaseLocationActivity(
         LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
     }
 
-    protected fun doCheckLocationPermission() {
+    protected fun checkLocationPermission() {
         if (hasLocationPermission()) {
             bindLocationManager()
         } else {

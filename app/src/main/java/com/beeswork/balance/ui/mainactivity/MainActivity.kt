@@ -57,7 +57,7 @@ class MainActivity : BaseLocationActivity(true), LocationPermissionListener, Loc
     }
 
     override fun onCheckLocationPermission() {
-        doCheckLocationPermission()
+        checkLocationPermission()
     }
 
     override fun onResume() {

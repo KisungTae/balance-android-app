@@ -69,7 +69,7 @@ class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener
         })
 
         //todo: remove me
-        binding.vpRegister.currentItem = RegisterViewPagerTabPosition.ABOUT.ordinal
+//        binding.vpRegister.currentItem = RegisterViewPagerTabPosition.ABOUT.ordinal
     }
 
     private fun showBackBtn() {
@@ -113,6 +113,6 @@ class RegisterActivity : BaseLocationActivity(false), LocationPermissionListener
     }
 
     override fun onCheckLocationPermission() {
-        doCheckLocationPermission()
+        checkLocationPermission()
     }
 }

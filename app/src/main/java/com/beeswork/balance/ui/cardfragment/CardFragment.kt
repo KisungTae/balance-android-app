@@ -178,10 +178,7 @@ class CardFragment(
     }
 
     override fun onFragmentSelected() {
-        CardBalanceGameDialog(UUID.fromString("a514e4ab-a5b0-4efb-a2ac-b96edfb0e77d"), "Kisung Tae", "", cardBalanceGameListener).show(
-            childFragmentManager,
-            CardBalanceGameDialog.TAG
-        )
+
     }
 
     override fun onApplyCardFilter() {
@@ -190,7 +187,9 @@ class CardFragment(
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        locationRequestListener = context as LocationRequestListener
+        if (context is LocationRequestListener) {
+            locationRequestListener = context
+        }
     }
 
     companion object {
