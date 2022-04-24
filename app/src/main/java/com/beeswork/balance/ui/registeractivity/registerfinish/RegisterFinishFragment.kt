@@ -10,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentRegisterFinishBinding
 import com.beeswork.balance.internal.util.MessageSource
+import com.beeswork.balance.internal.util.Navigator
+import com.beeswork.balance.ui.mainactivity.MainActivity
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -21,7 +23,7 @@ class RegisterFinishFragment : Fragment(), KodeinAware {
     private lateinit var viewModel: RegisterFinishViewModel
     private val viewModelFactory: RegisterFinishViewModelFactory by instance()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentRegisterFinishBinding.inflate(inflater)
         return binding.root
     }
@@ -54,22 +56,15 @@ class RegisterFinishFragment : Fragment(), KodeinAware {
                     binding.btnRegisterFinishRetry.isEnabled = false
                 }
                 saveProfileUIState.saved -> {
-//                    activity?.let { _activity ->
-//                        if (_activity is RegisterActivity) {
-//                            _activity.moveToNextTab()
-//                        }
-//                    }
+                    Navigator.finishToActivity(requireActivity(), MainActivity::class.java)
                 }
                 else -> {
                     binding.llRegisterFinishLoadingWrapper.visibility = View.GONE
                     binding.llRegisterFinishErrorWrapper.visibility = View.VISIBLE
                     binding.btnRegisterFinishRetry.visibility = View.VISIBLE
                     binding.btnRegisterFinishRetry.isEnabled = true
-
-                    val title = getString(R.string.error_title_save_profile)
-                    val message = MessageSource.getMessage(requireContext(), saveProfileUIState.exception)
-                    binding.tvRegisterFinishErrorTitle.text = title
-                    binding.tvRegisterFinishErrorMessage.text = message
+                    binding.tvRegisterFinishErrorTitle.text = getString(R.string.error_title_save_profile)
+                    binding.tvRegisterFinishErrorMessage.text =  MessageSource.getMessage(requireContext(), saveProfileUIState.exception)
                 }
             }
         }

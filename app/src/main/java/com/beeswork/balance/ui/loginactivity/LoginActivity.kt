@@ -78,9 +78,9 @@ class LoginActivity : BaseActivity(), KodeinAware {
             if (uiState.shouldLogin) {
                 showLoginErrorDialog(uiState.exception)
             } else if (!uiState.profileExists) {
-                Navigator.finishToActivity(this@LoginActivity, Intent(this@LoginActivity, RegisterActivity::class.java))
+                Navigator.finishToActivity(this@LoginActivity, RegisterActivity::class.java)
             } else {
-                Navigator.finishToActivity(this@LoginActivity, Intent(this@LoginActivity, MainActivity::class.java))
+                Navigator.finishToActivity(this@LoginActivity, MainActivity::class.java)
             }
         }
     }

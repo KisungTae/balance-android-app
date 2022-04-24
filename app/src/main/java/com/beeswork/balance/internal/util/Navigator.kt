@@ -13,7 +13,13 @@ import com.beeswork.balance.ui.loginactivity.LoginActivity
 class Navigator {
 
     companion object {
-        fun finishToActivity(fromActivity: Activity, intent: Intent) {
+
+        fun finishToActivity(fromActivity: Activity, toActivity: Class<*>) {
+            val intent = Intent(fromActivity, toActivity)
+            finishToActivity(fromActivity, intent)
+        }
+
+        private fun finishToActivity(fromActivity: Activity, intent: Intent) {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             fromActivity.startActivity(intent)
             fromActivity.finish()
