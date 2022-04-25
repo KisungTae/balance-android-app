@@ -4,18 +4,31 @@ import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.card.CardRepository
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.internal.mapper.card.CardFilterMapper
 import com.beeswork.balance.internal.mapper.card.CardMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.cardfragment.card.CardDomain
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class CardViewModel(
     private val cardRepository: CardRepository,
     private val settingRepository: SettingRepository,
     private val cardMapper: CardMapper,
+    private val cardFilterMapper: CardFilterMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
+
+    val cardFilterUIStateLiveData by viewModelLazyDeferred {
+        cardRepository.getCardFilterFlow().map { cardFilter ->
+            if (cardFilter == null) {
+                null
+            } else {
+                cardFilterMapper.toCardFilterUIState(cardFilter)
+            }
+        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+    }
 
     private val _fetchCards = MutableLiveData<Resource<List<CardDomain>>>()
     val fetchCards: LiveData<Resource<List<CardDomain>>> get() = _fetchCards

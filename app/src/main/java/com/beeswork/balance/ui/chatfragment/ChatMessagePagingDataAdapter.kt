@@ -15,17 +15,17 @@ import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.toDP
 import com.bumptech.glide.Glide
 
 
 class ChatMessagePagingDataAdapter(
-    private val chatMessageListener: ChatMessageListener,
-    displayDensity: Float
+    private val chatMessageListener: ChatMessageListener
 ) : PagingDataAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>(diffCallback) {
 
-    private val topMarginShort: Int = (displayDensity * 5).toInt()
-    private val topMarginMedium: Int = (displayDensity * 15).toInt()
-    private val topMarginLong: Int = (displayDensity * 30).toInt()
+    private val topMarginShort: Int = 5.toDP()
+    private val topMarginMedium: Int = 15.toDP()
+    private val topMarginLong: Int = 30.toDP()
 
     private var profilePhoto: Bitmap? = null
 

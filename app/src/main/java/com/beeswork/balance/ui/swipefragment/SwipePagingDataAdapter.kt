@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemSwipeBinding
 import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
-import com.beeswork.balance.domain.usecase.swipe.SwipeItemUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 import kotlin.random.Random

@@ -58,17 +58,16 @@ class RegisterFinishFragment : Fragment(), KodeinAware {
                 saveProfileUIState.saved -> {
                     Navigator.finishToActivity(requireActivity(), MainActivity::class.java)
                 }
-                else -> {
+                saveProfileUIState.showError -> {
                     binding.llRegisterFinishLoadingWrapper.visibility = View.GONE
                     binding.llRegisterFinishErrorWrapper.visibility = View.VISIBLE
                     binding.btnRegisterFinishRetry.visibility = View.VISIBLE
                     binding.btnRegisterFinishRetry.isEnabled = true
                     binding.tvRegisterFinishErrorTitle.text = getString(R.string.error_title_save_profile)
-                    binding.tvRegisterFinishErrorMessage.text =  MessageSource.getMessageFromFieldErrors(saveProfileUIState.exception)
+                    binding.tvRegisterFinishErrorMessage.text = MessageSource.getMessage(requireContext(), saveProfileUIState.exception)
+                        ?: MessageSource.getMessageFromFieldErrors(saveProfileUIState.exception)
                 }
             }
         }
     }
-
-
 }

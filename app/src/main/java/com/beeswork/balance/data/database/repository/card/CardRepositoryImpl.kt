@@ -11,6 +11,8 @@ import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import java.io.IOException
 import java.util.*
 
 class CardRepositoryImpl(
@@ -33,7 +35,7 @@ class CardRepositoryImpl(
         }
     }
 
-    override suspend fun getCardFilter(): CardFilter {
+    override suspend fun getCardFilter(): CardFilter? {
         return withContext(ioDispatcher) {
             return@withContext cardFilterDAO.getBy(preferenceProvider.getAccountId())
         }
@@ -53,25 +55,26 @@ class CardRepositoryImpl(
 
     override suspend fun fetchCards(): Resource<FetchCardsDTO> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
-            val swipeFilter = cardFilterDAO.getBy(accountId)
-            val response = cardRDS.fetchCards(
-                swipeFilter.minAge,
-                swipeFilter.maxAge,
-                swipeFilter.gender,
-                swipeFilter.distance,
-                swipeFilter.pageIndex
-            )
-            response.data?.let { data ->
-                savePageIndex(swipeFilter.pageIndex, data.reset)
-                val cardDTOs = data.cardDTOs
-                for (i in cardDTOs.size - 1 downTo 0) {
-                    if (clickDAO.existBy(accountId, cardDTOs[i].accountId))
-                        cardDTOs.removeAt(i)
-                }
-                cardDTOs.shuffle()
-            }
-            return@withContext response
+//            val accountId = preferenceProvider.getAccountId()
+//            val swipeFilter = cardFilterDAO.getBy(accountId)
+//            val response = cardRDS.fetchCards(
+//                swipeFilter.minAge,
+//                swipeFilter.maxAge,
+//                swipeFilter.gender,
+//                swipeFilter.distance,
+//                swipeFilter.pageIndex
+//            )
+//            response.data?.let { data ->
+//                savePageIndex(swipeFilter.pageIndex, data.reset)
+//                val cardDTOs = data.cardDTOs
+//                for (i in cardDTOs.size - 1 downTo 0) {
+//                    if (clickDAO.existBy(accountId, cardDTOs[i].accountId))
+//                        cardDTOs.removeAt(i)
+//                }
+//                cardDTOs.shuffle()
+//            }
+//            return@withContext response
+            return@withContext Resource.error(IOException())
         }
     }
 
@@ -91,4 +94,10 @@ class CardRepositoryImpl(
             cardFilterDAO.updatePageIndexBy(preferenceProvider.getAccountId(), pageIndex)
         }
     }
+
+    override fun getCardFilterFlow(): Flow<CardFilter?> {
+        return cardFilterDAO.getCardFilterFlow(preferenceProvider.getAccountId())
+    }
+
+
 }

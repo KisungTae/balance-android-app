@@ -14,11 +14,14 @@ class ClickUseCaseImpl(
     private val matchRepository: MatchRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : ClickUseCase {
-    override suspend fun invoke(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult> = withContext(defaultDispatcher) {
-        try {
-            return@withContext matchRepository.click(swipedId, answers)
+    override suspend fun invoke(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult> {
+
+        return try {
+            withContext(defaultDispatcher) {
+                return@withContext matchRepository.click(swipedId, answers)
+            }
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 }

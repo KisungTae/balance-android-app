@@ -17,11 +17,13 @@ class FetchQuestionsUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : FetchQuestionsUseCase {
 
-    override suspend fun invoke(): Resource<FetchQuestionsDTO> = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.fetchQuestions()
+    override suspend fun invoke(): Resource<FetchQuestionsDTO> {
+        return try {
+            withContext(defaultDispatcher) {
+                profileRepository.fetchQuestions()
+            }
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 }

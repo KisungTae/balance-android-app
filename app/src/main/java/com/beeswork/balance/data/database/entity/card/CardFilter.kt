@@ -10,7 +10,7 @@ data class CardFilter(
     @PrimaryKey
     val accountId: UUID,
 
-    val gender: Boolean = Gender.FEMALE,
+    val gender: Boolean? = null,
     val minAge: Int = MIN_AGE,
     val maxAge: Int = MAX_AGE,
     val distance: Int = MAX_DISTANCE,

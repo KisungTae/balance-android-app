@@ -3,7 +3,7 @@ package com.beeswork.balance.ui.swipefragment
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
-import com.beeswork.balance.domain.usecase.swipe.SwipeItemUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.lazyDeferred

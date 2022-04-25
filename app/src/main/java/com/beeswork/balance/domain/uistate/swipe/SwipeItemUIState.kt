@@ -1,4 +1,4 @@
-package com.beeswork.balance.domain.usecase.swipe
+package com.beeswork.balance.domain.uistate.swipe
 
 import java.util.*
 

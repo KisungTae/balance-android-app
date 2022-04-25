@@ -14,11 +14,13 @@ class LikeUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : LikeUseCase {
 
-    override suspend fun invoke(swipedId: UUID): Resource<FetchQuestionsDTO> = withContext(defaultDispatcher) {
-        try {
-            return@withContext cardRepository.like(swipedId)
+    override suspend fun invoke(swipedId: UUID): Resource<FetchQuestionsDTO> {
+        return try {
+            withContext(defaultDispatcher) {
+                cardRepository.like(swipedId)
+            }
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 }

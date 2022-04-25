@@ -15,16 +15,19 @@ class ResendChatMessageUseCaseImpl(
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-): ResendChatMessageUseCase {
+) : ResendChatMessageUseCase {
 
-    override suspend fun invoke(chatId: UUID, tag: UUID): Resource<EmptyResponse> = withContext(defaultDispatcher) {
-        try {
-            if (matchRepository.isUnmatched(chatId)) {
-                return@withContext Resource.error(MatchUnmatchedException())
+    override suspend fun invoke(chatId: UUID, tag: UUID): Resource<EmptyResponse> {
+        return try {
+            withContext(defaultDispatcher) {
+                if (matchRepository.isUnmatched(chatId)) {
+                    Resource.error(MatchUnmatchedException())
+                } else {
+                    chatRepository.resendChatMessage(tag)
+                }
             }
-            return@withContext chatRepository.resendChatMessage(tag)
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 }

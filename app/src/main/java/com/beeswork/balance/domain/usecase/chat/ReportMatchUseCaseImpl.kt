@@ -7,6 +7,7 @@ import com.beeswork.balance.internal.constant.ReportReason
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.util.*
 
 class ReportMatchUseCaseImpl(
@@ -14,9 +15,14 @@ class ReportMatchUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : ReportMatchUseCase {
 
-    override suspend fun invoke(chatId: UUID, swipedId: UUID, reportReason: ReportReason, description: String): Resource<UnmatchDTO> =
-        withContext(defaultDispatcher) {
-            matchRepository.reportMatch(chatId, swipedId, reportReason, description)
+    override suspend fun invoke(chatId: UUID, swipedId: UUID, reportReason: ReportReason, description: String): Resource<UnmatchDTO> {
+        return try {
+            withContext(defaultDispatcher) {
+                matchRepository.reportMatch(chatId, swipedId, reportReason, description)
+            }
+        } catch (e: IOException) {
+            Resource.error(e)
         }
+    }
 
 }

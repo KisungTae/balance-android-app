@@ -119,7 +119,7 @@ class ChatFragment : BaseFragment(),
     }
 
     private fun setupChatRecyclerView() {
-        chatMessagePagingDataAdapter = ChatMessagePagingDataAdapter(this, resources.displayMetrics.density)
+        chatMessagePagingDataAdapter = ChatMessagePagingDataAdapter(this)
         footerLoadStateAdapter = BalanceLoadStateAdapter(chatMessagePagingDataAdapter::retry)
         binding.rvChat.adapter = chatMessagePagingDataAdapter.withLoadStateFooter(
             footer = footerLoadStateAdapter

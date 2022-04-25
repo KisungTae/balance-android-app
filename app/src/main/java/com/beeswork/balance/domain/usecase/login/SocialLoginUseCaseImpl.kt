@@ -14,12 +14,13 @@ class SocialLoginUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SocialLoginUseCase {
 
-    override suspend fun invoke(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> =
-        withContext(defaultDispatcher) {
-            try {
-                return@withContext loginRepository.socialLogin(loginId, accessToken, loginType)
-            } catch (e: IOException) {
-                return@withContext Resource.error(e)
+    override suspend fun invoke(loginId: String, accessToken: String, loginType: LoginType): Resource<LoginDTO> {
+        return try {
+            withContext(defaultDispatcher) {
+                loginRepository.socialLogin(loginId, accessToken, loginType)
             }
+        } catch (e: IOException) {
+            Resource.error(e)
         }
+    }
 }

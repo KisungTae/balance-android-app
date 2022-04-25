@@ -16,7 +16,7 @@ import com.beeswork.balance.databinding.FragmentMainViewPagerBinding
 import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewSwipeBinding
 import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
-import com.beeswork.balance.domain.usecase.swipe.SwipeNotificationUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeNotificationUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener

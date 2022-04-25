@@ -15,11 +15,13 @@ class FetchRandomQuestionUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : FetchRandomQuestionUseCase {
 
-    override suspend fun invoke(questionIds: List<Int>): Resource<QuestionDTO> = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.fetchRandomQuestion(questionIds)
+    override suspend fun invoke(questionIds: List<Int>): Resource<QuestionDTO> {
+        return try {
+            withContext(defaultDispatcher) {
+                profileRepository.fetchRandomQuestion(questionIds)
+            }
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 }

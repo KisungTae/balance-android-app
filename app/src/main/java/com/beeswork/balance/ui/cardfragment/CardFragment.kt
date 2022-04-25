@@ -64,12 +64,22 @@ class CardFragment(
         locationRequestListener?.onRequestLocationPermission()
     }
 
-
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
         setupCardStackView()
         observeFetchCardsLiveData()
+        observeCardFilterUIStateLiveData()
         binding.btnCardStackReload.setOnClickListener { viewModel.fetchCards() }
+    }
+
+    private suspend fun observeCardFilterUIStateLiveData() {
+        viewModel.cardFilterUIStateLiveData.await().observe(viewLifecycleOwner) { cardFilterUIState ->
+            if (cardFilterUIState == null) {
+                
+            } else {
+                viewModel.fetchCards()
+            }
+        }
     }
 
     private fun observeFetchCardsLiveData() {

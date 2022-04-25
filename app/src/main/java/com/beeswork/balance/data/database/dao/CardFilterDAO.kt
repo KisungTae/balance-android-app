@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.card.CardFilter
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Dao
@@ -14,7 +15,7 @@ interface CardFilterDAO {
     fun insert(cardFilter: CardFilter)
 
     @Query("select * from cardFilter where accountId = :accountId")
-    fun getBy(accountId: UUID?): CardFilter
+    fun getBy(accountId: UUID?): CardFilter?
 
     @Query("update cardFilter set pageIndex = :pageIndex where accountId = :accountId")
     fun updatePageIndexBy(accountId: UUID?, pageIndex: Int)
@@ -27,4 +28,7 @@ interface CardFilterDAO {
 
     @Query("update cardFilter set gender = :gender, minAge = :minAge, maxAge = :maxAge, distance = :distance where accountId = :accountId")
     fun updateBy(accountId: UUID?, gender: Boolean, minAge: Int, maxAge: Int, distance: Int)
+
+    @Query("select * from cardFilter where accountId = :accountId")
+    fun getCardFilterFlow(accountId: UUID?): Flow<CardFilter?>
 }

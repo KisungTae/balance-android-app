@@ -14,11 +14,13 @@ class LoginWithRefreshTokenUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : LoginWithRefreshTokenUseCase {
 
-    override suspend fun invoke(): Resource<LoginDTO> = withContext(defaultDispatcher) {
-        try {
-            return@withContext loginRepository.loginWithRefreshToken()
+    override suspend fun invoke(): Resource<LoginDTO> {
+        return try {
+            withContext(defaultDispatcher) {
+                loginRepository.loginWithRefreshToken()
+            }
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 

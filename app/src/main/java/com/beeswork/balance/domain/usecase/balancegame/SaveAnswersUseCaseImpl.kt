@@ -15,11 +15,13 @@ class SaveAnswersUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SaveAnswersUseCase {
 
-    override suspend fun invoke(answers: Map<Int, Boolean>): Resource<EmptyResponse> = withContext(defaultDispatcher) {
-        try {
-            return@withContext profileRepository.saveAnswers(answers)
+    override suspend fun invoke(answers: Map<Int, Boolean>): Resource<EmptyResponse> {
+        return try {
+            withContext(defaultDispatcher) {
+                profileRepository.saveAnswers(answers)
+            }
         } catch (e: IOException) {
-            return@withContext Resource.error(e)
+            Resource.error(e)
         }
     }
 }
