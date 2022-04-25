@@ -37,8 +37,7 @@ class CardFragment(
 ) : BaseFragment(),
     KodeinAware,
     CardStackListener,
-    ViewPagerChildFragment,
-    CardFilterDialog.CardFilterDialogListener {
+    ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: CardViewModelFactory by instance()
@@ -74,12 +73,18 @@ class CardFragment(
 
     private suspend fun observeCardFilterUIStateLiveData() {
         viewModel.cardFilterUIStateLiveData.await().observe(viewLifecycleOwner) { cardFilterUIState ->
-            if (cardFilterUIState == null) {
-                
+            if (cardFilterUIState?.gender == null) {
+                showCardFilterDialog(showGenderTip = true, cancellable = false)
             } else {
                 viewModel.fetchCards()
             }
         }
+    }
+
+    private fun showCardFilterDialog(showGenderTip: Boolean, cancellable: Boolean) {
+        val cardFilterDialog = CardFilterDialog(showGenderTip)
+        cardFilterDialog.isCancelable = cancellable
+        cardFilterDialog.show(childFragmentManager, CardFilterDialog.TAG)
     }
 
     private fun observeFetchCardsLiveData() {
@@ -111,7 +116,7 @@ class CardFragment(
         binding.tbCard.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.miCardFilter -> {
-                    CardFilterDialog(this).show(childFragmentManager, CardFilterDialog.TAG)
+                    showCardFilterDialog(showGenderTip = false, cancellable = true)
                     true
                 }
                 else -> false
@@ -189,10 +194,6 @@ class CardFragment(
 
     override fun onFragmentSelected() {
 
-    }
-
-    override fun onApplyCardFilter() {
-        println("onApplySwipeFilter")
     }
 
     override fun onAttach(context: Context) {

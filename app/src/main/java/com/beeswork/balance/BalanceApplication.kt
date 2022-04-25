@@ -51,10 +51,7 @@ import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
 import com.beeswork.balance.domain.usecase.balancegame.*
-import com.beeswork.balance.domain.usecase.card.ClickUseCase
-import com.beeswork.balance.domain.usecase.card.ClickUseCaseImpl
-import com.beeswork.balance.domain.usecase.card.LikeUseCase
-import com.beeswork.balance.domain.usecase.card.LikeUseCaseImpl
+import com.beeswork.balance.domain.usecase.card.*
 import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCase
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImpl
@@ -232,6 +229,8 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind<UpdatePhotoStatusUseCase>() with singleton { UpdatePhotoStatusUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetCardFilterUseCase>() with singleton { GetCardFilterUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveCardFilterUseCase>() with singleton { SaveCardFilterUseCaseImpl(instance(), Dispatchers.Default) }
 
 
         // Repository
@@ -344,7 +343,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider { CardViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { CardFilterDialogViewModelFactory(instance(), instance()) }
+        bind() from provider { CardFilterDialogViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {
             MainViewPagerViewModelFactory(
                 instance(),

@@ -7,13 +7,17 @@ import com.beeswork.balance.data.network.rds.card.CardRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
+import com.beeswork.balance.domain.usecase.card.GetCardFilterUseCase
 import com.beeswork.balance.internal.constant.Gender
+import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import java.util.*
+import kotlin.math.min
 
 class CardRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
@@ -41,15 +45,18 @@ class CardRepositoryImpl(
         }
     }
 
-    override suspend fun saveCardFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int) {
-        withContext(ioDispatcher) {
-            cardFilterDAO.updateBy(
-                preferenceProvider.getAccountId(),
-                gender,
-                if (minAge < CardFilter.MIN_AGE) CardFilter.MIN_AGE else minAge,
-                if (maxAge > CardFilter.MAX_AGE) CardFilter.MAX_AGE else maxAge,
-                if (distance < CardFilter.MIN_DISTANCE || distance > CardFilter.MAX_DISTANCE) CardFilter.MAX_DISTANCE else distance
-            )
+    override suspend fun saveCardFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
+            val cardFilter = cardFilterDAO.getBy(accountId)?.let { cardFilter ->
+                cardFilter.gender = gender
+                cardFilter.minAge = minAge
+                cardFilter.maxAge = maxAge
+                cardFilter.distance = distance
+                cardFilter
+            } ?: CardFilter(accountId, gender, minAge, maxAge, distance)
+            cardFilterDAO.insert(cardFilter)
+            return@withContext Resource.success(EmptyResponse())
         }
     }
 
@@ -80,10 +87,10 @@ class CardRepositoryImpl(
 
     override suspend fun prepopulateCardFilter(gender: Boolean) {
         withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId() ?: return@withContext
-            if (!cardFilterDAO.existBy(accountId)) {
-                cardFilterDAO.insert(CardFilter(accountId, Gender.getOppositeGender(gender)))
-            }
+//            val accountId = preferenceProvider.getAccountId() ?: return@withContext
+//            if (!cardFilterDAO.existBy(accountId)) {
+//                cardFilterDAO.insert(CardFilter(accountId, Gender.getOppositeGender(gender)))
+//            }
         }
     }
 
