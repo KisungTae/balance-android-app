@@ -21,7 +21,15 @@ interface ProfileRepository {
     suspend fun getAbout(): String?
     suspend fun saveAbout(about: String)
     suspend fun getProfile(): Profile?
-    suspend fun saveProfile(): Resource<EmptyResponse>
+    suspend fun saveProfile(
+        name: String,
+        gender: Boolean,
+        birthDate: OffsetDateTime,
+        height: Int?,
+        about: String?,
+        latitude: Double,
+        longitude: Double
+    ): Resource<EmptyResponse>
     suspend fun deleteProfile()
     suspend fun fetchProfile(): Resource<Profile>
     suspend fun saveBio(height: Int?, about: String): Resource<Profile>

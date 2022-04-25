@@ -78,9 +78,9 @@ class HeightFragment(
     }
 
     companion object {
-        const val MAX_HEIGHT = 300
+        const val MAX_HEIGHT = 250
         const val MIN_HEIGHT = 100
-        const val DEFAULT_HEIGHT = 150
+        const val DEFAULT_HEIGHT = 160
     }
 
 }

@@ -24,6 +24,7 @@ interface SettingRepository {
 
     suspend fun saveLocation(latitude: Double, longitude: Double, syncLocation: Boolean)
     suspend fun syncLocation()
+    suspend fun getLocation(): Location?
     fun getLocationFlow(): Flow<Location?>
 
     suspend fun deleteAccount(): Resource<EmptyResponse>

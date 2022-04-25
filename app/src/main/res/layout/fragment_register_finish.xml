@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -11,38 +12,36 @@
         android:layout_weight="1">
 
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/llRegisterFinishErrorWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:visibility="gone">
 
             <ImageView
-                android:layout_width="@dimen/icon_large"
-                android:layout_height="@dimen/icon_large"
-                android:layout_marginBottom="20dp"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:layout_marginBottom="10dp"
                 android:contentDescription="@string/dialog_error_icon_description"
-                android:src="@drawable/ic_baseline_error_outline"
-                app:tint="@color/Black" />
+                android:src="@drawable/ic_thankful" />
 
             <TextView
                 android:id="@+id/tvRegisterFinishErrorTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="10dp"
                 android:textAlignment="center"
-                android:textColor="@color/TextBlack" />
+                android:textColor="@color/TextBlack"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvRegisterFinishErrorMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:paddingHorizontal="10dp"
                 android:textAlignment="center"
                 android:textColor="@color/TextBlack" />
 
@@ -50,9 +49,9 @@
 
         <LinearLayout
             android:id="@+id/llRegisterFinishLoadingWrapper"
-            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical">
 
 
@@ -64,9 +63,9 @@
                 app:SpinKit_Color="@color/Black" />
 
             <TextView
-                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:text="@string/save_profile_loading_text"
                 android:textAlignment="center" />
 
@@ -83,9 +82,9 @@
         android:layout_gravity="end"
         android:background="@drawable/sh_round_box"
         android:backgroundTint="@color/BackgroundWhite"
-        android:stateListAnimator="@null"
-        android:visibility="invisible"
         android:enabled="false"
-        android:text="@string/retry_btn" />
+        android:stateListAnimator="@null"
+        android:text="@string/retry_btn"
+        android:visibility="invisible" />
 
 </LinearLayout>

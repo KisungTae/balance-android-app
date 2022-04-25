@@ -17,6 +17,9 @@ interface LocationDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(location: Location)
 
+    @Query("update location set synced = :synced where id = ${Location.ID}")
+    fun updateSyncedBy(synced: Boolean)
+
     @Query("update location set synced = 1 where id = ${Location.ID} and updatedAt = :updatedAt")
     fun sync(updatedAt: OffsetDateTime)
 

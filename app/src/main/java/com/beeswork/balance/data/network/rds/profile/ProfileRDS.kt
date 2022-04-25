@@ -5,11 +5,20 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
+import org.threeten.bp.OffsetDateTime
 
 interface ProfileRDS {
 
     suspend fun fetchProfile(): Resource<ProfileDTO>
-    suspend fun saveProfile(profileDTO: ProfileDTO): Resource<EmptyResponse>
+    suspend fun saveProfile(
+        name: String,
+        gender: Boolean,
+        birthDate: OffsetDateTime,
+        height: Int?,
+        about: String?,
+        latitude: Double,
+        longitude: Double
+    ): Resource<EmptyResponse>
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     suspend fun fetchQuestions(): Resource<FetchQuestionsDTO>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionDTO>

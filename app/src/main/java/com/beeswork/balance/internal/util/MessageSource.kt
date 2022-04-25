@@ -4,6 +4,7 @@ import android.content.Context
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.exception.BaseException
 import com.beeswork.balance.internal.exception.ServerException
+import java.lang.StringBuilder
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -11,6 +12,20 @@ import java.net.UnknownHostException
 class MessageSource {
 
     companion object {
+
+        fun getMessageFromFieldErrors(exception: Throwable?): String? {
+            if (exception !is ServerException || exception.fieldErrors.isNullOrEmpty()) {
+                return null
+            }
+            val stringBuilder = StringBuilder()
+            exception.fieldErrors.forEach { entry ->
+                stringBuilder.append(entry.value)
+                stringBuilder.append("\n")
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length - 1)
+            return stringBuilder.toString()
+        }
+
         fun getMessage(context: Context, exception: Throwable?): String? {
             if (exception == null) {
                 return null

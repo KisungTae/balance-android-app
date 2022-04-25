@@ -109,6 +109,12 @@ class SettingRepositoryImpl(
         }
     }
 
+    override suspend fun getLocation(): Location? {
+        return withContext(ioDispatcher) {
+            return@withContext locationDAO.getById()
+        }
+    }
+
     private fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
             val response = settingRDS.saveLocation(

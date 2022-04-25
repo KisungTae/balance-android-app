@@ -28,7 +28,6 @@ abstract class BaseRDS {
                 return@sendRequest Resource.success(response.body())
             }
             if (response.headers()[HttpHeader.CONTENT_TYPE] == APPLICATION_XML) {
-                println("getResult xml")
                 return@sendRequest handleXmlException(response)
             } else {
                 return@sendRequest convertToErrorResponse(response)
@@ -38,7 +37,7 @@ abstract class BaseRDS {
 
     private fun <T> convertToErrorResponse(response: Response<T>): Resource<T> {
         val errorResponse = Gson().fromJson(response.errorBody()?.charStream(), ErrorResponse::class.java)
-        val serverException = ServerException(errorResponse.error, errorResponse.message, errorResponse.fieldErrorMessages)
+        val serverException = ServerException(errorResponse.error, errorResponse.message, errorResponse.fieldErrors)
         return Resource.error(serverException)
     }
 

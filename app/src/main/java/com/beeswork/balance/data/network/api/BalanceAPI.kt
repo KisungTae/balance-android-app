@@ -44,7 +44,7 @@ import java.util.*
 interface BalanceAPI {
 
     @POST("profile")
-    suspend fun saveProfile(@Body profileDTO: ProfileDTO): Response<EmptyResponse>
+    suspend fun saveProfile(@Body saveProfileBody: SaveProfileBody): Response<EmptyResponse>
 
     @POST("match/sync")
     suspend fun syncMatch(@Body syncMatchBody: SyncMatchBody): Response<EmptyResponse>

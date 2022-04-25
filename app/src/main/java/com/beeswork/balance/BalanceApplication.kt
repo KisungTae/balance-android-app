@@ -211,7 +211,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SaveHeightUseCase>() with singleton { SaveHeightUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetAboutUseCase>() with singleton { GetAboutUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveAboutUseCase>() with singleton { SaveAboutUseCaseImpl(instance(), Dispatchers.Default) }
-        bind<SaveProfileUseCase>() with singleton { SaveProfileUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveProfileUseCase>() with singleton { SaveProfileUseCaseImpl(instance(), instance(), Dispatchers.Default) }
         bind<SaveLocationUseCase>() with singleton { SaveLocationUseCaseImpl(instance(), Dispatchers.Default) }
         bind<FetchQuestionsUseCase>() with singleton { FetchQuestionsUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveAnswersUseCase>() with singleton { SaveAnswersUseCaseImpl(instance(), Dispatchers.Default) }
@@ -240,6 +240,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<ProfileRepository>() with singleton {
             ProfileRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

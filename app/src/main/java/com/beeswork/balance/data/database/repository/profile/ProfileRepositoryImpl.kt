@@ -1,6 +1,7 @@
 package com.beeswork.balance.data.database.repository.profile
 
 import com.beeswork.balance.data.database.BalanceDatabase
+import com.beeswork.balance.data.database.dao.LocationDAO
 import com.beeswork.balance.data.database.dao.ProfileDAO
 import com.beeswork.balance.data.database.entity.profile.Profile
 import com.beeswork.balance.data.network.rds.profile.ProfileRDS
@@ -19,6 +20,7 @@ import org.threeten.bp.OffsetDateTime
 class ProfileRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
     private val profileDAO: ProfileDAO,
+    private val locationDAO: LocationDAO,
     private val profileRDS: ProfileRDS,
     private val balanceDatabase: BalanceDatabase,
     private val profileMapper: ProfileMapper,
@@ -102,17 +104,20 @@ class ProfileRepositoryImpl(
         }
     }
 
-    override suspend fun saveProfile(): Resource<EmptyResponse> {
+    override suspend fun saveProfile(
+        name: String,
+        gender: Boolean,
+        birthDate: OffsetDateTime,
+        height: Int?,
+        about: String?,
+        latitude: Double,
+        longitude: Double
+    ): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
-            val profile = profileDAO.getBy(preferenceProvider.getAccountId())
-                ?: return@withContext Resource.error(ProfileNotFoundException())
-
-            val profileDTO = profileMapper.toProfileDTO(profile)
-                ?: return@withContext Resource.error(ProfileNotFoundException())
-
-            val response = profileRDS.saveProfile(profileDTO)
+            val response = profileRDS.saveProfile(name, gender, birthDate, height, about, latitude, longitude)
             if (response.isSuccess()) {
                 profileDAO.updateSyncedBy(preferenceProvider.getAccountId(), true)
+                locationDAO.updateSyncedBy(true)
             }
             return@withContext response
         }
@@ -137,7 +142,6 @@ class ProfileRepositoryImpl(
         }
     }
 
-
     override suspend fun saveBio(height: Int?, about: String): Resource<Profile> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
@@ -154,7 +158,6 @@ class ProfileRepositoryImpl(
             }
         }
     }
-
 
     override suspend fun fetchQuestions(): Resource<FetchQuestionsDTO> {
         return withContext(ioDispatcher) {
