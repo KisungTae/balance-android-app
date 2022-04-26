@@ -17,5 +17,5 @@ interface CardRepository {
     suspend fun fetchCards(): Resource<FetchCardsDTO>
     suspend fun prepopulateCardFilter(gender: Boolean)
 
-    fun getCardFilterFlow(): Flow<CardFilter?>
+    fun getCardFilterInvalidationFlow(): Flow<Boolean?>
 }

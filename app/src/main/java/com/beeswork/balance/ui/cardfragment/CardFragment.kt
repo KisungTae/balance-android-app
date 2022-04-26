@@ -11,7 +11,6 @@ import com.beeswork.balance.databinding.FragmentCardBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.observeResource
-import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameDialog
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 
 import com.beeswork.balance.ui.common.BaseFragment
@@ -20,7 +19,6 @@ import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
 import com.beeswork.balance.ui.common.LocationRequestListener
-import com.beeswork.balance.ui.mainactivity.MainActivity
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -29,7 +27,6 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-import java.lang.ClassCastException
 import java.util.*
 
 class CardFragment(
@@ -72,8 +69,8 @@ class CardFragment(
     }
 
     private suspend fun observeCardFilterUIStateLiveData() {
-        viewModel.cardFilterUIStateLiveData.await().observe(viewLifecycleOwner) { cardFilterUIState ->
-            if (cardFilterUIState?.gender == null) {
+        viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterGender ->
+            if (cardFilterGender == null) {
                 showCardFilterDialog(showGenderTip = true, cancellable = false)
             } else {
                 viewModel.fetchCards()

@@ -9,7 +9,6 @@ import com.beeswork.balance.internal.mapper.card.CardMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.cardfragment.card.CardDomain
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class CardViewModel(
@@ -20,14 +19,8 @@ class CardViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    val cardFilterUIStateLiveData by viewModelLazyDeferred {
-        cardRepository.getCardFilterFlow().map { cardFilter ->
-            if (cardFilter == null) {
-                null
-            } else {
-                cardFilterMapper.toCardFilterUIState(cardFilter)
-            }
-        }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
+    val cardFilterInvalidationLiveData by viewModelLazyDeferred {
+        cardRepository.getCardFilterInvalidationFlow().asLiveData()
     }
 
     private val _fetchCards = MutableLiveData<Resource<List<CardDomain>>>()

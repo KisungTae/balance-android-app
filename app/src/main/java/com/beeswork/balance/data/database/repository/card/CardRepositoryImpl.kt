@@ -5,19 +5,15 @@ import com.beeswork.balance.data.database.dao.CardFilterDAO
 import com.beeswork.balance.data.database.entity.card.CardFilter
 import com.beeswork.balance.data.network.rds.card.CardRDS
 import com.beeswork.balance.data.network.response.Resource
-import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
-import com.beeswork.balance.domain.usecase.card.GetCardFilterUseCase
-import com.beeswork.balance.internal.constant.Gender
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import java.util.*
-import kotlin.math.min
 
 class CardRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
@@ -48,14 +44,16 @@ class CardRepositoryImpl(
     override suspend fun saveCardFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-            val cardFilter = cardFilterDAO.getBy(accountId)?.let { cardFilter ->
+            val cardFilter = cardFilterDAO.getBy(accountId)
+            if (cardFilter == null) {
+                cardFilterDAO.insert(CardFilter(accountId, gender, minAge, maxAge, distance))
+            } else if (!cardFilter.isEqualTo(gender, minAge, maxAge, distance)) {
                 cardFilter.gender = gender
                 cardFilter.minAge = minAge
                 cardFilter.maxAge = maxAge
                 cardFilter.distance = distance
-                cardFilter
-            } ?: CardFilter(accountId, gender, minAge, maxAge, distance)
-            cardFilterDAO.insert(cardFilter)
+                cardFilterDAO.insert(cardFilter)
+            }
             return@withContext Resource.success(EmptyResponse())
         }
     }
@@ -102,8 +100,8 @@ class CardRepositoryImpl(
         }
     }
 
-    override fun getCardFilterFlow(): Flow<CardFilter?> {
-        return cardFilterDAO.getCardFilterFlow(preferenceProvider.getAccountId())
+    override fun getCardFilterInvalidationFlow(): Flow<Boolean?> {
+        return cardFilterDAO.getCardFilterGenderFlow(preferenceProvider.getAccountId())
     }
 
 
