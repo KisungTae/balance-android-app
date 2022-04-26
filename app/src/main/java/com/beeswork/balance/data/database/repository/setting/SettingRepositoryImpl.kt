@@ -117,12 +117,10 @@ class SettingRepositoryImpl(
 
     private fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
-            val response = settingRDS.saveLocation(
-                latitude,
-                longitude,
-                updatedAt
-            )
-            if (response.isSuccess()) locationDAO.sync(updatedAt)
+            val response = settingRDS.saveLocation(latitude, longitude, updatedAt)
+            if (response.isSuccess()) {
+                locationDAO.sync(updatedAt)
+            }
         }
     }
 

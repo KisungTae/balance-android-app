@@ -38,7 +38,7 @@
     <string name="chat_not_found_exception">chat_not_found_exception</string>
     <string name="birth_date_not_saved_exception">birth_date_not_saved_exception</string>
     <string name="location_not_found_exception">location_not_found_exception</string>
-
+    <string name="card_filter_not_found_exception">card_filter_not_found_exception</string>
 
 
     <string name="error_message_bad_request">유효하지 않은 요청입니다</string>

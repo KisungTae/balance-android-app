@@ -15,12 +15,11 @@ import com.beeswork.balance.data.database.entity.setting.Location
 import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.database.entity.card.CardFilter
 import com.beeswork.balance.data.database.entity.match.MatchCount
-import com.beeswork.balance.data.database.entity.swipe.Click
 import com.beeswork.balance.data.database.entity.swipe.SwipeCount
 
 
 @Database(
-    entities = [Match::class, ChatMessage::class, Click::class, FCMToken::class,
+    entities = [Match::class, ChatMessage::class, FCMToken::class,
                 Swipe::class, Profile::class, Location::class, Photo::class,
                 CardFilter::class, PushSetting::class, Login::class, SwipeCount::class, MatchCount::class],
     version = 1
@@ -38,7 +37,6 @@ abstract class BalanceDatabase : RoomDatabase() {
 
     abstract fun matchDAO(): MatchDAO
     abstract fun chatMessageDAO(): ChatMessageDAO
-    abstract fun clickDAO(): ClickDAO
     abstract fun fcmTokenDAO(): FCMTokenDAO
     abstract fun swipeDAO(): SwipeDAO
     abstract fun profileDAO(): ProfileDAO

@@ -1,7 +1,10 @@
 package com.beeswork.balance.internal.mapper.card
 
-import com.beeswork.balance.ui.cardfragment.card.CardDomain
+import com.beeswork.balance.data.database.entity.card.Card
+import com.beeswork.balance.data.network.response.card.CardDTO
+import com.beeswork.balance.domain.uistate.card.CardItemUIState
 
 interface CardMapper {
-    fun toCardDomain(cardDTO: com.beeswork.balance.data.network.response.card.CardDTO): CardDomain
+    fun toCardItemUIState(card: Card): CardItemUIState
+    fun toCard(cardDTO: CardDTO): Card
 }

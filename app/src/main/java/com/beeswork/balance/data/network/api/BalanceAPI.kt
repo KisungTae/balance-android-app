@@ -22,7 +22,7 @@ import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
-import com.beeswork.balance.data.network.response.card.FetchCardsDTO
+import com.beeswork.balance.data.network.response.card.FetchCardsResponse
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.ClickResponse
 import com.beeswork.balance.data.network.response.match.UnmatchDTO
@@ -199,7 +199,7 @@ interface BalanceAPI {
         @Query(value = "gender") gender: Boolean,
         @Query(value = "distance") distance: Int,
         @Query(value = "pageIndex") pageIndex: Int
-    ): Response<FetchCardsDTO>
+    ): Response<FetchCardsResponse>
 
     @GET("/question/random")
     suspend fun fetchRandomQuestion(@Query(value = "questionIds") questionIds: List<Int>): Response<QuestionDTO>

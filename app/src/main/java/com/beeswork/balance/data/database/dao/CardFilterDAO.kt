@@ -29,6 +29,6 @@ interface CardFilterDAO {
     @Query("update cardFilter set gender = :gender, minAge = :minAge, maxAge = :maxAge, distance = :distance where accountId = :accountId")
     fun updateBy(accountId: UUID?, gender: Boolean, minAge: Int, maxAge: Int, distance: Int)
 
-    @Query("select gender from cardFilter where accountId = :accountId")
-    fun getCardFilterGenderFlow(accountId: UUID?): Flow<Boolean?>
+    @Query("select count(*) > 0 from cardFilter where accountId = :accountId")
+    fun getCardFilterInvalidationFlow(accountId: UUID?): Flow<Boolean>
 }

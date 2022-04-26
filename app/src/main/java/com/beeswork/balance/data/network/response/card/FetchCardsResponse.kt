@@ -1,6 +1,6 @@
 package com.beeswork.balance.data.network.response.card
 
-data class FetchCardsDTO(
-    val cardDTOs: MutableList<CardDTO>,
+data class FetchCardsResponse(
+    val cardDTOs: List<CardDTO>,
     val reset: Boolean
 )

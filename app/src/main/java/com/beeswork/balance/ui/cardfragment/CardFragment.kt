@@ -11,6 +11,7 @@ import com.beeswork.balance.databinding.FragmentCardBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.observeResource
+import com.beeswork.balance.internal.util.observeUIState
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 
 import com.beeswork.balance.ui.common.BaseFragment
@@ -65,48 +66,8 @@ class CardFragment(
         setupCardStackView()
         observeFetchCardsLiveData()
         observeCardFilterUIStateLiveData()
-        binding.btnCardStackReload.setOnClickListener { viewModel.fetchCards() }
+        binding.btnCardStackRefetch.setOnClickListener { viewModel.fetchCards() }
     }
-
-    private suspend fun observeCardFilterUIStateLiveData() {
-        viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterGender ->
-            if (cardFilterGender == null) {
-                showCardFilterDialog(showGenderTip = true, cancellable = false)
-            } else {
-                viewModel.fetchCards()
-            }
-        }
-    }
-
-    private fun showCardFilterDialog(showGenderTip: Boolean, cancellable: Boolean) {
-        val cardFilterDialog = CardFilterDialog(showGenderTip)
-        cardFilterDialog.isCancelable = cancellable
-        cardFilterDialog.show(childFragmentManager, CardFilterDialog.TAG)
-    }
-
-    private fun observeFetchCardsLiveData() {
-        viewModel.fetchCards.observeResource(viewLifecycleOwner, activity) { resource ->
-            when {
-                resource.isSuccess() -> resource.data?.let { cardDomains ->
-                    if (cardDomains.isEmpty()) {
-                        updateCardLayouts(View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                    } else {
-                        updateCardLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                        cardStackAdapter.submitCards(cardDomains)
-                        binding.csvCard.visibility = View.VISIBLE
-                    }
-                }
-                resource.isLoading() -> updateCardLayouts(View.VISIBLE, View.GONE, View.GONE, View.GONE)
-                resource.isError() -> {
-                    updateCardLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE)
-                    val title = getString(R.string.fetch_card_exception_title)
-                    val message = MessageSource.getMessage(requireContext(), resource.exception)
-                    ErrorDialog.show(title, message, childFragmentManager)
-                }
-            }
-        }
-    }
-
 
     private fun setupToolBar() {
         binding.tbCard.inflateMenu(R.menu.card_tool_bar)
@@ -134,13 +95,51 @@ class CardFragment(
         binding.csvCard.itemAnimator = DefaultItemAnimator()
     }
 
+    private suspend fun observeCardFilterUIStateLiveData() {
+        viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterExists ->
+            if (cardFilterExists) {
+                viewModel.fetchCards()
+            } else {
+                showCardFilterDialog(showGenderTip = true, cancellable = false)
+            }
+        }
+    }
+
+    private fun showCardFilterDialog(showGenderTip: Boolean, cancellable: Boolean) {
+        val cardFilterDialog = CardFilterDialog(showGenderTip)
+        cardFilterDialog.isCancelable = cancellable
+        cardFilterDialog.show(childFragmentManager, CardFilterDialog.TAG)
+    }
+
+    private fun observeFetchCardsLiveData() {
+        viewModel.fetchCardsUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { fetchCardsUIState ->
+            when {
+                fetchCardsUIState.showLoading -> {
+                    updateCardLayouts(View.VISIBLE, View.GONE, View.GONE)
+                }
+                fetchCardsUIState.showError -> {
+                    updateCardLayouts(View.GONE, View.GONE, View.VISIBLE)
+                    binding.tvCardStackErrorTitle.text =  getString(R.string.fetch_card_exception_title)
+                    binding.tvCardStackErrorMessage.text = MessageSource.getMessage(requireContext(), fetchCardsUIState.exception)
+                }
+                fetchCardsUIState.cardItemUIStates.isNullOrEmpty() -> {
+                    updateCardLayouts(View.GONE, View.VISIBLE, View.GONE)
+                }
+                else -> {
+                    updateCardLayouts(View.GONE, View.GONE, View.GONE)
+                    cardStackAdapter.submitCards(fetchCardsUIState.cardItemUIStates)
+                }
+            }
+        }
+    }
+
     override fun onCardSwiped(direction: Direction?) {
         val removedCard = cardStackAdapter.removeCard()
         if (cardStackAdapter.itemCount == 0) binding.csvCard.visibility = View.GONE
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) viewModel.fetchCards()
 
         if (direction == Direction.Right) removedCard?.let { _removedCard ->
-            val profilePhotoKey = if (_removedCard.photoKeys.isNotEmpty()) _removedCard.photoKeys[0] else null
+            val profilePhotoKey = if (_removedCard.photoURLs.isNotEmpty()) _removedCard.photoURLs[0] else null
 //            CardBalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
 //                childFragmentManager,
 //                CardBalanceGameDialog.TAG
@@ -150,18 +149,17 @@ class CardFragment(
 
     fun onLocationPermissionChanged(granted: Boolean) {
         if (granted) {
-            updateCardLayouts(View.GONE, View.GONE, View.GONE, View.GONE)
+            binding.llCardStackLocationNotPermitted.visibility = View.GONE
             viewModel.fetchCards()
         } else {
-            updateCardLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE)
+            binding.llCardStackLocationNotPermitted.visibility = View.VISIBLE
         }
     }
 
-    private fun updateCardLayouts(loading: Int, empty: Int, error: Int, location: Int) {
+    private fun updateCardLayouts(loading: Int, empty: Int, error: Int) {
         binding.llCardStackLoading.visibility = loading
         binding.llCardStackEmpty.visibility = empty
         binding.llCardStackError.visibility = error
-        binding.llCardStackLocationNotPermitted.visibility = location
     }
 
     override fun onResume() {

@@ -147,7 +147,6 @@ class BalanceApplication : Application(), KodeinAware {
         // DAO
         bind() from singleton { instance<BalanceDatabase>().matchDAO() }
         bind() from singleton { instance<BalanceDatabase>().chatMessageDAO() }
-        bind() from singleton { instance<BalanceDatabase>().clickDAO() }
         bind() from singleton { instance<BalanceDatabase>().fcmTokenDAO() }
         bind() from singleton { instance<BalanceDatabase>().swipeDAO() }
         bind() from singleton { instance<BalanceDatabase>().profileDAO() }
@@ -231,6 +230,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<UpdatePhotoStatusUseCase>() with singleton { UpdatePhotoStatusUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetCardFilterUseCase>() with singleton { GetCardFilterUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveCardFilterUseCase>() with singleton { SaveCardFilterUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<FetchCardsUseCase>() with singleton { FetchCardsUseCaseImpl(instance(), Dispatchers.Default) }
 
 
         // Repository
@@ -303,7 +303,6 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
                 applicationScope,
                 instance(),
                 instance(),
@@ -341,7 +340,7 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.Default
             )
         }
-        bind() from provider { CardViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { CardViewModelFactory(instance(), instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {

@@ -34,22 +34,64 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.yuyakaido.android.cardstackview.CardStackView
+            android:id="@+id/csvCard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:clipToPadding="false"
+            android:paddingHorizontal="10dp" />
+
         <LinearLayout
             android:id="@+id/llCardStackError"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="17dp"
+            android:padding="20dp"
             android:background="@android:color/white"
             android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnCardStackReload"
-                android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="@string/dialog_error_icon_description"
+                android:src="@drawable/ic_thankful" />
+
+            <TextView
+                android:id="@+id/tvCardStackErrorTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/sh_round_box"
-                android:text="@string/dialog_retry_btn_text" />
+                android:layout_marginBottom="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/TextBlack"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCardStackErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/TextBlack" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCardStackRefetch"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="@string/retry_btn"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -91,11 +133,12 @@
 
         <LinearLayout
             android:id="@+id/llCardStackLocationNotPermitted"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="@dimen/icon_large"
@@ -116,15 +159,6 @@
                 android:textColor="@android:color/black" />
 
         </LinearLayout>
-
-
-        <com.yuyakaido.android.cardstackview.CardStackView
-            android:id="@+id/csvCard"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingHorizontal="10dp"
-            android:visibility="gone" />
 
     </FrameLayout>
 

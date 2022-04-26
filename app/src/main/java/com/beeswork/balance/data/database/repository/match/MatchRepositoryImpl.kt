@@ -8,7 +8,6 @@ import com.beeswork.balance.data.database.dao.*
 import com.beeswork.balance.data.database.entity.*
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.database.entity.match.MatchCount
-import com.beeswork.balance.data.database.entity.swipe.Click
 import com.beeswork.balance.data.database.entity.swipe.SwipeCount
 import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.database.result.ClickResult
@@ -24,7 +23,6 @@ import com.beeswork.balance.internal.constant.ClickOutcome
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
-import com.beeswork.balance.ui.mainviewpagerfragment.NewMatch
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +41,6 @@ class MatchRepositoryImpl(
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
     private val swipeDAO: SwipeDAO,
-    private val clickDAO: ClickDAO,
     private val matchCountDAO: MatchCountDAO,
     private val swipeCountDAO: SwipeCountDAO,
     private val photoDAO: PhotoDAO,
@@ -145,7 +142,6 @@ class MatchRepositoryImpl(
     }
 
     private fun insertMatch(matchDTO: MatchDTO): QueryResult<Match> {
-        clickDAO.insert(Click(matchDTO.swiperId, matchDTO.swipedId))
         val match = matchDAO.getBy(matchDTO.chatId)
         if (match == null || !match.isEqualTo(matchDTO)) {
             val newMatch = matchMapper.toMatch(matchDTO)
@@ -228,9 +224,7 @@ class MatchRepositoryImpl(
 
     override suspend fun click(swipedId: UUID, answers: Map<Int, Boolean>): Resource<ClickResult> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val response = matchRDS.click(swipedId, answers)
-
             return@withContext response.map { clickResponse ->
                 if (clickResponse == null) {
                     return@map null
@@ -244,7 +238,6 @@ class MatchRepositoryImpl(
                         return@map ClickResult(clickResponse.clickOutcome, match)
                     }
                     ClickOutcome.CLICKED -> {
-                        clickDAO.insert(Click(swipedId, accountId))
                         return@map ClickResult(clickResponse.clickOutcome, null)
                     }
                     ClickOutcome.MISSED -> {
