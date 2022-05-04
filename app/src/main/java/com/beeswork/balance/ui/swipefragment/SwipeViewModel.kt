@@ -33,7 +33,7 @@ class SwipeViewModel(
         }.flow.cachedIn(viewModelScope)
             .map { pagingData ->
                 pagingData.map { swipe ->
-                    swipeMapper.toSwipeItemUIState(swipe, preferenceProvider.getPhotoBucketUrl())
+                    swipeMapper.toSwipeItemUIState(swipe, preferenceProvider.getPhotoDomain())
                 }
             }
             .map { pagingData ->

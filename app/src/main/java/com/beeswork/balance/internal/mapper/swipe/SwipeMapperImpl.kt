@@ -19,17 +19,17 @@ class SwipeMapperImpl : SwipeMapper {
         }
     }
 
-    override fun toSwipeItemUIState(swipe: Swipe, photoBucketUrl: String?): SwipeItemUIState {
+    override fun toSwipeItemUIState(swipe: Swipe, photoDomain: String?): SwipeItemUIState {
         return SwipeItemUIState(
             swipe.swiperId,
             swipe.clicked,
-            EndPoint.ofPhoto(photoBucketUrl, swipe.swiperId, swipe.swiperProfilePhotoKey)
+            EndPoint.ofPhoto(photoDomain, swipe.swiperId, swipe.swiperProfilePhotoKey)
         )
     }
 
-    override fun toSwipeNotificationUIState(swipe: Swipe, photoBucketUrl: String?): SwipeNotificationUIState {
+    override fun toSwipeNotificationUIState(swipe: Swipe, photoDomain: String?): SwipeNotificationUIState {
         return SwipeNotificationUIState(
-            EndPoint.ofPhoto(photoBucketUrl, swipe.swiperId, swipe.swiperProfilePhotoKey),
+            EndPoint.ofPhoto(photoDomain, swipe.swiperId, swipe.swiperProfilePhotoKey),
             swipe.clicked
         )
     }

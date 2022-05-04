@@ -13,10 +13,10 @@ class FetchCardsUseCaseImpl(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ): FetchCardsUseCase {
 
-    override suspend fun invoke(): Resource<List<Card>> {
+    override suspend fun invoke(resetPage: Boolean): Resource<List<Card>> {
         return try {
             withContext(defaultDispatcher) {
-                cardRepository.fetchCards()
+                cardRepository.fetchCards(resetPage)
             }
         } catch (e: IOException) {
             return Resource.error(e)

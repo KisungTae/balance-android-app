@@ -13,6 +13,7 @@ import com.beeswork.balance.data.network.request.profile.*
 import com.beeswork.balance.data.network.request.setting.SaveLocationBody
 import com.beeswork.balance.data.network.request.setting.SavePushSettingsBody
 import com.beeswork.balance.data.network.request.swipe.LikeBody
+import com.beeswork.balance.data.network.response.card.CardDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.login.LoginDTO
@@ -199,7 +200,7 @@ interface BalanceAPI {
         @Query(value = "gender") gender: Boolean,
         @Query(value = "distance") distance: Int,
         @Query(value = "pageIndex") pageIndex: Int
-    ): Response<FetchCardsResponse>
+    ): Response<List<CardDTO>>
 
     @GET("/question/random")
     suspend fun fetchRandomQuestion(@Query(value = "questionIds") questionIds: List<Int>): Response<QuestionDTO>

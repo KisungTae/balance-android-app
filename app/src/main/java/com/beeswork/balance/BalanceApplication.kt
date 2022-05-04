@@ -235,7 +235,16 @@ class BalanceApplication : Application(), KodeinAware {
 
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
-        bind<CardRepository>() with singleton { CardRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
+        bind<CardRepository>() with singleton {
+            CardRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                Dispatchers.IO
+            )
+        }
         bind<PhotoRepository>() with singleton { PhotoRepositoryImpl(instance(), instance(), instance(), instance(), Dispatchers.IO) }
         bind<ProfileRepository>() with singleton {
             ProfileRepositoryImpl(

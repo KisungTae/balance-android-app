@@ -55,7 +55,7 @@ class BalanceGameViewModel(
         viewModelScope.launch {
             val profilePhoto = getProfilePhotoUseCase.invoke()
             val profilePhotoUrl = EndPoint.ofPhoto(
-                preferenceProvider.getPhotoBucketUrl(),
+                preferenceProvider.getPhotoDomain(),
                 profilePhoto?.accountId,
                 profilePhoto?.key
             )
@@ -78,7 +78,7 @@ class BalanceGameViewModel(
             val clickUIState = if (response.isSuccess() && response.data != null && response.data.match != null) {
                 val matchNotificationUIState = matchMapper.toMatchNotificationUIState(
                     response.data.match,
-                    preferenceProvider.getPhotoBucketUrl()
+                    preferenceProvider.getPhotoDomain()
                 )
                 ClickUIState.ofSuccess(response.data.clickOutcome, matchNotificationUIState)
             } else {

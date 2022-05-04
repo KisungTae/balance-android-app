@@ -4,6 +4,7 @@ import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.swipe.LikeBody
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.card.CardDTO
 import com.beeswork.balance.data.network.response.card.FetchCardsResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import java.util.*
@@ -18,7 +19,7 @@ class CardRDSImpl(
         gender: Boolean,
         distance: Int,
         pageIndex: Int
-    ): Resource<FetchCardsResponse> {
+    ): Resource<List<CardDTO>> {
         return getResult { balanceAPI.recommend(minAge, maxAge, gender, distance, pageIndex) }
     }
 

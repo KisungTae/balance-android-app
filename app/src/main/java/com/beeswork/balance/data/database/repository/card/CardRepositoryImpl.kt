@@ -3,7 +3,9 @@ package com.beeswork.balance.data.database.repository.card
 import com.beeswork.balance.data.database.dao.CardFilterDAO
 import com.beeswork.balance.data.database.entity.card.Card
 import com.beeswork.balance.data.database.entity.card.CardFilter
+import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.card.CardRDS
+import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
@@ -16,12 +18,13 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 class CardRepositoryImpl(
-    private val preferenceProvider: PreferenceProvider,
     private val cardFilterDAO: CardFilterDAO,
+    loginRDS: LoginRDS,
     private val cardRDS: CardRDS,
     private val cardMapper: CardMapper,
+    preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
-) : CardRepository {
+) : BaseRepository(loginRDS, preferenceProvider), CardRepository {
 
     override suspend fun like(swipedId: UUID): Resource<FetchQuestionsDTO> {
         return withContext(ioDispatcher) {
@@ -52,32 +55,31 @@ class CardRepositoryImpl(
                 cardFilter.minAge = minAge
                 cardFilter.maxAge = maxAge
                 cardFilter.distance = distance
+                cardFilter.pageIndex = 0
                 cardFilterDAO.insert(cardFilter)
             }
             return@withContext Resource.success(EmptyResponse())
         }
     }
 
-    override suspend fun fetchCards(): Resource<List<Card>> {
+    override suspend fun fetchCards(resetPage: Boolean): Resource<List<Card>> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
-            val cardFilter = cardFilterDAO.getBy(accountId) ?: return@withContext Resource.error(CardFilterNotFoundException())
-
-            val response = cardRDS.fetchCards(
-                cardFilter.minAge,
-                cardFilter.maxAge,
-                cardFilter.gender,
-                cardFilter.distance,
-                cardFilter.pageIndex
-            )
-
-            if (response.data != null) {
-                val pageIndex = if (response.data.reset) 0 else cardFilter.pageIndex + 1
-                cardFilterDAO.updatePageIndexBy(accountId, pageIndex)
+            if (resetPage) {
+                cardFilterDAO.updatePageIndexBy(accountId, 0)
             }
 
-            return@withContext response.map { fetchCardsResponse ->
-                val cards = fetchCardsResponse?.cardDTOs?.map { cardDTO ->
+            val cardFilter = cardFilterDAO.getBy(accountId) ?: return@withContext Resource.error(CardFilterNotFoundException())
+            val response = getResponse {
+                cardRDS.fetchCards(cardFilter.minAge, cardFilter.maxAge, cardFilter.gender, cardFilter.distance, cardFilter.pageIndex)
+            }
+
+            if (response.isSuccess() && !response.data.isNullOrEmpty()) {
+                cardFilterDAO.updatePageIndexBy(cardFilter.accountId, cardFilter.pageIndex + response.data.size)
+            }
+
+            return@withContext response.map { cardDTOs ->
+                val cards = cardDTOs?.map { cardDTO ->
                     cardMapper.toCard(cardDTO)
                 }?.toMutableList()
                 cards?.shuffle()

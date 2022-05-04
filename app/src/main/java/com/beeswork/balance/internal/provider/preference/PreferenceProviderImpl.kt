@@ -13,22 +13,22 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-    override fun putLoginInfo(accountId: UUID, accessToken: String, refreshToken: String?, photoBucketUrl: String) {
+    override fun putLoginInfo(accountId: UUID, accessToken: String, refreshToken: String?, photoDomain: String) {
         editor.putString(ACCOUNT_ID, accountId.toString())
         editor.putString(ACCESS_TOKEN, accessToken)
         if (refreshToken != null) {
             editor.putString(REFRESH_TOKEN, refreshToken)
         }
-        editor.putString(BALANCE_PHOTO_BUCKET_URL, photoBucketUrl)
+        editor.putString(PHOTO_DOMAIN, photoDomain)
         editor.apply()
     }
 
-    override fun putAccessInfo(accessToken: String, refreshToken: String?, photoBucketUrl: String) {
+    override fun putAccessInfo(accessToken: String, refreshToken: String?, photoDomain: String) {
         editor.putString(ACCESS_TOKEN, accessToken)
         if (refreshToken != null) {
             editor.putString(REFRESH_TOKEN, refreshToken)
         }
-        editor.putString(BALANCE_PHOTO_BUCKET_URL, photoBucketUrl)
+        editor.putString(PHOTO_DOMAIN, photoDomain)
         editor.apply()
     }
 
@@ -63,8 +63,8 @@ class PreferenceProviderImpl(
         return appToken
     }
 
-    override fun getPhotoBucketUrl(): String? {
-        return preferences.getString(BALANCE_PHOTO_BUCKET_URL, null)
+    override fun getPhotoDomain(): String? {
+        return preferences.getString(PHOTO_DOMAIN, null)
     }
 
     override fun delete() {
@@ -76,6 +76,6 @@ class PreferenceProviderImpl(
         const val REFRESH_TOKEN = "refreshToken"
         const val ACCOUNT_ID = "accountId"
         const val APP_TOKEN = "appToken"
-        const val BALANCE_PHOTO_BUCKET_URL = "photoBucketUrl"
+        const val PHOTO_DOMAIN = "photoDomain"
     }
 }

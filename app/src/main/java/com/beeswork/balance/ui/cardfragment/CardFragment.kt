@@ -10,13 +10,11 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentCardBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.MessageSource
-import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.internal.util.observeUIState
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
-import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
 import com.beeswork.balance.ui.common.LocationRequestListener
@@ -45,6 +43,7 @@ class CardFragment(
     private lateinit var cardStackLayoutManager: CardStackLayoutManager
     private lateinit var binding: FragmentCardBinding
     private var locationRequestListener: LocationRequestListener? = null
+    private var cardStackReachedEnd: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,7 +65,12 @@ class CardFragment(
         setupCardStackView()
         observeFetchCardsLiveData()
         observeCardFilterUIStateLiveData()
-        binding.btnCardStackRefetch.setOnClickListener { viewModel.fetchCards() }
+        setupBtnListeners()
+    }
+
+    private fun setupBtnListeners() {
+        binding.btnCardStackRefetch.setOnClickListener { viewModel.fetchCards(false) }
+        binding.btnCardStackReset.setOnClickListener { viewModel.fetchCards(true) }
     }
 
     private fun setupToolBar() {
@@ -98,7 +102,7 @@ class CardFragment(
     private suspend fun observeCardFilterUIStateLiveData() {
         viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterExists ->
             if (cardFilterExists) {
-                viewModel.fetchCards()
+//                viewModel.fetchCards()
             } else {
                 showCardFilterDialog(showGenderTip = true, cancellable = false)
             }
@@ -123,9 +127,11 @@ class CardFragment(
                     binding.tvCardStackErrorMessage.text = MessageSource.getMessage(requireContext(), fetchCardsUIState.exception)
                 }
                 fetchCardsUIState.cardItemUIStates.isNullOrEmpty() -> {
+                    cardStackReachedEnd = true
                     updateCardLayouts(View.GONE, View.VISIBLE, View.GONE)
                 }
                 else -> {
+                    cardStackReachedEnd = false
                     updateCardLayouts(View.GONE, View.GONE, View.GONE)
                     cardStackAdapter.submitCards(fetchCardsUIState.cardItemUIStates)
                 }
@@ -135,8 +141,12 @@ class CardFragment(
 
     override fun onCardSwiped(direction: Direction?) {
         val removedCard = cardStackAdapter.removeCard()
-        if (cardStackAdapter.itemCount == 0) binding.csvCard.visibility = View.GONE
-        if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) viewModel.fetchCards()
+        if (cardStackAdapter.itemCount == 0) {
+            binding.csvCard.visibility = View.GONE
+        }
+        if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) {
+            viewModel.fetchCards(false)
+        }
 
         if (direction == Direction.Right) removedCard?.let { _removedCard ->
             val profilePhotoKey = if (_removedCard.photoURLs.isNotEmpty()) _removedCard.photoURLs[0] else null
@@ -150,7 +160,7 @@ class CardFragment(
     fun onLocationPermissionChanged(granted: Boolean) {
         if (granted) {
             binding.llCardStackLocationNotPermitted.visibility = View.GONE
-            viewModel.fetchCards()
+//            viewModel.fetchCards()
         } else {
             binding.llCardStackLocationNotPermitted.visibility = View.VISIBLE
         }

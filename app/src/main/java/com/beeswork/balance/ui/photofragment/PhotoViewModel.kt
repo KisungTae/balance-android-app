@@ -31,7 +31,7 @@ open class PhotoViewModel (
     val photoItemUIStatesLiveData by viewModelLazyDeferred {
         photoRepository.getPhotosFlow(PhotoConstant.MAX_NUM_OF_PHOTOS).map { photos ->
             val photoItemUIStates = photos.map { photo ->
-                photoMapper.toPhotoItemUIState(photo, preferenceProvider.getPhotoBucketUrl())
+                photoMapper.toPhotoItemUIState(photo, preferenceProvider.getPhotoDomain())
             }.toMutableList()
 
             repeat(PhotoConstant.MAX_NUM_OF_PHOTOS - photoItemUIStates.size) {

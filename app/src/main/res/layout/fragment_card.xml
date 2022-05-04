@@ -34,23 +34,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.yuyakaido.android.cardstackview.CardStackView
-            android:id="@+id/csvCard"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            android:clipToPadding="false"
-            android:paddingHorizontal="10dp" />
-
         <LinearLayout
             android:id="@+id/llCardStackError"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="17dp"
-            android:padding="20dp"
             android:background="@android:color/white"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="100dp"
@@ -123,10 +116,31 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="empty icon"
+                android:src="@drawable/ic_baseline_wifi_tethering_24" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
                 android:text="@string/card_stac_empty_text" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCardStackReset"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/Primary"
+                android:stateListAnimator="@null"
+                android:text="@string/retry_btn"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -159,6 +173,13 @@
                 android:textColor="@android:color/black" />
 
         </LinearLayout>
+
+        <com.yuyakaido.android.cardstackview.CardStackView
+            android:id="@+id/csvCard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="10dp" />
 
     </FrameLayout>
 

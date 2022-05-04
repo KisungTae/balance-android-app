@@ -7,6 +7,6 @@ import com.beeswork.balance.ui.matchfragment.MatchItemUIState
 
 interface MatchMapper {
     fun toMatch(matchDTO: MatchDTO): Match
-    fun toItemUIState(match: Match, photoBucketUrl: String?): MatchItemUIState
-    fun toMatchNotificationUIState(match: Match, photoBucketUrl: String?): MatchNotificationUIState
+    fun toItemUIState(match: Match, photoDomain: String?): MatchItemUIState
+    fun toMatchNotificationUIState(match: Match, photoDomain: String?): MatchNotificationUIState
 }

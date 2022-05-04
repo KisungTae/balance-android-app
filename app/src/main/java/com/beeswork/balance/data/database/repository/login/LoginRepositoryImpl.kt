@@ -77,7 +77,7 @@ class LoginRepositoryImpl(
                     loginDTO.accountId,
                     loginDTO.accessToken,
                     loginDTO.refreshToken,
-                    loginDTO.photoBucketUrl
+                    loginDTO.photoDomain
                 )
             }
             return@withContext response
@@ -125,7 +125,7 @@ class LoginRepositoryImpl(
                     loginDTO.accountId,
                     loginDTO.accessToken,
                     loginDTO.refreshToken,
-                    loginDTO.photoBucketUrl
+                    loginDTO.photoDomain
                 )
             }
             return@withContext response

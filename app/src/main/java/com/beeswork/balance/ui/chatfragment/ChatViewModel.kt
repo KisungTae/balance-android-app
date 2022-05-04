@@ -47,7 +47,7 @@ class ChatViewModel(
             if (match == null) {
                 null
             } else {
-                matchMapper.toItemUIState(match, preferenceProvider.getPhotoBucketUrl())
+                matchMapper.toItemUIState(match, preferenceProvider.getPhotoDomain())
             }
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
