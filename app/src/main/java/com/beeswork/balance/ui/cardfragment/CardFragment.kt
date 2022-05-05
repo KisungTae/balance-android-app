@@ -44,6 +44,8 @@ class CardFragment(
     private lateinit var binding: FragmentCardBinding
     private var locationRequestListener: LocationRequestListener? = null
     private var cardStackReachedEnd: Boolean = false
+    private var locationGranted: Boolean = false
+    private var hasCardFilter: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -100,9 +102,10 @@ class CardFragment(
     }
 
     private suspend fun observeCardFilterUIStateLiveData() {
-        viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterExists ->
-            if (cardFilterExists) {
-//                viewModel.fetchCards()
+        viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterUpdated ->
+            hasCardFilter = cardFilterUpdated
+            if (cardFilterUpdated) {
+                fetchCards()
             } else {
                 showCardFilterDialog(showGenderTip = true, cancellable = false)
             }
@@ -122,16 +125,19 @@ class CardFragment(
                     updateCardLayouts(View.VISIBLE, View.GONE, View.GONE)
                 }
                 fetchCardsUIState.showError -> {
+                    hideEmptyCardStack()
                     updateCardLayouts(View.GONE, View.GONE, View.VISIBLE)
                     binding.tvCardStackErrorTitle.text =  getString(R.string.fetch_card_exception_title)
                     binding.tvCardStackErrorMessage.text = MessageSource.getMessage(requireContext(), fetchCardsUIState.exception)
                 }
                 fetchCardsUIState.cardItemUIStates.isNullOrEmpty() -> {
+                    hideEmptyCardStack()
                     cardStackReachedEnd = true
                     updateCardLayouts(View.GONE, View.VISIBLE, View.GONE)
                 }
                 else -> {
                     cardStackReachedEnd = false
+                    binding.csvCard.visibility = View.VISIBLE
                     updateCardLayouts(View.GONE, View.GONE, View.GONE)
                     cardStackAdapter.submitCards(fetchCardsUIState.cardItemUIStates)
                 }
@@ -139,13 +145,18 @@ class CardFragment(
         }
     }
 
-    override fun onCardSwiped(direction: Direction?) {
-        val removedCard = cardStackAdapter.removeCard()
+    private fun hideEmptyCardStack() {
         if (cardStackAdapter.itemCount == 0) {
             binding.csvCard.visibility = View.GONE
         }
+    }
+
+    override fun onCardSwiped(direction: Direction?) {
+        val removedCard = cardStackAdapter.removeCard()
+        hideEmptyCardStack()
+
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) {
-            viewModel.fetchCards(false)
+            fetchCards()
         }
 
         if (direction == Direction.Right) removedCard?.let { _removedCard ->
@@ -158,11 +169,21 @@ class CardFragment(
     }
 
     fun onLocationPermissionChanged(granted: Boolean) {
+        if (locationGranted && granted) {
+            return
+        }
+        locationGranted = granted
         if (granted) {
-            binding.llCardStackLocationNotPermitted.visibility = View.GONE
-//            viewModel.fetchCards()
+            binding.llCardStackLocationNotGranted.visibility = View.GONE
+            fetchCards()
         } else {
-            binding.llCardStackLocationNotPermitted.visibility = View.VISIBLE
+            binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
+        }
+    }
+
+    private fun fetchCards() {
+        if (locationGranted && hasCardFilter && !cardStackReachedEnd && cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) {
+            viewModel.fetchCards(false)
         }
     }
 

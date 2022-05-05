@@ -19,12 +19,12 @@ abstract class BaseLocationActivity(
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
     private lateinit var viewModel: BaseLocationViewModel
-    private val locationPermissionListeners = mutableListOf<LocationPermissionListener>()
+    private var locationPermissionListener: LocationPermissionListener? = null
 
 
     fun onCreate(viewModel: BaseLocationViewModel, locationPermissionListener: LocationPermissionListener) {
         this.viewModel = viewModel
-        locationPermissionListeners.add(locationPermissionListener)
+        this.locationPermissionListener = locationPermissionListener
     }
 
     private val requestLocationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -42,32 +42,24 @@ abstract class BaseLocationActivity(
 
     protected fun setupLocationManager() {
         if (hasLocationPermission()) {
-            bindLocationManager()
+            onLocationPermissionChanged(true)
         } else {
             requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
     private fun onLocationPermissionChanged(granted: Boolean) {
-        for (locationPermissionListener in locationPermissionListeners) {
-            locationPermissionListener.onLocationPermissionChanged(granted)
+        if (granted) {
+            LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
         }
+        locationPermissionListener?.onLocationPermissionChanged(granted)
     }
 
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun bindLocationManager() {
-        onLocationPermissionChanged(true)
-        LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
-    }
-
     protected fun checkLocationPermission() {
-        if (hasLocationPermission()) {
-            bindLocationManager()
-        } else {
-            onLocationPermissionChanged(false)
-        }
+        onLocationPermissionChanged(hasLocationPermission())
     }
 }

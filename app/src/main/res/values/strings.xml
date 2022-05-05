@@ -264,7 +264,7 @@
     <string name="register_about_label">자기소개를 입력해주세요</string>
     <string name="register_about_hint">자기소개를 입력해주세요</string>
     <string name="save_profile_loading_text">saving profile......</string>
-    <string name="location_permission_required_message">위치정보는 어플리케이션을 이용하데 필수 정보입니다. 위클릭이 위치 정보에 접근할 수 있게 허락해주세요. \n세팅 > Security &amp; Location > App-Level permission  </string>
+    <string name="location_permission_required_message">위치정보는 어플리케이션을 이용하데 필수 정보입니다. 위클릭이 위치 정보에 접근할 수 있게 허락해주세요. 세팅 > Security &amp; Location > App-Level permission  </string>
     <string name="retrieving_location_info">retrieving location info.....</string>
     <string name="request_location_permission_btn">위치정보 요청하기</string>
     <string name="retrieving_questions">retrieving questions....</string>
@@ -294,5 +294,7 @@
     <string name="card_filter_gender_tip">아래 필터에서 상대방의 성별을 설정해주세요!</string>
     <string name="tip_icon_description">tip icon</string>
     <string name="warn_select_gender">상대방 성별을 선택해주세요!</string>
+    <string name="empty_icon_description">empty icon</string>
+    <string name="card_stack_reset_btn">처음부터 보기</string>
 
 </resources>

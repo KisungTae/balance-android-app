@@ -7,6 +7,7 @@ import com.beeswork.balance.data.database.repository.card.CardRepository
 import com.beeswork.balance.domain.usecase.card.FetchCardsUseCase
 import com.beeswork.balance.internal.mapper.card.CardFilterMapper
 import com.beeswork.balance.internal.mapper.card.CardMapper
+import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
 
 class CardViewModelFactory(
@@ -15,11 +16,20 @@ class CardViewModelFactory(
     private val settingRepository: SettingRepository,
     private val cardMapper: CardMapper,
     private val cardFilterMapper: CardFilterMapper,
+    private val preferenceProvider: PreferenceProvider,
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return CardViewModel(fetchCardsUseCase, cardRepository, settingRepository, cardMapper, cardFilterMapper, defaultDispatcher) as T
+        return CardViewModel(
+            fetchCardsUseCase,
+            cardRepository,
+            settingRepository,
+            cardMapper,
+            cardFilterMapper,
+            preferenceProvider,
+            defaultDispatcher
+        ) as T
     }
 }
