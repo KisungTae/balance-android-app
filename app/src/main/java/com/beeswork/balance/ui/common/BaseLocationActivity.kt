@@ -2,8 +2,10 @@ package com.beeswork.balance.ui.common
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.ui.mainactivity.LocationLifecycleObserver
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -18,14 +20,9 @@ abstract class BaseLocationActivity(
 
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-    private lateinit var viewModel: BaseLocationViewModel
-    private var locationPermissionListener: LocationPermissionListener? = null
-
-
-    fun onCreate(viewModel: BaseLocationViewModel, locationPermissionListener: LocationPermissionListener) {
-        this.viewModel = viewModel
-        this.locationPermissionListener = locationPermissionListener
-    }
+    private lateinit var viewModelBase: BaseLocationViewModel
+    private val viewModelFactoryBase: BaseLocationViewModelFactory by instance()
+    private var locationLifecycleObserverBound: Boolean = false
 
     private val requestLocationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         onLocationPermissionChanged(granted)
@@ -35,13 +32,25 @@ abstract class BaseLocationActivity(
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult?.let { _locationResult ->
                 val location = _locationResult.lastLocation
-                viewModel.saveLocation(location.latitude, location.longitude, syncLocation)
+                viewModelBase.saveLocation(location.latitude, location.longitude, syncLocation)
             }
         }
     }
 
-    protected fun setupLocationManager() {
-        if (hasLocationPermission()) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModelBase = ViewModelProvider(this, viewModelFactoryBase).get(BaseLocationViewModel::class.java)
+        viewModelBase.updateLocationGranted(false)
+        setupLocationLifecycleObserver()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        onLocationPermissionChanged(isLocationPermissionGranted())
+    }
+
+    private fun setupLocationLifecycleObserver() {
+        if (isLocationPermissionGranted()) {
             onLocationPermissionChanged(true)
         } else {
             requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -49,17 +58,14 @@ abstract class BaseLocationActivity(
     }
 
     private fun onLocationPermissionChanged(granted: Boolean) {
-        if (granted) {
+        if (granted && !locationLifecycleObserverBound) {
+            locationLifecycleObserverBound = true
             LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
         }
-        locationPermissionListener?.onLocationPermissionChanged(granted)
     }
 
-    private fun hasLocationPermission(): Boolean {
+    private fun isLocationPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
-    protected fun checkLocationPermission() {
-        onLocationPermissionChanged(hasLocationPermission())
-    }
 }

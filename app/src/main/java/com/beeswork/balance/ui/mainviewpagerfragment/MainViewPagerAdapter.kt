@@ -11,7 +11,6 @@ import com.beeswork.balance.ui.swipefragment.SwipeFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.matchfragment.MatchFragment
 import com.beeswork.balance.ui.cardfragment.CardFragment
-import com.beeswork.balance.ui.common.LocationRequestListener
 
 class MainViewPagerAdapter(
     fragmentManager: FragmentManager,

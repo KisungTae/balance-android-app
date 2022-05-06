@@ -21,11 +21,17 @@ interface LocationDAO {
     fun updateSyncedBy(synced: Boolean)
 
     @Query("update location set synced = 1 where id = ${Location.ID} and updatedAt = :updatedAt")
-    fun sync(updatedAt: OffsetDateTime)
+    fun updateUpdatedAtBy(updatedAt: OffsetDateTime)
 
     @Query("select count() > 0 from location where id = ${Location.ID}")
     fun existById(): Boolean
 
     @Query("select * from location where id = ${Location.ID}")
-    fun getLocationFlowById(): Flow<Location>
+    fun getLocationFlow(): Flow<Location?>
+
+    @Query("select granted from location where id = ${Location.ID}")
+    fun getLocationGrantedFlow(): Flow<Boolean?>
+
+    @Query("update location set granted = :granted where id = ${Location.ID}")
+    fun updateGranted(granted: Boolean)
 }

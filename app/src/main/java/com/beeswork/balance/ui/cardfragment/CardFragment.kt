@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.cardfragment
 
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +16,6 @@ import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
-import com.beeswork.balance.ui.common.LocationRequestListener
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -42,7 +40,6 @@ class CardFragment(
     private lateinit var cardStackAdapter: CardStackAdapter
     private lateinit var cardStackLayoutManager: CardStackLayoutManager
     private lateinit var binding: FragmentCardBinding
-    private var locationRequestListener: LocationRequestListener? = null
     private var cardStackReachedEnd: Boolean = false
     private var locationGranted: Boolean = false
     private var hasCardFilter: Boolean = false
@@ -59,7 +56,6 @@ class CardFragment(
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(CardViewModel::class.java)
         bindUI()
-        locationRequestListener?.onRequestLocationPermission()
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -67,7 +63,23 @@ class CardFragment(
         setupCardStackView()
         observeFetchCardsLiveData()
         observeCardFilterUIStateLiveData()
+        observeLocationGrantedLiveData()
         setupBtnListeners()
+
+    }
+
+    private suspend fun observeLocationGrantedLiveData() {
+        viewModel.locationGrantedLiveData.await().observe(viewLifecycleOwner) { granted ->
+            if (locationGranted != granted) {
+                locationGranted = granted
+                if (granted) {
+                    binding.llCardStackLocationNotGranted.visibility = View.GONE
+                    fetchCards()
+                } else {
+                    binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     private fun setupBtnListeners() {
@@ -168,18 +180,18 @@ class CardFragment(
         }
     }
 
-    fun onLocationPermissionChanged(granted: Boolean) {
-        if (locationGranted && granted) {
-            return
-        }
-        locationGranted = granted
-        if (granted) {
-            binding.llCardStackLocationNotGranted.visibility = View.GONE
-            fetchCards()
-        } else {
-            binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
-        }
-    }
+//    fun onLocationPermissionChanged(granted: Boolean) {
+//        if (locationGranted && granted) {
+//            return
+//        }
+//        locationGranted = granted
+//        if (granted) {
+//            binding.llCardStackLocationNotGranted.visibility = View.GONE
+//            fetchCards()
+//        } else {
+//            binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
+//        }
+//    }
 
     private fun fetchCards() {
         if (locationGranted && hasCardFilter && !cardStackReachedEnd && cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) {
@@ -191,11 +203,6 @@ class CardFragment(
         binding.llCardStackLoading.visibility = loading
         binding.llCardStackEmpty.visibility = empty
         binding.llCardStackError.visibility = error
-    }
-
-    override fun onResume() {
-        super.onResume()
-        locationRequestListener?.onCheckLocationPermission()
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {
@@ -220,13 +227,6 @@ class CardFragment(
 
     override fun onFragmentSelected() {
 
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is LocationRequestListener) {
-            locationRequestListener = context
-        }
     }
 
     companion object {

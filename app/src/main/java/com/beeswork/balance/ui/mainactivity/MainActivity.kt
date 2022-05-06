@@ -6,16 +6,12 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
-import com.beeswork.balance.R
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseLocationActivity
-import com.beeswork.balance.ui.common.LocationPermissionListener
-import com.beeswork.balance.ui.common.LocationRequestListener
-import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 
 
-class MainActivity : BaseLocationActivity(true), LocationPermissionListener, LocationRequestListener {
+class MainActivity : BaseLocationActivity(true) {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
@@ -26,7 +22,6 @@ class MainActivity : BaseLocationActivity(true), LocationPermissionListener, Loc
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        super.onCreate(viewModel, this@MainActivity)
         bindUI()
     }
 
@@ -41,23 +36,6 @@ class MainActivity : BaseLocationActivity(true), LocationPermissionListener, Loc
                 Navigator.finishToLoginActivity(this, message)
             }
         }
-    }
-
-    override fun onLocationPermissionChanged(granted: Boolean) {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcvMain)
-        navHostFragment?.childFragmentManager?.fragments?.forEach { fragment ->
-            if (fragment is MainViewPagerFragment) {
-                fragment.onLocationPermissionChanged(granted)
-            }
-        }
-    }
-
-    override fun onRequestLocationPermission() {
-        setupLocationManager()
-    }
-
-    override fun onCheckLocationPermission() {
-        checkLocationPermission()
     }
 
     override fun onResume() {

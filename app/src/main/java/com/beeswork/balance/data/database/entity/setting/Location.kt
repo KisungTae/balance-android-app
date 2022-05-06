@@ -11,6 +11,7 @@ data class Location(
     val longitude: Double,
     val synced: Boolean,
     val updatedAt: OffsetDateTime,
+    val granted: Boolean,
 
     @PrimaryKey
     val id: Int = ID

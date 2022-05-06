@@ -92,7 +92,7 @@ class SettingRepositoryImpl(
     override suspend fun saveLocation(latitude: Double, longitude: Double, syncLocation: Boolean) {
         withContext(ioDispatcher) {
             val updatedAt = OffsetDateTime.now()
-            locationDAO.insert(Location(latitude, longitude, false, updatedAt))
+            locationDAO.insert(Location(latitude, longitude, false, updatedAt, true))
             if (syncLocation) {
                 syncLocation(latitude, longitude, updatedAt)
             }
@@ -115,17 +115,27 @@ class SettingRepositoryImpl(
         }
     }
 
+    override suspend fun updateLocationGranted(granted: Boolean) {
+        withContext(ioDispatcher) {
+            locationDAO.updateGranted(granted)
+        }
+    }
+
     private fun syncLocation(latitude: Double, longitude: Double, updatedAt: OffsetDateTime) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
             val response = settingRDS.saveLocation(latitude, longitude, updatedAt)
             if (response.isSuccess()) {
-                locationDAO.sync(updatedAt)
+                locationDAO.updateUpdatedAtBy(updatedAt)
             }
         }
     }
 
     override fun getLocationFlow(): Flow<Location?> {
-        return locationDAO.getLocationFlowById()
+        return locationDAO.getLocationFlow()
+    }
+
+    override fun getLocationGrantedFlow(): Flow<Boolean?> {
+        return locationDAO.getLocationGrantedFlow()
     }
 
     override suspend fun deleteAccount(): Resource<EmptyResponse> {

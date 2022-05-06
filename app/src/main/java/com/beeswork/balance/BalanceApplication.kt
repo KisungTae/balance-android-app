@@ -53,6 +53,10 @@ import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
 import com.beeswork.balance.domain.usecase.balancegame.*
 import com.beeswork.balance.domain.usecase.card.*
 import com.beeswork.balance.domain.usecase.chat.*
+import com.beeswork.balance.domain.usecase.location.SaveLocationUseCase
+import com.beeswork.balance.domain.usecase.location.SaveLocationUseCaseImpl
+import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCase
+import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCaseImpl
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCase
 import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImpl
 import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
@@ -87,7 +91,6 @@ import com.beeswork.balance.ui.mainactivity.MainViewModelFactory
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.matchfragment.MatchViewModelFactory
 import com.beeswork.balance.ui.profilefragment.ProfileViewModelFactory
-import com.beeswork.balance.ui.registeractivity.RegisterViewModelFactory
 import com.beeswork.balance.ui.registeractivity.about.AboutViewModelFactory
 import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateViewModelFactory
 import com.beeswork.balance.ui.registeractivity.gender.GenderViewModelFactory
@@ -102,6 +105,8 @@ import com.beeswork.balance.ui.splashfragment.SplashViewModelFactory
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialogViewModelFactory
 import com.beeswork.balance.ui.cardfragment.CardViewModelFactory
 import com.beeswork.balance.ui.chatfragment.ChatViewModelParameter
+import com.beeswork.balance.ui.common.BaseLocationViewModelFactory
+import com.beeswork.balance.ui.registeractivity.location.LocationStepViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.*
@@ -231,6 +236,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<GetCardFilterUseCase>() with singleton { GetCardFilterUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveCardFilterUseCase>() with singleton { SaveCardFilterUseCaseImpl(instance(), Dispatchers.Default) }
         bind<FetchCardsUseCase>() with singleton { FetchCardsUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<UpdateLocationGrantedUseCase>() with singleton { UpdateLocationGrantedUseCaseImpl(instance(), Dispatchers.Default) }
+
 
 
         // Repository
@@ -405,7 +412,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SplashViewModelFactory(instance()) }
         bind() from provider { LoginViewModelFactory(instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { RegisterViewModelFactory(instance()) }
         bind() from provider { AboutViewModelFactory(instance(), instance()) }
         bind() from provider { BirthDateViewModelFactory(instance(), instance()) }
         bind() from provider { GenderViewModelFactory(instance(), instance()) }
@@ -425,6 +431,9 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { RegisterFinishViewModelFactory(instance()) }
+        bind() from provider { BaseLocationViewModelFactory(instance(), instance()) }
+        bind() from provider { LocationStepViewModelFactory(instance()) }
+
 
 
         // Interceptor

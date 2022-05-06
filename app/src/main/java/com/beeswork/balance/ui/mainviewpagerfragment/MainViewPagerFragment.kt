@@ -194,23 +194,12 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
             .into(imageView)
     }
 
-    fun onLocationPermissionChanged(grated: Boolean) {
-        val fragment = mainViewPagerAdapter.getFragmentAt(MainViewPagerTabPosition.CARD.ordinal)
-        if (fragment is CardFragment) {
-            fragment.onLocationPermissionChanged(grated)
-        }
-    }
-
     override fun onGoToSwipeSelected() {
         binding.tlMain.getTabAt(MainViewPagerTabPosition.SWIPE.ordinal)?.select()
     }
 
     override fun onGoToMatchSelected() {
         binding.tlMain.getTabAt(MainViewPagerTabPosition.MATCH.ordinal)?.select()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
     }
 
     companion object {

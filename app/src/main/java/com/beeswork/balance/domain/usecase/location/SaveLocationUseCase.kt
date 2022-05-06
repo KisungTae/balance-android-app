@@ -1,4 +1,4 @@
-package com.beeswork.balance.domain.usecase.main
+package com.beeswork.balance.domain.usecase.location
 
 interface SaveLocationUseCase {
 

@@ -10,6 +10,7 @@ import com.beeswork.balance.domain.uistate.card.FetchCardsUIState
 import com.beeswork.balance.domain.usecase.card.FetchCardsUseCase
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,6 +26,12 @@ class CardViewModel(
 
     val cardFilterInvalidationLiveData by viewModelLazyDeferred {
         cardRepository.getCardFilterInvalidationFlow().asLiveData()
+    }
+
+    val locationGrantedLiveData by viewModelLazyDeferred {
+        settingRepository.getLocationGrantedFlow().map { granted ->
+            granted ?: false
+        }.asLiveData()
     }
 
     private val _fetchCardsUIStateLiveData = MutableLiveData<FetchCardsUIState>()
