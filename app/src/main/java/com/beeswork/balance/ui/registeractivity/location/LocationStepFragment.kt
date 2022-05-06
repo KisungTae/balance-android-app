@@ -40,7 +40,7 @@ class LocationStepFragment(
 
     private suspend fun observeLocationGrantedLiveData() {
         viewModel.locationGrantedLiveData.await().observe(viewLifecycleOwner) { granted ->
-            if (granted == true) {
+            if (granted) {
                 registerStepListener.onMoveToNextStep()
             } else {
                 binding.llRegisterLocationLoadingWrapper.visibility = View.GONE

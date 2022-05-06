@@ -17,13 +17,13 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class BirthDateFragment(
+class BirthDateStepFragment(
     private val registerStepListener: RegisterStepListener
 ) : BaseFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentBirthDateBinding
-    private lateinit var viewModel: BirthDateViewModel
-    private val viewModelFactory: BirthDateViewModelFactory by instance()
+    private lateinit var viewModel: BirthDateStepViewModel
+    private val viewModelFactory: BirthDateStepViewModelFactory by instance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentBirthDateBinding.inflate(inflater)
@@ -32,7 +32,7 @@ class BirthDateFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(BirthDateViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(BirthDateStepViewModel::class.java)
         bindUI()
     }
 

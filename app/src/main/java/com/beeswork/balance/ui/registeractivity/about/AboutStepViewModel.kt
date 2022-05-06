@@ -9,7 +9,7 @@ import com.beeswork.balance.domain.usecase.register.GetAboutUseCase
 import com.beeswork.balance.domain.usecase.register.SaveAboutUseCase
 import kotlinx.coroutines.launch
 
-class AboutViewModel (
+class AboutStepViewModel (
     private val getAboutUseCase: GetAboutUseCase,
     private val saveAboutUseCase: SaveAboutUseCase
 ): ViewModel() {

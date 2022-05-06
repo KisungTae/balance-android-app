@@ -17,13 +17,13 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class NameFragment(
+class NameStepFragment(
     private val registerStepListener: RegisterStepListener
 ) : BaseFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentNameBinding
-    private lateinit var viewModel: NameViewModel
-    private val viewModelFactory: NameViewModelFactory by instance()
+    private lateinit var viewModel: NameStepViewModel
+    private val viewModelFactory: NameStepViewModelFactory by instance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentNameBinding.inflate(inflater)
@@ -32,7 +32,7 @@ class NameFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(NameViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(NameStepViewModel::class.java)
         bindUI()
     }
 

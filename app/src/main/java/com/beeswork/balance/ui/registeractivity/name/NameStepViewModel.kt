@@ -9,7 +9,7 @@ import com.beeswork.balance.domain.usecase.register.GetNameUseCase
 import com.beeswork.balance.domain.usecase.register.SaveNameUseCase
 import kotlinx.coroutines.launch
 
-class NameViewModel(
+class NameStepViewModel(
     private val getNameUseCase: GetNameUseCase,
     private val saveNameUseCase: SaveNameUseCase
 ) : ViewModel() {

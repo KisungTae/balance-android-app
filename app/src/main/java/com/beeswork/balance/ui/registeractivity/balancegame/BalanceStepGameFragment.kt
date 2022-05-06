@@ -12,7 +12,7 @@ import com.beeswork.balance.ui.common.RegisterStepListener
 import kotlinx.coroutines.launch
 import java.util.*
 
-class BalanceGameFragment(
+class BalanceStepGameFragment(
     private val registerStepListener: RegisterStepListener
 ) : BaseFragment(), RegisterBalanceGameListener {
 

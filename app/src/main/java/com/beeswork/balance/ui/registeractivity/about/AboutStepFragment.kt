@@ -17,14 +17,14 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class AboutFragment(
+class AboutStepFragment(
     private val registerStepListener: RegisterStepListener
 ): BaseFragment(), KodeinAware {
 
     override val kodein by closestKodein()
     private lateinit var binding: FragmentAboutBinding
-    private lateinit var viewModel: AboutViewModel
-    private val viewModelFactory: AboutViewModelFactory by instance()
+    private lateinit var viewModel: AboutStepViewModel
+    private val viewModelFactory: AboutStepViewModelFactory by instance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentAboutBinding.inflate(inflater)
@@ -33,7 +33,7 @@ class AboutFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(AboutViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(AboutStepViewModel::class.java)
         bindUI()
     }
 

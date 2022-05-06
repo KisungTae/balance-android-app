@@ -9,7 +9,7 @@ import com.beeswork.balance.domain.usecase.register.GetGenderUseCase
 import com.beeswork.balance.domain.usecase.register.SaveGenderUseCase
 import kotlinx.coroutines.launch
 
-class GenderViewModel (
+class GenderStepViewModel (
     private val getGenderUseCase: GetGenderUseCase,
     private val saveGenderUseCase: SaveGenderUseCase
 ): ViewModel() {

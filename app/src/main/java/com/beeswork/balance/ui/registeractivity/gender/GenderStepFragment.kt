@@ -18,13 +18,13 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class GenderFragment(
+class GenderStepFragment(
     private val registerStepListener: RegisterStepListener
 ): BaseFragment(), KodeinAware {
     override val kodein by closestKodein()
     private lateinit var binding: FragmentGenderBinding
-    private lateinit var viewModel: GenderViewModel
-    private val viewModelFactory: GenderViewModelFactory by instance()
+    private lateinit var viewModel: GenderStepViewModel
+    private val viewModelFactory: GenderStepViewModelFactory by instance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentGenderBinding.inflate(inflater)
@@ -33,7 +33,7 @@ class GenderFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(GenderViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(GenderStepViewModel::class.java)
         bindUI()
     }
 

@@ -9,7 +9,7 @@ import com.beeswork.balance.domain.usecase.register.GetHeightUseCase
 import com.beeswork.balance.domain.usecase.register.SaveHeightUseCase
 import kotlinx.coroutines.launch
 
-class HeightViewModel (
+class HeightStepViewModel (
     private val getHeightUseCase: GetHeightUseCase,
     private val saveHeightUseCase: SaveHeightUseCase
 ): ViewModel() {

@@ -10,7 +10,7 @@ import com.beeswork.balance.domain.usecase.register.SaveBirthDateUseCase
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
-class BirthDateViewModel(
+class BirthDateStepViewModel(
     private val getBirthDateUseCase: GetBirthDateUseCase,
     private val saveBirthDateUseCase: SaveBirthDateUseCase
 ) : ViewModel() {

@@ -91,11 +91,11 @@ import com.beeswork.balance.ui.mainactivity.MainViewModelFactory
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerViewModelFactory
 import com.beeswork.balance.ui.matchfragment.MatchViewModelFactory
 import com.beeswork.balance.ui.profilefragment.ProfileViewModelFactory
-import com.beeswork.balance.ui.registeractivity.about.AboutViewModelFactory
-import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateViewModelFactory
-import com.beeswork.balance.ui.registeractivity.gender.GenderViewModelFactory
-import com.beeswork.balance.ui.registeractivity.height.HeightViewModelFactory
-import com.beeswork.balance.ui.registeractivity.name.NameViewModelFactory
+import com.beeswork.balance.ui.registeractivity.about.AboutStepViewModelFactory
+import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateStepViewModelFactory
+import com.beeswork.balance.ui.registeractivity.gender.GenderStepViewModelFactory
+import com.beeswork.balance.ui.registeractivity.height.HeightStepViewModelFactory
+import com.beeswork.balance.ui.registeractivity.name.NameStepViewModelFactory
 import com.beeswork.balance.ui.photofragment.PhotoViewModelFactory
 import com.beeswork.balance.ui.registeractivity.registerfinish.RegisterFinishViewModelFactory
 import com.beeswork.balance.ui.settingfragment.SettingViewModelFactory
@@ -412,11 +412,11 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { SplashViewModelFactory(instance()) }
         bind() from provider { LoginViewModelFactory(instance()) }
         bind() from provider { MainViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
-        bind() from provider { AboutViewModelFactory(instance(), instance()) }
-        bind() from provider { BirthDateViewModelFactory(instance(), instance()) }
-        bind() from provider { GenderViewModelFactory(instance(), instance()) }
-        bind() from provider { HeightViewModelFactory(instance(), instance()) }
-        bind() from provider { NameViewModelFactory(instance(), instance()) }
+        bind() from provider { AboutStepViewModelFactory(instance(), instance()) }
+        bind() from provider { BirthDateStepViewModelFactory(instance(), instance()) }
+        bind() from provider { GenderStepViewModelFactory(instance(), instance()) }
+        bind() from provider { HeightStepViewModelFactory(instance(), instance()) }
+        bind() from provider { NameStepViewModelFactory(instance(), instance()) }
         bind() from provider {
             PhotoViewModelFactory(
                 instance(),

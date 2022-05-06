@@ -20,8 +20,8 @@ abstract class BaseLocationActivity(
 
     override val kodein by closestKodein()
     private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
-    private lateinit var viewModelBase: BaseLocationViewModel
-    private val viewModelFactoryBase: BaseLocationViewModelFactory by instance()
+    private lateinit var viewModel: BaseLocationViewModel
+    private val viewModelFactory: BaseLocationViewModelFactory by instance()
     private var locationLifecycleObserverBound: Boolean = false
 
     private val requestLocationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -32,15 +32,15 @@ abstract class BaseLocationActivity(
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult?.let { _locationResult ->
                 val location = _locationResult.lastLocation
-                viewModelBase.saveLocation(location.latitude, location.longitude, syncLocation)
+                viewModel.saveLocation(location.latitude, location.longitude, syncLocation)
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModelBase = ViewModelProvider(this, viewModelFactoryBase).get(BaseLocationViewModel::class.java)
-        viewModelBase.updateLocationGranted(false)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(BaseLocationViewModel::class.java)
+        viewModel.updateLocationGranted(false)
         setupLocationLifecycleObserver()
     }
 

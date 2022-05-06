@@ -5,14 +5,14 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.beeswork.balance.ui.common.RegisterStepListener
-import com.beeswork.balance.ui.registeractivity.about.AboutFragment
-import com.beeswork.balance.ui.registeractivity.balancegame.BalanceGameFragment
-import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateFragment
-import com.beeswork.balance.ui.registeractivity.gender.GenderFragment
-import com.beeswork.balance.ui.registeractivity.height.HeightFragment
+import com.beeswork.balance.ui.registeractivity.about.AboutStepFragment
+import com.beeswork.balance.ui.registeractivity.balancegame.BalanceStepGameFragment
+import com.beeswork.balance.ui.registeractivity.birthdate.BirthDateStepFragment
+import com.beeswork.balance.ui.registeractivity.gender.GenderStepFragment
+import com.beeswork.balance.ui.registeractivity.height.HeightStepFragment
 import com.beeswork.balance.ui.registeractivity.location.LocationStepFragment
-import com.beeswork.balance.ui.registeractivity.name.NameFragment
-import com.beeswork.balance.ui.registeractivity.photo.PhotoFragment
+import com.beeswork.balance.ui.registeractivity.name.NameStepFragment
+import com.beeswork.balance.ui.registeractivity.photo.PhotoStepFragment
 import com.beeswork.balance.ui.registeractivity.registerfinish.RegisterFinishFragment
 
 class RegisterViewPagerAdapter(
@@ -28,15 +28,15 @@ class RegisterViewPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             RegisterViewPagerTabPosition.LOCATION.ordinal -> LocationStepFragment(registerStepListener)
-            RegisterViewPagerTabPosition.NAME.ordinal -> NameFragment(registerStepListener)
-            RegisterViewPagerTabPosition.GENDER.ordinal -> GenderFragment(registerStepListener)
-            RegisterViewPagerTabPosition.BIRTH_DATE.ordinal -> BirthDateFragment(registerStepListener)
-            RegisterViewPagerTabPosition.HEIGHT.ordinal -> HeightFragment(registerStepListener)
-            RegisterViewPagerTabPosition.ABOUT.ordinal -> AboutFragment(registerStepListener)
-            RegisterViewPagerTabPosition.PHOTO.ordinal -> PhotoFragment(registerStepListener)
-            RegisterViewPagerTabPosition.BALANCE_GAME.ordinal -> BalanceGameFragment(registerStepListener)
+            RegisterViewPagerTabPosition.NAME.ordinal -> NameStepFragment(registerStepListener)
+            RegisterViewPagerTabPosition.GENDER.ordinal -> GenderStepFragment(registerStepListener)
+            RegisterViewPagerTabPosition.BIRTH_DATE.ordinal -> BirthDateStepFragment(registerStepListener)
+            RegisterViewPagerTabPosition.HEIGHT.ordinal -> HeightStepFragment(registerStepListener)
+            RegisterViewPagerTabPosition.ABOUT.ordinal -> AboutStepFragment(registerStepListener)
+            RegisterViewPagerTabPosition.PHOTO.ordinal -> PhotoStepFragment(registerStepListener)
+            RegisterViewPagerTabPosition.BALANCE_GAME.ordinal -> BalanceStepGameFragment(registerStepListener)
             RegisterViewPagerTabPosition.FINISH.ordinal -> RegisterFinishFragment()
-            else -> NameFragment(registerStepListener)
+            else -> NameStepFragment(registerStepListener)
         }
     }
 
