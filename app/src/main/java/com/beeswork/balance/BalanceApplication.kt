@@ -237,6 +237,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<SaveCardFilterUseCase>() with singleton { SaveCardFilterUseCaseImpl(instance(), Dispatchers.Default) }
         bind<FetchCardsUseCase>() with singleton { FetchCardsUseCaseImpl(instance(), Dispatchers.Default) }
         bind<UpdateLocationGrantedUseCase>() with singleton { UpdateLocationGrantedUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<DisconnectStompUseCase>() with singleton { DisconnectStompUseCaseImpl(instance(), Dispatchers.Default) }
 
 
 

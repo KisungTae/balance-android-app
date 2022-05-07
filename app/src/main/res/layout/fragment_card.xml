@@ -158,7 +158,8 @@
             android:background="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="20dp"
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="100dp"
