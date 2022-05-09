@@ -16,6 +16,6 @@ interface CardPageDAO {
     @Query("update cardPage set currentIndex = :pageIndex where accountId = :accountId")
     fun updateCurrentIndex(accountId: UUID?, pageIndex: Int)
 
-    @Query("select currentIndex from cardPage where accountId = :accountId")
-    fun getCurrentIndexBy(accountId: UUID?): Int?
+    @Query("select * from cardPage where accountId = :accountId")
+    fun getBy(accountId: UUID?): CardPage?
 }

@@ -5,6 +5,7 @@ import com.beeswork.balance.data.database.dao.CardFilterDAO
 import com.beeswork.balance.data.database.dao.CardPageDAO
 import com.beeswork.balance.data.database.entity.card.Card
 import com.beeswork.balance.data.database.entity.card.CardFilter
+import com.beeswork.balance.data.database.entity.card.CardPage
 import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.card.CardRDS
 import com.beeswork.balance.data.network.rds.login.LoginRDS
@@ -63,26 +64,27 @@ class CardRepositoryImpl(
                 cardFilter.distance = distance
                 cardFilterDAO.insert(cardFilter)
             }
+            cardPageDAO.updateCurrentIndex(accountId, 0)
             return@withContext Resource.success(EmptyResponse())
         }
     }
 
     override suspend fun fetchCards(resetPage: Boolean): Resource<List<Card>> {
         return withContext(ioDispatcher) {
-            val accountId = preferenceProvider.getAccountId()
+            val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
+            val cardPage = cardPageDAO.getBy(accountId) ?: CardPage(accountId, 0)
             if (resetPage) {
-                cardPageDAO.updateCurrentIndex(accountId, 0)
+                cardPage.currentIndex = 0
             }
-
             val cardFilter = cardFilterDAO.getBy(accountId) ?: return@withContext Resource.error(CardFilterNotFoundException())
-            val currentCardPageIndex = cardPageDAO.getCurrentIndexBy(accountId) ?: 0
 
             val response = getResponse {
-                cardRDS.fetchCards(cardFilter.minAge, cardFilter.maxAge, cardFilter.gender, cardFilter.distance, currentCardPageIndex)
+                cardRDS.fetchCards(cardFilter.minAge, cardFilter.maxAge, cardFilter.gender, cardFilter.distance, cardPage.currentIndex)
             }
 
             if (response.isSuccess() && !response.data.isNullOrEmpty()) {
-                cardPageDAO.updateCurrentIndex(cardFilter.accountId, currentCardPageIndex + response.data.size)
+                cardPage.currentIndex += response.data.size
+                cardPageDAO.insert(cardPage)
             }
 
             return@withContext response.map { cardDTOs ->
