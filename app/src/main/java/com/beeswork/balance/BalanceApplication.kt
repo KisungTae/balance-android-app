@@ -162,6 +162,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().loginDAO() }
         bind() from singleton { instance<BalanceDatabase>().swipeCountDAO() }
         bind() from singleton { instance<BalanceDatabase>().matchCountDAO() }
+        bind() from singleton { instance<BalanceDatabase>().cardPageDAO() }
+
 
         // API
         bind() from singleton { BalanceAPI(instance()) }
@@ -245,6 +247,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
         bind<CardRepository>() with singleton {
             CardRepositoryImpl(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

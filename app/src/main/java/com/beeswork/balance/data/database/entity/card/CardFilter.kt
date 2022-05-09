@@ -14,8 +14,7 @@ data class CardFilter(
     var gender: Boolean,
     var minAge: Int,
     var maxAge: Int,
-    var distance: Int,
-    var pageIndex: Int = 0
+    var distance: Int
 ) {
     fun isEqualTo(gender: Boolean, minAge: Int, maxAge: Int, distance: Int): Boolean {
         return this.gender == gender && this.minAge == minAge && this.maxAge == maxAge && this.distance == distance

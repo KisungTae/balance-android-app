@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.cardfragment
 
 import android.os.Bundle
 import android.view.*
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -41,8 +42,7 @@ class CardFragment(
     private lateinit var cardStackLayoutManager: CardStackLayoutManager
     private lateinit var binding: FragmentCardBinding
     private var cardStackReachedEnd: Boolean = false
-    private var locationGranted: Boolean = false
-    private var hasCardFilter: Boolean = false
+    private lateinit var locationGrantedObserver: Observer<Boolean>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,24 +62,24 @@ class CardFragment(
         setupToolBar()
         setupCardStackView()
         observeFetchCardsLiveData()
-        observeCardFilterUIStateLiveData()
         observeLocationGrantedLiveData()
         setupBtnListeners()
-
     }
 
     private suspend fun observeLocationGrantedLiveData() {
-        viewModel.locationGrantedLiveData.await().observe(viewLifecycleOwner) { granted ->
-            if (locationGranted != granted) {
-                locationGranted = granted
-                if (granted) {
-                    binding.llCardStackLocationNotGranted.visibility = View.GONE
-                    fetchCards()
-                } else {
-                    binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
+        locationGrantedObserver = Observer<Boolean> { granted ->
+            if (granted) {
+                binding.llCardStackLocationNotGranted.visibility = View.GONE
+                lifecycleScope.launch {
+                    viewModel.locationGrantedLiveData.await().removeObserver(locationGrantedObserver)
+                    observeCardFilterUIStateLiveData()
                 }
+            } else {
+                binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
             }
+
         }
+        viewModel.locationGrantedLiveData.await().observe(viewLifecycleOwner, locationGrantedObserver)
     }
 
     private fun setupBtnListeners() {
@@ -115,9 +115,10 @@ class CardFragment(
 
     private suspend fun observeCardFilterUIStateLiveData() {
         viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterUpdated ->
-            hasCardFilter = cardFilterUpdated
             if (cardFilterUpdated) {
-                fetchCards()
+                cardStackReachedEnd = false
+                cardStackAdapter.clearCards()
+                viewModel.fetchCards(false)
             } else {
                 showCardFilterDialog(showGenderTip = true, cancellable = false)
             }
@@ -167,8 +168,8 @@ class CardFragment(
         val removedCard = cardStackAdapter.removeCard()
         hideEmptyCardStack()
 
-        if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) {
-            fetchCards()
+        if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE && !cardStackReachedEnd) {
+            viewModel.fetchCards(false)
         }
 
         if (direction == Direction.Right) removedCard?.let { _removedCard ->
@@ -177,25 +178,6 @@ class CardFragment(
 //                childFragmentManager,
 //                CardBalanceGameDialog.TAG
 //            )
-        }
-    }
-
-//    fun onLocationPermissionChanged(granted: Boolean) {
-//        if (locationGranted && granted) {
-//            return
-//        }
-//        locationGranted = granted
-//        if (granted) {
-//            binding.llCardStackLocationNotGranted.visibility = View.GONE
-//            fetchCards()
-//        } else {
-//            binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
-//        }
-//    }
-
-    private fun fetchCards() {
-        if (locationGranted && hasCardFilter && !cardStackReachedEnd && cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE) {
-            viewModel.fetchCards(false)
         }
     }
 

@@ -40,11 +40,18 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
         return null
     }
 
+    fun clearCards() {
+        cardItemUIStates.clear()
+        notifyDataSetChanged()
+    }
+
     class ViewHolder(
         private val binding: ItemCardStackBinding
     ) : RecyclerView.ViewHolder(binding.root), CardPhotoViewPagerAdapter.CardPhotoListener {
 
         fun bind(cardItemUIState: CardItemUIState) {
+
+
             binding.vpCardPhoto.adapter = CardPhotoViewPagerAdapter(cardItemUIState.accountId, cardItemUIState.photoURLs, this)
             TabLayoutMediator(binding.tlCardImage, binding.vpCardPhoto) { tab, pos -> }.attach()
         }

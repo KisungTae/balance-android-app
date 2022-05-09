@@ -1,6 +1,8 @@
 package com.beeswork.balance.data.database.repository.card
 
+import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.dao.CardFilterDAO
+import com.beeswork.balance.data.database.dao.CardPageDAO
 import com.beeswork.balance.data.database.entity.card.Card
 import com.beeswork.balance.data.database.entity.card.CardFilter
 import com.beeswork.balance.data.database.repository.BaseRepository
@@ -14,11 +16,15 @@ import com.beeswork.balance.internal.exception.CardFilterNotFoundException
 import com.beeswork.balance.internal.mapper.card.CardMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.util.*
 
+@ExperimentalCoroutinesApi
 class CardRepositoryImpl(
     private val cardFilterDAO: CardFilterDAO,
+    private val cardPageDAO: CardPageDAO,
     loginRDS: LoginRDS,
     private val cardRDS: CardRDS,
     private val cardMapper: CardMapper,
@@ -55,7 +61,6 @@ class CardRepositoryImpl(
                 cardFilter.minAge = minAge
                 cardFilter.maxAge = maxAge
                 cardFilter.distance = distance
-                cardFilter.pageIndex = 0
                 cardFilterDAO.insert(cardFilter)
             }
             return@withContext Resource.success(EmptyResponse())
@@ -66,16 +71,18 @@ class CardRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId()
             if (resetPage) {
-                cardFilterDAO.updatePageIndexBy(accountId, 0)
+                cardPageDAO.updateCurrentIndex(accountId, 0)
             }
 
             val cardFilter = cardFilterDAO.getBy(accountId) ?: return@withContext Resource.error(CardFilterNotFoundException())
+            val currentCardPageIndex = cardPageDAO.getCurrentIndexBy(accountId) ?: 0
+
             val response = getResponse {
-                cardRDS.fetchCards(cardFilter.minAge, cardFilter.maxAge, cardFilter.gender, cardFilter.distance, cardFilter.pageIndex)
+                cardRDS.fetchCards(cardFilter.minAge, cardFilter.maxAge, cardFilter.gender, cardFilter.distance, currentCardPageIndex)
             }
 
             if (response.isSuccess() && !response.data.isNullOrEmpty()) {
-                cardFilterDAO.updatePageIndexBy(cardFilter.accountId, cardFilter.pageIndex + response.data.size)
+                cardPageDAO.updateCurrentIndex(cardFilter.accountId, currentCardPageIndex + response.data.size)
             }
 
             return@withContext response.map { cardDTOs ->

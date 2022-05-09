@@ -17,9 +17,6 @@ interface CardFilterDAO {
     @Query("select * from cardFilter where accountId = :accountId")
     fun getBy(accountId: UUID?): CardFilter?
 
-    @Query("update cardFilter set pageIndex = :pageIndex where accountId = :accountId")
-    fun updatePageIndexBy(accountId: UUID?, pageIndex: Int)
-
     @Query("select count() > 0 from cardFilter where accountId = :accountId")
     fun existBy(accountId: UUID?): Boolean
 
