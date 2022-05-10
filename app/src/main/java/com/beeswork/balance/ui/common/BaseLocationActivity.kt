@@ -24,6 +24,7 @@ abstract class BaseLocationActivity(
     private lateinit var viewModel: BaseLocationViewModel
     private val viewModelFactory: BaseLocationViewModelFactory by instance()
     private var locationLifecycleObserverBound: Boolean = false
+    private var locationPermissionRequested: Boolean = false
 
     private val requestLocationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         onLocationPermissionChanged(granted)
@@ -41,13 +42,17 @@ abstract class BaseLocationActivity(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(BaseLocationViewModel::class.java)
-        viewModel.updateLocationPermissionStatus(LocationPermissionStatus.CHECKING)
-        setupLocationLifecycleObserver()
     }
 
     override fun onResume() {
         super.onResume()
-        onLocationPermissionChanged(isLocationPermissionGranted())
+        if (!locationPermissionRequested) {
+            locationPermissionRequested = true
+            viewModel.updateLocationPermissionStatus(LocationPermissionStatus.CHECKING)
+            setupLocationLifecycleObserver()
+        } else {
+            onLocationPermissionChanged(isLocationPermissionGranted())
+        }
     }
 
     private fun setupLocationLifecycleObserver() {
