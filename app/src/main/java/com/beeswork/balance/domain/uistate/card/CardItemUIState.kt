@@ -5,6 +5,7 @@ import java.util.*
 data class CardItemUIState(
     val accountId: UUID,
     val name: String,
+    val gender: Boolean,
     val about: String?,
     val height: Int?,
     val age: Int,

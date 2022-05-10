@@ -6,14 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemCardPhotoBinding
-import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
-import java.util.*
 
 class CardPhotoViewPagerAdapter(
-    private val accountId: UUID,
-    private val photoKeys: List<String>,
+    private val photoURLs: List<String>,
     private val cardPhotoListener: CardPhotoListener
 ) : RecyclerView.Adapter<CardPhotoViewPagerAdapter.ViewHolder>() {
 
@@ -29,11 +26,11 @@ class CardPhotoViewPagerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return photoKeys.size
+        return photoURLs.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        holder.bind(EndPoint.ofPhoto(accountId, photoKeys[position]))
+        holder.bind("")
 //        holder.itemView.imageView.setImageResource(images[position])
     }
 

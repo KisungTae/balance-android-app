@@ -16,14 +16,22 @@ abstract class BaseRepository(
 
     suspend fun<T> getResponse(block: suspend() -> Resource<T>): Resource<T> {
         val response = block.invoke()
-        if (response.isError() && !response.isExceptionCodeEqualTo(ExceptionCode.EXPIRED_JWT_EXCEPTION)) {
-            return response
+
+        when {
+            response.isSuccess() -> {
+                return response
+            }
+            response.isError() && response.isExceptionCodeEqualTo(ExceptionCode.EXPIRED_JWT_EXCEPTION) -> {
+                val refreshAccessTokenResponse = doRefreshAccessToken()
+                if (refreshAccessTokenResponse.isSuccess()) {
+                    return block.invoke()
+                }
+                return response
+            }
+            else -> {
+                return response
+            }
         }
-        val refreshAccessTokenResponse = doRefreshAccessToken()
-        if (refreshAccessTokenResponse.isSuccess()) {
-            return block.invoke()
-        }
-        return response
     }
 
     protected suspend fun doRefreshAccessToken(): Resource<RefreshAccessTokenDTO> {

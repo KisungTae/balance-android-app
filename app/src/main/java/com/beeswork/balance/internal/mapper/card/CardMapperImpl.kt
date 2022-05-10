@@ -15,6 +15,7 @@ class CardMapperImpl : CardMapper {
         return CardItemUIState(
             card.accountId,
             card.name,
+            card.gender,
             card.about,
             card.height,
             getAgeFromBirthYear(card.birthYear),
@@ -27,6 +28,7 @@ class CardMapperImpl : CardMapper {
         return Card(
             cardDTO.accountId,
             cardDTO.name,
+            cardDTO.gender,
             cardDTO.about,
             cardDTO.height,
             cardDTO.birthYear,

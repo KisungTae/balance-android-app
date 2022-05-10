@@ -11,10 +11,5 @@ class Gender {
     companion object {
         const val FEMALE = false
         const val MALE = true
-
-        fun getOppositeGender(gender: Boolean): Boolean {
-            return if (gender == FEMALE) MALE
-            else FEMALE
-        }
     }
 }

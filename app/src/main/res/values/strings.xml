@@ -297,4 +297,9 @@
     <string name="empty_icon_description">empty icon</string>
     <string name="card_stack_reset_btn">처음부터 보기</string>
 
+    <string name="female">여성</string>
+    <string name="male">남성</string>
+    <string name="distance_unit">km</string>
+
+
 </resources>

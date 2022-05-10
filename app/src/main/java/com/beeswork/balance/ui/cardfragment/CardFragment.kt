@@ -121,8 +121,8 @@ class CardFragment(
     }
 
     private suspend fun observeCardFilterUIStateLiveData() {
-        viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterUpdated ->
-            if (cardFilterUpdated) {
+        viewModel.cardFilterInvalidationLiveData.await().observe(viewLifecycleOwner) { cardFilterInvalidated ->
+            if (cardFilterInvalidated) {
                 cardStackReachedEnd = false
                 cardStackAdapter.clearCards()
                 viewModel.fetchCards(false)

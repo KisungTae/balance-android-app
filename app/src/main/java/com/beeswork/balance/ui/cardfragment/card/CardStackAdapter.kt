@@ -1,11 +1,15 @@
 package com.beeswork.balance.ui.cardfragment.card
 
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.beeswork.balance.databinding.ItemCardStackBinding
+import com.beeswork.balance.R
+import com.beeswork.balance.databinding.ItemCardBinding
 import com.beeswork.balance.domain.uistate.card.CardItemUIState
+import com.beeswork.balance.internal.constant.Gender
 import com.google.android.material.tabs.TabLayoutMediator
 
 
@@ -14,7 +18,7 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
     private val cardItemUIStates: MutableList<CardItemUIState> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(ItemCardStackBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return ViewHolder(ItemCardBinding.inflate(LayoutInflater.from(parent.context), parent, false), parent.context)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -46,13 +50,26 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
     }
 
     class ViewHolder(
-        private val binding: ItemCardStackBinding
+        private val binding: ItemCardBinding,
+        private val context: Context
     ) : RecyclerView.ViewHolder(binding.root), CardPhotoViewPagerAdapter.CardPhotoListener {
 
         fun bind(cardItemUIState: CardItemUIState) {
+            binding.tvCardName.text = cardItemUIState.name
+            binding.tvCardAge.text = cardItemUIState.age.toString()
+            binding.tvCardAboutSnippet.text = cardItemUIState.about
+            binding.tvCardHeight.text = cardItemUIState.height.toString()
+            binding.tvCardDistance.text = cardItemUIState.distance.toString()
 
-
-            binding.vpCardPhoto.adapter = CardPhotoViewPagerAdapter(cardItemUIState.accountId, cardItemUIState.photoURLs, this)
+            if (cardItemUIState.gender == Gender.FEMALE) {
+                binding.tvCardGender.text = context.getString(R.string.female)
+                binding.ivCardGenderIcon.setImageResource(R.drawable.ic_baseline_female_24)
+            } else {
+                binding.tvCardGender.text = context.getString(R.string.male)
+                binding.ivCardGenderIcon.setImageResource(R.drawable.ic_baseline_male_24)
+            }
+            binding.tvCardAbout.text = cardItemUIState.about
+            binding.vpCardPhoto.adapter = CardPhotoViewPagerAdapter(cardItemUIState.photoURLs, this)
             TabLayoutMediator(binding.tlCardImage, binding.vpCardPhoto) { tab, pos -> }.attach()
         }
 
