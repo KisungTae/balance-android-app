@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.setting.Location
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 
@@ -21,7 +22,7 @@ interface LocationDAO {
     fun updateSyncedBy(synced: Boolean)
 
     @Query("update location set synced = 1 where id = ${Location.ID} and updatedAt = :updatedAt")
-    fun updateUpdatedAtBy(updatedAt: OffsetDateTime)
+    fun updateAsSyncedBy(updatedAt: OffsetDateTime)
 
     @Query("select count() > 0 from location where id = ${Location.ID}")
     fun existById(): Boolean
@@ -29,9 +30,9 @@ interface LocationDAO {
     @Query("select * from location where id = ${Location.ID}")
     fun getLocationFlow(): Flow<Location?>
 
-    @Query("select granted from location where id = ${Location.ID}")
-    fun getLocationGrantedFlow(): Flow<Boolean?>
+    @Query("select locationPermissionStatus from location where id = ${Location.ID}")
+    fun getLocationPermissionStatusFlow(): Flow<LocationPermissionStatus?>
 
-    @Query("update location set granted = :granted where id = ${Location.ID}")
-    fun updateGranted(granted: Boolean)
+    @Query("update location set locationPermissionStatus = :locationPermissionStatus where id = ${Location.ID}")
+    fun updateLocationPermissionStatus(locationPermissionStatus: LocationPermissionStatus)
 }

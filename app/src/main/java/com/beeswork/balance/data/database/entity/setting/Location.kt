@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.entity.setting
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "location")
@@ -11,7 +12,7 @@ data class Location(
     val longitude: Double,
     val synced: Boolean,
     val updatedAt: OffsetDateTime,
-    val granted: Boolean,
+    val locationPermissionStatus: LocationPermissionStatus,
 
     @PrimaryKey
     val id: Int = ID

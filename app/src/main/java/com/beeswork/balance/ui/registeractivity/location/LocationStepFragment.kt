@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.FragmentLocationBinding
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.RegisterStepListener
 import kotlinx.coroutines.launch
@@ -39,12 +40,20 @@ class LocationStepFragment(
     }
 
     private suspend fun observeLocationGrantedLiveData() {
-        viewModel.locationGrantedLiveData.await().observe(viewLifecycleOwner) { granted ->
-            if (granted) {
-                registerStepListener.onMoveToNextStep()
-            } else {
-                binding.llRegisterLocationLoadingWrapper.visibility = View.GONE
-                binding.llRegisterLocationErrorWrapper.visibility = View.VISIBLE
+        viewModel.locationGrantedLiveData.await().observe(viewLifecycleOwner) { locationPermissionStatus ->
+            when (locationPermissionStatus) {
+                LocationPermissionStatus.CHECKING -> {
+                    binding.llRegisterLocationLoadingWrapper.visibility = View.VISIBLE
+                }
+                LocationPermissionStatus.GRANTED -> {
+                    registerStepListener.onMoveToNextStep()
+                }
+                LocationPermissionStatus.DENIED -> {
+                    binding.llRegisterLocationLoadingWrapper.visibility = View.GONE
+                    binding.llRegisterLocationErrorWrapper.visibility = View.VISIBLE
+                }
+                else -> {
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.mapper.setting.PushSettingMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -92,7 +93,7 @@ class SettingRepositoryImpl(
     override suspend fun saveLocation(latitude: Double, longitude: Double, syncLocation: Boolean) {
         withContext(ioDispatcher) {
             val updatedAt = OffsetDateTime.now()
-            locationDAO.insert(Location(latitude, longitude, false, updatedAt, true))
+            locationDAO.insert(Location(latitude, longitude, false, updatedAt, LocationPermissionStatus.GRANTED))
             if (syncLocation) {
                 syncLocation(latitude, longitude, updatedAt)
             }
@@ -115,9 +116,9 @@ class SettingRepositoryImpl(
         }
     }
 
-    override suspend fun updateLocationGranted(granted: Boolean) {
+    override suspend fun updateLocationPermissionStatus(locationPermissionStatus: LocationPermissionStatus) {
         withContext(ioDispatcher) {
-            locationDAO.updateGranted(granted)
+            locationDAO.updateLocationPermissionStatus(locationPermissionStatus)
         }
     }
 
@@ -125,7 +126,7 @@ class SettingRepositoryImpl(
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { c, t -> }) {
             val response = settingRDS.saveLocation(latitude, longitude, updatedAt)
             if (response.isSuccess()) {
-                locationDAO.updateUpdatedAtBy(updatedAt)
+                locationDAO.updateAsSyncedBy(updatedAt)
             }
         }
     }
@@ -134,8 +135,8 @@ class SettingRepositoryImpl(
         return locationDAO.getLocationFlow()
     }
 
-    override fun getLocationGrantedFlow(): Flow<Boolean?> {
-        return locationDAO.getLocationGrantedFlow()
+    override fun getLocationPermissionStatusFlow(): Flow<LocationPermissionStatus?> {
+        return locationDAO.getLocationPermissionStatusFlow()
     }
 
     override suspend fun deleteAccount(): Resource<EmptyResponse> {

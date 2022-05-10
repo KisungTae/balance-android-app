@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import com.beeswork.balance.ui.mainactivity.LocationLifecycleObserver
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -40,7 +41,7 @@ abstract class BaseLocationActivity(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(BaseLocationViewModel::class.java)
-        viewModel.updateLocationGranted(false)
+        viewModel.updateLocationPermissionStatus(LocationPermissionStatus.CHECKING)
         setupLocationLifecycleObserver()
     }
 
@@ -58,9 +59,13 @@ abstract class BaseLocationActivity(
     }
 
     private fun onLocationPermissionChanged(granted: Boolean) {
-        if (granted && !locationLifecycleObserverBound) {
-            locationLifecycleObserverBound = true
-            LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
+        if (granted) {
+            if (!locationLifecycleObserverBound) {
+                locationLifecycleObserverBound = true
+                LocationLifecycleObserver(this, fusedLocationProviderClient, locationCallback, this)
+            }
+        } else {
+            viewModel.updateLocationPermissionStatus(LocationPermissionStatus.DENIED)
         }
     }
 

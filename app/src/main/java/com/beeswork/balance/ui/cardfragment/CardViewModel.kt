@@ -8,6 +8,7 @@ import com.beeswork.balance.internal.mapper.card.CardMapper
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.domain.uistate.card.FetchCardsUIState
 import com.beeswork.balance.domain.usecase.card.FetchCardsUseCase
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
@@ -28,9 +29,9 @@ class CardViewModel(
         cardRepository.getCardFilterInvalidationFlow().asLiveData()
     }
 
-    val locationGrantedLiveData by viewModelLazyDeferred {
-        settingRepository.getLocationGrantedFlow().map { granted ->
-            granted ?: false
+    val locationPermissionStatusLiveData by viewModelLazyDeferred {
+        settingRepository.getLocationPermissionStatusFlow().map { locationPermissionStatus ->
+            locationPermissionStatus ?: LocationPermissionStatus.CHECKING
         }.asLiveData()
     }
 

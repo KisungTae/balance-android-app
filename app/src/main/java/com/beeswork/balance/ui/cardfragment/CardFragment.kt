@@ -42,7 +42,7 @@ class CardFragment(
     private lateinit var cardStackLayoutManager: CardStackLayoutManager
     private lateinit var binding: FragmentCardBinding
     private var cardStackReachedEnd: Boolean = false
-    private lateinit var locationGrantedObserver: Observer<Boolean>
+    private lateinit var locationPermissionStatusObserver: Observer<LocationPermissionStatus>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,19 +67,26 @@ class CardFragment(
     }
 
     private suspend fun observeLocationGrantedLiveData() {
-        locationGrantedObserver = Observer<Boolean> { granted ->
-            if (granted) {
-                binding.llCardStackLocationNotGranted.visibility = View.GONE
-                lifecycleScope.launch {
-                    viewModel.locationGrantedLiveData.await().removeObserver(locationGrantedObserver)
-                    observeCardFilterUIStateLiveData()
+        locationPermissionStatusObserver = Observer<LocationPermissionStatus> { locationPermissionStatus ->
+            when (locationPermissionStatus) {
+                LocationPermissionStatus.CHECKING -> {
+                    updateCardLayouts(View.VISIBLE, View.GONE, View.GONE)
                 }
-            } else {
-                binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
+                LocationPermissionStatus.GRANTED -> {
+                    binding.llCardStackLocationNotGranted.visibility = View.GONE
+                    lifecycleScope.launch {
+                        viewModel.locationPermissionStatusLiveData.await().removeObserver(locationPermissionStatusObserver)
+                        observeCardFilterUIStateLiveData()
+                    }
+                }
+                LocationPermissionStatus.DENIED -> {
+                    binding.llCardStackLocationNotGranted.visibility = View.VISIBLE
+                }
+                else -> {
+                }
             }
-
         }
-        viewModel.locationGrantedLiveData.await().observe(viewLifecycleOwner, locationGrantedObserver)
+        viewModel.locationPermissionStatusLiveData.await().observe(viewLifecycleOwner, locationPermissionStatusObserver)
     }
 
     private fun setupBtnListeners() {
@@ -140,7 +147,7 @@ class CardFragment(
                 fetchCardsUIState.showError -> {
                     hideEmptyCardStack()
                     updateCardLayouts(View.GONE, View.GONE, View.VISIBLE)
-                    binding.tvCardStackErrorTitle.text =  getString(R.string.fetch_card_exception_title)
+                    binding.tvCardStackErrorTitle.text = getString(R.string.fetch_card_exception_title)
                     binding.tvCardStackErrorMessage.text = MessageSource.getMessage(requireContext(), fetchCardsUIState.exception)
                 }
                 fetchCardsUIState.cardItemUIStates.isNullOrEmpty() -> {
@@ -192,19 +199,15 @@ class CardFragment(
     }
 
     override fun onCardRewound() {
-        println("onCardRewound")
     }
 
     override fun onCardCanceled() {
-        println("onCardCanceled")
     }
 
     override fun onCardAppeared(view: View?, position: Int) {
-        println("onCardAppeared")
     }
 
     override fun onCardDisappeared(view: View?, position: Int) {
-        println("onCardDisappeared")
     }
 
     override fun onFragmentSelected() {

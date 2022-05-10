@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.common
 import androidx.lifecycle.viewModelScope
 import com.beeswork.balance.domain.usecase.location.SaveLocationUseCase
 import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCase
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import kotlinx.coroutines.launch
 
 class BaseLocationViewModel(
@@ -16,9 +17,9 @@ class BaseLocationViewModel(
         }
     }
 
-    fun updateLocationGranted(granted: Boolean) {
+    fun updateLocationPermissionStatus(locationPermissionStatus: LocationPermissionStatus) {
         viewModelScope.launch {
-            updateLocationGrantedUseCase.invoke(granted)
+            updateLocationGrantedUseCase.invoke(locationPermissionStatus)
         }
     }
 

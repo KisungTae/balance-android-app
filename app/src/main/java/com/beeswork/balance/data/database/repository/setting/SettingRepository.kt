@@ -4,6 +4,7 @@ import com.beeswork.balance.data.database.entity.setting.Location
 import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.internal.constant.LocationPermissionStatus
 import kotlinx.coroutines.flow.Flow
 
 interface SettingRepository {
@@ -25,9 +26,9 @@ interface SettingRepository {
     suspend fun saveLocation(latitude: Double, longitude: Double, syncLocation: Boolean)
     suspend fun syncLocation()
     suspend fun getLocation(): Location?
-    suspend fun updateLocationGranted(granted: Boolean)
+    suspend fun updateLocationPermissionStatus(locationPermissionStatus: LocationPermissionStatus)
     fun getLocationFlow(): Flow<Location?>
-    fun getLocationGrantedFlow(): Flow<Boolean?>
+    fun getLocationPermissionStatusFlow(): Flow<LocationPermissionStatus?>
 
     suspend fun deleteAccount(): Resource<EmptyResponse>
 
