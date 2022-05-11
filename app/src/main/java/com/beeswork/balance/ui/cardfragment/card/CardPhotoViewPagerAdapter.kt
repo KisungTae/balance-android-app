@@ -31,6 +31,7 @@ class CardPhotoViewPagerAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind("")
+        println("onBindViewHolder: ${photoURLs[position]}")
 //        holder.itemView.imageView.setImageResource(images[position])
     }
 

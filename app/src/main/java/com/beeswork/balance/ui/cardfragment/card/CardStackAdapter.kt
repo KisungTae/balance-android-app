@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemCardBinding
 import com.beeswork.balance.domain.uistate.card.CardItemUIState
@@ -22,7 +23,7 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        cardItemUIStates[position].let { holder.bind(it) }
+        holder.bind(cardItemUIStates[position])
     }
 
     override fun getItemCount(): Int {
@@ -69,8 +70,9 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
                 binding.ivCardGenderIcon.setImageResource(R.drawable.ic_baseline_male_24)
             }
             binding.tvCardAbout.text = cardItemUIState.about
+            binding.vpCardPhoto.offscreenPageLimit = 1
             binding.vpCardPhoto.adapter = CardPhotoViewPagerAdapter(cardItemUIState.photoURLs, this)
-            TabLayoutMediator(binding.tlCardImage, binding.vpCardPhoto) { tab, pos -> }.attach()
+            TabLayoutMediator(binding.tlCardImage, binding.vpCardPhoto) { _, _ -> }.attach()
         }
 
         override fun onLeftButtonClick(position: Int) {
@@ -81,6 +83,8 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
             binding.vpCardPhoto.currentItem = position + 1
         }
     }
+
+
 
 
 }
