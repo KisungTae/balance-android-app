@@ -23,7 +23,7 @@
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:contentDescription="@string/match_rep_photo_iv_description"
-            android:src="@drawable/ic_baseline_account_circle" />
+            android:src="@drawable/round_account" />
 
     </LinearLayout>
 

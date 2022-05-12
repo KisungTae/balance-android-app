@@ -13,8 +13,8 @@ class GlideHelper {
             return RequestOptions()
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .priority(Priority.HIGH)
-                .placeholder(R.drawable.ic_baseline_account_circle)
-                .error(R.drawable.ic_baseline_account_circle)
+                .placeholder(R.drawable.round_account)
+                .error(R.drawable.round_account)
         }
 
 //      NOTE 1. card does not need to be cached

@@ -11,6 +11,7 @@ import com.beeswork.balance.databinding.FragmentCardBinding
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.observeUIState
+import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameDialog
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 
 import com.beeswork.balance.ui.common.BaseFragment
@@ -179,12 +180,16 @@ class CardFragment(
             viewModel.fetchCards(false)
         }
 
-        if (direction == Direction.Right) removedCard?.let { _removedCard ->
-            val profilePhotoKey = if (_removedCard.photoURLs.isNotEmpty()) _removedCard.photoURLs[0] else null
-//            CardBalanceGameDialog(_removedCard.accountId, _removedCard.name, profilePhotoKey).show(
-//                childFragmentManager,
-//                CardBalanceGameDialog.TAG
-//            )
+        if (removedCard != null && direction == Direction.Right) {
+            CardBalanceGameDialog(
+                removedCard.accountId,
+                removedCard.name,
+                removedCard.photoURLs.getOrNull(0),
+                cardBalanceGameListener
+            ).show(
+                childFragmentManager,
+                CardBalanceGameDialog.TAG
+            )
         }
     }
 

@@ -75,11 +75,11 @@ class BalanceGameViewModel(
         viewModelScope.launch {
             _clickUIStateLiveData.postValue(ClickUIState.ofLoading())
             val response = clickUseCase.invoke(swipedId, answers)
-            val clickUIState = if (response.isSuccess() && response.data != null && response.data.match != null) {
-                val matchNotificationUIState = matchMapper.toMatchNotificationUIState(
-                    response.data.match,
-                    preferenceProvider.getPhotoDomain()
-                )
+
+            val clickUIState = if (response.isSuccess() && response.data != null) {
+                val matchNotificationUIState = response.data.match?.let { match ->
+                    matchMapper.toMatchNotificationUIState(match, preferenceProvider.getPhotoDomain())
+                }
                 ClickUIState.ofSuccess(response.data.clickOutcome, matchNotificationUIState)
             } else {
                 ClickUIState.ofError(response.exception)

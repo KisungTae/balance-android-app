@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/accountFragment"
-        android:icon="@drawable/ic_baseline_account_circle"
+        android:icon="@drawable/round_account"
         android:title="" />
 
 

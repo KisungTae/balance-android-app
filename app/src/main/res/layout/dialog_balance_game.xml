@@ -303,7 +303,6 @@
                     android:id="@+id/tvBalanceGameMissedSwipedName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="슈기"
                     android:textColor="@color/Primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -525,8 +524,7 @@
                             android:id="@+id/ivBalanceGameMatchedSwiperProfilePhoto"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:contentDescription="@string/balance_game_profile_photo_description"
-                            android:src="@drawable/person3" />
+                            android:contentDescription="@string/balance_game_profile_photo_description" />
 
                     </LinearLayout>
 
@@ -543,8 +541,7 @@
                             android:id="@+id/ivBalanceGameMatchedSwipedProfilePhoto"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:contentDescription="@string/balance_game_profile_photo_description"
-                            android:src="@drawable/person1" />
+                            android:contentDescription="@string/balance_game_profile_photo_description" />
 
                     </LinearLayout>
 
@@ -564,7 +561,6 @@
                     android:id="@+id/tvBalanceGameMatchedSwipedName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="슈기"
                     android:textColor="@color/Primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />

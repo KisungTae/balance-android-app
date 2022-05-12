@@ -91,9 +91,10 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                         hideRefreshBtn()
                     }
                     showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.GONE)
-                    addBalanceGameTabs(fetchQuestionUIState.questionItemUIStates.size)
                     balanceGameViewPagerAdapter.submit(fetchQuestionUIState.questionItemUIStates)
+                    addBalanceGameTabs(fetchQuestionUIState.questionItemUIStates.size)
                     binding.tvBalanceGamePoint.text = fetchQuestionUIState.point.toString()
+                    binding.vpBalanceGame.currentItem = 0
                 }
                 fetchQuestionUIState.showLoading -> {
                     showLoading(getString(R.string.fetch_question_message))
@@ -109,11 +110,9 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
     }
 
     private fun addBalanceGameTabs(size: Int) {
-        val diff = size - binding.tlBalanceGame.tabCount
-        if (diff > 0) {
-            for (i in 1..diff) {
-                binding.tlBalanceGame.addTab(binding.tlBalanceGame.newTab())
-            }
+        binding.tlBalanceGame.removeAllTabs()
+        for (i in 1..size) {
+            binding.tlBalanceGame.addTab(binding.tlBalanceGame.newTab())
         }
     }
 

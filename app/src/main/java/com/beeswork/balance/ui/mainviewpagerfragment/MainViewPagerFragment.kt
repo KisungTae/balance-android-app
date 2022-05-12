@@ -125,7 +125,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
                 MainViewPagerTabPosition.CARD.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
                 MainViewPagerTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
                 MainViewPagerTabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
-                MainViewPagerTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_baseline_account_circle)
+                MainViewPagerTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.round_account)
             }
         }
         tabLayoutMediator.attach()

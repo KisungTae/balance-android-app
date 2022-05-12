@@ -66,7 +66,6 @@ class CardBalanceGameDialog(
         viewModel.clickUIStateLiveData.observe(viewLifecycleOwner) { clickUIState ->
             when {
                 clickUIState.clickOutcome != null -> {
-                    binding.tvBalanceGameMatchedSwipedName.text = swipedName ?: ""
                     when (clickUIState.clickOutcome) {
                         ClickOutcome.MATCHED -> {
                             showMatched(clickUIState.matchNotificationUIState)
@@ -94,6 +93,7 @@ class CardBalanceGameDialog(
 
     private fun showMatched(matchNotificationUIState: MatchNotificationUIState?) {
         showLayouts(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.GONE)
+        binding.tvBalanceGameMatchedSwipedName.text = swipedName ?: ""
         Glide.with(requireContext())
             .load(swipedProfilePhotoUrl)
             .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
@@ -102,18 +102,20 @@ class CardBalanceGameDialog(
         Glide.with(requireContext())
             .load(matchNotificationUIState?.swiperProfilePhotoUrl)
             .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-            .into(binding.ivBalanceGameClickedSwipedProfilePhoto)
+            .into(binding.ivBalanceGameMatchedSwiperProfilePhoto)
     }
 
     private fun showClicked() {
         showLayouts(View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE)
+        binding.tvBalanceGameClickedSwipedName.text = swipedName ?: ""
         Glide.with(requireContext())
             .load(swipedProfilePhotoUrl)
             .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
-            .into(binding.ivBalanceGameMatchedSwiperProfilePhoto)
+            .into(binding.ivBalanceGameClickedSwipedProfilePhoto)
     }
 
     private fun showMissed() {
+        binding.tvBalanceGameMissedSwipedName.text = swipedName ?: ""
         showLayouts(View.GONE, View.GONE, View.GONE, View.GONE, View.VISIBLE)
     }
 
