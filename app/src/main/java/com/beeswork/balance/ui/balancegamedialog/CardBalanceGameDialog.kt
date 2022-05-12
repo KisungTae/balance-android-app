@@ -15,7 +15,7 @@ class CardBalanceGameDialog(
     private val swipedName: String?,
     private val swipedProfilePhotoUrl: String?,
     private val cardBalanceGameListener: CardBalanceGameListener
-): BaseBalanceGameDialog() {
+) : BaseBalanceGameDialog() {
 
     private var balanceGameAttemptCount: Int = 0
 
@@ -77,6 +77,7 @@ class CardBalanceGameDialog(
                             showMissed()
                         }
                     }
+                    binding.tvBalanceGamePoint.text = clickUIState.point.toString()
                 }
                 clickUIState.showLoading -> {
                     showLoading(getString(R.string.msg_check_answers))

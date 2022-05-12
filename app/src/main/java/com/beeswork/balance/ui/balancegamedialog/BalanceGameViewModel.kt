@@ -80,7 +80,7 @@ class BalanceGameViewModel(
                 val matchNotificationUIState = response.data.match?.let { match ->
                     matchMapper.toMatchNotificationUIState(match, preferenceProvider.getPhotoDomain())
                 }
-                ClickUIState.ofSuccess(response.data.clickOutcome, matchNotificationUIState)
+                ClickUIState.ofSuccess(response.data.clickOutcome, response.data.point, matchNotificationUIState)
             } else {
                 ClickUIState.ofError(response.exception)
             }

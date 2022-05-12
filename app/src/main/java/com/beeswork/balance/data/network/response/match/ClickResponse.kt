@@ -4,5 +4,6 @@ import com.beeswork.balance.internal.constant.ClickOutcome
 
 data class ClickResponse(
     val clickOutcome: ClickOutcome,
-    val matchDTO: MatchDTO?
+    val point: Int,
+    val matchDTO: MatchDTO?,
 )

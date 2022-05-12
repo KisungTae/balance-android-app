@@ -55,6 +55,7 @@ class MatchRepositoryImpl(
     private val matchPageFetchDateTracker = PageFetchDateTracker(5L)
 
     private var newMatchCallBackFlowListener: CallBackFlowListener<Match>? = null
+
     @ExperimentalCoroutinesApi
     override val newMatchFlow: Flow<Match> = callbackFlow {
         newMatchCallBackFlowListener = object : CallBackFlowListener<Match> {
@@ -235,13 +236,13 @@ class MatchRepositoryImpl(
                         val saveMatchResult = doSaveMatch(clickResponse.matchDTO)
                         val match = saveMatchResult.data
                         match?.swiperProfilePhotoKey = photoDAO.getProfilePhotoKeyBy(match?.swiperId)
-                        return@map ClickResult(clickResponse.clickOutcome, match)
+                        return@map ClickResult(clickResponse.clickOutcome, clickResponse.point, match)
                     }
                     ClickOutcome.CLICKED -> {
-                        return@map ClickResult(clickResponse.clickOutcome, null)
+                        return@map ClickResult(clickResponse.clickOutcome, clickResponse.point, null)
                     }
                     ClickOutcome.MISSED -> {
-                        return@map ClickResult(clickResponse.clickOutcome, null)
+                        return@map ClickResult(clickResponse.clickOutcome, clickResponse.point, null)
                     }
                 }
             }
