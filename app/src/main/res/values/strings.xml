@@ -300,6 +300,7 @@
     <string name="female">여성</string>
     <string name="male">남성</string>
     <string name="distance_unit">km</string>
+    <string name="dislike_icon_description">dislike icon</string>
 
 
 </resources>

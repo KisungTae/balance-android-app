@@ -2,6 +2,7 @@ package com.beeswork.balance.ui.cardfragment
 
 import android.os.Bundle
 import android.view.*
+import android.view.animation.LinearInterpolator
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -115,6 +116,7 @@ class CardFragment(
         cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
         cardStackLayoutManager.setSwipeThreshold(0.5f)
         cardStackLayoutManager.setMaxDegree(0.0f)
+        cardStackLayoutManager.setOverlayInterpolator(LinearInterpolator())
 
         binding.csvCard.layoutManager = cardStackLayoutManager
         binding.csvCard.adapter = cardStackAdapter
