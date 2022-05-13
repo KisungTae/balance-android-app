@@ -6,7 +6,7 @@ import com.beeswork.balance.internal.constant.ExceptionCode
 
 data class ClickUIState(
     val clickOutcome: ClickOutcome?,
-    val point: Int,
+    val point: Int?,
     val matchNotificationUIState: MatchNotificationUIState?,
     val showLoading: Boolean,
     val showError: Boolean,
@@ -30,7 +30,7 @@ data class ClickUIState(
         fun ofLoading(): ClickUIState {
             return ClickUIState(
                 clickOutcome = null,
-                0,
+                point = null,
                 matchNotificationUIState = null,
                 showLoading = true,
                 showError = false,
@@ -41,7 +41,7 @@ data class ClickUIState(
         fun ofError(exception: Throwable?): ClickUIState {
             return ClickUIState(
                 clickOutcome = null,
-                0,
+                point = null,
                 matchNotificationUIState = null,
                 showLoading = false,
                 showError = true,

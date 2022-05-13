@@ -43,8 +43,8 @@ class CardBalanceGameDialog(
         binding.btnBalanceGameRefetch.setOnClickListener {
             viewModel.like(swipedId)
         }
-        binding.btnBalanceGameClickedGoToSwipe.setOnClickListener {
-            cardBalanceGameListener.onGoToSwipeSelected()
+        binding.btnBalanceGameClickedGoToCard.setOnClickListener {
+            cardBalanceGameListener.onGoToCardSelected()
             dismiss()
         }
         binding.btnBalanceGameMatchedGoToMatch.setOnClickListener {
@@ -77,7 +77,9 @@ class CardBalanceGameDialog(
                             showMissed()
                         }
                     }
-                    binding.tvBalanceGamePoint.text = clickUIState.point.toString()
+                    if (clickUIState.point != null) {
+                        binding.tvBalanceGamePoint.text = clickUIState.point.toString()
+                    }
                 }
                 clickUIState.showLoading -> {
                     showLoading(getString(R.string.msg_check_answers))

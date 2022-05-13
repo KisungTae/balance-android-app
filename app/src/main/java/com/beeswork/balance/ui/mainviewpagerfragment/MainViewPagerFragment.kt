@@ -194,8 +194,8 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
             .into(imageView)
     }
 
-    override fun onGoToSwipeSelected() {
-        binding.tlMain.getTabAt(MainViewPagerTabPosition.SWIPE.ordinal)?.select()
+    override fun onGoToCardSelected() {
+        binding.tlMain.getTabAt(MainViewPagerTabPosition.CARD.ordinal)?.select()
     }
 
     override fun onGoToMatchSelected() {

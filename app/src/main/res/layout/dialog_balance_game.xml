@@ -443,7 +443,7 @@
 
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnBalanceGameClickedGoToSwipe"
+                android:id="@+id/btnBalanceGameClickedGoToCard"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
