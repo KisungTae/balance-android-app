@@ -11,5 +11,6 @@ data class CardPage(
     @PrimaryKey
     val accountId: UUID,
 
-    var currentIndex: Int
+    var currentIndex: Int,
+    var readByIndex: Int
 )

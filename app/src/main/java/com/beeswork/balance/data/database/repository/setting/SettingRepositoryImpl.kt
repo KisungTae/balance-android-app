@@ -118,7 +118,10 @@ class SettingRepositoryImpl(
 
     override suspend fun updateLocationPermissionStatus(locationPermissionStatus: LocationPermissionStatus) {
         withContext(ioDispatcher) {
-            locationDAO.updateLocationPermissionStatus(locationPermissionStatus)
+            val updatedRows = locationDAO.updateLocationPermissionStatus(locationPermissionStatus)
+            if (updatedRows <= 0) {
+                locationDAO.insert(Location(0.0, 0.0, false, OffsetDateTime.now(), locationPermissionStatus))
+            }
         }
     }
 

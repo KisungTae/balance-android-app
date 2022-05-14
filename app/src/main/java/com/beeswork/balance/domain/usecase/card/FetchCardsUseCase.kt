@@ -5,5 +5,5 @@ import com.beeswork.balance.data.network.response.Resource
 
 interface FetchCardsUseCase {
 
-    suspend fun invoke(resetPage: Boolean): Resource<List<Card>>
+    suspend fun invoke(resetPage: Boolean, isFirstFetch: Boolean): Resource<List<Card>>
 }

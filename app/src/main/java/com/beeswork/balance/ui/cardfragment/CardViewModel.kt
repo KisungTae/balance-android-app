@@ -40,14 +40,14 @@ class CardViewModel(
 
     private var fetchingCards = false
 
-    fun fetchCards(resetPage: Boolean) {
+    fun fetchCards(resetPage: Boolean, isFirstFetch: Boolean) {
         viewModelScope.launch {
             if (fetchingCards) {
                 return@launch
             }
             fetchingCards = true
             _fetchCardsUIStateLiveData.postValue(FetchCardsUIState.ofLoading())
-            val response = fetchCardsUseCase.invoke(resetPage)
+            val response = fetchCardsUseCase.invoke(resetPage, isFirstFetch)
             val fetchCardsUIState = if (response.isSuccess() && response.data != null) {
                 withContext(defaultDispatcher) {
                     val cardItemUIStates = response.data.map { card ->

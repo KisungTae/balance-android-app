@@ -34,5 +34,5 @@ interface LocationDAO {
     fun getLocationPermissionStatusFlow(): Flow<LocationPermissionStatus?>
 
     @Query("update location set locationPermissionStatus = :locationPermissionStatus where id = ${Location.ID}")
-    fun updateLocationPermissionStatus(locationPermissionStatus: LocationPermissionStatus)
+    fun updateLocationPermissionStatus(locationPermissionStatus: LocationPermissionStatus): Int
 }

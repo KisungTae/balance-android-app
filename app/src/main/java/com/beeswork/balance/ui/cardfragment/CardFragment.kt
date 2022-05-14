@@ -92,8 +92,8 @@ class CardFragment(
     }
 
     private fun setupBtnListeners() {
-        binding.btnCardStackRefetch.setOnClickListener { viewModel.fetchCards(false) }
-        binding.btnCardStackReset.setOnClickListener { viewModel.fetchCards(true) }
+        binding.btnCardStackRefetch.setOnClickListener { viewModel.fetchCards(resetPage = false, isFirstFetch = false) }
+        binding.btnCardStackReset.setOnClickListener { viewModel.fetchCards(resetPage = true, isFirstFetch = true) }
     }
 
     private fun setupToolBar() {
@@ -128,7 +128,7 @@ class CardFragment(
             if (cardFilterInvalidated) {
                 cardStackReachedEnd = false
                 cardStackAdapter.clearCards()
-                viewModel.fetchCards(false)
+                viewModel.fetchCards(resetPage = false, isFirstFetch = true)
             } else {
                 showCardFilterDialog(showGenderTip = true, cancellable = false)
             }
@@ -179,7 +179,7 @@ class CardFragment(
         hideEmptyCardStack()
 
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE && !cardStackReachedEnd) {
-            viewModel.fetchCards(false)
+            viewModel.fetchCards(resetPage = false, isFirstFetch = false)
         }
 
         if (removedCard != null && direction == Direction.Right) {

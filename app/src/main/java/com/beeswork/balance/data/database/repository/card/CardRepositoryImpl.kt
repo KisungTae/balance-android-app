@@ -1,6 +1,5 @@
 package com.beeswork.balance.data.database.repository.card
 
-import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.dao.CardFilterDAO
 import com.beeswork.balance.data.database.dao.CardPageDAO
 import com.beeswork.balance.data.database.entity.card.Card
@@ -17,9 +16,7 @@ import com.beeswork.balance.internal.exception.CardFilterNotFoundException
 import com.beeswork.balance.internal.mapper.card.CardMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import java.util.*
 
 @ExperimentalCoroutinesApi
@@ -69,14 +66,20 @@ class CardRepositoryImpl(
         }
     }
 
-    override suspend fun fetchCards(resetPage: Boolean): Resource<List<Card>> {
+    override suspend fun fetchCards(resetPage: Boolean, isFirstFetch: Boolean): Resource<List<Card>> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-            val cardPage = cardPageDAO.getBy(accountId) ?: CardPage(accountId, 0)
+            val cardFilter = cardFilterDAO.getBy(accountId) ?: return@withContext Resource.error(CardFilterNotFoundException())
+            val cardPage = cardPageDAO.getBy(accountId) ?: CardPage(accountId, 0, 0)
+
             if (resetPage) {
+                cardPage.readByIndex = 0
                 cardPage.currentIndex = 0
             }
-            val cardFilter = cardFilterDAO.getBy(accountId) ?: return@withContext Resource.error(CardFilterNotFoundException())
+
+            if (isFirstFetch) {
+                cardPage.currentIndex = cardPage.readByIndex
+            }
 
             val response = getResponse {
                 cardRDS.fetchCards(cardFilter.minAge, cardFilter.maxAge, cardFilter.gender, cardFilter.distance, cardPage.currentIndex)

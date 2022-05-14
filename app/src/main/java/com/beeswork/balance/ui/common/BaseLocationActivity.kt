@@ -42,6 +42,7 @@ abstract class BaseLocationActivity(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(BaseLocationViewModel::class.java)
+        viewModel.updateLocationPermissionStatus(LocationPermissionStatus.CHECKING)
     }
 
     override fun onResume() {

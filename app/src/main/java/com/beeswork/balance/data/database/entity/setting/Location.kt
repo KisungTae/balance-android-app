@@ -12,7 +12,7 @@ data class Location(
     val longitude: Double,
     val synced: Boolean,
     val updatedAt: OffsetDateTime,
-    val locationPermissionStatus: LocationPermissionStatus,
+    var locationPermissionStatus: LocationPermissionStatus,
 
     @PrimaryKey
     val id: Int = ID

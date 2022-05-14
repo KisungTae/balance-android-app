@@ -228,13 +228,13 @@
     <FrameLayout
         android:id="@+id/left_overlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginEnd="50dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
-            android:layout_marginEnd="30dp"
             android:alpha=".7"
             android:background="@drawable/sh_circle_box"
             android:backgroundTint="@color/white"
@@ -254,13 +254,13 @@
     <FrameLayout
         android:id="@+id/right_overlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginStart="50dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|start"
-            android:layout_marginStart="30dp"
             android:alpha=".7"
             android:background="@drawable/sh_circle_box"
             android:backgroundTint="@color/white"
