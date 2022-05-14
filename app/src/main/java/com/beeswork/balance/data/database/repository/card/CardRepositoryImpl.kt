@@ -100,6 +100,12 @@ class CardRepositoryImpl(
         }
     }
 
+    override suspend fun incrementReadByIndex() {
+        withContext(ioDispatcher) {
+            cardPageDAO.incrementReadByIndexBy(preferenceProvider.getAccountId(), 1)
+        }
+    }
+
     override fun getCardFilterInvalidationFlow(): Flow<Boolean> {
         return cardFilterDAO.getCardFilterInvalidationFlow(preferenceProvider.getAccountId())
     }

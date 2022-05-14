@@ -18,4 +18,7 @@ interface CardPageDAO {
 
     @Query("select * from cardPage where accountId = :accountId")
     fun getBy(accountId: UUID?): CardPage?
+
+    @Query("update cardPage set readByIndex = readByIndex + :incrementBy where accountId = :accountId")
+    fun incrementReadByIndexBy(accountId: UUID?, incrementBy: Int)
 }

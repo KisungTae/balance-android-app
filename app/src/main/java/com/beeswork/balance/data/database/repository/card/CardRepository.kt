@@ -14,5 +14,6 @@ interface CardRepository {
     suspend fun getCardFilter(): CardFilter?
     suspend fun saveCardFilter(gender: Boolean, minAge: Int, maxAge: Int, distance: Int): Resource<EmptyResponse>
     suspend fun fetchCards(resetPage: Boolean, isFirstFetch: Boolean): Resource<List<Card>>
+    suspend fun incrementReadByIndex()
     fun getCardFilterInvalidationFlow(): Flow<Boolean>
 }

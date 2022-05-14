@@ -61,6 +61,9 @@ class CardViewModel(
             fetchingCards = false
             _fetchCardsUIStateLiveData.postValue(fetchCardsUIState)
         }
+    }
+
+    fun incrementReadByIndex() {
 
     }
 }
