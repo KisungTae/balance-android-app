@@ -240,6 +240,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<FetchCardsUseCase>() with singleton { FetchCardsUseCaseImpl(instance(), Dispatchers.Default) }
         bind<UpdateLocationGrantedUseCase>() with singleton { UpdateLocationGrantedUseCaseImpl(instance(), Dispatchers.Default) }
         bind<DisconnectStompUseCase>() with singleton { DisconnectStompUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<IncrementReadByIndexUseCase>() with singleton { IncrementReadByIndexUseCaseImpl(instance(), Dispatchers.Default) }
 
 
 
@@ -362,6 +363,7 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind() from provider {
             CardViewModelFactory(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

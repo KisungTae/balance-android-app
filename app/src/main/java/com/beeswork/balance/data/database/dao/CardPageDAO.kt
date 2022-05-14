@@ -13,8 +13,8 @@ interface CardPageDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(cardPage: CardPage)
 
-    @Query("update cardPage set currentIndex = :pageIndex where accountId = :accountId")
-    fun updateCurrentIndex(accountId: UUID?, pageIndex: Int)
+    @Query("update cardPage set currentIndex = :currentIndex, readByIndex = :readyByIndex where accountId = :accountId")
+    fun updateBy(accountId: UUID?, currentIndex: Int, readyByIndex: Int)
 
     @Query("select * from cardPage where accountId = :accountId")
     fun getBy(accountId: UUID?): CardPage?

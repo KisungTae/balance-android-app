@@ -60,8 +60,8 @@ class CardRepositoryImpl(
                 cardFilter.maxAge = maxAge
                 cardFilter.distance = distance
                 cardFilterDAO.insert(cardFilter)
+                cardPageDAO.updateBy(accountId, 0, 0)
             }
-            cardPageDAO.updateCurrentIndex(accountId, 0)
             return@withContext Resource.success(EmptyResponse())
         }
     }
@@ -91,11 +91,9 @@ class CardRepositoryImpl(
             }
 
             return@withContext response.map { cardDTOs ->
-                val cards = cardDTOs?.map { cardDTO ->
+                cardDTOs?.map { cardDTO ->
                     cardMapper.toCard(cardDTO)
-                }?.toMutableList()
-                cards?.shuffle()
-                cards
+                }
             }
         }
     }

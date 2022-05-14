@@ -178,6 +178,10 @@ class CardFragment(
         val removedCard = cardStackAdapter.removeCard()
         hideEmptyCardStack()
 
+        if (removedCard != null) {
+            viewModel.incrementReadByIndex()
+        }
+
         if (cardStackAdapter.itemCount < MIN_CARD_STACK_SIZE && !cardStackReachedEnd) {
             viewModel.fetchCards(resetPage = false, isFirstFetch = false)
         }
