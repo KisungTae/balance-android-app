@@ -77,7 +77,7 @@ class CardStackAdapter(
             TabLayoutMediator(binding.tlCardImage, binding.vpCardPhoto) { _, _ -> }.attach()
 
             binding.btnCardReport.setOnClickListener {
-                cardListener.onCardReported(cardItemUIState.accountId)
+                cardListener.onReportCard(cardItemUIState.accountId)
             }
         }
 

@@ -4,5 +4,5 @@ import java.util.*
 
 interface CardListener {
 
-    fun onCardReported(reportedId: UUID)
+    fun onReportCard(reportedId: UUID)
 }

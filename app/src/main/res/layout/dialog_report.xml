@@ -75,8 +75,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:paddingHorizontal="10dp"
-                    android:textAlignment="center" />
+                    android:paddingHorizontal="20dp" />
 
             </LinearLayout>
 
@@ -93,7 +92,7 @@
                 android:textColor="@color/Primary" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnReportErrorClose"
+                android:id="@+id/btnReportDialogErrorClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -108,7 +107,7 @@
         </LinearLayout>
 
         <FrameLayout
-            android:id="@+id/llReportDialogLoading"
+            android:id="@+id/llReportDialogLoadingWrapper"
             android:layout_width="match_parent"
             android:layout_height="330dp"
             android:background="@drawable/sh_round_box_medium"
@@ -157,6 +156,69 @@
 
 
         </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/llReportDialogSuccessWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="330dp"
+            android:background="@drawable/sh_round_box_medium"
+            android:backgroundTint="@color/BackgroundWhite"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="신고완료"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/ic_baseline_check_circle_outline_24"
+                    app:tint="@color/Accent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="20dp"
+                    android:text="해당유저를 신고하였습니다. 더나은 위클릭을 위해 신고를 신속히 처리하겠습니다." />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnReportDialogSuccessClose"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/BackgroundWhite"
+                android:stateListAnimator="@null"
+                android:text="@string/dialog_close_btn_title"
+                android:textColor="@color/TextGrey" />
+
+
+        </LinearLayout>
+
 
 
     </FrameLayout>
@@ -322,12 +384,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/sh_bottom_round_box"
             android:backgroundTint="@color/BackgroundWhite"
             android:stateListAnimator="@null"
             android:text="@string/dialog_close_btn_title"
             android:textColor="@color/TextGrey" />
     </LinearLayout>
+
 
 
 </FrameLayout>

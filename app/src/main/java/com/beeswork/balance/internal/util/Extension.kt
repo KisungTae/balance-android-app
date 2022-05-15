@@ -56,7 +56,7 @@ fun Context.hideKeyboard(view: View) {
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
-const val ANIMATION_DURATION = 1000L
+const val ANIMATION_DURATION = 200L
 
 fun View.slideInFromLeft() {
     this.translationX = this.width.toFloat().unaryMinus()

@@ -13,6 +13,7 @@ import com.beeswork.balance.internal.util.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -66,19 +67,19 @@ class ReportDialog(
 
     private fun setupBtnListeners() {
         binding.btnReportDialogClose.setOnClickListener { dismiss() }
+        binding.btnReportDialogErrorClose.setOnClickListener { dismiss() }
+        binding.btnReportDialogSuccessClose.setOnClickListener {
+            reportDialogListener.onReportSubmitted()
+            dismiss()
+        }
         binding.btnReportDialogDescriptionBack.setOnClickListener { goBackToReportOption() }
         binding.btnReportDialogErrorBack.setOnClickListener { goBackToReportDetail() }
-
-
         binding.btnReportDialogMessage.setOnClickListener { showReportDetail(ReportReason.MESSAGE, it.getText()) }
         binding.btnReportDialogBehaviour.setOnClickListener { showReportDetail(ReportReason.BEHAVIOUR, it.getText()) }
         binding.btnReportDialogSpam.setOnClickListener { showReportDetail(ReportReason.SPAM, it.getText()) }
         binding.btnReportDialogPhoto.setOnClickListener { showReportDetail(ReportReason.PHOTO, it.getText()) }
         binding.btnReportDialogOther.setOnClickListener { showReportDetail(ReportReason.OTHER, it.getText()) }
-
-        binding.btnReportDialogRetry.setOnClickListener {
-            submitReport()
-        }
+        binding.btnReportDialogRetry.setOnClickListener { submitReport() }
         binding.btnReportDialogSubmit.setOnClickListener {
             showResultWrapper()
             submitReport()
@@ -113,18 +114,25 @@ class ReportDialog(
         viewModel.reportUIStateLiveData.observe(viewLifecycleOwner) { reportUIState ->
             when {
                 reportUIState.reported -> {
-                    reportDialogListener.onReportSubmitted()
-                    dismiss()
+                    updateLayouts(View.VISIBLE, View.GONE, View.GONE)
                 }
                 reportUIState.showLoading -> {
-                    binding.llReportDialogLoading.visibility = View.VISIBLE
-                    binding.llReportDialogErrorWrapper.visibility = View.GONE
+                    updateLayouts(View.GONE, View.VISIBLE, View.GONE)
                 }
                 reportUIState.showError -> {
-                    showError(reportUIState.exception)
+                    requireContext().hideKeyboard(requireView())
+                    binding.tvReportDialogErrorTitle.text = getString(R.string.error_title_report)
+                    binding.tvReportDialogErrorMessage.text = MessageSource.getMessage(requireContext(), reportUIState.exception)
+                    updateLayouts(View.GONE, View.GONE, View.VISIBLE)
                 }
             }
         }
+    }
+
+    private fun updateLayouts(success: Int, loading: Int, error: Int) {
+        binding.llReportDialogSuccessWrapper.visibility = success
+        binding.llReportDialogLoadingWrapper.visibility = loading
+        binding.llReportDialogErrorWrapper.visibility = error
     }
 
     private fun showReportDetail(reportReason: ReportReason, head: String) {
@@ -132,16 +140,6 @@ class ReportDialog(
         binding.tvReportDialogDescriptionHead.text = head
         binding.llReportDialogOptionWrapper.slideOutToLeft()
         binding.llReportDialogDescriptionWrapper.slideInFromRight()
-    }
-
-    private fun showError(exception: Throwable?) {
-        requireContext().hideKeyboard(requireView())
-        binding.llReportDialogLoading.visibility = View.GONE
-        binding.tvReportDialogErrorTitle.text = getString(R.string.error_title_report)
-        binding.tvReportDialogErrorMessage.text = MessageSource.getMessage(requireContext(), exception)
-        binding.llReportDialogLoading.visibility = View.GONE
-        binding.llReportDialogErrorWrapper.visibility = View.VISIBLE
-
     }
 
     private fun showResultWrapper() {

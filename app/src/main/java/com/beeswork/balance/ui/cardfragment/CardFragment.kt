@@ -20,6 +20,7 @@ import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
 import com.beeswork.balance.ui.reportdialog.ReportDialog
+import com.google.android.material.snackbar.Snackbar
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -227,7 +228,7 @@ class CardFragment(
 
     }
 
-    override fun onCardReported(reportedId: UUID) {
+    override fun onReportCard(reportedId: UUID) {
         ReportDialog(this@CardFragment, ReportDialog.Type.REPORT_PROFILE, reportedId).show(childFragmentManager, ReportDialog.TAG)
     }
 

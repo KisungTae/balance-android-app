@@ -20,8 +20,7 @@ class ReportProfileUseCaseImpl(
         return try {
             withContext(defaultDispatcher) {
                 delay(3000)
-                throw IOException("test exception fdfas fdsf dsfdsaf dasfds fdsafdsafdsf dsfdsaf sdfd fdsaf sadfdsaf dsafdsfa dsf dsfdsafds fsd fdsfasfsda fdsafdsafsadfds afdsafsdfdsaf dfdsafdsafas dfdsafdasfdas fadsfdsafdsaf")
-//                return@withContext cardRepository.reportProfile(reportedId, reportReason, reportDescription)
+                return@withContext cardRepository.reportProfile(reportedId, reportReason, reportDescription)
             }
         } catch (e: IOException) {
             return Resource.error(e)

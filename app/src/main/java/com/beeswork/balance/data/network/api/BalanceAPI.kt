@@ -169,7 +169,7 @@ interface BalanceAPI {
     suspend fun saveBio(@Body saveBioBody: SaveBioBody): Response<EmptyResponse>
 
 
-    @POST("report/profile")
+    @POST("profile/report")
     suspend fun reportProfile(@Body reportBody: ReportBody): Response<EmptyResponse>
 
     @POST("match/report")
