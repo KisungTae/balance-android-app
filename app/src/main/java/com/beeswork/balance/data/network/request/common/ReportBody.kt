@@ -6,5 +6,5 @@ import java.util.*
 data class ReportBody(
     val reportedId: UUID,
     val reportReasonId: ReportReason,
-    val description: String
+    val reportDescription: String?
 )

@@ -1,4 +1,4 @@
-package com.beeswork.balance.domain.usecase.chat
+package com.beeswork.balance.domain.usecase.report
 
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.data.network.response.Resource
@@ -13,16 +13,15 @@ import java.util.*
 class ReportMatchUseCaseImpl(
     private val matchRepository: MatchRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-) : ReportMatchUseCase {
+): ReportMatchUseCase {
 
-    override suspend fun invoke(chatId: UUID, swipedId: UUID, reportReason: ReportReason, description: String): Resource<UnmatchDTO> {
+    override suspend fun invoke(chatId: UUID, reportedId: UUID, reportReason: ReportReason, reportDescription: String?): Resource<UnmatchDTO> {
         return try {
             withContext(defaultDispatcher) {
-                matchRepository.reportMatch(chatId, swipedId, reportReason, description)
+                return@withContext matchRepository.reportMatch(chatId, reportedId, reportReason, reportDescription)
             }
         } catch (e: IOException) {
-            Resource.error(e)
+            return Resource.error(e)
         }
     }
-
 }

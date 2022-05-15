@@ -301,6 +301,8 @@
     <string name="male">남성</string>
     <string name="distance_unit">km</string>
     <string name="dislike_icon_description">dislike icon</string>
+    <string name="submitting_report">submitting report......</string>
+    <string name="submit_report_title">Submit Report</string>
 
 
 </resources>

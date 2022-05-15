@@ -25,7 +25,7 @@ import com.beeswork.balance.ui.common.PagingInitialPageAdapter
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
 import com.beeswork.balance.ui.dialog.ConfirmDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
-import com.beeswork.balance.ui.dialog.ReportDialog
+import com.beeswork.balance.ui.reportdialog.ReportDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -44,7 +44,7 @@ class ChatFragment : BaseFragment(),
     ChatMessagePagingDataAdapter.ChatMessageListener,
     ConfirmDialog.ConfirmDialogClickListener,
     ChatMoreMenuDialog.ChatMoreMenuDialogClickListener,
-    ReportDialog.ReportDialogClickListener,
+    ReportDialog.ReportDialogListener,
     ErrorDialog.RetryListener {
 
     override val kodein by closestKodein()
@@ -55,7 +55,9 @@ class ChatFragment : BaseFragment(),
     private lateinit var chatPagingInitialPageDataAdapter: PagingInitialPageAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>
     private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
     private lateinit var binding: FragmentChatBinding
+    private lateinit var swipedId: UUID
     private var chatMessagePagingObserveJob: Job? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,6 +75,7 @@ class ChatFragment : BaseFragment(),
         val swipedId = Converter.toUUID(arguments?.getString(BundleKey.SWIPED_ID))
         if (chatId != null && swipedId != null) {
             val chatViewModelParameter = ChatViewModelParameter(chatId, swipedId)
+            this.swipedId = swipedId
             viewModel = ViewModelProvider(this, viewModelFactory(chatViewModelParameter)).get(ChatViewModel::class.java)
             bindUI()
         } else {
@@ -301,13 +304,13 @@ class ChatFragment : BaseFragment(),
         viewModel.reportMatchLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
             when {
                 uiState.unmatched -> Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
-                uiState.showLoading -> getReportDialog()?.showLoading()
+//                uiState.showLoading -> getReportDialog()?.showLoading()
                 uiState.showError -> {
                     val reportDialog = getReportDialog()
                     if (reportDialog != null) {
                         val title = getString(R.string.error_title_report)
                         val message = MessageSource.getMessage(requireContext(), uiState.exception)
-                        getReportDialog()?.showError(title, message)
+//                        getReportDialog()?.showError(title, message)
                     }
                 }
             }
@@ -394,19 +397,23 @@ class ChatFragment : BaseFragment(),
     }
 
     override fun onReportMatch() {
-        ReportDialog(this).show(childFragmentManager, ReportDialog.TAG)
+        ReportDialog(this@ChatFragment, ReportDialog.Type.REPORT_MATCH, swipedId).show(childFragmentManager, ReportDialog.TAG)
     }
 
-    override fun submitReport(reportReason: ReportReason, description: String) {
-        viewModel.reportMatch(reportReason, description)
-    }
+//    override fun submitReport(reportReason: ReportReason, description: String)    {
+//        viewModel.reportMatch(reportReason, description)
+//    }
 
     override fun onRetry(requestCode: Int?) {
         when (requestCode) {
-            RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
+//            RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
             RequestCode.UNMATCH -> onUnmatch()
             RequestCode.CONNECT_TO_STOMP -> viewModel.connectToStomp()
         }
+    }
+
+    override fun onReportSubmitted() {
+        TODO("Not yet implemented")
     }
 }
 

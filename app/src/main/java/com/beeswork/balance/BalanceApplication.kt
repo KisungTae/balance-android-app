@@ -40,8 +40,6 @@ import com.beeswork.balance.data.network.rds.photo.PhotoRDS
 import com.beeswork.balance.data.network.rds.photo.PhotoRDSImpl
 import com.beeswork.balance.data.network.rds.profile.ProfileRDS
 import com.beeswork.balance.data.network.rds.profile.ProfileRDSImpl
-import com.beeswork.balance.data.network.rds.report.ReportRDS
-import com.beeswork.balance.data.network.rds.report.ReportRDSImpl
 import com.beeswork.balance.data.network.rds.setting.SettingRDS
 import com.beeswork.balance.data.network.rds.setting.SettingRDSImpl
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -64,6 +62,10 @@ import com.beeswork.balance.domain.usecase.login.SocialLoginUseCaseImpl
 import com.beeswork.balance.domain.usecase.main.*
 import com.beeswork.balance.domain.usecase.photo.*
 import com.beeswork.balance.domain.usecase.register.*
+import com.beeswork.balance.domain.usecase.report.ReportMatchUseCase
+import com.beeswork.balance.domain.usecase.report.ReportMatchUseCaseImpl
+import com.beeswork.balance.domain.usecase.report.ReportProfileUseCase
+import com.beeswork.balance.domain.usecase.report.ReportProfileUseCaseImpl
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapperImpl
 import com.beeswork.balance.internal.mapper.location.LocationMapper
@@ -107,6 +109,7 @@ import com.beeswork.balance.ui.cardfragment.CardViewModelFactory
 import com.beeswork.balance.ui.chatfragment.ChatViewModelParameter
 import com.beeswork.balance.ui.common.BaseLocationViewModelFactory
 import com.beeswork.balance.ui.registeractivity.location.LocationStepViewModelFactory
+import com.beeswork.balance.ui.reportdialog.ReportViewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.*
@@ -169,7 +172,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { BalanceAPI(instance()) }
 
         // Remote Data Source
-        bind<ReportRDS>() with singleton { ReportRDSImpl(instance()) }
         bind<ChatRDS>() with singleton { ChatRDSImpl(instance()) }
         bind<MatchRDS>() with singleton { MatchRDSImpl(instance()) }
         bind<SwipeRDS>() with singleton { SwipeRDSImpl(instance()) }
@@ -194,7 +196,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ConnectToStompUseCase>() with singleton { ConnectToStompUseCaseImpl(instance(), Dispatchers.Default) }
         bind<DeleteChatMessageUseCase>() with singleton { DeleteChatMessageUseCaseImpl(instance(), Dispatchers.Default) }
         bind<UnmatchUseCase>() with singleton { UnmatchUseCaseImpl(instance(), Dispatchers.Default) }
-        bind<ReportMatchUseCase>() with singleton { ReportMatchUseCaseImpl(instance(), Dispatchers.Default) }
 
 
         bind<LoginWithRefreshTokenUseCase>() with singleton {
@@ -241,7 +242,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind<UpdateLocationGrantedUseCase>() with singleton { UpdateLocationGrantedUseCaseImpl(instance(), Dispatchers.Default) }
         bind<DisconnectStompUseCase>() with singleton { DisconnectStompUseCaseImpl(instance(), Dispatchers.Default) }
         bind<IncrementReadByIndexUseCase>() with singleton { IncrementReadByIndexUseCaseImpl(instance(), Dispatchers.Default) }
-
+        bind<ReportProfileUseCase>() with singleton { ReportProfileUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<ReportMatchUseCase>() with singleton { ReportMatchUseCaseImpl(instance(), Dispatchers.Default) }
 
 
         // Repository
@@ -323,7 +325,6 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
                 applicationScope,
                 instance(),
                 instance(),
@@ -345,7 +346,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from factory { chatViewModelParameter: ChatViewModelParameter ->
             ChatViewModelFactory(
                 chatViewModelParameter,
-                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -439,7 +439,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { RegisterFinishViewModelFactory(instance()) }
         bind() from provider { BaseLocationViewModelFactory(instance(), instance()) }
         bind() from provider { LocationStepViewModelFactory(instance()) }
-
+        bind() from provider { ReportViewModelFactory(instance(), instance()) }
 
 
         // Interceptor

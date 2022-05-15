@@ -16,13 +16,11 @@ import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
-import com.beeswork.balance.data.network.rds.report.ReportRDS
 import com.beeswork.balance.data.network.response.match.*
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.constant.ClickOutcome
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.constant.ReportReason
-import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +34,6 @@ import java.util.concurrent.Callable
 
 class MatchRepositoryImpl(
     private val matchRDS: MatchRDS,
-    private val reportRDS: ReportRDS,
     loginRDS: LoginRDS,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
@@ -318,10 +315,10 @@ class MatchRepositoryImpl(
         chatId: UUID,
         swipedId: UUID,
         reportReason: ReportReason,
-        description: String
+        reportDescription: String?
     ): Resource<UnmatchDTO> {
         return withContext(ioDispatcher) {
-            val response = reportRDS.reportMatch(swipedId, reportReason, description)
+            val response = matchRDS.reportMatch(swipedId, reportReason, reportDescription)
             if (response.isSuccess()) {
                 unmatch(chatId)
             }

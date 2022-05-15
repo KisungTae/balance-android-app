@@ -33,7 +33,6 @@ class ChatViewModel(
     private val connectToStompUseCase: ConnectToStompUseCase,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
     private val unmatchUseCase: UnmatchUseCase,
-    private val reportMatchUseCase: ReportMatchUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
     private val preferenceProvider: PreferenceProvider,
@@ -156,16 +155,16 @@ class ChatViewModel(
     }
 
     fun reportMatch(reportReason: ReportReason, description: String) {
-        viewModelScope.launch {
-            _reportMatchLiveData.postValue(UnmatchUIState.ofLoading())
-            val response = reportMatchUseCase.invoke(chatId, swipedId, reportReason, description)
-            val unmatchUIState = if (response.isSuccess()) {
-                UnmatchUIState.ofSuccess()
-            } else {
-                UnmatchUIState.ofError(response.exception)
-            }
-            _reportMatchLiveData.postValue(unmatchUIState)
-        }
+//        viewModelScope.launch {
+//            _reportMatchLiveData.postValue(UnmatchUIState.ofLoading())
+//            val response = reportMatchUseCase.invoke(chatId, swipedId, reportReason, description)
+//            val unmatchUIState = if (response.isSuccess()) {
+//                UnmatchUIState.ofSuccess()
+//            } else {
+//                UnmatchUIState.ofError(response.exception)
+//            }
+//            _reportMatchLiveData.postValue(unmatchUIState)
+//        }
     }
 
     fun test() {

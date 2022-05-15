@@ -4,22 +4,23 @@ package com.beeswork.balance.ui.cardfragment.card
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemCardBinding
 import com.beeswork.balance.domain.uistate.card.CardItemUIState
 import com.beeswork.balance.internal.constant.Gender
+import com.beeswork.balance.ui.cardfragment.CardListener
 import com.google.android.material.tabs.TabLayoutMediator
 
 
-class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
+class CardStackAdapter(
+    private val cardListener: CardListener
+) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     private val cardItemUIStates: MutableList<CardItemUIState> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(ItemCardBinding.inflate(LayoutInflater.from(parent.context), parent, false), parent.context)
+        return ViewHolder(ItemCardBinding.inflate(LayoutInflater.from(parent.context), parent, false), cardListener, parent.context)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -52,6 +53,7 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     class ViewHolder(
         private val binding: ItemCardBinding,
+        private val cardListener: CardListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root), CardPhotoViewPagerAdapter.CardPhotoListener {
 
@@ -73,6 +75,10 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
             binding.vpCardPhoto.offscreenPageLimit = 1
             binding.vpCardPhoto.adapter = CardPhotoViewPagerAdapter(cardItemUIState.photoURLs, this)
             TabLayoutMediator(binding.tlCardImage, binding.vpCardPhoto) { _, _ -> }.attach()
+
+            binding.btnCardReport.setOnClickListener {
+                cardListener.onCardReported(cardItemUIState.accountId)
+            }
         }
 
         override fun onLeftButtonClick(position: Int) {
@@ -83,8 +89,6 @@ class CardStackAdapter : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
             binding.vpCardPhoto.currentItem = position + 1
         }
     }
-
-
 
 
 }

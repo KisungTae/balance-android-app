@@ -3,6 +3,7 @@ package com.beeswork.balance.data.network.rds.match
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.request.click.ClickBody
+import com.beeswork.balance.data.network.request.common.ReportBody
 import com.beeswork.balance.data.network.request.match.SyncMatchBody
 import com.beeswork.balance.data.network.request.match.UnmatchBody
 import com.beeswork.balance.data.network.response.Resource
@@ -11,6 +12,7 @@ import com.beeswork.balance.data.network.response.match.ClickResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.match.UnmatchDTO
 import com.beeswork.balance.internal.constant.MatchPageFilter
+import com.beeswork.balance.internal.constant.ReportReason
 import java.util.*
 
 
@@ -36,5 +38,13 @@ class MatchRDSImpl(
 
     override suspend fun syncMatch(chatId: UUID, lastReadReceivedChatMessageId: Long): Resource<EmptyResponse> {
         return getResult { balanceAPI.syncMatch(SyncMatchBody(chatId, lastReadReceivedChatMessageId)) }
+    }
+
+    override suspend fun reportMatch(
+        reportedId: UUID,
+        reportReason: ReportReason,
+        reportDescription: String?
+    ): Resource<UnmatchDTO> {
+        return getResult { balanceAPI.reportMatch(ReportBody(reportedId, reportReason, reportDescription)) }
     }
 }

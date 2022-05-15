@@ -19,6 +19,7 @@ import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
+import com.beeswork.balance.ui.reportdialog.ReportDialog
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -34,7 +35,9 @@ class CardFragment(
 ) : BaseFragment(),
     KodeinAware,
     CardStackListener,
-    ViewPagerChildFragment {
+    ViewPagerChildFragment,
+    CardListener,
+    ReportDialog.ReportDialogListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: CardViewModelFactory by instance()
@@ -110,7 +113,7 @@ class CardFragment(
     }
 
     private fun setupCardStackView() {
-        cardStackAdapter = CardStackAdapter()
+        cardStackAdapter = CardStackAdapter(this@CardFragment)
         cardStackLayoutManager = CardStackLayoutManager(context, this@CardFragment)
         cardStackLayoutManager.setCanScrollVertical(false)
         cardStackLayoutManager.setSwipeableMethod(SwipeableMethod.Manual)
@@ -206,7 +209,6 @@ class CardFragment(
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {
-
     }
 
     override fun onCardRewound() {
@@ -223,6 +225,14 @@ class CardFragment(
 
     override fun onFragmentSelected() {
 
+    }
+
+    override fun onCardReported(reportedId: UUID) {
+        ReportDialog(this@CardFragment, ReportDialog.Type.REPORT_PROFILE, reportedId).show(childFragmentManager, ReportDialog.TAG)
+    }
+
+    override fun onReportSubmitted() {
+        binding.csvCard.swipe()
     }
 
     companion object {

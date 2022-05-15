@@ -11,6 +11,7 @@ import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
+import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.CardFilterNotFoundException
 import com.beeswork.balance.internal.mapper.card.CardMapper
@@ -101,6 +102,12 @@ class CardRepositoryImpl(
     override suspend fun incrementReadByIndex() {
         withContext(ioDispatcher) {
             cardPageDAO.incrementReadByIndexBy(preferenceProvider.getAccountId(), 1)
+        }
+    }
+
+    override suspend fun reportProfile(reportedId: UUID, reportReason: ReportReason, reportDescription: String?): Resource<EmptyResponse> {
+        return withContext(ioDispatcher) {
+            return@withContext cardRDS.reportProfile(reportedId, reportReason, reportDescription)
         }
     }
 

@@ -6,6 +6,7 @@ import com.beeswork.balance.data.network.response.match.ClickResponse
 import com.beeswork.balance.data.network.response.match.ListMatchesDTO
 import com.beeswork.balance.data.network.response.match.UnmatchDTO
 import com.beeswork.balance.internal.constant.MatchPageFilter
+import com.beeswork.balance.internal.constant.ReportReason
 import java.util.*
 
 
@@ -15,4 +16,5 @@ interface MatchRDS {
     suspend fun fetchMatches(loadSize: Int, lastMatchId: Long?, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
     suspend fun listMatches(loadSize: Int, startPosition: Int, matchPageFilter: MatchPageFilter?): Resource<ListMatchesDTO>
     suspend fun syncMatch(chatId: UUID, lastReadReceivedChatMessageId: Long): Resource<EmptyResponse>
+    suspend fun reportMatch(reportedId: UUID, reportReason: ReportReason, reportDescription: String?): Resource<UnmatchDTO>
 }
