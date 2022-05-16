@@ -303,6 +303,9 @@
     <string name="dislike_icon_description">dislike icon</string>
     <string name="submitting_report">submitting report......</string>
     <string name="submit_report_title">Submit Report</string>
+    <string name="comma">,</string>
+    <string name="point_suffix">P</string>
+    <string name="balance_game_of">OF</string>
 
 
 </resources>

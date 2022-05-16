@@ -64,7 +64,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     private suspend fun observeNameLiveData() {
         viewModel.nameLiveData.await().observe(viewLifecycleOwner) {
-            binding.tvAccountName.text = it ?: ""
+//            binding.tvAccountName.text = it ?: ""
         }
     }
 

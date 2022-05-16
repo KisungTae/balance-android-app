@@ -26,31 +26,60 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingHorizontal="20dp"
         android:paddingVertical="20dp">
 
         <ImageView
             android:id="@+id/ivAccountProfile"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="20dp"
-            android:contentDescription="@string/account_profile_photo_description" />
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/account_profile_photo_description"
+            android:src="@drawable/round_account" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvAccountName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="태기성"
+                android:textSize="@dimen/text_large"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/comma" />
+
+            <TextView
+                android:id="@+id/tvAccountAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="35"
+                android:textSize="@dimen/text_large"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvAccountName"
+            android:id="@+id/tvAccountEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="3dp"
-            android:textSize="@dimen/text_large"
-            android:textStyle="bold" />
+            android:text="c0go233@gmail.com"
+            android:textAlignment="center"
+            android:textColor="@color/TextGrey" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
         android:layout_weight="1"
         android:orientation="vertical"
         android:paddingHorizontal="20dp">
@@ -65,12 +94,13 @@
             android:paddingVertical="15dp">
 
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/profile_edit_icon_description"
-                android:src="@drawable/ic_baseline_edit_note_24" />
+                android:src="@drawable/ic_baseline_edit_note_24"
+                app:tint="@color/TextBlack" />
 
             <TextView
                 android:layout_width="0dp"
@@ -86,7 +116,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/select_arrow_icon_description"
                 android:src="@drawable/ic_baseline_arrow_forward_ios_24"
-                app:tint="@color/GreyDark" />
+                app:tint="@color/TextBlack" />
 
         </LinearLayout>
 
@@ -94,16 +124,18 @@
             android:id="@+id/llAccountChargePoint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="horizontal"
             android:paddingVertical="15dp">
 
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/charge_point_icon_description"
-                android:src="@drawable/ic_baseline_auto_graph_24" />
+                android:src="@drawable/ic_baseline_attach_money_24"
+                app:tint="@color/TextBlack" />
 
             <TextView
                 android:layout_width="0dp"
@@ -113,13 +145,42 @@
                 android:text="@string/charge_point_text"
                 android:textStyle="bold" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:backgroundTint="@color/PrimaryLight"
+                android:orientation="horizontal"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="2dp">
+
+                <TextView
+                    android:id="@+id/tvAccountPoint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="50"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:layout_marginStart="2dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/point_suffix"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
             <ImageView
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center"
                 android:contentDescription="@string/select_arrow_icon_description"
                 android:src="@drawable/ic_baseline_arrow_forward_ios_24"
-                app:tint="@color/GreyDark" />
+                app:tint="@color/TextBlack" />
 
         </LinearLayout>
 
@@ -131,12 +192,13 @@
             android:paddingVertical="15dp">
 
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/setting_icon_description"
-                android:src="@drawable/ic_baseline_settings" />
+                android:src="@drawable/ic_baseline_settings"
+                app:tint="@color/TextBlack" />
 
             <TextView
                 android:layout_width="0dp"
@@ -152,7 +214,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/select_arrow_icon_description"
                 android:src="@drawable/ic_baseline_arrow_forward_ios_24"
-                app:tint="@color/GreyDark" />
+                app:tint="@color/TextBlack" />
 
         </LinearLayout>
 
