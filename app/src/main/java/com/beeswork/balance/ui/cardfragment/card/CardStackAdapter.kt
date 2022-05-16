@@ -47,8 +47,9 @@ class CardStackAdapter(
     }
 
     fun clearCards() {
+        val size = cardItemUIStates.size
         cardItemUIStates.clear()
-        notifyDataSetChanged()
+        notifyItemRangeRemoved(0, size)
     }
 
     class ViewHolder(

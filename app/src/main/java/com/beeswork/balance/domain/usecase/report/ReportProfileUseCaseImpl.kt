@@ -19,7 +19,6 @@ class ReportProfileUseCaseImpl(
     override suspend fun invoke(reportedId: UUID, reportReason: ReportReason, reportDescription: String?): Resource<EmptyResponse> {
         return try {
             withContext(defaultDispatcher) {
-                delay(3000)
                 return@withContext cardRepository.reportProfile(reportedId, reportReason, reportDescription)
             }
         } catch (e: IOException) {
