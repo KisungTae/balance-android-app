@@ -234,7 +234,7 @@ class CardFragment(
     }
 
     override fun onReportCard(reportedId: UUID) {
-        ReportDialog(this@CardFragment, ReportDialog.Type.REPORT_PROFILE, reportedId).show(childFragmentManager, ReportDialog.TAG)
+        ReportDialog(this@CardFragment, ReportType.REPORT_PROFILE, reportedId).show(childFragmentManager, ReportDialog.TAG)
     }
 
     override fun onReportSubmitted() {

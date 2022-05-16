@@ -8,7 +8,6 @@ class RequestCode {
         const val FETCH_MATCHES = 4
         const val CONNECT_TO_STOMP = 5
         const val DELETE_CHAT_MESSAGE = 6
-        const val REPORT_MATCH = 7
         const val UNMATCH = 8
         const val FETCH_SWIPES = 9
         const val FETCH_PHOTOS = 10

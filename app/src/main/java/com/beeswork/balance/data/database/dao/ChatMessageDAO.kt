@@ -51,7 +51,8 @@ interface ChatMessageDAO {
     @Query("delete from chatMessage where chatId = :chatId and tag = :tag")
     fun deleteBy(chatId: UUID, tag: UUID)
 
-
+    @Query("delete from chatMessage where chatId = :chatId")
+    fun deleteBy(chatId: UUID?)
 
 
 
@@ -97,8 +98,7 @@ interface ChatMessageDAO {
 
 
 
-    @Query("delete from chatMessage where chatId = :chatId")
-    fun deleteByChatId(chatId: UUID)
+
 
     @Query("delete from chatMessage")
     fun deleteAll()

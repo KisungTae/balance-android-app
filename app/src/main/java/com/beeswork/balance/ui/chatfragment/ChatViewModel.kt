@@ -85,9 +85,6 @@ class ChatViewModel(
     private val _resendChatMessageUIStateLiveData = MutableLiveData<ResendChatMessageUIState>()
     val resendChatMessageUIStateLiveData: LiveData<ResendChatMessageUIState> = _resendChatMessageUIStateLiveData
 
-    private val _reportMatchLiveData = MutableLiveData<UnmatchUIState>()
-    val reportMatchLiveData: LiveData<UnmatchUIState> get() = _reportMatchLiveData
-
     private val _unmatchLiveData = MutableLiveData<UnmatchUIState>()
     val unmatchLiveData: LiveData<UnmatchUIState> get() = _unmatchLiveData
 
@@ -139,8 +136,7 @@ class ChatViewModel(
             deleteChatMessageUseCase.invoke(chatId, tag)
         }
     }
-
-
+    
     fun unmatch() {
         viewModelScope.launch {
             _unmatchLiveData.postValue(UnmatchUIState.ofLoading())
@@ -152,19 +148,6 @@ class ChatViewModel(
             }
             _unmatchLiveData.postValue(unmatchUIState)
         }
-    }
-
-    fun reportMatch(reportReason: ReportReason, description: String) {
-//        viewModelScope.launch {
-//            _reportMatchLiveData.postValue(UnmatchUIState.ofLoading())
-//            val response = reportMatchUseCase.invoke(chatId, swipedId, reportReason, description)
-//            val unmatchUIState = if (response.isSuccess()) {
-//                UnmatchUIState.ofSuccess()
-//            } else {
-//                UnmatchUIState.ofError(response.exception)
-//            }
-//            _reportMatchLiveData.postValue(unmatchUIState)
-//        }
     }
 
     fun test() {

@@ -97,7 +97,6 @@ class ChatFragment : BaseFragment(),
         observeResendChatMessageUIStateLiveData()
         observeWebSocketEventLiveData()
         setupEmoticonBtnListener()
-        observeReportMatchLiveData()
         observeUnmatchLiveData()
         viewModel.syncMatch()
     }
@@ -300,23 +299,6 @@ class ChatFragment : BaseFragment(),
         ErrorDialog.show(title, message, RequestCode.UNMATCH, this, childFragmentManager)
     }
 
-    private fun observeReportMatchLiveData() {
-        viewModel.reportMatchLiveData.observeUIState(viewLifecycleOwner, activity) { uiState ->
-            when {
-                uiState.unmatched -> Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
-//                uiState.showLoading -> getReportDialog()?.showLoading()
-                uiState.showError -> {
-                    val reportDialog = getReportDialog()
-                    if (reportDialog != null) {
-                        val title = getString(R.string.error_title_report)
-                        val message = MessageSource.getMessage(requireContext(), uiState.exception)
-//                        getReportDialog()?.showError(title, message)
-                    }
-                }
-            }
-        }
-    }
-
     private fun getReportDialog(): ReportDialog? {
         return childFragmentManager.findFragmentByTag(ReportDialog.TAG)?.let {
             return@let it as ReportDialog
@@ -397,23 +379,18 @@ class ChatFragment : BaseFragment(),
     }
 
     override fun onReportMatch() {
-        ReportDialog(this@ChatFragment, ReportDialog.Type.REPORT_MATCH, swipedId).show(childFragmentManager, ReportDialog.TAG)
+        ReportDialog(this@ChatFragment, ReportType.REPORT_MATCH, swipedId).show(childFragmentManager, ReportDialog.TAG)
     }
-
-//    override fun submitReport(reportReason: ReportReason, description: String)    {
-//        viewModel.reportMatch(reportReason, description)
-//    }
 
     override fun onRetry(requestCode: Int?) {
         when (requestCode) {
-//            RequestCode.REPORT_MATCH -> getReportDialog()?.clickSubmitButton()
             RequestCode.UNMATCH -> onUnmatch()
             RequestCode.CONNECT_TO_STOMP -> viewModel.connectToStomp()
         }
     }
 
     override fun onReportSubmitted() {
-        TODO("Not yet implemented")
+        Navigator.popBackStack(activity, MainViewPagerFragment.TAG)
     }
 }
 

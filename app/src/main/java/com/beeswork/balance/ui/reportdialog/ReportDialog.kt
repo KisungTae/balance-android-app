@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogReportBinding
 import com.beeswork.balance.internal.constant.ReportReason
+import com.beeswork.balance.internal.constant.ReportType
 import com.beeswork.balance.internal.util.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -22,7 +23,7 @@ import java.util.*
 
 class ReportDialog(
     private val reportDialogListener: ReportDialogListener,
-    private val reportType: Type,
+    private val reportType: ReportType,
     private val reportedId: UUID
 ) : BottomSheetDialogFragment(), KodeinAware {
 
@@ -88,14 +89,7 @@ class ReportDialog(
 
     private fun submitReport() {
         val reportDescription = binding.etReportDialogDescription.text.toString()
-        when (reportType) {
-            Type.REPORT_PROFILE -> {
-                viewModel.reportProfile(reportedId, reportReason!!, reportDescription)
-            }
-            Type.REPORT_MATCH -> {
-                viewModel.reportMatch(reportedId, reportReason!!, reportDescription)
-            }
-        }
+        viewModel.report(reportType, reportedId, reportReason!!, reportDescription)
     }
 
     private fun goBackToReportOption() {
@@ -143,17 +137,13 @@ class ReportDialog(
     }
 
     private fun showResultWrapper() {
+        requireContext().hideKeyboard(requireView())
         binding.llReportDialogDescriptionWrapper.slideOutToLeft()
         binding.flReportDialogResultWrapper.slideInFromRight()
     }
 
     companion object {
         const val TAG = "reportMenuDialog"
-    }
-
-    enum class Type {
-        REPORT_PROFILE,
-        REPORT_MATCH
     }
 
     interface ReportDialogListener {

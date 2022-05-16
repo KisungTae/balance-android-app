@@ -14,6 +14,7 @@ import com.beeswork.balance.data.database.result.ClickResult
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.rds.match.MatchRDS
 import com.beeswork.balance.data.network.response.Resource
+import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.data.network.response.match.*
@@ -312,27 +313,26 @@ class MatchRepositoryImpl(
     }
 
     override suspend fun reportMatch(
-        chatId: UUID,
         swipedId: UUID,
         reportReason: ReportReason,
         reportDescription: String?
-    ): Resource<UnmatchDTO> {
+    ): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val response = matchRDS.reportMatch(swipedId, reportReason, reportDescription)
             if (response.isSuccess()) {
-                unmatch(chatId)
+                unmatch(matchDAO.getChatIdBy(swipedId))
             }
             if (response.data != null) {
                 updateMatchCount(response.data.matchCount, response.data.matchCountCountedAt)
             }
-            return@withContext response
+            return@withContext response.toEmptyResponse()
         }
     }
 
-    private fun unmatch(chatId: UUID) {
+    private fun unmatch(chatId: UUID?) {
         balanceDatabase.runInTransaction {
             matchDAO.deleteBy(chatId)
-            chatMessageDAO.deleteByChatId(chatId)
+            chatMessageDAO.deleteBy(chatId)
         }
     }
 
