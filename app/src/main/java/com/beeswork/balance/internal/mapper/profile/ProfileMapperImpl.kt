@@ -2,15 +2,17 @@ package com.beeswork.balance.internal.mapper.profile
 
 import com.beeswork.balance.data.database.entity.profile.Profile
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
-import com.beeswork.balance.ui.profilefragment.ProfileDomain
-import java.util.*
+import com.beeswork.balance.domain.uistate.profile.ProfileUIState
+import org.threeten.bp.LocalDate
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
 
 class ProfileMapperImpl : ProfileMapper {
-    override fun toProfile(accountId: UUID, profileDTO: ProfileDTO): Profile {
+    override fun toProfile(profileDTO: ProfileDTO): Profile {
         return Profile(
-            accountId,
+            profileDTO.accountId,
             profileDTO.name,
-            profileDTO.birthDate,
+            OffsetDateTime.from(profileDTO.birthDate),
             profileDTO.gender,
             profileDTO.height,
             profileDTO.about,
@@ -18,15 +20,15 @@ class ProfileMapperImpl : ProfileMapper {
         )
     }
 
-    override fun toProfileDomain(profile: Profile): ProfileDomain {
-        return ProfileDomain(profile.name, profile.birthDate, profile.gender, profile.height, profile.about)
+    override fun toProfileDomain(profile: Profile): ProfileUIState {
+        return ProfileUIState(profile.name, profile.birthDate, profile.gender, profile.height, profile.about, null)
     }
 
-    override fun toProfileDTO(profile: Profile): ProfileDTO? {
-        if (profile.name != null && profile.birthDate != null && profile.gender != null) {
-            return ProfileDTO(profile.name, profile.birthDate, profile.gender, profile.height, profile.about)
-        }
-        return null
-    }
+//    override fun toProfileDTO(profile: Profile): ProfileDTO? {
+//        if (profile.name != null && profile.birthDate != null && profile.gender != null) {
+//            return ProfileDTO(profile.name, profile.birthDate, profile.gender, profile.height, profile.about)
+//        }
+//        return null
+//    }
 
 }

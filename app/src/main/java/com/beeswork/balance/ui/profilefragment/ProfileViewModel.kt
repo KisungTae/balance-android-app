@@ -8,6 +8,7 @@ import com.beeswork.balance.data.database.repository.photo.PhotoRepository
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
+import com.beeswork.balance.domain.uistate.profile.ProfileUIState
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.exception.PhotoNotExistException
 import com.beeswork.balance.internal.exception.PhotoNotSupportedTypeException
@@ -29,11 +30,11 @@ class ProfileViewModel(
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
-    private val _fetchProfileLiveData = MutableLiveData<Resource<ProfileDomain>>()
-    val fetchProfileLiveData: LiveData<Resource<ProfileDomain>> get() = _fetchProfileLiveData
+    private val _fetchProfileLiveData = MutableLiveData<Resource<ProfileUIState>>()
+    val fetchProfileLiveData: LiveData<Resource<ProfileUIState>> get() = _fetchProfileLiveData
 
-    private val _saveBioLiveData = MutableLiveData<Resource<ProfileDomain>>()
-    val saveBioLiveData: LiveData<Resource<ProfileDomain>> get() = _saveBioLiveData
+    private val _saveBioLiveData = MutableLiveData<Resource<ProfileUIState>>()
+    val saveBioLiveData: LiveData<Resource<ProfileUIState>> get() = _saveBioLiveData
 
     private val _fetchPhotosLiveData = MutableLiveData<Resource<EmptyResponse>>()
     val fetchPhotosLiveData: LiveData<Resource<EmptyResponse>> get() = _fetchPhotosLiveData
@@ -60,7 +61,7 @@ class ProfileViewModel(
                 _fetchProfileLiveData.postValue(Resource.success(profileDomain))
             else {
                 _fetchProfileLiveData.postValue(Resource.loading(profileDomain))
-                val response = profileRepository.fetchProfile().map {
+                val response = profileRepository.fetchProfile(true).map {
                     it?.let { _profile -> profileMapper.toProfileDomain(_profile) }
                 }
                 _fetchProfileLiveData.postValue(response)

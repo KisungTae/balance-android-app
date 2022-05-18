@@ -48,6 +48,8 @@ import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapperImpl
 import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
+import com.beeswork.balance.domain.usecase.account.FetchProfileUseCase
+import com.beeswork.balance.domain.usecase.account.FetchProfileUseCaseImpl
 import com.beeswork.balance.domain.usecase.balancegame.*
 import com.beeswork.balance.domain.usecase.card.*
 import com.beeswork.balance.domain.usecase.chat.*
@@ -55,10 +57,7 @@ import com.beeswork.balance.domain.usecase.location.SaveLocationUseCase
 import com.beeswork.balance.domain.usecase.location.SaveLocationUseCaseImpl
 import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCase
 import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCaseImpl
-import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCase
-import com.beeswork.balance.domain.usecase.login.LoginWithRefreshTokenUseCaseImpl
-import com.beeswork.balance.domain.usecase.login.SocialLoginUseCase
-import com.beeswork.balance.domain.usecase.login.SocialLoginUseCaseImpl
+import com.beeswork.balance.domain.usecase.login.*
 import com.beeswork.balance.domain.usecase.main.*
 import com.beeswork.balance.domain.usecase.photo.*
 import com.beeswork.balance.domain.usecase.register.*
@@ -244,6 +243,9 @@ class BalanceApplication : Application(), KodeinAware {
         bind<IncrementReadByIndexUseCase>() with singleton { IncrementReadByIndexUseCaseImpl(instance(), Dispatchers.Default) }
         bind<ReportProfileUseCase>() with singleton { ReportProfileUseCaseImpl(instance(), Dispatchers.Default) }
         bind<ReportMatchUseCase>() with singleton { ReportMatchUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<FetchProfileUseCase>() with singleton { FetchProfileUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetEmailUseCase>() with singleton { GetEmailUseCaseImpl(instance(), Dispatchers.Default) }
+
 
 
         // Repository
@@ -385,7 +387,7 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.Default
             )
         }
-        bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind() from provider { AccountViewModelFactory(instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider {
             BalanceGameViewModelFactory(

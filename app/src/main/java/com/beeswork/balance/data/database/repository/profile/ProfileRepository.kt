@@ -31,7 +31,7 @@ interface ProfileRepository {
         longitude: Double
     ): Resource<EmptyResponse>
     suspend fun deleteProfile()
-    suspend fun fetchProfile(): Resource<Profile>
+    suspend fun fetchProfile(sync: Boolean): Resource<Profile>
     suspend fun saveBio(height: Int?, about: String): Resource<Profile>
     suspend fun fetchQuestions(): Resource<FetchQuestionsDTO>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionDTO>

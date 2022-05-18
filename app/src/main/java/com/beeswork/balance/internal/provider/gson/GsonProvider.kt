@@ -1,6 +1,7 @@
 package com.beeswork.balance.internal.provider.gson
 
 import com.google.gson.GsonBuilder
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 
 object GsonProvider {
@@ -11,6 +12,9 @@ object GsonProvider {
     ).registerTypeAdapter(
         OffsetDateTime::class.java,
         StringToOffsetDateTimeDeserializer()
+    ).registerTypeAdapter(
+        LocalDate::class.java,
+        StringToLocalDateDeserializer()
     ).create()
 
 

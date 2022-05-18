@@ -1,11 +1,12 @@
-package com.beeswork.balance.ui.profilefragment
+package com.beeswork.balance.domain.uistate.profile
 
 import org.threeten.bp.OffsetDateTime
 
-data class ProfileDomain(
+data class ProfileUIState(
     val name: String?,
     val birth: OffsetDateTime?,
     val gender: Boolean?,
     val height: Int?,
-    val about: String?
+    val about: String?,
+    val age: Int?
 )

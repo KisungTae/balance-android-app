@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.databinding.FragmentProfileBinding
+import com.beeswork.balance.domain.uistate.profile.ProfileUIState
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
@@ -416,9 +417,9 @@ class ProfileFragment : BaseFragment(),
         }
     }
 
-    private fun showFetchProfileSuccess(profileDomain: ProfileDomain?) {
+    private fun showFetchProfileSuccess(profileUIState: ProfileUIState?) {
         enableProfileEdit()
-        setupProfile(profileDomain)
+        setupProfile(profileUIState)
     }
 
     private fun showFetchProfileError(exception: Throwable?) {
@@ -428,8 +429,8 @@ class ProfileFragment : BaseFragment(),
         ErrorDialog.show(title, message, RequestCode.FETCH_PROFILE, this, childFragmentManager)
     }
 
-    private fun setupProfile(profileDomain: ProfileDomain?) {
-        profileDomain?.let { _profileDomain ->
+    private fun setupProfile(profileUIState: ProfileUIState?) {
+        profileUIState?.let { _profileDomain ->
             binding.tvProfileName.text = _profileDomain.name
             binding.tvProfileDateOfBirth.text = _profileDomain.birth?.format(DateTimePattern.ofDate())
             binding.tvProfileHeight.text = _profileDomain.height?.toString() ?: ""
@@ -470,7 +471,7 @@ class ProfileFragment : BaseFragment(),
     }
 
     private fun showSaveBioError(
-        profileDomain: ProfileDomain?,
+        profileUIState: ProfileUIState?,
         exception: Throwable?
     ) {
         enableProfileEdit()
@@ -483,7 +484,7 @@ class ProfileFragment : BaseFragment(),
                 errorTextView.visibility = View.VISIBLE
             }
         } else {
-            setupProfile(profileDomain)
+            setupProfile(profileUIState)
             hideFieldErrors()
             val title = getString(R.string.error_title_save_about)
             val message = MessageSource.getMessage(requireContext(), exception)

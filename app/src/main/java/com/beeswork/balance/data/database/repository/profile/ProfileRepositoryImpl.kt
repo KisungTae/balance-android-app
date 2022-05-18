@@ -10,11 +10,11 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
-import com.beeswork.balance.internal.exception.ProfileNotFoundException
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 
 class ProfileRepositoryImpl(
@@ -128,17 +128,27 @@ class ProfileRepositoryImpl(
         withContext(ioDispatcher) { profileDAO.deleteBy(preferenceProvider.getAccountId()) }
     }
 
-    override suspend fun fetchProfile(): Resource<Profile> {
+    override suspend fun fetchProfile(sync: Boolean): Resource<Profile> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
             val response = profileRDS.fetchProfile()
-            if (response.isSuccess()) response.data?.let { profileDTO ->
-                val profile = profileMapper.toProfile(accountId, profileDTO)
-                profileDAO.insert(profile)
-                return@withContext response.map { profile }
-            }
-            return@withContext response.map { null }
+            println(response.data?.birthDate)
+
+
+//            val response = profileRDS.fetchProfile()
+//            val profile = profileDAO.getBy(accountId)
+//            if (profile == null || (profile.synced && sync)) {
+//                return@withContext profileRDS.fetchProfile().map { profileDTO ->
+//                    profileDTO?.let { _profileDTO ->
+//                        val fetchedProfile = profileMapper.toProfile(_profileDTO)
+//                        profileDAO.insert(fetchedProfile)
+//                        fetchedProfile
+//                    }
+//                }
+//            }
+//            return@withContext Resource.success(profile)
+            return@withContext Resource.success(null)
         }
     }
 

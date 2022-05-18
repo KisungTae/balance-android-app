@@ -28,7 +28,6 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     private val viewModelFactory: AccountViewModelFactory by instance()
     private lateinit var viewModel: AccountViewModel
     private lateinit var binding: FragmentAccountBinding
-    private val preferenceProvider: PreferenceProvider by instance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,9 +45,10 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-        observeNameLiveData()
-        observeProfilePhotoLiveData()
+//        observeNameLiveData()
+//        observeProfilePhotoLiveData()
         setupListeners()
+        viewModel.fetchProfile()
     }
 
     private suspend fun observeProfilePhotoLiveData() {
@@ -63,14 +63,15 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private suspend fun observeNameLiveData() {
-        viewModel.nameLiveData.await().observe(viewLifecycleOwner) {
+//        viewModel.nameLiveData.await().observe(viewLifecycleOwner) {
 //            binding.tvAccountName.text = it ?: ""
-        }
+//        }
     }
 
     private fun setupListeners() {
         binding.llAccountEditProfile.setOnClickListener {
-            Navigator.moveToFragment(activity, ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+            viewModel.fetchProfile()
+//            Navigator.moveToFragment(activity, ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
         binding.llAccountChargePoint.setOnClickListener {
         }
