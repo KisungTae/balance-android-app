@@ -247,7 +247,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind<GetEmailUseCase>() with singleton { GetEmailUseCaseImpl(instance(), Dispatchers.Default) }
 
 
-
         // Repository
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
         bind<CardRepository>() with singleton {
@@ -387,7 +386,7 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.Default
             )
         }
-        bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider {
             BalanceGameViewModelFactory(

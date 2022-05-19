@@ -44,6 +44,10 @@ class PhotoRepositoryImpl(
         return photoDAO.getPhotoFlowBy(preferenceProvider.getAccountId(), maxPhotoCount)
     }
 
+    override fun getProfilePhotoFlow(): Flow<Photo?> {
+        return photoDAO.getProfilePhotoFlowBy(preferenceProvider.getAccountId())
+    }
+
     override suspend fun fetchPhotos(maxNumOfPhotos: Int): Resource<List<Photo>> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())

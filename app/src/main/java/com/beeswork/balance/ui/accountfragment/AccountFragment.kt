@@ -46,14 +46,12 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private fun bindUI() = lifecycleScope.launch {
-//        observeNameLiveData()
-//        observeProfilePhotoLiveData()
         setupListeners()
         observeProfileUIStateLiveData()
         viewModel.fetchProfile()
         observeEmailLiveData()
         viewModel.fetchEmail()
-
+        observeProfilePhotoLiveData()
     }
 
     private fun observeEmailLiveData() {
@@ -70,20 +68,14 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     private suspend fun observeProfilePhotoLiveData() {
-//        viewModel.profilePhotoKeyLiveData.await().observe(viewLifecycleOwner) {
-//            val profilePhotoKey = EndPoint.ofPhoto(preferenceProvider.getAccountId(), it)
-//            Glide.with(requireContext())
-//                .load(R.drawable.person4)
-//                .apply(GlideHelper.profilePhotoGlideOptions())
-//                .circleCrop()
-//                .into(binding.ivAccountProfile)
-//        }
-    }
-
-    private suspend fun observeNameLiveData() {
-//        viewModel.nameLiveData.await().observe(viewLifecycleOwner) {
-//            binding.tvAccountName.text = it ?: ""
-//        }
+        viewModel.profilePhotoURLLiveData.await().observe(viewLifecycleOwner) { profilePhotoURL ->
+            // todo: replace person4 with profilePHotoURL
+            Glide.with(requireContext())
+                .load(R.drawable.person4)
+                .apply(GlideHelper.profilePhotoGlideOptions())
+                .circleCrop()
+                .into(binding.ivAccountProfile)
+        }
     }
 
     private fun setupListeners() {

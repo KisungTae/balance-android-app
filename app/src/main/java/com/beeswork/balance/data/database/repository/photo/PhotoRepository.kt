@@ -11,6 +11,7 @@ import java.io.File
 interface PhotoRepository {
     suspend fun getProfilePhoto(): Photo?
     fun getPhotosFlow(maxPhotoCount: Int): Flow<List<Photo>>
+    fun getProfilePhotoFlow(): Flow<Photo?>
     suspend fun fetchPhotos(maxNumOfPhotos: Int): Resource<List<Photo>>
     suspend fun uploadPhoto(photoFile: File, photoUri: Uri, extension: String, photoKey: String?): Resource<EmptyResponse>
 
