@@ -15,6 +15,9 @@ object GsonProvider {
     ).registerTypeAdapter(
         LocalDate::class.java,
         StringToLocalDateDeserializer()
+    ).registerTypeAdapter(
+        LocalDate::class.java,
+        LocalDateToStringSerializer()
     ).create()
 
 

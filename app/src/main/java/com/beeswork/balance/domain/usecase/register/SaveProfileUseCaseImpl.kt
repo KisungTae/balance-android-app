@@ -19,8 +19,8 @@ class SaveProfileUseCaseImpl(
     override suspend fun invoke(): Resource<EmptyResponse> {
         return try {
             withContext(defaultDispatcher) {
-                val profile = profileRepository.getProfile()
                 val location = settingRepository.getLocation() ?: return@withContext Resource.error(LocationNotFoundException())
+                val profile = profileRepository.getProfile()
                 when {
                     profile?.name == null -> {
                         return@withContext Resource.error(NameEmptyException())

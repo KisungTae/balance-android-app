@@ -3,12 +3,10 @@ package com.beeswork.balance.domain.usecase.register
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
-import com.beeswork.balance.internal.exception.AboutMaxSizeExceedException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
+import org.threeten.bp.LocalDate
 import java.io.IOException
 
 class SaveBirthDateUseCaseImpl(
@@ -19,8 +17,7 @@ class SaveBirthDateUseCaseImpl(
     override suspend fun invoke(year: Int, month: Int, day: Int): Resource<EmptyResponse> {
         return try {
             withContext(defaultDispatcher) {
-                val birthDate = OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.UTC)
-                profileRepository.saveBirthDate(birthDate)
+                profileRepository.saveBirthDate(LocalDate.of(year, month, day))
                 return@withContext Resource.success(EmptyResponse())
             }
         } catch (e: IOException) {

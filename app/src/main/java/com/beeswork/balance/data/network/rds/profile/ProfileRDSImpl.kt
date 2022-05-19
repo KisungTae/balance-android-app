@@ -2,7 +2,6 @@ package com.beeswork.balance.data.network.rds.profile
 
 import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
-import com.beeswork.balance.data.network.request.common.ReportBody
 import com.beeswork.balance.data.network.request.profile.SaveAnswersBody
 import com.beeswork.balance.data.network.request.profile.SaveBioBody
 import com.beeswork.balance.data.network.request.profile.SaveProfileBody
@@ -11,9 +10,7 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
-import com.beeswork.balance.internal.constant.ReportReason
-import org.threeten.bp.OffsetDateTime
-import java.util.*
+import org.threeten.bp.LocalDate
 
 class ProfileRDSImpl(
     private val balanceAPI: BalanceAPI
@@ -26,7 +23,7 @@ class ProfileRDSImpl(
     override suspend fun saveProfile(
         name: String,
         gender: Boolean,
-        birthDate: OffsetDateTime,
+        birthDate: LocalDate,
         height: Int?,
         about: String?,
         latitude: Double,

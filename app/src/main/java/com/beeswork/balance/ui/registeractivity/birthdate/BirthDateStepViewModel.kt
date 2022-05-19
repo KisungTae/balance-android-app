@@ -8,6 +8,7 @@ import com.beeswork.balance.domain.uistate.register.RegisterStepUIState
 import com.beeswork.balance.domain.usecase.register.GetBirthDateUseCase
 import com.beeswork.balance.domain.usecase.register.SaveBirthDateUseCase
 import kotlinx.coroutines.launch
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 
 class BirthDateStepViewModel(
@@ -15,8 +16,8 @@ class BirthDateStepViewModel(
     private val saveBirthDateUseCase: SaveBirthDateUseCase
 ) : ViewModel() {
 
-    private val _birthDateLiveData = MutableLiveData<OffsetDateTime?>()
-    val birthDateLiveData: LiveData<OffsetDateTime?> get() = _birthDateLiveData
+    private val _birthDateLiveData = MutableLiveData<LocalDate?>()
+    val birthDateLiveData: LiveData<LocalDate?> get() = _birthDateLiveData
 
     private val _saveBirthDateUIStateLiveData = MutableLiveData<RegisterStepUIState>()
     val saveBirthDateUIStateLiveData: LiveData<RegisterStepUIState> get() = _saveBirthDateUIStateLiveData

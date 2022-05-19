@@ -55,14 +55,14 @@ class ProfileViewModel(
         viewModelScope.launch {
             val profile = profileRepository.getProfile()
             val isProfileSynced = profile?.synced == true
-            val profileDomain = profile?.let { _profile -> profileMapper.toProfileDomain(_profile) }
+            val profileDomain = profile?.let { _profile -> profileMapper.toProfileUIState(_profile) }
 
             if (isProfileSynced)
                 _fetchProfileLiveData.postValue(Resource.success(profileDomain))
             else {
                 _fetchProfileLiveData.postValue(Resource.loading(profileDomain))
                 val response = profileRepository.fetchProfile(true).map {
-                    it?.let { _profile -> profileMapper.toProfileDomain(_profile) }
+                    it?.let { _profile -> profileMapper.toProfileUIState(_profile) }
                 }
                 _fetchProfileLiveData.postValue(response)
             }
@@ -73,7 +73,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             _saveBioLiveData.postValue(Resource.loading())
             val response = profileRepository.saveBio(height, about).map {
-                it?.let { profile -> profileMapper.toProfileDomain(profile) }
+                it?.let { profile -> profileMapper.toProfileUIState(profile) }
             }
             _saveBioLiveData.postValue(response)
         }

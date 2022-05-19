@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.entity.profile
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
@@ -13,7 +14,7 @@ data class Profile(
     val accountId: UUID,
 
     val name: String?,
-    val birthDate: OffsetDateTime?,
+    val birthDate: LocalDate?,
     val gender: Boolean?,
     val height: Int?,
     val about: String?,

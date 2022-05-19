@@ -6,6 +6,6 @@ import com.beeswork.balance.domain.uistate.profile.ProfileUIState
 
 interface ProfileMapper {
     fun toProfile(profileDTO: ProfileDTO): Profile
-    fun toProfileDomain(profile: Profile): ProfileUIState
+    fun toProfileUIState(profile: Profile): ProfileUIState
 //    fun toProfileDTO(profile: Profile): ProfileDTO?
 }

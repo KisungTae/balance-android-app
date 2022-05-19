@@ -45,7 +45,7 @@ class BirthDateStepFragment(
     private fun observeBirthDateLiveData() {
         viewModel.birthDateLiveData.observe(viewLifecycleOwner) { birthDate ->
             if (birthDate != null) {
-                binding.dpRegisterBirthDate.updateDate(birthDate.year, birthDate.monthValue - 1, birthDate.dayOfMonth)
+                binding.dpRegisterBirthDate.updateDate(birthDate.year, birthDate.monthValue, birthDate.dayOfMonth)
             }
         }
         viewModel.getBirthDate()

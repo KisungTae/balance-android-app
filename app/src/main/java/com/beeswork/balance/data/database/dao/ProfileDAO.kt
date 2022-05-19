@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.beeswork.balance.data.database.entity.profile.Profile
 import kotlinx.coroutines.flow.Flow
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 
@@ -34,7 +35,7 @@ interface ProfileDAO {
     fun saveNameBy(accountId: UUID?, name: String)
 
     @Query("update profile set birthDate = :birthDate where accountId = :accountId")
-    fun saveBirthDateBy(accountId: UUID?, birthDate: OffsetDateTime)
+    fun saveBirthDateBy(accountId: UUID?, birthDate: LocalDate)
 
     @Query("update profile set gender = :gender where accountId = :accountId")
     fun saveGenderBy(accountId: UUID?, gender: Boolean)
@@ -49,7 +50,7 @@ interface ProfileDAO {
     fun getName(accountId: UUID?): String?
 
     @Query("select birthDate from profile where accountId = :accountId")
-    fun getBirthDate(accountId: UUID?): OffsetDateTime?
+    fun getBirthDate(accountId: UUID?): LocalDate?
 
     @Query("select gender from profile where accountId = :accountId")
     fun getGender(accountId: UUID?): Boolean?

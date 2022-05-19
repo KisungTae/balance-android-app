@@ -62,13 +62,13 @@ class ProfileRepositoryImpl(
         }
     }
 
-    override suspend fun getBirthDate(): OffsetDateTime? {
+    override suspend fun getBirthDate(): LocalDate? {
         return withContext(ioDispatcher) {
             profileDAO.getBirthDate(preferenceProvider.getAccountId())
         }
     }
 
-    override suspend fun saveBirthDate(birthDate: OffsetDateTime) {
+    override suspend fun saveBirthDate(birthDate: LocalDate) {
         withContext(ioDispatcher) {
             profileDAO.saveBirthDateBy(preferenceProvider.getAccountId(), birthDate)
         }
@@ -107,7 +107,7 @@ class ProfileRepositoryImpl(
     override suspend fun saveProfile(
         name: String,
         gender: Boolean,
-        birthDate: OffsetDateTime,
+        birthDate: LocalDate,
         height: Int?,
         about: String?,
         latitude: Double,
@@ -131,24 +131,17 @@ class ProfileRepositoryImpl(
     override suspend fun fetchProfile(sync: Boolean): Resource<Profile> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
-
-            val response = profileRDS.fetchProfile()
-            println(response.data?.birthDate)
-
-
-//            val response = profileRDS.fetchProfile()
-//            val profile = profileDAO.getBy(accountId)
-//            if (profile == null || (profile.synced && sync)) {
-//                return@withContext profileRDS.fetchProfile().map { profileDTO ->
-//                    profileDTO?.let { _profileDTO ->
-//                        val fetchedProfile = profileMapper.toProfile(_profileDTO)
-//                        profileDAO.insert(fetchedProfile)
-//                        fetchedProfile
-//                    }
-//                }
-//            }
-//            return@withContext Resource.success(profile)
-            return@withContext Resource.success(null)
+            val profile = profileDAO.getBy(accountId)
+            if (profile == null || (profile.synced && sync)) {
+                return@withContext profileRDS.fetchProfile().map { profileDTO ->
+                    profileDTO?.let { _profileDTO ->
+                        val fetchedProfile = profileMapper.toProfile(_profileDTO)
+                        profileDAO.insert(fetchedProfile)
+                        fetchedProfile
+                    }
+                }
+            }
+            return@withContext Resource.success(profile)
         }
     }
 

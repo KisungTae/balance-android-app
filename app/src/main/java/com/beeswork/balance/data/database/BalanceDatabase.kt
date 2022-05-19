@@ -33,7 +33,8 @@ import com.beeswork.balance.data.database.entity.swipe.SwipeCount
     PhotoStatusConverter::class,
     UriConverter::class,
     LoginTypeConverter::class,
-    LocationPermissionStatusConverter::class
+    LocationPermissionStatusConverter::class,
+    LocalDateConverter::class
 )
 abstract class BalanceDatabase : RoomDatabase() {
 

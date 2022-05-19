@@ -1,10 +1,10 @@
 package com.beeswork.balance.domain.uistate.profile
 
-import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.LocalDate
 
 data class ProfileUIState(
     val name: String?,
-    val birth: OffsetDateTime?,
+    val birth: LocalDate?,
     val gender: Boolean?,
     val height: Int?,
     val about: String?,
