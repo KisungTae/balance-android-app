@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAccountBinding
+import com.beeswork.balance.domain.uistate.profile.ProfileUIState
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.Navigator
@@ -48,7 +49,24 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 //        observeNameLiveData()
 //        observeProfilePhotoLiveData()
         setupListeners()
+        observeProfileUIStateLiveData()
         viewModel.fetchProfile()
+        observeEmailLiveData()
+        viewModel.fetchEmail()
+
+    }
+
+    private fun observeEmailLiveData() {
+        viewModel.emailLiveData.observe(viewLifecycleOwner) { email ->
+            binding.tvAccountEmail.text = email
+        }
+    }
+
+    private fun observeProfileUIStateLiveData() {
+        viewModel.profileUIStateLiveData.observe(viewLifecycleOwner) { profileUIState ->
+            binding.tvAccountName.text = profileUIState.name
+            binding.tvAccountAge.text = profileUIState.age?.toString()
+        }
     }
 
     private suspend fun observeProfilePhotoLiveData() {
@@ -70,8 +88,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
 
     private fun setupListeners() {
         binding.llAccountEditProfile.setOnClickListener {
-            viewModel.fetchProfile()
-//            Navigator.moveToFragment(activity, ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
+            Navigator.moveToFragment(activity, ProfileFragment(), R.id.fcvMain, MainViewPagerFragment.TAG)
         }
         binding.llAccountChargePoint.setOnClickListener {
         }

@@ -387,7 +387,7 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.Default
             )
         }
-        bind() from provider { AccountViewModelFactory(instance(), instance(), instance()) }
+        bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
         bind() from provider {
             BalanceGameViewModelFactory(

@@ -132,7 +132,7 @@ class ProfileRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val profile = profileDAO.getBy(accountId)
-            if (profile == null || (profile.synced && sync)) {
+            if (profile == null || (!profile.synced && sync)) {
                 return@withContext profileRDS.fetchProfile().map { profileDTO ->
                     profileDTO?.let { _profileDTO ->
                         val fetchedProfile = profileMapper.toProfile(_profileDTO)

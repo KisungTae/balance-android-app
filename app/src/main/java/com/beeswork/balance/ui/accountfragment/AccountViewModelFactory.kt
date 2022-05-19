@@ -8,15 +8,17 @@ import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.domain.usecase.account.FetchProfileUseCase
 import com.beeswork.balance.domain.usecase.login.GetEmailUseCase
+import com.beeswork.balance.internal.mapper.profile.ProfileMapper
 
 class AccountViewModelFactory(
     private val photoRepository: PhotoRepository,
     private val fetchProfileUseCase: FetchProfileUseCase,
-    private val getEmailUseCase: GetEmailUseCase
+    private val getEmailUseCase: GetEmailUseCase,
+    private val profileMapper: ProfileMapper
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return AccountViewModel(photoRepository, fetchProfileUseCase, getEmailUseCase) as T
+        return AccountViewModel(photoRepository, fetchProfileUseCase, getEmailUseCase, profileMapper) as T
     }
 }
