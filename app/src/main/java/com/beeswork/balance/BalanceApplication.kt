@@ -50,6 +50,8 @@ import com.beeswork.balance.data.network.service.stomp.StompClientImpl
 import com.beeswork.balance.data.network.service.stomp.WebSocketStateImpl
 import com.beeswork.balance.domain.usecase.account.FetchProfileUseCase
 import com.beeswork.balance.domain.usecase.account.FetchProfileUseCaseImpl
+import com.beeswork.balance.domain.usecase.account.GetProfilePhotoFlowUseCase
+import com.beeswork.balance.domain.usecase.account.GetProfilePhotoFlowUseCaseImpl
 import com.beeswork.balance.domain.usecase.balancegame.*
 import com.beeswork.balance.domain.usecase.card.*
 import com.beeswork.balance.domain.usecase.chat.*
@@ -245,6 +247,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<ReportMatchUseCase>() with singleton { ReportMatchUseCaseImpl(instance(), Dispatchers.Default) }
         bind<FetchProfileUseCase>() with singleton { FetchProfileUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetEmailUseCase>() with singleton { GetEmailUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetProfilePhotoFlowUseCase>() with singleton { GetProfilePhotoFlowUseCaseImpl(instance(), Dispatchers.Default) }
 
 
         // Repository

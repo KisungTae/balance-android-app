@@ -7,6 +7,7 @@ import com.beeswork.balance.data.database.repository.profile.ProfileRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.domain.uistate.profile.ProfileUIState
 import com.beeswork.balance.domain.usecase.account.FetchProfileUseCase
+import com.beeswork.balance.domain.usecase.account.GetProfilePhotoFlowUseCase
 import com.beeswork.balance.domain.usecase.login.GetEmailUseCase
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
@@ -17,9 +18,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class AccountViewModel(
-    private val photoRepository: PhotoRepository,
     private val fetchProfileUseCase: FetchProfileUseCase,
     private val getEmailUseCase: GetEmailUseCase,
+    private val getProfilePhotoFlowUseCase: GetProfilePhotoFlowUseCase,
     private val profileMapper: ProfileMapper,
     private val preferenceProvider: PreferenceProvider
 ) : BaseViewModel() {
@@ -31,7 +32,7 @@ class AccountViewModel(
     val emailLiveData: LiveData<String?> = _emailLiveData
 
     val profilePhotoURLLiveData by lazyDeferred {
-        photoRepository.getProfilePhotoFlow().map { profilePhoto ->
+        getProfilePhotoFlowUseCase.invoke().map { profilePhoto ->
             EndPoint.ofPhoto(preferenceProvider.getPhotoDomain(), profilePhoto?.accountId, profilePhoto?.key)
         }.asLiveData()
     }
