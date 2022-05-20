@@ -2,6 +2,7 @@ package com.beeswork.balance.data.database.repository.login
 
 import com.beeswork.balance.data.database.dao.FCMTokenDAO
 import com.beeswork.balance.data.database.dao.LoginDAO
+import com.beeswork.balance.data.database.dao.PhotoDAO
 import com.beeswork.balance.data.database.entity.login.Login
 import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.network.rds.login.LoginRDS
@@ -9,10 +10,12 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
+import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.internal.constant.LoginType
 import com.beeswork.balance.internal.exception.AccessTokenNotFoundException
 import com.beeswork.balance.internal.exception.AccountIdNotFoundException
 import com.beeswork.balance.internal.exception.RefreshTokenNotFoundException
+import com.beeswork.balance.internal.mapper.photo.PhotoMapper
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -23,13 +26,15 @@ import java.util.*
 class LoginRepositoryImpl(
     private val loginDAO: LoginDAO,
     private val fcmTokenDAO: FCMTokenDAO,
+    private val photoDAO: PhotoDAO,
+    private val photoMapper: PhotoMapper,
     loginRDS: LoginRDS,
     preferenceProvider: PreferenceProvider,
     private val ioDispatcher: CoroutineDispatcher
 ) : BaseRepository(loginRDS, preferenceProvider), LoginRepository {
 
-    private suspend fun saveEmail(accountId: UUID, email: String?, loginType: LoginType) {
-        withContext(ioDispatcher) {
+    private fun saveEmail(accountId: UUID, email: String?, loginType: LoginType) {
+        if (email != null) {
             val login = Login(accountId, loginType, email, true)
             loginDAO.insert(login)
         }
@@ -73,6 +78,7 @@ class LoginRepositoryImpl(
             val response = loginRDS.socialLogin(loginId, accessToken, loginType, fcmTokenDAO.getById())
             response.data?.let { loginDTO ->
                 saveEmail(loginDTO.accountId, loginDTO.email, loginType)
+                saveProfilePhoto(loginDTO.accountId, loginDTO.profilePhotoDTO)
                 preferenceProvider.putLoginInfo(
                     loginDTO.accountId,
                     loginDTO.accessToken,
@@ -81,6 +87,13 @@ class LoginRepositoryImpl(
                 )
             }
             return@withContext response
+        }
+    }
+
+    private fun saveProfilePhoto(accountId: UUID, profilePhotoDTO: PhotoDTO?) {
+        if (profilePhotoDTO != null && photoDAO.getProfilePhotoBy(accountId) == null) {
+            val profilePhoto = photoMapper.toPhoto(profilePhotoDTO)
+            photoDAO.insert(profilePhoto)
         }
     }
 

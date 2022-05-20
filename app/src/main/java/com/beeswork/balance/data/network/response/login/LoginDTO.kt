@@ -1,5 +1,6 @@
 package com.beeswork.balance.data.network.response.login
 
+import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import java.util.*
 
 data class LoginDTO(
@@ -8,5 +9,6 @@ data class LoginDTO(
     val accessToken: String,
     val refreshToken: String?,
     val email: String?,
-    val photoDomain: String
+    val photoDomain: String,
+    val profilePhotoDTO: PhotoDTO?
 )

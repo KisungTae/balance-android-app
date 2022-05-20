@@ -13,7 +13,7 @@ class PhotoMapperImpl : PhotoMapper {
             photoDTO.key,
             photoDTO.accountId,
             PhotoStatus.DOWNLOADING,
-            false,
+            deleting = false,
             null,
             photoDTO.sequence,
             photoDTO.sequence,
