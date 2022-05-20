@@ -173,7 +173,7 @@
     <string name="profile_name_label">이름</string>
     <string name="profile_date_of_birth_label">생년월일</string>
     <string name="profile_gender_label">성별</string>
-    <string name="profile_height_label">키</string>
+    <string name="profile_height_label">신장</string>
     <string name="height_unit_label">cm</string>
     <string name="down_arrow_icon_description">down arrow</string>
     <string name="profile_about_label">자기소개</string>

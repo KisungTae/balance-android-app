@@ -35,7 +35,7 @@
 
         <View
             android:layout_width="@dimen/icon_medium"
-            android:layout_height="@dimen/icon_medium"/>
+            android:layout_height="@dimen/icon_medium" />
 
     </LinearLayout>
 
@@ -51,19 +51,24 @@
 
             <include
                 android:id="@+id/layoutPhotoPicker"
-                layout="@layout/layout_photo_picker" />
+                layout="@layout/layout_photo_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginBottom="25dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="15dp">
+                android:paddingHorizontal="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:text="@string/profile_name_label" />
+                    android:text="@string/profile_name_label"
+                    android:textColor="@color/TextDarkGrey" />
 
                 <TextView
                     android:id="@+id/tvProfileName"
@@ -78,7 +83,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:text="@string/profile_date_of_birth_label" />
+                    android:text="@string/profile_date_of_birth_label"
+                    android:textColor="@color/TextDarkGrey" />
 
                 <TextView
                     android:id="@+id/tvProfileDateOfBirth"
@@ -93,7 +99,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:text="@string/profile_gender_label" />
+                    android:text="@string/profile_gender_label"
+                    android:textColor="@color/TextDarkGrey" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -128,7 +135,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:text="@string/profile_height_label" />
+                    android:text="@string/profile_height_label"
+                    android:textColor="@color/TextDarkGrey" />
 
                 <LinearLayout
                     android:id="@+id/llProfileHeightWrapper"
@@ -174,16 +182,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:text="@string/profile_about_label" />
+                    android:text="@string/profile_about_label"
+                    android:textColor="@color/TextDarkGrey" />
 
                 <TextView
-                    android:visibility="gone"
                     android:id="@+id/tvAboutError"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:tag="aboutError"
-                    android:textColor="@color/WarningRed" />
+                    android:textColor="@color/WarningRed"
+                    android:visibility="gone" />
 
                 <EditText
                     android:id="@+id/etProfileAbout"
@@ -199,12 +208,6 @@
                     android:padding="15dp"
                     android:scrollbars="vertical"
                     android:textCursorDrawable="@drawable/sh_edit_text_cursor" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:text="@string/profile_balance_game_label" />
 
                 <LinearLayout
                     android:id="@+id/btnProfileEditBalanceGame"
@@ -236,10 +239,10 @@
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:layout_marginBottom="40dp"
                     android:id="@+id/btnProfileSave"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
                     android:background="@drawable/sh_round_box"
                     android:backgroundTint="@color/Primary"
                     android:text="@string/save_btn_text"
