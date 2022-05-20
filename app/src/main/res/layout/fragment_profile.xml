@@ -33,31 +33,9 @@
             android:textSize="@dimen/text_large"
             android:textStyle="bold" />
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-
-            <com.github.ybq.android.spinkit.SpinKitView
-                style="@style/SpinKitView.Large.Circle"
-                android:id="@+id/skvProfileLoading"
-                android:layout_margin="12dp"
-                android:layout_width="@dimen/icon_small"
-                android:layout_height="@dimen/icon_small"
-                android:layout_gravity="center"
-                app:SpinKit_Color="@color/GreyDark" />
-
-
-            <ImageButton
-                android:id="@+id/btnProfileRefresh"
-                android:layout_width="@dimen/icon_medium"
-                android:layout_height="@dimen/icon_medium"
-                android:background="@color/BackgroundWhite"
-                android:contentDescription="@string/back_button_description"
-                android:src="@drawable/ic_refresh"
-                android:visibility="invisible" />
-
-        </FrameLayout>
+        <View
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"/>
 
     </LinearLayout>
 
@@ -71,15 +49,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvPhotoPicker"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="10dp"
-                android:clipToPadding="false"
-                android:paddingTop="15dp"
-                android:paddingBottom="30dp" />
+            <include
+                android:id="@+id/layoutPhotoPicker"
+                layout="@layout/layout_photo_picker" />
 
             <LinearLayout
                 android:layout_width="match_parent"

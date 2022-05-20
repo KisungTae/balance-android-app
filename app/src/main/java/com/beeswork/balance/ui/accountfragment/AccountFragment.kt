@@ -90,6 +90,5 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
     }
 
     override fun onFragmentSelected() {
-        println("account fragment: onFragmentSelected")
     }
 }

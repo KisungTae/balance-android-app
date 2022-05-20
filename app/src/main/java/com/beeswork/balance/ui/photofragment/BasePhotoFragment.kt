@@ -6,11 +6,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,12 +28,20 @@ import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.closestKodein
+import org.kodein.di.generic.instance
 import java.io.File
 
-open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.PhotoPickerListener, PhotoPickerOptionListener {
+open class BasePhotoFragment : BaseFragment(),
+    KodeinAware,
+    PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
+    PhotoPickerOptionListener {
 
-    protected lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
+    override val kodein by closestKodein()
     private lateinit var viewModel: PhotoViewModel
+    private val viewModelFactory: PhotoViewModelFactory by instance()
+    protected lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
     private lateinit var binding: LayoutPhotoPickerBinding
 
     private val requestGalleryPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -60,8 +70,9 @@ open class BasePhotoFragment : BaseFragment(), PhotoPickerRecyclerViewAdapter.Ph
         }
     }
 
-    protected fun onViewCreated(viewModel: PhotoViewModel, layoutPhotoPickerBinding: LayoutPhotoPickerBinding) {
-        this.viewModel = viewModel
+    protected fun onViewCreated(view: View, savedInstanceState: Bundle?, layoutPhotoPickerBinding: LayoutPhotoPickerBinding) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(PhotoViewModel::class.java)
         this.binding = layoutPhotoPickerBinding
         setupPhotoPickerRecyclerView(binding.rvPhotoPicker)
         setupBtnListeners()

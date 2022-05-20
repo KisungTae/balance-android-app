@@ -52,7 +52,9 @@ class PhotoRepositoryImpl(
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
             val photos = photoDAO.getAllBy(accountId, maxNumOfPhotos)
-            if (photos.isNotEmpty()) {
+
+            // profile photo is saved when login, so make sure that the rest of photos are fetched
+            if (photos.size > 1) {
                 return@withContext Resource.success(photos)
             }
 

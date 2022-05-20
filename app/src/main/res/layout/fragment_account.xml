@@ -69,7 +69,6 @@
             android:id="@+id/tvAccountEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="c0go233@gmail.com"
             android:textAlignment="center"
             android:textColor="@color/TextGrey" />
 
@@ -157,7 +156,7 @@
                     android:id="@+id/tvAccountPoint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="50"
+                    android:text="0"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
 

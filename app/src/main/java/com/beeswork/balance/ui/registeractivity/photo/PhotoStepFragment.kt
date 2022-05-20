@@ -20,11 +20,9 @@ import org.kodein.di.generic.instance
 
 class PhotoStepFragment(
     private val registerStepListener: RegisterStepListener
-) : BasePhotoFragment(), KodeinAware {
-    override val kodein by closestKodein()
+) : BasePhotoFragment() {
+
     private lateinit var binding: FragmentPhotoBinding
-    private lateinit var viewModel: PhotoViewModel
-    private val viewModelFactory: PhotoViewModelFactory by instance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPhotoBinding.inflate(inflater)
@@ -32,9 +30,7 @@ class PhotoStepFragment(
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(PhotoViewModel::class.java)
-        super.onViewCreated(viewModel, binding.layoutPhotoPicker)
+        super.onViewCreated(view, savedInstanceState, binding.layoutPhotoPicker)
         bindUI()
     }
 

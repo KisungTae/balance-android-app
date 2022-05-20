@@ -45,41 +45,13 @@ import org.kodein.di.generic.instance
 import java.io.File
 
 
-class ProfileFragment : BaseFragment(),
-    KodeinAware,
+class ProfileFragment : BasePhotoFragment(),
     HeightOptionDialog.HeightOptionDialogListener,
-    PhotoPickerRecyclerViewAdapter.PhotoPickerListener,
-    ErrorDialog.RetryListener,
-    PhotoPickerOptionListener {
+    ErrorDialog.RetryListener{
 
-    override val kodein by closestKodein()
-    private val preferenceProvider: PreferenceProvider by instance()
     private val viewModelFactory: ProfileViewModelFactory by instance()
-
     private lateinit var viewModel: ProfileViewModel
     private lateinit var binding: FragmentProfileBinding
-    private lateinit var photoPickerRecyclerViewAdapter: PhotoPickerRecyclerViewAdapter
-
-    private var fetchPhotosStatus = Resource.Status.SUCCESS
-    private var fetchProfileStatus = Resource.Status.SUCCESS
-
-    private val requestGalleryPermission = registerForActivityResult(RequestPermission()) { granted ->
-        if (granted) selectPhotoFromGallery()
-    }
-
-    private val requestCameraPermission = registerForActivityResult(RequestPermission()) { granted ->
-        if (granted) selectPhotoFromCapture()
-    }
-
-    private val readFromGalleryActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) result.data?.data?.let { uri -> launchCropImage(uri) }
-    }
-
-    private val readFromCaptureActivityResult = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            launchCropImage(getCapturedPhotoUri())
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentProfileBinding.inflate(inflater)
@@ -87,13 +59,10 @@ class ProfileFragment : BaseFragment(),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(view, savedInstanceState, binding.layoutPhotoPicker)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProfileViewModel::class.java)
         bindUI()
-        viewModel.fetchPhotos()
-        viewModel.syncPhotos()
         viewModel.fetchProfile()
-
     }
 
     private fun bindUI() = lifecycleScope.launch {
@@ -101,78 +70,7 @@ class ProfileFragment : BaseFragment(),
         observeFetchProfileLiveData()
         observeSaveBioLiveData()
         setupListeners()
-
-
-        setupPhotoPickerRecyclerView()
-        observeFetchPhotosLiveData()
-        observeSyncPhotosLiveData()
-        observeUploadPhotoLiveData()
-        observeOrderPhotosLiveData()
-        observeDeletePhotoLiveData()
-
-
     }
-
-
-    private fun observeFetchPhotosLiveData() {
-        viewModel.fetchPhotosLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
-            fetchPhotosStatus = resource.status
-            updateRefreshBtn()
-            if (resource.isError()) {
-                showFetchPhotosError(resource.exception)
-            }
-        }
-    }
-
-    private fun showFetchPhotosError(exception: Throwable?) {
-        val title = getString(R.string.error_title_fetch_photos)
-        val message = MessageSource.getMessage(requireContext(), exception)
-        ErrorDialog.show(title, message, RequestCode.FETCH_PHOTOS, this, childFragmentManager)
-    }
-
-
-    private fun observeDeletePhotoLiveData() {
-        viewModel.deletePhotoLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
-            if (resource.isError()) {
-                val title = getString(R.string.error_title_delete_photo)
-                val message = MessageSource.getMessage(requireContext(), resource.exception)
-                ErrorDialog.show(title, message, childFragmentManager)
-            }
-        }
-    }
-
-    private fun observeOrderPhotosLiveData() {
-        viewModel.orderPhotosLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
-            if (resource.isError()) {
-                val title = getString(R.string.error_title_order_photos)
-                val message = MessageSource.getMessage(requireContext(), resource.exception)
-                ErrorDialog.show(title, message, childFragmentManager)
-            }
-        }
-    }
-
-    private fun observeSyncPhotosLiveData() {
-        viewModel.syncPhotosLiveData.observe(viewLifecycleOwner) {
-            if (it) observePhotosLiveData()
-        }
-    }
-
-    private fun observeUploadPhotoLiveData() {
-        viewModel.uploadPhotoLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
-            if (resource.isError() && resource.isExceptionCodeEqualTo(ExceptionCode.PHOTO_ALREADY_EXIST_EXCEPTION)) {
-                val title = getString(R.string.error_title_add_photo)
-                val message = MessageSource.getMessage(requireContext(), resource.exception)
-                ErrorDialog.show(title, message, childFragmentManager)
-            }
-        }
-    }
-
-    private fun observePhotosLiveData() {
-//        viewModel.getPhotosLiveData().observe(viewLifecycleOwner) {
-//            photoPickerRecyclerViewAdapter.submit(it)
-//        }
-    }
-
 
     private fun setupListeners() {
         binding.llProfileHeightWrapper.setOnClickListener {
@@ -182,59 +80,10 @@ class ProfileFragment : BaseFragment(),
 //        binding.btnProfileEditBalanceGame.setOnClickListener {
 //            ProfileBalanceGameDialog().show(childFragmentManager, ProfileBalanceGameDialog.TAG)
 //        }
-        binding.btnProfileRefresh.setOnClickListener {
-            if (fetchProfileStatus == Resource.Status.ERROR) viewModel.fetchProfile()
-            if (fetchPhotosStatus == Resource.Status.ERROR) viewModel.fetchPhotos()
-        }
+
     }
 
 
-    private fun setupPhotoPickerRecyclerView() {
-        photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(this)
-        binding.rvPhotoPicker.adapter = photoPickerRecyclerViewAdapter
-        binding.rvPhotoPicker.layoutManager = object : GridLayoutManager(
-            requireContext(),
-            PHOTO_PICKER_NUM_OF_COLUMNS
-        ) {
-            override fun canScrollVertically(): Boolean = false
-            override fun canScrollHorizontally(): Boolean = false
-        }
-
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0
-        ) {
-            override fun isLongPressDragEnabled(): Boolean {
-                val isSwipeable = photoPickerRecyclerViewAdapter.isSwipeable()
-                if (!isSwipeable) {
-                    val title = getString(R.string.error_title_order_photos)
-                    val message = getString(R.string.photo_not_orderable_exception)
-                    ErrorDialog.show(title, message, childFragmentManager)
-                }
-                return isSwipeable
-            }
-
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                photoPickerRecyclerViewAdapter.swapPhotos(
-                    viewHolder.absoluteAdapterPosition,
-                    target.absoluteAdapterPosition
-                )
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-
-            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-                viewHolder.itemView.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, null)
-                viewModel.orderPhotos(photoPickerRecyclerViewAdapter.getPhotoPickerSequences())
-            }
-
-        })
-        itemTouchHelper.attachToRecyclerView(binding.rvPhotoPicker)
-    }
 
     private fun setupToolBar() {
         binding.btnProfileSave.setOnClickListener { saveBio() }
@@ -249,162 +98,15 @@ class ProfileFragment : BaseFragment(),
     override fun onRetry(requestCode: Int?) {
         when (requestCode) {
             RequestCode.FETCH_PROFILE -> viewModel.fetchProfile()
-            RequestCode.FETCH_PHOTOS -> viewModel.fetchPhotos()
         }
     }
 
-    override fun onClickPhoto(position: Int) {
-        if (fetchPhotosStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.ERROR) {
-            val message = getString(R.string.fetching_photos_message)
-            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-            if (fetchPhotosStatus == Resource.Status.ERROR) viewModel.fetchPhotos()
-            return
-        }
-
-        val photoPicker = photoPickerRecyclerViewAdapter.getPhotoPicker(position)
-        when (photoPicker.status) {
-            PhotoStatus.EMPTY -> UploadPhotoOptionDialog(this).show(childFragmentManager, UploadPhotoOptionDialog.TAG)
-            PhotoStatus.OCCUPIED -> DeletePhotoOptionDialog(photoPicker.key, this).show(
-                childFragmentManager,
-                DeletePhotoOptionDialog.TAG
-            )
-            PhotoStatus.UPLOAD_ERROR -> UploadPhotoErrorOptionDialog(photoPicker.uri, photoPicker.key, this).show(
-                childFragmentManager,
-                UploadPhotoErrorOptionDialog.TAG
-            )
-            PhotoStatus.DOWNLOAD_ERROR -> DownloadPhotoErrorOptionDialog(photoPicker.key, this).show(
-                childFragmentManager,
-                DownloadPhotoErrorOptionDialog.TAG
-            )
-            else -> println("")
-        }
-    }
-
-    override fun onDownloadPhotoError(photoKey: String?) {
-        viewModel.onDownloadPhotoError(photoKey)
-    }
-
-    override fun onDownloadPhotoSuccess(photoKey: String?) {
-        viewModel.onDownloadPhotoSuccess(photoKey)
-    }
-
-    private fun hasExternalStoragePermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-    }
 
 
-    private fun selectPhotoFromGallery() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = PhotoConstant.PHOTO_INTENT_TYPE
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, PhotoConstant.PHOTO_MIME_TYPES)
-        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        readFromGalleryActivityResult.launch(intent)
-    }
-
-    // CASE 1. Read an image from gallery and deleted when launch CropImage --> CropImage activity will result in error
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
-                val result = CropImage.getActivityResult(data)
-                if (resultCode == Activity.RESULT_OK) viewModel.uploadPhoto(result.uri, null)
-                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    val title = getString(R.string.error_title_crop_image)
-                    val message = result.error.localizedMessage ?: ""
-                    ErrorDialog.show(title, message, childFragmentManager)
-                }
-                deleteCapturedPhoto()
-            }
-        }
-    }
-
-    private fun launchCropImage(uri: Uri) {
-        CropImage.activity(uri)
-            .setGuidelines(CropImageView.Guidelines.ON)
-            .setAspectRatio(PhotoItemUIState.MAX_PHOTO_WIDTH, PhotoItemUIState.MAX_PHOTO_HEIGHT)
-            .setAutoZoomEnabled(false)
-            .setFixAspectRatio(true)
-            .setMaxCropResultSize(PhotoItemUIState.MAX_PHOTO_WIDTH, PhotoItemUIState.MAX_PHOTO_HEIGHT)
-            .setMinCropResultSize(PhotoItemUIState.MAX_PHOTO_WIDTH, PhotoItemUIState.MAX_PHOTO_HEIGHT)
-            .setCropShape(CropImageView.CropShape.RECTANGLE)
-            .start(requireContext(), this)
-    }
-
-
-    override fun reuploadPhoto(photoUri: Uri?, photoKey: String?) {
-        viewModel.uploadPhoto(photoUri, photoKey)
-    }
-
-    override fun redownloadPhoto(photoKey: String?) {
-        viewModel.downloadPhoto(photoKey)
-    }
-
-    override fun deletePhoto(photoKey: String?) {
-        viewModel.deletePhoto(photoKey)
-    }
-
-    override fun uploadPhotoFromGallery() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (hasExternalStoragePermission()) selectPhotoFromGallery()
-            else requestGalleryPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            selectPhotoFromGallery()
-        }
-    }
-
-    override fun uploadPhotoFromCapture() {
-        val cameraIsAvailable = activity?.packageManager?.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) ?: false
-        if (cameraIsAvailable) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (hasCameraPermission()) {
-                    selectPhotoFromCapture()
-                } else {
-                    requestCameraPermission.launch(Manifest.permission.CAMERA)
-                }
-            } else {
-                selectPhotoFromCapture()
-            }
-        }
-    }
-
-    private fun hasCameraPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun selectPhotoFromCapture() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, getCapturedPhotoUri())
-        readFromCaptureActivityResult.launch(intent)
-    }
-
-    private fun getCapturedPhotoUri(): Uri {
-        return FileProvider.getUriForFile(
-            requireContext(),
-            requireContext().packageName.toString() + FILE_PROVIDER_SUFFIX,
-            getCapturedPhotoFile()
-        )
-    }
-
-    private fun getCapturedPhotoFile(): File {
-        return File(requireContext().getExternalFilesDir(null), CAPTURED_PHOTO_NAME)
-    }
-
-    private fun deleteCapturedPhoto() {
-        val file = getCapturedPhotoFile()
-        if (file.exists()) {
-            file.delete()
-        }
-    }
 
 
     private fun observeFetchProfileLiveData() {
         viewModel.fetchProfileLiveData.observeResource(viewLifecycleOwner, activity) { resource ->
-            fetchProfileStatus = resource.status
             updateRefreshBtn()
             when {
                 resource.isSuccess() -> showFetchProfileSuccess(resource.data)
@@ -521,30 +223,23 @@ class ProfileFragment : BaseFragment(),
 
 
     private fun showLoading() {
-        binding.btnProfileRefresh.visibility = View.GONE
-        binding.skvProfileLoading.visibility = View.VISIBLE
+//        binding.btnProfileRefresh.visibility = View.GONE
+//        binding.skvProfileLoading.visibility = View.VISIBLE
     }
 
     private fun showRefreshBtn() {
-        binding.btnProfileRefresh.visibility = View.VISIBLE
-        binding.skvProfileLoading.visibility = View.GONE
+//        binding.btnProfileRefresh.visibility = View.VISIBLE
+//        binding.skvProfileLoading.visibility = View.GONE
     }
 
     private fun hideLoadingAndRefreshBtn() {
-        binding.btnProfileRefresh.visibility = View.INVISIBLE
-        binding.skvProfileLoading.visibility = View.GONE
+//        binding.btnProfileRefresh.visibility = View.INVISIBLE
+//        binding.skvProfileLoading.visibility = View.GONE
     }
 
     private fun updateRefreshBtn() {
-        if (fetchProfileStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.LOADING) showLoading()
-        else if (fetchProfileStatus == Resource.Status.ERROR || fetchPhotosStatus == Resource.Status.ERROR) showRefreshBtn()
-        else hideLoadingAndRefreshBtn()
-    }
-
-
-    companion object {
-        private const val CAPTURED_PHOTO_NAME = "capturedPhoto.jpg"
-        private const val FILE_PROVIDER_SUFFIX = ".fileProvider"
-        private const val PHOTO_PICKER_NUM_OF_COLUMNS = 3
+//        if (fetchProfileStatus == Resource.Status.LOADING || fetchPhotosStatus == Resource.Status.LOADING) showLoading()
+//        else if (fetchProfileStatus == Resource.Status.ERROR || fetchPhotosStatus == Resource.Status.ERROR) showRefreshBtn()
+//        else hideLoadingAndRefreshBtn()
     }
 }
