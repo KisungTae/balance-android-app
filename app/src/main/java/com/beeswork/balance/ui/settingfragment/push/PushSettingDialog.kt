@@ -32,7 +32,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
+        setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_WhiteFullScreen)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

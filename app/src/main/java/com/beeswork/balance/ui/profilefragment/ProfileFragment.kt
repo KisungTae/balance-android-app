@@ -51,9 +51,15 @@ class ProfileFragment : BasePhotoFragment(),
 
     private fun bindUI() = lifecycleScope.launch {
         setupToolBar()
+        setupListeners()
         observeFetchProfileUIStateLiveData()
         observeSaveBioLiveData()
-        setupListeners()
+
+    }
+
+    private fun setupToolBar() {
+        binding.btnProfileSave.setOnClickListener { saveBio() }
+        binding.btnProfileBack.setOnClickListener { Navigator.popBackStack(activity, MainViewPagerFragment.TAG) }
     }
 
     private fun setupListeners() {
@@ -68,13 +74,6 @@ class ProfileFragment : BasePhotoFragment(),
             ProfileBalanceGameDialog(null, this@ProfileFragment).show(childFragmentManager, ProfileBalanceGameDialog.TAG)
         }
     }
-
-
-    private fun setupToolBar() {
-        binding.btnProfileSave.setOnClickListener { saveBio() }
-        binding.btnProfileBack.setOnClickListener { Navigator.popBackStack(activity, MainViewPagerFragment.TAG) }
-    }
-
 
     private fun observeFetchProfileUIStateLiveData() {
         viewModel.fetchProfileUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { fetchProfileUIState ->
@@ -93,7 +92,7 @@ class ProfileFragment : BasePhotoFragment(),
                 fetchProfileUIState.showError -> {
                     binding.btnProfileRefresh.visibility = View.VISIBLE
                     binding.skvProfileLoading.visibility = View.GONE
-                    binding.btnProfileSave.isEnabled = true
+                    binding.btnProfileSave.isEnabled = false
                     val title = getString(R.string.error_title_fetch_profile)
                     val message = MessageSource.getMessage(requireContext(), fetchProfileUIState.exception)
                     ErrorDialog.show(title, message, RequestCode.FETCH_PROFILE, this, childFragmentManager)

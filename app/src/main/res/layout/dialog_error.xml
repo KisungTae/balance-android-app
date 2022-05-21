@@ -1,73 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llErrorDialogMask"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/sh_round_box_medium"
-    android:orientation="vertical"
-    android:paddingHorizontal="10dp"
-    android:paddingTop="20dp"
-    android:paddingBottom="30dp">
+    android:background="@color/Transparent"
+    android:gravity="center"
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/ivErrorDialogIcon"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:contentDescription="@string/dialog_error_icon_description"
-        android:src="@drawable/ic_thankful" />
-
-    <TextView
-        android:id="@+id/tvErrorDialogTitle"
+    <LinearLayout
+        android:id="@+id/llErrorDialogWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ivErrorDialogIcon"
-        android:layout_marginBottom="10dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tvErrorDialogMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvErrorDialogTitle"
-        android:layout_marginBottom="30dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:textAlignment="center"
-        android:textColor="@color/TextBlack" />
-
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnErrorDialogRetry"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvErrorDialogMessage"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="40dp"
         android:background="@drawable/sh_round_box_medium"
-        android:backgroundTint="@color/Primary"
-        android:stateListAnimator="@null"
-        android:text="@string/retry_btn"
-        android:textColor="@color/white"
-        android:textStyle="bold" />
+        android:backgroundTint="@color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="25dp"
+        android:paddingVertical="40dp">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnErrorDialogClose"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnErrorDialogRetry"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/sh_round_box_border_medium"
-        android:stateListAnimator="@null"
-        android:text="@string/close"
-        android:textColor="@color/Primary"
-        android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/ivErrorDialogIcon"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginBottom="15dp"
+            android:contentDescription="@string/dialog_error_icon_description"
+            android:src="@drawable/melting_ice_cream" />
+
+        <TextView
+            android:id="@+id/tvErrorDialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7dp"
+            android:text="다운로드를 하지 못했습니다."
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvErrorDialogMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
+            android:text="서버에서 요청을 처리하지 못했습니다. 잠시후에 다시시도해주세요. "
+            android:textAlignment="center"
+            android:textColor="@color/TextDarkGrey"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnErrorDialogRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="43dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/sh_round_box_medium"
+            android:paddingHorizontal="25dp"
+            android:text="다시시도하기"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnErrorDialogClose"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:background="@color/Transparent"
+            android:text="@string/close"
+            android:textColor="@color/TextGrey"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
 
-</RelativeLayout>
+</LinearLayout>

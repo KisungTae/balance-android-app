@@ -47,6 +47,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@color/Transparent"
+                android:contentDescription="@string/refresh_button_icon_description"
                 android:src="@drawable/refresh"
                 app:tint="?attr/colorControlNormal" />
 
@@ -80,6 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="25dp" />
 
             <LinearLayout

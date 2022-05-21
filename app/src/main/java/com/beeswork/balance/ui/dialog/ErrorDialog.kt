@@ -21,9 +21,14 @@ class ErrorDialog(
     private val retryListener: RetryListener?,
     private val dismissListener: DismissListener?,
     private val id: UUID? = null
-) : DialogFragment() {
+) : BaseDialog() {
 
     private lateinit var binding: DialogErrorBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.Theme_App_Dialog_FullScreen)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,11 +44,10 @@ class ErrorDialog(
         bindUI()
     }
 
-    override fun getTheme(): Int {
-        return R.style.RoundedCornersDialog
-    }
-
     private fun bindUI() {
+        binding.llErrorDialogMask.setOnClickListener {
+            dismiss()
+        }
         setupRetryListener()
         binding.tvErrorDialogTitle.text = title ?: resources.getString(R.string.error_title_generic)
         binding.tvErrorDialogMessage.text = message ?: ""
