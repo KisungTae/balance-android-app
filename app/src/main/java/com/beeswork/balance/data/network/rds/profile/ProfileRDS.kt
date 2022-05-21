@@ -22,7 +22,7 @@ interface ProfileRDS {
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>
     suspend fun fetchQuestions(): Resource<FetchQuestionsDTO>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionDTO>
-    suspend fun saveBio(height: Int?, about: String): Resource<EmptyResponse>
+    suspend fun saveBio(height: Int?, about: String?): Resource<EmptyResponse>
 
 
 }

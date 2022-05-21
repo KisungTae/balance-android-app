@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class ProfileBalanceGameDialog(
     private val profilePhotoUrl: String?,
-    private val registerBalanceGameListener: RegisterBalanceGameListener?
+    private val balanceGameListener: BalanceGameListener?
 ): BaseBalanceGameDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,7 +69,7 @@ class ProfileBalanceGameDialog(
         viewModel.saveAnswersUIStateLiveData.observe(viewLifecycleOwner) { saveAnswersUIState ->
             when {
                 saveAnswersUIState.saved -> {
-                    registerBalanceGameListener?.onBalanceGameAnswersSaved()
+                    balanceGameListener?.onBalanceGameAnswersSaved()
                     dismiss()
                 }
                 saveAnswersUIState.showLoading -> {

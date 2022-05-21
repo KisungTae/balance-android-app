@@ -7,7 +7,6 @@ import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.LocalDate
-import org.threeten.bp.OffsetDateTime
 
 interface ProfileRepository {
 
@@ -33,7 +32,7 @@ interface ProfileRepository {
     ): Resource<EmptyResponse>
     suspend fun deleteProfile()
     suspend fun fetchProfile(sync: Boolean): Resource<Profile>
-    suspend fun saveBio(height: Int?, about: String): Resource<Profile>
+    suspend fun saveBio(height: Int?, about: String?): Resource<EmptyResponse>
     suspend fun fetchQuestions(): Resource<FetchQuestionsDTO>
     suspend fun fetchRandomQuestion(questionIds: List<Int>): Resource<QuestionDTO>
     suspend fun saveAnswers(answers: Map<Int, Boolean>): Resource<EmptyResponse>

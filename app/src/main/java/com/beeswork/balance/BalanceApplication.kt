@@ -62,6 +62,8 @@ import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCase
 import com.beeswork.balance.domain.usecase.login.*
 import com.beeswork.balance.domain.usecase.main.*
 import com.beeswork.balance.domain.usecase.photo.*
+import com.beeswork.balance.domain.usecase.profile.SaveBioUseCase
+import com.beeswork.balance.domain.usecase.profile.SaveBioUseCaseImpl
 import com.beeswork.balance.domain.usecase.register.*
 import com.beeswork.balance.domain.usecase.report.ReportMatchUseCase
 import com.beeswork.balance.domain.usecase.report.ReportMatchUseCaseImpl
@@ -248,6 +250,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<FetchProfileUseCase>() with singleton { FetchProfileUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetEmailUseCase>() with singleton { GetEmailUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetProfilePhotoFlowUseCase>() with singleton { GetProfilePhotoFlowUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<SaveBioUseCase>() with singleton { SaveBioUseCaseImpl(instance(), Dispatchers.Default) }
 
 
         // Repository
@@ -400,7 +403,7 @@ class BalanceApplication : Application(), KodeinAware {
             )
         }
         bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance(), instance()) }
-        bind() from provider { ProfileViewModelFactory(instance(), instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { ProfileViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {
             BalanceGameViewModelFactory(
                 instance(),

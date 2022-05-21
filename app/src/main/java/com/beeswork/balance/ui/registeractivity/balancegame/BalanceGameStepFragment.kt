@@ -10,11 +10,10 @@ import com.beeswork.balance.ui.balancegamedialog.*
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.RegisterStepListener
 import kotlinx.coroutines.launch
-import java.util.*
 
-class BalanceStepGameFragment(
+class BalanceGameStepFragment(
     private val registerStepListener: RegisterStepListener
-) : BaseFragment(), RegisterBalanceGameListener {
+) : BaseFragment(), BalanceGameListener {
 
     private lateinit var binding: FragmentBalanceGameBinding
 

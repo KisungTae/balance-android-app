@@ -15,7 +15,6 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.LocalDate
-import org.threeten.bp.OffsetDateTime
 
 class ProfileRepositoryImpl(
     private val preferenceProvider: PreferenceProvider,
@@ -145,7 +144,7 @@ class ProfileRepositoryImpl(
         }
     }
 
-    override suspend fun saveBio(height: Int?, about: String): Resource<Profile> {
+    override suspend fun saveBio(height: Int?, about: String?): Resource<EmptyResponse> {
         return withContext(ioDispatcher) {
             val accountId = preferenceProvider.getAccountId() ?: return@withContext Resource.error(AccountIdNotFoundException())
 
@@ -153,12 +152,11 @@ class ProfileRepositoryImpl(
             val response = profileRDS.saveBio(height, about)
 
             if (response.isSuccess()) {
-                profileDAO.updateAboutBy(accountId, height, about)
-                return@withContext response.map { null }
+                profileDAO.updateBioBy(accountId, height, about)
             } else {
                 profileDAO.updateSyncedBy(accountId, true)
-                return@withContext response.map { profileDAO.getBy(accountId) }
             }
+            return@withContext response
         }
     }
 

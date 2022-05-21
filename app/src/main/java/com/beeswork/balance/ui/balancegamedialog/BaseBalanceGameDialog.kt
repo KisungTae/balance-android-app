@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.size
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -12,13 +11,12 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.DialogBalanceGameBinding
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.common.BaseDialog
-import com.beeswork.balance.ui.dialog.ErrorDialog
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameViewPagerAdapter.BalanceGameListener {
+abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameViewPagerAdapter.BalanceGameOptionListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: BalanceGameViewModelFactory by instance()

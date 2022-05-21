@@ -30,7 +30,7 @@ class PhotoStepFragment(
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState, binding.layoutPhotoPicker)
+        super.onViewCreated(view, savedInstanceState, binding.photoStepPhotoPickerLayout)
         bindUI()
     }
 

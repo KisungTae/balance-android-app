@@ -4,5 +4,5 @@ import java.util.*
 
 data class SaveBioBody(
     val height: Int?,
-    val about: String
+    val about: String?
 )

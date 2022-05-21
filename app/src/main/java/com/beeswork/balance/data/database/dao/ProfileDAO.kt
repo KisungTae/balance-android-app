@@ -20,7 +20,7 @@ interface ProfileDAO {
     fun getBy(accountId: UUID?): Profile?
 
     @Query("update profile set height = :height, about = :about, synced = 1 where accountId = :accountId")
-    fun updateAboutBy(accountId: UUID, height: Int?, about: String)
+    fun updateBioBy(accountId: UUID, height: Int?, about: String?)
 
     @Query("delete from profile where accountId = :accountId")
     fun deleteBy(accountId: UUID?)

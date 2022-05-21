@@ -16,7 +16,7 @@ import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 
 class BalanceGameViewPagerAdapter(
-    private val balanceGameListener: BalanceGameListener
+    private val balanceGameOptionListener: BalanceGameOptionListener
 ) : RecyclerView.Adapter<BalanceGameViewPagerAdapter.ViewHolder>() {
 
     private var profilePhotoURL: String? = null
@@ -27,7 +27,7 @@ class BalanceGameViewPagerAdapter(
         return ViewHolder(
             ItemBalanceGameBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             profilePhotoURL,
-            balanceGameListener,
+            balanceGameOptionListener,
             parent.context
         )
     }
@@ -74,7 +74,7 @@ class BalanceGameViewPagerAdapter(
         profilePhotoURL = url
     }
 
-    interface BalanceGameListener {
+    interface BalanceGameOptionListener {
         fun onBalanceGameOptionSelected(position: Int, answer: Boolean)
     }
 
@@ -82,7 +82,7 @@ class BalanceGameViewPagerAdapter(
     class ViewHolder(
         private val binding: ItemBalanceGameBinding,
         private val profilePhotoUrl: String?,
-        private val balanceGameListener: BalanceGameListener,
+        private val balanceGameOptionListener: BalanceGameOptionListener,
         private val context: Context
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -98,10 +98,10 @@ class BalanceGameViewPagerAdapter(
             setOptionButton(binding.btnBalanceGameBottomOption, questionItemUIState.answer == BalanceGameOption.BOTTOM)
 
             binding.btnBalanceGameTopOption.setOnClickListener {
-                balanceGameListener.onBalanceGameOptionSelected(absoluteAdapterPosition, BalanceGameOption.TOP)
+                balanceGameOptionListener.onBalanceGameOptionSelected(absoluteAdapterPosition, BalanceGameOption.TOP)
             }
             binding.btnBalanceGameBottomOption.setOnClickListener {
-                balanceGameListener.onBalanceGameOptionSelected(absoluteAdapterPosition, BalanceGameOption.BOTTOM)
+                balanceGameOptionListener.onBalanceGameOptionSelected(absoluteAdapterPosition, BalanceGameOption.BOTTOM)
             }
 
             Glide.with(context)

@@ -13,7 +13,8 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/BackgroundWhite"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp">
 
         <ImageButton
             android:id="@+id/btnProfileBack"
@@ -25,7 +26,7 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/profile_tool_bar_title"
@@ -33,9 +34,33 @@
             android:textSize="@dimen/text_large"
             android:textStyle="bold" />
 
-        <View
-            android:layout_width="@dimen/icon_medium"
-            android:layout_height="@dimen/icon_medium" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
+
+            <ImageButton
+                android:id="@+id/btnProfileRefresh"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/Transparent"
+                android:src="@drawable/refresh"
+                app:tint="?attr/colorControlNormal" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/skvProfileLoading"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
+                android:background="@color/Transparent"
+                android:padding="12dp"
+                app:SpinKit_Color="@color/darkerGrey" />
+
+
+        </FrameLayout>
 
     </LinearLayout>
 
@@ -50,7 +75,7 @@
             android:orientation="vertical">
 
             <include
-                android:id="@+id/layoutPhotoPicker"
+                android:id="@+id/profilePhotoPickerLayout"
                 layout="@layout/layout_photo_picker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -238,15 +263,40 @@
 
                 </LinearLayout>
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnProfileSave"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp"
-                    android:background="@drawable/sh_round_box"
-                    android:backgroundTint="@color/Primary"
-                    android:text="@string/save_btn_text"
-                    android:textColor="@color/white" />
+                    android:layout_marginBottom="40dp">
+
+                    <LinearLayout
+                        android:id="@+id/llProfileSaveLoading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/sh_round_box"
+                        android:backgroundTint="@color/Primary"
+                        android:gravity="center_horizontal">
+
+                        <com.github.ybq.android.spinkit.SpinKitView
+                            style="@style/SpinKitView.Large.Circle"
+                            android:layout_width="@dimen/icon_medium"
+                            android:layout_height="@dimen/icon_medium"
+                            android:background="@color/Transparent"
+                            android:padding="12dp"
+                            app:SpinKit_Color="@color/white" />
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnProfileSave"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/sh_round_box"
+                        android:backgroundTint="@color/Primary"
+                        android:text="@string/save_btn_text"
+                        android:textColor="@color/white" />
+
+                </FrameLayout>
+
 
             </LinearLayout>
 

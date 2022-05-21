@@ -1,4 +1,4 @@
-package com.beeswork.balance.domain.usecase.account
+package com.beeswork.balance.domain.usecase.profile
 
 import com.beeswork.balance.data.database.entity.profile.Profile
 import com.beeswork.balance.data.database.repository.profile.ProfileRepository
@@ -10,15 +10,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class FetchProfileUseCaseImpl(
+class SaveBioUseCaseImpl(
     private val profileRepository: ProfileRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-): FetchProfileUseCase {
+) : SaveBioUseCase {
 
-    override suspend fun invoke(sync: Boolean): Resource<Profile> {
+    override suspend fun invoke(height: Int?, about: String?): Resource<EmptyResponse> {
         return try {
             withContext(defaultDispatcher) {
-                return@withContext profileRepository.fetchProfile(sync)
+                delay(10000)
+                return@withContext profileRepository.saveBio(height, about)
             }
         } catch (e: IOException) {
             return Resource.error(e)
