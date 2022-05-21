@@ -80,11 +80,6 @@ class RegisterActivity : BaseLocationActivity(false), RegisterStepListener {
         binding.vpRegister.currentItem = previousIndex
     }
 
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        this.hideKeyboard(ev)
-        return super.dispatchTouchEvent(ev)
-    }
-
     override fun onMoveToNextStep() {
         moveToNextTab()
     }

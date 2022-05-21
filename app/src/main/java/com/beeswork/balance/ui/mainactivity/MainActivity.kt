@@ -1,6 +1,9 @@
 package com.beeswork.balance.ui.mainactivity
 
+import android.content.Context
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.databinding.ActivityMainBinding
