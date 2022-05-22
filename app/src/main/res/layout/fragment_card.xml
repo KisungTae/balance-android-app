@@ -14,10 +14,17 @@
         android:background="@color/BackgroundWhite"
         app:contentInsetStart="0dp">
 
-        <Button
-            android:layout_width="@dimen/icon_medium"
-            android:layout_height="@dimen/icon_medium"
-            android:visibility="invisible" />
+        <!--        <Button-->
+        <!--            android:layout_width="@dimen/icon_medium"-->
+        <!--            android:layout_height="@dimen/icon_medium"-->
+        <!--            android:visibility="invisible" />-->
+
+        <ImageView
+            android:layout_margin="12dp"
+            android:layout_width="@dimen/icon_small"
+            android:layout_height="@dimen/icon_small"
+            android:src="@drawable/undo"
+            app:tint="#808080" />
 
         <com.beeswork.balance.ui.common.GradientTextView
             android:layout_width="match_parent"

@@ -85,8 +85,12 @@ class SwipePagingDataAdapter(
         }
 
         fun bind(swipeItemUIState: SwipeItemUIState) {
-            binding.ivSwipeClickedIcon.isVisible = swipeItemUIState.clicked
-            binding.ivSwipeLikedIcon.isVisible = !swipeItemUIState.clicked
+//            binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE
+//            if (swipeItemUIState.clicked) {
+//                binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE
+//            } else {
+//                binding.llSwipeClickedIconWrapper.visibility = View.GONE
+//            }
 
 //            swipeItemUIState.swiperProfilePhotoUrl
 

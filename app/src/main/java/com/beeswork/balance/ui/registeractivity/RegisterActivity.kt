@@ -8,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivityRegisterBinding
-import com.beeswork.balance.internal.util.hideKeyboard
 import com.beeswork.balance.ui.common.BaseLocationActivity
 import com.beeswork.balance.ui.common.RegisterStepListener
 import kotlinx.coroutines.launch

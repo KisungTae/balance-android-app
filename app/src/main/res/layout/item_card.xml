@@ -117,7 +117,7 @@
                             android:layout_width="15dp"
                             android:layout_height="15dp"
                             android:contentDescription="@string/height_icon_description"
-                            android:src="@drawable/ic_baseline_height_24"
+                            android:src="@drawable/ic_round_height_24"
                             app:tint="@color/TextBlack" />
 
                         <TextView
@@ -182,7 +182,6 @@
                             android:layout_width="15dp"
                             android:layout_height="15dp"
                             android:contentDescription="@string/gender_icon_description"
-                            android:src="@drawable/ic_baseline_female_24"
                             app:tint="@color/TextBlack" />
 
                         <TextView
@@ -245,7 +244,7 @@
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:contentDescription="@string/dislike_icon_description"
-                android:src="@drawable/ic_baseline_thumb_down_24"
+                android:src="@drawable/ic_round_thumb_down_24"
                 app:tint="@color/GreyDark" />
 
         </LinearLayout>
@@ -271,7 +270,7 @@
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:contentDescription="@string/favorite_icon_description"
-                android:src="@drawable/ic_baseline_favorite"
+                android:src="@drawable/ic_round_favorite_24"
                 app:tint="@color/Primary" />
 
         </LinearLayout>

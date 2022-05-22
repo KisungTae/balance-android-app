@@ -1,22 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="15dp">
 
     <FrameLayout
+        android:background="@drawable/sh_new_match_circle_boarder"
+        android:backgroundTint="@color/PrimaryLight"
+        android:padding="1dp"
         android:id="@+id/flMatchProfilePhotoWrapper"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginEnd="10dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp">
 
         <ImageView
+            android:layout_margin="3dp"
             android:id="@+id/ivMatchProfilePhoto"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_gravity="center"
+
             android:contentDescription="@string/match_rep_photo_iv_description"
             android:src="@drawable/round_account" />
+
+        <TextView
+            android:id="@+id/tvMatchNewTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/sh_new_match_tag_box"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textStyle="bold"
+            android:text="NEW"
+            android:textColor="@color/white"
+            android:textSize="9sp" />
 
     </FrameLayout>
 
@@ -30,6 +50,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -39,13 +60,22 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".4"
                 android:ellipsize="end"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:text="태기성"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvMatchUnreadIndicator"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:background="@drawable/sh_circle_primary_solid" />
+                android:id="@+id/tvMatchNewMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sh_new_match_tag_box"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:textStyle="bold"
+                android:text="message"
+                android:textColor="@color/white"
+                android:textSize="9sp" />
 
         </LinearLayout>
 
@@ -59,9 +89,20 @@
                 android:id="@+id/tvMatchLastChatMessageBody"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
                 android:layout_weight=".5"
                 android:ellipsize="end"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:text="안녕하세요 처음뵙겠습니다 저는 태기성이라 고 해요 반가워용"
+                android:textColor="@color/TextGrey"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10/12/2020"
+                android:textColor="@color/TextGrey"
+                android:textSize="13sp" />
 
 
         </LinearLayout>

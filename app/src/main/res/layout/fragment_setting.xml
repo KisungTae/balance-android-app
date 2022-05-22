@@ -63,8 +63,15 @@
                     android:background="@drawable/sh_round_box_thin_border"
                     android:clickable="true"
                     android:focusable="true"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_round_email_24" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -94,8 +101,15 @@
                     android:background="@drawable/sh_round_box_thin_border"
                     android:clickable="true"
                     android:focusable="true"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_round_location_on_24" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -120,8 +134,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:background="@drawable/sh_round_box_thin_border"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_round_notifications_24" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -141,8 +162,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:background="@drawable/sh_round_box_thin_border"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_round_perm_phone_msg_24" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -162,8 +190,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:background="@drawable/sh_round_box_thin_border"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/accept"
+                        app:tint="#808080" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -184,8 +220,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:background="@drawable/sh_round_box_thin_border"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/logout" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -201,8 +244,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:background="@drawable/sh_round_box_thin_border"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/delete_user"
+                        app:tint="#808080" />
 
                     <TextView
                         android:layout_width="0dp"

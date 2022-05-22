@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemMatchBinding
+import com.beeswork.balance.internal.util.GlideHelper
+import com.bumptech.glide.Glide
+import kotlin.random.Random
 
 class MatchPagingDataAdapter(
     private val matchListener: MatchListener
@@ -56,26 +59,58 @@ class MatchPagingDataAdapter(
         }
 
         fun bind(matchItemUIState: MatchItemUIState) {
+            //todo: remove me
+            val image = when (Random.nextInt(4)) {
+                0 -> R.drawable.person1
+                1 -> R.drawable.person2
+                2 -> R.drawable.person3
+                3 -> R.drawable.person4
+                4 -> R.drawable.person5
+                else -> R.drawable.person5
+            }
+            Glide.with(context)
+                .load(image)
+                .apply(GlideHelper.profilePhotoGlideOptions().circleCrop())
+                .into(binding.ivMatchProfilePhoto)
 //            Glide.with(context)
 //                .load(matchItemUIState.swipedProfilePhotoUrl)
 //                .apply(GlideHelper.profilePhotoGlideOptions())
-//                .into(binding.ivMatchProfilePicture)
+//                .into(binding.ivMatchProfilePhoto)
+
             binding.tvMatchName.text = matchItemUIState.swipedName ?: context.getString(R.string.unknown_user_name)
-            binding.tvMatchUnreadIndicator.visibility = if (matchItemUIState.unread) {
-                View.VISIBLE
+//            binding.tvMatchUnreadIndicator.visibility = if (matchItemUIState.unread) {
+//                View.VISIBLE
+//            } else {
+//                View.GONE
+//            }
+
+            // todo: remove me
+            if (Random.nextBoolean()) {
+                binding.tvMatchNewMessage.visibility = View.VISIBLE
             } else {
-                View.GONE
+                binding.tvMatchNewMessage.visibility = View.GONE
             }
+
+
             binding.tvMatchLastChatMessageBody.text = if (matchItemUIState.active || matchItemUIState.unmatched) {
                 matchItemUIState.lastChatMessageBody
             } else {
                 context.getString(R.string.recent_chat_message_new_match)
             }
-            binding.flMatchProfilePhotoWrapper.background = if (matchItemUIState.active || matchItemUIState.unmatched) {
-                null
+
+            if (matchItemUIState.active || matchItemUIState.unmatched) {
+                binding.flMatchProfilePhotoWrapper.background = null
+                binding.tvMatchNewTag.visibility = View.GONE
             } else {
-                ContextCompat.getDrawable(context, R.drawable.sh_circle_primary_border)
+                binding.flMatchProfilePhotoWrapper.background = ContextCompat.getDrawable(context, R.drawable.sh_new_match_circle_boarder)
+                binding.tvMatchNewTag.visibility = View.VISIBLE
             }
+
+//            binding.flMatchProfilePhotoWrapper.background = if (matchItemUIState.active || matchItemUIState.unmatched) {
+//                null
+//            } else {
+//                ContextCompat.getDrawable(context, R.drawable.sh_circle_primary_border)
+//            }
             val colorCode = if (matchItemUIState.unmatched) {
                 R.color.TextGrey
             } else {
@@ -83,7 +118,7 @@ class MatchPagingDataAdapter(
             }
             val textColor = context.getColor(colorCode)
             binding.tvMatchName.setTextColor(textColor)
-            binding.tvMatchLastChatMessageBody.setTextColor(textColor)
+//            binding.tvMatchLastChatMessageBody.setTextColor(textColor)
         }
 
         override fun onClick(view: View?) {

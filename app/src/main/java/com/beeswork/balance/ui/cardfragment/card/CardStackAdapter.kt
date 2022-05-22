@@ -69,10 +69,10 @@ class CardStackAdapter(
 
             if (cardItemUIState.gender == Gender.FEMALE) {
                 binding.tvCardGender.text = context.getString(R.string.female)
-                binding.ivCardGenderIcon.setImageResource(R.drawable.ic_baseline_female_24)
+                binding.ivCardGenderIcon.setImageResource(R.drawable.ic_round_female_24)
             } else {
                 binding.tvCardGender.text = context.getString(R.string.male)
-                binding.ivCardGenderIcon.setImageResource(R.drawable.ic_baseline_male_24)
+                binding.ivCardGenderIcon.setImageResource(R.drawable.ic_round_male_24)
             }
             binding.tvCardAbout.text = cardItemUIState.about
             binding.vpCardPhoto.offscreenPageLimit = 1

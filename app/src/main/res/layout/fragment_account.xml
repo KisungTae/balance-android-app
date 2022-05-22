@@ -96,7 +96,7 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/profile_edit_icon_description"
-                android:src="@drawable/ic_baseline_edit_note_24"
+                android:src="@drawable/edit_profile"
                 app:tint="@color/TextBlack" />
 
             <TextView
@@ -131,7 +131,7 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/charge_point_icon_description"
-                android:src="@drawable/ic_baseline_attach_money_24"
+                android:src="@drawable/ic_round_attach_money_24"
                 app:tint="@color/TextBlack" />
 
             <TextView
@@ -162,9 +162,9 @@
 
 
                 <TextView
-                    android:layout_marginStart="2dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
                     android:text="@string/point_suffix"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -194,7 +194,7 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/setting_icon_description"
-                android:src="@drawable/ic_baseline_settings"
+                android:src="@drawable/ic_round_settings_24"
                 app:tint="@color/TextBlack" />
 
             <TextView
