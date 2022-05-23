@@ -27,6 +27,7 @@ data class Match(
     val lastReadByChatMessageId: Long,
     var lastChatMessageId: Long,
     var lastChatMessageBody: String?,
+    var lastChatMessageCreatedAt: OffsetDateTime?,
     val createdAt: OffsetDateTime,
     val swipedName: String?,
     val swipedProfilePhotoKey: String?,
@@ -47,6 +48,7 @@ data class Match(
             && this.lastReadByChatMessageId == matchDTO.lastReadByChatMessageId
             && this.lastChatMessageId == matchDTO.lastChatMessageId
             && this.lastChatMessageBody == matchDTO.lastChatMessageBody
+            && this.lastChatMessageCreatedAt == matchDTO.lastChatMessageCreatedAt
             && this.createdAt == matchDTO.createdAt
             && this.swipedName == matchDTO.swipedName
             && this.swipedProfilePhotoKey == matchDTO.swipedProfilePhotoKey

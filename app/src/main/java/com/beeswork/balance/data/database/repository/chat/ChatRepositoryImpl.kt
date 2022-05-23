@@ -219,6 +219,7 @@ class ChatRepositoryImpl(
             if (lastChatMessage.id > match.lastChatMessageId) {
                 match.lastChatMessageId = lastChatMessage.id
                 match.lastChatMessageBody = lastChatMessage.body
+                match.lastChatMessageCreatedAt = lastChatMessage.createdAt
             }
 
             val lastReceivedChatMessageId = if (lastChatMessage.status == ChatMessageStatus.RECEIVED) {

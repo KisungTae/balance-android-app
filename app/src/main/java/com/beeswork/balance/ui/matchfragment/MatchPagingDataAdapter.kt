@@ -78,19 +78,12 @@ class MatchPagingDataAdapter(
 //                .into(binding.ivMatchProfilePhoto)
 
             binding.tvMatchName.text = matchItemUIState.swipedName ?: context.getString(R.string.unknown_user_name)
-//            binding.tvMatchUnreadIndicator.visibility = if (matchItemUIState.unread) {
-//                View.VISIBLE
-//            } else {
-//                View.GONE
-//            }
 
-            // todo: remove me
-            if (Random.nextBoolean()) {
-                binding.tvMatchNewMessage.visibility = View.VISIBLE
+            binding.vMatchNewMessageFlag.visibility = if (matchItemUIState.unread) {
+                View.VISIBLE
             } else {
-                binding.tvMatchNewMessage.visibility = View.GONE
+                View.GONE
             }
-
 
             binding.tvMatchLastChatMessageBody.text = if (matchItemUIState.active || matchItemUIState.unmatched) {
                 matchItemUIState.lastChatMessageBody
@@ -106,19 +99,11 @@ class MatchPagingDataAdapter(
                 binding.tvMatchNewTag.visibility = View.VISIBLE
             }
 
-//            binding.flMatchProfilePhotoWrapper.background = if (matchItemUIState.active || matchItemUIState.unmatched) {
-//                null
-//            } else {
-//                ContextCompat.getDrawable(context, R.drawable.sh_circle_primary_border)
-//            }
-            val colorCode = if (matchItemUIState.unmatched) {
-                R.color.TextGrey
+            if (matchItemUIState.unmatched) {
+                binding.tvMatchName.setTextColor(context.getColor(R.color.TextGrey))
             } else {
-                R.color.TextBlack
+                binding.tvMatchName.setTextColor(context.getColor(R.color.TextBlack))
             }
-            val textColor = context.getColor(colorCode)
-            binding.tvMatchName.setTextColor(textColor)
-//            binding.tvMatchLastChatMessageBody.setTextColor(textColor)
         }
 
         override fun onClick(view: View?) {

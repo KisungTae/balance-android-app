@@ -63,19 +63,15 @@
                 android:singleLine="true"
                 android:text="태기성"
                 android:textSize="17sp"
+                android:layout_marginEnd="80dp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvMatchNewMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/sh_new_match_tag_box"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                android:textStyle="bold"
-                android:text="message"
-                android:textColor="@color/white"
-                android:textSize="9sp" />
+            <View
+                android:id="@+id/vMatchNewMessageFlag"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/sh_circle_box"
+                android:backgroundTint="@color/PrimaryLight"/>
 
         </LinearLayout>
 

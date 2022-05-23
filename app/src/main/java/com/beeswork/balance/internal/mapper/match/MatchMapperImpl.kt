@@ -20,6 +20,7 @@ class MatchMapperImpl : MatchMapper {
             matchDTO.lastReadByChatMessageId,
             matchDTO.lastChatMessageId,
             matchDTO.lastChatMessageBody,
+            matchDTO.lastChatMessageCreatedAt,
             matchDTO.createdAt,
             matchDTO.swipedName,
             matchDTO.swipedProfilePhotoKey,

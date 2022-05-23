@@ -14,6 +14,7 @@ data class MatchDTO(
     val lastReadByChatMessageId: Long,
     val lastChatMessageId: Long,
     val lastChatMessageBody: String?,
+    val lastChatMessageCreatedAt: OffsetDateTime?,
     val createdAt: OffsetDateTime,
     val swipedName: String?,
     val swipedProfilePhotoKey: String?,
