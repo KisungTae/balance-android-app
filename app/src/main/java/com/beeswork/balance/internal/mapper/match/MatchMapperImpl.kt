@@ -35,7 +35,8 @@ class MatchMapperImpl : MatchMapper {
             match.lastChatMessageId > 0L,
             match.lastReadReceivedChatMessageId < match.lastReceivedChatMessageId,
             match.unmatched || match.swipedDeleted,
-            match.lastChatMessageBody ?: "",
+            match.lastChatMessageBody,
+            match.lastChatMessageCreatedAt,
             match.swipedName,
             EndPoint.ofPhoto(photoDomain, match.swipedId, match.swipedProfilePhotoKey)
         )
