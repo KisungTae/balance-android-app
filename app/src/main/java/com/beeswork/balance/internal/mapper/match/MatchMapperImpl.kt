@@ -3,8 +3,15 @@ package com.beeswork.balance.internal.mapper.match
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
+import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.EndPoint
+import com.beeswork.balance.internal.util.toLocalDateTimeAtSystemDefaultZone
 import com.beeswork.balance.ui.matchfragment.MatchItemUIState
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.temporal.ChronoUnit
 
 class MatchMapperImpl : MatchMapper {
 
@@ -36,7 +43,7 @@ class MatchMapperImpl : MatchMapper {
             match.lastReadReceivedChatMessageId < match.lastReceivedChatMessageId,
             match.unmatched || match.swipedDeleted,
             match.lastChatMessageBody,
-            match.lastChatMessageCreatedAt,
+            match.lastChatMessageCreatedAt?.toLocalDateTimeAtSystemDefaultZone(),
             match.swipedName,
             EndPoint.ofPhoto(photoDomain, match.swipedId, match.swipedProfilePhotoKey)
         )

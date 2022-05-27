@@ -2,6 +2,14 @@
     <string name="app_name">WECLICK</string>
     <string name="app_name_capital">WECLICK</string>
 
+
+    <string name="date_time_pattern_time_with_meridiem">a h:mm</string>
+    <string name="date_time_expression_yesterday">어제</string>
+    <string name="date_time_expression_days_ago">%d일전</string>
+    <string name="date_time_expression_weeks_ago">%d주전</string>
+    <string name="date_time_pattern_date_with_short_year">yy/M/d</string>
+
+
     <string name="error_message_generic">에러가 발생했습니다</string>
     <string name="error_title_generic">에러</string>
     <string name="error_title_invalid_login">로그인이 유효하지 않습니다</string>

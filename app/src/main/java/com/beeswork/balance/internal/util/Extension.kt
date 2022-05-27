@@ -19,6 +19,10 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.domain.uistate.UIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
@@ -102,6 +106,10 @@ fun View.getText(): String {
     }
 }
 
+fun OffsetDateTime.toLocalDateTimeAtSystemDefaultZone(): LocalDateTime {
+    return this.toZonedDateTime().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+}
+
 fun <T> lazyDeferred(block: suspend CoroutineScope.() -> T): Lazy<Deferred<T>> {
 
     return lazy {
@@ -154,6 +162,8 @@ fun <T: UIState> LiveData<T>.observeUIState(lifecycleOwner: LifecycleOwner, acti
         }
     }
 }
+
+
 
 
 

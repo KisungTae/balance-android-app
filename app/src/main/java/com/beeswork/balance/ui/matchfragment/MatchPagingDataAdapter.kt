@@ -10,8 +10,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemMatchBinding
+import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.internal.util.toLocalDateTimeAtSystemDefaultZone
 import com.bumptech.glide.Glide
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.ChronoUnit
 import kotlin.random.Random
 
 class MatchPagingDataAdapter(
@@ -103,6 +110,32 @@ class MatchPagingDataAdapter(
                 binding.tvMatchName.setTextColor(context.getColor(R.color.TextGrey))
             } else {
                 binding.tvMatchName.setTextColor(context.getColor(R.color.TextBlack))
+            }
+
+            if (matchItemUIState.lastChatMessageCreatedAt != null) {
+                val today = LocalDateTime.now()
+                val dayDiff = ChronoUnit.DAYS.between(matchItemUIState.lastChatMessageCreatedAt.toLocalDate(), today.toLocalDate())
+                binding.tvMatchLastChatMessageCreatedAt.text = when {
+                    dayDiff <= 0L -> {
+                        val dateTimeFormat = DateTimeFormatter.ofPattern(context.getString(R.string.date_time_pattern_time_with_meridiem))
+                        matchItemUIState.lastChatMessageCreatedAt.toLocalTime().format(dateTimeFormat)
+                    }
+                    dayDiff == 1L -> {
+                        context.getString(R.string.date_time_expression_yesterday)
+                    }
+                    dayDiff < 7 -> {
+                        context.getString(R.string.date_time_expression_days_ago).format(dayDiff)
+                    }
+                    dayDiff < 30 -> {
+                        context.getString(R.string.date_time_expression_weeks_ago).format((dayDiff / 7))
+                    }
+                    else -> {
+                        val dateTimeFormat = DateTimeFormatter.ofPattern(context.getString(R.string.date_time_pattern_date_with_short_year))
+                        matchItemUIState.lastChatMessageCreatedAt.toLocalDate().format(dateTimeFormat)
+                    }
+                }
+            } else {
+                binding.tvMatchLastChatMessageCreatedAt.text = ""
             }
         }
 
