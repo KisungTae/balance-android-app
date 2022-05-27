@@ -45,8 +45,7 @@ class GetChatMessagePagingDataUseCaseImpl(
             }.insertSeparators { before: ChatMessageItemUIState?, after: ChatMessageItemUIState? ->
                 var separator: ChatMessageItemUIState? = null
                 if (before?.status?.isProcessed() == true && (after?.dateCreatedAt == null || before.dateCreatedAt != after.dateCreatedAt)) {
-                    val dateCreatedAt = before.dateCreatedAt?.format(DateTimePattern.ofDateWithDayOfWeek())
-                    if (dateCreatedAt != null) {
+                    before.dateCreatedAt?.let { dateCreatedAt ->
                         separator = ChatMessageItemUIState.ofSeparator(dateCreatedAt)
                     }
                 }

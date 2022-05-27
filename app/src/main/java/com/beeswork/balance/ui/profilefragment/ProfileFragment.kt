@@ -26,6 +26,7 @@ import com.beeswork.balance.ui.photofragment.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
+import org.threeten.bp.format.DateTimeFormatter
 
 
 class ProfileFragment : BasePhotoFragment(),
@@ -103,7 +104,8 @@ class ProfileFragment : BasePhotoFragment(),
 
     private fun setupProfile(profileUIState: ProfileUIState) {
         binding.tvProfileName.text = profileUIState.name
-        binding.tvProfileDateOfBirth.text = profileUIState.birth?.format(DateTimePattern.ofDate())
+        val dateTimeFormat = DateTimeFormatter.ofPattern(getString(R.string.date_time_pattern_date))
+        binding.tvProfileDateOfBirth.text = profileUIState.birth?.format(dateTimeFormat)
         binding.tvProfileHeight.text = profileUIState.height?.toString() ?: ""
         binding.etProfileAbout.setText(profileUIState.about)
         when (profileUIState.gender) {

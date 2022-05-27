@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemChatMessageReceivedBinding
 import com.beeswork.balance.databinding.ItemChatMessageSentBinding
 import com.beeswork.balance.databinding.ItemChatMessageSeparatorBinding
@@ -17,6 +18,7 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.toDP
 import com.bumptech.glide.Glide
+import org.threeten.bp.format.DateTimeFormatter
 
 
 class ChatMessagePagingDataAdapter(
@@ -32,7 +34,10 @@ class ChatMessagePagingDataAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
             ChatMessageStatus.SEPARATOR.ordinal -> {
-                SeparatorViewHolder(ItemChatMessageSeparatorBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+                SeparatorViewHolder(
+                    ItemChatMessageSeparatorBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                    parent.context
+                )
             }
             ChatMessageStatus.RECEIVED.ordinal -> {
                 ReceivedViewHolder(
@@ -43,7 +48,8 @@ class ChatMessagePagingDataAdapter(
             else -> {
                 SentViewHolder(
                     ItemChatMessageSentBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                    chatMessageListener
+                    chatMessageListener,
+                    parent.context
                 )
             }
         }
@@ -108,13 +114,16 @@ class ChatMessagePagingDataAdapter(
 
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<ChatMessageItemUIState>() {
-            override fun areItemsTheSame(oldItem: ChatMessageItemUIState, newItem: ChatMessageItemUIState): Boolean = oldItem.tag == newItem.tag
+            override fun areItemsTheSame(oldItem: ChatMessageItemUIState, newItem: ChatMessageItemUIState): Boolean =
+                oldItem.tag == newItem.tag
+
             override fun areContentsTheSame(oldItem: ChatMessageItemUIState, newItem: ChatMessageItemUIState): Boolean = oldItem == newItem
         }
     }
 
     abstract class ViewHolder(
-        val root: LinearLayout
+        val root: LinearLayout,
+        val context: Context
     ) : RecyclerView.ViewHolder(root) {
 
         protected fun setTopMargin(root: LinearLayout, topMargin: Int) {
@@ -122,12 +131,21 @@ class ChatMessagePagingDataAdapter(
             marginLayoutParams.topMargin = topMargin
             root.layoutParams = marginLayoutParams
         }
+
+        protected fun getFormattedTime(chatMessageItemUIState: ChatMessageItemUIState): String {
+            return if (chatMessageItemUIState.showTime) {
+                val dateTimeFormat = DateTimeFormatter.ofPattern(context.getString(R.string.date_time_pattern_time_with_meridiem))
+                chatMessageItemUIState.timeCreatedAt?.format(dateTimeFormat) ?: ""
+            } else {
+                ""
+            }
+        }
     }
 
     class ReceivedViewHolder(
         private val binding: ItemChatMessageReceivedBinding,
-        private val context: Context
-    ) : ViewHolder(binding.root) {
+        context: Context
+    ) : ViewHolder(binding.root, context) {
 
         fun bind(
             chatMessageItemUIState: ChatMessageItemUIState,
@@ -135,7 +153,7 @@ class ChatMessagePagingDataAdapter(
         ) {
             binding.tvChatMessageReceivedBody.text = chatMessageItemUIState.body
             binding.ivChatMessageReceivedProfilePhoto.visibility = if (chatMessageItemUIState.showProfilePhoto) View.VISIBLE else View.INVISIBLE
-            binding.tvChatMessageReceivedCreatedAt.text = chatMessageItemUIState.formatTimeCreatedAt()
+            binding.tvChatMessageReceivedCreatedAt.text = getFormattedTime(chatMessageItemUIState)
             setTopMargin(binding.root, chatMessageItemUIState.topMargin)
             Glide.with(context)
                 .load(profilePhoto)
@@ -146,8 +164,9 @@ class ChatMessagePagingDataAdapter(
 
     class SentViewHolder(
         private val binding: ItemChatMessageSentBinding,
-        private val chatMessageListener: ChatMessageListener
-    ) : ViewHolder(binding.root) {
+        private val chatMessageListener: ChatMessageListener,
+        context: Context
+    ) : ViewHolder(binding.root, context) {
 
         fun bind(
             chatMessageItemUIState: ChatMessageItemUIState
@@ -164,7 +183,7 @@ class ChatMessagePagingDataAdapter(
                 ChatMessageStatus.SENDING -> showLayout(binding, View.GONE, View.VISIBLE, View.GONE)
                 ChatMessageStatus.ERROR -> showLayout(binding, View.GONE, View.GONE, View.VISIBLE)
                 else -> {
-                    binding.tvChatMessageSentCreatedAt.text = chatMessageItemUIState.formatTimeCreatedAt()
+                    binding.tvChatMessageSentCreatedAt.text = getFormattedTime(chatMessageItemUIState)
                     showLayout(binding, View.VISIBLE, View.GONE, View.GONE)
                 }
             }
@@ -183,10 +202,13 @@ class ChatMessagePagingDataAdapter(
     }
 
     class SeparatorViewHolder(
-        private val binding: ItemChatMessageSeparatorBinding
-    ) : ViewHolder(binding.root) {
+        private val binding: ItemChatMessageSeparatorBinding,
+        context: Context
+    ) : ViewHolder(binding.root, context) {
+
         fun bind(chatMessageItemUIState: ChatMessageItemUIState) {
-            binding.tvChatSeparatorTitle.text = chatMessageItemUIState.body
+            val dateTimeFormat = DateTimeFormatter.ofPattern(context.getString(R.string.date_time_pattern_date_with_day_of_week))
+            binding.tvChatSeparatorTitle.text = chatMessageItemUIState.dateCreatedAt?.format(dateTimeFormat)
             setTopMargin(binding.root, chatMessageItemUIState.topMargin)
         }
     }

@@ -16,16 +16,10 @@ data class ChatMessageItemUIState(
     var showTime: Boolean = true,
     var topMargin: Int = 0
 ) {
-    fun formatTimeCreatedAt(): String {
-        if (!showTime) {
-            return ""
-        }
-        return timeCreatedAt?.format(DateTimePattern.ofTimeWithMeridiem()) ?: ""
-    }
 
     companion object {
-        fun ofSeparator(body: String): ChatMessageItemUIState {
-            return ChatMessageItemUIState(null, body, ChatMessageStatus.SEPARATOR, null, null)
+        fun ofSeparator(dateCreatedAt: LocalDate): ChatMessageItemUIState {
+            return ChatMessageItemUIState(null, "", ChatMessageStatus.SEPARATOR, dateCreatedAt, null)
         }
     }
 }
