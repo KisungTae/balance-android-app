@@ -16,7 +16,6 @@ data class ChatMessageItemUIState(
     var showTime: Boolean = true,
     var topMargin: Int = 0
 ) {
-
     companion object {
         fun ofSeparator(dateCreatedAt: LocalDate): ChatMessageItemUIState {
             return ChatMessageItemUIState(null, "", ChatMessageStatus.SEPARATOR, dateCreatedAt, null)
