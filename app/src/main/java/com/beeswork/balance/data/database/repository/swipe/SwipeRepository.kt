@@ -18,5 +18,5 @@ interface SwipeRepository {
     fun getSwipePageInvalidationFlow(): Flow<Boolean>
     fun getSwipeCountFlow(): Flow<Long?>
 
-    fun test()
+    suspend fun test()
 }

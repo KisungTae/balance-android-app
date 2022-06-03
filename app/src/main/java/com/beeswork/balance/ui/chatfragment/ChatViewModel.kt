@@ -74,8 +74,8 @@ class ChatViewModel(
     }
 
     val webSocketEventUIStateLiveData by viewModelLazyDeferred {
-        chatRepository.webSocketEventFlow.map { webSocketEvent ->
-            WebSocketEventUIState(webSocketEvent.status == WebSocketStatus.STOMP_CONNECTED, false, webSocketEvent.exception)
+        chatRepository.getWebSocketEventFlow().map { webSocketEvent ->
+            WebSocketEventUIState(webSocketEvent.status, false, webSocketEvent.exception)
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 

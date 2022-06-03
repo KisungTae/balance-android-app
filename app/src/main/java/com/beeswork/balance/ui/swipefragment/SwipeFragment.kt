@@ -83,6 +83,8 @@ class SwipeFragment(
             footer = footerLoadStateAdapter
         )
 
+
+
         val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -137,6 +139,7 @@ class SwipeFragment(
 
     override fun onSelectSwipe(position: Int) {
         swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
+            viewModel.test()
 //            SwipeBalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
 //                childFragmentManager,
 //                SwipeBalanceGameDialog.TAG

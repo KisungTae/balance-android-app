@@ -23,9 +23,9 @@ class MainViewModel(
 ) : BaseViewModel() {
 
     val webSocketEventUIStateLiveData by viewModelLazyDeferred {
-        mainRepository.webSocketEventFlow.map { webSocketEvent ->
+        mainRepository.getWebSocketEventFlow().map { webSocketEvent ->
             WebSocketEventUIState(
-                webSocketEvent.status == WebSocketStatus.STOMP_CONNECTED,
+                webSocketEvent.status,
                 ExceptionCode.isLoginException(webSocketEvent.exception),
                 webSocketEvent.exception
             )

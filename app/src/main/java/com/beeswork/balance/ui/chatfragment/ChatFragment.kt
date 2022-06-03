@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
+import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.databinding.FragmentChatBinding
 import com.beeswork.balance.databinding.SnackBarNewChatMessageBinding
 import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
@@ -103,7 +104,7 @@ class ChatFragment : BaseFragment(),
 
     private suspend fun observeWebSocketEventLiveData() {
         viewModel.webSocketEventUIStateLiveData.await().observe(viewLifecycleOwner) { webSocketEventUIState ->
-            if (webSocketEventUIState.connected) {
+            if (webSocketEventUIState.webSocketStatus == WebSocketStatus.STOMP_CONNECTED) {
                 Snackbar.make(requireView(), getString(R.string.message_server_connected), Snackbar.LENGTH_LONG)
                     .setAction(getString(R.string.close)) {}.show()
             }

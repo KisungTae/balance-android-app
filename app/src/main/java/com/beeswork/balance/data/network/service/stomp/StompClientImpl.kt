@@ -14,8 +14,7 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.*
 import okhttp3.*
 import okio.ByteString
 import java.util.*
@@ -44,8 +43,12 @@ class StompClientImpl(
     private val stompReceiptChannel = Channel<StompReceiptDTO>(Channel.BUFFERED)
     override val stompReceiptFlow = stompReceiptChannel.consumeAsFlow()
 
-    @ExperimentalCoroutinesApi
-    override val webSocketEventChannel = BroadcastChannel<WebSocketEvent>(4)
+    private val _webSocketEventFlow = MutableSharedFlow<WebSocketEvent>()
+    override val webSocketEventFlow = _webSocketEventFlow.asSharedFlow()
+
+
+//    @ExperimentalCoroutinesApi
+//    override val webSocketEventChannel = BroadcastChannel<WebSocketEvent>(4)
 
 
     init {
@@ -56,25 +59,23 @@ class StompClientImpl(
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun connect(forceToConnect: Boolean) {
         println("connect($forceToConnect)")
         applicationScope.launch {
-//            if (webSocketState.isClosed() && forceToConnect) {
-//                webSocketState.reset()
-//            }
-//
-//            if (webSocketState.isConnectableAndSetToConnecting()) {
-//                val webSocketRequest = Request.Builder()
-//                    .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
-//                    .url(EndPoint.WEB_SOCKET_ENDPOINT)
-//                    .build()
-//                socket = okHttpClient.newWebSocket(webSocketRequest, this@StompClientImpl)
-//            }
+            if (webSocketState.isClosed() && forceToConnect) {
+                webSocketState.reset()
+            }
+
+            if (webSocketState.isConnectableAndSetToConnecting()) {
+                val webSocketRequest = Request.Builder()
+                    .addHeader(HttpHeader.NO_AUTHENTICATION, true.toString())
+                    .url(EndPoint.WEB_SOCKET_ENDPOINT)
+                    .build()
+                socket = okHttpClient.newWebSocket(webSocketRequest, this@StompClientImpl)
+            }
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onOpen(webSocket: WebSocket, response: Response) {
         println("override fun onOpen(webSocket: WebSocket, response: Response)")
         applicationScope.launch {
@@ -82,7 +83,7 @@ class StompClientImpl(
             val accessToken = preferenceProvider.getAccessToken()
             if (accessToken.isNullOrBlank()) {
                 socket?.close(1000, null)
-                webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
+                _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
             } else {
                 val headers = mutableMapOf<String, String>()
                 headers[StompHeader.VERSION] = SUPPORTED_VERSIONS
@@ -132,21 +133,20 @@ class StompClientImpl(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private suspend fun onConnectedFrameReceived() {
         println("private fun onConnectedFrameReceived()")
         webSocketState.setSocketStatus(WebSocketStatus.STOMP_CONNECTED)
         val accountId = preferenceProvider.getAccountId()
         if (accountId == null) {
             socket?.close(1000, null)
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccountIdNotFoundException()))
+            _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.ERROR, AccountIdNotFoundException()))
             return
         }
 
         val accessToken = preferenceProvider.getAccessToken()
         if (accessToken.isNullOrBlank()) {
             socket?.close(1000, null)
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
+            _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
             return
         }
 
@@ -156,7 +156,7 @@ class StompClientImpl(
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.ACCESS_TOKEN] = accessToken
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.STOMP_CONNECTED, null))
+            _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.STOMP_CONNECTED, null))
         }
     }
 
@@ -185,7 +185,6 @@ class StompClientImpl(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private suspend fun onErrorFrameReceived(stompFrame: StompFrame) {
         println("private fun onErrorFrameReceived(stompFrame: StompFrame): ${stompFrame.getError()} - ${stompFrame.getErrorMessage()}")
         val receiptId = stompFrame.getReceiptId()
@@ -194,7 +193,7 @@ class StompClientImpl(
         }
         val serverException = ServerException(stompFrame.getError(), stompFrame.getErrorMessage())
         val webSocketEvent = WebSocketEvent(WebSocketStatus.ERROR, serverException)
-        webSocketEventChannel.send(webSocketEvent)
+        _webSocketEventFlow.emit(webSocketEvent)
     }
 
 
@@ -207,25 +206,22 @@ class StompClientImpl(
         socket?.close(code, reason)
     }
 
-    @ExperimentalCoroutinesApi
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         println("onClosed reason: $reason")
         applicationScope.launch {
             webSocketState.setSocketStatus(WebSocketStatus.CLOSED)
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.CLOSED, null))
+            _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.CLOSED, null))
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         println("override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?)")
         applicationScope.launch {
             webSocketState.setSocketStatus(WebSocketStatus.CLOSED)
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.CLOSED, t))
+            _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.CLOSED, t))
         }
     }
 
-    @ExperimentalCoroutinesApi
     override suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO): Resource<EmptyResponse> {
         println("private suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO)")
         if (webSocketState.isClosed()) {
@@ -234,7 +230,7 @@ class StompClientImpl(
 
         val accessToken = preferenceProvider.getAccessToken()
         if (accessToken.isNullOrBlank()) {
-            webSocketEventChannel.send(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
+            _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.ERROR, AccessTokenNotFoundException()))
             socket?.close(1000, null)
             return Resource.error(AccessTokenNotFoundException())
         }

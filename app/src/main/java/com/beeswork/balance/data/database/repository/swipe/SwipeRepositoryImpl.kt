@@ -14,6 +14,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import kotlinx.coroutines.*
@@ -22,10 +23,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import java.util.concurrent.Callable
+import kotlin.random.Random
 
+@ExperimentalCoroutinesApi
 class SwipeRepositoryImpl(
     private val swipeRDS: SwipeRDS,
     private val swipeDAO: SwipeDAO,
@@ -145,9 +150,9 @@ class SwipeRepositoryImpl(
 
     override suspend fun loadSwipes(loadSize: Int, startPosition: Int): List<Swipe> {
         return withContext(ioDispatcher) {
-            if (swipePageFetchDateTracker.shouldFetchPage(startPosition)) {
-                listSwipes(loadSize, startPosition)
-            }
+//            if (swipePageFetchDateTracker.shouldFetchPage(startPosition)) {
+//                listSwipes(loadSize, startPosition)
+//            }
             return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
@@ -187,8 +192,10 @@ class SwipeRepositoryImpl(
         return swipeCountDAO.getCountFlowBy(preferenceProvider.getAccountId())
     }
 
-    override fun test() {
-
+    override suspend fun test() {
+        withContext(ioDispatcher) {
+            swipeDAO.insert(Swipe(Random.nextLong(), preferenceProvider.getAccountId()!!, UUID.randomUUID(), false, null))
+        }
     }
 
 

@@ -9,11 +9,14 @@ import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface StompClient {
 
-    @ExperimentalCoroutinesApi
-    val webSocketEventChannel: BroadcastChannel<WebSocketEvent>
+    val webSocketEventFlow: SharedFlow<WebSocketEvent>
+
+//    @ExperimentalCoroutinesApi
+//    val webSocketEventChannel: BroadcastChannel<WebSocketEvent>
 
     val swipeFlow: Flow<SwipeDTO>
     val matchFlow: Flow<MatchDTO>

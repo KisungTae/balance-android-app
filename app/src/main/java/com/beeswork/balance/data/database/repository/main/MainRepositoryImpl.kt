@@ -14,7 +14,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
-@ExperimentalCoroutinesApi
 class MainRepositoryImpl(
     loginRDS: LoginRDS,
     preferenceProvider: PreferenceProvider,
@@ -23,30 +22,16 @@ class MainRepositoryImpl(
     private val applicationScope: CoroutineScope
 ) : BaseRepository(loginRDS, preferenceProvider), MainRepository {
 
-    private var webSocketEventCallBackFlowListener: CallBackFlowListener<WebSocketEvent>? = null
-    override val webSocketEventFlow: Flow<WebSocketEvent> = callbackFlow {
-        webSocketEventCallBackFlowListener = object : CallBackFlowListener<WebSocketEvent> {
-            override fun onInvoke(data: WebSocketEvent) {
-                offer(data)
-            }
-        }
-        awaitClose { }
-    }
-
     private var reconnectToStompJob: Job? = null
 
 
     init {
-        applicationScope.launch {
-            stompClient.webSocketEventChannel.openSubscription().let { receiveChannel ->
-                for (webSocketEvent in receiveChannel) {
-                    when (webSocketEvent.status) {
-                        WebSocketStatus.ERROR -> reconnectToStomp(webSocketEvent)
-                        WebSocketStatus.CLOSED -> reconnectToStomp(webSocketEvent)
-                    }
-                }
+        stompClient.webSocketEventFlow.onEach { webSocketEvent ->
+            when (webSocketEvent.status) {
+                WebSocketStatus.ERROR -> reconnectToStomp(webSocketEvent)
+                WebSocketStatus.CLOSED -> reconnectToStomp(webSocketEvent)
             }
-        }
+        }.launchIn(applicationScope)
     }
 
     private suspend fun reconnectToStomp(webSocketEvent: WebSocketEvent) {
@@ -69,7 +54,6 @@ class MainRepositoryImpl(
         if (ExceptionCode.isLoginException(webSocketEvent.exception) || webSocketEvent.exception is NoInternetConnectivityException) {
             println("ExceptionCode.isLoginException(webSocketEvent.exception) || webSocketEvent.exception is NoInternetConnectivityException")
             reconnectToStompJob?.cancel()
-            webSocketEventCallBackFlowListener?.onInvoke(webSocketEvent)
             return
         }
 
@@ -80,6 +64,10 @@ class MainRepositoryImpl(
                 stompClient.connect(false)
             }
         }
+    }
+
+    override fun getWebSocketEventFlow(): SharedFlow<WebSocketEvent> {
+        return stompClient.webSocketEventFlow
     }
 
     override fun connectStomp(forceToConnect: Boolean) {

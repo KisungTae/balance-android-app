@@ -10,6 +10,7 @@ import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 
 class SwipeViewModel(
@@ -43,7 +44,9 @@ class SwipeViewModel(
     }
 
     fun test() {
-        swipeRepository.test()
+        viewModelScope.launch {
+            swipeRepository.test()
+        }
     }
 
     companion object {

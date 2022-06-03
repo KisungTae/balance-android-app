@@ -56,31 +56,14 @@ class ChatRepositoryImpl(
         awaitClose { }
     }
 
-    private var webSocketEventCallBackFlowListener: CallBackFlowListener<WebSocketEvent>? = null
-    override val webSocketEventFlow: Flow<WebSocketEvent> = callbackFlow {
-        webSocketEventCallBackFlowListener = object : CallBackFlowListener<WebSocketEvent> {
-            override fun onInvoke(data: WebSocketEvent) {
-                offer(data)
-            }
-        }
-        awaitClose { }
+    override fun getWebSocketEventFlow(): SharedFlow<WebSocketEvent> {
+        return stompClient.webSocketEventFlow
     }
 
-
     init {
-        println("chatRepository init!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        applicationScope.launch {
-            stompClient.webSocketEventChannel.openSubscription().let { receiveChannel ->
-                for (webSocketEvent in receiveChannel) {
-                    when (webSocketEvent.status) {
-                        WebSocketStatus.STOMP_CONNECTED -> {
-                            webSocketEventCallBackFlowListener?.onInvoke(webSocketEvent)
-                            sendChatMessages()
-                        }
-                    }
-                }
-            }
-        }
+        stompClient.webSocketEventFlow.onEach { webSocketEvent ->
+            // todo: implement page refresh logic
+        }.launchIn(applicationScope)
 
         stompClient.stompReceiptFlow.onEach { stompReceiptDTO ->
             saveChatMessageReceipt(stompReceiptDTO)

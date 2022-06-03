@@ -6,13 +6,14 @@ import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import java.util.*
 
 interface ChatRepository {
 
     val chatPageInvalidationFlow: Flow<ChatMessage?>
-    val webSocketEventFlow: Flow<WebSocketEvent>
 
+    fun getWebSocketEventFlow(): SharedFlow<WebSocketEvent>
     suspend fun sendChatMessage(chatId: UUID, body: String): Resource<EmptyResponse>
     suspend fun resendChatMessage(tag: UUID): Resource<EmptyResponse>
     suspend fun fetchChatMessages(chatId: UUID, lastChatMessageId: Long?, loadSize: Int): Resource<List<ChatMessageDTO>>
