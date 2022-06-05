@@ -17,6 +17,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import okhttp3.*
 import okio.ByteString
+import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 
@@ -47,9 +48,11 @@ class StompClientImpl(
     override val webSocketEventFlow = _webSocketEventFlow.asSharedFlow()
 
 
-//    @ExperimentalCoroutinesApi
-//    override val webSocketEventChannel = BroadcastChannel<WebSocketEvent>(4)
+    private var stompReconnectedAt: OffsetDateTime? = null
 
+    override fun getStompReconnectedAt(): OffsetDateTime? {
+        return stompReconnectedAt
+    }
 
     init {
         applicationScope.launch {
@@ -156,6 +159,7 @@ class StompClientImpl(
             headers[StompHeader.ACCEPT_LANGUAGE] = Locale.getDefault().toString()
             headers[HttpHeader.ACCESS_TOKEN] = accessToken
             socket?.send(StompFrame(StompFrame.Command.SUBSCRIBE, headers, null).compile())
+            stompReconnectedAt = OffsetDateTime.now()
             _webSocketEventFlow.emit(WebSocketEvent(WebSocketStatus.STOMP_CONNECTED, null))
         }
     }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
+import org.threeten.bp.OffsetDateTime
 
 interface StompClient {
 
@@ -24,7 +25,7 @@ interface StompClient {
     val stompReceiptFlow: Flow<StompReceiptDTO>
 
 
-
+    fun getStompReconnectedAt(): OffsetDateTime?
     fun connect(forceToConnect: Boolean)
     fun disconnect()
     suspend fun sendChatMessage(chatMessageDTO: ChatMessageDTO): Resource<EmptyResponse>

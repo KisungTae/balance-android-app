@@ -1,7 +1,6 @@
 package com.beeswork.balance.data.database.repository.swipe
 
 import com.beeswork.balance.data.database.BalanceDatabase
-import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.SwipeDAO
@@ -14,7 +13,6 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.data.network.service.stomp.StompClient
-import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import kotlinx.coroutines.*
@@ -23,8 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import java.util.concurrent.Callable
@@ -44,8 +40,6 @@ class SwipeRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher
 ) : SwipeRepository {
 
-    private val swipePageFetchDateTracker = PageFetchDateTracker(5L)
-
     private var newSwipeCallBackFlowListener: CallBackFlowListener<Swipe>? = null
     @ExperimentalCoroutinesApi
     override val newSwipeFlow: Flow<Swipe> = callbackFlow {
@@ -56,6 +50,8 @@ class SwipeRepositoryImpl(
         }
         awaitClose { }
     }
+
+    private var refreshedPagesSyncedAt = OffsetDateTime.MIN
 
     init {
         stompClient.swipeFlow.onEach { swipeDTO ->
@@ -80,12 +76,7 @@ class SwipeRepositoryImpl(
 
     private fun listSwipes(loadSize: Int, startPosition: Int) {
         CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
-            swipePageFetchDateTracker.updateFetchDate(startPosition, OffsetDateTime.now())
             val response = swipeRDS.listSwipes(loadSize, startPosition)
-            if (response.isError()) {
-                swipePageFetchDateTracker.updateFetchDate(startPosition, null)
-                return@launch
-            }
             balanceDatabase.runInTransaction {
                 response.data?.let { listSwipesDTO ->
                     saveSwipes(listSwipesDTO)
@@ -148,11 +139,11 @@ class SwipeRepositoryImpl(
         }
     }
 
-    override suspend fun loadSwipes(loadSize: Int, startPosition: Int): List<Swipe> {
+    override suspend fun loadSwipes(loadSize: Int, startPosition: Int, sync: Boolean): List<Swipe> {
         return withContext(ioDispatcher) {
-//            if (swipePageFetchDateTracker.shouldFetchPage(startPosition)) {
-//                listSwipes(loadSize, startPosition)
-//            }
+            if (sync) {
+                listSwipes(loadSize, startPosition)
+            }
             return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
@@ -190,6 +181,19 @@ class SwipeRepositoryImpl(
 
     override fun getSwipeCountFlow(): Flow<Long?> {
         return swipeCountDAO.getCountFlowBy(preferenceProvider.getAccountId())
+    }
+
+    override fun syncSwipes(loadSize: Int, startPosition: Int?) {
+        if (loadSize <= 0 || startPosition == null) {
+            return
+        }
+
+        stompClient.getStompReconnectedAt()?.let { stompReconnectedAt ->
+            if (stompReconnectedAt.isAfter(refreshedPagesSyncedAt)) {
+                refreshedPagesSyncedAt = stompReconnectedAt
+                listSwipes(loadSize, startPosition)
+            }
+        }
     }
 
     override suspend fun test() {

@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import org.threeten.bp.OffsetDateTime
 import java.util.*
 
 class SwipeFragment(
@@ -82,8 +83,6 @@ class SwipeFragment(
         binding.rvSwipe.adapter = swipePagingDataAdapter.withLoadStateFooter(
             footer = footerLoadStateAdapter
         )
-
-
 
         val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {

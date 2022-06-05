@@ -10,13 +10,15 @@ interface SwipeRepository {
 
     val newSwipeFlow: Flow<Swipe>
 
+
     suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO>
-    suspend fun loadSwipes(loadSize: Int, startPosition: Int): List<Swipe>
+    suspend fun loadSwipes(loadSize: Int, startPosition: Int, sync: Boolean): List<Swipe>
     suspend fun saveSwipe(swipeDTO: SwipeDTO)
     suspend fun deleteSwipes()
     suspend fun deleteSwipeSwipeCount()
     fun getSwipePageInvalidationFlow(): Flow<Boolean>
     fun getSwipeCountFlow(): Flow<Long?>
+    fun syncSwipes(loadSize: Int, startPosition: Int?)
 
     suspend fun test()
 }

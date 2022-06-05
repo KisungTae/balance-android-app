@@ -51,7 +51,7 @@ class SwipeViewModel(
 
     companion object {
         private const val SWIPE_PAGE_SIZE = 100
-        private const val SWIPE_PAGE_PREFETCH_DISTANCE = SWIPE_PAGE_SIZE
+        private const val SWIPE_PAGE_PREFETCH_DISTANCE = SWIPE_PAGE_SIZE + 10
         private const val SWIPE_MAX_PAGE_SIZE = SWIPE_PAGE_PREFETCH_DISTANCE * 3 + SWIPE_PAGE_SIZE
         private val swipePagingConfig = PagingConfig(
             SWIPE_PAGE_SIZE,
