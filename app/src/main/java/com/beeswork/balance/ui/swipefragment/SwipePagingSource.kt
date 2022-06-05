@@ -16,8 +16,8 @@ class SwipePagingSource(
     override fun getRefreshKey(state: PagingState<Int, Swipe>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
-            val numOfKeysAdded = pagingKeyTracker.addRefreshedPageKeys(anchorPage)
-            swipeRepository.syncSwipes((numOfKeysAdded * state.config.pageSize), pagingKeyTracker.prevKey ?: pagingKeyTracker.currKey)
+            val loadSize = pagingKeyTracker.addRefreshedPageKeys(anchorPage) * state.config.pageSize
+            swipeRepository.syncSwipes(loadSize, pagingKeyTracker.prevKey)
             return pagingKeyTracker.currKey
         }
     }
@@ -27,8 +27,16 @@ class SwipePagingSource(
             val currentPage = params.key ?: 0
             val startPosition = currentPage * params.loadSize
             val swipes = swipeRepository.loadSwipes(params.loadSize, startPosition, pagingKeyTracker.shouldSyncPage(currentPage))
-            val prevPage = if (currentPage >= 1) currentPage - 1 else null
-            val nextPage = if (swipes.isEmpty()) null else currentPage + 1
+            val prevPage = if (currentPage >= 1) {
+                currentPage - 1
+            } else {
+                null
+            }
+            val nextPage = if (swipes.isEmpty()) {
+                null
+            } else {
+                currentPage + 1
+            }
             LoadResult.Page(swipes, prevPage, nextPage)
         } catch (exception: IOException) {
             LoadResult.Error(exception)

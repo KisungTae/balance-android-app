@@ -138,7 +138,8 @@ class SwipeFragment(
 
     override fun onSelectSwipe(position: Int) {
         swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
-            viewModel.test()
+            swipePagingDataAdapter.refresh()
+//            viewModel.test()
 //            SwipeBalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
 //                childFragmentManager,
 //                SwipeBalanceGameDialog.TAG
