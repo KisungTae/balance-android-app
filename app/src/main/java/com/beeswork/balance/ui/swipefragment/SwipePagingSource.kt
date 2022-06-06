@@ -17,7 +17,8 @@ class SwipePagingSource(
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             val loadSize = pagingKeyTracker.addRefreshedPageKeys(anchorPage) * state.config.pageSize
-            swipeRepository.syncSwipes(loadSize, pagingKeyTracker.prevKey)
+            val startPosition = pagingKeyTracker.prevKey?.times(state.config.pageSize)
+            swipeRepository.syncSwipes(loadSize, startPosition)
             return pagingKeyTracker.currKey
         }
     }
@@ -27,6 +28,7 @@ class SwipePagingSource(
             val currentPage = params.key ?: 0
             val startPosition = currentPage * params.loadSize
             val swipes = swipeRepository.loadSwipes(params.loadSize, startPosition, pagingKeyTracker.shouldSyncPage(currentPage))
+
             val prevPage = if (currentPage >= 1) {
                 currentPage - 1
             } else {

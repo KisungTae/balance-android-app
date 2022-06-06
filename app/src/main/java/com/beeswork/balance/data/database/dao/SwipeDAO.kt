@@ -33,5 +33,7 @@ interface SwipeDAO {
     @Query("select 1 from swipe")
     fun getPageInvalidationFlow(): Flow<Boolean>
 
+    @Query("select count(*) > 0 from swipe where swiperId = :swiperId and swipedId = :swipedId")
+    fun existsBy(swiperId: UUID?, swipedId: UUID?): Boolean
 
 }

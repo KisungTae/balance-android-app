@@ -22,11 +22,14 @@ class PagingKeyTracker<Value: Any> {
             prevKey = _prevKey
         }
 
+        currKey = anchorPage.prevKey?.plus(1) ?: anchorPage.nextKey?.minus(1)
+        currKey?.let { _currKey ->
+            pagingKeys.add(_currKey)
+        }
+
         anchorPage.nextKey?.let { nextKey ->
             pagingKeys.add(nextKey)
         }
-
-        currKey = anchorPage.prevKey?.plus(1) ?: anchorPage.nextKey?.minus(1)
 
         if (prevKey == null) {
             prevKey = currKey

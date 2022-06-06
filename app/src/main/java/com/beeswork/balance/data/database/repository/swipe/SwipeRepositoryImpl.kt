@@ -2,7 +2,6 @@ package com.beeswork.balance.data.database.repository.swipe
 
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.CallBackFlowListener
-import com.beeswork.balance.data.database.common.QueryResult
 import com.beeswork.balance.data.database.dao.SwipeDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.dao.SwipeCountDAO
@@ -41,6 +40,7 @@ class SwipeRepositoryImpl(
 ) : SwipeRepository {
 
     private var newSwipeCallBackFlowListener: CallBackFlowListener<Swipe>? = null
+
     @ExperimentalCoroutinesApi
     override val newSwipeFlow: Flow<Swipe> = callbackFlow {
         newSwipeCallBackFlowListener = object : CallBackFlowListener<Swipe> {
@@ -75,7 +75,7 @@ class SwipeRepositoryImpl(
     }
 
     private fun listSwipes(loadSize: Int, startPosition: Int) {
-        CoroutineScope(ioDispatcher).launch(CoroutineExceptionHandler { _, _ -> }) {
+        applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
             val response = swipeRDS.listSwipes(loadSize, startPosition)
             balanceDatabase.runInTransaction {
                 response.data?.let { listSwipesDTO ->
@@ -90,28 +90,30 @@ class SwipeRepositoryImpl(
             if (swipeDTO.swiperDeleted) {
                 swipeDAO.deleteBy(swipeDTO.swiperId, swipeDTO.swipedId)
             } else {
-                insertSwipe(swipeDTO)
+                swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
+                    swipeDAO.insert(swipe)
+                }
             }
         }
         updateSwipeCount(listSwipesDTO.swipeCount, listSwipesDTO.swipeCountCountedAt)
     }
 
-    private fun insertSwipe(swipeDTO: SwipeDTO): QueryResult<Swipe> {
-        if (swipeDTO.swiperDeleted || matchDAO.existBy(swipeDTO.swipedId, swipeDTO.swiperId)) {
-            return QueryResult.none()
-        }
-        val swipe = swipeDAO.getBy(swipeDTO.swiperId, swipeDTO.swipedId)
-        if (swipe == null || !swipe.isEqualTo(swipeDTO)) {
-            val newSwipe = swipeMapper.toSwipe(swipeDTO) ?: return QueryResult.none()
-            swipeDAO.insert(newSwipe)
-            return if (swipe == null) {
-                QueryResult.insert(newSwipe)
-            } else {
-                QueryResult.update(newSwipe)
-            }
-        }
-        return QueryResult.none()
-    }
+//    private fun insertSwipe(swipeDTO: SwipeDTO): QueryResult<Swipe> {
+//        if (swipeDTO.swiperDeleted || matchDAO.existBy(swipeDTO.swipedId, swipeDTO.swiperId)) {
+//            return QueryResult.none()
+//        }
+//        val swipe = swipeDAO.getBy(swipeDTO.swiperId, swipeDTO.swipedId)
+//        if (swipe == null || !swipe.isEqualTo(swipeDTO)) {
+//            val newSwipe = swipeMapper.toSwipe(swipeDTO) ?: return QueryResult.none()
+//            swipeDAO.insert(newSwipe)
+//            return if (swipe == null) {
+//                QueryResult.insert(newSwipe)
+//            } else {
+//                QueryResult.update(newSwipe)
+//            }
+//        }
+//        return QueryResult.none()
+//    }
 
     private fun updateSwipeCount(count: Long, countedAt: OffsetDateTime) {
         val accountId = preferenceProvider.getAccountId() ?: return
@@ -150,15 +152,22 @@ class SwipeRepositoryImpl(
 
     override suspend fun saveSwipe(swipeDTO: SwipeDTO) {
         withContext(Dispatchers.IO) {
-            val swipe = balanceDatabase.runInTransaction(Callable {
-                val queryResult = insertSwipe(swipeDTO)
-                if (queryResult.isInsert()) {
-                    incrementSwipeCount(swipeDTO)
+            val newSwipe = balanceDatabase.runInTransaction(Callable {
+                val exists = swipeDAO.existsBy(swipeDTO.swiperId, swipeDTO.swipedId)
+                val swipe = swipeMapper.toSwipe(swipeDTO)
+                if (swipe != null) {
+                    swipeDAO.insert(swipe)
                 }
-                return@Callable queryResult.data
+
+                if (exists) {
+                    return@Callable null
+                } else {
+                    incrementSwipeCount(swipeDTO)
+                    return@Callable swipe
+                }
             })
-            if (swipe != null && swipe.swipedId == preferenceProvider.getAccountId()) {
-                newSwipeCallBackFlowListener?.onInvoke(swipe)
+            if (newSwipe != null && newSwipe.swipedId == preferenceProvider.getAccountId()) {
+                newSwipeCallBackFlowListener?.onInvoke(newSwipe)
             }
         }
     }
@@ -198,7 +207,9 @@ class SwipeRepositoryImpl(
 
     override suspend fun test() {
         withContext(ioDispatcher) {
-            swipeDAO.insert(Swipe(Random.nextLong(), preferenceProvider.getAccountId()!!, UUID.randomUUID(), false, null))
+            saveSwipe(SwipeDTO(Random.nextLong(), UUID.randomUUID(), preferenceProvider.getAccountId()!!, false, null, false, ""))
+
+//            swipeDAO.insert(Swipe(Random.nextLong(), preferenceProvider.getAccountId()!!, UUID.randomUUID(), false, null))
         }
     }
 
