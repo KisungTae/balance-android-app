@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
+import com.beeswork.balance.internal.constant.TabPosition
 import com.beeswork.balance.ui.accountfragment.AccountFragment
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.swipefragment.SwipeFragment
@@ -21,16 +22,16 @@ class MainViewPagerAdapter(
     private val fragments = mutableListOf<Fragment>()
 
     override fun getItemCount(): Int {
-        return MainViewPagerTabPosition.values().size
+        return TabPosition.values().size
     }
 
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            MainViewPagerTabPosition.CARD.ordinal -> addToFragments(position, CardFragment(cardBalanceGameListener))
-            MainViewPagerTabPosition.SWIPE.ordinal -> addToFragments(position, SwipeFragment(cardBalanceGameListener))
-            MainViewPagerTabPosition.MATCH.ordinal -> addToFragments(position, MatchFragment())
-            MainViewPagerTabPosition.ACCOUNT.ordinal -> addToFragments(position, AccountFragment())
+            TabPosition.CARD.ordinal -> addToFragments(position, CardFragment(cardBalanceGameListener))
+            TabPosition.SWIPE.ordinal -> addToFragments(position, SwipeFragment(cardBalanceGameListener))
+            TabPosition.MATCH.ordinal -> addToFragments(position, MatchFragment())
+            TabPosition.ACCOUNT.ordinal -> addToFragments(position, AccountFragment())
             else -> fragments[1]
         }
     }

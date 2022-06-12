@@ -26,6 +26,8 @@ import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.data.database.repository.setting.SettingRepositoryImpl
 import com.beeswork.balance.data.database.repository.card.CardRepository
 import com.beeswork.balance.data.database.repository.card.CardRepositoryImpl
+import com.beeswork.balance.data.database.repository.tabcount.TabCountRepository
+import com.beeswork.balance.data.database.repository.tabcount.TabCountRepositoryImpl
 import com.beeswork.balance.data.network.rds.card.CardRDS
 import com.beeswork.balance.data.network.rds.card.CardRDSImpl
 import com.beeswork.balance.data.network.rds.chat.ChatRDS
@@ -61,6 +63,8 @@ import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCase
 import com.beeswork.balance.domain.usecase.location.UpdateLocationGrantedUseCaseImpl
 import com.beeswork.balance.domain.usecase.login.*
 import com.beeswork.balance.domain.usecase.main.*
+import com.beeswork.balance.domain.usecase.tabcount.GetTabCountFlowUseCase
+import com.beeswork.balance.domain.usecase.tabcount.GetTabCountFlowUseCaseImpl
 import com.beeswork.balance.domain.usecase.photo.*
 import com.beeswork.balance.domain.usecase.profile.SaveBioUseCase
 import com.beeswork.balance.domain.usecase.profile.SaveBioUseCaseImpl
@@ -166,9 +170,8 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from singleton { instance<BalanceDatabase>().swipeFilterDAO() }
         bind() from singleton { instance<BalanceDatabase>().settingDAO() }
         bind() from singleton { instance<BalanceDatabase>().loginDAO() }
-        bind() from singleton { instance<BalanceDatabase>().swipeCountDAO() }
-        bind() from singleton { instance<BalanceDatabase>().matchCountDAO() }
         bind() from singleton { instance<BalanceDatabase>().cardPageDAO() }
+        bind() from singleton { instance<BalanceDatabase>().tabCountDAO() }
 
 
         // API
@@ -251,9 +254,11 @@ class BalanceApplication : Application(), KodeinAware {
         bind<GetEmailUseCase>() with singleton { GetEmailUseCaseImpl(instance(), Dispatchers.Default) }
         bind<GetProfilePhotoFlowUseCase>() with singleton { GetProfilePhotoFlowUseCaseImpl(instance(), Dispatchers.Default) }
         bind<SaveBioUseCase>() with singleton { SaveBioUseCaseImpl(instance(), Dispatchers.Default) }
+        bind<GetTabCountFlowUseCase>() with singleton { GetTabCountFlowUseCaseImpl(instance(), Dispatchers.Default) }
 
 
         // Repository
+        bind<TabCountRepository>() with singleton { TabCountRepositoryImpl(instance(), instance(), Dispatchers.IO) }
         bind<MainRepository>() with singleton { MainRepositoryImpl(instance(), instance(), instance(), Dispatchers.IO, applicationScope) }
         bind<CardRepository>() with singleton {
             CardRepositoryImpl(
@@ -280,7 +285,6 @@ class BalanceApplication : Application(), KodeinAware {
         }
         bind<SwipeRepository>() with singleton {
             SwipeRepositoryImpl(
-                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -314,7 +318,6 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
                 applicationScope,
                 Dispatchers.IO
             )
@@ -322,7 +325,6 @@ class BalanceApplication : Application(), KodeinAware {
 
         bind<MatchRepository>() with singleton {
             MatchRepositoryImpl(
-                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -394,6 +396,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {
             MainViewPagerViewModelFactory(
+                instance(),
                 instance(),
                 instance(),
                 instance(),

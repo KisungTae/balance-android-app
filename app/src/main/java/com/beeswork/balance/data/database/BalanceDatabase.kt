@@ -15,14 +15,22 @@ import com.beeswork.balance.data.database.entity.setting.Location
 import com.beeswork.balance.data.database.entity.setting.PushSetting
 import com.beeswork.balance.data.database.entity.card.CardFilter
 import com.beeswork.balance.data.database.entity.card.CardPage
-import com.beeswork.balance.data.database.entity.match.MatchCount
-import com.beeswork.balance.data.database.entity.swipe.SwipeCount
+import com.beeswork.balance.data.database.entity.tabcount.TabCount
 
 
 @Database(
-    entities = [Match::class, ChatMessage::class, FCMToken::class,
-                Swipe::class, Profile::class, Location::class, Photo::class,
-                CardFilter::class, PushSetting::class, Login::class, SwipeCount::class, MatchCount::class, CardPage::class],
+    entities = [Match::class,
+        ChatMessage::class,
+        FCMToken::class,
+        Swipe::class,
+        Profile::class,
+        Location::class,
+        Photo::class,
+        CardFilter::class,
+        PushSetting::class,
+        Login::class,
+        CardPage::class,
+        TabCount::class],
     version = 1
 )
 @TypeConverters(
@@ -34,7 +42,8 @@ import com.beeswork.balance.data.database.entity.swipe.SwipeCount
     UriConverter::class,
     LoginTypeConverter::class,
     LocationPermissionStatusConverter::class,
-    LocalDateConverter::class
+    LocalDateConverter::class,
+    TabPositionConverter::class
 )
 abstract class BalanceDatabase : RoomDatabase() {
 
@@ -48,9 +57,8 @@ abstract class BalanceDatabase : RoomDatabase() {
     abstract fun swipeFilterDAO(): CardFilterDAO
     abstract fun settingDAO(): PushSettingDAO
     abstract fun loginDAO(): LoginDAO
-    abstract fun swipeCountDAO(): SwipeCountDAO
-    abstract fun matchCountDAO(): MatchCountDAO
     abstract fun cardPageDAO(): CardPageDAO
+    abstract fun tabCountDAO(): TabCountDAO
 
     companion object {
 

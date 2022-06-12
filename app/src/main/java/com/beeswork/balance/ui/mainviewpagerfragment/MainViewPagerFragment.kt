@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.mainviewpagerfragment
 
-import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -17,10 +16,10 @@ import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewSwipeBinding
 import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
 import com.beeswork.balance.domain.uistate.swipe.SwipeNotificationUIState
+import com.beeswork.balance.internal.constant.TabPosition
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
-import com.beeswork.balance.ui.cardfragment.CardFragment
 import com.beeswork.balance.ui.common.BaseFragment
 import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayoutMediator
@@ -57,53 +56,53 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
         setupViewPager()
         setupViewPagerTab()
         observeSwipeNotificationUIStateLiveData()
-        observeSwipeCountLiveData()
-        observeMatchCountLiveData()
         observeMatchNotificationUIStateLiveData()
     }
 
-
     private suspend fun observeSwipeNotificationUIStateLiveData() {
-        viewModel.swipeNotificationUIStateLiveData.await().observe(viewLifecycleOwner) { swipeNotificationUIState ->
+        viewModel.newSwipeNotificationUIStateLiveData.await().observe(viewLifecycleOwner) { swipeNotificationUIState ->
             showNewSwipeSnackBar(swipeNotificationUIState)
         }
     }
 
-    private suspend fun observeSwipeCountLiveData() {
-        viewModel.swipeCountLiveData.await().observe(viewLifecycleOwner) { count ->
-            showBadgeWithCount(MainViewPagerTabPosition.SWIPE.ordinal, count)
-        }
-    }
-
-    private suspend fun observeMatchCountLiveData() {
-        viewModel.matchCountLiveData.await().observe(viewLifecycleOwner) { count ->
-            showBadgeWithCount(MainViewPagerTabPosition.MATCH.ordinal, count)
+    private suspend fun observeTabCountUIStatesLiveData() {
+        viewModel.tabCountUIStatesLiveData.await().observe(viewLifecycleOwner) { tabCountUIStates ->
+            tabCountUIStates.forEach { tabCountUIState ->
+                showTabCount(tabCountUIState.tabPosition.ordinal, tabCountUIState.count)
+            }
         }
     }
 
     private suspend fun observeMatchNotificationUIStateLiveData() {
-        viewModel.matchNotificationUIStateLiveData.await().observe(viewLifecycleOwner) { matchNotificationUIState ->
+        viewModel.newMatchNotificationUIStateLiveData.await().observe(viewLifecycleOwner) { matchNotificationUIState ->
             showNewMatchSnackBar(matchNotificationUIState)
         }
     }
 
-    private fun showBadgeWithCount(position: Int, count: Long?) {
-        if (count == null) {
-            return
-        }
+    private fun showTabCount(position: Int, count: Long) {
         if (count > 0) {
-            showTabBadge(position, count)
+            binding.tlMain.getTabAt(position)?.let { tab ->
+                val badge = tab.orCreateBadge
+                badge.number = count.toInt()
+                badge.maxCharacterCount = BADGE_MAX_CHAR_COUNT
+                badge.backgroundColor = ContextCompat.getColor(requireContext(), R.color.WarningRed)
+                badge.isVisible = true
+            }
         } else {
-            hideTabBadge(position)
+            binding.tlMain.getTabAt(position)?.let { tab ->
+                tab.badge?.let { badgeDrawable ->
+                    badgeDrawable.isVisible = false
+                }
+            }
         }
     }
 
     private fun setupViewPager() {
         mainViewPagerAdapter = MainViewPagerAdapter(childFragmentManager, lifecycle, this@MainViewPagerFragment)
         binding.vpMain.adapter = mainViewPagerAdapter
-        binding.vpMain.offscreenPageLimit = MainViewPagerTabPosition.values().size
+        binding.vpMain.offscreenPageLimit = TabPosition.values().size
         binding.vpMain.setPageTransformer(null)
-        binding.vpMain.setCurrentItem(MainViewPagerTabPosition.CARD.ordinal, false)
+        binding.vpMain.setCurrentItem(TabPosition.CARD.ordinal, false)
         binding.vpMain.isUserInputEnabled = false
         binding.vpMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -122,31 +121,13 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
             false
         ) { tab, position ->
             when (position) {
-                MainViewPagerTabPosition.CARD.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
-                MainViewPagerTabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
-                MainViewPagerTabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
-                MainViewPagerTabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.round_account)
+                TabPosition.CARD.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
+                TabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
+                TabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
+                TabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.round_account)
             }
         }
         tabLayoutMediator.attach()
-    }
-
-    private fun showTabBadge(position: Int, count: Long) {
-        binding.tlMain.getTabAt(position)?.let { tab ->
-            val badge = tab.orCreateBadge
-            badge.number = count.toInt()
-            badge.maxCharacterCount = BADGE_MAX_CHAR_COUNT
-            badge.backgroundColor = ContextCompat.getColor(requireContext(), R.color.WarningRed)
-            badge.isVisible = true
-        }
-    }
-
-    private fun hideTabBadge(position: Int) {
-        binding.tlMain.getTabAt(position)?.let { tab ->
-            tab.badge?.let { badgeDrawable ->
-                badgeDrawable.isVisible = false
-            }
-        }
     }
 
     private fun showNewSwipeSnackBar(swipeNotificationUIState: SwipeNotificationUIState) {
@@ -154,7 +135,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
         val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
         val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, snackBarNewSwipeBinding.root)
         snackBar.view.setOnClickListener {
-            binding.tlMain.getTabAt(MainViewPagerTabPosition.SWIPE.ordinal)?.select()
+            binding.tlMain.getTabAt(TabPosition.SWIPE.ordinal)?.select()
         }
         setupProfilePhoto(swipeNotificationUIState.swiperProfilePhotoUrl, snackBarNewSwipeBinding.ivNewSwipeSnackBarProfilePhoto)
 
@@ -176,7 +157,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
         val topPadding = resources.getDimension(R.dimen.snack_bar_top_padding).toInt()
         val snackBar = SnackBarHelper.make(requireView(), Gravity.TOP, topPadding, 0, snackBarNewSwipeBinding.root)
         snackBar.view.setOnClickListener {
-            binding.tlMain.getTabAt(MainViewPagerTabPosition.MATCH.ordinal)?.select()
+            binding.tlMain.getTabAt(TabPosition.MATCH.ordinal)?.select()
             snackBar.dismiss()
         }
         snackBarNewSwipeBinding.tvNewMatchSnackBarClose.setOnClickListener {
@@ -195,11 +176,11 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
     }
 
     override fun onGoToCardSelected() {
-        binding.tlMain.getTabAt(MainViewPagerTabPosition.CARD.ordinal)?.select()
+        binding.tlMain.getTabAt(TabPosition.CARD.ordinal)?.select()
     }
 
     override fun onGoToMatchSelected() {
-        binding.tlMain.getTabAt(MainViewPagerTabPosition.MATCH.ordinal)?.select()
+        binding.tlMain.getTabAt(TabPosition.MATCH.ordinal)?.select()
     }
 
     companion object {

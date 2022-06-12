@@ -4,7 +4,6 @@ import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.common.PageFetchDateTracker
 import com.beeswork.balance.data.database.dao.ChatMessageDAO
-import com.beeswork.balance.data.database.dao.MatchCountDAO
 import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.chat.ChatMessage
 import com.beeswork.balance.data.database.repository.BaseRepository
@@ -16,7 +15,6 @@ import com.beeswork.balance.data.network.response.chat.StompReceiptDTO
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.data.network.service.stomp.WebSocketEvent
-import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
@@ -35,7 +33,6 @@ class ChatRepositoryImpl(
     preferenceProvider: PreferenceProvider,
     private val chatMessageDAO: ChatMessageDAO,
     private val matchDAO: MatchDAO,
-    private val matchCountDAO: MatchCountDAO,
     private val chatRDS: ChatRDS,
     private val stompClient: StompClient,
     private val chatMessageMapper: ChatMessageMapper,
@@ -219,13 +216,13 @@ class ChatRepositoryImpl(
     }
 
     private fun decrementMatchCount(updatedAt: OffsetDateTime) {
-        balanceDatabase.runInTransaction {
-            val matchCount = matchCountDAO.getBy(preferenceProvider.getAccountId())
-            if (matchCount != null && updatedAt.isAfter(matchCount.countedAt) && matchCount.count > 0) {
-                matchCount.count = matchCount.count - 1
-                matchCountDAO.insert(matchCount)
-            }
-        }
+//        balanceDatabase.runInTransaction {
+//            val matchCount = matchCountDAO.getBy(preferenceProvider.getAccountId())
+//            if (matchCount != null && updatedAt.isAfter(matchCount.countedAt) && matchCount.count > 0) {
+//                matchCount.count = matchCount.count - 1
+//                matchCountDAO.insert(matchCount)
+//            }
+//        }
     }
 
     private fun sendChatMessages() {
