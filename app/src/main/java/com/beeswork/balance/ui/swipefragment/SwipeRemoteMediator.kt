@@ -21,7 +21,7 @@ class SwipeRemoteMediator(
                     return MediatorResult.Success(false)
                 }
                 LoadType.PREPEND -> {
-                    return MediatorResult.Success(true)
+                    return MediatorResult.Success(false)
                 }
                 LoadType.APPEND -> {
                     state.lastItemOrNull()?.id

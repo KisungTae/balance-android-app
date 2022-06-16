@@ -25,7 +25,17 @@ class SwipePagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Swipe> {
         return try {
+            if (params is LoadParams.Refresh) {
+                println("params is LoadParams.Refresh")
+            } else if (params is LoadParams.Prepend) {
+                println("params is LoadParams.Prepend")
+            } else if (params is LoadParams.Append) {
+                println("params is LoadParams.Append")
+            }
+
+
             val currentPage = params.key ?: 0
+            println("currentPage: $currentPage")
             val startPosition = currentPage * params.loadSize
             val swipes = swipeRepository.loadSwipes(params.loadSize, startPosition, pagingKeyTracker.shouldSyncPage(currentPage))
 

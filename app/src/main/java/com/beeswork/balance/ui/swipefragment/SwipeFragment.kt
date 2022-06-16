@@ -55,10 +55,10 @@ class SwipeFragment(
 
     @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
-        setupSwipeRecyclerView()
-        setupSwipePagingInitialPageAdapter()
-        observeSwipePagingDataLiveData()
-        observeSwipePageInvalidationLiveData()
+//        setupSwipeRecyclerView()
+//        setupSwipePagingInitialPageAdapter()
+//        observeSwipePagingDataLiveData()
+//        observeSwipePageInvalidationLiveData()
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
@@ -83,6 +83,8 @@ class SwipeFragment(
         binding.rvSwipe.adapter = swipePagingDataAdapter.withLoadStateFooter(
             footer = footerLoadStateAdapter
         )
+
+
 
         val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -138,8 +140,9 @@ class SwipeFragment(
 
     override fun onSelectSwipe(position: Int) {
         swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
+            swipePagingDataAdapter.refresh()
 //            swipePagingDataAdapter.refresh()
-            viewModel.test()
+//            viewModel.test()
 //            SwipeBalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
 //                childFragmentManager,
 //                SwipeBalanceGameDialog.TAG

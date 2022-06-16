@@ -11,6 +11,7 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.data.network.service.stomp.StompClient
+import com.beeswork.balance.internal.constant.TabPosition
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import kotlinx.coroutines.*
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import java.util.concurrent.Callable
+import kotlin.random.Random.Default.nextLong
 
 @ExperimentalCoroutinesApi
 class SwipeRepositoryImpl(
@@ -59,40 +61,40 @@ class SwipeRepositoryImpl(
     override suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO> {
         return withContext(ioDispatcher) {
             val response = swipeRDS.fetchSwipes(loadSize, lastSwipeId)
-            if (response.isError()) {
-                return@withContext Resource.error(response.exception)
-            }
-            balanceDatabase.runInTransaction {
-                response.data?.let { listSwipesDTO ->
-                    saveSwipes(listSwipesDTO)
-                }
-            }
+//            if (response.isError()) {
+//                return@withContext Resource.error(response.exception)
+//            }
+//            balanceDatabase.runInTransaction {
+//                response.data?.let { listSwipesDTO ->
+//                    saveSwipes(listSwipesDTO)
+//                }
+//            }
             return@withContext response
         }
     }
 
     private fun listSwipes(loadSize: Int, startPosition: Int) {
-        applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
-            val response = swipeRDS.listSwipes(loadSize, startPosition)
-            balanceDatabase.runInTransaction {
-                response.data?.let { listSwipesDTO ->
-                    saveSwipes(listSwipesDTO)
-                }
-            }
-        }
+//        applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
+//            val response = swipeRDS.listSwipes(loadSize, startPosition)
+//            balanceDatabase.runInTransaction {
+//                response.data?.let { listSwipesDTO ->
+//                    saveSwipes(listSwipesDTO)
+//                }
+//            }
+//        }
     }
 
     private fun saveSwipes(listSwipesDTO: ListSwipesDTO) {
-        listSwipesDTO.swipeDTOs.forEach { swipeDTO ->
-            if (swipeDTO.swiperDeleted) {
-                swipeDAO.deleteBy(swipeDTO.swiperId, swipeDTO.swipedId)
-            } else {
-                swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
-                    swipeDAO.insert(swipe)
-                }
-            }
-        }
-        updateSwipeCount(listSwipesDTO.swipeCount, listSwipesDTO.swipeCountCountedAt)
+//        listSwipesDTO.swipeDTOs.forEach { swipeDTO ->
+//            if (swipeDTO.swiperDeleted) {
+//                swipeDAO.deleteBy(swipeDTO.swiperId, swipeDTO.swipedId)
+//            } else {
+//                swipeMapper.toSwipe(swipeDTO)?.let { swipe ->
+//                    swipeDAO.insert(swipe)
+//                }
+//            }
+//        }
+//        updateSwipeCount(listSwipesDTO.swipeCount, listSwipesDTO.swipeCountCountedAt)
     }
 
     private fun updateSwipeCount(count: Long, countedAt: OffsetDateTime) {
@@ -123,9 +125,9 @@ class SwipeRepositoryImpl(
 
     override suspend fun loadSwipes(loadSize: Int, startPosition: Int, sync: Boolean): List<Swipe> {
         return withContext(ioDispatcher) {
-            if (sync) {
-                listSwipes(loadSize, startPosition)
-            }
+//            if (sync) {
+//                listSwipes(loadSize, startPosition)
+//            }
             return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)
         }
     }
@@ -178,11 +180,15 @@ class SwipeRepositoryImpl(
     override suspend fun test() {
         withContext(ioDispatcher) {
 
+//            for (i in 0..99) {
+//                swipeDAO.insert(Swipe(Random().nextLong(), preferenceProvider.getAccountId()!!, UUID.randomUUID(), false, null))
+//            }
+
 //            swipeCountDAO.insert(SwipeCount(preferenceProvider.getAccountId()!!, Random.nextInt(10)))
 
 //            saveSwipe(SwipeDTO(Random.nextLong(), UUID.randomUUID(), preferenceProvider.getAccountId()!!, false, null, false, ""))
 
-//            swipeDAO.insert(Swipe(Random.nextLong(), preferenceProvider.getAccountId()!!, UUID.randomUUID(), false, null))
+
         }
     }
 

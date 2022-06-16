@@ -55,6 +55,7 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
     private fun bindUI() = lifecycleScope.launch {
         setupViewPager()
         setupViewPagerTab()
+        observeTabCountUIStatesLiveData()
         observeSwipeNotificationUIStateLiveData()
         observeMatchNotificationUIStateLiveData()
     }
