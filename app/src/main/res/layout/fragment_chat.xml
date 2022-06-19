@@ -202,7 +202,8 @@
                     android:contentDescription="@string/chat_message_send_button_description"
                     android:focusableInTouchMode="false"
                     android:padding="8dp"
-                    android:src="@drawable/ic_baseline_send_12" />
+                    android:src="@drawable/ic_send_message"
+                    app:tint="@color/white" />
 
             </LinearLayout>
         </LinearLayout>

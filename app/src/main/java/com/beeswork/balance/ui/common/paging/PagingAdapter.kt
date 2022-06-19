@@ -6,7 +6,4 @@ abstract class PagingAdapter<T : Any, VH : RecyclerView.ViewHolder> : RecyclerVi
 
     protected val items = mutableListOf<T>()
 
-    fun submit(page: Page<T>) {
-
-    }
 }

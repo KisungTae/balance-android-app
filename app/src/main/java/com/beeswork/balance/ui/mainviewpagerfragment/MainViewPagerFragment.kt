@@ -122,10 +122,11 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
             false
         ) { tab, position ->
             when (position) {
-                TabPosition.CARD.ordinal -> tab.setIcon(R.drawable.ic_baseline_thumb_up)
-                TabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_baseline_favorite)
-                TabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_baseline_chat_bubble)
-                TabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.round_account)
+                TabPosition.CARD.ordinal -> tab.setIcon(R.drawable.ic_card_stack_new_new)
+                TabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_heart_with_arrow_down)
+                TabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_couple)
+                TabPosition.CHAT.ordinal -> tab.setIcon(R.drawable.ic_match_message_full)
+                TabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_account_new)
             }
         }
         tabLayoutMediator.attach()

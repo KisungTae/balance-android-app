@@ -31,6 +31,7 @@ class MainViewPagerAdapter(
             TabPosition.CARD.ordinal -> addToFragments(position, CardFragment(cardBalanceGameListener))
             TabPosition.SWIPE.ordinal -> addToFragments(position, SwipeFragment(cardBalanceGameListener))
             TabPosition.MATCH.ordinal -> addToFragments(position, MatchFragment())
+            TabPosition.CHAT.ordinal -> addToFragments(position, MatchFragment())
             TabPosition.ACCOUNT.ordinal -> addToFragments(position, AccountFragment())
             else -> fragments[1]
         }

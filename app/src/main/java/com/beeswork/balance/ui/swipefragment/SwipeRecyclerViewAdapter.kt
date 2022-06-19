@@ -39,8 +39,16 @@ class SwipeRecyclerViewAdapter(
         }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return R.layout.item_swipe
+    }
+
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
     }
 
     interface SwipeViewHolderListener {

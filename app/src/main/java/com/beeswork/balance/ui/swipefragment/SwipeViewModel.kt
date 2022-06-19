@@ -9,7 +9,7 @@ import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
@@ -23,6 +23,11 @@ class SwipeViewModel(
     val swipePageInvalidationLiveData by lazyDeferred {
         swipeRepository.getSwipePageInvalidationFlow().asLiveData()
     }
+
+    // Backing property to avoid state updates from other classes
+    private val _uiState = MutableStateFlow("")
+    // The UI collects from this StateFlow to get its state updates
+    val uiState: StateFlow<String> = _uiState
 
     @ExperimentalPagingApi
     fun initSwipePagingData(): LiveData<PagingData<SwipeItemUIState>> {
@@ -45,16 +50,23 @@ class SwipeViewModel(
 
     fun test() {
         viewModelScope.launch {
+            _uiState.emit("abc")
+        }
+
+
+        viewModelScope.launch {
             swipeRepository.test()
         }
     }
 
     companion object {
         private const val SWIPE_PAGE_SIZE = 60
-//        private const val SWIPE_PAGE_PREFETCH_DISTANCE = SWIPE_PAGE_SIZE
+
+        //        private const val SWIPE_PAGE_PREFETCH_DISTANCE = SWIPE_PAGE_SIZE
         private const val SWIPE_PAGE_PREFETCH_DISTANCE = SWIPE_PAGE_SIZE
         private const val SWIPE_MAX_PAGE_SIZE = SWIPE_PAGE_PREFETCH_DISTANCE * 2 + SWIPE_PAGE_SIZE
-//        private const val SWIPE_MAX_PAGE_SIZE = 100
+
+        //        private const val SWIPE_MAX_PAGE_SIZE = 100
         private val swipePagingConfig = PagingConfig(
             SWIPE_PAGE_SIZE,
             SWIPE_PAGE_PREFETCH_DISTANCE,

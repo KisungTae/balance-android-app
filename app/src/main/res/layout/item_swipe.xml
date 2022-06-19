@@ -39,7 +39,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:contentDescription="@string/delete_photo_icon_description"
-                android:src="@drawable/heart_with_arrow"
+                android:src="@drawable/ic_empty_heart_with_arrwo"
                 app:tint="@color/lighterGrey" />
 
         </LinearLayout>

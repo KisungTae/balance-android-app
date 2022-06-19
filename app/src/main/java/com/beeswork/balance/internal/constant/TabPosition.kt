@@ -4,5 +4,6 @@ enum class TabPosition {
     CARD,
     SWIPE,
     MATCH,
+    CHAT,
     ACCOUNT
 }

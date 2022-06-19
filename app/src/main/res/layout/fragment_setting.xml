@@ -228,7 +228,7 @@
                         android:layout_width="@dimen/icon_small"
                         android:layout_height="@dimen/icon_small"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/logout" />
+                        android:src="@drawable/ic_logout" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -252,7 +252,7 @@
                         android:layout_width="@dimen/icon_small"
                         android:layout_height="@dimen/icon_small"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/delete_user"
+                        android:src="@drawable/ic_delete_account"
                         app:tint="#808080" />
 
                     <TextView
