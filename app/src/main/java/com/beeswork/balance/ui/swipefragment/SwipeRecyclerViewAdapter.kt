@@ -20,7 +20,7 @@ class SwipeRecyclerViewAdapter(
 
     init {
         // todo: remove me
-        for (i in 0..100) {
+        for (i in 0..30) {
             items.add(SwipeItemUIState(UUID.randomUUID(), false, null))
         }
     }

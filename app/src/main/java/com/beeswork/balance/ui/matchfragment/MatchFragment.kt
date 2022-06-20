@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentMatchBinding
 import com.beeswork.balance.internal.constant.BundleKey
@@ -18,6 +17,7 @@ import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.chatfragment.ChatFragment
 import com.beeswork.balance.ui.common.*
+import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import kotlinx.coroutines.Job
