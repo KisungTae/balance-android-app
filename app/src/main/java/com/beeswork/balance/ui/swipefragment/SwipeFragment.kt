@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -16,7 +15,7 @@ import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
-import com.beeswork.balance.ui.common.paging.LoadStatusAdapter
+import com.beeswork.balance.ui.common.paging.LoadStateAdapter
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -28,7 +27,7 @@ class SwipeFragment(
     private val cardBalanceGameListener: CardBalanceGameListener
 ) : BaseFragment(),
     KodeinAware,
-    SwipeRecyclerViewAdapter.SwipeViewHolderListener,
+    SwipePagingAdapter.SwipeViewHolderListener,
     SwipePagingDataAdapter.OnSwipeListener,
     ViewPagerChildFragment {
 
@@ -42,7 +41,7 @@ class SwipeFragment(
     private lateinit var swipePagingInitialPageAdapter: PagingInitialPageAdapter<SwipeItemUIState, RecyclerView.ViewHolder>
 
 
-    private lateinit var swipeRecyclerViewAdapter: SwipeRecyclerViewAdapter
+    private lateinit var swipePagingAdapter: SwipePagingAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +68,26 @@ class SwipeFragment(
 //        observeSwipePageInvalidationLiveData()
     }
 
+    private fun setupSwipeRecyclerView() {
+        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment)
+        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
+            LoadStateAdapter(swipePagingAdapter::retry),
+            LoadStateAdapter(swipePagingAdapter::retry)
+        )
+        val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (binding.rvSwipe.adapter?.getItemViewType(position)) {
+                    R.layout.layout_load_state -> LOAD_STATE_SPAN_COUNT
+                    R.layout.item_swipe_header -> SWIPE_HEADER_SPAN_COUNT
+                    else -> SWIPE_ITEM_SPAN_COUNT
+                }
+            }
+        }
+        binding.rvSwipe.layoutManager = gridLayoutManager
+        binding.rvSwipe.itemAnimator = null
+    }
+
     private suspend fun observeSwipePageInvalidationLiveData() {
         viewModel.swipePageInvalidationLiveData.await().observe(viewLifecycleOwner) {
             swipePagingRefreshAdapter.refresh()
@@ -85,25 +104,7 @@ class SwipeFragment(
         })
     }
 
-    private fun setupSwipeRecyclerView() {
-        swipeRecyclerViewAdapter = SwipeRecyclerViewAdapter(this@SwipeFragment)
-        binding.rvSwipe.adapter = swipeRecyclerViewAdapter.withLoadState(
-            LoadStatusAdapter(swipeRecyclerViewAdapter::retry),
-            LoadStatusAdapter(swipeRecyclerViewAdapter::retry)
-        )
-        val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
-        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                val viewType = binding.rvSwipe.adapter?.getItemViewType(position)
-                if (viewType == R.layout.layout_load_state) {
-                    return HEADER_SPAN_COUNT
-                }
-                return ITEM_SPAN_COUNT
-            }
-        }
-        binding.rvSwipe.layoutManager = gridLayoutManager
-        binding.rvSwipe.itemAnimator = null
-    }
+
 
     private fun setupSwipePagingInitialPageAdapter() {
         binding.btnSwipeRetry.setOnClickListener {
@@ -146,9 +147,9 @@ class SwipeFragment(
     }
 
     companion object {
-        const val HEADER_SPAN_COUNT = 2
-        const val ITEM_SPAN_COUNT = 1
-        const val FOOTER_SPAN_COUNT = 2
+        const val LOAD_STATE_SPAN_COUNT = 2
+        const val SWIPE_HEADER_SPAN_COUNT = 2
+        const val SWIPE_ITEM_SPAN_COUNT = 1
         const val SWIPE_PAGE_SPAN_COUNT = 2
     }
 

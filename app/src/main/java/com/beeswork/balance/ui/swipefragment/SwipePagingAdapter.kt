@@ -4,9 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemSwipeBinding
+import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.ui.common.paging.PagingAdapter
@@ -14,33 +16,45 @@ import com.bumptech.glide.Glide
 import java.util.*
 import kotlin.random.Random
 
-class SwipeRecyclerViewAdapter(
+class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener
-) : PagingAdapter<SwipeItemUIState, SwipeRecyclerViewAdapter.ViewHolder>() {
+) : PagingAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(diffCallback) {
 
     init {
         // todo: remove me
+        items.add(SwipeItemUIState.asHeader())
         for (i in 0..30) {
             items.add(SwipeItemUIState(UUID.randomUUID(), false, null))
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            ItemSwipeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            parent.context,
-            swipeViewHolderListener
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            R.layout.item_swipe_header -> HeaderViewHolder(
+                ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            else -> ItemViewHolder(
+                ItemSwipeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                parent.context,
+                swipeViewHolderListener
+            )
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        items.getOrNull(position)?.let { swipeItemUIState ->
-            holder.bind(swipeItemUIState)
+    override fun onBindViewHolder(holderItem: RecyclerView.ViewHolder, position: Int) {
+        when (holderItem) {
+            is HeaderViewHolder -> holderItem.bind()
+            is ItemViewHolder -> holderItem.bind(items[position])
+            else -> {
+            }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return R.layout.item_swipe
+        return when (items[position].type) {
+            SwipeItemUIState.Type.HEADER -> R.layout.item_swipe_header
+            else -> R.layout.item_swipe
+        }
     }
 
     override fun getItemCount(): Int {
@@ -51,11 +65,27 @@ class SwipeRecyclerViewAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
+    companion object {
+        private val diffCallback = object : DiffUtil.ItemCallback<SwipeItemUIState>() {
+            override fun areItemsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
+                oldItem.swiperId == newItem.swiperId
+
+            override fun areContentsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
+                oldItem == newItem
+        }
+    }
+
     interface SwipeViewHolderListener {
         fun onClickSwipeViewHolder(position: Int)
     }
 
-    class ViewHolder(
+    class HeaderViewHolder(
+        binding: ItemSwipeHeaderBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind() {}
+    }
+
+    class ItemViewHolder(
         private val binding: ItemSwipeBinding,
         private val context: Context,
         private val swipeViewHolderListener: SwipeViewHolderListener

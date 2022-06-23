@@ -44,6 +44,9 @@ class SwipePagingDataAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
+
+
+
         return getSwipeDomain(position)?.type?.ordinal ?: SwipeItemUIState.Type.ITEM.ordinal
     }
 
