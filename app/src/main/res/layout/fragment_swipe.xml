@@ -68,7 +68,7 @@
 
         <LinearLayout
             android:visibility="gone"
-            android:id="@+id/llSwipeInitialErrorPage"
+            android:id="@+id/llSwipeErrorPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/BackgroundWhite"
@@ -101,7 +101,7 @@
         <LinearLayout
             android:visibility="gone"
             android:background="@color/BackgroundWhite"
-            android:id="@+id/llSwipeInitialEmptyPage"
+            android:id="@+id/llSwipeEmptyPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="10dp">

@@ -121,13 +121,13 @@ class MatchRepositoryImpl(
 
     private fun saveMatches(listMatchesDTO: ListMatchesDTO) {
 //        val swipeCount = swipeCountDAO.getBy(preferenceProvider.getAccountId())
-//        listMatchesDTO.matchDTOs.forEach { matchDTO ->
-//            val match = insertMatch(matchDTO).data
+        listMatchesDTO.matchDTOs.forEach { matchDTO ->
+            val match = insertMatch(matchDTO).data
 //            if (match != null && swipeCount != null) {
 //                deleteSwipe(match, swipeCount)
 //            }
-//        }
-//        updateMatchCount(listMatchesDTO.matchCount, listMatchesDTO.matchCountCountedAt)
+        }
+        updateMatchCount(listMatchesDTO.matchCount, listMatchesDTO.matchCountCountedAt)
 //        if (swipeCount != null) {
 //            swipeCountDAO.insert(swipeCount)
 //        }

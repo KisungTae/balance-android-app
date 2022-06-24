@@ -16,7 +16,7 @@ import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.common.paging.LoadStateAdapter
-import kotlinx.coroutines.flow.collect
+import com.beeswork.balance.ui.common.paging.PagingAdapterListener
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -28,8 +28,8 @@ class SwipeFragment(
 ) : BaseFragment(),
     KodeinAware,
     SwipePagingAdapter.SwipeViewHolderListener,
-    SwipePagingDataAdapter.OnSwipeListener,
-    ViewPagerChildFragment {
+    ViewPagerChildFragment,
+    PagingAdapterListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
@@ -69,7 +69,7 @@ class SwipeFragment(
     }
 
     private fun setupSwipeRecyclerView() {
-        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment)
+        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment, this@SwipeFragment)
         binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
             LoadStateAdapter(swipePagingAdapter::retry),
             LoadStateAdapter(swipePagingAdapter::retry)
@@ -86,6 +86,7 @@ class SwipeFragment(
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
+        swipePagingAdapter.setupPager(viewLifecycleOwner, viewModel.getSwipePager())
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
@@ -96,33 +97,32 @@ class SwipeFragment(
 
     @ExperimentalPagingApi
     private fun observeSwipePagingDataLiveData() {
-        viewModel.initSwipePagingData().observe(viewLifecycleOwner, { pagingData ->
-            swipePagingRefreshAdapter.reset()
-            lifecycleScope.launch {
-                swipePagingDataAdapter.submitData(pagingData)
-            }
-        })
+//        viewModel.initSwipePagingData().observe(viewLifecycleOwner, { pagingData ->
+//            swipePagingRefreshAdapter.reset()
+//            lifecycleScope.launch {
+//                swipePagingDataAdapter.submitData(pagingData)
+//            }
+//        })
     }
 
 
-
     private fun setupSwipePagingInitialPageAdapter() {
-        binding.btnSwipeRetry.setOnClickListener {
-            swipePagingDataAdapter.retry()
-        }
-        swipePagingInitialPageAdapter = PagingInitialPageAdapter(
-            swipePagingDataAdapter,
-            binding.llSwipeInitialLoadingPage,
-            binding.llSwipeInitialErrorPage,
-            binding.llSwipeInitialEmptyPage,
-            binding.tvSwipeErrorMessage,
-            requireContext()
-        )
-        lifecycleScope.launch {
-            swipePagingDataAdapter.loadStateFlow.collect { loadState ->
-                swipePagingInitialPageAdapter.updateUI(loadState)
-            }
-        }
+//        binding.btnSwipeRetry.setOnClickListener {
+//            swipePagingDataAdapter.retry()
+//        }
+//        swipePagingInitialPageAdapter = PagingInitialPageAdapter(
+//            swipePagingDataAdapter,
+//            binding.llSwipeInitialLoadingPage,
+//            binding.llSwipeInitialErrorPage,
+//            binding.llSwipeInitialEmptyPage,
+//            binding.tvSwipeErrorMessage,
+//            requireContext()
+//        )
+//        lifecycleScope.launch {
+//            swipePagingDataAdapter.loadStateFlow.collect { loadState ->
+//                swipePagingInitialPageAdapter.updateUI(loadState)
+//            }
+//        }
     }
 
     override fun onFragmentSelected() {
@@ -134,7 +134,14 @@ class SwipeFragment(
 //        }
     }
 
-    override fun onSelectSwipe(position: Int) {
+    companion object {
+        const val LOAD_STATE_SPAN_COUNT = 2
+        const val SWIPE_HEADER_SPAN_COUNT = 2
+        const val SWIPE_ITEM_SPAN_COUNT = 1
+        const val SWIPE_PAGE_SPAN_COUNT = 2
+    }
+
+    override fun onClickSwipeViewHolder(position: Int) {
         swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
 //            swipePagingDataAdapter.refresh()
 //            swipePagingDataAdapter.refresh()
@@ -146,13 +153,15 @@ class SwipeFragment(
         }
     }
 
-    companion object {
-        const val LOAD_STATE_SPAN_COUNT = 2
-        const val SWIPE_HEADER_SPAN_COUNT = 2
-        const val SWIPE_ITEM_SPAN_COUNT = 1
-        const val SWIPE_PAGE_SPAN_COUNT = 2
+    override fun onPageEmpty() {
+        TODO("Not yet implemented")
     }
 
-    override fun onClickSwipeViewHolder(position: Int) {
+    override fun onPageLoaded() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPageLoadError(throwable: Throwable?) {
+        TODO("Not yet implemented")
     }
 }

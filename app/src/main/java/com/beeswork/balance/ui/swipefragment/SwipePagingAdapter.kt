@@ -12,13 +12,15 @@ import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.ui.common.paging.PagingAdapter
+import com.beeswork.balance.ui.common.paging.PagingAdapterListener
 import com.bumptech.glide.Glide
 import java.util.*
 import kotlin.random.Random
 
 class SwipePagingAdapter(
-    private val swipeViewHolderListener: SwipeViewHolderListener
-) : PagingAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(diffCallback) {
+    private val swipeViewHolderListener: SwipeViewHolderListener,
+    private val pagingAdapterListener: PagingAdapterListener
+) : PagingAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(diffCallback, pagingAdapterListener) {
 
     init {
         // todo: remove me
@@ -45,24 +47,18 @@ class SwipePagingAdapter(
         when (holderItem) {
             is HeaderViewHolder -> holderItem.bind()
             is ItemViewHolder -> holderItem.bind(items[position])
-            else -> {
-            }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position].type) {
             SwipeItemUIState.Type.HEADER -> R.layout.item_swipe_header
-            else -> R.layout.item_swipe
+            SwipeItemUIState.Type.ITEM -> R.layout.item_swipe
         }
     }
 
     override fun getItemCount(): Int {
         return items.size
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
     }
 
     companion object {
