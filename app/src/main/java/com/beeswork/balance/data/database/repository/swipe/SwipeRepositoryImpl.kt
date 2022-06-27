@@ -3,7 +3,6 @@ package com.beeswork.balance.data.database.repository.swipe
 import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.dao.SwipeDAO
-import com.beeswork.balance.data.database.dao.MatchDAO
 import com.beeswork.balance.data.database.entity.swipe.Swipe
 import com.beeswork.balance.data.database.repository.tabcount.TabCountRepository
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
@@ -11,9 +10,9 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.data.network.service.stomp.StompClient
-import com.beeswork.balance.internal.constant.TabPosition
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
+import com.beeswork.balance.ui.common.paging.LoadType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
 import java.util.*
 import java.util.concurrent.Callable
-import kotlin.random.Random.Default.nextLong
 
 @ExperimentalCoroutinesApi
 class SwipeRepositoryImpl(
@@ -48,6 +46,10 @@ class SwipeRepositoryImpl(
             }
         }
         awaitClose { }
+    }
+
+    override suspend fun loadSwipes(key: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>> {
+        TODO("Not yet implemented")
     }
 
     private var refreshedPagesSyncedAt = OffsetDateTime.MIN

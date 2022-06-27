@@ -3,6 +3,7 @@ package com.beeswork.balance.domain.uistate.swipe
 import java.util.*
 
 data class SwipeItemUIState(
+    val id: Long,
     val swiperId: UUID,
     val clicked: Boolean,
     val swiperProfilePhotoUrl: String?,
@@ -16,7 +17,7 @@ data class SwipeItemUIState(
 
     companion object {
         fun asHeader(): SwipeItemUIState {
-            return SwipeItemUIState(UUID.randomUUID(), false, null, Type.HEADER)
+            return SwipeItemUIState(0, UUID.randomUUID(), false, null, Type.HEADER)
         }
     }
 }

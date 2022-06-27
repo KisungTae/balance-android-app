@@ -20,14 +20,17 @@ import kotlin.random.Random
 class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
     private val pagingAdapterListener: PagingAdapterListener
-) : PagingAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(diffCallback, pagingAdapterListener) {
+) : PagingAdapter<SwipeItemUIState, Long, RecyclerView.ViewHolder>(diffCallback, pagingAdapterListener) {
 
     init {
+        val items = mutableListOf<SwipeItemUIState>()
         // todo: remove me
         items.add(SwipeItemUIState.asHeader())
         for (i in 0..30) {
-            items.add(SwipeItemUIState(UUID.randomUUID(), false, null))
+            items.add(SwipeItemUIState(i.toLong(), UUID.randomUUID(), false, null))
         }
+        submitList(items)
+        currentList
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -46,19 +49,19 @@ class SwipePagingAdapter(
     override fun onBindViewHolder(holderItem: RecyclerView.ViewHolder, position: Int) {
         when (holderItem) {
             is HeaderViewHolder -> holderItem.bind()
-            is ItemViewHolder -> holderItem.bind(items[position])
+            is ItemViewHolder -> holderItem.bind(currentList[position])
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (items[position].type) {
+        return when (currentList[position].type) {
             SwipeItemUIState.Type.HEADER -> R.layout.item_swipe_header
             SwipeItemUIState.Type.ITEM -> R.layout.item_swipe
         }
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return currentList.size
     }
 
     companion object {

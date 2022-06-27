@@ -49,7 +49,7 @@ class SwipeViewModel(
 //    }
 
     fun getSwipePager(): SwipePager {
-        return SwipePager(SWIPE_PAGE_SIZE, viewModelScope)
+        return SwipePager(swipeRepository, SWIPE_PAGE_SIZE, 2, viewModelScope)
     }
 
 

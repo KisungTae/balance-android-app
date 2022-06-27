@@ -21,6 +21,7 @@ class SwipeMapperImpl : SwipeMapper {
 
     override fun toSwipeItemUIState(swipe: Swipe, photoDomain: String?): SwipeItemUIState {
         return SwipeItemUIState(
+            swipe.id,
             swipe.swiperId,
             swipe.clicked,
             EndPoint.ofPhoto(photoDomain, swipe.swiperId, swipe.swiperProfilePhotoKey)
