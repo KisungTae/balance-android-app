@@ -376,14 +376,11 @@ class BalanceApplication : Application(), KodeinAware {
                 instance(),
                 instance(),
                 instance(),
-                instance(),
                 Dispatchers.Default
             )
         }
         bind() from provider {
             CardViewModelFactory(
-                instance(),
-                instance(),
                 instance(),
                 instance(),
                 instance(),

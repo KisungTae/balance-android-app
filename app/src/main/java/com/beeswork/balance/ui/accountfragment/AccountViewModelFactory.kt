@@ -10,7 +10,6 @@ import com.beeswork.balance.domain.usecase.account.FetchProfileUseCase
 import com.beeswork.balance.domain.usecase.account.GetProfilePhotoFlowUseCase
 import com.beeswork.balance.domain.usecase.login.GetEmailUseCase
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 
 class AccountViewModelFactory(
     private val fetchProfileUseCase: FetchProfileUseCase,

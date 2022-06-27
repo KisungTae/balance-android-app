@@ -8,7 +8,6 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.internal.constant.ExceptionCode
 import com.beeswork.balance.internal.exception.*
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.google.gson.Gson
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory

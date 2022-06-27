@@ -12,7 +12,6 @@ import com.beeswork.balance.internal.constant.ChatMessageStatus
 import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filter
@@ -33,7 +32,6 @@ class ChatViewModel(
     private val unmatchUseCase: UnmatchUseCase,
     private val chatRepository: ChatRepository,
     private val matchRepository: MatchRepository,
-    private val preferenceProvider: PreferenceProvider,
     private val chatMessageMapper: ChatMessageMapper,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher

@@ -9,7 +9,6 @@ import com.beeswork.balance.domain.usecase.photo.*
 import com.beeswork.balance.internal.constant.PhotoConstant
 import com.beeswork.balance.internal.constant.PhotoStatus
 import com.beeswork.balance.internal.mapper.photo.PhotoMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

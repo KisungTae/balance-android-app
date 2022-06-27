@@ -9,7 +9,6 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.photo.PhotoDTO
 import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.util.*

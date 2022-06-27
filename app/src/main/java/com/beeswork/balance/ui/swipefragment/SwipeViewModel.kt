@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import com.beeswork.balance.ui.common.paging.Pager

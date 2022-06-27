@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentAccountBinding
 import com.beeswork.balance.domain.uistate.profile.ProfileUIState
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseFragment

@@ -5,7 +5,6 @@ import androidx.paging.*
 import com.beeswork.balance.data.database.repository.match.MatchRepository
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.mapper.match.MatchMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -13,7 +12,6 @@ import kotlinx.coroutines.flow.*
 
 class MatchViewModel(
     private val matchRepository: MatchRepository,
-    private val preferenceProvider: PreferenceProvider,
     private val matchMapper: MatchMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {

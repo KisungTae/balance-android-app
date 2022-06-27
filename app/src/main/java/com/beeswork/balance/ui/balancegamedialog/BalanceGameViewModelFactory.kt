@@ -10,7 +10,6 @@ import com.beeswork.balance.domain.usecase.card.LikeUseCase
 import com.beeswork.balance.domain.usecase.photo.GetProfilePhotoUseCase
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.profile.QuestionMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 
 class BalanceGameViewModelFactory(
     private val fetchQuestionsUseCase: FetchQuestionsUseCase,

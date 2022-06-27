@@ -7,7 +7,6 @@ import com.beeswork.balance.data.network.request.setting.SavePushSettingsBody
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import org.threeten.bp.OffsetDateTime
 
 class SettingRDSImpl(

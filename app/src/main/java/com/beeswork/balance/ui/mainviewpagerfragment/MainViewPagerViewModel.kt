@@ -8,7 +8,6 @@ import com.beeswork.balance.domain.uistate.tabcount.TabCountUIState
 import com.beeswork.balance.domain.usecase.tabcount.GetTabCountFlowUseCase
 import com.beeswork.balance.internal.mapper.match.MatchMapper
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
@@ -19,7 +18,6 @@ class MainViewPagerViewModel(
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper,
     private val matchMapper: MatchMapper,
-    private val preferenceProvider: PreferenceProvider,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 

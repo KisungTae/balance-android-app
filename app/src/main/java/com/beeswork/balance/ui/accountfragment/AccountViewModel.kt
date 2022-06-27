@@ -7,7 +7,6 @@ import com.beeswork.balance.domain.usecase.account.GetProfilePhotoFlowUseCase
 import com.beeswork.balance.domain.usecase.login.GetEmailUseCase
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.mapper.profile.ProfileMapper
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
 import kotlinx.coroutines.flow.map

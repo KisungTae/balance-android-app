@@ -11,7 +11,6 @@ import com.beeswork.balance.data.network.response.common.EmptyResponse
 import com.beeswork.balance.data.network.response.login.LoginDTO
 import com.beeswork.balance.data.network.response.login.RefreshAccessTokenDTO
 import com.beeswork.balance.internal.constant.LoginType
-import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 
 class LoginRDSImpl(
     private val balanceAPI: BalanceAPI
