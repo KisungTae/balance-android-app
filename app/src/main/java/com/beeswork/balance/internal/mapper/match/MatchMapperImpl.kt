@@ -3,15 +3,9 @@ package com.beeswork.balance.internal.mapper.match
 import com.beeswork.balance.data.database.entity.match.Match
 import com.beeswork.balance.data.network.response.match.MatchDTO
 import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
-import com.beeswork.balance.internal.constant.DateTimePattern
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.util.toLocalDateTimeAtSystemDefaultZone
 import com.beeswork.balance.ui.matchfragment.MatchItemUIState
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.temporal.ChronoUnit
 
 class MatchMapperImpl : MatchMapper {
 
@@ -35,7 +29,7 @@ class MatchMapperImpl : MatchMapper {
         )
     }
 
-    override fun toItemUIState(match: Match, photoDomain: String?): MatchItemUIState {
+    override fun toItemUIState(match: Match): MatchItemUIState {
         return MatchItemUIState(
             match.chatId,
             match.swipedId,
@@ -45,14 +39,14 @@ class MatchMapperImpl : MatchMapper {
             match.lastChatMessageBody,
             match.lastChatMessageCreatedAt?.toLocalDateTimeAtSystemDefaultZone(),
             match.swipedName,
-            EndPoint.ofPhoto(photoDomain, match.swipedId, match.swipedProfilePhotoKey)
+            EndPoint.ofPhoto(match.swipedId, match.swipedProfilePhotoKey)
         )
     }
 
-    override fun toMatchNotificationUIState(match: Match, photoDomain: String?): MatchNotificationUIState {
+    override fun toMatchNotificationUIState(match: Match): MatchNotificationUIState {
         return MatchNotificationUIState(
-            EndPoint.ofPhoto(photoDomain, match.swiperId, match.swiperProfilePhotoKey),
-            EndPoint.ofPhoto(photoDomain, match.swipedId, match.swipedProfilePhotoKey),
+            EndPoint.ofPhoto(match.swiperId, match.swiperProfilePhotoKey),
+            EndPoint.ofPhoto(match.swipedId, match.swipedProfilePhotoKey),
             match.swipedName
         )
     }

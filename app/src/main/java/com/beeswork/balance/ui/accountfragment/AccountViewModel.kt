@@ -1,10 +1,6 @@
 package com.beeswork.balance.ui.accountfragment
 
 import androidx.lifecycle.*
-import com.beeswork.balance.data.database.repository.login.LoginRepository
-import com.beeswork.balance.data.database.repository.photo.PhotoRepository
-import com.beeswork.balance.data.database.repository.profile.ProfileRepository
-import com.beeswork.balance.data.database.repository.setting.SettingRepository
 import com.beeswork.balance.domain.uistate.profile.ProfileUIState
 import com.beeswork.balance.domain.usecase.account.FetchProfileUseCase
 import com.beeswork.balance.domain.usecase.account.GetProfilePhotoFlowUseCase
@@ -21,8 +17,7 @@ class AccountViewModel(
     private val fetchProfileUseCase: FetchProfileUseCase,
     private val getEmailUseCase: GetEmailUseCase,
     private val getProfilePhotoFlowUseCase: GetProfilePhotoFlowUseCase,
-    private val profileMapper: ProfileMapper,
-    private val preferenceProvider: PreferenceProvider
+    private val profileMapper: ProfileMapper
 ) : BaseViewModel() {
 
     private val _profileUIStateLiveData = MutableLiveData<ProfileUIState>()
@@ -33,7 +28,7 @@ class AccountViewModel(
 
     val profilePhotoURLLiveData by lazyDeferred {
         getProfilePhotoFlowUseCase.invoke().map { profilePhoto ->
-            EndPoint.ofPhoto(preferenceProvider.getPhotoDomain(), profilePhoto?.accountId, profilePhoto?.key)
+            EndPoint.ofPhoto(profilePhoto?.accountId, profilePhoto?.key)
         }.asLiveData()
     }
 

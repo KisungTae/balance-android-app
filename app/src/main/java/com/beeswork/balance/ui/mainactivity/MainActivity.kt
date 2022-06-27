@@ -6,12 +6,14 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.common.BaseLocationActivity
+import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 
 
 class MainActivity : BaseLocationActivity(true) {
@@ -30,6 +32,7 @@ class MainActivity : BaseLocationActivity(true) {
 
     private fun bindUI() = lifecycleScope.launch {
         observeWebSocketEventUIStateLiveData()
+        supportFragmentManager.beginTransaction().add(R.id.fcvMain, MainViewPagerFragment()).commit()
     }
 
     private suspend fun observeWebSocketEventUIStateLiveData() {

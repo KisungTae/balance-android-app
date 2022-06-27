@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 
 class MainViewPagerViewModel(
-    private val tabCountFlowUseCase: GetTabCountFlowUseCase,
+    private val getTabCountFlowUseCase: GetTabCountFlowUseCase,
     private val matchRepository: MatchRepository,
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper,
@@ -24,7 +24,7 @@ class MainViewPagerViewModel(
 ) : BaseViewModel() {
 
     val tabCountUIStatesLiveData by viewModelLazyDeferred {
-        tabCountFlowUseCase.invoke().map { tabCounts ->
+        getTabCountFlowUseCase.invoke().map { tabCounts ->
             tabCounts.map { tabCount ->
                 TabCountUIState(tabCount.tabPosition, tabCount.count)
             }
@@ -33,13 +33,13 @@ class MainViewPagerViewModel(
 
     val newSwipeNotificationUIStateLiveData by viewModelLazyDeferred {
         swipeRepository.newSwipeFlow.map { swipe ->
-            swipeMapper.toSwipeNotificationUIState(swipe, preferenceProvider.getPhotoDomain())
+            swipeMapper.toSwipeNotificationUIState(swipe)
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 
     val newMatchNotificationUIStateLiveData by viewModelLazyDeferred {
         matchRepository.newMatchFlow.map { match ->
-            matchMapper.toMatchNotificationUIState(match, preferenceProvider.getPhotoDomain())
+            matchMapper.toMatchNotificationUIState(match)
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }
 

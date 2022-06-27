@@ -32,7 +32,7 @@ class MatchViewModel(
         }.flow.cachedIn(viewModelScope)
             .map { pagingData ->
                 pagingData.map { match ->
-                    matchMapper.toItemUIState(match, preferenceProvider.getPhotoDomain())
+                    matchMapper.toItemUIState(match)
                 }
             }
             .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)

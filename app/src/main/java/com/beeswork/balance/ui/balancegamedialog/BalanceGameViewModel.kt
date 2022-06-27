@@ -30,7 +30,6 @@ class BalanceGameViewModel(
     private val getProfilePhotoUseCase: GetProfilePhotoUseCase,
     private val likeUseCase: LikeUseCase,
     private val clickUseCase: ClickUseCase,
-    private val preferenceProvider: PreferenceProvider,
     private val matchMapper: MatchMapper,
     private val questionMapper: QuestionMapper
 ) : BaseViewModel() {
@@ -54,11 +53,7 @@ class BalanceGameViewModel(
     fun fetchProfilePhotoUrl() {
         viewModelScope.launch {
             val profilePhoto = getProfilePhotoUseCase.invoke()
-            val profilePhotoUrl = EndPoint.ofPhoto(
-                preferenceProvider.getPhotoDomain(),
-                profilePhoto?.accountId,
-                profilePhoto?.key
-            )
+            val profilePhotoUrl = EndPoint.ofPhoto(profilePhoto?.accountId, profilePhoto?.key)
             _profilePhotoUrlLiveData.postValue(profilePhotoUrl)
         }
     }
@@ -78,7 +73,7 @@ class BalanceGameViewModel(
 
             val clickUIState = if (response.isSuccess() && response.data != null) {
                 val matchNotificationUIState = response.data.match?.let { match ->
-                    matchMapper.toMatchNotificationUIState(match, preferenceProvider.getPhotoDomain())
+                    matchMapper.toMatchNotificationUIState(match)
                 }
                 ClickUIState.ofSuccess(response.data.clickOutcome, response.data.point, matchNotificationUIState)
             } else {

@@ -16,6 +16,7 @@ import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewSwipeBinding
 import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
 import com.beeswork.balance.domain.uistate.swipe.SwipeNotificationUIState
+import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.TabPosition
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
@@ -139,7 +140,10 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
         snackBar.view.setOnClickListener {
             binding.tlMain.getTabAt(TabPosition.SWIPE.ordinal)?.select()
         }
-        setupProfilePhoto(swipeNotificationUIState.swiperProfilePhotoUrl, snackBarNewSwipeBinding.ivNewSwipeSnackBarProfilePhoto)
+        setupProfilePhoto(
+            swipeNotificationUIState.swiperProfilePhotoURL,
+            snackBarNewSwipeBinding.ivNewSwipeSnackBarProfilePhoto
+        )
 
         if (swipeNotificationUIState.clicked) {
             snackBarNewSwipeBinding.tvNewSwipeSnackBarTitle.text = getString(R.string.title_new_swipe_clicked)
@@ -189,7 +193,6 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
         const val TAG = "mainViewPagerFragment"
         const val BADGE_MAX_CHAR_COUNT = 3
     }
-
 
 
 }

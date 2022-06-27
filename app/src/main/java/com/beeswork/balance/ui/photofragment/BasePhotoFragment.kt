@@ -142,7 +142,7 @@ open class BasePhotoFragment : BaseFragment(),
     }
 
     private fun setupPhotoPickerRecyclerView(photoPickerRecyclerView: RecyclerView) {
-        photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(this)
+        photoPickerRecyclerViewAdapter = PhotoPickerRecyclerViewAdapter(this@BasePhotoFragment)
         photoPickerRecyclerView.adapter = photoPickerRecyclerViewAdapter
         photoPickerRecyclerView.layoutManager = object : GridLayoutManager(
             requireContext(),

@@ -53,7 +53,7 @@ class CardViewModel(
             val fetchCardsUIState = if (response.isSuccess() && response.data != null) {
                 withContext(defaultDispatcher) {
                     val cardItemUIStates = response.data.map { card ->
-                        cardMapper.toCardItemUIState(card, preferenceProvider.getPhotoDomain())
+                        cardMapper.toCardItemUIState(card)
                     }
                     FetchCardsUIState.ofSuccess(cardItemUIStates)
                 }

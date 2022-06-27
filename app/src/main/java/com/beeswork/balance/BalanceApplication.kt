@@ -392,7 +392,7 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.Default
             )
         }
-        bind() from provider { SwipeViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { SwipeViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {
             MainViewPagerViewModelFactory(
@@ -405,11 +405,10 @@ class BalanceApplication : Application(), KodeinAware {
                 Dispatchers.Default
             )
         }
-        bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance(), instance()) }
+        bind() from provider { AccountViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { ProfileViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {
             BalanceGameViewModelFactory(
-                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -445,7 +444,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { NameStepViewModelFactory(instance(), instance()) }
         bind() from provider {
             PhotoViewModelFactory(
-                instance(),
                 instance(),
                 instance(),
                 instance(),

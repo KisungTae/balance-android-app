@@ -13,22 +13,22 @@ class PreferenceProviderImpl(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val editor = preferences.edit()
 
-    override fun putLoginInfo(accountId: UUID, accessToken: String, refreshToken: String?, photoDomain: String) {
+    override fun putLoginInfo(accountId: UUID, accessToken: String, refreshToken: String?, photoURLDomain: String) {
         editor.putString(ACCOUNT_ID, accountId.toString())
         editor.putString(ACCESS_TOKEN, accessToken)
         if (refreshToken != null) {
             editor.putString(REFRESH_TOKEN, refreshToken)
         }
-        editor.putString(PHOTO_DOMAIN, photoDomain)
+        editor.putString(PHOTO_URL_DOMAIN, photoURLDomain)
         editor.apply()
     }
 
-    override fun putAccessInfo(accessToken: String, refreshToken: String?, photoDomain: String) {
+    override fun putAccessInfo(accessToken: String, refreshToken: String?, photoURLDomain: String) {
         editor.putString(ACCESS_TOKEN, accessToken)
         if (refreshToken != null) {
             editor.putString(REFRESH_TOKEN, refreshToken)
         }
-        editor.putString(PHOTO_DOMAIN, photoDomain)
+        editor.putString(PHOTO_URL_DOMAIN, photoURLDomain)
         editor.apply()
     }
 
@@ -63,8 +63,8 @@ class PreferenceProviderImpl(
         return appToken
     }
 
-    override fun getPhotoDomain(): String? {
-        return preferences.getString(PHOTO_DOMAIN, null)
+    override fun getPhotoURLDomain(): String? {
+        return preferences.getString(PHOTO_URL_DOMAIN, null)
     }
 
     override fun delete() {
@@ -76,6 +76,6 @@ class PreferenceProviderImpl(
         const val REFRESH_TOKEN = "refreshToken"
         const val ACCOUNT_ID = "accountId"
         const val APP_TOKEN = "appToken"
-        const val PHOTO_DOMAIN = "photoDomain"
+        const val PHOTO_URL_DOMAIN = "photoURLDomain"
     }
 }

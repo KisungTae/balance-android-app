@@ -8,9 +8,9 @@ import java.util.*
 
 class CardMapperImpl : CardMapper {
 
-    override fun toCardItemUIState(card: Card, photoDomain: String?): CardItemUIState {
+    override fun toCardItemUIState(card: Card): CardItemUIState {
         val photoURLs = card.photoKeys.map { photoKey ->
-            EndPoint.ofPhoto(photoDomain, card.accountId, photoKey)
+            EndPoint.ofPhoto(card.accountId, photoKey)
         }
         return CardItemUIState(
             card.accountId,

@@ -19,7 +19,6 @@ class BalanceGameViewModelFactory(
     private val getProfilePhotoUseCase: GetProfilePhotoUseCase,
     private val likeUseCase: LikeUseCase,
     private val clickUseCase: ClickUseCase,
-    private val preferenceProvider: PreferenceProvider,
     private val matchMapper: MatchMapper,
     private val questionMapper: QuestionMapper
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -33,7 +32,6 @@ class BalanceGameViewModelFactory(
             getProfilePhotoUseCase,
             likeUseCase,
             clickUseCase,
-            preferenceProvider,
             matchMapper,
             questionMapper
         ) as T

@@ -4,13 +4,11 @@ import androidx.lifecycle.*
 import androidx.paging.*
 import com.beeswork.balance.data.database.repository.chat.ChatRepository
 import com.beeswork.balance.data.database.repository.match.MatchRepository
-import com.beeswork.balance.data.network.service.stomp.WebSocketStatus
 import com.beeswork.balance.domain.uistate.chat.*
 import com.beeswork.balance.domain.uistate.main.WebSocketEventUIState
 import com.beeswork.balance.domain.usecase.chat.*
 import com.beeswork.balance.domain.usecase.main.ConnectToStompUseCase
 import com.beeswork.balance.internal.constant.ChatMessageStatus
-import com.beeswork.balance.internal.constant.ReportReason
 import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.mapper.chat.ChatMessageMapper
 import com.beeswork.balance.internal.mapper.match.MatchMapper
@@ -46,7 +44,7 @@ class ChatViewModel(
             if (match == null) {
                 null
             } else {
-                matchMapper.toItemUIState(match, preferenceProvider.getPhotoDomain())
+                matchMapper.toItemUIState(match)
             }
         }.asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
     }

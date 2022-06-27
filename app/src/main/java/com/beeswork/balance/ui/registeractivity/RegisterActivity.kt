@@ -42,7 +42,7 @@ class RegisterActivity : BaseLocationActivity(false), RegisterStepListener {
     }
 
     private fun setupRegisterViewPager() {
-        registerViewPagerAdapter = RegisterViewPagerAdapter(supportFragmentManager, lifecycle, this@RegisterActivity)
+        registerViewPagerAdapter = RegisterViewPagerAdapter(supportFragmentManager, lifecycle, this@RegisterActivity, )
         binding.vpRegister.adapter = registerViewPagerAdapter
         binding.vpRegister.offscreenPageLimit = RegisterViewPagerTabPosition.values().size
         binding.vpRegister.isUserInputEnabled = false

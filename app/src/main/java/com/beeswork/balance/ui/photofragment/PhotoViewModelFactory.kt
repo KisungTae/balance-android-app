@@ -15,7 +15,6 @@ class PhotoViewModelFactory(
     private val orderPhotosUseCase: OrderPhotosUseCase,
     private val syncPhotosUseCase: SyncPhotosUseCase,
     private val updatePhotoStatusUseCase: UpdatePhotoStatusUseCase,
-    private val preferenceProvider: PreferenceProvider,
     private val photoRepository: PhotoRepository,
     private val photoMapper: PhotoMapper,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -30,7 +29,6 @@ class PhotoViewModelFactory(
             syncPhotosUseCase,
             updatePhotoStatusUseCase,
             photoRepository,
-            preferenceProvider,
             photoMapper,
             defaultDispatcher
         ) as T

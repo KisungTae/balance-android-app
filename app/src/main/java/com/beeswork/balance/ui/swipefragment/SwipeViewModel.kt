@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 class SwipeViewModel(
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper,
-    private val preferenceProvider: PreferenceProvider,
     private val defaultDispatcher: CoroutineDispatcher
 ) : BaseViewModel() {
 
@@ -49,7 +48,7 @@ class SwipeViewModel(
 //    }
 
     fun getSwipePager(): SwipePager {
-        return SwipePager(swipeRepository, SWIPE_PAGE_SIZE, 2, viewModelScope)
+        return SwipePager(swipeRepository, swipeMapper, SWIPE_PAGE_SIZE, 2, viewModelScope)
     }
 
 

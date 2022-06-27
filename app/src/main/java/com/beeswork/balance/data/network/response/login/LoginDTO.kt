@@ -9,6 +9,6 @@ data class LoginDTO(
     val accessToken: String,
     val refreshToken: String?,
     val email: String?,
-    val photoDomain: String,
+    val photoURLDomain: String,
     val profilePhotoDTO: PhotoDTO?
 )

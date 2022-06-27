@@ -6,7 +6,7 @@ data class SwipeItemUIState(
     val id: Long,
     val swiperId: UUID,
     val clicked: Boolean,
-    val swiperProfilePhotoUrl: String?,
+    val swiperProfilePhotoURL: String?,
     val type: Type = Type.ITEM
 ) {
 

@@ -17,11 +17,10 @@ class AccountViewModelFactory(
     private val getEmailUseCase: GetEmailUseCase,
     private val getProfilePhotoFlowUseCase: GetProfilePhotoFlowUseCase,
     private val profileMapper: ProfileMapper,
-    private val preferenceProvider: PreferenceProvider
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return AccountViewModel(fetchProfileUseCase, getEmailUseCase, getProfilePhotoFlowUseCase, profileMapper, preferenceProvider) as T
+        return AccountViewModel(fetchProfileUseCase, getEmailUseCase, getProfilePhotoFlowUseCase, profileMapper) as T
     }
 }

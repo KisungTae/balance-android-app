@@ -5,6 +5,6 @@ import com.beeswork.balance.data.network.response.card.CardDTO
 import com.beeswork.balance.domain.uistate.card.CardItemUIState
 
 interface CardMapper {
-    fun toCardItemUIState(card: Card, photoDomain: String?): CardItemUIState
+    fun toCardItemUIState(card: Card): CardItemUIState
     fun toCard(cardDTO: CardDTO): Card
 }

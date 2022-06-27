@@ -19,7 +19,7 @@ import kotlin.random.Random
 
 class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
-    private val pagingAdapterListener: PagingAdapterListener
+    pagingAdapterListener: PagingAdapterListener
 ) : PagingAdapter<SwipeItemUIState, Long, RecyclerView.ViewHolder>(diffCallback, pagingAdapterListener) {
 
     init {
