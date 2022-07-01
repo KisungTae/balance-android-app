@@ -62,6 +62,7 @@ class SwipeFragment(
     @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
         setupSwipeRecyclerView()
+
 //        setupSwipeRecyclerView()
 //        setupSwipePagingInitialPageAdapter()
 //        observeSwipePagingDataLiveData()
@@ -69,11 +70,14 @@ class SwipeFragment(
     }
 
     private fun setupSwipeRecyclerView() {
-        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment, this@SwipeFragment)
-        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
+        swipePagingAdapter = SwipePagingAdapter(
+            this@SwipeFragment,
+            this@SwipeFragment,
+            viewLifecycleOwner,
             LoadStateAdapter(swipePagingAdapter::retry),
             LoadStateAdapter(swipePagingAdapter::retry)
         )
+        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters()
         val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -86,7 +90,7 @@ class SwipeFragment(
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
-        swipePagingAdapter.setupPager(viewLifecycleOwner, viewModel.getSwipePager())
+        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator())
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {

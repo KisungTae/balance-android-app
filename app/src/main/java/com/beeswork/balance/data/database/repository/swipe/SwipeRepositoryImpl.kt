@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.Callable
 
@@ -49,7 +50,7 @@ class SwipeRepositoryImpl(
     }
 
     override suspend fun loadSwipes(key: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>> {
-        TODO("Not yet implemented")
+        throw IOException()
     }
 
     private var refreshedPagesSyncedAt = OffsetDateTime.MIN

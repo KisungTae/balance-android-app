@@ -11,7 +11,7 @@ class LoadStateAdapter(
     private val retry: () -> Unit
 ) : RecyclerView.Adapter<LoadStateAdapter.ViewHolder>() {
 
-    var loadState: LoadState = LoadState.Loaded(LoadType.REFRESH)
+    var loadState: LoadState = LoadState.Loaded()
         set(loadState) {
             if (field != loadState) {
                 val displayOldLoadState = displayLoadState(field)

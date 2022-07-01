@@ -11,7 +11,8 @@ class EndPoint {
         const val WEB_SERVICE_ENDPOINT = "http://$WEB_SERVICE_URL/"
         const val WEB_SOCKET_ENDPOINT = "ws://$WEB_SERVICE_URL/web-socket"
         const val STOMP_SEND_ENDPOINT = "/app/chat/send"
-        var PHOTO_URL_DOMAIN: String? = null
+        lateinit var PHOTO_URL_DOMAIN: String
+//        lateinit var PHOTO_URL_DOMAIN: String? = null
 
         fun ofPhoto(accountId: UUID?, photoKey: String?): String {
             return "$PHOTO_URL_DOMAIN${Delimiter.FORWARD_SLASH}$accountId${Delimiter.FORWARD_SLASH}$photoKey"

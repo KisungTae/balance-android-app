@@ -1,16 +1,22 @@
 package com.beeswork.balance.ui.common.paging
 
+import android.renderscript.Sampler
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.ui.swipefragment.SwipePagingAdapter
+import kotlinx.coroutines.launch
 import java.util.*
 
-abstract class PagingAdapter<T : Any, I : Any, VH : RecyclerView.ViewHolder>(
-    private val diffCallback: DiffUtil.ItemCallback<T>,
-    private val pagingAdapterListener: PagingAdapterListener?
+abstract class PagingAdapter<T : Any, VH : RecyclerView.ViewHolder>(
+    diffCallback: DiffUtil.ItemCallback<T>,
+    private val pagingAdapterListener: PagingAdapterListener?,
+    private val lifecycleOwner: LifecycleOwner,
+    private val headerLoadStateAdapter: LoadStateAdapter,
+    private val footerLoadStateAdapter: LoadStateAdapter
 ) : ListAdapter<T, VH>(AsyncDifferConfig.Builder<T>(diffCallback).build()) {
 
 
@@ -20,18 +26,12 @@ abstract class PagingAdapter<T : Any, I : Any, VH : RecyclerView.ViewHolder>(
 //    protected val items = mutableListOf<T>()
 //    protected val items = mutableListOf<SwipeItemUIState>()
 
-    private var headerLoadStateAdapter: LoadStateAdapter? = null
-    private var footerLoadStateAdapter: LoadStateAdapter? = null
-    private var headerAdapter: RecyclerView.Adapter<VH>? = null
-    private lateinit var pager: Pager<T, I>
+    private lateinit var pagingMediator: Pager.PagingMediator<T>
 
+    private var reachedTop = true
+    private var reachedBottom = true
 
-    fun withLoadStateAdapters(
-        headerLoadStateAdapter: LoadStateAdapter,
-        footerLoadStateAdapter: LoadStateAdapter
-    ): ConcatAdapter {
-        this.headerLoadStateAdapter = headerLoadStateAdapter
-        this.footerLoadStateAdapter = footerLoadStateAdapter
+    fun withLoadStateAdapters(): ConcatAdapter {
         return ConcatAdapter(
             ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
             headerLoadStateAdapter,
@@ -40,10 +40,32 @@ abstract class PagingAdapter<T : Any, I : Any, VH : RecyclerView.ViewHolder>(
         )
     }
 
-    fun setupPager(lifecycleOwner: LifecycleOwner, pager: Pager<T, I>) {
-        this.pager = pager
-        this.pager.pageLiveData.observe(lifecycleOwner) { page ->
+    fun setupPagingMediator(pagingMediator: Pager.PagingMediator<T>) {
+        this.pagingMediator = pagingMediator
+        this.pagingMediator.pageSnapshotLiveData.observe(lifecycleOwner) { pageSnapshot ->
 
+        }
+        triggerPageLoad(LoadType.INITIAL_LOAD)
+    }
+
+    private fun triggerPageLoad(loadType: LoadType) {
+        when (loadType) {
+            LoadType.PREPEND -> {
+                if (headerLoadStateAdapter.itemCount > 0) {
+                    return
+                }
+                headerLoadStateAdapter.loadState = LoadState.Loading()
+            }
+            LoadType.APPEND -> {
+                if (footerLoadStateAdapter.itemCount > 0) {
+                    return
+                }
+                footerLoadStateAdapter.loadState = LoadState.Loading()
+            }
+        }
+
+        lifecycleOwner.lifecycleScope.launch {
+            pagingMediator.pageLoadEventChannel.send(loadType)
         }
     }
 
@@ -55,54 +77,13 @@ abstract class PagingAdapter<T : Any, I : Any, VH : RecyclerView.ViewHolder>(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-
                 super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(-1) && dy < 0) {
-                    // reached the top
-
-                    println("!recyclerView.canScrollVertically(-1) && dy < 0")
-                } else if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                    // reached the bottom
-
-//                    footerLoadStateAdapter?.loadState = LoadState.Loading(LoadType.APPEND)
-
-//                    println(items.subList(10, 30))
-
-                    val newList = mutableListOf<SwipeItemUIState>()
-
-//                    val list = items.subList(20, items.lastIndex)
-                    for (i in 0..40) {
-//                        list.add(SwipeItemUIState(UUID.randomUUID(), false, null))
-                    }
-
-
+                if (!recyclerView.canScrollVertically(-1) && dy < 0 && !reachedTop) {
+                    triggerPageLoad(LoadType.PREPEND)
+                } else if (!recyclerView.canScrollVertically(1) && dy > 0 && !reachedBottom) {
+                    triggerPageLoad(LoadType.APPEND)
                 }
-
-//                if (dy > 0) {
-//                    println("scroll up!!!!!!")
-//                } else {
-//                    println("scroll down!!!!!!")
-//                }
-
-                //                val layoutManager = recyclerView.layoutManager!!
-//                val totalCount = layoutManager.itemCount
-//                val lastVisibleItemPosition = if (layoutManager is LinearLayoutManager) {
-//                    layoutManager.findLastVisibleItemPosition()
-//                } else if (layoutManager is GridLayoutManager) {
-//                    layoutManager.findLastVisibleItemPosition()
-//                } else {
-//                    0
-//                }
-//
-//                val firstVisibleItemPosition = if (layoutManager is LinearLayoutManager) {
-//                    layoutManager.findFirstVisibleItemPosition()
-//                } else if (layoutManager is GridLayoutManager) {
-//                    layoutManager.findFirstVisibleItemPosition()
-//                } else {
-//                    0
-//                }
             }
         })
     }

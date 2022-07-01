@@ -361,7 +361,7 @@ class BalanceApplication : Application(), KodeinAware {
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
 
         // Factory
-        bind() from provider { MatchViewModelFactory(instance(), instance(), instance(), Dispatchers.Default) }
+        bind() from provider { MatchViewModelFactory(instance(), instance(), Dispatchers.Default) }
         bind() from factory { chatViewModelParameter: ChatViewModelParameter ->
             ChatViewModelFactory(
                 chatViewModelParameter,
@@ -393,7 +393,6 @@ class BalanceApplication : Application(), KodeinAware {
         bind() from provider { CardFilterDialogViewModelFactory(instance(), instance(), instance()) }
         bind() from provider {
             MainViewPagerViewModelFactory(
-                instance(),
                 instance(),
                 instance(),
                 instance(),

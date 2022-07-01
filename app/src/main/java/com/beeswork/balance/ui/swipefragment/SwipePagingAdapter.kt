@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -11,6 +12,7 @@ import com.beeswork.balance.databinding.ItemSwipeBinding
 import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.util.GlideHelper
+import com.beeswork.balance.ui.common.paging.LoadStateAdapter
 import com.beeswork.balance.ui.common.paging.PagingAdapter
 import com.beeswork.balance.ui.common.paging.PagingAdapterListener
 import com.bumptech.glide.Glide
@@ -19,8 +21,17 @@ import kotlin.random.Random
 
 class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
-    pagingAdapterListener: PagingAdapterListener
-) : PagingAdapter<SwipeItemUIState, Long, RecyclerView.ViewHolder>(diffCallback, pagingAdapterListener) {
+    pagingAdapterListener: PagingAdapterListener,
+    lifecycleOwner: LifecycleOwner,
+    headerLoadStateAdapter: LoadStateAdapter,
+    footerLoadStateAdapter: LoadStateAdapter
+) : PagingAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(
+    diffCallback,
+    pagingAdapterListener,
+    lifecycleOwner,
+    headerLoadStateAdapter,
+    footerLoadStateAdapter
+) {
 
     init {
         val items = mutableListOf<SwipeItemUIState>()
