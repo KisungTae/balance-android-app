@@ -23,14 +23,10 @@ class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
     pagingAdapterListener: PagingAdapterListener,
     lifecycleOwner: LifecycleOwner,
-    headerLoadStateAdapter: LoadStateAdapter,
-    footerLoadStateAdapter: LoadStateAdapter
 ) : PagingAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(
     diffCallback,
     pagingAdapterListener,
-    lifecycleOwner,
-    headerLoadStateAdapter,
-    footerLoadStateAdapter
+    lifecycleOwner
 ) {
 
     init {

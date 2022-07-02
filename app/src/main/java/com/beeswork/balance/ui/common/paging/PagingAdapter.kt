@@ -14,29 +14,29 @@ import java.util.*
 abstract class PagingAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     diffCallback: DiffUtil.ItemCallback<T>,
     private val pagingAdapterListener: PagingAdapterListener?,
-    private val lifecycleOwner: LifecycleOwner,
-    private val headerLoadStateAdapter: LoadStateAdapter,
-    private val footerLoadStateAdapter: LoadStateAdapter
+    private val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<T, VH>(AsyncDifferConfig.Builder<T>(diffCallback).build()) {
 
 
     // refreshed then set reachedEnd = false
     // when fetched pages with refresh, check if scroll position is at end, then trigger prepend or append
 
-//    protected val items = mutableListOf<T>()
-//    protected val items = mutableListOf<SwipeItemUIState>()
-
     private lateinit var pagingMediator: Pager.PagingMediator<T>
+    private lateinit var headerLoadStateAdapter: LoadStateAdapter
+    private lateinit var footerLoadStateAdapter: LoadStateAdapter
+
 
     private var reachedTop = true
     private var reachedBottom = true
 
-    fun withLoadStateAdapters(): ConcatAdapter {
+    fun withLoadStateAdapters(headerLoadStateAdapter: LoadStateAdapter, footerLoadStateAdapter: LoadStateAdapter): ConcatAdapter {
+        this.headerLoadStateAdapter = headerLoadStateAdapter
+        this.footerLoadStateAdapter = footerLoadStateAdapter
         return ConcatAdapter(
             ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
-            headerLoadStateAdapter,
+            this.headerLoadStateAdapter,
             this,
-            footerLoadStateAdapter
+            this.footerLoadStateAdapter
         )
     }
 
@@ -48,30 +48,23 @@ abstract class PagingAdapter<T : Any, VH : RecyclerView.ViewHolder>(
         triggerPageLoad(LoadType.INITIAL_LOAD)
     }
 
-    private fun triggerPageLoad(loadType: LoadType) {
+    fun triggerPageLoad(loadType: LoadType) {
         when (loadType) {
             LoadType.PREPEND -> {
-                if (headerLoadStateAdapter.itemCount > 0) {
-                    return
-                }
                 headerLoadStateAdapter.loadState = LoadState.Loading()
             }
             LoadType.APPEND -> {
-                if (footerLoadStateAdapter.itemCount > 0) {
-                    return
-                }
                 footerLoadStateAdapter.loadState = LoadState.Loading()
             }
+            LoadType.REFRESH_PAGE -> {
+            }
+            else -> {
+                pagingAdapterListener?.onPageLoading()
+            }
         }
-
         lifecycleOwner.lifecycleScope.launch {
             pagingMediator.pageLoadEventChannel.send(loadType)
         }
-    }
-
-    fun retry() {
-
-        // todo: implement this
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -79,9 +72,9 @@ abstract class PagingAdapter<T : Any, VH : RecyclerView.ViewHolder>(
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(-1) && dy < 0 && !reachedTop) {
+                if (!recyclerView.canScrollVertically(-1) && dy < 0 && !reachedTop && headerLoadStateAdapter.itemCount <= 0) {
                     triggerPageLoad(LoadType.PREPEND)
-                } else if (!recyclerView.canScrollVertically(1) && dy > 0 && !reachedBottom) {
+                } else if (!recyclerView.canScrollVertically(1) && dy > 0 && !reachedBottom && footerLoadStateAdapter.itemCount <= 0) {
                     triggerPageLoad(LoadType.APPEND)
                 }
             }

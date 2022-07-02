@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.threeten.bp.OffsetDateTime
-import java.io.IOException
 import java.util.*
 import java.util.concurrent.Callable
 
@@ -49,8 +48,15 @@ class SwipeRepositoryImpl(
         awaitClose { }
     }
 
-    override suspend fun loadSwipes(key: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>> {
-        throw IOException()
+    override suspend fun loadSwipes(loadKey: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>> {
+        return withContext(ioDispatcher) {
+            // delete swipes if initial load
+
+            val response = swipeRDS.fetchSwipes(loadKey, loadSize, loadType.isAppend())
+
+
+            return@withContext Resource.success(null)
+        }
     }
 
     private var refreshedPagesSyncedAt = OffsetDateTime.MIN
@@ -61,9 +67,9 @@ class SwipeRepositoryImpl(
         }.launchIn(applicationScope)
     }
 
-    override suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO> {
-        return withContext(ioDispatcher) {
-            val response = swipeRDS.fetchSwipes(loadSize, lastSwipeId)
+//    override suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO> {
+//        return withContext(ioDispatcher) {
+//            val response = swipeRDS.fetchSwipes(lastSwipeId, loadSize,)
 //            if (response.isError()) {
 //                return@withContext Resource.error(response.exception)
 //            }
@@ -72,9 +78,9 @@ class SwipeRepositoryImpl(
 //                    saveSwipes(listSwipesDTO)
 //                }
 //            }
-            return@withContext response
-        }
-    }
+//            return@withContext response
+//        }
+//    }
 
     private fun listSwipes(loadSize: Int, startPosition: Int) {
 //        applicationScope.launch(CoroutineExceptionHandler { _, _ -> }) {
@@ -126,19 +132,19 @@ class SwipeRepositoryImpl(
 //        }
     }
 
-    override suspend fun loadSwipes(loadSize: Int, startPosition: Int, sync: Boolean): List<Swipe> {
-        return withContext(ioDispatcher) {
+//    override suspend fun loadSwipes(loadSize: Int, startPosition: Int, sync: Boolean): List<Swipe> {
+//        return withContext(ioDispatcher) {
 //            if (sync) {
 //                listSwipes(loadSize, startPosition)
 //            }
-            return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)
-        }
-    }
+//            return@withContext swipeDAO.getAllPagedBy(preferenceProvider.getAccountId(), loadSize, startPosition)
+//        }
+//    }
 
     override suspend fun saveSwipe(swipeDTO: SwipeDTO) {
         withContext(Dispatchers.IO) {
             val newSwipe = balanceDatabase.runInTransaction(Callable {
-                val exists = swipeDAO.existsBy(swipeDTO.swiperId, swipeDTO.swipedId)
+                val exists = swipeDAO.exists(swipeDTO.swiperId, swipeDTO.swipedId)
                 val swipe = swipeMapper.toSwipe(swipeDTO)
                 if (swipe != null) {
                     swipeDAO.insert(swipe)
@@ -159,7 +165,7 @@ class SwipeRepositoryImpl(
 
     override suspend fun deleteSwipes() {
         withContext(ioDispatcher) {
-            swipeDAO.deleteAllBy(preferenceProvider.getAccountId())
+            swipeDAO.deleteAll(preferenceProvider.getAccountId())
         }
     }
 

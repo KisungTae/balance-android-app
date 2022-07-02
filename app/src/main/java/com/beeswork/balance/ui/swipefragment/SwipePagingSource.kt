@@ -1,10 +1,8 @@
 package com.beeswork.balance.ui.swipefragment
 
-import com.beeswork.balance.data.database.entity.swipe.Swipe
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
-import com.beeswork.balance.ui.common.PagingKeyTracker
 import com.beeswork.balance.ui.common.paging.LoadResult
 import com.beeswork.balance.ui.common.paging.LoadType
 import com.beeswork.balance.ui.common.paging.PagingSource
@@ -13,10 +11,18 @@ import java.io.IOException
 class SwipePagingSource(
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper
-) : PagingSource<Int, SwipeItemUIState>() {
+) : PagingSource<Long, SwipeItemUIState>() {
 
-    override suspend fun load(key: Int?, loadType: LoadType, loadSize: Int): LoadResult<Int, SwipeItemUIState> {
-        TODO("Not yet implemented")
+    override suspend fun load(loadKey: Long?, loadType: LoadType, loadSize: Int): LoadResult<Long, SwipeItemUIState> {
+        return try {
+            val response = swipeRepository.loadSwipes(loadKey, loadType, loadSize)
+
+
+
+            LoadResult.Error(loadType, null)
+        } catch (e: IOException) {
+            LoadResult.Error(loadType, e)
+        }
     }
 
 //    private val pagingKeyTracker = PagingKeyTracker<Swipe>()

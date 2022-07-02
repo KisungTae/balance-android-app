@@ -2,15 +2,12 @@ package com.beeswork.balance.ui.common.paging
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.launch
 
-class Pager<Key: Any, Value: Any>(
+class Pager<Key : Any, Value : Any>(
     private val pageSize: Int,
     private val numOfPagesToKeep: Int,
     private val pagingSource: PagingSource<Key, Value>,
@@ -31,14 +28,25 @@ class Pager<Key: Any, Value: Any>(
     init {
         viewModelScope.launch(defaultDispatcher) {
             pageLoadEventChannel.consumeAsFlow().collect { loadType ->
+                val loadKey = when (loadType) {
+                    LoadType.PREPEND, LoadType.REFRESH_PAGE, LoadType.REFRESH_DATA -> page?.firstKey
+                    LoadType.APPEND -> page?.lastKey
+                    LoadType.INITIAL_LOAD -> null
+                }
 
+                val loadSize = when (loadType) {
+                    LoadType.PREPEND, LoadType.APPEND, LoadType.INITIAL_LOAD -> pageSize
+                    LoadType.REFRESH_DATA, LoadType.REFRESH_PAGE -> page?.items?.size ?: pageSize
+                }
 
+                if (loadType == LoadType.INITIAL_LOAD) {
+                    // delete swipes
+                }
 
-
+                val loadResult = pagingSource.load(loadKey, loadType, loadSize)
             }
         }
     }
-
 
 
     companion object {
@@ -46,7 +54,7 @@ class Pager<Key: Any, Value: Any>(
     }
 
 
-    class PagingMediator<Value: Any>(
+    class PagingMediator<Value : Any>(
         val pageLoadEventChannel: Channel<LoadType>,
         val pageSnapshotLiveData: LiveData<PageSnapshot<Value>>
     )

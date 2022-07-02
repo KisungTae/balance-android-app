@@ -29,12 +29,13 @@ class SwipeRemoteMediator(
             }
 
             val pageSize = state.config.pageSize
-            val response = swipeRepository.fetchSwipes(pageSize, loadKey)
-            if (response.isError()) {
-                val exception = response.exception ?: IOException()
-                return MediatorResult.Error(exception)
-            }
-            return MediatorResult.Success((response.data?.swipeDTOs?.size ?: 0) < pageSize)
+//            val response = swipeRepository.fetchSwipes(pageSize, loadKey)
+//            if (response.isError()) {
+//                val exception = response.exception ?: IOException()
+//                return MediatorResult.Error(exception)
+//            }
+//            return MediatorResult.Success((response.data?.swipeDTOs?.size ?: 0) < pageSize)
+            return MediatorResult.Success(false)
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

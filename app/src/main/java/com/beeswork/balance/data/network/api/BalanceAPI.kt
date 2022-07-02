@@ -32,6 +32,7 @@ import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.provider.gson.GsonProvider
+import com.beeswork.balance.ui.common.paging.LoadType
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -72,9 +73,14 @@ interface BalanceAPI {
 
     @GET("swipe/fetch")
     suspend fun fetchSwipes(
+        @Query(value = "key") key: Long?,
         @Query(value = "loadSize") loadSize: Int,
-        @Query(value = "lastSwipeId") lastSwiperId: Long?
+        @Query(value = "append") append: Boolean
     ): Response<ListSwipesDTO>
+
+
+
+
 
     @GET("swipe/list")
     suspend fun listSwipes(

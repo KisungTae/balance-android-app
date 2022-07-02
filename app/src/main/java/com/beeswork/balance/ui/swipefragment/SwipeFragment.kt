@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
@@ -16,6 +15,7 @@ import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.common.paging.LoadStateAdapter
+import com.beeswork.balance.ui.common.paging.LoadType
 import com.beeswork.balance.ui.common.paging.PagingAdapterListener
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -52,14 +52,12 @@ class SwipeFragment(
         return binding.root
     }
 
-    @ExperimentalPagingApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(SwipeViewModel::class.java)
         bindUI()
     }
 
-    @ExperimentalPagingApi
     private fun bindUI() = lifecycleScope.launch {
         setupSwipeRecyclerView()
 
@@ -70,14 +68,11 @@ class SwipeFragment(
     }
 
     private fun setupSwipeRecyclerView() {
-        swipePagingAdapter = SwipePagingAdapter(
-            this@SwipeFragment,
-            this@SwipeFragment,
-            viewLifecycleOwner,
-            LoadStateAdapter(swipePagingAdapter::retry),
-            LoadStateAdapter(swipePagingAdapter::retry)
+        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment, this@SwipeFragment, viewLifecycleOwner)
+        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
+            headerLoadStateAdapter = LoadStateAdapter { swipePagingAdapter.triggerPageLoad(LoadType.PREPEND) },
+            footerLoadStateAdapter = LoadStateAdapter { swipePagingAdapter.triggerPageLoad(LoadType.APPEND) }
         )
-        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters()
         val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -99,7 +94,6 @@ class SwipeFragment(
         }
     }
 
-    @ExperimentalPagingApi
     private fun observeSwipePagingDataLiveData() {
 //        viewModel.initSwipePagingData().observe(viewLifecycleOwner, { pagingData ->
 //            swipePagingRefreshAdapter.reset()
@@ -146,7 +140,7 @@ class SwipeFragment(
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
-        swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
+//        swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
 //            swipePagingDataAdapter.refresh()
 //            swipePagingDataAdapter.refresh()
 //            viewModel.test()
@@ -154,18 +148,22 @@ class SwipeFragment(
 //                childFragmentManager,
 //                SwipeBalanceGameDialog.TAG
 //            )
-        }
+//        }
+    }
+
+    override fun onPageLoading() {
+
     }
 
     override fun onPageEmpty() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPageLoaded() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPageLoadError(throwable: Throwable?) {
-        TODO("Not yet implemented")
+
     }
 }

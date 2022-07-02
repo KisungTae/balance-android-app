@@ -19,21 +19,43 @@ interface SwipeDAO {
     fun insert(swipes: List<Swipe>)
 
     @Query("delete from swipe where swiperId = :swiperId and swipedId = :swipedId")
-    fun deleteBy(swiperId: UUID, swipedId: UUID?): Int
+    fun delete(swiperId: UUID, swipedId: UUID?): Int
 
-    @Query("select * from swipe where swipedId = :swiperId order by id desc limit :loadSize offset :startPosition ")
-    fun getAllPagedBy(swiperId: UUID?, loadSize: Int, startPosition: Int): List<Swipe>
-
-    @Query("delete from swipe where swipedId = :swiperId")
-    fun deleteAllBy(swiperId: UUID?)
+    @Query("delete from swipe where swipedId = :swipedId")
+    fun deleteAll(swipedId: UUID?)
 
     @Query("select * from swipe where swiperId = :swiperId and swipedId = :swipedId")
-    fun getBy(swiperId: UUID?, swipedId: UUID?): Swipe?
+    fun get(swiperId: UUID?, swipedId: UUID?): Swipe?
 
     @Query("select 1 from swipe")
     fun getPageInvalidationFlow(): Flow<Boolean>
 
     @Query("select count(*) > 0 from swipe where swiperId = :swiperId and swipedId = :swipedId")
-    fun existsBy(swiperId: UUID?, swipedId: UUID?): Boolean
+    fun exists(swiperId: UUID?, swipedId: UUID?): Boolean
+
+    @Query("select * from swipe where swipedId = :swipedId and id > :loadKey order by id limit :loadSize")
+    fun getPrependPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
+
+    @Query("select * from swipe where swipedId = :swipedId and id < :loadKey order by id desc limit :loadSize")
+    fun getAppendPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
