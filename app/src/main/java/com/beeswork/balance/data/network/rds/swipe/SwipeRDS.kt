@@ -6,5 +6,5 @@ import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 
 interface SwipeRDS {
     suspend fun listSwipes(loadSize: Int, startPosition: Int): Resource<ListSwipesDTO>
-    suspend fun fetchSwipes(loadKey: Long?, loadSize: Int, append: Boolean, includeLoadKey: Boolean): Resource<List<SwipeDTO>>
+    suspend fun fetchSwipes(loadKey: Long?, loadSize: Int, isAppend: Boolean, isIncludeLoadKey: Boolean): Resource<List<SwipeDTO>>
 }

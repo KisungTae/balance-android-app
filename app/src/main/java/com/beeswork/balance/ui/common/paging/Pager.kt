@@ -21,29 +21,16 @@ class Pager<Key : Any, Value : Any>(
     // channel
     private val pageLoadEventChannel = Channel<LoadType>(LOAD_PAGE_CHANNEL_BUFFER)
 
-    private var page: Page<Key, Value>? = null
+    private var page: Page<Key, Value> = Page(pageSize, numOfPagesToKeep)
 
     val pagingMediator = PagingMediator(pageLoadEventChannel, pageSnapshotLiveData)
 
     init {
         viewModelScope.launch(defaultDispatcher) {
             pageLoadEventChannel.consumeAsFlow().collect { loadType ->
-                val loadKey = when (loadType) {
-                    LoadType.PREPEND, LoadType.REFRESH_PAGE, LoadType.REFRESH_DATA -> page?.firstKey
-                    LoadType.APPEND -> page?.lastKey
-                    LoadType.INITIAL_LOAD -> null
-                }
-
-                val loadSize = when (loadType) {
-                    LoadType.PREPEND, LoadType.APPEND, LoadType.INITIAL_LOAD -> pageSize
-                    LoadType.REFRESH_DATA, LoadType.REFRESH_PAGE -> page?.items?.size ?: pageSize
-                }
-
-                if (loadType == LoadType.INITIAL_LOAD) {
-                    // delete swipes
-                }
-
-                val loadResult = pagingSource.load(loadKey, loadType, loadSize)
+                val loadResult = pagingSource.load(page.getLoadKey(loadType), loadType, page.getLoadSize(loadType))
+                val pageSnapshot = page.insertAndGeneratePageSnapshot(loadResult)
+                _pageSnapshotLiveData.postValue(pageSnapshot)
             }
         }
     }

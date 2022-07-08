@@ -5,7 +5,6 @@ import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.dao.SwipeDAO
 import com.beeswork.balance.data.database.entity.swipe.Swipe
 import com.beeswork.balance.data.database.repository.BaseRepository
-import com.beeswork.balance.data.database.repository.tabcount.TabCountRepository
 import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.response.Resource
@@ -14,7 +13,6 @@ import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
-import com.beeswork.balance.ui.common.paging.LoadType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -56,10 +54,10 @@ class SwipeRepositoryImpl(
         }.launchIn(applicationScope)
     }
 
-    override suspend fun loadSwipes(loadKey: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>> {
+    override suspend fun loadSwipes(loadKey: Long?, loadSize: Int, isAppend: Boolean, isIncludeLoadKey: Boolean): Resource<List<Swipe>> {
         return withContext(ioDispatcher) {
             val response = getResponse {
-                swipeRDS.fetchSwipes(loadKey, loadSize, loadType.isAppend(), loadType.isIncludeLoadKey())
+                swipeRDS.fetchSwipes(loadKey, loadSize, isAppend, isIncludeLoadKey)
             }.map { swipeDTOs ->
                 swipeDTOs?.map { swipeDTO ->
                     swipeMapper.toSwipe(swipeDTO)

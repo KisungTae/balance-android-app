@@ -14,7 +14,7 @@ class SwipeRDSImpl(
         return getResult { balanceAPI.listSwipes(loadSize, startPosition) }
     }
 
-    override suspend fun fetchSwipes(loadKey: Long?, loadSize: Int, append: Boolean, includeLoadKey: Boolean): Resource<List<SwipeDTO>> {
-        return getResult { balanceAPI.fetchSwipes(loadKey, loadSize, append, includeLoadKey) }
+    override suspend fun fetchSwipes(loadKey: Long?, loadSize: Int, isAppend: Boolean, isIncludeLoadKey: Boolean): Resource<List<SwipeDTO>> {
+        return getResult { balanceAPI.fetchSwipes(loadKey, loadSize, isAppend, isIncludeLoadKey) }
     }
 }
