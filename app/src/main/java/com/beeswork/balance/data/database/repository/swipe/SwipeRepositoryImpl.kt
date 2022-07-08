@@ -4,7 +4,9 @@ import com.beeswork.balance.data.database.BalanceDatabase
 import com.beeswork.balance.data.database.common.CallBackFlowListener
 import com.beeswork.balance.data.database.dao.SwipeDAO
 import com.beeswork.balance.data.database.entity.swipe.Swipe
+import com.beeswork.balance.data.database.repository.BaseRepository
 import com.beeswork.balance.data.database.repository.tabcount.TabCountRepository
+import com.beeswork.balance.data.network.rds.login.LoginRDS
 import com.beeswork.balance.data.network.rds.swipe.SwipeRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
@@ -25,16 +27,16 @@ import java.util.concurrent.Callable
 
 @ExperimentalCoroutinesApi
 class SwipeRepositoryImpl(
+    loginRDS: LoginRDS,
+    preferenceProvider: PreferenceProvider,
     private val swipeRDS: SwipeRDS,
     private val swipeDAO: SwipeDAO,
-    private val tabCountRepository: TabCountRepository,
-    private val preferenceProvider: PreferenceProvider,
     private val swipeMapper: SwipeMapper,
     private val stompClient: StompClient,
     private val applicationScope: CoroutineScope,
     private val balanceDatabase: BalanceDatabase,
     private val ioDispatcher: CoroutineDispatcher
-) : SwipeRepository {
+) : BaseRepository(loginRDS, preferenceProvider), SwipeRepository {
 
     private var newSwipeCallBackFlowListener: CallBackFlowListener<Swipe>? = null
 
@@ -48,24 +50,33 @@ class SwipeRepositoryImpl(
         awaitClose { }
     }
 
-    override suspend fun loadSwipes(loadKey: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>> {
-        return withContext(ioDispatcher) {
-            // delete swipes if initial load
-
-            val response = swipeRDS.fetchSwipes(loadKey, loadSize, loadType.isAppend())
-
-
-            return@withContext Resource.success(null)
-        }
-    }
-
-    private var refreshedPagesSyncedAt = OffsetDateTime.MIN
-
     init {
         stompClient.swipeFlow.onEach { swipeDTO ->
             saveSwipe(swipeDTO)
         }.launchIn(applicationScope)
     }
+
+    override suspend fun loadSwipes(loadKey: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>> {
+        return withContext(ioDispatcher) {
+            val response = getResponse {
+                swipeRDS.fetchSwipes(loadKey, loadSize, loadType.isAppend(), loadType.isIncludeLoadKey())
+            }.map { swipeDTOs ->
+                swipeDTOs?.map { swipeDTO ->
+                    swipeMapper.toSwipe(swipeDTO)
+                }?.sortedByDescending { swipe ->
+                    swipe.id
+                }
+            }
+
+            if (response.data?.isNotEmpty() == true) {
+                swipeDAO.deleteBetween(preferenceProvider.getAccountId(), response.data.first().id, response.data.last().id)
+                swipeDAO.insert(response.data)
+            }
+            return@withContext response
+        }
+    }
+
+
 
 //    override suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO> {
 //        return withContext(ioDispatcher) {
@@ -178,12 +189,12 @@ class SwipeRepositoryImpl(
             return
         }
 
-        stompClient.getStompReconnectedAt()?.let { stompReconnectedAt ->
-            if (stompReconnectedAt.isAfter(refreshedPagesSyncedAt)) {
-                listSwipes(loadSize, startPosition)
-                refreshedPagesSyncedAt = stompReconnectedAt
-            }
-        }
+//        stompClient.getStompReconnectedAt()?.let { stompReconnectedAt ->
+//            if (stompReconnectedAt.isAfter(refreshedPagesSyncedAt)) {
+//                listSwipes(loadSize, startPosition)
+//                refreshedPagesSyncedAt = stompReconnectedAt
+//            }
+//        }
     }
 
     override suspend fun test() {

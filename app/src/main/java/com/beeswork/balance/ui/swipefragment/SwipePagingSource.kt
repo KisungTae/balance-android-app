@@ -15,9 +15,10 @@ class SwipePagingSource(
 
     override suspend fun load(loadKey: Long?, loadType: LoadType, loadSize: Int): LoadResult<Long, SwipeItemUIState> {
         return try {
+            if (loadType == LoadType.INITIAL_LOAD) {
+                swipeRepository.deleteSwipes()
+            }
             val response = swipeRepository.loadSwipes(loadKey, loadType, loadSize)
-
-
 
             LoadResult.Error(loadType, null)
         } catch (e: IOException) {

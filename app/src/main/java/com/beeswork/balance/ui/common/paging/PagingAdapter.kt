@@ -20,6 +20,7 @@ abstract class PagingAdapter<T : Any, VH : RecyclerView.ViewHolder>(
 
     // refreshed then set reachedEnd = false
     // when fetched pages with refresh, check if scroll position is at end, then trigger prepend or append
+    // refresh the middle pages and nothing returned from, then it is empty page, then trigger prepend because refresh already append
 
     private lateinit var pagingMediator: Pager.PagingMediator<T>
     private lateinit var headerLoadStateAdapter: LoadStateAdapter

@@ -4,6 +4,7 @@ import com.beeswork.balance.data.network.api.BalanceAPI
 import com.beeswork.balance.data.network.rds.BaseRDS
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
+import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 
 class SwipeRDSImpl(
     private val balanceAPI: BalanceAPI
@@ -13,7 +14,7 @@ class SwipeRDSImpl(
         return getResult { balanceAPI.listSwipes(loadSize, startPosition) }
     }
 
-    override suspend fun fetchSwipes(loadKey: Long?, loadSize: Int, append: Boolean): Resource<ListSwipesDTO> {
-        return getResult { balanceAPI.fetchSwipes(loadKey, loadSize, append) }
+    override suspend fun fetchSwipes(loadKey: Long?, loadSize: Int, append: Boolean, includeLoadKey: Boolean): Resource<List<SwipeDTO>> {
+        return getResult { balanceAPI.fetchSwipes(loadKey, loadSize, append, includeLoadKey) }
     }
 }

@@ -12,8 +12,6 @@ interface SwipeRepository {
 
     suspend fun loadSwipes(loadKey: Long?, loadType: LoadType, loadSize: Int): Resource<List<Swipe>>
 
-//    suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO>
-//    suspend fun loadSwipes(loadSize: Int, startPosition: Int, sync: Boolean): List<Swipe>
     suspend fun saveSwipe(swipeDTO: SwipeDTO)
     suspend fun deleteSwipes()
     fun getSwipePageInvalidationFlow(): Flow<Boolean>

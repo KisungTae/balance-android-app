@@ -29,6 +29,7 @@ import com.beeswork.balance.data.network.response.match.ClickResponse
 import com.beeswork.balance.data.network.response.match.UnmatchDTO
 import com.beeswork.balance.data.network.response.profile.FetchQuestionsDTO
 import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
+import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.provider.gson.GsonProvider
@@ -75,8 +76,9 @@ interface BalanceAPI {
     suspend fun fetchSwipes(
         @Query(value = "key") key: Long?,
         @Query(value = "loadSize") loadSize: Int,
-        @Query(value = "append") append: Boolean
-    ): Response<ListSwipesDTO>
+        @Query(value = "append") append: Boolean,
+        @Query(value = "includeLoadKey") includeLoadKey: Boolean
+    ): Response<List<SwipeDTO>>
 
 
 

@@ -24,6 +24,9 @@ interface SwipeDAO {
     @Query("delete from swipe where swipedId = :swipedId")
     fun deleteAll(swipedId: UUID?)
 
+    @Query("delete from swipe where swiperId = :swiperId and id >= :fromSwipeId and id <= :toSwipeId")
+    fun deleteBetween(swiperId: UUID?, fromSwipeId: Long, toSwipeId: Long)
+
     @Query("select * from swipe where swiperId = :swiperId and swipedId = :swipedId")
     fun get(swiperId: UUID?, swipedId: UUID?): Swipe?
 
@@ -34,28 +37,13 @@ interface SwipeDAO {
     fun exists(swiperId: UUID?, swipedId: UUID?): Boolean
 
     @Query("select * from swipe where swipedId = :swipedId and id > :loadKey order by id limit :loadSize")
-    fun getPrependPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
+    fun getPrependedPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
 
     @Query("select * from swipe where swipedId = :swipedId and id < :loadKey order by id desc limit :loadSize")
-    fun getAppendPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
+    fun getAppendedPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @Query("select * from swipe where swipedId = :swipedId and id <= :loadKey order by id desc limit :loadSize")
+    fun getAppendedPageInclusive(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
 
 
 }

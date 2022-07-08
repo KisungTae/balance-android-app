@@ -9,14 +9,8 @@ import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 import java.util.*
 
 class SwipeMapperImpl : SwipeMapper {
-    override fun toSwipe(swipeDTO: SwipeDTO): Swipe? {
-        return safeLet(
-            swipeDTO.id,
-            swipeDTO.swipedId,
-            swipeDTO.clicked
-        ) { id, swipedId, clicked ->
-            return@safeLet Swipe(id, swipeDTO.swiperId, swipedId, clicked, swipeDTO.swiperProfilePhotoKey)
-        }
+    override fun toSwipe(swipeDTO: SwipeDTO): Swipe {
+        return Swipe(swipeDTO.id, swipeDTO.swiperId, swipeDTO.swipedId, swipeDTO.clicked, swipeDTO.swiperProfilePhotoKey)
     }
 
     override fun toSwipeItemUIState(swipe: Swipe): SwipeItemUIState {

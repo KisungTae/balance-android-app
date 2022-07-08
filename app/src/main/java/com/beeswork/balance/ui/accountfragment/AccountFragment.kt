@@ -49,7 +49,7 @@ class AccountFragment : BaseFragment(), KodeinAware, ViewPagerChildFragment {
         observeProfileUIStateLiveData()
         viewModel.fetchProfile()
         observeEmailLiveData()
-        viewModel.fetchEmail()
+//        viewModel.fetchEmail()
         observeProfilePhotoLiveData()
     }
 

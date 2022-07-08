@@ -6,7 +6,7 @@ import com.beeswork.balance.domain.uistate.swipe.SwipeNotificationUIState
 import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
 
 interface SwipeMapper {
-    fun toSwipe(swipeDTO: SwipeDTO): Swipe?
+    fun toSwipe(swipeDTO: SwipeDTO): Swipe
     fun toSwipeItemUIState(swipe: Swipe): SwipeItemUIState
     fun toSwipeNotificationUIState(swipe: Swipe): SwipeNotificationUIState
 }

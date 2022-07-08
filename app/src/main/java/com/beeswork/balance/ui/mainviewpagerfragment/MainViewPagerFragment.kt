@@ -16,7 +16,6 @@ import com.beeswork.balance.databinding.SnackBarNewMatchBinding
 import com.beeswork.balance.databinding.SnackBarNewSwipeBinding
 import com.beeswork.balance.domain.uistate.match.MatchNotificationUIState
 import com.beeswork.balance.domain.uistate.swipe.SwipeNotificationUIState
-import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.TabPosition
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.internal.util.SnackBarHelper
@@ -124,8 +123,8 @@ class MainViewPagerFragment : BaseFragment(), KodeinAware, CardBalanceGameListen
         ) { tab, position ->
             when (position) {
                 TabPosition.CARD.ordinal -> tab.setIcon(R.drawable.ic_card_stack_new_new)
-                TabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_heart_with_arrow_down)
-                TabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_couple)
+                TabPosition.SWIPE.ordinal -> tab.setIcon(R.drawable.ic_heart_with_arrow_final)
+                TabPosition.MATCH.ordinal -> tab.setIcon(R.drawable.ic_match_with_arrwo)
                 TabPosition.CHAT.ordinal -> tab.setIcon(R.drawable.ic_match_message_full)
                 TabPosition.ACCOUNT.ordinal -> tab.setIcon(R.drawable.ic_account_new)
             }

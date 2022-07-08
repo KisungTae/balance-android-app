@@ -290,7 +290,7 @@
                 android:layout_height="100dp"
                 android:layout_marginBottom="20dp"
                 android:contentDescription="@string/broken_heart_icon_description"
-                android:src="@drawable/ic_broken_heart" />
+                android:src="@drawable/broken_heart_new" />
 
             <LinearLayout
                 android:layout_width="match_parent"
