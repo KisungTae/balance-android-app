@@ -11,7 +11,7 @@ class SwipeMapperImpl : SwipeMapper {
         return Swipe(swipeDTO.id, swipeDTO.swiperId, swipeDTO.swipedId, swipeDTO.clicked, swipeDTO.swiperProfilePhotoKey)
     }
 
-    override fun toSwipeItemUIState(swipe: Swipe): SwipeUIState {
+    override fun toSwipeUIStateItem(swipe: Swipe): SwipeUIState {
         return SwipeUIState.Item(
             swipe.id,
             swipe.swiperId,
