@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 
-class Pager<Key : Any, Value : Any>(
+class Pager<Key : Any, Value : Pageable>(
     private val pageSize: Int,
     private val numOfPagesToKeep: Int,
     private val pagingSource: PagingSource<Key, Value>,
@@ -28,9 +28,18 @@ class Pager<Key : Any, Value : Any>(
     init {
         viewModelScope.launch(defaultDispatcher) {
             pageLoadEventChannel.consumeAsFlow().collect { loadType ->
-                val loadResult = pagingSource.load(page.getLoadKey(loadType), loadType, page.getLoadSize(loadType))
-                val pageSnapshot = page.insertAndGeneratePageSnapshot(loadResult)
-                _pageSnapshotLiveData.postValue(pageSnapshot)
+                // loadType == REFRESH_PAGE but items.size == 0 then no need to refresh
+
+
+//                when (val loadResult = pagingSource.load(page.getLoadKey(loadType), loadType, page.getLoadSize(loadType))) {
+//                    is LoadResult.Success -> {
+//                        val pageSnapshot = page.insertAndGeneratePageSnapshot(loadResult)
+//                        _pageSnapshotLiveData.postValue(pageSnapshot)
+//                    }
+//                    is LoadResult.Error -> {
+//                        _pageSnapshotLiveData.postValue(PageSnapshot.Error(loadResult.loadType, loadResult.throwable))
+//                    }
+//                }
             }
         }
     }
@@ -41,7 +50,7 @@ class Pager<Key : Any, Value : Any>(
     }
 
 
-    class PagingMediator<Value : Any>(
+    class PagingMediator<Value : Pageable>(
         val pageLoadEventChannel: Channel<LoadType>,
         val pageSnapshotLiveData: LiveData<PageSnapshot<Value>>
     )

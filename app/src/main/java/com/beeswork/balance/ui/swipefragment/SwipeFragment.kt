@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
-import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
@@ -35,10 +35,10 @@ class SwipeFragment(
     private val viewModelFactory: SwipeViewModelFactory by instance()
     private lateinit var viewModel: SwipeViewModel
     private lateinit var binding: FragmentSwipeBinding
-    private lateinit var swipePagingRefreshAdapter: PagingRefreshAdapter<SwipeItemUIState, RecyclerView.ViewHolder>
+    private lateinit var swipePagingRefreshAdapter: PagingRefreshAdapter<SwipeUIState, RecyclerView.ViewHolder>
     private lateinit var swipePagingDataAdapter: SwipePagingDataAdapter
     private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
-    private lateinit var swipePagingInitialPageAdapter: PagingInitialPageAdapter<SwipeItemUIState, RecyclerView.ViewHolder>
+    private lateinit var swipePagingInitialPageAdapter: PagingInitialPageAdapter<SwipeUIState, RecyclerView.ViewHolder>
 
 
     private lateinit var swipePagingAdapter: SwipePagingAdapter
@@ -79,6 +79,7 @@ class SwipeFragment(
                 return when (binding.rvSwipe.adapter?.getItemViewType(position)) {
                     R.layout.layout_load_state -> LOAD_STATE_SPAN_COUNT
                     R.layout.item_swipe_header -> SWIPE_HEADER_SPAN_COUNT
+                    R.layout.item_swipe_footer -> SWIPE_FOOTER_SPAN_COUNT
                     else -> SWIPE_ITEM_SPAN_COUNT
                 }
             }
@@ -135,6 +136,7 @@ class SwipeFragment(
     companion object {
         const val LOAD_STATE_SPAN_COUNT = 2
         const val SWIPE_HEADER_SPAN_COUNT = 2
+        const val SWIPE_FOOTER_SPAN_COUNT = 2
         const val SWIPE_ITEM_SPAN_COUNT = 1
         const val SWIPE_PAGE_SPAN_COUNT = 2
     }

@@ -4,14 +4,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemSwipeBinding
 import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
-import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.bumptech.glide.Glide
 import kotlin.random.Random
@@ -19,19 +18,22 @@ import kotlin.random.Random
 
 class SwipePagingDataAdapter(
     private val onSwipeListener: OnSwipeListener
-) : PagingDataAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            SwipeItemUIState.Type.HEADER.ordinal -> HeaderViewHolder(
-                ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            )
-            else -> ItemViewHolder(
-                ItemSwipeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                parent.context,
-                onSwipeListener
-            )
-        }
+//        return when (viewType) {
+//            SwipeUIState.Type.HEADER.ordinal -> HeaderViewHolder(
+//                ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+//            )
+//            else -> ItemViewHolder(
+//                ItemSwipeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+//                parent.context,
+//                onSwipeListener
+//            )
+//        }
+        return HeaderViewHolder(
+            ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -46,11 +48,11 @@ class SwipePagingDataAdapter(
     override fun getItemViewType(position: Int): Int {
 
 
-
-        return getSwipeDomain(position)?.type?.ordinal ?: SwipeItemUIState.Type.ITEM.ordinal
+//        return getSwipeDomain(position)?.type?.ordinal ?: SwipeUIState.Type.ITEM.ordinal
+        return 0
     }
 
-    fun getSwipeDomain(position: Int): SwipeItemUIState? {
+    fun getSwipeDomain(position: Int): SwipeUIState? {
         if (position >= itemCount) {
             return null
         }
@@ -58,11 +60,11 @@ class SwipePagingDataAdapter(
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<SwipeItemUIState>() {
-            override fun areItemsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
-                oldItem.swiperId == newItem.swiperId
+        private val diffCallback = object : DiffUtil.ItemCallback<SwipeUIState>() {
+            override fun areItemsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean =
+                oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
+            override fun areContentsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean =
                 oldItem == newItem
         }
     }
@@ -87,7 +89,7 @@ class SwipePagingDataAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(swipeItemUIState: SwipeItemUIState) {
+        fun bind(swipeUIState: SwipeUIState) {
 //            binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE
 //            if (swipeItemUIState.clicked) {
 //                binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE

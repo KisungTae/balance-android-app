@@ -1,7 +1,7 @@
 package com.beeswork.balance.ui.swipefragment
 
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
-import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.ui.common.paging.LoadResult
 import com.beeswork.balance.ui.common.paging.LoadType
@@ -11,9 +11,9 @@ import java.io.IOException
 class SwipePagingSource(
     private val swipeRepository: SwipeRepository,
     private val swipeMapper: SwipeMapper
-) : PagingSource<Long, SwipeItemUIState>() {
+) : PagingSource<Long, SwipeUIState>() {
 
-    override suspend fun load(loadKey: Long?, loadType: LoadType, loadSize: Int): LoadResult<Long, SwipeItemUIState> {
+    override suspend fun load(loadKey: Long?, loadType: LoadType, loadSize: Int): LoadResult<Long, SwipeUIState> {
         return try {
             if (loadType == LoadType.INITIAL_LOAD) {
                 swipeRepository.deleteSwipes()

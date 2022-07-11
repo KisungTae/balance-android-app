@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemSwipeBinding
+import com.beeswork.balance.databinding.ItemSwipeFooterBinding
 import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
-import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.internal.util.GlideHelper
-import com.beeswork.balance.ui.common.paging.LoadStateAdapter
 import com.beeswork.balance.ui.common.paging.PagingAdapter
 import com.beeswork.balance.ui.common.paging.PagingAdapterListener
 import com.bumptech.glide.Glide
@@ -23,19 +23,20 @@ class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
     pagingAdapterListener: PagingAdapterListener,
     lifecycleOwner: LifecycleOwner,
-) : PagingAdapter<SwipeItemUIState, RecyclerView.ViewHolder>(
+) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(
     diffCallback,
     pagingAdapterListener,
     lifecycleOwner
 ) {
 
     init {
-        val items = mutableListOf<SwipeItemUIState>()
+        val items = mutableListOf<SwipeUIState>()
         // todo: remove me
-        items.add(SwipeItemUIState.asHeader())
+        items.add(SwipeUIState.Header())
         for (i in 0..30) {
-            items.add(SwipeItemUIState(i.toLong(), UUID.randomUUID(), false, null))
+            items.add(SwipeUIState.Item(i.toLong(), UUID.randomUUID(), false, null))
         }
+        items.add(SwipeUIState.Footer())
         submitList(items)
         currentList
     }
@@ -44,6 +45,9 @@ class SwipePagingAdapter(
         return when (viewType) {
             R.layout.item_swipe_header -> HeaderViewHolder(
                 ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            R.layout.item_swipe_footer -> FooterViewHolder(
+                ItemSwipeFooterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
             else -> ItemViewHolder(
                 ItemSwipeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
@@ -56,14 +60,16 @@ class SwipePagingAdapter(
     override fun onBindViewHolder(holderItem: RecyclerView.ViewHolder, position: Int) {
         when (holderItem) {
             is HeaderViewHolder -> holderItem.bind()
-            is ItemViewHolder -> holderItem.bind(currentList[position])
+            is FooterViewHolder -> holderItem.bind()
+            is ItemViewHolder -> holderItem.bind(currentList[position] as SwipeUIState.Item)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (currentList[position].type) {
-            SwipeItemUIState.Type.HEADER -> R.layout.item_swipe_header
-            SwipeItemUIState.Type.ITEM -> R.layout.item_swipe
+        return when (currentList[position]) {
+            is SwipeUIState.Header -> R.layout.item_swipe_header
+            is SwipeUIState.Item -> R.layout.item_swipe
+            is SwipeUIState.Footer -> R.layout.item_swipe_footer
         }
     }
 
@@ -72,11 +78,11 @@ class SwipePagingAdapter(
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<SwipeItemUIState>() {
-            override fun areItemsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
-                oldItem.swiperId == newItem.swiperId
+        private val diffCallback = object : DiffUtil.ItemCallback<SwipeUIState>() {
+            override fun areItemsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean =
+                oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: SwipeItemUIState, newItem: SwipeItemUIState): Boolean =
+            override fun areContentsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean =
                 oldItem == newItem
         }
     }
@@ -91,6 +97,12 @@ class SwipePagingAdapter(
         fun bind() {}
     }
 
+    class FooterViewHolder(
+        binding: ItemSwipeFooterBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind() {}
+    }
+
     class ItemViewHolder(
         private val binding: ItemSwipeBinding,
         private val context: Context,
@@ -101,7 +113,7 @@ class SwipePagingAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(swipeItemUIState: SwipeItemUIState) {
+        fun bind(swipeUIState: SwipeUIState.Item) {
 //            binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE
 //            if (swipeItemUIState.clicked) {
 //                binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE

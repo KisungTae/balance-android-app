@@ -2,7 +2,7 @@ package com.beeswork.balance.ui.swipefragment
 
 import androidx.lifecycle.*
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
-import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
+import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
@@ -46,7 +46,7 @@ class SwipeViewModel(
 //            .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
 //    }
 
-    fun getPagingMediator(): Pager.PagingMediator<SwipeItemUIState> {
+    fun getPagingMediator(): Pager.PagingMediator<SwipeUIState> {
         return Pager(
             SWIPE_PAGE_SIZE,
             SWIPE_NUM_OF_PAGES_TO_KEEP,

@@ -27,7 +27,7 @@
             android:layout_height="96dp"
             android:layout_marginBottom="15dp"
             android:contentDescription="@string/dialog_error_icon_description"
-            android:src="@drawable/melting_ice_cream" />
+            android:src="@drawable/ic_icecream_broken" />
 
         <TextView
             android:id="@+id/tvErrorDialogTitle"

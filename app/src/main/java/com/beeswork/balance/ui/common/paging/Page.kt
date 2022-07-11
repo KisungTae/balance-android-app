@@ -1,5 +1,6 @@
 package com.beeswork.balance.ui.common.paging
 
+
 class Page<Key : Any, Value : Any>(
     private val pageSize: Int,
     private val numOfPagesToKeep: Int
@@ -12,14 +13,26 @@ class Page<Key : Any, Value : Any>(
     private var reachedBottom: Boolean = false
 
 
-    fun insertAndGeneratePageSnapshot(loadResult: LoadResult<Key, Value>): PageSnapshot<Value> {
-        if (loadResult is LoadResult.Success) {
-            page.insert(loadResult)
+    fun insertAndGeneratePageSnapshot(loadResult: LoadResult.Success<Key, Value>): PageSnapshot<Value> {
 
-        } else if (loadResult is LoadResult.Error) {
 
-        }
-        return PageSnapshot.Error()
+
+//        val newItems = loadResult.items
+//        when (loadResult.loadType) {
+//
+//            LoadType.PREPEND -> {
+//                reachedTop = newItems.size < pageSize
+//                0
+//            }
+//            LoadType.APPEND -> {
+//
+//            }
+//            LoadType.APPEND_NEW -> TODO()
+//            LoadType.INITIAL_LOAD -> TODO()
+//            LoadType.REFRESH_DATA -> TODO()
+//            LoadType.REFRESH_PAGE -> TODO()
+//        }
+        return PageSnapshot.Success(items, loadResult.loadType, reachedTop, reachedBottom)
     }
 
 

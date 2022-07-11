@@ -4,17 +4,15 @@ import com.beeswork.balance.data.database.entity.swipe.Swipe
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.domain.uistate.swipe.SwipeNotificationUIState
 import com.beeswork.balance.internal.constant.EndPoint
-import com.beeswork.balance.internal.util.safeLet
-import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
-import java.util.*
+import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 
 class SwipeMapperImpl : SwipeMapper {
     override fun toSwipe(swipeDTO: SwipeDTO): Swipe {
         return Swipe(swipeDTO.id, swipeDTO.swiperId, swipeDTO.swipedId, swipeDTO.clicked, swipeDTO.swiperProfilePhotoKey)
     }
 
-    override fun toSwipeItemUIState(swipe: Swipe): SwipeItemUIState {
-        return SwipeItemUIState(
+    override fun toSwipeItemUIState(swipe: Swipe): SwipeUIState {
+        return SwipeUIState.Item(
             swipe.id,
             swipe.swiperId,
             swipe.clicked,

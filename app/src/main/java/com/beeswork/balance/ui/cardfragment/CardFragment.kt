@@ -20,6 +20,7 @@ import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.ViewPagerChildFragment
 import com.beeswork.balance.ui.cardfragment.card.CardStackAdapter
 import com.beeswork.balance.ui.cardfragment.filter.CardFilterDialog
+import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.reportdialog.ReportDialog
 import com.google.android.material.snackbar.Snackbar
 import com.yuyakaido.android.cardstackview.*

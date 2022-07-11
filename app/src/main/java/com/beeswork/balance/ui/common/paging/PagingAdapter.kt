@@ -1,17 +1,11 @@
 package com.beeswork.balance.ui.common.paging
 
-import android.renderscript.Sampler
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
-import com.beeswork.balance.domain.uistate.swipe.SwipeItemUIState
-import com.beeswork.balance.ui.swipefragment.SwipePagingAdapter
 import kotlinx.coroutines.launch
-import java.util.*
 
-abstract class PagingAdapter<T : Any, VH : RecyclerView.ViewHolder>(
+abstract class PagingAdapter<T : Pageable, VH : RecyclerView.ViewHolder>(
     diffCallback: DiffUtil.ItemCallback<T>,
     private val pagingAdapterListener: PagingAdapterListener?,
     private val lifecycleOwner: LifecycleOwner
