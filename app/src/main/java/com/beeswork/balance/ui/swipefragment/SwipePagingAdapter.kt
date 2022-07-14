@@ -80,7 +80,7 @@ class SwipePagingAdapter(
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<SwipeUIState>() {
             override fun areItemsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.key == newItem.key
             }
 
             override fun areContentsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean {

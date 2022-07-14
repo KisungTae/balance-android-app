@@ -142,17 +142,17 @@ class SwipeFragment(
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
-//        val newList = ArrayList<SwipeUIState>(swipePagingAdapter.currentList)
-//        swipePagingAdapter.submitList(newList)
+        val newList = ArrayList<SwipeUIState>(swipePagingAdapter.currentList)
+        swipePagingAdapter.submitList(newList)
 
-        val items = mutableListOf<SwipeUIState>()
-        // todo: remove me
-        items.add(SwipeUIState.Header())
-        for (i in 0..30) {
-            items.add(SwipeUIState.Item(i.toLong(), UUID.randomUUID(), false, null))
-        }
-        items.add(SwipeUIState.Footer())
-        swipePagingAdapter.submitList(items)
+//        val items = mutableListOf<SwipeUIState>()
+//        // todo: remove me
+//        items.add(SwipeUIState.Header())
+//        for (i in 0..30) {
+//            items.add(SwipeUIState.Item(i.toLong(), UUID.randomUUID(), false, null))
+//        }
+//        items.add(SwipeUIState.Footer())
+//        swipePagingAdapter.submitList(items)
 
 
 //        swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
