@@ -6,7 +6,7 @@ import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
 import com.beeswork.balance.internal.util.lazyDeferred
 import com.beeswork.balance.ui.common.BaseViewModel
-import com.beeswork.balance.ui.common.paging.Pager
+import com.beeswork.balance.ui.common.paging.ItemKeyPager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -46,8 +46,8 @@ class SwipeViewModel(
 //            .asLiveData(viewModelScope.coroutineContext + defaultDispatcher)
 //    }
 
-    fun getPagingMediator(): Pager.PagingMediator<SwipeUIState> {
-        return Pager(
+    fun getPagingMediator(): ItemKeyPager.PagingMediator<SwipeUIState> {
+        return ItemKeyPager(
             SWIPE_PAGE_SIZE,
             SWIPE_NUM_OF_PAGES_TO_KEEP,
             SwipePagingSource(swipeRepository, swipeMapper),

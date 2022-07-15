@@ -5,18 +5,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import kotlinx.coroutines.launch
 
-abstract class PagingAdapter<T : Pageable, VH : RecyclerView.ViewHolder>(
-    diffCallback: DiffUtil.ItemCallback<T>,
+abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
+    diffCallback: DiffUtil.ItemCallback<Value>,
     private val pagingAdapterListener: PagingAdapterListener?,
     private val lifecycleOwner: LifecycleOwner
-) : ListAdapter<T, VH>(AsyncDifferConfig.Builder<T>(diffCallback).build()) {
+) : ListAdapter<Value, VH>(AsyncDifferConfig.Builder<Value>(diffCallback).build()) {
 
 
     // refreshed then set reachedEnd = false
     // when fetched pages with refresh, check if scroll position is at end, then trigger prepend or append
     // refresh the middle pages and nothing returned from, then it is empty page, then trigger prepend because refresh already append
 
-    private lateinit var pagingMediator: Pager.PagingMediator<T>
+    private lateinit var pagingMediator: PagingMediator<Value>
     private lateinit var headerLoadStateAdapter: LoadStateAdapter
     private lateinit var footerLoadStateAdapter: LoadStateAdapter
 
@@ -35,10 +35,12 @@ abstract class PagingAdapter<T : Pageable, VH : RecyclerView.ViewHolder>(
         )
     }
 
-    fun setupPagingMediator(pagingMediator: Pager.PagingMediator<T>) {
+    fun setupPagingMediator(pagingMediator: PagingMediator<Value>) {
         this.pagingMediator = pagingMediator
         this.pagingMediator.pageSnapshotLiveData.observe(lifecycleOwner) { pageSnapshot ->
-
+            if (pageSnapshot is PageSnapshot.Success && pageSnapshot.items != null) {
+                submitList(pageSnapshot.items)
+            }
         }
         triggerPageLoad(LoadType.INITIAL_LOAD)
     }

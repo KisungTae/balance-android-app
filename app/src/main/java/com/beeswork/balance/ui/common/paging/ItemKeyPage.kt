@@ -1,7 +1,7 @@
 package com.beeswork.balance.ui.common.paging
 
 
-class Page<Key : Any, Value : Any>(
+class ItemKeyPage<Key : Any, Value : Any>(
     private val pageSize: Int,
     private val numOfPagesToKeep: Int
 ) {
