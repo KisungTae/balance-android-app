@@ -38,9 +38,9 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
     fun setupPagingMediator(pagingMediator: PagingMediator<Value>) {
         this.pagingMediator = pagingMediator
         this.pagingMediator.pageSnapshotLiveData.observe(lifecycleOwner) { pageSnapshot ->
-            if (pageSnapshot is PageSnapshot.Success && pageSnapshot.items != null) {
-                submitList(pageSnapshot.items)
-            }
+//            if (pageSnapshot is PageSnapshot.Success && pageSnapshot.items != null) {
+//                submitList(pageSnapshot.items)
+//            }
         }
         triggerPageLoad(LoadType.INITIAL_LOAD)
     }
@@ -62,6 +62,14 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
         lifecycleOwner.lifecycleScope.launch {
             pagingMediator.pageLoadEventChannel.send(loadType)
         }
+    }
+
+    fun refreshPage() {
+        triggerPageLoad(LoadType.REFRESH_PAGE)
+    }
+
+    fun refreshData() {
+        triggerPageLoad(LoadType.REFRESH_DATA)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {

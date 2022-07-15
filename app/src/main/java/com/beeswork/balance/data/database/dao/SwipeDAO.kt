@@ -36,12 +36,6 @@ interface SwipeDAO {
     @Query("select count(*) > 0 from swipe where swiperId = :swiperId and swipedId = :swipedId")
     fun exists(swiperId: UUID?, swipedId: UUID?): Boolean
 
-    @Query("select * from swipe where swipedId = :swipedId and id > :loadKey order by id limit :loadSize")
-    fun getPrependedPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
-
-    @Query("select * from swipe where swipedId = :swipedId and id < :loadKey order by id desc limit :loadSize")
-    fun getAppendedPage(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
-
     @Query("select * from swipe where swipedId = :swipedId and id <= :loadKey order by id desc limit :loadSize")
     fun getAppendedPageInclusive(swipedId: UUID?, loadKey: Long, loadSize: Int): List<Swipe>
 

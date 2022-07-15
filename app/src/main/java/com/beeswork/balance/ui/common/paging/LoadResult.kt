@@ -9,9 +9,7 @@ sealed class LoadResult<Key: Any, Value: Any> {
 
     data class Success<Key: Any, Value : Any>(
         val items: List<Value>,
-        val loadType: LoadType,
-        val firstKey: Key?,
-        val lastKey: Key?
+        val loadType: LoadType
     ) : LoadResult<Key, Value>()
 
 }

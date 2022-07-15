@@ -30,15 +30,15 @@ class ItemKeyPager<Key : Any, Value : ItemKeyPageable<Key>>(
                 // loadType == REFRESH_PAGE but items.size == 0 then no need to refresh
 
 
-//                when (val loadResult = pagingSource.load(page.getLoadKey(loadType), loadType, page.getLoadSize(loadType))) {
-//                    is LoadResult.Success -> {
-//                        val pageSnapshot = page.insertAndGeneratePageSnapshot(loadResult)
-//                        _pageSnapshotLiveData.postValue(pageSnapshot)
-//                    }
-//                    is LoadResult.Error -> {
-//                        _pageSnapshotLiveData.postValue(PageSnapshot.Error(loadResult.loadType, loadResult.throwable))
-//                    }
-//                }
+                when (val loadResult = pagingSource.load(itemKeyPage.getLoadKey(loadType), loadType, itemKeyPage.getLoadSize(loadType))) {
+                    is LoadResult.Success -> {
+                        val pageSnapshot = itemKeyPage.insertAndGeneratePageSnapshot(loadResult)
+                        _pageSnapshotLiveData.postValue(pageSnapshot)
+                    }
+                    is LoadResult.Error -> {
+                        _pageSnapshotLiveData.postValue(PageSnapshot.Error(loadResult.loadType, loadResult.throwable))
+                    }
+                }
             }
         }
     }

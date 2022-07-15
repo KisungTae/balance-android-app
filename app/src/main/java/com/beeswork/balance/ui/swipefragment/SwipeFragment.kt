@@ -142,8 +142,8 @@ class SwipeFragment(
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
-        val newList = ArrayList<SwipeUIState>(swipePagingAdapter.currentList)
-        swipePagingAdapter.submitList(newList)
+//        val newList = ArrayList<SwipeUIState>(swipePagingAdapter.currentList)
+//        swipePagingAdapter.submitList(newList)
 
 //        val items = mutableListOf<SwipeUIState>()
 //        // todo: remove me

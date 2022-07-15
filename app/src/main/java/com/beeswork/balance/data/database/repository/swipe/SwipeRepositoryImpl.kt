@@ -54,7 +54,12 @@ class SwipeRepositoryImpl(
         }.launchIn(applicationScope)
     }
 
-    override suspend fun loadSwipes(loadKey: Long?, loadSize: Int, isAppend: Boolean, isIncludeLoadKey: Boolean): Resource<List<Swipe>> {
+    override suspend fun fetchSwipePage(
+        loadKey: Long?,
+        loadSize: Int,
+        isAppend: Boolean,
+        isIncludeLoadKey: Boolean
+    ): Resource<List<Swipe>> {
         return withContext(ioDispatcher) {
             val response = getResponse {
                 swipeRDS.fetchSwipes(loadKey, loadSize, isAppend, isIncludeLoadKey)
@@ -67,13 +72,19 @@ class SwipeRepositoryImpl(
             }
 
             if (response.data?.isNotEmpty() == true) {
-                swipeDAO.deleteBetween(preferenceProvider.getAccountId(), response.data.first().id, response.data.last().id)
+                swipeDAO.deleteBetween(preferenceProvider.getAccountId(), response.data.last().id, response.data.first().id)
                 swipeDAO.insert(response.data)
             }
             return@withContext response
         }
     }
 
+    override suspend fun refreshSwipePage(loadKey: Long?, loadSize: Int): Resource<List<Swipe>> {
+        return withContext(ioDispatcher) {
+            val swipePage = swipeDAO.getAppendedPageInclusive(preferenceProvider.getAccountId(), loadKey ?: Long.MAX_VALUE, loadSize)
+            return@withContext Resource.success(swipePage)
+        }
+    }
 
 
 //    override suspend fun fetchSwipes(loadSize: Int, lastSwipeId: Long?): Resource<ListSwipesDTO> {

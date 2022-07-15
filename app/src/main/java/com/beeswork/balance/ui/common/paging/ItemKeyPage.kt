@@ -1,14 +1,12 @@
 package com.beeswork.balance.ui.common.paging
 
 
-class ItemKeyPage<Key : Any, Value : Any>(
+class ItemKeyPage<Key : Any, Value : ItemKeyPageable<Key>>(
     private val pageSize: Int,
     private val numOfPagesToKeep: Int
 ) {
 
     private var items: List<Value> = arrayListOf()
-    private var firstKey: Key? = null
-    private var lastKey: Key? = null
     private var reachedTop: Boolean = false
     private var reachedBottom: Boolean = false
 
@@ -38,8 +36,8 @@ class ItemKeyPage<Key : Any, Value : Any>(
 
     fun getLoadKey(loadType: LoadType): Key? {
         return when (loadType) {
-            LoadType.PREPEND, LoadType.REFRESH_PAGE, LoadType.REFRESH_DATA -> firstKey
-            LoadType.APPEND, LoadType.APPEND_NEW -> lastKey
+            LoadType.PREPEND, LoadType.REFRESH_PAGE, LoadType.REFRESH_DATA -> items.firstOrNull()?.key
+            LoadType.APPEND, LoadType.APPEND_NEW -> items.lastOrNull()?.key
             LoadType.INITIAL_LOAD -> null
         }
     }

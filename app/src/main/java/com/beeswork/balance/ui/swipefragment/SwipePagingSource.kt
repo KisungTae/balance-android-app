@@ -18,12 +18,16 @@ class SwipePagingSource(
             if (loadType == LoadType.INITIAL_LOAD) {
                 swipeRepository.deleteSwipes()
             }
-            val response = swipeRepository.loadSwipes(loadKey, loadSize, loadType.isAppend(), loadType.isIncludeLoadKey())
+            val response = if (loadType == LoadType.REFRESH_PAGE) {
+                swipeRepository.refreshSwipePage(loadKey, loadSize)
+            } else {
+                swipeRepository.fetchSwipePage(loadKey, loadSize, loadType.isAppend(), loadType.isIncludeLoadKey())
+            }
             return if (response.isSuccess() && response.data != null) {
                 val swipes = response.data.map { swipe ->
                     swipeMapper.toSwipeUIStateItem(swipe)
                 }
-                LoadResult.Success(swipes, loadType, swipes.first().key, swipes.last().key)
+                LoadResult.Success(swipes, loadType)
             } else {
                 LoadResult.Error(loadType, null)
             }
