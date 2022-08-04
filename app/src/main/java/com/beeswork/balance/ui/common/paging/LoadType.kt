@@ -1,19 +1,26 @@
 package com.beeswork.balance.ui.common.paging
 
 enum class LoadType {
-    PREPEND,
-    APPEND,
-    APPEND_NEW,
-    INITIAL_LOAD,
+    PREPEND_DATA,
+    APPEND_DATA,
     REFRESH_DATA,
-    REFRESH_PAGE;
-
+    REFRESH_PAGE,
+    REFRESH_FIRST_PAGE,
+    PREPEND_DATA_AFTER_EMPTY_REFRESH;
 
     fun isAppend(): Boolean {
-        return this == APPEND || this == INITIAL_LOAD || this == REFRESH_DATA || this == REFRESH_PAGE
+        return this == APPEND_DATA || this == REFRESH_DATA || this == REFRESH_PAGE
     }
 
     fun isIncludeLoadKey(): Boolean {
         return this == REFRESH_DATA || this == REFRESH_PAGE
+    }
+
+    fun isRefresh(): Boolean {
+        return this == REFRESH_DATA || this == REFRESH_PAGE
+    }
+
+    fun isLoadPage(): Boolean {
+        return this == REFRESH_PAGE || this == REFRESH_FIRST_PAGE
     }
 }

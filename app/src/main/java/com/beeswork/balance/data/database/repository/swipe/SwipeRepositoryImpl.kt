@@ -71,7 +71,24 @@ class SwipeRepositoryImpl(
                 }
             }
 
+
+            if (response.isSuccess()) {
+                if (response.data?.isNotEmpty() == true) {
+                    swipeDAO.deleteBetween(preferenceProvider.getAccountId(), response.data.last().id, response.data.first().id)
+                    swipeDAO.insert(response.data)
+                } else {
+                     if (loadKey != null) {
+                         if (isAppend) {
+                             swipeDAO.deleteBetween(preferenceProvider.getAccountId(), 0, loadKey)
+                         } else {
+                             swipeDAO.deleteBetween(preferenceProvider.getAccountId(), loadKey, Long.MAX_VALUE)
+                         }
+                     }
+                }
+            }
+
             if (response.data?.isNotEmpty() == true) {
+                // delete all <= or >= loadKey when fetched null or empty when loadKey is not null based on prepend or append
                 swipeDAO.deleteBetween(preferenceProvider.getAccountId(), response.data.last().id, response.data.first().id)
                 swipeDAO.insert(response.data)
             }

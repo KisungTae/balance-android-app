@@ -2,11 +2,14 @@ package com.beeswork.balance.ui.common.paging
 
 sealed class LoadState {
 
-    class Loaded: LoadState()
+    object Loaded : LoadState()
 
-    class Loading: LoadState()
+    object Loading : LoadState()
 
     class Error(
-        val errorMessage: String
+        val errorMessage: String?,
+        val loadType: LoadType
     ): LoadState()
+
+    object Empty: LoadState()
 }

@@ -9,7 +9,12 @@ sealed class LoadResult<Key: Any, Value: Any> {
 
     data class Success<Key: Any, Value : Any>(
         val items: List<Value>,
-        val loadType: LoadType
-    ) : LoadResult<Key, Value>()
+        val loadParam: LoadParam<Key>
+    ) : LoadResult<Key, Value>() {
+
+        fun reachedEnd(): Boolean {
+            return items.size < loadParam.loadSize
+        }
+    }
 
 }

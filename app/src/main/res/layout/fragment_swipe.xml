@@ -38,76 +38,87 @@
             android:layout_marginEnd="10dp"
             tools:listitem="@layout/item_swipe" />
 
-        <FrameLayout
-            android:visibility="gone"
-            android:id="@+id/llSwipeInitialLoadingPage"
+        <LinearLayout
+            android:id="@+id/llSwipePagingLoading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/BackgroundWhite"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/tvSwipeHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/swipe_header_title"
-                android:textAlignment="center"
-                android:textColor="@color/TextGrey" />
+            android:background="@color/TransparentWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="50dp"
+            android:visibility="gone">
 
             <com.github.ybq.android.spinkit.SpinKitView
-                android:id="@+id/skvSwipeProgressBar"
                 style="@style/SpinKitView.Large.Circle"
                 android:layout_width="@dimen/icon_medium"
                 android:layout_height="@dimen/icon_medium"
-                android:layout_gravity="center"
+                android:layout_marginBottom="15dp"
                 android:background="@color/Transparent"
                 app:SpinKit_Color="@color/Primary" />
 
-        </FrameLayout>
+        </LinearLayout>
 
         <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/llSwipeErrorPage"
+            android:id="@+id/llSwipePagingError"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/BackgroundWhite"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="50dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_marginBottom="15dp"
+                android:contentDescription="@string/dialog_error_icon_description"
+                android:src="@drawable/ic_icecream_broken" />
 
             <TextView
-                android:id="@+id/tvSwipeErrorMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:paddingHorizontal="10dp"
-                android:text="@string/error_generic_try_later"
-                android:textAlignment="center" />
+                android:layout_marginBottom="7dp"
+                android:text="페이지를 가져오지 못했습니다"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSwipeRetry"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tvSwipePagingErrorMessage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/sh_round_box"
-                android:backgroundTint="@color/Primary"
+                android:layout_marginBottom="25dp"
+                android:text="서버에서 요청을 처리하지 못했습니다. 잠시후에 다시시도해주세요. "
+                android:textAlignment="center"
+                android:textColor="@color/TextDarkGrey"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btnSwipePagingErrorRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/sh_round_box_medium"
+                android:paddingHorizontal="25dp"
+                android:text="다시시도하기"
+                android:textColor="@color/white"
                 android:textSize="13sp"
-                android:text="@string/retry_btn"
-                android:textColor="@color/white" />
+                android:textStyle="bold" />
 
 
         </LinearLayout>
 
         <LinearLayout
-            android:visibility="gone"
-            android:background="@color/BackgroundWhite"
-            android:id="@+id/llSwipeEmptyPage"
+            android:id="@+id/llSwipePagingEmpty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp">
+            android:background="@color/BackgroundWhite"
+            android:padding="50dp"
+            android:visibility="gone">
 
             <TextView
-                android:id="@+id/tvSwipeEmptyPageTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -117,9 +128,6 @@
                 android:textColor="@color/TextGrey" />
 
         </LinearLayout>
-
-
-
 
     </FrameLayout>
 

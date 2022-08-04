@@ -14,19 +14,18 @@ import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.internal.util.GlideHelper
 import com.beeswork.balance.ui.common.paging.PagingAdapter
-import com.beeswork.balance.ui.common.paging.PagingAdapterListener
 import com.bumptech.glide.Glide
 import java.util.*
 import kotlin.random.Random
 
 class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
-    pagingAdapterListener: PagingAdapterListener,
     lifecycleOwner: LifecycleOwner,
+    context: Context
 ) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(
     diffCallback,
-    pagingAdapterListener,
-    lifecycleOwner
+    lifecycleOwner,
+    context
 ) {
 
     init {

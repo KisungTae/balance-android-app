@@ -50,7 +50,7 @@ class SwipeViewModel(
     fun getPagingMediator(): PagingMediator<SwipeUIState> {
         return ItemKeyPager(
             SWIPE_PAGE_SIZE,
-            SWIPE_NUM_OF_PAGES_TO_KEEP,
+            SWIPE_MAX_PAGE_SIZE,
             SwipePagingSource(swipeRepository, swipeMapper),
             viewModelScope
         ).pagingMediator
@@ -68,8 +68,8 @@ class SwipeViewModel(
     }
 
     companion object {
-        private const val SWIPE_PAGE_SIZE = 30
-        private const val SWIPE_NUM_OF_PAGES_TO_KEEP = 1
+        private const val SWIPE_PAGE_SIZE = 50
+        private const val SWIPE_MAX_PAGE_SIZE = 2 * SWIPE_PAGE_SIZE
 
         //        private const val SWIPE_PAGE_PREFETCH_DISTANCE = SWIPE_PAGE_SIZE
 //        private const val SWIPE_PAGE_PREFETCH_DISTANCE = SWIPE_PAGE_SIZE

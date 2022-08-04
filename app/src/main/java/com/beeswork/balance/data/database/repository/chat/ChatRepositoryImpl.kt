@@ -57,6 +57,8 @@ class ChatRepositoryImpl(
         return stompClient.webSocketEventFlow
     }
 
+    // todo: should have function to handle prepend_page
+
     init {
         stompClient.webSocketEventFlow.onEach { webSocketEvent ->
             // todo: implement page refresh logic
@@ -292,6 +294,11 @@ class ChatRepositoryImpl(
 
     }
 }
+
+
+
+
+
 
 
 //TODO: move logic from match to chat

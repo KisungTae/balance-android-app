@@ -4,6 +4,6 @@ import androidx.lifecycle.LiveData
 import kotlinx.coroutines.channels.Channel
 
 class PagingMediator<Value : Any>(
-    val pageLoadEventChannel: Channel<LoadType>,
-    val pageSnapshotLiveData: LiveData<PageSnapshot<Value>>
+    val pager: Pager,
+    val pageUIStateLiveData: LiveData<PageUIState<Value>>
 )

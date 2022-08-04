@@ -3,6 +3,7 @@ package com.beeswork.balance.ui.swipefragment
 import com.beeswork.balance.data.database.repository.swipe.SwipeRepository
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
+import com.beeswork.balance.ui.common.paging.LoadParam
 import com.beeswork.balance.ui.common.paging.LoadResult
 import com.beeswork.balance.ui.common.paging.LoadType
 import com.beeswork.balance.ui.common.paging.PagingSource
@@ -13,72 +14,32 @@ class SwipePagingSource(
     private val swipeMapper: SwipeMapper
 ) : PagingSource<Long, SwipeUIState>() {
 
-    override suspend fun load(loadKey: Long?, loadType: LoadType, loadSize: Int): LoadResult<Long, SwipeUIState> {
+    override suspend fun load(loadParam: LoadParam<Long>): LoadResult<Long, SwipeUIState> {
         return try {
-            if (loadType == LoadType.INITIAL_LOAD) {
+            if (loadParam.loadType == LoadType.REFRESH_DATA) {
                 swipeRepository.deleteSwipes()
             }
-            val response = if (loadType == LoadType.REFRESH_PAGE) {
-                swipeRepository.refreshSwipePage(loadKey, loadSize)
+            val response = if (loadParam.loadType == LoadType.REFRESH_PAGE) {
+                swipeRepository.refreshSwipePage(loadParam.loadKey, loadParam.loadSize)
             } else {
-                swipeRepository.fetchSwipePage(loadKey, loadSize, loadType.isAppend(), loadType.isIncludeLoadKey())
+                swipeRepository.fetchSwipePage(
+                    loadParam.loadKey,
+                    loadParam.loadSize,
+                    loadParam.loadType.isAppend(),
+                    loadParam.loadType.isIncludeLoadKey()
+                )
             }
             return if (response.isSuccess() && response.data != null) {
                 val swipes = response.data.map { swipe ->
                     swipeMapper.toSwipeUIStateItem(swipe)
                 }
-                LoadResult.Success(swipes, loadType)
+                LoadResult.Success(swipes, loadParam)
             } else {
-                LoadResult.Error(loadType, null)
+                LoadResult.Error(loadParam.loadType, null)
             }
         } catch (e: IOException) {
-            LoadResult.Error(loadType, e)
+            LoadResult.Error(loadParam.loadType, e)
         }
     }
-
-//    private val pagingKeyTracker = PagingKeyTracker<Swipe>()
-//
-//    override fun getRefreshKey(state: PagingState<Int, Swipe>): Int? {
-//        return state.anchorPosition?.let { anchorPosition ->
-//            val anchorPage = state.closestPageToPosition(anchorPosition)
-//            val loadSize = pagingKeyTracker.addRefreshedPageKeys(anchorPage) * state.config.pageSize
-//            val startPosition = pagingKeyTracker.prevKey?.times(state.config.pageSize)
-//            swipeRepository.syncSwipes(loadSize, startPosition)
-//            return pagingKeyTracker.currKey
-//        }
-//    }
-//
-//    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Swipe> {
-//        return try {
-//            if (params is LoadParams.Refresh) {
-//                println("params is LoadParams.Refresh")
-//            } else if (params is LoadParams.Prepend) {
-//                println("params is LoadParams.Prepend")
-//            } else if (params is LoadParams.Append) {
-//                println("params is LoadParams.Append")
-//            }
-//
-//
-//            val currentPage = params.key ?: 0
-//            println("currentPage: $currentPage")
-//            val startPosition = currentPage * params.loadSize
-//            val swipes = swipeRepository.loadSwipes(params.loadSize, startPosition, pagingKeyTracker.shouldSyncPage(currentPage))
-//
-//            val prevPage = if (currentPage >= 1) {
-//                currentPage - 1
-//            } else {
-//                null
-//            }
-//            val nextPage = if (swipes.isEmpty()) {
-//                null
-//            } else {
-//                currentPage + 1
-//            }
-//            LoadResult.Page(swipes, prevPage, nextPage)
-//        } catch (exception: IOException) {
-//            LoadResult.Error(exception)
-//        }
-//
-//    }
 
 }
