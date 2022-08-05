@@ -20,13 +20,8 @@ import kotlin.random.Random
 
 class SwipePagingAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
-    lifecycleOwner: LifecycleOwner,
     context: Context
-) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(
-    diffCallback,
-    lifecycleOwner,
-    context
-) {
+) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback, context) {
 
     init {
         val items = mutableListOf<SwipeUIState>()

@@ -15,12 +15,4 @@ enum class LoadType {
     fun isIncludeLoadKey(): Boolean {
         return this == REFRESH_DATA || this == REFRESH_PAGE
     }
-
-    fun isRefresh(): Boolean {
-        return this == REFRESH_DATA || this == REFRESH_PAGE
-    }
-
-    fun isLoadPage(): Boolean {
-        return this == REFRESH_PAGE || this == REFRESH_FIRST_PAGE
-    }
 }

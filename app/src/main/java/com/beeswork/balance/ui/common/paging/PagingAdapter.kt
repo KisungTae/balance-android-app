@@ -9,14 +9,8 @@ import kotlinx.coroutines.launch
 
 abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
     diffCallback: DiffUtil.ItemCallback<Value>,
-    private val lifecycleOwner: LifecycleOwner,
     private val context: Context
 ) : ListAdapter<Value, VH>(AsyncDifferConfig.Builder<Value>(diffCallback).build()) {
-
-
-    // refreshed then set reachedEnd = false
-    // when fetched pages with refresh, check if scroll position is at end, then trigger prepend or append
-    // refresh the middle pages and nothing returned from, then it is empty page, then trigger prepend because refresh already append
 
     private lateinit var pagingMediator: PagingMediator<Value>
     private lateinit var headerItemLoadStateAdapter: ItemLoadStateAdapter
@@ -25,7 +19,6 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
 
     private var reachedTop = true
     private var reachedBottom = true
-
 
     fun withLoadStateAdapters(
         headerItemLoadStateAdapter: ItemLoadStateAdapter,
@@ -43,14 +36,15 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
         )
     }
 
-    fun setupPagingMediator(pagingMediator: PagingMediator<Value>) {
+    fun setupPagingMediator(pagingMediator: PagingMediator<Value>, lifecycleOwner: LifecycleOwner) {
         this.pagingMediator = pagingMediator
         this.pagingMediator.pageUIStateLiveData.observe(lifecycleOwner) { pageUIState ->
             when (pageUIState) {
                 is PageUIState.Loading -> {
-                    if (!pageUIState.loadType.isLoadPage()) {
-                        loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(LoadState.Loading)
+                    if (pageUIState.loadType == LoadType.REFRESH_PAGE || pageUIState.loadType == LoadType.REFRESH_FIRST_PAGE) {
+                        return@observe
                     }
+                    loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(LoadState.Loading)
                 }
                 is PageUIState.Success -> {
                     reachedBottom = pageUIState.reachedBottom
@@ -81,28 +75,20 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
     }
 
     fun loadPage(loadType: LoadType) {
-        lifecycleOwner.lifecycleScope.launch {
-            println("pagingMediator.pager.loadPage(loadType)")
-            pagingMediator.pager.loadPage(loadType)
-        }
-
-        // if refresh error is shown then do not trigger
-//        lifecycleOwner.lifecycleScope.launch {
-//            pagingMediator.pageLoadEventChannel.send(loadType)
-//        }
+        pagingMediator.pager.loadPage(loadType)
     }
 
-//    fun refreshPage() {
-//        triggerPageLoad(LoadType.REFRESH_PAGE)
-//    }
-//
-//    fun refreshData() {
-//        triggerPageLoad(LoadType.REFRESH_DATA)
-//    }
-//
-//    fun fetchNew() {
-//        triggerPageLoad(LoadType.PREPEND_NEW)
-//    }
+    fun refreshPage() {
+        loadPage(LoadType.REFRESH_PAGE)
+    }
+
+    fun refreshData() {
+        loadPage(LoadType.REFRESH_DATA)
+    }
+
+    fun refreshFirstPage() {
+        loadPage(LoadType.REFRESH_FIRST_PAGE)
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)

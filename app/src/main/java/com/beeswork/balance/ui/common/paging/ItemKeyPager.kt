@@ -13,7 +13,7 @@ class ItemKeyPager<Key : Any, Value : ItemKeyPageable<Key>>(
     private val pageSize: Int,
     private val maxPageSize: Int,
     private val pagingSource: PagingSource<Key, Value>,
-    private val viewModelScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : Pager {
 
@@ -39,12 +39,12 @@ class ItemKeyPager<Key : Any, Value : ItemKeyPageable<Key>>(
 
             val loadResult = doLoadPage(itemKeyPage.getLoadParam(loadType))
             if (loadResult is LoadResult.Success
-                && loadResult.loadParam.loadType.isRefresh()
+                && (loadResult.loadParam.loadType == LoadType.REFRESH_DATA || loadResult.loadParam.loadType == LoadType.REFRESH_PAGE)
                 && loadResult.loadParam.loadKey != null
                 && loadResult.items.isNullOrEmpty()) {
                 doLoadPage(itemKeyPage.getLoadParam(LoadType.PREPEND_DATA_AFTER_EMPTY_REFRESH))
             }
-        }.launchIn(viewModelScope + defaultDispatcher)
+        }.launchIn(coroutineScope + defaultDispatcher)
     }
 
     private suspend fun doLoadPage(loadParam: LoadParam<Key>): LoadResult<Key, Value> {
@@ -55,11 +55,13 @@ class ItemKeyPager<Key : Any, Value : ItemKeyPageable<Key>>(
         return loadResult
     }
 
-    override suspend fun loadPage(loadType: LoadType) {
-        mutex.withLock {
-            if (!loadTypeQueue.contains(loadType)) {
-                loadTypeQueue.add(loadType)
-                pageLoadEventChannel.send(loadType)
+    override fun loadPage(loadType: LoadType) {
+        coroutineScope.launch {
+            mutex.withLock {
+                if (!loadTypeQueue.contains(loadType)) {
+                    loadTypeQueue.add(loadType)
+                    pageLoadEventChannel.send(loadType)
+                }
             }
         }
     }

@@ -66,7 +66,7 @@ class SwipeFragment(
     }
 
     private fun setupSwipeRecyclerView() {
-        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment, viewLifecycleOwner, requireContext())
+        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment, requireContext())
         binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
             headerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
             footerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
@@ -94,7 +94,7 @@ class SwipeFragment(
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
-        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator())
+        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
