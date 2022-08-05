@@ -20,44 +20,34 @@ class ItemKeyPage<Key : Any, Value : ItemKeyPageable<Key>>(
                 PageUIState.Error(loadResult.loadType, loadResult.throwable)
             }
             is LoadResult.Success -> {
-                updatePageEnds(loadResult)
-                updateItems(loadResult)
+                mergeLoadResult(loadResult)
                 PageUIState.Success(items, loadResult.loadParam.loadType, reachedTop, reachedBottom)
             }
         }
     }
 
-    private fun updateItems(loadResult: LoadResult.Success<Key, Value>) {
+    private fun mergeLoadResult(loadResult: LoadResult.Success<Key, Value>) {
         val tempItems = mutableListOf<Value>()
         tempItems.addAll(loadResult.items)
-        when (loadResult.loadParam.loadType) {
-            LoadType.PREPEND_DATA -> {
-                tempItems.addAll(items.take((maxPageSize - tempItems.size)))
-            }
-            LoadType.APPEND_DATA -> {
-                tempItems.addAll(0, items.takeLast((maxPageSize - tempItems.size)))
-            }
-            LoadType.REFRESH_DATA, LoadType.REFRESH_PAGE, LoadType.REFRESH_FIRST_PAGE, LoadType.PREPEND_DATA_AFTER_EMPTY_REFRESH -> { }
-        }
-        items = tempItems.toList()
-    }
-
-    private fun updatePageEnds(loadResult: LoadResult.Success<Key, Value>) {
         when (loadResult.loadParam.loadType) {
             LoadType.REFRESH_PAGE, LoadType.REFRESH_FIRST_PAGE -> {
                 return
             }
             LoadType.PREPEND_DATA -> {
                 reachedTop = loadResult.reachedEnd()
-                if (exceedMaxPageSize(loadResult.items)) {
+                if (loadResult.items.size > countInsertableItemIndexes()) {
                     reachedBottom = false
                 }
+                tempItems.addAll(items.take((maxPageSize - tempItems.size)))
             }
             LoadType.APPEND_DATA -> {
-                reachedBottom = loadResult.reachedEnd()
-                if (exceedMaxPageSize(loadResult.items)) {
+                if (loadResult.reachedEnd()) {
+                    reachedBottom = true
+                }
+                if (loadResult.items.size > countInsertableItemIndexes()) {
                     reachedTop = false
                 }
+                tempItems.addAll(0, items.takeLast((maxPageSize - tempItems.size)))
             }
             LoadType.REFRESH_DATA -> {
                 if (loadResult.reachedEnd()) {
@@ -66,12 +56,14 @@ class ItemKeyPage<Key : Any, Value : ItemKeyPageable<Key>>(
             }
             LoadType.PREPEND_DATA_AFTER_EMPTY_REFRESH -> {
                 reachedTop = loadResult.reachedEnd()
+                failedRefreshPrependDataLoadKey = null
             }
         }
+        items = tempItems.toList()
     }
 
-    private fun exceedMaxPageSize(newItems: List<Value>): Boolean {
-        return (newItems.size + items.size) > maxPageSize
+    private fun countInsertableItemIndexes(): Int {
+        return maxPageSize - items.size
     }
 
     private fun getLoadKey(loadType: LoadType): Key? {

@@ -94,7 +94,7 @@ class SwipeFragment(
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
-        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
+            swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
