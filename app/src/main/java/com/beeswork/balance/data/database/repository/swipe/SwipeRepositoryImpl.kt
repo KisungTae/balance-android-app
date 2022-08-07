@@ -13,6 +13,8 @@ import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
+import com.beeswork.balance.ui.common.paging.LoadParam
+import com.beeswork.balance.ui.common.paging.LoadType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -54,34 +56,40 @@ class SwipeRepositoryImpl(
         }.launchIn(applicationScope)
     }
 
-    override suspend fun fetchSwipes(
-        loadKey: Long?,
-        loadSize: Int,
-        isAppend: Boolean,
-        isIncludeLoadKey: Boolean
-    ): Resource<List<Swipe>> {
-        return withContext(ioDispatcher) {
-            val response = getResponse {
-                swipeRDS.fetchSwipes(loadKey, loadSize, isAppend, isIncludeLoadKey)
-            }.map { swipeDTOs ->
-                swipeDTOs?.map { swipeDTO ->
-                    swipeMapper.toSwipe(swipeDTO)
-                }?.sortedByDescending { swipe ->
-                    swipe.id
-                }
+    private suspend fun fetchSwipes(loadParam: LoadParam<Long>): Resource<List<Swipe>> {
+        val response = getResponse {
+            swipeRDS.fetchSwipes(
+                loadParam.loadKey,
+                loadParam.loadSize,
+                loadParam.loadType.isAppend(),
+                loadParam.loadType.isIncludeLoadKey()
+            )
+        }.map { swipeDTOs ->
+            swipeDTOs?.map { swipeDTO ->
+                swipeMapper.toSwipe(swipeDTO)
+            }?.sortedByDescending { swipe ->
+                swipe.id
             }
-
-            if (response.isSuccess() && response.data != null) {
-                swipeDAO.insert(response.data)
-            }
-            return@withContext response
         }
+
+        if (response.isSuccess() && response.data != null) {
+            swipeDAO.insert(response.data)
+        }
+        return response
     }
 
-    override suspend fun loadSwipes(loadKey: Long?, loadSize: Int): Resource<List<Swipe>> {
+    override suspend fun loadSwipes(loadParam: LoadParam<Long>): Resource<List<Swipe>> {
         return withContext(ioDispatcher) {
-            val swipePage = swipeDAO.getIdLessThan(preferenceProvider.getAccountId(), loadKey ?: Long.MAX_VALUE, loadSize)
-            return@withContext Resource.success(swipePage)
+            if (loadParam.loadType == LoadType.REFRESH_PAGE || loadParam.loadType == LoadType.REFRESH_FIRST_PAGE) {
+                val swipePage = swipeDAO.getIdLessThan(
+                    preferenceProvider.getAccountId(),
+                    loadParam.loadKey ?: Long.MAX_VALUE,
+                    loadParam.loadSize
+                )
+                return@withContext Resource.success(swipePage)
+            } else {
+                return@withContext fetchSwipes(loadParam)
+            }
         }
     }
 

@@ -17,23 +17,16 @@ class SwipePagingSource(
     override suspend fun load(loadParam: LoadParam<Long>): LoadResult<Long, SwipeUIState> {
         return try {
             swipeRepository.deleteSwipes(loadParam.loadKey, loadParam.loadType.isAppend())
-            val response = if (loadParam.loadType == LoadType.REFRESH_PAGE || loadParam.loadType == LoadType.REFRESH_FIRST_PAGE) {
-                swipeRepository.loadSwipes(loadParam.loadKey, loadParam.loadSize)
-            } else {
-                swipeRepository.fetchSwipes(
-                    loadParam.loadKey,
-                    loadParam.loadSize,
-                    loadParam.loadType.isAppend(),
-                    loadParam.loadType.isIncludeLoadKey()
-                )
-            }
-            return if (response.isSuccess() && response.data != null) {
-                val swipes = response.data.map { swipe ->
+            val response = swipeRepository.loadSwipes(loadParam).map { swipes ->
+                swipes?.map { swipe ->
                     swipeMapper.toSwipeUIStateItem(swipe)
                 }
-                LoadResult.Success(swipes, loadParam)
+            }
+
+            return if (response.isSuccess() && response.data != null) {
+                LoadResult.Success(response.data, loadParam)
             } else {
-                LoadResult.Error(loadParam.loadType, null)
+                LoadResult.Error(loadParam.loadType, response.exception)
             }
         } catch (e: IOException) {
             LoadResult.Error(loadParam.loadType, e)
