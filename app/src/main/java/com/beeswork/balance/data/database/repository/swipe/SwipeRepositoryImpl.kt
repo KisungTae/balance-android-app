@@ -54,7 +54,7 @@ class SwipeRepositoryImpl(
         }.launchIn(applicationScope)
     }
 
-    override suspend fun fetchSwipePage(
+    override suspend fun fetchSwipes(
         loadKey: Long?,
         loadSize: Int,
         isAppend: Boolean,
@@ -71,34 +71,16 @@ class SwipeRepositoryImpl(
                 }
             }
 
-
-            if (response.isSuccess()) {
-                if (response.data?.isNotEmpty() == true) {
-                    swipeDAO.deleteBetween(preferenceProvider.getAccountId(), response.data.last().id, response.data.first().id)
-                    swipeDAO.insert(response.data)
-                } else {
-                     if (loadKey != null) {
-                         if (isAppend) {
-                             swipeDAO.deleteBetween(preferenceProvider.getAccountId(), 0, loadKey)
-                         } else {
-                             swipeDAO.deleteBetween(preferenceProvider.getAccountId(), loadKey, Long.MAX_VALUE)
-                         }
-                     }
-                }
-            }
-
-            if (response.data?.isNotEmpty() == true) {
-                // delete all <= or >= loadKey when fetched null or empty when loadKey is not null based on prepend or append
-                swipeDAO.deleteBetween(preferenceProvider.getAccountId(), response.data.last().id, response.data.first().id)
+            if (response.isSuccess() && response.data != null) {
                 swipeDAO.insert(response.data)
             }
             return@withContext response
         }
     }
 
-    override suspend fun refreshSwipePage(loadKey: Long?, loadSize: Int): Resource<List<Swipe>> {
+    override suspend fun loadSwipes(loadKey: Long?, loadSize: Int): Resource<List<Swipe>> {
         return withContext(ioDispatcher) {
-            val swipePage = swipeDAO.getAppendedPageInclusive(preferenceProvider.getAccountId(), loadKey ?: Long.MAX_VALUE, loadSize)
+            val swipePage = swipeDAO.getIdLessThan(preferenceProvider.getAccountId(), loadKey ?: Long.MAX_VALUE, loadSize)
             return@withContext Resource.success(swipePage)
         }
     }
@@ -203,6 +185,22 @@ class SwipeRepositoryImpl(
     override suspend fun deleteSwipes() {
         withContext(ioDispatcher) {
             swipeDAO.deleteAll(preferenceProvider.getAccountId())
+        }
+    }
+
+    override suspend fun deleteSwipes(loadKey: Long?, isAppend: Boolean) {
+        withContext(ioDispatcher) {
+            when {
+                loadKey == null -> {
+                    swipeDAO.deleteAll(preferenceProvider.getAccountId())
+                }
+                isAppend -> {
+                    swipeDAO.deleteIdLessThan(preferenceProvider.getAccountId(), loadKey)
+                }
+                else -> {
+                    swipeDAO.deleteIdGreaterThan(preferenceProvider.getAccountId(), loadKey)
+                }
+            }
         }
     }
 
