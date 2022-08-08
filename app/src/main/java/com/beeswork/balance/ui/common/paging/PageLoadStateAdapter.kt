@@ -5,7 +5,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class PageLoadStateAdapter(
+abstract class PageLoadStateAdapter(
     private val recyclerView: RecyclerView,
     private val loadingView: View,
     private val emptyView: View,

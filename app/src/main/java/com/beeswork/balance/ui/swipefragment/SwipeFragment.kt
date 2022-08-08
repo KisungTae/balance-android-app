@@ -70,15 +70,7 @@ class SwipeFragment(
         binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
             headerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
             footerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
-            pageLoadStateAdapter = PageLoadStateAdapter(
-                binding.rvSwipe,
-                binding.llSwipePagingLoading,
-                binding.llSwipePagingEmpty,
-                binding.llSwipePagingError,
-                binding.tvSwipePagingErrorMessage,
-                binding.btnSwipePagingErrorRetry,
-                swipePagingAdapter::loadPage
-            )
+            pageLoadStateAdapter = SwipePageLoadStateAdapter(binding, swipePagingAdapter::loadPage)
         )
 
         val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)

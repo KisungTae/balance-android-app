@@ -93,6 +93,19 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
+
+
+                val layoutManager = recyclerView.layoutManager
+                if (layoutManager is GridLayoutManager) {
+
+                }
+
+
+
+
+
+
+
                 if (!recyclerView.canScrollVertically(-1) && dy < 0 && !reachedTop && headerItemLoadStateAdapter.itemCount <= 0) {
                     loadPage(LoadType.PREPEND_DATA)
                 } else if (!recyclerView.canScrollVertically(1) && dy > 0 && !reachedBottom && footerItemLoadStateAdapter.itemCount <= 0) {

@@ -71,7 +71,7 @@ class ItemKeyPager<Key : Any, Value : ItemKeyPageable<Key>>(
 
     private suspend fun loadPage(loadParam: LoadParam<Key>): LoadResult<Key, Value> {
         _pageUIStateLiveData.postValue(PageUIState.Loading(loadParam.loadType))
-        delay(2000)
+        delay(5000)
         val loadResult = pagingSource.load(loadParam)
         val pageUIState = when (loadResult) {
             is LoadResult.Error -> {
@@ -170,9 +170,6 @@ class ItemKeyPager<Key : Any, Value : ItemKeyPageable<Key>>(
         this.footer = footer
         return this
     }
-
-
-
 
     companion object {
         const val LOAD_PAGE_CHANNEL_BUFFER = 10
