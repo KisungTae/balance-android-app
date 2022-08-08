@@ -25,6 +25,7 @@ class SwipeViewModel(
 
     // Backing property to avoid state updates from other classes
     private val _uiState = MutableStateFlow("")
+
     // The UI collects from this StateFlow to get its state updates
     val uiState: StateFlow<String> = _uiState
 
@@ -53,7 +54,7 @@ class SwipeViewModel(
             SWIPE_MAX_PAGE_SIZE,
             SwipePagingSource(swipeRepository, swipeMapper),
             viewModelScope
-        ).pagingMediator
+        ).withHeader(SwipeUIState.Header()).withFooter(SwipeUIState.Footer()).pagingMediator
     }
 
     fun test() {

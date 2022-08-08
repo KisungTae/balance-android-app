@@ -74,7 +74,7 @@ interface BalanceAPI {
 
     @GET("swipe/fetch")
     suspend fun fetchSwipes(
-        @Query(value = "key") key: Long?,
+        @Query(value = "loadKey") key: Long?,
         @Query(value = "loadSize") loadSize: Int,
         @Query(value = "append") isAppend: Boolean,
         @Query(value = "includeLoadKey") isIncludeLoadKey: Boolean

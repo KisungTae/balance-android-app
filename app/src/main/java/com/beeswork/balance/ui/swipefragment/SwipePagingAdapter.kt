@@ -23,18 +23,6 @@ class SwipePagingAdapter(
     context: Context
 ) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback, context) {
 
-    init {
-        val items = mutableListOf<SwipeUIState>()
-        // todo: remove me
-        items.add(SwipeUIState.Header())
-        for (i in 0..30) {
-            items.add(SwipeUIState.Item(i.toLong(), UUID.randomUUID(), false, null))
-        }
-        items.add(SwipeUIState.Footer())
-        submitList(items)
-        currentList
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             R.layout.item_swipe_header -> HeaderViewHolder(
@@ -78,9 +66,7 @@ class SwipePagingAdapter(
             }
 
             override fun areContentsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean {
-                val result = oldItem == newItem
-                println("result: $result")
-                return result
+                return oldItem == newItem
             }
         }
     }
@@ -120,6 +106,8 @@ class SwipePagingAdapter(
 //            }
 
 //            swipeItemUIState.swiperProfilePhotoUrl
+
+            binding.tempSwipeId.text = swipeUIState.key.toString()
 
 //            TODO: remove me
             val r = Random.nextInt(50)

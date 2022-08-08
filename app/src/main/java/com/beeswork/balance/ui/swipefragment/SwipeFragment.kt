@@ -94,7 +94,7 @@ class SwipeFragment(
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
-            swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
+        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
@@ -149,7 +149,7 @@ class SwipeFragment(
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
-        swipePagingAdapter.loadPage(LoadType.REFRESH_DATA)
+//        swipePagingAdapter.loadPage(LoadType.REFRESH_DATA)
 //        val newList = ArrayList<SwipeUIState>(swipePagingAdapter.currentList)
 //        swipePagingAdapter.submitList(newList)
 

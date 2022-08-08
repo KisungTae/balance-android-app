@@ -74,6 +74,14 @@
         <!--            android:background="@drawable/sh_round_box"-->
         <!--            android:backgroundTint="@color/Black" />-->
 
+<!--     todo: remove me   -->
+        <TextView
+            android:textColor="@color/WarningRed"
+            android:id="@+id/tempSwipeId"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
         <View
             android:layout_width="70dp"
             android:layout_height="7dp"

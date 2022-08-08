@@ -6,7 +6,7 @@ enum class LoadType {
     REFRESH_DATA,
     REFRESH_PAGE,
     REFRESH_FIRST_PAGE,
-    PREPEND_DATA_AFTER_EMPTY_REFRESH;
+    REFRESH_PREPEND_DATA;
 
     fun isAppend(): Boolean {
         return this == APPEND_DATA || this == REFRESH_DATA || this == REFRESH_PAGE

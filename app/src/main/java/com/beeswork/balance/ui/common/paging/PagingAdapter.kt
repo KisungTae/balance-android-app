@@ -2,10 +2,8 @@ package com.beeswork.balance.ui.common.paging
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import com.beeswork.balance.internal.util.MessageSource
-import kotlinx.coroutines.launch
 
 abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
     diffCallback: DiffUtil.ItemCallback<Value>,
@@ -63,14 +61,14 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
                 }
             }
         }
-//        triggerPageLoad(LoadType.REFRESH_DATA)
+        loadPage(LoadType.REFRESH_DATA)
     }
 
     private fun loadStateAdapter(loadType: LoadType): LoadStateAdapter {
         return when (loadType) {
             LoadType.PREPEND_DATA -> headerItemLoadStateAdapter
             LoadType.APPEND_DATA -> footerItemLoadStateAdapter
-            LoadType.REFRESH_DATA, LoadType.REFRESH_PAGE, LoadType.REFRESH_FIRST_PAGE, LoadType.PREPEND_DATA_AFTER_EMPTY_REFRESH -> pageLoadStateAdapter
+            LoadType.REFRESH_DATA, LoadType.REFRESH_PAGE, LoadType.REFRESH_FIRST_PAGE, LoadType.REFRESH_PREPEND_DATA -> pageLoadStateAdapter
         }
     }
 
