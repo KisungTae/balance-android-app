@@ -67,7 +67,7 @@ class SettingFragment : BaseFragment(), KodeinAware {
                 resource.isError() -> {
                     binding.llSettingLoading.visibility = View.GONE
                     val title = getString(R.string.error_title_delete_account)
-                    val message = MessageSource.getMessage(requireContext(), resource.exception)
+                    val message = MessageSource.getMessage(resource.exception)
                     ErrorDialog.show(title, message, childFragmentManager)
                 }
             }

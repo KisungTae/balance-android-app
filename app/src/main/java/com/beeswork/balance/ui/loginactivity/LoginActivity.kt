@@ -1,6 +1,5 @@
 package com.beeswork.balance.ui.loginactivity
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -87,7 +86,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
 
     private fun showLoginErrorDialog(exception: Throwable?) {
         val title = getString(R.string.error_title_login)
-        val message = MessageSource.getMessage(this, exception)
+        val message = MessageSource.getMessage(exception)
         ErrorDialog.show(title, message, supportFragmentManager)
     }
 

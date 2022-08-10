@@ -3,15 +3,12 @@ package com.beeswork.balance.ui.common
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.internal.util.MessageSource
-import com.github.ybq.android.spinkit.SpinKitView
 
 class PagingInitialPageAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     private val pagingDataAdapter: PagingDataAdapter<T, VH>,
@@ -28,7 +25,7 @@ class PagingInitialPageAdapter<T : Any, VH : RecyclerView.ViewHolder>(
                 updateUI(View.VISIBLE, View.GONE, View.GONE)
             } else if (loadState.append is LoadState.Error) {
                 val exception = (loadState.append as LoadState.Error).error
-                val message = MessageSource.getMessage(context, exception)
+                val message = MessageSource.getMessage(exception)
                 if (message != null) {
                     tvErrorMessage.text = message
                 }

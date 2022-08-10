@@ -1,6 +1,6 @@
 package com.beeswork.balance.internal.util
 
-import android.content.Context
+import com.beeswork.balance.App
 import com.beeswork.balance.R
 import com.beeswork.balance.internal.exception.BaseException
 import com.beeswork.balance.internal.exception.ServerException
@@ -26,7 +26,7 @@ class MessageSource {
             return stringBuilder.toString()
         }
 
-        fun getMessage(context: Context, exception: Throwable?): String? {
+        fun getMessage(exception: Throwable?): String? {
             if (exception == null) {
                 return null
             }
@@ -35,23 +35,23 @@ class MessageSource {
                 return exception.message
             }
 
-            val resources = context.resources
+            val resources = App.getContext()?.resources
             if (exception is BaseException && exception.error != null) {
-                val resourceId = resources.getIdentifier(exception.error, "string", context.packageName)
-                if (resourceId > 0) {
+                val resourceId = resources?.getIdentifier(exception.error, "string", App.getContext()?.packageName)
+                if (resourceId != null && resourceId > 0) {
                     return resources.getString(resourceId)
                 }
             }
 
             return when (exception) {
                 is SocketTimeoutException -> {
-                    resources.getString(R.string.socket_timeout_exception)
+                    resources?.getString(R.string.socket_timeout_exception)
                 }
                 is ConnectException -> {
-                    resources.getString(R.string.connect_exception)
+                    resources?.getString(R.string.connect_exception)
                 }
                 is UnknownHostException -> {
-                    resources.getString(R.string.unknown_host_exception)
+                    resources?.getString(R.string.unknown_host_exception)
                 }
                 else -> exception.message
             }

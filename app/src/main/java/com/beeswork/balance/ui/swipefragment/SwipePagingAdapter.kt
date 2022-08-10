@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.ItemSwipeBinding
@@ -19,9 +20,8 @@ import java.util.*
 import kotlin.random.Random
 
 class SwipePagingAdapter(
-    private val swipeViewHolderListener: SwipeViewHolderListener,
-    context: Context
-) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback, context) {
+    private val swipeViewHolderListener: SwipeViewHolderListener
+) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {

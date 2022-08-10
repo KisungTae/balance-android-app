@@ -88,7 +88,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.RetryListener 
         showRefreshBtn()
         disableEdit()
         val title = getString(R.string.error_title_fetch_email)
-        val message = MessageSource.getMessage(requireContext(), exception)
+        val message = MessageSource.getMessage(exception)
         ErrorDialog.show(title, message, RequestCode.FETCH_EMAIL, this, childFragmentManager)
     }
 
@@ -119,7 +119,7 @@ class EmailSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.RetryListener 
     private fun showSaveEmailError(exception: Throwable?) {
         enableEdit()
         val title = getString(R.string.error_title_save_email)
-        val message = MessageSource.getMessage(requireContext(), exception)
+        val message = MessageSource.getMessage(exception)
         ErrorDialog.show(title, message, childFragmentManager)
         hideLoadingAndRefreshBtn()
     }

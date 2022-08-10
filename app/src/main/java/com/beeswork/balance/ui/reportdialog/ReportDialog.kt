@@ -14,7 +14,6 @@ import com.beeswork.balance.internal.util.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
@@ -116,7 +115,7 @@ class ReportDialog(
                 reportUIState.showError -> {
                     requireContext().hideKeyboard(requireView())
                     binding.tvReportDialogErrorTitle.text = getString(R.string.error_title_report)
-                    binding.tvReportDialogErrorMessage.text = MessageSource.getMessage(requireContext(), reportUIState.exception)
+                    binding.tvReportDialogErrorMessage.text = MessageSource.getMessage(reportUIState.exception)
                     updateLayouts(View.GONE, View.GONE, View.VISIBLE)
                 }
             }

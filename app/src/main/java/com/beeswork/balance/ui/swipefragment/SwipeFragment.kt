@@ -1,16 +1,21 @@
 package com.beeswork.balance.ui.swipefragment
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.beeswork.balance.App
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
+import com.beeswork.balance.internal.exception.BaseException
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
@@ -57,8 +62,6 @@ class SwipeFragment(
 
     private fun bindUI() = lifecycleScope.launch {
         setupSwipeRecyclerView()
-
-
 //        setupSwipeRecyclerView()
 //        setupSwipePagingInitialPageAdapter()
 //        observeSwipePagingDataLiveData()
@@ -66,13 +69,6 @@ class SwipeFragment(
     }
 
     private fun setupSwipeRecyclerView() {
-        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment, requireContext())
-        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
-            headerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
-            footerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
-            pageLoadStateAdapter = SwipePageLoadStateAdapter(binding, swipePagingAdapter::loadPage)
-        )
-
         val gridLayoutManager = GridLayoutManager(this@SwipeFragment.context, SWIPE_PAGE_SPAN_COUNT)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -86,6 +82,13 @@ class SwipeFragment(
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
+
+        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment)
+        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
+            headerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
+            footerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
+            pageLoadStateAdapter = SwipePageLoadStateAdapter(binding, swipePagingAdapter::loadPage)
+        )
         swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
     }
 

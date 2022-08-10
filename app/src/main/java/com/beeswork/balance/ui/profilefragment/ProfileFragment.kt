@@ -16,14 +16,12 @@ import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.exception.ServerException
 import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.internal.util.Navigator
-import com.beeswork.balance.internal.util.observeResource
 import com.beeswork.balance.internal.util.observeUIState
 import com.beeswork.balance.ui.balancegamedialog.BalanceGameListener
 import com.beeswork.balance.ui.balancegamedialog.ProfileBalanceGameDialog
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import com.beeswork.balance.ui.photofragment.*
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 import org.threeten.bp.format.DateTimeFormatter
@@ -95,7 +93,7 @@ class ProfileFragment : BasePhotoFragment(),
                     binding.skvProfileLoading.visibility = View.GONE
                     binding.btnProfileSave.isEnabled = false
                     val title = getString(R.string.error_title_fetch_profile)
-                    val message = MessageSource.getMessage(requireContext(), fetchProfileUIState.exception)
+                    val message = MessageSource.getMessage(fetchProfileUIState.exception)
                     ErrorDialog.show(title, message, RequestCode.FETCH_PROFILE, this, childFragmentManager)
                 }
             }
@@ -150,7 +148,7 @@ class ProfileFragment : BasePhotoFragment(),
             }
         } else {
             val title = getString(R.string.error_title_save_about)
-            val message = MessageSource.getMessage(requireContext(), exception)
+            val message = MessageSource.getMessage(exception)
             ErrorDialog.show(title, message, childFragmentManager)
         }
     }

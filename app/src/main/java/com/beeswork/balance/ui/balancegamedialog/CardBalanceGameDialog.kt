@@ -86,7 +86,7 @@ class CardBalanceGameDialog(
                 }
                 clickUIState.showError -> {
                     val title = getString(R.string.error_title_check_answers)
-                    val message = MessageSource.getMessage(requireContext(), clickUIState.exception)
+                    val message = MessageSource.getMessage(clickUIState.exception)
                     showErrorBtn(View.GONE, View.GONE, View.VISIBLE)
                     showError(title, message)
                 }

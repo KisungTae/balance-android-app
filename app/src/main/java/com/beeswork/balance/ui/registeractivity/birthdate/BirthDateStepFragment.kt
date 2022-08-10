@@ -57,7 +57,7 @@ class BirthDateStepFragment(
                 registerStepListener.onMoveToNextStep()
             } else if (saveBirthDateUIState.showError) {
                 val title = getString(R.string.error_title_save_birthDate)
-                val message = MessageSource.getMessage(requireContext(), saveBirthDateUIState.exception)
+                val message = MessageSource.getMessage(saveBirthDateUIState.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }

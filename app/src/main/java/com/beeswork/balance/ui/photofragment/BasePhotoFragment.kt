@@ -87,7 +87,7 @@ open class BasePhotoFragment : BaseFragment(),
         viewModel.orderPhotosUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { orderPhotosUIState ->
             if (orderPhotosUIState.showError) {
                 val title = getString(R.string.error_title_order_photos)
-                val message = MessageSource.getMessage(requireContext(), orderPhotosUIState.exception)
+                val message = MessageSource.getMessage(orderPhotosUIState.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }
@@ -97,7 +97,7 @@ open class BasePhotoFragment : BaseFragment(),
         viewModel.deletePhotoUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { deletePhotoUIState ->
             if (deletePhotoUIState.showError) {
                 val title = getString(R.string.error_title_delete_photo)
-                val message = MessageSource.getMessage(requireContext(), deletePhotoUIState.exception)
+                val message = MessageSource.getMessage(deletePhotoUIState.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }
@@ -107,7 +107,7 @@ open class BasePhotoFragment : BaseFragment(),
         viewModel.uploadPhotoUIStateLiveData.observeUIState(viewLifecycleOwner, activity) { uploadPhotoUIState ->
             if (uploadPhotoUIState.showError) {
                 val title = getString(R.string.error_title_add_photo)
-                val message = MessageSource.getMessage(requireContext(), uploadPhotoUIState.exception)
+                val message = MessageSource.getMessage(uploadPhotoUIState.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }

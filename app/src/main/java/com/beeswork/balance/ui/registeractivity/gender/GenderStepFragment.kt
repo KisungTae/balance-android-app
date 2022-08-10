@@ -59,7 +59,7 @@ class GenderStepFragment(
                 registerStepListener.onMoveToNextStep()
             } else if (saveGenderUIState.showError) {
                 val title = getString(R.string.error_title_save_gender)
-                val message = MessageSource.getMessage(requireContext(), saveGenderUIState.exception)
+                val message = MessageSource.getMessage(saveGenderUIState.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }

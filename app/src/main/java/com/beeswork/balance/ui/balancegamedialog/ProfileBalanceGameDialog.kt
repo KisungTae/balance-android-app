@@ -58,7 +58,7 @@ class ProfileBalanceGameDialog(
                     showRefreshBtn()
                     showBackBtn()
                     val title = getString(R.string.error_title_fetch_question)
-                    val message = MessageSource.getMessage(requireContext(), fetchRandomQuestionUIState.exception)
+                    val message = MessageSource.getMessage(fetchRandomQuestionUIState.exception)
                     ErrorDialog.show(title, message, childFragmentManager)
                 }
             }
@@ -77,7 +77,7 @@ class ProfileBalanceGameDialog(
                 }
                 saveAnswersUIState.showError -> {
                     val title = getString(R.string.error_title_save_answers)
-                    val message = MessageSource.getMessage(requireContext(), saveAnswersUIState.exception)
+                    val message = MessageSource.getMessage(saveAnswersUIState.exception)
                     showError(title, message)
                     showErrorBtn(View.VISIBLE, View.GONE, View.GONE)
                 }

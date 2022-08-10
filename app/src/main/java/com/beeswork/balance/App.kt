@@ -133,14 +133,14 @@ const val NETWORK_READ_TIMEOUT = 10L
 const val NETWORK_CONNECTION_TIMEOUT = 10L
 const val NETWORK_WRITE_TIMEOUT = 10L
 
-class BalanceApplication : Application(), KodeinAware {
+class App : Application(), KodeinAware {
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 
     @ExperimentalCoroutinesApi
     override val kodein = Kodein.lazy {
-        import(androidXModule(this@BalanceApplication))
+        import(androidXModule(this@App))
 
         // Mapper
         bind<MatchMapper>() with singleton { MatchMapperImpl() }
@@ -477,8 +477,16 @@ class BalanceApplication : Application(), KodeinAware {
 
     override fun onCreate() {
         super.onCreate()
+        app = this
         AndroidThreeTen.init(this)
 
+    }
+
+    companion object {
+        lateinit var app: App
+        fun getContext(): Context? {
+            return app.applicationContext
+        }
     }
 }
 

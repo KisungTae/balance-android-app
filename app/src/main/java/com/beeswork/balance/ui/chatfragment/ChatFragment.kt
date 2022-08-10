@@ -242,7 +242,7 @@ class ChatFragment : BaseFragment(),
 
     private fun showSendChatMessageErrorDialog(exception: Throwable?) {
         val title = getString(R.string.error_title_send_chat_message)
-        val message = MessageSource.getMessage(requireContext(), exception)
+        val message = MessageSource.getMessage(exception)
         if (exception is WebSocketDisconnectedException) {
             val retryBtnTitle = resources.getString(R.string.title_connect_to_web_socket)
             ErrorDialog.show(title, message, retryBtnTitle, RequestCode.CONNECT_TO_STOMP, this, childFragmentManager)
@@ -296,7 +296,7 @@ class ChatFragment : BaseFragment(),
 
     private fun showUnmatchErrorDialog(exception: Throwable?) {
         val title = getString(R.string.error_title_unmatch)
-        val message = MessageSource.getMessage(requireContext(), exception)
+        val message = MessageSource.getMessage(exception)
         ErrorDialog.show(title, message, RequestCode.UNMATCH, this, childFragmentManager)
     }
 

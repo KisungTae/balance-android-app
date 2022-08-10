@@ -99,7 +99,7 @@ abstract class BaseBalanceGameDialog : BaseDialog(), KodeinAware, BalanceGameVie
                 }
                 fetchQuestionUIState.showError -> {
                     val title = getString(R.string.error_title_fetch_question)
-                    val message = MessageSource.getMessage(requireContext(), fetchQuestionUIState.exception)
+                    val message = MessageSource.getMessage(fetchQuestionUIState.exception)
                     showError(title, message)
                     showErrorBtn(View.GONE, View.VISIBLE, View.GONE)
                 }

@@ -82,7 +82,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener
         enableEdit()
         hideLoadingAndRefreshBtn()
         val title = getString(R.string.error_title_save_push_setting)
-        val message = MessageSource.getMessage(requireContext(), exception)
+        val message = MessageSource.getMessage(exception)
         ErrorDialog.show(title, message, childFragmentManager)
     }
 
@@ -150,7 +150,7 @@ class PushSettingDialog : BaseDialog(), KodeinAware, ErrorDialog.DismissListener
         showRefreshBtn()
         disableEdit()
         val title = getString(R.string.error_title_fetch_push_setting)
-        val message = MessageSource.getMessage(requireContext(), exception)
+        val message = MessageSource.getMessage(exception)
         ErrorDialog.show(title, message, RequestCode.FETCH_PUSH_SETTING, this, childFragmentManager)
     }
 

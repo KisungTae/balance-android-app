@@ -64,7 +64,7 @@ class RegisterFinishFragment : Fragment(), KodeinAware {
                     binding.btnRegisterFinishRetry.visibility = View.VISIBLE
                     binding.btnRegisterFinishRetry.isEnabled = true
                     binding.tvRegisterFinishErrorTitle.text = getString(R.string.error_title_save_profile)
-                    binding.tvRegisterFinishErrorMessage.text = MessageSource.getMessage(requireContext(), saveProfileUIState.exception)
+                    binding.tvRegisterFinishErrorMessage.text = MessageSource.getMessage(saveProfileUIState.exception)
                         ?: MessageSource.getMessageFromFieldErrors(saveProfileUIState.exception)
                 }
             }

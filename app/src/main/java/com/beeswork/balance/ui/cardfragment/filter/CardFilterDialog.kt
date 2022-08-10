@@ -68,7 +68,7 @@ class CardFilterDialog(
                 dismiss()
             } else if (saveCardFilterUIstate.showError) {
                 val title = getString(R.string.error_title_save_card_filter)
-                val message = MessageSource.getMessage(requireContext(), saveCardFilterUIstate.exception)
+                val message = MessageSource.getMessage(saveCardFilterUIstate.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }

@@ -57,7 +57,7 @@ class NameStepFragment(
                 registerStepListener.onMoveToNextStep()
             } else if (saveNameUIState.showError) {
                 val title = getString(R.string.error_title_save_name)
-                val message = MessageSource.getMessage(requireContext(), saveNameUIState.exception)
+                val message = MessageSource.getMessage(saveNameUIState.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }

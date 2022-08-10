@@ -65,7 +65,7 @@ class HeightStepFragment(
                 registerStepListener.onMoveToNextStep()
             } else if (saveHeightUIState.showError) {
                 val title = getString(R.string.error_title_save_height)
-                val message = MessageSource.getMessage(requireContext(), saveHeightUIState.exception)
+                val message = MessageSource.getMessage(saveHeightUIState.exception)
                 ErrorDialog.show(title, message, childFragmentManager)
             }
         }

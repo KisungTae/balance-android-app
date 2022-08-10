@@ -19,11 +19,9 @@ import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.domain.uistate.UIState
 import com.beeswork.balance.internal.constant.ExceptionCode
 import kotlinx.coroutines.*
-import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
-import java.util.*
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
@@ -145,7 +143,7 @@ fun <T> LiveData<Resource<T>>.observeResource(lifecycleOwner: LifecycleOwner, ac
         println("observeResource inside observe")
         if (activity != null && resource.isError() && ExceptionCode.isLoginException(resource.exception)) {
             println("observeResource resource.isError() && ExceptionCode.isLoginException(resource.exception)")
-            val message = MessageSource.getMessage(activity, resource.exception)
+            val message = MessageSource.getMessage(resource.exception)
             Navigator.finishToLoginActivity(activity, message)
         } else {
             block.invoke(resource)
@@ -156,7 +154,7 @@ fun <T> LiveData<Resource<T>>.observeResource(lifecycleOwner: LifecycleOwner, ac
 fun <T: UIState> LiveData<T>.observeUIState(lifecycleOwner: LifecycleOwner, activity: Activity?, block: (uiState: T) -> Unit) {
     observe(lifecycleOwner) { uiState ->
         if (activity != null && uiState.shouldLogout) {
-            val message = MessageSource.getMessage(activity, uiState.exception)
+            val message = MessageSource.getMessage(uiState.exception)
             Navigator.finishToLoginActivity(activity, message)
         } else {
             block.invoke(uiState)
