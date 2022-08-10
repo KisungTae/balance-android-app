@@ -89,7 +89,24 @@ class SwipeFragment(
             footerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
             pageLoadStateAdapter = SwipePageLoadStateAdapter(binding, swipePagingAdapter::loadPage)
         )
-        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
+
+//        swipePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+//            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+//                super.onItemRangeInserted(positionStart, itemCount)
+//                println("positionStart: $positionStart | itemCount: $itemCount")
+//                binding.rvSwipe.scrollToPosition(positionStart + 2)
+//            }
+//        })
+
+//        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
+    }
+
+    private fun setupPaging() {
+        val pagingMediator = viewModel.getPagingMediator()
+        pagingMediator.pageUIStateLiveData.observe(viewLifecycleOwner) { pageUIState ->
+            swipePagingAdapter.submitPageUIState(pageUIState)
+        }
+        swipePagingAdapter.setupPagingMediator(pagingMediator)
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
@@ -144,6 +161,7 @@ class SwipeFragment(
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
+        binding.rvSwipe.scrollBy(0, 300)
 //        swipePagingAdapter.loadPage(LoadType.REFRESH_DATA)
 //        val newList = ArrayList<SwipeUIState>(swipePagingAdapter.currentList)
 //        swipePagingAdapter.submitList(newList)

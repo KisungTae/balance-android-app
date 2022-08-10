@@ -1,9 +1,9 @@
 package com.beeswork.balance.ui.common.paging
 
-import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.*
 import com.beeswork.balance.internal.util.MessageSource
+import java.lang.RuntimeException
 
 abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
     diffCallback: DiffUtil.ItemCallback<Value>
@@ -13,8 +13,8 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
     private lateinit var headerItemLoadStateAdapter: ItemLoadStateAdapter
     private lateinit var footerItemLoadStateAdapter: ItemLoadStateAdapter
     private lateinit var pageLoadStateAdapter: PageLoadStateAdapter
-//    private var layoutManager: LinearLayoutManager? = null
     private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var recyclerView: RecyclerView
 
     private var reachedTop = true
     private var reachedBottom = true
@@ -35,33 +35,34 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
         )
     }
 
-    fun setupPagingMediator(pagingMediator: PagingMediator<Value>, lifecycleOwner: LifecycleOwner) {
-        this.pagingMediator = pagingMediator
-        this.pagingMediator.pageUIStateLiveData.observe(lifecycleOwner) { pageUIState ->
-            when (pageUIState) {
-                is PageUIState.Loading -> {
-                    if (pageUIState.loadType == LoadType.REFRESH_PAGE || pageUIState.loadType == LoadType.REFRESH_FIRST_PAGE) {
-                        return@observe
-                    }
-                    loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(LoadState.Loading)
+    fun submitPageUIState(pageUIState: PageUIState<Value>) {
+        when (pageUIState) {
+            is PageUIState.Loading -> {
+                if (pageUIState.loadType == LoadType.REFRESH_PAGE || pageUIState.loadType == LoadType.REFRESH_FIRST_PAGE) {
+                    return
                 }
-                is PageUIState.Success -> {
-                    reachedBottom = pageUIState.reachedBottom
-                    reachedTop = pageUIState.reachedTop
-                    submitList(pageUIState.items)
+                loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(LoadState.Loading)
+            }
+            is PageUIState.Success -> {
+                reachedBottom = pageUIState.reachedBottom
+                reachedTop = pageUIState.reachedTop
 
-                    if (currentList.isEmpty()) {
-                        pageLoadStateAdapter.onLoadStateUpdated(LoadState.Empty)
-                    } else {
-                        loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(LoadState.Loaded)
-                    }
-                }
-                is PageUIState.Error -> {
-                    val errorLoadState = LoadState.Error(MessageSource.getMessage(pageUIState.throwable), pageUIState.loadType)
-                    loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(errorLoadState)
+                submitList(pageUIState.items)
+                if (currentList.isEmpty()) {
+                    pageLoadStateAdapter.onLoadStateUpdated(LoadState.Empty)
+                } else {
+                    loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(LoadState.Loaded)
                 }
             }
+            is PageUIState.Error -> {
+                val errorLoadState = LoadState.Error(MessageSource.getMessage(pageUIState.throwable), pageUIState.loadType)
+                loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(errorLoadState)
+            }
         }
+    }
+
+    fun setupPagingMediator(pagingMediator: PagingMediator<Value>) {
+        this.pagingMediator = pagingMediator
         loadPage(LoadType.REFRESH_DATA)
     }
 
@@ -91,6 +92,11 @@ abstract class PagingAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+
+        if (recyclerView.layoutManager !is LinearLayoutManager) {
+            throw RuntimeException("please provide valid layout manager for paging")
+        }
         this.layoutManager = recyclerView.layoutManager as LinearLayoutManager
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {

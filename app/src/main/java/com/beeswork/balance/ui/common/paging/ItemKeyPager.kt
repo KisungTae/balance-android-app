@@ -110,15 +110,19 @@ class ItemKeyPager<Key : Any, Value : ItemKeyPageable<Key>>(
                 reachedTop = loadResult.reachedEnd()
                 if (loadResult.items.size > countInsertableItemIndexes()) {
                     reachedBottom = false
+                    tempItems.addAll(items.take(pageSize))
+                } else {
+                    tempItems.addAll(items)
                 }
-                tempItems.addAll(items.take((maxPageSize - tempItems.size)))
             }
             LoadType.APPEND_DATA -> {
                 reachedBottom = loadResult.reachedEnd()
                 if (loadResult.items.size > countInsertableItemIndexes()) {
                     reachedTop = false
+                    tempItems.addAll(0, items.takeLast(pageSize))
+                } else {
+                    tempItems.addAll(0, items)
                 }
-                tempItems.addAll(0, items.takeLast((maxPageSize - tempItems.size)))
             }
             LoadType.REFRESH_DATA -> {
                 reachedBottom = loadResult.reachedEnd()
