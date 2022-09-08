@@ -3,14 +3,14 @@ package com.beeswork.balance.data.database.repository.swipe
 import com.beeswork.balance.data.database.entity.swipe.Swipe
 import com.beeswork.balance.data.network.response.Resource
 import com.beeswork.balance.data.network.response.swipe.SwipeDTO
-import com.beeswork.balance.ui.common.paging.LoadParam
+import com.beeswork.balance.ui.common.page.PageLoadParam
 import kotlinx.coroutines.flow.Flow
 
 interface SwipeRepository {
 
     val newSwipeFlow: Flow<Swipe>
 
-    suspend fun loadSwipes(loadParam: LoadParam<Long>): Resource<List<Swipe>>
+    suspend fun loadSwipes(pageLoadParam: PageLoadParam<Long>): Resource<List<Swipe>>
 
     suspend fun saveSwipe(swipeDTO: SwipeDTO)
     suspend fun deleteSwipes()

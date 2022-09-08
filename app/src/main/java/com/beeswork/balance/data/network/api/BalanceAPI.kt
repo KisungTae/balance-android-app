@@ -23,7 +23,6 @@ import com.beeswork.balance.data.network.response.photo.PreSignedURLDTO
 import com.beeswork.balance.data.network.response.profile.ProfileDTO
 import com.beeswork.balance.data.network.response.profile.QuestionDTO
 import com.beeswork.balance.data.network.response.setting.PushSettingDTO
-import com.beeswork.balance.data.network.response.card.FetchCardsResponse
 import com.beeswork.balance.data.network.response.chat.ChatMessageDTO
 import com.beeswork.balance.data.network.response.match.ClickResponse
 import com.beeswork.balance.data.network.response.match.UnmatchDTO
@@ -33,7 +32,6 @@ import com.beeswork.balance.data.network.response.swipe.SwipeDTO
 import com.beeswork.balance.internal.constant.EndPoint
 import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.provider.gson.GsonProvider
-import com.beeswork.balance.ui.common.paging.LoadType
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient

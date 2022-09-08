@@ -1,6 +1,6 @@
-package com.beeswork.balance.ui.common.paging
+package com.beeswork.balance.ui.common.page
 
-enum class LoadType {
+enum class PageLoadType {
     PREPEND_DATA,
     APPEND_DATA,
     REFRESH_DATA,

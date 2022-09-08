@@ -21,28 +21,29 @@
             android:id="@+id/ivSwipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/GreyDark"
             android:contentDescription="@string/swipe_profile_photo_image_view_description" />
 
-        <LinearLayout
-            android:id="@+id/llSwipeClickedIconWrapper"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:padding="7dp"
-            android:background="@drawable/sh_circle_box"
-            android:backgroundTint="@color/TransparentBlack"
-            android:gravity="center">
+        <!--        <LinearLayout-->
+        <!--            android:id="@+id/llSwipeClickedIconWrapper"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_gravity="end"-->
+        <!--            android:layout_marginTop="10dp"-->
+        <!--            android:layout_marginEnd="10dp"-->
+        <!--            android:padding="7dp"-->
+        <!--            android:background="@drawable/sh_circle_box"-->
+        <!--            android:backgroundTint="@color/TransparentBlack"-->
+        <!--            android:gravity="center">-->
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:contentDescription="@string/delete_photo_icon_description"
-                android:src="@drawable/ic_empty_heart_with_arrwo"
-                app:tint="@color/lighterGrey" />
+        <!--            <ImageView-->
+        <!--                android:layout_width="20dp"-->
+        <!--                android:layout_height="20dp"-->
+        <!--                android:contentDescription="@string/delete_photo_icon_description"-->
+        <!--                android:src="@drawable/ic_empty_heart_with_arrwo"-->
+        <!--                app:tint="@color/lighterGrey" />-->
 
-        </LinearLayout>
+        <!--        </LinearLayout>-->
 
         <!--        <FrameLayout-->
         <!--            android:layout_marginTop="10dp"-->
@@ -74,31 +75,31 @@
         <!--            android:background="@drawable/sh_round_box"-->
         <!--            android:backgroundTint="@color/Black" />-->
 
-<!--     todo: remove me   -->
+        <!--     todo: remove me   -->
         <TextView
-            android:textColor="@color/WarningRed"
             android:id="@+id/tempSwipeId"
-            android:textSize="20sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textColor="@color/WarningRed"
+            android:textSize="20sp" />
 
-        <View
-            android:layout_width="70dp"
-            android:layout_height="7dp"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="15dp"
-            android:layout_marginBottom="30dp"
-            android:background="@drawable/sh_round_box"
-            android:backgroundTint="@color/Grey" />
+        <!--        <View-->
+        <!--            android:layout_width="70dp"-->
+        <!--            android:layout_height="7dp"-->
+        <!--            android:layout_gravity="bottom"-->
+        <!--            android:layout_marginStart="15dp"-->
+        <!--            android:layout_marginBottom="30dp"-->
+        <!--            android:background="@drawable/sh_round_box"-->
+        <!--            android:backgroundTint="@color/Grey" />-->
 
-        <View
-            android:layout_width="50dp"
-            android:layout_height="6dp"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="15dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/sh_round_box"
-            android:backgroundTint="@color/GreyDark" />
+        <!--        <View-->
+        <!--            android:layout_width="50dp"-->
+        <!--            android:layout_height="6dp"-->
+        <!--            android:layout_gravity="bottom"-->
+        <!--            android:layout_marginStart="15dp"-->
+        <!--            android:layout_marginBottom="16dp"-->
+        <!--            android:background="@drawable/sh_round_box"-->
+        <!--            android:backgroundTint="@color/GreyDark" />-->
 
 
     </androidx.cardview.widget.CardView>

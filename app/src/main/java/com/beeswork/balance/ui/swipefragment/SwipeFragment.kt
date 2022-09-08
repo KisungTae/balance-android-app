@@ -1,25 +1,20 @@
 package com.beeswork.balance.ui.swipefragment
 
-import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.beeswork.balance.App
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
-import com.beeswork.balance.internal.exception.BaseException
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.common.*
-import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
-import com.beeswork.balance.ui.common.paging.*
+import com.beeswork.balance.ui.common.page.*
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -30,20 +25,14 @@ class SwipeFragment(
     private val cardBalanceGameListener: CardBalanceGameListener
 ) : BaseFragment(),
     KodeinAware,
-    SwipePagingAdapter.SwipeViewHolderListener,
+    SwipePageAdapter.SwipeViewHolderListener,
     ViewPagerChildFragment {
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
     private lateinit var viewModel: SwipeViewModel
     private lateinit var binding: FragmentSwipeBinding
-    private lateinit var swipePagingRefreshAdapter: PagingRefreshAdapter<SwipeUIState, RecyclerView.ViewHolder>
-    private lateinit var swipePagingDataAdapter: SwipePagingDataAdapter
-    private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
-    private lateinit var swipePagingInitialPageAdapter: PagingInitialPageAdapter<SwipeUIState, RecyclerView.ViewHolder>
-
-
-    private lateinit var swipePagingAdapter: SwipePagingAdapter
+    private lateinit var swipePageAdapter: SwipePageAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,6 +51,7 @@ class SwipeFragment(
 
     private fun bindUI() = lifecycleScope.launch {
         setupSwipeRecyclerView()
+        setupSwipePaging()
 //        setupSwipeRecyclerView()
 //        setupSwipePagingInitialPageAdapter()
 //        observeSwipePagingDataLiveData()
@@ -73,117 +63,45 @@ class SwipeFragment(
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (binding.rvSwipe.adapter?.getItemViewType(position)) {
-                    R.layout.layout_load_state -> ItemLoadStateAdapter.PAGING_ITEM_LOAD_STATE_SPAN_COUNT
+                    R.layout.item_page_load_state_loading -> SWIPE_PAGE_LOAD_STATE_LOADING_SPAN_COUNT
+                    R.layout.item_page_load_state_error -> SWIPE_PAGE_LOAD_STATE_ERROR_SPAN_COUNT
                     R.layout.item_swipe_header -> SWIPE_HEADER_SPAN_COUNT
-                    R.layout.item_swipe_footer -> SWIPE_FOOTER_SPAN_COUNT
                     else -> SWIPE_ITEM_SPAN_COUNT
                 }
             }
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
-
-        swipePagingAdapter = SwipePagingAdapter(this@SwipeFragment)
-        binding.rvSwipe.adapter = swipePagingAdapter.withLoadStateAdapters(
-            headerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
-            footerItemLoadStateAdapter = ItemLoadStateAdapter(swipePagingAdapter::loadPage),
-            pageLoadStateAdapter = SwipePageLoadStateAdapter(binding, swipePagingAdapter::loadPage)
-        )
-
-//        swipePagingAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-//            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-//                super.onItemRangeInserted(positionStart, itemCount)
-//                println("positionStart: $positionStart | itemCount: $itemCount")
-//                binding.rvSwipe.scrollToPosition(positionStart + 2)
-//            }
-//        })
-
-//        swipePagingAdapter.setupPagingMediator(viewModel.getPagingMediator(), viewLifecycleOwner)
+        swipePageAdapter = SwipePageAdapter(this@SwipeFragment)
+        binding.rvSwipe.adapter = swipePageAdapter
     }
 
-    private fun setupPaging() {
-        val pagingMediator = viewModel.getPagingMediator()
-        pagingMediator.pageUIStateLiveData.observe(viewLifecycleOwner) { pageUIState ->
-            swipePagingAdapter.submitPageUIState(pageUIState)
-        }
-        swipePagingAdapter.setupPagingMediator(pagingMediator)
+    private fun setupSwipePaging() {
+//        val pagingMediator = viewModel.getPagingMediator()
+//        pagingMediator.pageUIStateLiveData.observe(viewLifecycleOwner) { pageUIState ->
+//            swipePageAdapter.submitPageUIState(pageUIState)
+//        }
+//        swipePageAdapter.setupPagingMediator(pagingMediator)
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
         viewModel.swipePageInvalidationLiveData.await().observe(viewLifecycleOwner) {
-            swipePagingRefreshAdapter.refresh()
+//            swipePagingRefreshAdapter.refresh()
         }
     }
 
-    private fun observeSwipePagingDataLiveData() {
-//        viewModel.initSwipePagingData().observe(viewLifecycleOwner, { pagingData ->
-//            swipePagingRefreshAdapter.reset()
-//            lifecycleScope.launch {
-//                swipePagingDataAdapter.submitData(pagingData)
-//            }
-//        })
-    }
-
-
-    private fun setupSwipePagingInitialPageAdapter() {
-//        binding.btnSwipeRetry.setOnClickListener {
-//            swipePagingDataAdapter.retry()
-//        }
-//        swipePagingInitialPageAdapter = PagingInitialPageAdapter(
-//            swipePagingDataAdapter,
-//            binding.llSwipeInitialLoadingPage,
-//            binding.llSwipeInitialErrorPage,
-//            binding.llSwipeInitialEmptyPage,
-//            binding.tvSwipeErrorMessage,
-//            requireContext()
-//        )
-//        lifecycleScope.launch {
-//            swipePagingDataAdapter.loadStateFlow.collect { loadState ->
-//                swipePagingInitialPageAdapter.updateUI(loadState)
-//            }
-//        }
-    }
-
     override fun onFragmentSelected() {
-//        viewModel.test()
-//        activity?.let { _activity ->
-//            if (_activity is MainActivity) {
-//                _activity.requestLocationPermission()
-//            }
-//        }
-    }
-
-    companion object {
-        const val SWIPE_HEADER_SPAN_COUNT = 2
-        const val SWIPE_FOOTER_SPAN_COUNT = 2
-        const val SWIPE_ITEM_SPAN_COUNT = 1
-        const val SWIPE_PAGE_SPAN_COUNT = 2
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
-        binding.rvSwipe.scrollBy(0, 300)
-//        swipePagingAdapter.loadPage(LoadType.REFRESH_DATA)
-//        val newList = ArrayList<SwipeUIState>(swipePagingAdapter.currentList)
-//        swipePagingAdapter.submitList(newList)
 
-//        val items = mutableListOf<SwipeUIState>()
-//        // todo: remove me
-//        items.add(SwipeUIState.Header())
-//        for (i in 0..30) {
-//            items.add(SwipeUIState.Item(i.toLong(), UUID.randomUUID(), false, null))
-//        }
-//        items.add(SwipeUIState.Footer())
-//        swipePagingAdapter.submitList(items)
+    }
 
-
-//        swipePagingDataAdapter.getSwipeDomain(position)?.let { swipe ->
-//            swipePagingDataAdapter.refresh()
-//            swipePagingDataAdapter.refresh()
-//            viewModel.test()
-//            SwipeBalanceGameDialog(click.swiperId, click.name, click.profilePhotoKey).show(
-//                childFragmentManager,
-//                SwipeBalanceGameDialog.TAG
-//            )
-//        }
+    companion object {
+        const val SWIPE_PAGE_LOAD_STATE_LOADING_SPAN_COUNT = 2
+        const val SWIPE_PAGE_LOAD_STATE_ERROR_SPAN_COUNT = 2
+        const val SWIPE_HEADER_SPAN_COUNT = 2
+        const val SWIPE_ITEM_SPAN_COUNT = 1
+        const val SWIPE_PAGE_SPAN_COUNT = 2
     }
 }

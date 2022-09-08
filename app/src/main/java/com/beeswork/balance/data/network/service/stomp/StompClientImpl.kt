@@ -44,6 +44,8 @@ class StompClientImpl(
     private val stompReceiptChannel = Channel<StompReceiptDTO>(Channel.BUFFERED)
     override val stompReceiptFlow = stompReceiptChannel.consumeAsFlow()
 
+    // todo: check if one receiver delays its receiving then does it cause delay on other receivers? put delay() in one receiver and see what results
+
     private val _webSocketEventFlow = MutableSharedFlow<WebSocketEvent>()
     override val webSocketEventFlow = _webSocketEventFlow.asSharedFlow()
 

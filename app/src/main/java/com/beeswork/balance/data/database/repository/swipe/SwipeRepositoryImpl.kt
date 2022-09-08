@@ -13,8 +13,8 @@ import com.beeswork.balance.data.network.response.swipe.ListSwipesDTO
 import com.beeswork.balance.data.network.service.stomp.StompClient
 import com.beeswork.balance.internal.provider.preference.PreferenceProvider
 import com.beeswork.balance.internal.mapper.swipe.SwipeMapper
-import com.beeswork.balance.ui.common.paging.LoadParam
-import com.beeswork.balance.ui.common.paging.LoadType
+import com.beeswork.balance.ui.common.page.PageLoadParam
+import com.beeswork.balance.ui.common.page.PageLoadType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -47,22 +47,26 @@ class SwipeRepositoryImpl(
                 offer(data)
             }
         }
-        awaitClose { }
+        awaitClose {
+
+        }
     }
 
     init {
+
+        // todo: check if it only accepts most recent values, like liveData or flow or it consumes all values sent from buffer channel
         stompClient.swipeFlow.onEach { swipeDTO ->
             saveSwipe(swipeDTO)
         }.launchIn(applicationScope)
     }
 
-    private suspend fun fetchSwipes(loadParam: LoadParam<Long>): Resource<List<Swipe>> {
+    private suspend fun fetchSwipes(pageLoadParam: PageLoadParam<Long>): Resource<List<Swipe>> {
         val response = getResponse {
             swipeRDS.fetchSwipes(
-                loadParam.loadKey,
-                loadParam.loadSize,
-                loadParam.loadType.isAppend(),
-                loadParam.loadType.isIncludeLoadKey()
+                pageLoadParam.loadKey,
+                pageLoadParam.loadSize,
+                pageLoadParam.pageLoadType.isAppend(),
+                pageLoadParam.pageLoadType.isIncludeLoadKey()
             )
         }.map { swipeDTOs ->
             swipeDTOs?.map { swipeDTO ->
@@ -78,18 +82,42 @@ class SwipeRepositoryImpl(
         return response
     }
 
-    override suspend fun loadSwipes(loadParam: LoadParam<Long>): Resource<List<Swipe>> {
+
+    //todo: remove me
+    var swipes = mutableListOf<Swipe>()
+
+    override suspend fun loadSwipes(pageLoadParam: PageLoadParam<Long>): Resource<List<Swipe>> {
         return withContext(ioDispatcher) {
-            if (loadParam.loadType == LoadType.REFRESH_PAGE || loadParam.loadType == LoadType.REFRESH_FIRST_PAGE) {
-                val swipePage = swipeDAO.getIdLessThan(
-                    preferenceProvider.getAccountId(),
-                    loadParam.loadKey ?: Long.MAX_VALUE,
-                    loadParam.loadSize
-                )
-                return@withContext Resource.success(swipePage)
-            } else {
-                return@withContext fetchSwipes(loadParam)
+            if (swipes.isEmpty()) {
+                for (i in 0..200) {
+                    swipes.add(Swipe(i.toLong(), UUID.randomUUID(), UUID.randomUUID(), false, null))
+                }
             }
+
+            val pagedSwipes = if (pageLoadParam.loadKey == null) {
+                swipes.subList(0, pageLoadParam.loadSize)
+            } else if (pageLoadParam.pageLoadType == PageLoadType.PREPEND_DATA) {
+                var fromIndex = pageLoadParam.loadKey.toInt() - pageLoadParam.loadSize - 1
+                if (fromIndex < 0) {
+                    fromIndex = 0
+                }
+                swipes.subList(fromIndex, pageLoadParam.loadKey.toInt())
+            } else {
+                swipes.subList((pageLoadParam.loadKey.toInt() + 1), (pageLoadParam.loadKey.toInt() + pageLoadParam.loadSize + 1))
+            }
+
+            return@withContext Resource.success(pagedSwipes)
+
+//            if (loadParam.loadType == LoadType.REFRESH_PAGE || loadParam.loadType == LoadType.REFRESH_FIRST_PAGE) {
+//                val swipePage = swipeDAO.getIdLessThan(
+//                    preferenceProvider.getAccountId(),
+//                    loadParam.loadKey ?: Long.MAX_VALUE,
+//                    loadParam.loadSize
+//                )
+//                return@withContext Resource.success(swipePage)
+//            } else {
+//                return@withContext fetchSwipes(loadParam)
+//            }
         }
     }
 

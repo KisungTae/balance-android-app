@@ -17,7 +17,6 @@ import com.beeswork.balance.internal.constant.MatchPageFilter
 import com.beeswork.balance.internal.util.Navigator
 import com.beeswork.balance.ui.chatfragment.ChatFragment
 import com.beeswork.balance.ui.common.*
-import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.dialog.ErrorDialog
 import com.beeswork.balance.ui.mainviewpagerfragment.MainViewPagerFragment
 import kotlinx.coroutines.Job
@@ -37,7 +36,6 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
     private lateinit var matchPagingDataAdapter: MatchPagingDataAdapter
     private lateinit var matchPagingRefreshAdapter: PagingRefreshAdapter<MatchItemUIState, MatchPagingDataAdapter.ViewHolder>
     private lateinit var matchPagingInitialPageAdapter: PagingInitialPageAdapter<MatchItemUIState, MatchPagingDataAdapter.ViewHolder>
-    private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
     private lateinit var binding: FragmentMatchBinding
     private var matchPageFilterJob: Job? = null
 
@@ -74,10 +72,10 @@ class MatchFragment : BaseFragment(), KodeinAware, MatchPagingDataAdapter.MatchL
 
     private fun setupMatchRecyclerView() {
         matchPagingDataAdapter = MatchPagingDataAdapter(this@MatchFragment)
-        footerLoadStateAdapter = BalanceLoadStateAdapter(matchPagingDataAdapter::retry)
-        binding.rvMatch.adapter = matchPagingDataAdapter.withLoadStateFooter(
-            footer = footerLoadStateAdapter
-        )
+//        footerLoadStateAdapter = BalanceLoadStateAdapter(matchPagingDataAdapter::retry)
+//        binding.rvMatch.adapter = matchPagingDataAdapter.withLoadStateFooter(
+//            footer = footerLoadStateAdapter
+//        )
         binding.rvMatch.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMatch.itemAnimator = null
         matchPagingRefreshAdapter = PagingRefreshAdapter(binding.rvMatch, matchPagingDataAdapter)

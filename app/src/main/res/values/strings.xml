@@ -228,7 +228,7 @@
     <string name="button_next_label">다음</string>
     <string name="register_name_hint"></string>
     <string name="title_swipe_empty_page">아직 내 취향에 클릭한 사람이 없어요.\n스와이프를 통해 상대방에게 관심을 보내세요</string>
-    <string name="error_generic_try_later">해당요청을 처리하지 못했습니다. 다시 시도해주세요!</string>
+    <string name="error_generic_try_later">오류가 발생했습니다. 다시 시도해주세요!</string>
 
 
 

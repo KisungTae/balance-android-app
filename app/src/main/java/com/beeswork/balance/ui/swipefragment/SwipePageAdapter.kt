@@ -1,39 +1,32 @@
 package com.beeswork.balance.ui.swipefragment
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
-import com.beeswork.balance.databinding.ItemSwipeBinding
-import com.beeswork.balance.databinding.ItemSwipeFooterBinding
-import com.beeswork.balance.databinding.ItemSwipeHeaderBinding
+import com.beeswork.balance.databinding.*
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
-import com.beeswork.balance.internal.util.GlideHelper
-import com.beeswork.balance.ui.common.paging.PagingAdapter
-import com.bumptech.glide.Glide
-import java.util.*
-import kotlin.random.Random
+import com.beeswork.balance.ui.common.page.PageAdapter
 
-class SwipePagingAdapter(
+class SwipePageAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener
-) : PagingAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback) {
+) : PageAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             R.layout.item_swipe_header -> HeaderViewHolder(
                 ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
-            R.layout.item_swipe_footer -> FooterViewHolder(
-                ItemSwipeFooterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            R.layout.item_page_load_state_loading -> PageLoadStateLoadingViewHolder(
+                ItemPageLoadStateLoadingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            R.layout.item_page_load_state_error -> PageLoadStateErrorViewHolder(
+                ItemPageLoadStateErrorBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
             else -> ItemViewHolder(
                 ItemSwipeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                parent.context,
                 swipeViewHolderListener
             )
         }
@@ -41,8 +34,10 @@ class SwipePagingAdapter(
 
     override fun onBindViewHolder(holderItem: RecyclerView.ViewHolder, position: Int) {
         when (holderItem) {
-            is HeaderViewHolder -> holderItem.bind()
-            is FooterViewHolder -> holderItem.bind()
+            is PageLoadStateErrorViewHolder -> {
+                val pageLoadStateError = currentList[position] as SwipeUIState.PageLoadStateError
+                holderItem.bind({ loadPage(pageLoadStateError.pageLoadType) }, null)
+            }
             is ItemViewHolder -> holderItem.bind(currentList[position] as SwipeUIState.Item)
         }
     }
@@ -50,8 +45,9 @@ class SwipePagingAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (currentList[position]) {
             is SwipeUIState.Header -> R.layout.item_swipe_header
+            is SwipeUIState.PageLoadStateLoading -> R.layout.item_page_load_state_loading
+            is SwipeUIState.PageLoadStateError -> R.layout.item_page_load_state_error
             is SwipeUIState.Item -> R.layout.item_swipe
-            is SwipeUIState.Footer -> R.layout.item_swipe_footer
         }
     }
 
@@ -62,7 +58,10 @@ class SwipePagingAdapter(
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<SwipeUIState>() {
             override fun areItemsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean {
-                return oldItem.key == newItem.key
+                if (oldItem is SwipeUIState.Item && newItem is SwipeUIState.Item) {
+                    return oldItem.id == newItem.id
+                }
+                return false
             }
 
             override fun areContentsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean {
@@ -71,25 +70,17 @@ class SwipePagingAdapter(
         }
     }
 
+
     interface SwipeViewHolderListener {
         fun onClickSwipeViewHolder(position: Int)
     }
 
     class HeaderViewHolder(
         binding: ItemSwipeHeaderBinding,
-    ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind() {}
-    }
-
-    class FooterViewHolder(
-        binding: ItemSwipeFooterBinding,
-    ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind() {}
-    }
+    ) : RecyclerView.ViewHolder(binding.root)
 
     class ItemViewHolder(
         private val binding: ItemSwipeBinding,
-        private val context: Context,
         private val swipeViewHolderListener: SwipeViewHolderListener
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
@@ -97,34 +88,17 @@ class SwipePagingAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(swipeUIState: SwipeUIState.Item) {
-//            binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE
+        fun bind(swipeUIStateItem: SwipeUIState.Item) {
 //            if (swipeItemUIState.clicked) {
 //                binding.llSwipeClickedIconWrapper.visibility = View.VISIBLE
 //            } else {
 //                binding.llSwipeClickedIconWrapper.visibility = View.GONE
 //            }
-
 //            swipeItemUIState.swiperProfilePhotoUrl
-
-            binding.tempSwipeId.text = swipeUIState.key.toString()
-
-//            TODO: remove me
-            val r = Random.nextInt(50)
-            val re = r % 5
-            val pic = when (re) {
-                0 -> R.drawable.person1
-                1 -> R.drawable.person2
-                2 -> R.drawable.person3
-                3 -> R.drawable.person4
-                4 -> R.drawable.person5
-                else -> R.drawable.person2
-            }
-
-            Glide.with(context)
-                .load(pic)
-                .apply(GlideHelper.profilePhotoGlideOptions())
-                .into(binding.ivSwipe)
+//            Glide.with(App.getContext())
+//                .load(pic)
+//                .apply(GlideHelper.profilePhotoGlideOptions())
+//                .into(binding.ivSwipe)
         }
 
         override fun onClick(v: View?) {

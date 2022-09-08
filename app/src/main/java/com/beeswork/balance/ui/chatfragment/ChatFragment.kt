@@ -20,7 +20,6 @@ import com.beeswork.balance.domain.uistate.chat.ChatMessageItemUIState
 import com.beeswork.balance.internal.constant.*
 import com.beeswork.balance.internal.exception.WebSocketDisconnectedException
 import com.beeswork.balance.internal.util.*
-import com.beeswork.balance.ui.common.BalanceLoadStateAdapter
 import com.beeswork.balance.ui.common.BaseFragment
 import com.beeswork.balance.ui.common.PagingInitialPageAdapter
 import com.beeswork.balance.ui.common.PagingRefreshAdapter
@@ -54,7 +53,6 @@ class ChatFragment : BaseFragment(),
     private lateinit var chatMessagePagingDataAdapter: ChatMessagePagingDataAdapter
     private lateinit var chatMessagePagingRefreshDataAdapter: PagingRefreshAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>
     private lateinit var chatPagingInitialPageDataAdapter: PagingInitialPageAdapter<ChatMessageItemUIState, ChatMessagePagingDataAdapter.ViewHolder>
-    private lateinit var footerLoadStateAdapter: BalanceLoadStateAdapter
     private lateinit var binding: FragmentChatBinding
     private lateinit var swipedId: UUID
     private var chatMessagePagingObserveJob: Job? = null
@@ -123,10 +121,10 @@ class ChatFragment : BaseFragment(),
 
     private fun setupChatRecyclerView() {
         chatMessagePagingDataAdapter = ChatMessagePagingDataAdapter(this)
-        footerLoadStateAdapter = BalanceLoadStateAdapter(chatMessagePagingDataAdapter::retry)
-        binding.rvChat.adapter = chatMessagePagingDataAdapter.withLoadStateFooter(
-            footer = footerLoadStateAdapter
-        )
+//        footerLoadStateAdapter = BalanceLoadStateAdapter(chatMessagePagingDataAdapter::retry)
+//        binding.rvChat.adapter = chatMessagePagingDataAdapter.withLoadStateFooter(
+//            footer = footerLoadStateAdapter
+//        )
         val layoutManager = LinearLayoutManager(this@ChatFragment.context)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         layoutManager.reverseLayout = true
