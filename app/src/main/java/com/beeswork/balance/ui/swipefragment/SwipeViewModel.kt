@@ -21,14 +21,29 @@ class SwipeViewModel(
         swipeRepository.getSwipePageInvalidationFlow().asLiveData()
     }
 
-    fun getPager(): Pager<SwipeUIState> {
-        return PagerImpl(
+    fun initPager(): PageMediator<SwipeUIState> {
+        return Pager(
             SWIPE_PAGE_SIZE,
             SWIPE_MAX_PAGE_SIZE,
             SwipePageSource(swipeRepository, swipeMapper),
             viewModelScope
-        )
+        ).withHeader {
+            SwipeUIState.Header
+        }.withLoadStateLoading {
+            SwipeUIState.PageLoadStateLoading
+        }.withLoadStateError { pageLoadType, error ->
+            SwipeUIState.PageLoadStateError(pageLoadType, error)
+        }
     }
+
+//    fun getPager(): Pager<SwipeUIState> {
+//        return Pager(
+//            SWIPE_PAGE_SIZE,
+//            SWIPE_MAX_PAGE_SIZE,
+//            SwipePageSource(swipeRepository, swipeMapper),
+//            viewModelScope
+//        )
+//    }
 
     fun test() {
     }

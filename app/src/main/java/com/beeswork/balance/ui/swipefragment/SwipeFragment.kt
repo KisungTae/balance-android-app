@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
@@ -51,7 +49,7 @@ class SwipeFragment(
 
     private fun bindUI() = lifecycleScope.launch {
         setupSwipeRecyclerView()
-        setupSwipePaging()
+        setupPager()
 //        setupSwipeRecyclerView()
 //        setupSwipePagingInitialPageAdapter()
 //        observeSwipePagingDataLiveData()
@@ -74,9 +72,13 @@ class SwipeFragment(
         binding.rvSwipe.itemAnimator = null
         swipePageAdapter = SwipePageAdapter(this@SwipeFragment)
         binding.rvSwipe.adapter = swipePageAdapter
+
+
+        val pageMediator = viewModel.initPager()
     }
 
-    private fun setupSwipePaging() {
+    private fun setupPager() {
+
 //        val pagingMediator = viewModel.getPagingMediator()
 //        pagingMediator.pageUIStateLiveData.observe(viewLifecycleOwner) { pageUIState ->
 //            swipePageAdapter.submitPageUIState(pageUIState)
@@ -91,10 +93,13 @@ class SwipeFragment(
     }
 
     override fun onFragmentSelected() {
+        val items = mutableListOf<SwipeUIState>()
+        items.add(SwipeUIState.Item(0, UUID.randomUUID(), false, null))
+        swipePageAdapter.submitList(items)
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
-
+        viewModel.test()
     }
 
     companion object {

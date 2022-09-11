@@ -1,15 +1,11 @@
 package com.beeswork.balance.ui.common.page
 
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.*
 import com.beeswork.balance.databinding.ItemPageLoadStateErrorBinding
 import com.beeswork.balance.databinding.ItemPageLoadStateLoadingBinding
 import java.lang.RuntimeException
-
-
-// todo: 1. keep the loading state when refresh or other data load
-//       2. if error load state at the bottom but successful prepend, then get rid of the bottom error state
-//       3. every data load, needs page_refresh after it successfully loads data and udpate data in database
-//       4.
 
 
 // todo: before insert new items check if can scroll if yes then registerdataadapter and do recyferlview.scrollotposition(list.size),
@@ -22,8 +18,11 @@ abstract class PageAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
 
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var recyclerView: RecyclerView
+    private lateinit var lifecycleScope: LifecycleCoroutineScope
 
-
+    fun submitPageMediator(pageMediator: PageMediator<Value>, lifecycleScope: LifecycleCoroutineScope) {
+        this.lifecycleScope = lifecycleScope
+    }
 
     fun submitPageUIState(pageUIState: PageUIState<Value>) {
 
