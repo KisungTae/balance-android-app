@@ -1,10 +1,10 @@
 package com.beeswork.balance.ui.common.page
 
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.LiveData
 
 interface PageMediator<Value: Any> {
 
-    val pageUIStateFlow: StateFlow<PageUIState<Value>>
+    val pageUIStateLiveData: LiveData<PageUIState<Value>>
 
     fun loadPage(pageLoadType: PageLoadType)
     fun clearPageLoad(pageLoadType: PageLoadType)

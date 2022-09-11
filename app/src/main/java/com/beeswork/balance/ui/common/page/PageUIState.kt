@@ -20,5 +20,4 @@ sealed class PageUIState<Value : Any> {
         val pageLoadType: PageLoadType
     ): PageUIState<Value>()
 
-    class Empty<Value: Any>: PageUIState<Value>()
 }

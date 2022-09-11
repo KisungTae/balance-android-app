@@ -1,9 +1,8 @@
 package com.beeswork.balance.ui.common.page
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class Pager<Key : Any, Value : Any>(
     private val pageSize: Int,
@@ -14,8 +13,8 @@ class Pager<Key : Any, Value : Any>(
 ): PageMediator<Value> {
 
 
-    private val _pageUIStateFlow = MutableStateFlow<PageUIState<Value>>(PageUIState.Empty())
-    override val pageUIStateFlow: StateFlow<PageUIState<Value>> get() = _pageUIStateFlow
+    private val _pageUIStateLiveData = MutableLiveData<PageUIState<Value>>()
+    override val pageUIStateLiveData: LiveData<PageUIState<Value>> get() = _pageUIStateLiveData
 
     private var reachedTop = false
     private var reachedBottom = false

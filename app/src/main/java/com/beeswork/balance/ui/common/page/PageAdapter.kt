@@ -1,7 +1,7 @@
 package com.beeswork.balance.ui.common.page
 
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import com.beeswork.balance.databinding.ItemPageLoadStateErrorBinding
 import com.beeswork.balance.databinding.ItemPageLoadStateLoadingBinding
@@ -18,11 +18,22 @@ abstract class PageAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
 
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var recyclerView: RecyclerView
-    private lateinit var lifecycleScope: LifecycleCoroutineScope
+    private lateinit var lifecycleOwner: LifecycleOwner
+    private lateinit var pageMediator: PageMediator<Value>
 
-    fun submitPageMediator(pageMediator: PageMediator<Value>, lifecycleScope: LifecycleCoroutineScope) {
-        this.lifecycleScope = lifecycleScope
+    fun submitPageMediator(pageMediator: PageMediator<Value>, lifecycleOwner: LifecycleOwner) {
+        this.lifecycleOwner = lifecycleOwner
+        this.pageMediator = pageMediator
+        observePageUIStateLiveData()
     }
+
+    private fun observePageUIStateLiveData() {
+        pageMediator.pageUIStateLiveData.observe(lifecycleOwner) { pageUIState ->
+            
+        }
+    }
+
+
 
     fun submitPageUIState(pageUIState: PageUIState<Value>) {
 

@@ -49,7 +49,6 @@ class SwipeFragment(
 
     private fun bindUI() = lifecycleScope.launch {
         setupSwipeRecyclerView()
-        setupPager()
 //        setupSwipeRecyclerView()
 //        setupSwipePagingInitialPageAdapter()
 //        observeSwipePagingDataLiveData()
@@ -72,18 +71,7 @@ class SwipeFragment(
         binding.rvSwipe.itemAnimator = null
         swipePageAdapter = SwipePageAdapter(this@SwipeFragment)
         binding.rvSwipe.adapter = swipePageAdapter
-
-
-        val pageMediator = viewModel.initPager()
-    }
-
-    private fun setupPager() {
-
-//        val pagingMediator = viewModel.getPagingMediator()
-//        pagingMediator.pageUIStateLiveData.observe(viewLifecycleOwner) { pageUIState ->
-//            swipePageAdapter.submitPageUIState(pageUIState)
-//        }
-//        swipePageAdapter.setupPagingMediator(pagingMediator)
+        swipePageAdapter.submitPageMediator(viewModel.initPageMediator(), viewLifecycleOwner)
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
