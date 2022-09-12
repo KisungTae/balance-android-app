@@ -50,7 +50,7 @@ class Pager<Key : Any, Value : Any>(
         return this
     }
 
-    fun withLoadStateError(block: (pageLoadType: PageLoadType, error: Throwable?) -> Value): Pager<Key, Value> {
+    fun withLoadStateError(block: (pageLoadType: PageLoadType, exception: Throwable?) -> Value): Pager<Key, Value> {
         return this
     }
 

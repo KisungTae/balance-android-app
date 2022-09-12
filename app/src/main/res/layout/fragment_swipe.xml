@@ -39,7 +39,7 @@
             tools:listitem="@layout/item_swipe" />
 
         <LinearLayout
-            android:id="@+id/llSwipePagingLoading"
+            android:id="@+id/llSwipePageLoading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/TransparentWhite"
@@ -59,7 +59,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llSwipePagingError"
+            android:id="@+id/llSwipePageError"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/BackgroundWhite"
@@ -86,7 +86,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvSwipePagingErrorMessage"
+                android:id="@+id/tvSwipePageErrorMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="25dp"
@@ -96,7 +96,7 @@
                 android:textSize="14sp" />
 
             <Button
-                android:id="@+id/btnSwipePagingErrorRetry"
+                android:id="@+id/btnSwipePageErrorRetry"
                 android:layout_width="wrap_content"
                 android:layout_height="43dp"
                 android:layout_marginBottom="5dp"
@@ -111,7 +111,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llSwipePagingEmpty"
+            android:id="@+id/llSwipePageEmpty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/BackgroundWhite"

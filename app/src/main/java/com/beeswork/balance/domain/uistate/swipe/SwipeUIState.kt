@@ -18,7 +18,7 @@ sealed class SwipeUIState {
 
     class PageLoadStateError(
         val pageLoadType: PageLoadType,
-        val error: Throwable?
+        val exception: Throwable?
     ) : SwipeUIState()
 
 }

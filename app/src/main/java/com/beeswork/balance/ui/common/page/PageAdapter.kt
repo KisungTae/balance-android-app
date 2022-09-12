@@ -12,7 +12,8 @@ import java.lang.RuntimeException
 //      only if it's loading to error
 
 abstract class PageAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
-    diffCallback: DiffUtil.ItemCallback<Value>
+    diffCallback: DiffUtil.ItemCallback<Value>,
+    private val pageLoadStateListener: PageLoadStateListener?
 ) : ListAdapter<Value, VH>(AsyncDifferConfig.Builder<Value>(diffCallback).build()) {
 
 
@@ -29,60 +30,19 @@ abstract class PageAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
 
     private fun observePageUIStateLiveData() {
         pageMediator.pageUIStateLiveData.observe(lifecycleOwner) { pageUIState ->
-            
-        }
-    }
-
-
-
-    fun submitPageUIState(pageUIState: PageUIState<Value>) {
-
-
-        when (pageUIState) {
-            is PageUIState.Loading -> {
-                if (pageUIState.pageLoadType == PageLoadType.REFRESH_DATA || pageUIState.pageLoadType == PageLoadType.REFRESH_PREPEND_DATA) {
-//                    pageLoadStateAdapter.onLoadStateUpdated(LoadState.Loading)
-                }
+            val pageLoadState = pageUIState.pageLoadState
+            if (pageUIState.items != null) {
+                submitList(pageUIState.items)
             }
-            is PageUIState.Success -> {
-//                reachedBottom = pageUIState.reachedBottom
-//                reachedTop = pageUIState.reachedTop
-
-
-//                val a = PageLoadStatus.Loaded(PageLoadType.REFRESH_FIRST_PAGE, true)
-
-
-//                submitList(pageUIState.items)
-//                loadTypeQueue.remove(pageUIState.originalPageLoadType)
-
-
-                // todo: remove loadstate even if it's empty?
-//                if (currentList.isEmpty()) {
-//                    pageLoadStateAdapter.onLoadStateUpdated(LoadState.Empty)
-//                } else {
-//                    loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(LoadState.Loaded)
-//                }
-
-
-            }
-            is PageUIState.Error -> {
-//                loadTypeQueue.remove(pageUIState.originalPageLoadType)
-//                val errorLoadState = LoadState.Error(MessageSource.getMessage(pageUIState.throwable), pageUIState.loadType)
-//                loadStateAdapter(pageUIState.loadType).onLoadStateUpdated(errorLoadState)
+            pageLoadStateListener?.onPageLoadStateUpdated(pageLoadState)
+            if (pageLoadState is PageLoadState.Loaded || pageLoadState is PageLoadState.Error) {
+                pageMediator.clearPageLoad(pageLoadState.pageLoadType)
             }
         }
     }
-
-//    fun setupPagingMediator(pageMediator: PageMediator<Value>) {
-//        this.pageMediator = pageMediator
-//        loadPage(LoadType.REFRESH_DATA)
-//    }
 
     fun loadPage(pageLoadType: PageLoadType) {
-//        if (!loadTypeQueue.contains(pageLoadType)) {
-//            pageMediator.pager.loadPage(pageLoadType)
-//            loadTypeQueue.add(pageLoadType)
-//        }
+
     }
 
     fun refreshPage() {
@@ -111,11 +71,11 @@ abstract class PageAdapter<Value : Any, VH : RecyclerView.ViewHolder>(
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-//                if (dy < 0 && !reachedTop && reachedTopPreLoadDistance()) {
-//                    loadPage(PageLoadType.PREPEND_DATA)
-//                } else if (dy > 0 && !reachedBottom && reachedBottomPreLoadDistance()) {
-//                    loadPage(PageLoadType.APPEND_DATA)
-//                }
+                if (dy < 0 && !pageMediator.reachedTop() && reachedTopPreLoadDistance()) {
+                    loadPage(PageLoadType.PREPEND_DATA)
+                } else if (dy > 0 && !pageMediator.reachedBottom() && reachedBottomPreLoadDistance()) {
+                    loadPage(PageLoadType.APPEND_DATA)
+                }
             }
         })
     }

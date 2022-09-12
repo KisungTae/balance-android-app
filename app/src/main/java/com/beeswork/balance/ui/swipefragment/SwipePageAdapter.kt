@@ -9,10 +9,12 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.*
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.ui.common.page.PageAdapter
+import com.beeswork.balance.ui.common.page.PageLoadStateListener
 
 class SwipePageAdapter(
-    private val swipeViewHolderListener: SwipeViewHolderListener
-) : PageAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback) {
+    private val swipeViewHolderListener: SwipeViewHolderListener,
+    pageLoadStateListener: PageLoadStateListener?
+) : PageAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback, pageLoadStateListener) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {

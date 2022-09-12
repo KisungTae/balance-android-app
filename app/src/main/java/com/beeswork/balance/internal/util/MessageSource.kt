@@ -26,6 +26,10 @@ class MessageSource {
             return stringBuilder.toString()
         }
 
+        fun getMessage(exception: Throwable?, defaultResourceId: Int): String? {
+            return getMessage(exception) ?: App.getContext()?.getString(defaultResourceId)
+        }
+
         fun getMessage(exception: Throwable?): String? {
             if (exception == null) {
                 return null

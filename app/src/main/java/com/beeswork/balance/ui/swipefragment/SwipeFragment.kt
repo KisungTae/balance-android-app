@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
+import com.beeswork.balance.internal.util.MessageSource
 import com.beeswork.balance.ui.balancegamedialog.CardBalanceGameListener
 import com.beeswork.balance.ui.common.*
 import com.beeswork.balance.ui.common.page.*
@@ -24,7 +25,8 @@ class SwipeFragment(
 ) : BaseFragment(),
     KodeinAware,
     SwipePageAdapter.SwipeViewHolderListener,
-    ViewPagerChildFragment {
+    ViewPagerChildFragment,
+    PageLoadStateListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
@@ -69,7 +71,7 @@ class SwipeFragment(
         }
         binding.rvSwipe.layoutManager = gridLayoutManager
         binding.rvSwipe.itemAnimator = null
-        swipePageAdapter = SwipePageAdapter(this@SwipeFragment)
+        swipePageAdapter = SwipePageAdapter(this@SwipeFragment, this@SwipeFragment)
         binding.rvSwipe.adapter = swipePageAdapter
         swipePageAdapter.submitPageMediator(viewModel.initPageMediator(), viewLifecycleOwner)
     }
@@ -88,6 +90,39 @@ class SwipeFragment(
 
     override fun onClickSwipeViewHolder(position: Int) {
         viewModel.test()
+    }
+
+    override fun onPageLoadStateUpdated(pageLoadState: PageLoadState) {
+        if (pageLoadState.pageLoadType != PageLoadType.PREPEND_DATA && pageLoadState.pageLoadType != PageLoadType.REFRESH_PREPEND_DATA) {
+            return
+        }
+        resetPageLayouts()
+        when (pageLoadState) {
+            is PageLoadState.Loading -> {
+                binding.llSwipePageLoading.visibility = View.VISIBLE
+            }
+            is PageLoadState.Loaded -> {
+                if (pageLoadState.numOfItemsLoaded <= 0) {
+                    binding.llSwipePageEmpty.visibility = View.VISIBLE
+                } else {
+                    binding.rvSwipe.visibility = View.VISIBLE
+                }
+            }
+            is PageLoadState.Error -> {
+                binding.llSwipePageError.visibility = View.VISIBLE
+                binding.tvSwipePageErrorMessage.text = MessageSource.getMessage(pageLoadState.exception, R.string.error_message_generic)
+                binding.btnSwipePageErrorRetry.setOnClickListener {
+                    swipePageAdapter.loadPage(pageLoadState.pageLoadType)
+                }
+            }
+        }
+    }
+
+    private fun resetPageLayouts() {
+        binding.rvSwipe.visibility = View.GONE
+        binding.llSwipePageEmpty.visibility = View.GONE
+        binding.llSwipePageError.visibility = View.GONE
+        binding.llSwipePageLoading.visibility = View.GONE
     }
 
     companion object {
