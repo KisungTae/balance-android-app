@@ -84,7 +84,9 @@ class SwipeFragment(
 
     override fun onFragmentSelected() {
         val items = mutableListOf<SwipeUIState>()
-        items.add(SwipeUIState.Item(0, UUID.randomUUID(), false, null))
+        for (i in 0..100) {
+            items.add(SwipeUIState.Item(0, UUID.randomUUID(), false, null))
+        }
         swipePageAdapter.submitList(items)
     }
 
@@ -93,10 +95,13 @@ class SwipeFragment(
     }
 
     override fun onPageLoadStateUpdated(pageLoadState: PageLoadState) {
-        if (pageLoadState.pageLoadType != PageLoadType.PREPEND_DATA && pageLoadState.pageLoadType != PageLoadType.REFRESH_PREPEND_DATA) {
-            return
+        if (pageLoadState.pageLoadType == PageLoadType.PREPEND_DATA || pageLoadState.pageLoadType == PageLoadType.REFRESH_PREPEND_DATA) {
+            resetPageLayouts()
+            updatePageLayouts(pageLoadState)
         }
-        resetPageLayouts()
+    }
+
+    private fun updatePageLayouts(pageLoadState: PageLoadState) {
         when (pageLoadState) {
             is PageLoadState.Loading -> {
                 binding.llSwipePageLoading.visibility = View.VISIBLE
