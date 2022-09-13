@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
@@ -73,7 +75,21 @@ class SwipeFragment(
         binding.rvSwipe.itemAnimator = null
         swipePageAdapter = SwipePageAdapter(this@SwipeFragment, this@SwipeFragment)
         binding.rvSwipe.adapter = swipePageAdapter
-        swipePageAdapter.submitPageMediator(viewModel.initPageMediator(), viewLifecycleOwner)
+//        swipePageAdapter.submitPageMediator(viewModel.initPageMediator(), viewLifecycleOwner)
+
+        swipePageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                val layoutManager = binding.rvSwipe.layoutManager
+                if (layoutManager is LinearLayoutManager) {
+                    if (swipePageAdapter.getSwipeUIState(layoutManager.findFirstVisibleItemPosition())?.isPageLoadState() == true) {
+                        binding.rvSwipe.scrollToPosition(0)
+                    } else if (swipePageAdapter.getSwipeUIState(layoutManager.findLastVisibleItemPosition())?.isPageLoadState() == true) {
+                        binding.rvSwipe.scrollToPosition(swipePageAdapter.itemCount - 1)
+                    }
+                }
+            }
+        })
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
@@ -84,14 +100,19 @@ class SwipeFragment(
 
     override fun onFragmentSelected() {
         val items = mutableListOf<SwipeUIState>()
-        for (i in 0..100) {
+        for (i in 0..50) {
             items.add(SwipeUIState.Item(0, UUID.randomUUID(), false, null))
         }
+        items.add(SwipeUIState.PageLoadStateLoading)
         swipePageAdapter.submitList(items)
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
-        viewModel.test()
+        val items = mutableListOf<SwipeUIState>()
+        items.addAll(swipePageAdapter.currentList)
+        items.removeLast()
+        items.add(SwipeUIState.PageLoadStateError(PageLoadType.REFRESH_PAGE, null))
+        swipePageAdapter.submitList(items)
     }
 
     override fun onPageLoadStateUpdated(pageLoadState: PageLoadState) {

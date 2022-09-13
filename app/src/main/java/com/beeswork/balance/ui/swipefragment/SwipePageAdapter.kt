@@ -57,6 +57,10 @@ class SwipePageAdapter(
         return currentList.size
     }
 
+    fun getSwipeUIState(position: Int): SwipeUIState? {
+        return currentList.getOrNull(position)
+    }
+
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<SwipeUIState>() {
             override fun areItemsTheSame(oldItem: SwipeUIState, newItem: SwipeUIState): Boolean {

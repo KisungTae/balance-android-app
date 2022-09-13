@@ -5,6 +5,10 @@ import java.util.*
 
 sealed class SwipeUIState {
 
+    fun isPageLoadState(): Boolean {
+        return this is PageLoadStateLoading || this is PageLoadStateError
+    }
+
     data class Item(
         val id: Long,
         val swiperId: UUID,
