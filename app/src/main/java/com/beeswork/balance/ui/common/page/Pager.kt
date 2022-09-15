@@ -46,11 +46,11 @@ class Pager<Key : Any, Value : Any>(
         return this
     }
 
-    fun withLoadStateLoading(block: (pageLoadType: PageLoadType) -> Value): Pager<Key, Value> {
+    fun withPageLoadStateLoading(block: (pageLoadType: PageLoadType) -> Value): Pager<Key, Value> {
         return this
     }
 
-    fun withLoadStateError(block: (pageLoadType: PageLoadType, exception: Throwable?) -> Value): Pager<Key, Value> {
+    fun withPageLoadStateError(block: (pageLoadType: PageLoadType, exception: Throwable?) -> Value): Pager<Key, Value> {
         return this
     }
 

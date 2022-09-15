@@ -29,10 +29,10 @@ class SwipeViewModel(
             viewModelScope
         ).withHeader {
             SwipeUIState.Header
-        }.withLoadStateLoading {
-            SwipeUIState.PageLoadStateLoading
-        }.withLoadStateError { pageLoadType, error ->
-            SwipeUIState.PageLoadStateError(pageLoadType, error)
+        }.withPageLoadStateLoading { pageLoadType ->
+            SwipeUIState.PageLoadState(PageLoadStatus.Loading(pageLoadType))
+        }.withPageLoadStateError { pageLoadType, exception ->
+            SwipeUIState.PageLoadState(PageLoadStatus.Error(pageLoadType, exception))
         }
     }
 

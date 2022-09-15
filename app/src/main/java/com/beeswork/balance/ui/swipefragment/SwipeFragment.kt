@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.beeswork.balance.R
 import com.beeswork.balance.databinding.FragmentSwipeBinding
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
@@ -28,7 +26,7 @@ class SwipeFragment(
     KodeinAware,
     SwipePageAdapter.SwipeViewHolderListener,
     ViewPagerChildFragment,
-    PageLoadStateListener {
+    PageLoadStatusListener {
 
     override val kodein by closestKodein()
     private val viewModelFactory: SwipeViewModelFactory by instance()
@@ -64,8 +62,7 @@ class SwipeFragment(
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (binding.rvSwipe.adapter?.getItemViewType(position)) {
-                    R.layout.item_page_load_state_loading -> SWIPE_PAGE_LOAD_STATE_LOADING_SPAN_COUNT
-                    R.layout.item_page_load_state_error -> SWIPE_PAGE_LOAD_STATE_ERROR_SPAN_COUNT
+                    R.layout.item_page_load_state -> SWIPE_PAGE_LOAD_STATE_SPAN_COUNT
                     R.layout.item_swipe_header -> SWIPE_HEADER_SPAN_COUNT
                     else -> SWIPE_ITEM_SPAN_COUNT
                 }
@@ -76,20 +73,6 @@ class SwipeFragment(
         swipePageAdapter = SwipePageAdapter(this@SwipeFragment, this@SwipeFragment)
         binding.rvSwipe.adapter = swipePageAdapter
 //        swipePageAdapter.submitPageMediator(viewModel.initPageMediator(), viewLifecycleOwner)
-
-        swipePageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                val layoutManager = binding.rvSwipe.layoutManager
-                if (layoutManager is LinearLayoutManager) {
-                    if (swipePageAdapter.getSwipeUIState(layoutManager.findFirstVisibleItemPosition())?.isPageLoadState() == true) {
-                        binding.rvSwipe.scrollToPosition(0)
-                    } else if (swipePageAdapter.getSwipeUIState(layoutManager.findLastVisibleItemPosition())?.isPageLoadState() == true) {
-                        binding.rvSwipe.scrollToPosition(swipePageAdapter.itemCount - 1)
-                    }
-                }
-            }
-        })
     }
 
     private suspend fun observeSwipePageInvalidationLiveData() {
@@ -100,45 +83,46 @@ class SwipeFragment(
 
     override fun onFragmentSelected() {
         val items = mutableListOf<SwipeUIState>()
+//        items.add(SwipeUIState.PageLoadStateLoading)
         for (i in 0..50) {
             items.add(SwipeUIState.Item(0, UUID.randomUUID(), false, null))
         }
-        items.add(SwipeUIState.PageLoadStateLoading)
+
         swipePageAdapter.submitList(items)
     }
 
     override fun onClickSwipeViewHolder(position: Int) {
         val items = mutableListOf<SwipeUIState>()
         items.addAll(swipePageAdapter.currentList)
-        items.removeLast()
-        items.add(SwipeUIState.PageLoadStateError(PageLoadType.REFRESH_PAGE, null))
+        items.removeFirst()
+//        items.add(0, SwipeUIState.PageLoadStateError(PageLoadType.REFRESH_PAGE, null))
         swipePageAdapter.submitList(items)
     }
 
-    override fun onPageLoadStateUpdated(pageLoadState: PageLoadState) {
-        if (pageLoadState.pageLoadType == PageLoadType.PREPEND_DATA || pageLoadState.pageLoadType == PageLoadType.REFRESH_PREPEND_DATA) {
+    override fun onPageLoadStatusUpdated(pageLoadStatus: PageLoadStatus) {
+        if (pageLoadStatus.pageLoadType == PageLoadType.PREPEND_DATA || pageLoadStatus.pageLoadType == PageLoadType.REFRESH_PREPEND_DATA) {
             resetPageLayouts()
-            updatePageLayouts(pageLoadState)
+            updatePageLayouts(pageLoadStatus)
         }
     }
 
-    private fun updatePageLayouts(pageLoadState: PageLoadState) {
-        when (pageLoadState) {
-            is PageLoadState.Loading -> {
+    private fun updatePageLayouts(pageLoadStatus: PageLoadStatus) {
+        when (pageLoadStatus) {
+            is PageLoadStatus.Loading -> {
                 binding.llSwipePageLoading.visibility = View.VISIBLE
             }
-            is PageLoadState.Loaded -> {
-                if (pageLoadState.numOfItemsLoaded <= 0) {
+            is PageLoadStatus.Loaded -> {
+                if (pageLoadStatus.numOfItemsLoaded <= 0) {
                     binding.llSwipePageEmpty.visibility = View.VISIBLE
                 } else {
                     binding.rvSwipe.visibility = View.VISIBLE
                 }
             }
-            is PageLoadState.Error -> {
+            is PageLoadStatus.Error -> {
                 binding.llSwipePageError.visibility = View.VISIBLE
-                binding.tvSwipePageErrorMessage.text = MessageSource.getMessage(pageLoadState.exception, R.string.error_message_generic)
+                binding.tvSwipePageErrorMessage.text = MessageSource.getMessage(pageLoadStatus.exception, R.string.error_message_generic)
                 binding.btnSwipePageErrorRetry.setOnClickListener {
-                    swipePageAdapter.loadPage(pageLoadState.pageLoadType)
+                    swipePageAdapter.loadPage(pageLoadStatus.pageLoadType)
                 }
             }
         }
@@ -152,8 +136,7 @@ class SwipeFragment(
     }
 
     companion object {
-        const val SWIPE_PAGE_LOAD_STATE_LOADING_SPAN_COUNT = 2
-        const val SWIPE_PAGE_LOAD_STATE_ERROR_SPAN_COUNT = 2
+        const val SWIPE_PAGE_LOAD_STATE_SPAN_COUNT = 2
         const val SWIPE_HEADER_SPAN_COUNT = 2
         const val SWIPE_ITEM_SPAN_COUNT = 1
         const val SWIPE_PAGE_SPAN_COUNT = 2

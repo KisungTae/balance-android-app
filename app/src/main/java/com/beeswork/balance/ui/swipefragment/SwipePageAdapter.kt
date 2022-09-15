@@ -9,23 +9,21 @@ import com.beeswork.balance.R
 import com.beeswork.balance.databinding.*
 import com.beeswork.balance.domain.uistate.swipe.SwipeUIState
 import com.beeswork.balance.ui.common.page.PageAdapter
-import com.beeswork.balance.ui.common.page.PageLoadStateListener
+import com.beeswork.balance.ui.common.page.PageLoadStatusListener
 
 class SwipePageAdapter(
     private val swipeViewHolderListener: SwipeViewHolderListener,
-    pageLoadStateListener: PageLoadStateListener?
-) : PageAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback, pageLoadStateListener) {
+    pageLoadStatusListener: PageLoadStatusListener?
+) : PageAdapter<SwipeUIState, RecyclerView.ViewHolder>(diffCallback, pageLoadStatusListener) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             R.layout.item_swipe_header -> HeaderViewHolder(
                 ItemSwipeHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
-            R.layout.item_page_load_state_loading -> PageLoadStateLoadingViewHolder(
-                ItemPageLoadStateLoadingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            )
-            R.layout.item_page_load_state_error -> PageLoadStateErrorViewHolder(
-                ItemPageLoadStateErrorBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            R.layout.item_page_load_state -> PageLoadStateViewHolder(
+                ItemPageLoadStateBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                this::loadPage
             )
             else -> ItemViewHolder(
                 ItemSwipeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
@@ -36,9 +34,9 @@ class SwipePageAdapter(
 
     override fun onBindViewHolder(holderItem: RecyclerView.ViewHolder, position: Int) {
         when (holderItem) {
-            is PageLoadStateErrorViewHolder -> {
-                val pageLoadStateError = currentList[position] as SwipeUIState.PageLoadStateError
-                holderItem.bind({ loadPage(pageLoadStateError.pageLoadType) }, null)
+            is PageLoadStateViewHolder -> {
+                val swipePageLoadState = currentList[position] as SwipeUIState.PageLoadState
+                holderItem.bind(swipePageLoadState.pageLoadStatus)
             }
             is ItemViewHolder -> holderItem.bind(currentList[position] as SwipeUIState.Item)
         }
@@ -47,8 +45,7 @@ class SwipePageAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (currentList[position]) {
             is SwipeUIState.Header -> R.layout.item_swipe_header
-            is SwipeUIState.PageLoadStateLoading -> R.layout.item_page_load_state_loading
-            is SwipeUIState.PageLoadStateError -> R.layout.item_page_load_state_error
+            is SwipeUIState.PageLoadState -> R.layout.item_page_load_state
             is SwipeUIState.Item -> R.layout.item_swipe
         }
     }
